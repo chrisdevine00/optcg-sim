@@ -1,6 +1,6 @@
 # Status
 
-**Phase:** 3 Deep research (next). Phases 1 and 2 gated 2026-10-28.
+**Phase:** 4 Design (next). Phases 1, 2 and 3 gated 2026-10-28.
 **Milestone:** M0 scaffold started (allowed before the Phase 4 gate)
 **Run the app:** `npm install && npm run dev` then open http://localhost:5173/optcg-sim/ (placeholder page only)
 **Deployed:** https://chrisdevine00.github.io/optcg-sim/ (auto-deploys after green CI on `main`)
@@ -11,7 +11,7 @@
 | --- | --- | --- |
 | 1 Research | docs/research/rules-digest.md, data-sources.md, competitive-teardown.md, meta-landscape.md, strategy-concepts.md | **Gated 2026-10-28** (all five deliverables) |
 | 2 Plan | docs/PLAN.md, docs/ARCHITECTURE.md, docs/adr/ | **Gated 2026-10-28** (revision 2 after two reviews; see docs/plan-review-1.md) |
-| 3 Deep research | docs/research/effect-dsl.md, rulings.md; docs/content/archetypes/, curriculum.md, glossary.md, sources.md | In progress: Tracks E, F, G running in parallel |
+| 3 Deep research | docs/research/effect-dsl.md, rulings.md; docs/content/archetypes/, curriculum.md, glossary.md, sources.md | **Gated 2026-10-28** (competitive-player review: 20 findings, 0 severity-3 open; see docs/content/review-1.md) |
 | 4 Design | docs/design/principles.md, board.md, flows.md, visual-system.md, learning-ui.md, wireframes/, review-1.md | Not started |
 | 5 Build | M0 through M10 per PROMPT.md | Not started |
 
@@ -32,22 +32,26 @@
   - an `Explanation` schema;
   - estimate re-baselined from 264 h to about 720 h.
 
+- Phase 3:
+  - **Track E:** `effect-dsl.md`. 97.7% of clauses are tagged. All 182 meta cards are covered by 28 effect primitives, 12 costs and 17 timings. There are 7 paper scripts, including Rosinante's replacement.
+  - **Track F:** `rulings.md`. 49 official rulings, with engine tests, close R1–R12, R14, S3, S4 and B4. Three corrections went into the rules digest.
+  - **Track G:** 12 archetype guides, a 27-lesson curriculum, a glossary and a sources list.
+  - **Guide review:** a competitive-player review found 6 severity-3 errors (misread cards, a curriculum flag that would punish correct play). All are fixed and verified against card text (`docs/content/review-1.md`).
+  - **onepiece.gg scrub:** that material was removed from `strategy-concepts.md` (it disallows Anthropic agents). About 26 claims were re-sourced from Shonen TCG and Bounty TCG; 7 heuristics are now listed as gaps.
+
 ## In progress
 
-Three Phase 3 subagents are running in parallel; each writes only its own files:
-- **Track E** → `docs/research/effect-dsl.md` (scratch in `.cache/track-e/`)
-- **Track F** → `docs/research/rulings.md` (scratch in `.cache/track-f/`)
-- **Track G** → `docs/content/archetypes/*.md`, `curriculum.md`, `glossary.md`, `sources.md`, plus a concept-slug table at the top of `strategy-concepts.md` (scratch in `.cache/track-g/`)
-
-If they are interrupted, re-launch each with the same brief, and check its files for finished sections first. Stage only the files of tracks that have reported.
+Nothing running.
 
 ## Next
 
-1. Phase 3, in parallel:
-   - **Track E:** tokenize the optcgapi dump, build action frequency tables (pool and the 12 archetypes), write `effect-dsl.md`, and five paper scripts (one replacement effect).
-   - **Track F:** `rulings.md`, covering open questions R1–R14, S3, S4 and B4.
-   - **Track G:** 12 archetype guides, the curriculum with stable concept slugs, the glossary and sources, then a competitive-player review.
-2. Phase 4 (40 h), including `accessibility.md`, `usability-plan.md`, about 20 example explanations, and the card-face study.
+1. Phase 4 Design (estimate 40 h). Deliverables in `docs/design/`:
+   - the core documents: `principles.md`, `board.md`, `flows.md`, `visual-system.md`, `learning-ui.md`;
+   - added after plan review 1: `accessibility.md` (with the keyboard spec), `usability-plan.md`, about 20 example explanations, and a card-face study under the SAMPLE watermark;
+   - HTML wireframes in `docs/design/wireframes/`, screenshotted at 1280×720 and 1920×1080.
+
+   It is gated by a UX-director review recorded in `review-1.md`, with no severity-3 or severity-4 finding open.
+2. Then Phase 5, slice pass (ADR 0012): M0 tokens, M1 cards, M2 engine core, and so on.
 
 ## Blockers
 

@@ -23,7 +23,8 @@ sources:
 ## How this file is used
 
 - **Lesson IDs are stable.** The format is `L<nn>-<slug>`. Never renumber or rename a lesson; retire it and add a new one. Every `Explanation.lessonId` (ARCHITECTURE §4.5) must be one of these IDs.
-- **Concept slugs** come from the "Concept slugs" table in `docs/research/strategy-concepts.md`. Rules-only lessons (L01–L07) carry rule numbers instead; their concept column says `—` where no strategy concept applies.
+- **Concept slugs** come from the "Concept slugs" table in `docs/research/strategy-concepts.md`. Rules lessons (L01–L07 and L25–L27) carry rule numbers; their concept column says `—` where no strategy concept applies.
+- **Teaching order is the order of the sections below, not the ID number.** Because IDs never change, lessons added later (L25–L27) and lessons moved for teaching order (L18) sit where they are taught. Stage 1 runs L01–L07, L25–L27, L08; Stage 2 runs L18, L10, L09, L11–L14.
 - **Exit criteria are untimed by default** (WCAG 2.2.1 Timing Adjustable). Each lesson also lists an *optional* timed criterion. The timed criterion is off unless the player switches on "timed drills" in settings, it never gates progress, and it can be extended or turned off at any time. Progress shows "passed" on the untimed criterion and a separate "passed (timed)" badge.
 - **Drill sizes** match PROMPT.md M9 (at least 20 items per drill). Where a lesson says "10 items", the drill bank holds at least 20 and the lesson samples 10.
 - **Measured in the app.** Every exit criterion is something the app can count: drill accuracy, review flags (PROMPT.md "Game Review"), or game results. "Agrees with the guide" means the answer matches the archetype guide or playbook in `docs/content/archetypes/`.
@@ -39,7 +40,7 @@ The review and coach link each flag to the lesson below.
 | `don-efficiency` | L09-don-efficiency | L03 |
 | `life-as-resource` | L11-life-as-resource | L06 |
 | `counter-or-take` | L10-counter-or-take | L05 |
-| `counters-and-blockers` | L05-block-and-counter | L10 |
+| `counters-and-blockers` | L05-block-and-counter | L10, L27 |
 | `board-vs-face` | L14-board-vs-face | L16 |
 | `rush-tempo-swings` | L17-tempo-and-rush | L07 |
 | `lethal-math` | L15-lethal-math | L16 |
@@ -48,7 +49,7 @@ The review and coach link each flag to the lesson below.
 | `hand-management` | L18-hand-management | L10 |
 | `leader-identity` | L19-leader-identity | L22 |
 | `card-advantage` | L20-card-advantage | L18 |
-| `removal-timing` | L21-removal-and-denial | L14 |
+| `removal-timing` | L21-removal-and-denial | L14, L25 |
 | `resource-denial` | L21-removal-and-denial | — |
 | `hand-reading` | L16-reading-counters | L15 |
 
@@ -105,23 +106,44 @@ Goal: play a complete legal game and know why each step happens. These lessons p
 - **Exit (untimed):** 13 of 15 correct.
 - **Exit (optional, timed):** 13 of 15, each within 30 seconds.
 
+### L25-base-and-current-values
+- **Concept slugs:** `removal-timing` · **Rules:** CR 4-9-2, 4-9-2-1, 4-9-2-2 (rules-digest item 34); RL-33, RL-43
+- **Concept:** Every card has a printed (base) cost and power and a current cost and power after modifiers. Most effects read the current value; an effect that says "base" reads the printed number, or the number another effect has *set* as base (CR 4-9-2). This format turns on the difference. OP17's Giants gain +12 cost on the field only: Rodo is cost 1 in hand and cost 13 on the field under an Elbaph leader (RL-43) [CARD]. So "cost 8 or less" effects such as Nami OP14-031 and Gloriosa (cost 5 or less) miss them, while Miss Buckingham Stussy, which checks *base* cost 6 or less, still reaches them [CARD]. Base power can be set: Charlotte Linlin OP17-112 sets your 4000-base Trigger Characters to 8000 base on your turn, Holly OP15-071 sets Ohm and herself to 6000 base on the opponent's turn, and Charlotte Linlin ST34-004 sets one opposing Character's base power to 0 [CARD]. Given DON!! and +X effects then add on top. If several effects set base power, the highest applies (CR 4-9-2-1; RL-33).
+- **Drill:** "Read the numbers": 10 boards with modifiers shown. For one highlighted card, give its cost, base cost, power and base power right now, and say whether a named effect (for example Gloriosa, Stussy, Mamaragan or Gum-Gum Lightning) can target it.
+- **Exit (untimed):** 9 of 10 correct, including every item with a +cost or a base-power setting.
+- **Exit (optional, timed):** 9 of 10, each within 30 seconds.
+
+### L26-leader-or-character
+- **Concept slugs:** — · **Rules:** CR 2-1-2, 2-2-3-1, 2-2-4-1, 2-2-4-3, 7-1-1-2 (rules-digest item 24); RL-45, RL-49
+- **Concept:** Read who an effect can touch before planning around it. "Your opponent's Characters" means Characters in their Character area, never their Leader (CR 2-2-4-1): Kaido OP17-058's −2000 cannot shrink an attacking Leader (RL-45). "Leader or Character cards" covers both (CR 2-2-4-3). A name in brackets means exactly that name (CR 2-1-2): Luffy & Ace gives +3000 to [Monkey.D.Luffy] and [Portgas.D.Ace] cards, which does not include the Luffy & Ace Leader itself (RL-49). Attacks can target only the Leader or a rested Character (CR 7-1-1-2).
+- **Drill:** "Who can it hit?": 10 card texts, each shown with a board; pick every legal target, or "none".
+- **Exit (untimed):** 9 of 10 correct.
+- **Exit (optional, timed):** 9 of 10, each within 20 seconds.
+
+### L27-opponent-turn-timing
+- **Concept slugs:** `counters-and-blockers` · **Rules:** CR 6-5-5-2, 7-1-1-3, 7-1-2, 7-1-3, 8-3-1-6, 8-3-2-3, 8-3-2-5, 10-2-16-1 (rules-digest items 82, 86, 89–94, 121); RL-18, RL-45, RL-46
+- **Concept:** Much of a game is decided on the opponent's turn, in a fixed order. When they attack, their [When Attacking] effects resolve first, then your [On Your Opponent's Attack] effects (CR 10-2-16-1), then the Block Step, the Counter Step, damage and [Trigger] (CR 7-1-1-3, 7-1-2, 7-1-3; rules-digest items 89–94). So an [On Your Opponent's Attack] choice is made before you know whether you will block or counter (RL-45, RL-46). [Opponent's Turn] effects are on for the whole of their turn (CR 8-3-2-5): Luffy & Ace's +3000 on Luffy cards, Loki's +3000, Holly's 6000 base [CARD]. DON!! given on your turn stay given and still meet [DON!! xX] conditions, but add no power on their turn (CR 6-5-5-2, 8-3-2-3). Active DON!! you leave up can pay for [Counter] Events, and for opponent-turn effects that rest active DON!!, such as OP13-001 Luffy's leader, which gives +2000 per DON!! rested (RL-46). DON!! −X costs, such as Kaido OP17-058's, can return rested or given DON!! as well (CR 8-3-1-6).
+- **Drill:** "Their turn": 10 opponent-turn sequences. For each: which of your effects can you use at this point, in what order do the effects shown resolve, and how many active DON!! must you have left?
+- **Exit (untimed):** 8 of 10 correct.
+- **Exit (optional, timed):** 8 of 10, each within 30 seconds.
+
 ### L08-first-full-game
 - **Concept slugs:** `leader-identity` · **Rules:** all of the above
-- **Concept:** Put L01–L07 together in a full game.
+- **Concept:** Put L01–L07 and L25–L27 together in a full game.
 - **Drill:** play complete games against the Rookie AI with a starter-level list (the tutorial's lists). Coach hints allowed.
 - **Exit (untimed):** finish 3 complete games and win at least 2 against Rookie.
 - **Exit (optional, timed):** none. Game clocks are never part of an exit criterion *(inference: a tournament clock would fail WCAG 2.2.1 for this purpose)*.
 
 ## Stage 2 — Core strategy
 
-Goal: stop the habits that lose most games. Shonen TCG's priority order for new players is: hold counters, count the opponent's DON!! before attacking, stop over-extending into removal, then learn the take-versus-block read [SH-MIS]. Lessons L09–L12 follow that order.
+Goal: stop the habits that lose most games. Shonen TCG's priority order for new players is: hold counters, count the opponent's DON!! before attacking, stop over-extending into removal, then learn the take-versus-block read [SH-MIS]. Stage 2 opens with the first of those, holding counters (L18, Shonen's "number one mistake"), and pairs it at once with the take-versus-block read (L10), because both are decided with the same hand. Counting the opponent's DON!! is taught in L16 (Stage 3) and over-extending into removal in L20 (Stage 4), because both build on reading the opponent's hand *(inference: our ordering, not Shonen's)*.
 
-### L09-don-efficiency
-- **Concept slugs:** `don-efficiency` · **Rules:** CR 6-2-3, 6-2-4, 6-5-5
-- **Concept:** DON!! does not carry over, so DON!! left active at end of turn is wasted unless it is held to pay a [Counter] Event [SH-DON][BANDAI-EXP]. "Spending every DON!! on Characters keeps your attacks at base power, and they bounce off a single Counter" [SH-DON]. Plan each turn around one job, develop or push [SH-DON][SH-MIS]. Each +1000 matters only if it forces one more counter card or one more Life *(inference; strategy-concepts.md §2c)*.
-- **Drill:** "DON!! allocation" (PROMPT.md Drills): 10 main phases with several playable lines; pick one; the analysis scores each.
-- **Exit (untimed):** 7 of 10 picks within the analysis's top two lines, **and** no "DON!! left unused" review flag in 2 of 3 consecutive games against Pirate.
-- **Exit (optional, timed):** the drill part within 45 seconds per item.
+### L18-hand-management
+- **Concept slugs:** `hand-management`, `card-advantage`
+- **Concept:** Emptying your hand of counters is "the number one mistake": keep 1–3 counter cards in hand in the midgame [SH-MIS]. About two-thirds of a typical tournament list can counter (median 33 counter cards per 50) [SH-DB], so most hand cards are also shields *(inference)*. Keep a threat or two in reserve against removal colours, and do not give the opponent a two-for-one [SH-MIS].
+- **Drill:** none separate; measured in play.
+- **Exit (untimed):** over 3 consecutive games against Pirate, end at least 80% of your turns from your turn 3 onward with 1 or more counter cards in hand, and lose no game to an attack that the counters you played the turn before would have stopped (review flag).
+- **Exit (optional, timed):** none.
 
 ### L10-counter-or-take
 - **Concept slugs:** `counter-or-take`, `counters-and-blockers`, `hand-management`
@@ -129,6 +151,13 @@ Goal: stop the habits that lose most games. Shonen TCG's priority order for new 
 - **Drill:** "Counter or take it" (PROMPT.md Drills): 10 incoming attacks with your hand shown; decide block, counter (with which cards) or take; the analysis explains.
 - **Exit (untimed):** 8 of 10 agree with the analysis, **and** at most one "wasted counter" or "hit that should have been countered" flag per game over 3 consecutive games against Pirate.
 - **Exit (optional, timed):** the drill part within 30 seconds per item.
+
+### L09-don-efficiency
+- **Concept slugs:** `don-efficiency` · **Rules:** CR 6-2-3, 6-2-4, 6-5-5
+- **Concept:** A DON!! left active at the end of your turn adds nothing unless something uses it on the opponent's turn: the cost of a [Counter] Event in hand [SH-DON][BANDAI-EXP], or an opponent-turn effect that rests active DON!!, such as OP13-001 Luffy's leader, which gives +2000 per active DON!! rested (RL-46; L27). For that deck, ending the turn with up to 5 active DON!! is the plan, not waste (OP13-001 guide, seed 3). "Spending every DON!! on Characters keeps your attacks at base power, and they bounce off a single Counter" [SH-DON]. Plan each turn around one job, develop or push [SH-DON][SH-MIS]. Each +1000 matters only if it forces one more counter card or one more Life *(inference; strategy-concepts.md §2c)*.
+- **Drill:** "DON!! allocation" (PROMPT.md Drills): 10 main phases with several playable lines; pick one; the analysis scores each.
+- **Exit (untimed):** 7 of 10 picks within the analysis's top two lines, **and** no "DON!! left unused" review flag in 2 of 3 consecutive games against Pirate. For this exit the flag counts only active DON!! that nothing could use on the opponent's turn. DON!! that can pay for a [Counter] Event in hand, or that the player's own opponent-turn effects can spend (for OP13-001, up to 5 active DON!! for the leader), are not "unused" *(inference)*.
+- **Exit (optional, timed):** the drill part within 45 seconds per item.
 
 ### L11-life-as-resource
 - **Concept slugs:** `life-as-resource`
@@ -146,10 +175,10 @@ Goal: stop the habits that lose most games. Shonen TCG's priority order for new 
 
 ### L13-turn-order
 - **Concept slugs:** `turn-order`, `tempo`
-- **Concept:** The second player stays one card and one DON!! ahead on equivalent turns; the first player gets the first attack [BOUNTY][SH-DON]. "The general default in One Piece is to go second"; go first with decks that curve out and attack early, or to race a faster deck, and against Banish decks [BOUNTY]. Beginners should go second [BOUNTY][SH-DON].
-- **Drill:** 12 prompts, one per archetype, each against a named opponent: "first or second?" with the guide's reason.
-- **Exit (untimed):** 9 of 12 agree with the archetype guides.
-- **Exit (optional, timed):** 9 of 12, each within 15 seconds.
+- **Concept:** The second player stays one card and one DON!! ahead on equivalent turns; the first player gets the first attack [BOUNTY][SH-DON]. "The general default in One Piece is to go second" [BOUNTY]; that default rests on this one source; no other source in `sources.md` states it. Go first with decks that curve out and attack early, or to race a faster deck, and against Banish decks [BOUNTY]. Beginners should go second [BOUNTY][SH-DON]. The archetype guides do not give a per-matchup seat choice. What they give are seat facts: DON!! per turn (CR 6-4-1) and a few sourced seat notes, such as Luffy & Ace's T3 Sanji turn (88% going first, 94% going second [SH-LA]) and Robin reaching 10 DON!! on T4 going second [SH-ROB].
+- **Drill:** 12 prompts built from those facts: "this deck's key play needs N DON!!; on which of your turns can you make it going first, and going second?", and "which seat does the guide's sourced note favour for this deck, and why?".
+- **Exit (untimed):** 10 of 12 correct. Every answer is either DON!! arithmetic or a sourced seat note in the guide. A per-matchup "first or second?" drill waits for seat win rates from self-play (M5) *(inference)*.
+- **Exit (optional, timed):** 10 of 12, each within 15 seconds.
 
 ### L14-board-vs-face
 - **Concept slugs:** `board-vs-face`, `removal-timing`
@@ -181,13 +210,6 @@ Goal: stop the habits that lose most games. Shonen TCG's priority order for new 
 - **Exit (untimed):** 8 of 10 within 1000 power and one attacker of the analysis's figure.
 - **Exit (optional, timed):** 8 of 10, each within 45 seconds.
 
-### L18-hand-management
-- **Concept slugs:** `hand-management`, `card-advantage`
-- **Concept:** Emptying your hand of counters is "the number one mistake": keep 1–3 counter cards in hand in the midgame [SH-MIS]. About two-thirds of a typical tournament list can counter (median 33 counter cards per 50) [SH-DB], so most hand cards are also shields *(inference)*. Keep a threat or two in reserve against removal colours, and do not give the opponent a two-for-one [SH-MIS].
-- **Drill:** none separate; measured in play.
-- **Exit (untimed):** over 3 consecutive games against Pirate, end at least 80% of your turns from your turn 3 onward with 1 or more counter cards in hand, and lose no game to an attack that the counters you played the turn before would have stopped (review flag).
-- **Exit (optional, timed):** none.
-
 ### L19-leader-identity
 - **Concept slugs:** `leader-identity`
 - **Concept:** "Your Leader determines the colors you can play and sets the direction of your entire deck", and it never has to be drawn [BANDAI-EXP]. Read its text and mulligan toward it [SH-MUL]; if you cannot name the two things your deck must do by turn three, you cannot mulligan for them [SH-MUL].
@@ -215,13 +237,13 @@ Goal: stop the habits that lose most games. Shonen TCG's priority order for new 
 - **Concept slugs:** `leader-identity`, `mulligan`, `tempo`
 - **Concept:** Play a meta deck the way its guide says. The archetype guide's "Game plan by turn" and "Playbook seeds" are the checklist.
 - **Drill:** 5 games with one archetype against Pirate, with the coach's "game-plan check" on.
-- **Exit (untimed):** in 3 of 5 games, meet at least 3 of that archetype's playbook seeds (as measured by the same assertions the AI playbook tests), and pass L12's mulligan drill for that archetype.
+- **Exit (untimed):** in 3 of 5 games, meet at least 60% of that archetype's playbook seeds, rounded up (2 of 3, 3 of 4, 3 of 5, 4 of 6), as measured by the same assertions the AI playbook tests, and pass L12's mulligan drill for that archetype. Seeds are counted as they stand after `docs/content/review-1.md`, which removed or rewrote the seeds that were wrong or could not be measured.
 - **Exit (optional, timed):** none.
 
 ### L23-matchup-plans
 - **Concept slugs:** `tempo`, `board-vs-face`, `removal-timing`
-- **Concept:** Each guide gives a one-line plan against every other archetype. Most plans are *(inference)*; the sourced ones carry match records from Shonen TCG's Limitless Play samples.
-- **Drill:** "Matchup quiz": 12 prompts "you are X against Y: what is the plan?" chosen from the guide's lines and three distractors; then one game per two matchups against Warlord.
+- **Concept:** Each guide gives a one-line plan against every other archetype. Most plans are *(inference)*; the sourced ones carry match records from Shonen TCG's Limitless Play samples. The first review found several inferred plans wrong on card text (`docs/content/review-1.md`), so this lesson tests the card facts that plans rest on, not the inferred plans themselves.
+- **Drill:** "Matchup facts" quiz: 12 prompts of the form "you are X against Y: can your answer reach their threat?" (for example: can Gloriosa remove King EB04-031; can Kaido's leader shrink an attacking Leader; does El Thor reach Rodo?), each answerable from card text and `docs/research/rulings.md`. After each answer the app shows the guide line it supports. Prompts may also quote a matchup line that carries a source tag; lines marked *(inference)* are never the answer key. Then one game per two matchups against Warlord.
 - **Exit (untimed):** 10 of 12 quiz answers correct, and win at least 3 of 6 matchup games against Warlord.
 - **Exit (optional, timed):** quiz within 20 seconds per prompt.
 

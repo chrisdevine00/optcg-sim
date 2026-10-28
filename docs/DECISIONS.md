@@ -2,6 +2,10 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-10-28 — Phase 3 gated after the competitive-player review
+
+Context: PROMPT.md gates Phase 3 on a competitive-player review of the archetype guides. The review found 20 issues: 6 severity-3, including misread leader texts (OP17-058, OP05-098), targets out of a card's cost range, a curriculum flag that would penalize correct OP13-001 play, and missing fundamentals. Decision: a separate agent checked every finding against card text, the rulings and the lists. It accepted 18 and partly accepted 2 (`docs/content/review-1.md`), fixed nine further errors found along the way, added lessons L25–L27 (base vs current values, Leader vs Character targeting, opponent-turn timing), marked every unsourced claim individually, and added the EB05 format note. Lesson IDs are stable, so teaching order follows section order rather than ID. Alternative rejected: gating with the guides marked "low confidence" (they would teach false facts).
+
 ## 2026-10-28 — Rulings adopted from Track F
 
 Context: Track F read all 46 official Q&A PDFs, CR v1.2.1 (still the newest), the Rule Manual, the tournament manual and the floor rules, and wrote 49 rulings (`docs/research/rulings.md`). Decision:
