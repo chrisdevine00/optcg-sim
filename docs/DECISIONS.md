@@ -2,6 +2,18 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-10-28 — Engine public API and test fixtures frozen for M2
+
+Context: PLAN §5 requires the fixture API to be frozen before M2. The engine author and an independent test author can then work in parallel, and the tests encode the rules rather than the implementation. Decision:
+- **Frozen API.** `engine/src/api.ts` fixes the public types: `GameSetup`, `ScenarioSpec` with `PlayerSpec` and `CardPlacement`, `Action`, `Decision`, `DonClass`, `PlayerView`, `Preview`, `GameRecord`, `Queries` and `IllegalAction`.
+- **Stubs.** `engine/src/game.ts` holds stub entry points that throw until implemented.
+- **Card lookup.** Card data is injected as a `CardLookup`, so the engine never loads JSON.
+- **Read-only access.** Tests observe the game only through `queries` (zone, card, decision, turn, DON!!, result). `GameState` is opaque to them.
+- **Fixtures.** `engine/test/fixtures/` offers `scenario()` with defaults (seed 1, turn 3, p1 active, Main Phase) and a `TestGame` with `act`, `legal`, `find`, `leader`, `power` and `life`. Every action is checked against `legalActions`, and the invariants are checked after every step.
+- **Change rule.** Changing any frozen shape needs an entry here and an update to the independent tests.
+
+Alternatives rejected: letting tests read `GameState` fields (it couples tests to internals); a fluent builder DSL for scenarios (plain objects are easier to read and to diff).
+
 ## 2026-10-28 — M1 card data decisions
 
 Context: building `cards:update` and verifying the 182 meta cards raised five choices.
