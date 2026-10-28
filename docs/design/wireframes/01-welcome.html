@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OPTCG Sim · Home</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+<style>
+  .welcome { max-width: 920px; margin: 0 auto; padding: 48px 24px 24px; }
+  .welcome h1 { font: 600 var(--text-4xl)/var(--leading-4xl) var(--font-display); margin: 0 0 8px; }
+  .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 28px 0 16px; }
+  .choice { display: block; text-decoration: none; color: var(--color-text); background: var(--color-surface-1); border: 1px solid var(--color-line-strong); border-radius: var(--radius-4); padding: 24px; min-height: 170px; position: relative; }
+  .choice:hover { background: var(--color-surface-2); border-color: var(--color-accent); }
+  .choice .t { font: 600 var(--text-2xl)/var(--leading-2xl) var(--font-display); display: block; margin-bottom: 8px; }
+  .choice .s { color: var(--color-text-muted); font-size: var(--text-lg); line-height: var(--leading-lg); display: block; }
+  .choice .go { position: absolute; right: 20px; bottom: 18px; color: var(--color-accent-text); font-weight: 600; }
+  .choice.resume { border-color: var(--color-accent); }
+  .mini { display: flex; gap: 6px; margin-top: 14px; }
+  .mini span { width: 34px; height: 47px; border-radius: 3px; }
+  .keys { color: var(--color-text-subtle); font-size: var(--text-sm); }
+  @media (max-width: 700px) { .choices { grid-template-columns: 1fr; } .welcome h1 { font-size: 30px; line-height: 38px; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="app-header"></header>
+  <main class="app-main" id="main"></main>
+  <footer class="app-footer"></footer>
+</div>
+<script src="wf.js"></script>
+<script>
+WF.chrome('Home');
+const STATES = [['first', 'First launch'], ['returning', 'Returning, saved game']];
+function draw() {
+  const st = WF.state() || 'first';
+  const ret = st === 'returning';
+  const choices = `
+    <a class="choice" href="02-setup.html" ${ret ? '' : 'data-wf-focus'}><span class="t">I know the rules: start a game</span><span class="s">Rocks vs Kaido, Pirate AI. Change anything first if you like.</span><span class="go">Set up a game →</span></a>
+    <a class="choice" href="15-tutorial.html"><span class="t">I'm new: teach me</span><span class="s">About 20 minutes. You can leave and come back.</span><span class="go">Start the tutorial →</span></a>`;
+  document.getElementById('main').innerHTML = `<div class="welcome">
+    ${ret ? `<a class="choice resume" href="03-main.html" data-wf-focus style="min-height:0;margin-bottom:28px"><span class="t">Resume your game vs Kaido (turn 6)</span><span class="s">Saved on this device 2 hours ago. Practice mode.</span><span class="go">Resume →</span></a>` : ''}
+    <h1>Have you played One Piece Card Game before?</h1>
+    <p class="lede">OPTCG Sim plays a full game against an AI that follows the rules, and teaches as you go. No account. Everything stays on this device.</p>
+    <div class="choices">${choices}</div>
+    <p style="margin:0 0 20px"><a href="13-meta.html">Just look around</a> <span class="subtle">· cards, meta decks and the rules</span></p>
+    <p class="keys">↑ ↓ or Tab to move · Enter to choose · <kbd>?</kbd> keyboard shortcuts</p></div>`;
+  const f = document.querySelector('[data-wf-focus]'); if (f) f.focus();
+}
+draw(); window.addEventListener('hashchange', draw); WF.statesBar(STATES);
+</script>
+</body>
+</html>

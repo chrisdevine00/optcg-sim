@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Drill: lethal puzzle</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+</head>
+<body class="board-page">
+<main class="stage" aria-label="Lethal puzzle. Position from explanations.md E01"></main>
+<script src="wf.js"></script>
+<script src="cards.js"></script>
+<script src="scenarios.js"></script>
+<script src="expl.js"></script>
+<script>
+const STATES = [['item', 'Puzzle: untimed (default)'], ['timed', 'Timer switched on'], ['answer', 'Answer: missed'], ['real', 'From review: their real hand']];
+WF.mountBoard((st) => {
+  const opp = (id, x = {}) => K(id, { who: 'Opponent’s', ...x });
+  const s = {
+    boardLabel: 'Lethal puzzle board, your Main Phase',
+    opp: {
+      idText: 'Rocks.D.Xebec · puzzle', hand: 2, donDeck: 0, active: 3, rested: 7, life: 1, deck: 22,
+      leader: opp('OP17-039'), trash: { n: 13, top: K('OP17-056') }, chars: [null, null, null, null, null],
+    },
+    me: {
+      donDeck: 2, active: 4, rested: 4, life: 3, deck: 26,
+      leader: K('OP17-058', { who: 'Your', st: ['legal'], g: 'attack' }), trash: { n: 7, top: K('OP17-076') },
+      chars: [null, null, K('OP17-062', { st: ['legal'], g: 'attack' }), null, null],
+      hand: [K('OP17-073', { hand: true }), K('OP15-069', { hand: true }), K('OP17-061', { hand: true })],
+      donLegal: true,
+    },
+    mid: { turn: 'Puzzle · Turn 9 · Your turn', phase: 'Main', left: '<span class="chip outline" style="color:var(--color-text-muted)">Item 3 of 10</span>' },
+    log: [SCN.th('Puzzle · Lethal (L15)'), '<li>Find lethal, or declare none.</li>', '<li>Their hand: 2 cards, up to +2000 each.</li>', '<li class="subtle">Their deck runs no [Trigger] cards.</li>'],
+    coach: 'open', verbosity: 'Learner',
+    coachHtml: EXPL.coach('lethal', `<p style="margin:0 0 6px">The guided count is free in drills: using it doesn't mark the item wrong. <b>Show answer</b> does.</p><div class="row" style="gap:6px"><button class="btn small primary" type="button">Count it with me</button><button class="btn small" type="button">Show answer</button></div>`, { lethal: 'puzzle', hint: 'Show answer' }),
+  };
+  const timer = st === 'timed'
+    ? `<div class="row" style="gap:8px;margin:6px 0"><span class="num" style="font-weight:700">0:42</span><div style="flex:1;height:4px;background:var(--color-surface-3);border-radius:2px"><div style="width:70%;height:100%;background:var(--color-accent)"></div></div><button class="btn small" type="button">❚❚ Pause <kbd>P</kbd></button></div><p class="subtle" style="margin:0;font-size:12px">Time never ends the item: past 0:00 it says "Over time" and still counts untimed.</p>`
+    : `<div class="row" style="gap:8px;margin:6px 0"><button type="button" class="switch" role="switch" aria-checked="false" style="border:0;background:none;padding:0"><span class="track" aria-hidden="true"></span><span>Timer off</span></button><span class="subtle" style="font-size:12px">Untimed by default</span></div>`;
+  s.decision = {
+    title: 'Lethal puzzle · find lethal',
+    body: `<p style="margin:0">Play the turn on the board, with Rewind. Or declare there is none.</p><p class="muted" style="margin:4px 0 0;font-size:12px">Their hand: 2 cards, up to +2000 each <span class="chip outline" style="height:16px">public</span> · a line that wins here wins against any hand.</p>${timer}`,
+    foot: `<button class="btn" type="button">No lethal <kbd>N</kbd></button>${SCN.primary('End turn', '2 can attack · 4 DON!! unused', 'E')}`,
+  };
+  if (st === 'answer') {
+    s.me.leader = K('OP17-058', { who: 'Your', r: true, don: 2, p: 7000 });
+    s.me.chars[2] = K('OP17-062', { r: true, don: 2, p: 14000 });
+    s.me.active = 0; s.opp.life = 0; s.opp.hand = 1;
+    s.coach = 'tall';
+    s.coachHtml = EXPL.coach('lethal', `<p style="margin:0 0 6px"><span class="chip attack">✕ Not this time</span> They stopped your Leader with two +2000 Events.</p>` + EXPL.render(EXPL.E.E01, { verbosity: 'learner', mode: 'live' }), { lethal: 'answer' });
+    s.decision = { title: 'Puzzle 3 of 10 · missed', body: '<p style="margin:0">Your split: 2 DON!! each, Kaido first. The line: all 4 on your Leader, Leader first.</p><p class="subtle" style="margin:6px 0 0">Counts toward the untimed score: 2 of 3 so far.</p>', foot: `<button class="btn" type="button">Try again</button>${SCN.primary('Next puzzle', 'item 4 of 10', 'Enter')}` };
+    s.log.push(SCN.you('Kaido attacks their Leader · 14000 vs 5000'), '<li>Hit · their Life 1 → 0 · 3 cards</li>', SCN.you('Your Leader attacks · 7000 vs 5000'), SCN.opp('Counter: +2000, +2000 · 5000 → 9000', false), '<li>Attack fails · puzzle missed</li>');
+  }
+  if (st === 'real') {
+    s.mid.left = '<span class="chip outline" style="color:var(--color-text-muted)">From your game, turn 12</span>';
+    s.opp = { idText: 'Kaido · their real hand', hand: 4, known: ['Kaido', 'Lead Performers', 'Gum-Gum Lightning', 'Yamato'], donDeck: 0, active: 0, rested: 9, life: 0, deck: 20, leader: opp('OP17-058'), trash: { n: 14, top: K('OP17-076') }, chars: [null, opp('EB04-031', { r: true }), opp('EB04-032', { r: true }), null, null] };
+    s.me = { donDeck: 0, active: 0, rested: 7, life: 2, deck: 18, leader: K('OP17-039', { who: 'Your', r: true, don: 3, p: 8000 }), trash: { n: 15, top: K('OP17-056') }, chars: [K('OP17-049', { st: ['legal'], g: 'attack' }), K('OP17-048', { st: ['legal'], g: 'attack' }), K('OP17-040', { st: ['legal'], g: 'attack' }), null, null], hand: [K('OP17-045', { hand: true }), K('OP17-054', { hand: true })] };
+    s.decision.title = 'Practice · their real hand';
+    s.decision.foot = `<button class="btn" type="button">No lethal <kbd>N</kbd></button>${SCN.primary('End turn', '3 can attack', 'E')}`;
+    s.decision.body = `<p style="margin:0">${EXPL.cert('needed-hidden-info', 'review')}</p><p style="margin:6px 0 0">Their real hand is face up: one way to see it. Against a hand you can't see, this line is not proven.</p>`;
+    s.log = [SCN.th('Practice · from review'), '<li>Turn 12 · after your Leader’s hit</li>', '<li>Their hand shown: Kaido, Lead Performers, Gum-Gum Lightning, Yamato</li>'];
+  }
+  return s;
+}, STATES);
+</script>
+</body>
+</html>

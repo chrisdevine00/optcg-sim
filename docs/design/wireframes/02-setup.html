@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OPTCG Sim · Set up a game</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+<style>
+  .cols { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; align-items: start; }
+  .col h2 { font: 600 var(--text-sm)/20px var(--font-ui); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: .06em; margin: 0 0 8px; }
+  .deck { display: grid; grid-template-columns: 84px 1fr; gap: 12px; align-items: start; }
+  .deck .cardbox { position: relative; width: 84px; height: 117px; }
+  .deck .dn { font: 600 var(--text-xl)/var(--leading-xl) var(--font-display); }
+  .opt-list { display: flex; flex-direction: column; gap: 4px; margin: 0; padding: 0; list-style: none; }
+  .radio { display: grid; grid-template-columns: 20px 1fr auto; gap: 8px; align-items: start; padding: 6px 8px; border-radius: var(--radius-2); border: 1px solid transparent; cursor: pointer; }
+  .radio[aria-checked='true'] { border-color: var(--color-accent); background: var(--color-surface-2); }
+  .radio .dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--color-line-strong); margin-top: 2px; }
+  .radio[aria-checked='true'] .dot { border-color: var(--color-accent); box-shadow: inset 0 0 0 3px var(--color-surface-2); background: var(--color-accent); }
+  .radio small { display: block; color: var(--color-text-muted); font-size: 12px; line-height: 16px; }
+  .radio .tm { font-size: 12px; color: var(--color-text-subtle); white-space: nowrap; }
+  .startbar { display: flex; align-items: center; gap: 16px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--color-line); }
+  .val { list-style: none; margin: 8px 0 0; padding: 0; font-size: var(--text-sm); }
+  .val li { padding: 2px 0; }
+  .val .bad { color: var(--color-danger-text); }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="app-header"></header>
+  <main class="app-main" id="main" style="padding-top:20px"></main>
+  <footer class="app-footer"></footer>
+</div>
+<script src="wf.js"></script>
+<script src="cards.js"></script>
+<script>
+WF.chrome('Play');
+const STATES = [['ready', 'Defaults: ready'], ['invalid', 'Invalid deck'], ['rps', 'Start → first player']];
+function draw() {
+  const st = WF.state() || 'ready';
+  if (st === 'rps') { location.replace('02b-start.html#rps'); return; }
+  const bad = st === 'invalid';
+  const g = { card: [84, 117] };
+  const card = (id) => `<div class="cardbox" style="--card-w:84px">${WF.cardHTML(K(id, { st: [] }), [0, 0, 84, 117], g, { tag: 'span' })}</div>`;
+  const radio = (on, t, d, tm) => `<li class="radio" role="radio" aria-checked="${on}" tabindex="${on ? 0 : -1}"><span class="dot" aria-hidden="true"></span><span>${t}${d ? `<small>${d}</small>` : ''}</span>${tm ? `<span class="tm">${tm}</span>` : '<span></span>'}</li>`;
+  document.getElementById('main').innerHTML = `
+    <h1 class="page">Set up a game</h1>
+    <p class="muted" style="margin:0 0 16px">Everything is preselected. Change anything, or press Start.</p>
+    <div class="cols">
+      <section class="col panel" aria-labelledby="h1"><h2 id="h1">Your deck</h2>
+        <div class="deck">${card('OP17-039')}<div><div class="dn">${bad ? 'Rocks test' : 'Rocks.D.Xebec'}</div><div class="muted">Blue · OP17-039</div>
+          <div style="font-size:13px;margin-top:4px">${bad ? 'Your saved deck · edited today' : 'List: ChinoizeCup #122, 6th, 13 Oct'}</div>
+          <div style="font-size:13px;margin-top:4px"><span class="chip success">✓</span> 50 of 50 cards automated</div></div></div>
+        ${bad ? `<ul class="val" aria-label="Deck problems"><li class="bad">✕ 5 copies of OP17-045 Kyo: the limit is 4 per card number <span class="subtle">(CR 5-1-2-3)</span></li><li>✓ 50 cards · ✓ colours · ✓ no banned cards (from 2026-10-12)</li></ul><p style="margin:8px 0 0"><a href="12-deck-builder.html">Fix in the deck builder →</a></p>` : ''}
+        <div class="row" style="margin-top:12px;gap:8px"><button class="btn small" type="button">Change deck</button><a class="btn small ghost" href="12-deck-builder.html">Edit</a></div></section>
+      <section class="col panel" aria-labelledby="h2"><h2 id="h2">Opponent</h2>
+        <div class="deck">${card('OP17-058')}<div><div class="dn">Kaido</div><div class="muted">Purple · OP17-058 · archetype list</div>
+          <div style="font-size:13px;margin-top:4px">Playbook: Kaido's game plan</div><div style="font-size:13px;margin-top:4px"><span class="chip success">✓</span> 50 of 50 cards automated</div></div></div>
+        <div class="lbl" style="margin-top:12px" id="tier">AI tier</div>
+        <ul class="opt-list" role="radiogroup" aria-labelledby="tier">
+          ${radio(false, 'Rookie', 'Random legal moves, but always blocks or counters a lethal attack.', '~3 s turns')}
+          ${radio(true, 'Pirate', 'Plays its deck’s plan. Default.', '~6 s')}
+          ${radio(false, 'Warlord', 'Searches ahead on every decision.', '~8 s')}
+          ${radio(false, 'Emperor', 'Deepest search. Thinks longer.', '~11 s')}
+        </ul><p class="subtle" style="font-size:12px;margin:6px 0 0">Turn times at 1× speed, from the pacing budget.</p></section>
+      <section class="col panel" aria-labelledby="h3"><h2 id="h3">Game</h2>
+        <div class="lbl" id="mode">Mode</div>
+        <ul class="opt-list" role="radiogroup" aria-labelledby="mode">
+          ${radio(true, 'Practice', 'Rewind on. Counts in your stats unless rewound.')}
+          ${radio(false, 'Strict', 'No rewind. A second press confirms end turn and take the hit.')}
+          ${radio(false, 'Hotseat', 'Two people, one device.')}
+          ${radio(false, 'Open hands', 'You play both sides.')}
+        </ul>
+        <div class="lbl" style="margin-top:12px" id="first">Who goes first</div>
+        <div class="seg" role="radiogroup" aria-labelledby="first"><button type="button" role="radio" aria-checked="true">Rock-paper-scissors</button><button type="button" role="radio" aria-checked="false">Me</button><button type="button" role="radio" aria-checked="false">AI</button></div>
+        <div class="lbl" style="margin-top:12px" id="coach">Coach verbosity</div>
+        <div class="seg" role="radiogroup" aria-labelledby="coach"><button type="button" role="radio" aria-checked="false">Learner</button><button type="button" role="radio" aria-checked="true">Standard</button><button type="button" role="radio" aria-checked="false">Terse</button></div></section>
+    </div>
+    <div class="startbar">
+      ${bad ? `<button class="btn primary big" type="button" aria-disabled="true" aria-describedby="why"><span class="lbl2">Start game</span><span class="sub">fix your deck first</span></button><span id="why" class="muted">Start is off until your deck passes the checks.</span>`
+        : `<a class="btn primary big" href="02b-start.html#rps" data-wf-focus><span class="lbl2">Start game <kbd>S</kbd></span><span class="sub">Rocks vs Kaido · Pirate · Practice</span></a><span class="muted">Rock-paper-scissors decides who chooses first or second.</span>`}
+    </div>`;
+  const f = document.querySelector('[data-wf-focus]'); if (f) f.focus();
+}
+draw(); window.addEventListener('hashchange', draw); WF.statesBar(STATES.slice(0, 2));
+</script>
+</body>
+</html>

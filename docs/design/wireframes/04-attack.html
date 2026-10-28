@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Board: declaring an attack</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+</head>
+<body class="board-page">
+<main class="stage" aria-label="Game: Rocks.D.Xebec (you) vs Kaido (Pirate AI)"></main>
+<div id="announce-polite" class="sr-only" role="status" aria-live="polite">Shiki, 9000, attacking. Choose a target: their Leader, or King, rested.</div>
+<script src="wf.js"></script>
+<script src="cards.js"></script>
+<script src="scenarios.js"></script>
+<script>
+const STATES = [['target', 'Choose target + whyNot'], ['confirm', 'Target chosen: confirm'], ['declared', 'Declared: AI deciding']];
+WF.mountBoard((st) => {
+  const s = SCN.mainBase();
+  const me = s.me, o = s.opp;
+  s.boardLabel = 'Game board, turn 7, your Main Phase, choosing an attack target';
+  const shiki = me.chars[2];
+  // everything that is not part of this mode dims (board.md §2.5 target candidate)
+  [me.leader, me.chars[1], me.chars[3], ...me.hand].forEach((c) => { c.st = ['dim']; });
+  const king = o.chars[1], yam = o.chars[2], ulti = o.chars[3];
+  if (st === 'target') {
+    shiki.st = ['selected']; shiki.chips = [{ t: '✓ Selected', cls: 'you', pos: 'top' }];
+    [o.leader, king].forEach((c) => { c.st = ['legal']; c.g = 'target'; });
+    ulti.st = ['dim'];
+    yam.st = ['dim', 'wf-focus']; yam.aria = 'Opponent’s Yamato, active, 1000 power, Blocker. Not a target: active Characters can’t be attacked';
+    s.arrows = [{ from: 'me.c3', to: 'opp.leader', dashed: true, bend: -70 }];
+    s.decision = {
+      title: 'Choose a target for Shiki',
+      body: `<p style="margin:0 0 4px"><b>2 targets:</b> their Leader and King (rested). Yamato and Ulti &amp; Page One are active.</p>
+        <div class="bp-res" style="margin:4px 0"><span aria-hidden="true">⌖</span>Their Leader <span class="num" style="font-weight:500">9000 vs 5000</span><span class="need">They need +5000</span></div>
+        <p style="margin:4px 0 0" role="status"><b>Yamato</b> is not a target: active Characters can't be attacked <span class="subtle">(CR 7-1-1-2)</span>.</p>
+        <p class="subtle" style="margin:4px 0 0">← → move between targets · Enter chooses</p>`,
+      foot: `<button class="btn" type="button">Cancel <kbd>Esc</kbd></button><span class="grow"></span>`,
+    };
+    s.extra = (g, R) => {
+      const st = g.oppStage; const roomy = g === WF.G.roomy;
+      return `<div class="pop noarrow" role="tooltip" style="left:${st[0] - 4}px;top:${st[1] + 2}px;width:${roomy ? 320 : 206}px">
+        <div class="ph">Yamato · not a target</div>Active Characters can't be attacked <span class="subtle">(CR 7-1-1-2)</span>. <a href="16-settings.html#rules">Learn more</a></div>
+        <svg style="position:absolute;left:0;top:0;z-index:31;pointer-events:none" width="${g.W}" height="${g.H}" aria-hidden="true"><path d="M${st[0] + 10},${st[1] + st[3] - 2} L${g.charX[2] + g.slot - 18},${g.oppCharY + 8}" stroke="var(--color-line-strong)" stroke-width="2"/></svg>`;
+    };
+  }
+  if (st === 'confirm' || st === 'declared') {
+    shiki.st = ['selected', 'battle'];
+    king.st = ['legal', 'battle']; king.g = 'target';
+    [o.leader, ulti, yam].forEach((c) => { c.st = ['dim']; });
+    s.arrows = [{ from: 'me.c3', to: 'opp.c2', dashed: st === 'confirm' }];
+    s.mid = { turn: 'Turn 7 · Your turn', phase: 'Main', battle: st === 'confirm' ? 'Attack' : 'Block' };
+    const body = SCN.battle({
+      att: { name: 'Shiki', num: '9000', bd: '9000 base' },
+      def: { name: 'King <span class="subtle">(rested)</span>', num: '7000', bd: '7000 base · its DON!! add nothing now' },
+      res: { cls: 'hit', text: 'K.O.', need: 'They need +3000 · 5 cards' },
+      post: st === 'confirm'
+        ? `<div style="font-size:12px;line-height:16px;color:var(--color-text-muted)"><b style="color:var(--color-text)">They can see:</b> Yamato can block (King safe, Yamato K.O.'d). Kaido's Leader −2000 on Shiki: 7000 vs 7000, still K.O. <a href="09-coach.html#don">Their hand: ask the coach</a></div>`
+        : `<div class="row" style="gap:6px;margin-top:2px"><span class="chip success">✓ Attack</span><span class="chip outline">Block · Kaido is considering…</span></div><div class="indet" style="margin-top:8px" aria-hidden="true"></div>`,
+    });
+    s.decision = {
+      title: st === 'confirm' ? 'Attack King with Shiki?' : 'Battle · Block step · Kaido deciding',
+      body,
+      foot: st === 'confirm'
+        ? `<button class="btn" type="button">Cancel <kbd>Esc</kbd></button>${SCN.primary('Confirm attack', '9000 vs 7000', 'Enter', '04-attack.html#declared')}`
+        : `${SCN.rewind}<span class="grow"></span>`,
+    };
+    if (st === 'declared') {
+      shiki.r = true; shiki.st = ['battle']; shiki.chips = [{ t: '⚔ Attacking', cls: 'attack', pos: 'below' }]; shiki.noRestChip = true;
+      king.st = ['battle']; king.g = 'target'; king.chips = [{ t: '⌖ Attacked', cls: 'attack', pos: 'below' }]; king.noRestChip = true;
+      s.log.push(SCN.you(`${SCN.lk('Shiki')} attacks ${SCN.lk('King')} · 9000 vs 7000`));
+      s.mid.left = '<span aria-hidden="true">◔</span> Kaido is considering…';
+      o.status = 'Considering';
+    }
+  }
+  return s;
+}, STATES);
+</script>
+</body>
+</html>

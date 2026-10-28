@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OPTCG Sim · Settings</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+<style>
+  html { scroll-behavior: auto; scroll-padding-top: 12px; }
+  .set { display: grid; grid-template-columns: 200px 1fr; gap: 32px; align-items: start; }
+  .snav { position: sticky; top: 12px; display: flex; flex-direction: column; gap: 2px; }
+  .snav a { color: var(--color-text-muted); text-decoration: none; padding: 6px 10px; border-radius: 6px; }
+  .snav a[aria-current='true'] { background: var(--color-surface-3); color: var(--color-text); }
+  .sgroup { margin-bottom: 28px; max-width: 760px; }
+  .sgroup h2 { font: 600 var(--text-2xl)/var(--leading-2xl) var(--font-display); margin: 0 0 8px; }
+  .srow { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--color-line); }
+  .srow .d { color: var(--color-text-muted); font-size: 13px; line-height: 18px; }
+  .src { list-style: none; margin: 0; padding: 0; }
+  .src li { padding: 8px 0; border-bottom: 1px solid var(--color-line); font-size: 14px; }
+  .disc { border: 1px solid var(--color-line-strong); border-radius: 8px; padding: 12px 14px; background: var(--color-surface-1); }
+  @media (max-width: 800px) { .set { grid-template-columns: 1fr; } .snav { position: static; flex-direction: row; flex-wrap: wrap; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="app-header"></header>
+  <main class="app-main" style="padding-top:16px">
+    <h1 class="page">Settings</h1>
+    <p class="muted" style="margin:0 0 16px">Every change applies at once and is stored on this device.</p>
+    <div class="set">
+      <nav class="snav" aria-label="Settings sections"><a href="#game" aria-current="true">Game</a><a href="#coach">Coach</a><a href="#cards">Cards</a><a href="#a11y">Accessibility</a><a href="#keys">Keyboard</a><a href="#data">Data</a><a href="#rules">Rules reference</a><a href="#about">About</a></nav>
+      <div>
+        <section class="sgroup" id="game" aria-labelledby="g1"><h2 id="g1">Game</h2>
+          <div class="srow"><div><b>Opponent speed</b><div class="d">How fast the AI's moves play. Attacks on you always keep a readable pause.</div></div><div class="seg" role="radiogroup" aria-label="Opponent speed"><button type="button" role="radio" aria-checked="false">0.5×</button><button type="button" role="radio" aria-checked="true">1×</button><button type="button" role="radio" aria-checked="false">2×</button><button type="button" role="radio" aria-checked="false">4×</button></div></div>
+          <div class="srow"><div><b>Pause after each opponent move</b><div class="d">Step mode. The AI waits; press "Next move".</div></div><button type="button" class="switch" role="switch" aria-checked="false" aria-label="Pause after each opponent move" style="border:0;background:none"><span class="track"></span></button></div>
+          <div class="srow"><div><b>Empty windows</b><div class="d">Skip Block and Counter steps where you have nothing to do.</div></div><div class="seg" role="radiogroup" aria-label="Empty windows"><button type="button" role="radio" aria-checked="true">Auto-skip</button><button type="button" role="radio" aria-checked="false">Always ask me</button></div></div>
+          <div class="srow"><div><b>Warn when I end with attacks left</b><div class="d">Adds the count to the End turn button. Never a dialog.</div></div><button type="button" class="switch" role="switch" aria-checked="false" aria-label="Warn when I end with attacks left" style="border:0;background:none"><span class="track"></span></button></div>
+        </section>
+        <section class="sgroup" id="coach" aria-labelledby="g2"><h2 id="g2">Coach</h2>
+          <div class="srow"><div><b>Verbosity</b><div class="d">Changes how much is open, never the words.</div></div><div class="seg" role="radiogroup" aria-label="Coach verbosity"><button type="button" role="radio" aria-checked="false">Learner</button><button type="button" role="radio" aria-checked="true">Standard</button><button type="button" role="radio" aria-checked="false">Terse</button></div></div>
+          <div class="srow"><div><b>Lethal detector</b><div class="d">"Ask me" runs nothing until you press L.</div></div><div class="seg" role="radiogroup" aria-label="Lethal detector"><button type="button" role="radio" aria-checked="false">Off</button><button type="button" role="radio" aria-checked="false">Tier 1 on</button><button type="button" role="radio" aria-checked="false">Tier 2 on</button><button type="button" role="radio" aria-checked="true">Ask me</button></div></div>
+          <div class="srow"><div><b>Blunder warning</b><div class="d">Only at commit, only for clear mistakes, only if ready within 300 ms.</div></div><button type="button" class="switch" role="switch" aria-checked="false" aria-label="Blunder warning" style="border:0;background:none"><span class="track"></span></button></div>
+          <div class="srow"><div><b>DON!! math on the board</b><div class="d">"+4000 to stop" tags on targets while you choose.</div></div><button type="button" class="switch" role="switch" aria-checked="false" aria-label="DON!! math on the board" style="border:0;background:none"><span class="track"></span></button></div>
+        </section>
+        <section class="sgroup" id="cards" aria-labelledby="g3"><h2 id="g3">Cards</h2>
+          <div class="srow"><div><b>Card faces on the board</b><div class="d">Art window shows the clean top of the art, without the SAMPLE watermark. The full scan is always one hover away.</div></div><div class="seg" role="radiogroup" aria-label="Card faces on the board"><button type="button" role="radio" aria-checked="true">Art window</button><button type="button" role="radio" aria-checked="false">Full card scan</button><button type="button" role="radio" aria-checked="false">Text first</button></div></div>
+          <div class="srow"><div><b>Art variant</b><div class="d">Choose per card in the deck builder. Cosmetic, stored on this device.</div></div><div class="seg" role="radiogroup" aria-label="Art variant"><button type="button" role="radio" aria-checked="true">Prefer base art</button><button type="button" role="radio" aria-checked="false">My choices</button></div></div>
+        </section>
+        <section class="sgroup" id="a11y" aria-labelledby="g4"><h2 id="g4">Accessibility and display</h2>
+          <div class="srow"><div><b>Theme</b></div><div class="seg" role="radiogroup" aria-label="Theme"><button type="button" role="radio" aria-checked="true">Dark</button><button type="button" role="radio" aria-checked="false">Light</button><button type="button" role="radio" aria-checked="false">Match system</button></div></div>
+          <div class="srow"><div><b>Motion</b><div class="d">Reduced: nothing travels or rotates, and pauses get longer, not shorter.</div></div><div class="seg" role="radiogroup" aria-label="Motion"><button type="button" role="radio" aria-checked="true">Match system</button><button type="button" role="radio" aria-checked="false">Reduced</button><button type="button" role="radio" aria-checked="false">Full</button></div></div>
+          <div class="srow"><div><b>Move focus to new decisions</b><div class="d">When Kaido attacks, focus goes to the defence panel.</div></div><button type="button" class="switch" role="switch" aria-checked="true" aria-label="Move focus to new decisions" style="border:0;background:none"><span class="track"></span></button></div>
+          <div class="srow"><div><b>Opponent moves announced</b></div><div class="seg" role="radiogroup" aria-label="Opponent moves announced"><button type="button" role="radio" aria-checked="true">Each move</button><button type="button" role="radio" aria-checked="false">Turn summary</button><button type="button" role="radio" aria-checked="false">Off</button></div></div>
+        </section>
+        <section class="sgroup" id="keys" aria-labelledby="g5"><h2 id="g5">Keyboard</h2>
+          <div class="srow"><div><b>Single-key shortcuts</b><div class="d">Work only while focus is on the board. Every command also has a button.</div></div><button type="button" class="switch" role="switch" aria-checked="true" aria-label="Single-key shortcuts" style="border:0;background:none"><span class="track"></span></button></div>
+          <div class="srow"><div><b>Shortcut sheet</b><div class="d"><kbd>?</kbd> anywhere. <kbd>A</kbd> attack · <kbd>+</kbd> give DON!! · <kbd>E</kbd> end turn · <kbd>H</kbd> hint · <kbd>L</kbd> lethal · <kbd>U</kbd> rewind · <kbd>K</kbd> pause AI</div></div><button class="btn" type="button">Open</button></div>
+        </section>
+        <section class="sgroup" id="data" aria-labelledby="g6"><h2 id="g6">Data</h2>
+          <div class="srow"><div><b>Your data</b><div class="d">Games, reviews, decks and progress. Local only.</div></div><div class="row"><button class="btn" type="button">Export everything</button><button class="btn" type="button">Import</button><button class="btn" type="button" style="color:var(--color-danger-text)">Delete all…</button></div></div>
+        </section>
+        <section class="sgroup" id="rules" aria-labelledby="g7"><h2 id="g7">Rules reference</h2>
+          <p class="muted" style="margin:0">Searchable Comprehensive Rules digest, glossary and the rulings each card uses. Every "Learn more" and "CR" link in the game opens here at its rule. (Content arrives in Phase 7; this wireframe stops at the entry point.)</p>
+        </section>
+        <section class="sgroup" id="about" aria-labelledby="g8"><h2 id="g8">About</h2>
+          <div class="disc"><b>Unofficial fan tool.</b> OPTCG Sim is a non-commercial fan project. It is not affiliated with or endorsed by Bandai, Shueisha or Toei Animation. One Piece and all card names, text and art belong to their respective owners. Card images load from the sources below at run time and are never stored in this project.</div>
+          <h3 class="sub" style="margin-top:14px">Sources</h3>
+          <ul class="src">
+            <li><b>Card data and images:</b> <a href="https://optcgapi.com/">optcgapi.com</a>, which says it is open for anyone to use. Text is normalised (restored minus signs); unverified cards say so in the inspector.</li>
+            <li><b>Official card list:</b> <a href="https://en.onepiece-cardgame.com/cardlist/">en.onepiece-cardgame.com</a>, read by a person to verify scripted cards; never fetched in bulk.</li>
+            <li><b>Rules:</b> the Comprehensive Rules and Q&amp;A, from the official site.</li>
+            <li><b>Decklists and results:</b> <a href="https://play.limitlesstcg.com/">Limitless TCG</a>.</li>
+            <li><b>Tier:</b> <a href="https://opmetagame.com/tier-list/">opmetagame.com</a> (October 2026).</li>
+            <li><b>Strategy:</b> Shonen TCG and TCGplayer articles, cited by tag in each guide.</li>
+            <li><b>Fonts:</b> Inter (Rasmus Andersson) and Fraunces (Undercase Type), SIL Open Font License 1.1.</li>
+          </ul>
+          <p class="muted" style="font-size:13px">Meta data as of 2026-10-28. Version 0.0 (wireframe).</p>
+        </section>
+      </div>
+    </div>
+  </main>
+  <footer class="app-footer"></footer>
+</div>
+<script src="wf.js"></script>
+<script>
+WF.chrome('Settings');
+const STATES = [['game', 'Top: Game, Coach'], ['cards', 'Cards (face setting)'], ['about', 'About: sources, disclaimer']];
+function go() { const st = WF.state() || 'game'; const el = document.getElementById(st); if (el) el.scrollIntoView(); document.querySelectorAll('.snav a').forEach((a) => a.setAttribute('aria-current', a.getAttribute('href') === '#' + st)); }
+go(); window.addEventListener('hashchange', go); WF.statesBar(STATES);
+</script>
+</body>
+</html>

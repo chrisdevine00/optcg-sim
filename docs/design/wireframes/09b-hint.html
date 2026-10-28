@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Board: coach hint as a line</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+</head>
+<body class="board-page">
+<main class="stage" aria-label="Game: Monkey.D.Luffy OP13-001 (you) vs Kaido (Pirate AI). Position from explanations.md E15"></main>
+<div id="announce-polite" class="sr-only" role="status" aria-live="polite">Hint ready: play Nami, attack both their Characters, and end with 5 DON!! active. 5 steps.</div>
+<script src="wf.js"></script>
+<script src="cards.js"></script>
+<script src="scenarios.js"></script>
+<script src="expl.js"></script>
+<script>
+const STATES = [['thinking', 'Hint: thinking'], ['result', 'Hint: the line'], ['following', 'Following: 2 steps done'], ['stale', 'Board changed: stale']];
+WF.mountBoard((st) => {
+  const opp = (id, x = {}) => K(id, { who: 'Opponent’s', ...x });
+  const s = {
+    boardLabel: 'Game board, turn 6, your Main Phase',
+    opp: {
+      idText: 'Kaido · Pirate AI', hand: 5, donDeck: 3, active: 0, rested: 7, life: 5, deck: 33,
+      leader: opp('OP17-058'),
+      trash: { n: 2, top: K('OP17-077') },
+      chars: [null, opp('OP17-074'), opp('EB04-032'), null, null],
+    },
+    me: {
+      donDeck: 4, active: 6, rested: 0, life: 4, deck: 34,
+      leader: K('OP13-001', { who: 'Your' }),
+      trash: { n: 1, top: K('OP15-035') },
+      chars: [null, null, K('EB04-002'), null, null],
+      hand: [K('OP14-031', { hand: true }), K('OP13-027', { hand: true }), K('OP15-035', { hand: true }), K('OP04-016', { hand: true }), K('OP14-022', { hand: true })],
+    },
+    mid: { turn: 'Turn 6 · Your turn', phase: 'Main' },
+    log: [
+      SCN.th('Turn 5 · Opp'),
+      SCN.opp(`Play ${SCN.lk('Queen')} · 1 DON!!`),
+      SCN.opp(`Play ${SCN.lk('Yamato')} · 3 DON!!`),
+      '<li>On Play: +1 DON!! rested</li>',
+      SCN.opp('End of turn', false),
+      SCN.th('Turn 6 · You'),
+      SCN.you('Refresh · Draw: Usopp · DON!! +2 · 6 DON!!'),
+    ],
+    coach: 'open', verbosity: 'Standard',
+    coachStrip: {},
+  };
+  const me = s.me, E = EXPL.E.E15;
+  me.leader.st = ['legal']; me.leader.g = 'attack'; me.chars[2].st = ['legal']; me.chars[2].g = 'attack'; me.donLegal = true;
+  me.hand.forEach((c, i) => { if ([0, 1, 2, 4].includes(i)) { c.st = ['legal']; c.g = 'play'; } });
+  s.decision = { title: 'Your Main phase', body: '<p style="margin:0">Play a card, give DON!!, attack, or end your turn.</p><ul style="margin:6px 0 0;padding-left:16px"><li><b>2 can attack:</b> Leader, Bonney</li><li><b>4 playable</b> from hand</li><li><b>6 DON!! active</b></li></ul>', foot: `${SCN.rewind}${SCN.primary('End turn', '2 can attack · 6 DON!! unused', 'E')}` };
+  if (st === 'thinking') {
+    s.coachHtml = EXPL.coach('hint', `<p style="margin:0 0 6px"><b>Thinking…</b> <span class="subtle">(Esc to stop)</span></p><div class="indet" aria-hidden="true" style="--x:1"></div><p class="subtle" style="margin:6px 0 0;font-size:12px">Usually 1.5 to 2.5 s. The board stays yours: keep playing if you like.</p>`, { hint: 'thinking' });
+    s.coachStrip = { hint: 'thinking' };
+  }
+  if (st === 'result' || st === 'following') {
+    if (st === 'following') {
+      me.hand.splice(0, 1);
+      me.chars[1] = K('OP14-031', { chips: [{ t: 'New', pos: 'top' }] });
+      me.active = 1; me.rested = 4; me.leader = K('OP13-001', { who: 'Your', don: 1, p: 6000, st: ['legal'], g: 'attack' });
+      s.opp.chars[1] = opp('OP17-074', { r: true, st: ['legal'], g: 'target' }); s.opp.chars[2] = opp('EB04-032', { r: true });
+      s.log.push(SCN.you(`Play ${SCN.lk('Nami')} · 4 DON!!`), '<li>On Play: rest Yamato and Queen · 5 DON!! active at end of turn</li>', SCN.you(`Give 1 DON!! to ${SCN.lk('Monkey.D.Luffy')} · 6000`));
+    } else {
+      me.hand[0].chips = [{ t: 'Step 1', cls: 'you', pos: 'top' }];
+    }
+    s.coachHtml = EXPL.coach('hint', EXPL.render(E, { live: true, verbosity: 'standard', done: st === 'following' ? 2 : 0 }) + '<details class="srcs" style="margin-top:4px"><summary>Other lines</summary><p style="margin:4px 0;font-size:12px">Sanji instead: ends with 3 active DON!!, +6000 defence.</p></details>', { hint: st === 'following' ? '2 of 5 done' : 'ready' });
+    s.coachStrip = { hint: 'ready', hintCls: 'ready' };
+  }
+  if (st === 'stale') {
+    me.hand.splice(1, 1);
+    me.chars[1] = K('OP13-027', { chips: [{ t: 'New', pos: 'top' }] });
+    me.active = 3; me.rested = 3;
+    s.log.push(SCN.you(`Play ${SCN.lk('Sanji')} · 5 DON!!`), '<li>On Play: set 2 DON!! active</li>');
+    s.coachHtml = EXPL.coach('hint', `<div style="opacity:.75">${EXPL.render(E, { live: true, verbosity: 'terse' })}</div><p style="margin:6px 0 0;padding:6px 8px;border:1px dashed var(--color-line-strong);border-radius:6px"><b>Board changed: ask again</b> <kbd>H</kbd><br><span class="subtle" style="font-size:12px">You played Sanji, which is not in this line. Hints never re-run on their own.</span></p>`, { hint: 'stale' });
+    s.coachStrip = { hint: 'stale' };
+  }
+  return s;
+}, STATES);
+</script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Board: defending</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+</head>
+<body class="board-page">
+<main class="stage" aria-label="Game: Rocks.D.Xebec (you) vs Kaido (Pirate AI)"></main>
+<div id="announce-assertive" class="sr-only" role="alert">Kaido attacks your Leader. Kaido 7000, your Leader 5000. You need 3000 to stop it. You have 3 counter cards worth 5000.</div>
+<script src="wf.js"></script>
+<script src="cards.js"></script>
+<script src="scenarios.js"></script>
+<script>
+const STATES = [['plan', 'Nothing staged'], ['tie', 'Staged: ties (warning)'], ['stop', 'Staged: stops it'], ['block', 'Blocker chosen']];
+WF.mountBoard((st) => {
+  const opp = (c) => ({ ...c, who: 'Opponent’s' });
+  const s = {
+    boardLabel: 'Game board, turn 8, opponent’s turn, you are defending',
+    opp: {
+      idText: 'Kaido · Pirate AI', hand: 4, donDeck: 0, active: 5, rested: 3, life: 1, deck: 29,
+      leader: opp(K('OP17-058', { r: true, don: 2, p: 7000, st: ['opp-act', 'battle'], chips: [{ t: '⚔ attacking', cls: 'attack', pos: 'below' }], noRestChip: true })),
+      trash: { n: 6, top: K('OP17-077') },
+      chars: [opp(K('OP17-073', { chips: [{ t: 'New', pos: 'top' }] })), opp(K('EB04-031')), opp(K('OP17-074')), opp(K('OP17-060', { r: true })), null],
+    },
+    me: {
+      donDeck: 2, active: 3, rested: 5, life: 3, deck: 27,
+      leader: K('OP17-039', { who: 'Your', st: ['battle'] }),
+      trash: { n: 9, top: K('OP17-055') },
+      chars: [null, K('OP17-040'), K('OP17-046'), K('OP17-048', { r: true }), null],
+      hand: [K('OP17-056', { hand: true }), K('OP08-051', { hand: true }), K('OP17-055', { hand: true }), K('OP17-045', { hand: true, st: ['dim'] }), K('OP17-048', { hand: true, st: ['dim'] })],
+    },
+    mid: { turn: 'Turn 8 · Opponent’s turn', oppTag: false, opp: true, battle: 'Block', left: '' },
+    log: [
+      SCN.th('Turn 7 · You'),
+      SCN.you(`${SCN.lk('Rocks.D.Xebec')} attacks their Leader · 7000 vs 5000`),
+      SCN.opp(`Counter: ${SCN.lk('Mamaragan')} +1000 · 5000 → 6000`),
+      '<li>Hit · their Life 3 → 2</li>',
+      SCN.you(`${SCN.lk('Shiki')} attacks their Leader · 9000 vs 5000`),
+      SCN.opp(`Counter: ${SCN.lk('Kundali Dragon Swarm')} +4000 · 5000 → 9000`),
+      '<li>Hit · ties go to the attacker · their Life 2 → 1</li>',
+      SCN.you('End of turn · 3 active DON!!'),
+      SCN.th('Turn 8 · Opp'),
+      SCN.opp('Refresh · Draw · DON!! +2 · 9 DON!!', false),
+      SCN.opp(`Play ${SCN.lk('Basil Hawkins')} · 3 DON!!`),
+      '<li>On Play: trash 1 · +1 DON!! active · 10 DON!!</li>',
+      SCN.opp(`${SCN.lk('Ulti & Page One')} attacks ${SCN.lk('Shiki')} · 6000 vs 9000`),
+      '<li>Attack fails</li>',
+      SCN.opp(`Give 2 DON!! to ${SCN.lk('Kaido')} · 7000`, false),
+      SCN.opp(`${SCN.lk('Kaido')} attacks your Leader · 7000 vs 5000`),
+    ],
+    coachStrip: { hint: 'ask' },
+    arrows: [{ from: 'opp.leader', to: 'me.leader', bend: 0, cut: 40 }],
+  };
+  const me = s.me;
+  const [rp, buckin, auth] = me.hand;
+  const lit = (c) => { c.st = ['legal']; c.g = 'play'; };
+  [rp, buckin, auth].forEach(lit);
+  const glor = me.chars[2];
+  glor.st = ['legal']; glor.g = 'target';
+  const stage = (c, amt) => { c.st = ['legal', 'hand-raise']; c.g = 'pick'; c.chips = [{ t: `${amt} ✓`, cls: 'you', pos: 'top' }]; c.aria = `${c.n}, staged, ${amt}`; };
+
+  let def = { name: 'Your Leader', num: '5000', bd: '3 counters: up to +5000' };
+  let res = { cls: 'hit', text: 'Hit lands', need: 'Need +3000' };
+  let note = '';
+  let foot = `<button class="btn" type="button" aria-disabled="true">Clear</button>${SCN.primary('Take the hit', 'Life 3 → 2 · +1 card', '')}`;
+  let blockOpts = `<button class="opt" type="button" aria-pressed="true">No block</button><button class="opt" type="button" aria-pressed="false">Gloriosa 1000 · K.O.'d</button>`;
+  let ctrOpts = `<span class="muted">3 cards, up to +5000 · click lit hand cards</span>`;
+  if (st === 'tie') {
+    stage(rp, '+2000'); me.leader.p = 7000;
+    def = { name: 'Your Leader', num: '7000', bd: '5000 + 2000 staged' };
+    res = { cls: 'hit', text: 'Ties go to the attacker', need: 'Need +1000 more' };
+    note = `<p style="margin:2px 0 0;color:var(--color-warning-text);font-size:12px;line-height:16px"><span aria-hidden="true">⚠</span> 7000 vs 7000 still hits. Add Buckin (+1000) or Newgate (+3000) to stop it, or take the hit and keep Rocks Pirates.</p>`;
+    ctrOpts = `<button class="opt" type="button" aria-pressed="true">Rocks Pirates +2000 ✓</button><button class="opt" type="button" aria-pressed="false">Buckin +1000</button><button class="opt" type="button" aria-pressed="false">No Authority +2000</button>`;
+    foot = `<button class="btn" type="button">Clear <kbd>Esc</kbd></button><button type="button" class="btn warn big"><span class="lbl2">Play 1 counter · still hits</span><span class="sub">7000 vs 7000 · Life 3 → 2</span></button>`;
+    s.mid.battle = 'Counter';
+  }
+  if (st === 'stop') {
+    stage(rp, '+2000'); stage(buckin, '+1000'); me.leader.p = 8000;
+    def = { name: 'Your Leader', num: '8000', bd: '5000 + 3000 staged' };
+    res = { cls: 'ok', text: 'Attack fails', need: 'Exactly enough' };
+    ctrOpts = `<button class="opt" type="button" aria-pressed="true">Rocks Pirates +2000 ✓</button><button class="opt" type="button" aria-pressed="true">Buckin +1000 ✓</button><button class="opt" type="button" aria-pressed="false">No Authority +2000</button>`;
+    foot = `<button class="btn" type="button">Clear <kbd>Esc</kbd></button>${SCN.primary('Counter +3000 · survive', 'Hand 5 → 3 · Life stays 3', 'Enter')}`;
+    s.mid.battle = 'Counter';
+  }
+  if (st === 'block') {
+    glor.st = ['selected', 'battle']; glor.chips = [{ t: '✓ Blocking', cls: 'you', pos: 'top' }];
+    me.leader.st = []; me.leader.chips = [];
+    [rp, buckin, auth].forEach((c) => { c.st = []; c.g = undefined; });
+    def = { name: 'Gloriosa <span class="subtle">(Blocker)</span>', num: '1000', bd: 'redirected from your Leader' };
+    res = { cls: 'hit', text: 'K.O. · Gloriosa', need: 'Leader safe · Life stays 3' };
+    blockOpts = `<button class="opt" type="button" aria-pressed="false">No block</button><button class="opt" type="button" aria-pressed="true">Gloriosa 1000 ✓</button>`;
+    ctrOpts = `<span class="muted">Saving Gloriosa needs +7000: you have +5000</span>`;
+    s.arrows = [{ from: 'opp.leader', to: 'me.c3', bend: 60, label: 'Blocked by Gloriosa', labelAt: 0.62, cut: 40 }];
+    foot = `<button class="btn" type="button">Clear <kbd>Esc</kbd></button>${SCN.primary('Block with Gloriosa', 'Gloriosa K.O.’d · Life stays 3', 'Enter')}`;
+  }
+  const lanes = `<div style="margin-top:2px">
+      <div class="lane"><span class="ln">When<br>attacked</span><div class="opts"><button class="opt" type="button" aria-pressed="false">Newgate: trash 1 → Leader +3000</button></div></div>
+      <div class="lane"><span class="ln">Block</span><div class="opts">${blockOpts}</div></div>
+      ${WF.isRoomy() ? `<div class="lane" style="border-bottom:0"><span class="ln">Counter</span><div class="opts" style="font-size:12px;line-height:24px">${ctrOpts}</div></div>` : ''}</div>`;
+  s.decision = {
+    title: 'Defend your Leader',
+    body: SCN.battle({ att: { name: 'Kaido <span class="subtle">(their Leader)</span>', num: '7000', bd: '5000 + 2000 DON!!' }, def, res, post: note + lanes }),
+    foot,
+  };
+  s.extra = (g, R) => {
+    if (st === 'block') return '';
+    // "+2000 staged" tags for staged hand cards sit above the hand
+    return '';
+  };
+  return s;
+}, STATES);
+</script>
+</body>
+</html>

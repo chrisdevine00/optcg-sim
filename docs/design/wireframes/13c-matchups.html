@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OPTCG Sim · Matchup grid</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+<style>
+  .mwrap { overflow: auto; border: 1px solid var(--color-line); border-radius: var(--radius-3); position: relative; max-height: calc(100vh - 56px - 41px - 120px); }
+  table.mu { border-collapse: separate; border-spacing: 0; font-size: 12px; }
+  table.mu th, table.mu td { border-right: 1px solid var(--color-line); border-bottom: 1px solid var(--color-line); padding: 0; }
+  table.mu thead th { position: sticky; top: 0; z-index: 3; background: var(--color-surface-2); height: 52px; min-width: 78px; font-weight: 600; vertical-align: bottom; padding: 4px; line-height: 14px; }
+  table.mu tbody th { position: sticky; left: 0; z-index: 2; background: var(--color-surface-2); text-align: left; padding: 0 8px; white-space: nowrap; font-weight: 600; height: 34px; }
+  table.mu thead th:first-child { left: 0; z-index: 4; }
+  .cellb { width: 100%; height: 34px; border: 0; background: transparent; cursor: pointer; font: 600 12px/1 var(--font-ui); font-feature-settings: var(--font-num-features); color: var(--color-text); }
+  .cellb:hover { background: var(--color-surface-3); }
+  .cellb.plan { color: var(--color-text-subtle); font-weight: 500; }
+  .cellb.mirror { color: var(--color-text-subtle); font-style: italic; cursor: default; }
+  .cellb.on { box-shadow: inset 0 0 0 2px var(--color-accent); }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="app-header"></header>
+  <main class="app-main" style="padding-top:16px" id="main"></main>
+  <footer class="app-footer"></footer>
+</div>
+<script src="wf.js"></script>
+<script src="meta-data.js"></script>
+<script>
+WF.chrome('Meta');
+const A = [...META.arch].sort((a, b) => b.share - a.share);
+const short = (a) => ({ 'OP17-079': 'Luffy (Black)', 'OP13-001': 'Luffy (R/G)', 'OP15-058': 'Enel (Purple)', 'OP05-098': 'Enel (Yellow)', 'OP12-061': 'Rosinante', 'ST30-001': 'Luffy & Ace', 'OP17-039': 'Rocks', 'OP09-062': 'Nico Robin', 'OP14-041': 'Boa Hancock' }[a.id] || a.name);
+let rows = '';
+A.forEach((r) => {
+  rows += `<tr><th scope="row">${short(r)} <span class="subtle" style="font-weight:500">${r.id}</span></th>`;
+  A.forEach((c) => {
+    if (r.id === c.id) { rows += '<td><span class="cellb mirror" style="display:grid;place-items:center">mirror</span></td>'; return; }
+    const m = META.mu[r.id + '|' + c.id];
+    const on = r.id === 'OP17-039' && c.id === 'OP17-058';
+    const lab = m && m.rec ? `${short(r)} against ${short(c)}: record ${m.rec}, source ${m.src}` : `${short(r)} against ${short(c)}: plan available${m && m.inf ? ', inference' : ''}`;
+    rows += `<td><button type="button" class="cellb ${m && m.rec ? '' : 'plan'} ${on ? 'on' : ''}" aria-label="${lab}. Enter for details." ${on ? 'data-wf-focus' : ''}>${m && m.rec ? m.rec : '◇ plan'}</button></td>`;
+  });
+  rows += '</tr>';
+});
+const m = META.mu['OP17-039|OP17-058'];
+document.getElementById('main').innerHTML = `
+  <div class="row" style="align-items:end;margin-bottom:10px"><div><h1 class="page" style="margin:0">Matchups</h1><p class="muted" style="margin:2px 0 0">Rows: you play · columns: against · records are wins–losses from the source named, never a win rate we computed</p></div><span style="flex:1"></span>
+    <div class="seg" role="radiogroup" aria-label="View"><button type="button" role="radio" aria-checked="false" onclick="location.href='13-meta.html'">Grid</button><button type="button" role="radio" aria-checked="true">Matchups <kbd>M</kbd></button></div></div>
+  <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start">
+    <div class="mwrap" role="region" tabindex="0" aria-label="Matchup grid, scrollable"><table class="mu"><thead><tr><th scope="col">You play ↓ · against →</th>${A.map((a) => `<th scope="col">${short(a)}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>
+    <section class="panel raised" role="dialog" aria-labelledby="ph"><h2 id="ph" class="sub" style="margin:0 0 4px">Rocks against Kaido</h2>
+      <p style="margin:0 0 6px"><b class="num">16–20</b> <span class="muted">slightly behind</span> <span class="tag-src">${m.src}</span></p>
+      <p style="margin:0 0 6px;font-size:13px;line-height:19px">Their leader gives one of your Characters −2000 once per turn on either player's attack, never your Leader (RL-45), so Shiki and your Blockers come up short while your leader's reveal attacks are safe. <span class="tag-inf">our reasoning</span></p>
+      <p class="subtle" style="font-size:12px;margin:0 0 8px">Records under about 30 games are a hint, not a fact. Kaido's guide has the same pairing as 20–16 from its side.</p>
+      <div class="row"><a class="btn primary" href="02-setup.html">Play this matchup</a><a class="btn" href="13b-guide.html">Rocks guide</a></div></section>
+  </div>`;
+const f = document.querySelector('[data-wf-focus]'); if (f) f.focus();
+</script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tutorial: giving DON!!</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+<style>
+  .tcard { position: absolute; z-index: 30; background: var(--color-surface-2); border: 2px solid var(--color-accent); border-radius: var(--radius-3); box-shadow: var(--elev-2); padding: 10px 12px; font-size: var(--text-lg); line-height: var(--leading-lg); }
+  .tcard h2 { font: 600 var(--text-xl)/var(--leading-xl) var(--font-display); margin: 0 0 4px; }
+  .tcard::before { content: ''; position: absolute; left: -9px; top: 40px; width: 14px; height: 14px; background: var(--color-surface-2); border-left: 2px solid var(--color-accent); border-bottom: 2px solid var(--color-accent); transform: rotate(45deg); }
+  .dots { display: flex; gap: 4px; }
+  .dots span { width: 22px; height: 6px; border-radius: 3px; background: var(--color-surface-3); }
+  .dots span.done { background: var(--color-text-muted); }
+  .dots span.cur { background: var(--color-accent); }
+</style>
+</head>
+<body class="board-page">
+<main class="stage" aria-label="Tutorial step 3 of 8: Giving DON!!"></main>
+<div id="announce-polite" class="sr-only" role="status" aria-live="polite">Giving DON!!. Each DON!! you give adds 1000 power, on your turn only. Highlighted: your Leader. Press Enter to give 1 DON!!.</div>
+<script src="wf.js"></script>
+<script src="cards.js"></script>
+<script src="scenarios.js"></script>
+<script>
+const STATES = [['step', 'Step 3: constrained action'], ['notyet', 'Tried something else'], ['done', 'Done: Next']];
+WF.mountBoard((st) => {
+  const opp = (id, x = {}) => K(id, { who: 'Opponent’s', ...x });
+  const done = st === 'done';
+  const s = {
+    boardLabel: 'Tutorial board, step 3 of 8',
+    opp: { idText: 'Kaido · Rookie (scripted)', hand: 5, donDeck: 8, active: 0, rested: 2, life: 5, deck: 39, leader: opp('OP17-058'), trash: { n: 0 }, chars: [null, null, opp('EB04-032', { r: true }), null, null] },
+    me: {
+      donDeck: 7, active: done ? 2 : 3, rested: 0, life: 5, deck: 39,
+      leader: K('OP17-039', { who: 'Your', don: done ? 1 : 0, p: done ? 6000 : 5000, st: done ? [] : ['legal', 'wf-focus'], g: done ? undefined : 'don', chips: done ? [{ t: '◆ +1 · 6000', cls: 'don', pos: 'below' }] : [] }),
+      trash: { n: 0 }, chars: [null, null, K('OP17-045'), null, null],
+      hand: [K('OP17-046', { hand: true }), K('OP17-056', { hand: true }), K('OP17-049', { hand: true }), K('OP08-051', { hand: true })],
+      donLegal: !done,
+    },
+    mid: { turn: 'Turn 3 · Your turn', phase: 'Main', left: '<span class="chip you">Tutorial</span>' },
+    log: [SCN.th('Tutorial · step 3 of 8'), '<li>Step 1 Zones ✓ · Step 2 Your first turn ✓</li>', SCN.you('Refresh · Draw · DON!! +2 · 3 DON!!')],
+    coachStrip: {},
+  };
+  if (done) s.log.push(SCN.you('Give 1 DON!! to Rocks.D.Xebec · 6000'));
+  const dots = `<div class="dots" role="img" aria-label="Step 3 of 8">${[1, 2, 3, 4, 5, 6, 7, 8].map((i) => `<span class="${i < 3 ? 'done' : i === 3 ? 'cur' : ''}"></span>`).join('')}</div>`;
+  s.decision = {
+    title: 'Tutorial · step 3 of 8',
+    q: false,
+    body: `${dots}<p style="margin:8px 0 4px"><b>Giving DON!!</b></p><p style="margin:0">${done ? 'Your Leader is 6000 until the end of your turn.' : 'Give 1 DON!! to your Leader. Only that move works in this step.'}</p><p class="subtle" style="margin:6px 0 0;font-size:12px">No timers. <kbd>P</kbd> reads this step again.</p>`,
+    foot: `<a class="btn" href="01-welcome.html">Leave tutorial</a>${done ? SCN.primary('Next', 'Step 4: Attacking', 'Enter', '04-attack.html') : '<button type="button" class="btn primary big" aria-disabled="true"><span class="lbl2">Next</span><span class="sub">after the move</span></button>'}`,
+  };
+  s.extra = (g, R) => {
+    const r = R['me.leader']; const roomy = g.W > 1600; const w = roomy ? 400 : 300;
+    const x = r[0] + r[2] + 14, y = r[1] - (roomy ? 40 : 64);
+    const body = st === 'notyet'
+      ? '<p style="margin:0"><b>Not yet.</b> First, give 1 DON!! to your Leader.</p>'
+      : done ? '<p style="margin:0">Your Leader went from 5000 to 6000. On their turn, it goes back to 5000 while the DON!! stays.</p>'
+        : '<p style="margin:0">Each DON!! you give a Leader or Character adds +1000 power, on your turn only. Click your Leader (or press Enter) to give it 1 DON!!.</p>';
+    return `<section class="tcard" role="region" aria-label="Step explanation" style="left:${x}px;top:${y}px;width:${w}px"><h2>${done ? 'That’s it' : 'Giving DON!!'}</h2>${body}<p style="margin:6px 0 0;font-size:var(--text-sm)"><a href="16-settings.html#rules">Why? CR 6-5-5-2</a></p></section>`;
+  };
+  if (st === 'notyet') { s.me.chars[2].st = ['wf-focus']; s.me.leader.st = ['legal']; }
+  return s;
+}, STATES);
+</script>
+</body>
+</html>

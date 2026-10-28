@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Board: coach panel, lethal and DON!! math</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+</head>
+<body class="board-page">
+<main class="stage" aria-label="Game: Kaido (you) vs Rocks.D.Xebec (Warlord AI). Position from explanations.md E20"></main>
+<div id="announce-polite" class="sr-only" role="status" aria-live="polite">Lethal: proven, works against any hand.</div>
+<script src="wf.js"></script>
+<script src="cards.js"></script>
+<script src="scenarios.js"></script>
+<script src="expl.js"></script>
+<script>
+const STATES = [['rail', 'Collapsed: Lethal badge'], ['tier1', 'Lethal tier 1'], ['tier2', 'Lethal tier 2'], ['count', 'Guided count'], ['tier3', 'Lethal tier 3 (tall)'], ['don', 'DON!! math overlay'], ['tempo', 'Tempo meter']];
+WF.mountBoard((st) => {
+  const opp = (id, x = {}) => K(id, { who: 'Opponent’s', ...x });
+  // E20: your turn 6, going first (game turn 11), 10 DON!! all active
+  const s = {
+    boardLabel: 'Game board, turn 11, your Main Phase',
+    opp: {
+      idText: 'Rocks.D.Xebec · Warlord AI', hand: 1, donDeck: 0, active: 2, rested: 8, life: 2, deck: 20,
+      leader: opp('OP17-039'),
+      trash: { n: 15, top: K('OP17-055') },
+      chars: [null, null, opp('OP17-040', { r: true }), null, null],
+    },
+    me: {
+      donDeck: 0, active: 10, rested: 0, life: 3, deck: 23,
+      leader: K('OP17-058', { who: 'Your' }),
+      trash: { n: 9, top: K('OP17-076') },
+      chars: [null, K('OP17-060'), K('OP17-062'), null, null],
+      hand: [K('OP15-069', { hand: true }), K('OP17-073', { hand: true }), K('EB04-040', { hand: true }), K('OP17-061', { hand: true })],
+    },
+    mid: { turn: 'Turn 11 · Your turn', phase: 'Main' },
+    log: [
+      SCN.th('Turn 10 · Opp'),
+      SCN.opp(`${SCN.lk('Edward.Newgate')} attacks your Leader · 8000 vs 5000`),
+      SCN.you(`Counter: ${SCN.lk('Nola')} +2000 · 5000 → 7000`),
+      '<li>Hit · your Life 4 → 3</li>',
+      SCN.opp('End of turn', false),
+      SCN.th('Turn 11 · You'),
+      SCN.you('Refresh · Draw: Basil Hawkins · DON!! +2 · 10 DON!!'),
+    ],
+    coachStrip: { lethal: 'Lethal', lethalCls: 'alert', tempo: '0 of 10' },
+    verbosity: 'Standard',
+  };
+  const me = s.me;
+  const idle = () => {
+    me.leader.st = ['legal']; me.leader.g = 'attack';
+    me.chars[1].st = ['legal']; me.chars[1].g = 'attack';
+    me.chars[2].st = ['legal']; me.chars[2].g = 'attack';
+    me.donLegal = true;
+    s.decision = { title: 'Your Main phase', body: '<p style="margin:0">Play a card, give DON!!, attack, or end your turn.</p><ul style="margin:6px 0 0;padding-left:16px"><li><b>3 can attack</b></li><li><b>10 DON!! active</b></li></ul>', foot: `${SCN.rewind}${SCN.primary('End turn', '3 can attack · 10 DON!! unused', 'E')}` };
+  };
+  idle();
+  const L = EXPL.E.E20;
+  const lethalSt = { lethal: '◆ Lethal' };
+  const t1 = `<h4 class="claim">Lethal is on the board.</h4><p style="margin:0 0 6px">${EXPL.cert('any-hand')}</p>
+    <p class="muted" style="margin:0 0 8px">Their deck runs no [Trigger] cards, so no Life card can stop it.</p>`;
+  const t2 = `<h4 class="claim">You need 3 hits. You have 3 attackers that can hit their Leader.</h4>`;
+  const next = (a, b) => `<div class="row" style="gap:6px;flex-wrap:wrap">${a ? `<button class="btn small" type="button">${a}</button>` : ''}${b ? `<button class="btn small primary" type="button">${b}</button>` : ''}</div>`;
+  if (st === 'tier1') { s.coach = 'open'; s.coachHtml = EXPL.coach('lethal', t1 + next('Count it with me', 'How many hits? <kbd>L</kbd>'), lethalSt); }
+  if (st === 'tier2') { s.coach = 'open'; s.coachHtml = EXPL.coach('lethal', t1 + t2 + next('Count it with me', 'Show the line <kbd>L</kbd>'), lethalSt); }
+  if (st === 'count') {
+    s.coach = 'open';
+    [me.leader, me.chars[1], me.chars[2]].forEach((c) => { c.st = ['legal']; c.g = 'pick'; c.chips = [{ t: '✓ can hit', cls: 'you', pos: 'top' }]; });
+    s.coachHtml = EXPL.coach('lethal', `<p style="margin:0 0 6px" class="muted">Count it with me · step 3 of 4</p>
+      <ol style="margin:0;padding-left:18px">
+        <li><b>How many hits?</b> <span class="chip success">✓ 3</span> <span class="muted">2 Life + 1</span></li>
+        <li><b>Who can hit their Leader?</b> <span class="chip success">✓ 3</span> <span class="muted">Ulti, your Leader, Kaido</span></li>
+        <li><b>How much can they stop?</b>
+          <ul style="padding-left:14px;margin:2px 0">
+            <li>Blockers: <b>none</b> active</li>
+            <li>Newgate: +3000, once, for 1 card</li>
+            <li>Counters: +2000 each <span class="tag-src">archetype</span></li>
+          </ul>
+          <div class="nexttime" style="margin:4px 0"><b>Most often missed</b>Each hit gives them a card. After 1 hit they have 2 cards; after 2 hits, 3.</div>
+          <div class="row" style="gap:4px;font-size:12px"><span>They can stop:</span><input class="input" style="height:28px;width:72px" value="3000" aria-label="Most they can stop on your first attack"><span>on attack 1</span></div></li>
+        <li class="subtle"><b>Split your DON!!</b> (next)</li>
+      </ol>
+      <div class="row" style="gap:6px;margin-top:8px"><button class="btn small primary" type="button">Check my count</button><button class="btn small" type="button">Show the line</button></div>`, lethalSt);
+  }
+  if (st === 'tier3') {
+    s.coach = 'tall';
+    s.log = s.log.slice(-3);
+    s.coachHtml = EXPL.coach('lethal', EXPL.render(L, { live: true, verbosity: 'learner' }), lethalSt);
+  }
+  if (st === 'don') {
+    // DON!! math on the board (setting, default off): while an attacker is selected each target shows its "to stop" tag
+    me.chars[1] = K('OP17-060', { don: 2, p: 8000, st: ['selected', 'battle'], chips: [{ t: '✓ Selected', cls: 'you', pos: 'top' }] });
+    me.leader = K('OP17-058', { who: 'Your', don: 5, p: 10000 }); me.active = 3;
+    me.chars[2].st = []; me.chars[2].g = undefined; me.leader.st = ['dim'];
+    s.opp.leader.st = ['legal', 'battle']; s.opp.leader.g = 'target';
+    s.opp.chars[2].st = ['dim'];
+    s.arrows = [{ from: 'me.c2', to: 'opp.leader', dashed: true, bend: -60 }];
+    s.mid.battle = 'Attack';
+    s.extra = (g, R) => { const r = R['opp.leader']; return `<span class="cchip" style="left:${r[0] + r[2] + 6}px;top:${r[1] + r[3] / 2 - 9}px;transform:none;background:var(--color-plate);color:#fff;z-index:25;border:1px solid var(--color-attack)">+4000 to stop · they can make 3000</span>`; };
+    s.coach = 'open';
+    s.coachHtml = EXPL.coach('don', `<p style="margin:0 0 4px"><b>Ulti 8000 vs their Leader 5000</b></p>
+      <p class="num" style="margin:0 0 4px">8000 − 5000 + 1000 = <b>4000</b> to stop it</p>
+      <p style="margin:0 0 4px">They can make <b>3000</b>: 1 card through Newgate. ${EXPL.cert('any-hand')}</p>
+      <p class="subtle" style="margin:4px 0 0;font-size:12px">Ties go to the attacker (CR 7-1-4-1). DON!! add power on your turn only (CR 6-5-5-2).</p>
+      <label class="row" style="gap:6px;margin-top:6px;font-size:12px"><input type="checkbox" checked> Show "to stop" tags on the board</label>`, { ...lethalSt, don: 'Ulti → Leader' });
+    s.decision = {
+      title: 'Attack their Leader with Ulti?',
+      body: SCN.battle({ att: { name: 'Ulti &amp; Page One', num: '8000', bd: '6000 + 2000 DON!!' }, def: { name: 'Their Leader', num: '5000', bd: '5000 · 1 card in hand' }, res: { cls: 'hit', text: 'Hit lands', need: 'They need +4000' } }) + '<p class="subtle" style="margin:4px 0 0;font-size:12px">8000 − 5000 + 1000 = 4000 · ties go to the attacker</p>',
+      foot: `<button class="btn" type="button">Cancel</button>${SCN.primary('Confirm attack', '8000 vs 5000', 'Enter')}`,
+    };
+  }
+  if (st === 'tempo') {
+    me.chars[1] = K('OP17-060', { don: 2, p: 8000 }); me.leader = K('OP17-058', { who: 'Your', don: 5, p: 10000 });
+    me.active = 3;
+    [me.leader, me.chars[1], me.chars[2]].forEach((c) => { c.st = ['legal']; c.g = 'attack'; });
+    s.coachStrip.tempo = '7 of 10';
+    s.coach = 'open';
+    const seg = (w, bg, pat, label) => `<span title="${label}" style="flex:${w};background:${bg};${pat}"></span>`;
+    s.coachHtml = EXPL.coach('tempo', `<p style="margin:0 0 4px;font-weight:600" class="num">10 DON!! · 0 paid · 7 given · 0 held · 3 unused</p>
+      <div style="display:flex;height:18px;border-radius:4px;overflow:hidden;border:1px solid var(--color-line-strong)" role="img" aria-label="Tempo: 0 paid, 7 given, 0 held, 3 unused">
+        ${seg(7, 'var(--color-don)', 'background-image:repeating-linear-gradient(45deg,rgb(0 0 0/.25) 0 3px,transparent 3px 7px)', 'Given 7')}${seg(3, 'transparent', 'background-image:repeating-linear-gradient(90deg,var(--color-line-strong) 0 1px,transparent 1px 6px)', 'Unused 3')}</div>
+      <div class="row" style="gap:10px;font-size:12px;margin:4px 0 8px;flex-wrap:wrap"><span>▨ Paid 0</span><span>▧ Given 7</span><span>▦ Held 0</span><span>▥ Unused 3</span></div>
+      <p style="margin:0">3 active DON!! with nothing to spend them on their turn. Giving them to an attacker adds +3000 now.</p>
+      <p class="subtle" style="margin:6px 0 0;font-size:12px">No end-of-turn nag: the meter only updates.</p>`, { ...lethalSt, tempo: '7 of 10' });
+    s.decision.foot = `${SCN.rewind}${SCN.primary('End turn', '3 can attack · 3 DON!! unused', 'E')}`;
+    s.decision.body = '<p style="margin:0">Play a card, give DON!!, attack, or end your turn.</p><ul style="margin:6px 0 0;padding-left:16px"><li><b>3 can attack</b></li><li><b>3 DON!! active</b></li></ul>';
+  }
+  return s;
+}, STATES);
+</script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OPTCG Sim · Phone and narrow screens</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+<style>
+  .devs { display: flex; gap: 24px; align-items: flex-start; }
+  .dev { display: flex; flex-direction: column; gap: 8px; }
+  .frame { border: 10px solid #2a323d; border-radius: 28px; overflow: hidden; background: var(--color-bg); position: relative; }
+  .frame iframe { border: 0; transform-origin: 0 0; position: absolute; left: 0; top: 0; }
+  .cap { font-size: 13px; color: var(--color-text-muted); max-width: 300px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="app-header"></header>
+  <main class="app-main" style="padding-top:16px">
+    <h1 class="page" style="font-size:var(--text-2xl);line-height:var(--leading-2xl)">Phone and narrow screens <span class="muted" style="font:500 14px var(--font-ui)">board.md §6.4 · shown at reduced scale</span></h1>
+    <div class="devs" id="devs"></div>
+  </main>
+  <footer class="app-footer"></footer>
+</div>
+<script src="wf.js"></script>
+<script>
+WF.chrome('Play');
+const roomy = WF.isRoomy();
+const D = [
+  ['phone', 390, 844, 'Phone, portrait (390 × 844). Rotating would not help: landscape is below the 968 × 590 floor, so it says so.'],
+  ['phone', 844, 390, 'Phone, landscape (844 × 390). Same honest screen; no cramped board.'],
+  ['tablet', 820, 1180, 'iPad, portrait (820 × 1180). Landscape meets the floor, so it asks you to rotate.'],
+];
+const H = roomy ? 760 : 470, MAXK = roomy ? 0.8 : 0.55;
+document.getElementById('devs').innerHTML = D.map(([m, w, h, c]) => { const k = Math.min(MAXK, H / h); return `<div class="dev"><div class="frame" style="width:${w * k + 20}px;height:${h * k + 20}px"><iframe title="${c}" src="17-phone.html?mode=${m}" width="${w}" height="${h}" style="transform:scale(${k})"></iframe></div><p class="cap" style="max-width:${Math.max(220, w * k)}px">${c}</p></div>`; }).join('');
+</script>
+</body>
+</html>

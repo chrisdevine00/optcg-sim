@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OPTCG Sim · Deck builder</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+<style>
+  body { overflow: hidden; }
+  .db { height: calc(100vh - 56px - 41px); display: grid; grid-template-columns: 1fr 440px; gap: 16px; padding: 12px 24px; }
+  .roomy-db .db { grid-template-columns: 1fr 560px; }
+  .pane { background: var(--color-surface-1); border: 1px solid var(--color-line); border-radius: var(--radius-3); display: flex; flex-direction: column; min-height: 0; }
+  .pane > header { padding: 10px 12px; border-bottom: 1px solid var(--color-line); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .pane h2 { font: 600 var(--text-xl)/var(--leading-xl) var(--font-display); margin: 0; }
+  .filters { display: flex; gap: 6px; flex-wrap: wrap; padding: 8px 12px; border-bottom: 1px solid var(--color-line); }
+  .results { overflow: auto; padding: 18px 12px 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 22px 12px; }
+  .res { position: relative; height: 150px; }
+  .res .card { left: 0; top: 0; }
+  .res .ctl { position: absolute; left: 0; right: 0; top: 122px; display: flex; align-items: center; justify-content: space-between; }
+  .res .ctl .btn { min-height: 24px; height: 24px; min-width: 24px; padding: 0 6px; }
+  .deckbody { overflow: auto; padding: 8px 12px; min-height: 0; flex: 1; }
+  .vrow { display: flex; gap: 6px; font-size: 13px; line-height: 20px; }
+  .vrow.bad { color: var(--color-danger-text); font-weight: 600; }
+  .cov { height: 10px; border-radius: 5px; background: var(--color-surface-3); overflow: hidden; border: 1px solid var(--color-line-strong); }
+  .cov span { display: block; height: 100%; background: var(--color-success); }
+  .dl { list-style: none; margin: 0; padding: 0; }
+  .dl li { display: grid; grid-template-columns: 22px 28px 1fr auto auto; gap: 6px; align-items: center; padding: 3px 0; border-bottom: 1px solid var(--color-line); font-size: 13px; }
+  .dl li.bad { background: rgb(255 107 122 / 0.08); }
+  .dl .q { font-weight: 700; text-align: right; }
+  .dl .cst { width: 20px; height: 20px; border-radius: 50%; background: var(--color-plate); color: #fff; display: grid; place-items: center; font: 700 12px/1 var(--font-ui); }
+  .grp { font: 600 12px/16px var(--font-ui); color: var(--color-text-subtle); margin: 8px 0 2px; }
+  .modal { position: fixed; inset: 0; background: var(--color-scrim); display: grid; place-items: center; z-index: 60; }
+  .modal .dlg { width: min(860px, 92vw); max-height: 86vh; background: var(--color-surface-2); border: 1px solid var(--color-line-strong); border-radius: var(--radius-4); box-shadow: var(--elev-3); display: flex; flex-direction: column; }
+  .modal .dlg > header { padding: 12px 16px; border-bottom: 1px solid var(--color-line); display: flex; align-items: center; }
+  .modal .dlg > header h2 { margin: 0; flex: 1; font: 600 var(--text-xl)/var(--leading-xl) var(--font-display); }
+  .modal .dlg .bd { padding: 12px 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; overflow: auto; }
+  .modal textarea { width: 100%; height: 260px; background: var(--color-bg); border: 1px solid var(--color-line-strong); border-radius: 6px; padding: 8px; font: 13px/18px ui-monospace, Menlo, monospace; color: var(--color-text); }
+  .rep { list-style: none; margin: 0; padding: 0; font-size: 13px; }
+  .rep li { display: grid; grid-template-columns: 60px 1fr; gap: 6px; padding: 2px 0; border-bottom: 1px solid var(--color-line); }
+  .modal footer { padding: 12px 16px; border-top: 1px solid var(--color-line); display: flex; gap: 8px; justify-content: flex-end; align-items: center; }
+</style>
+</head>
+<body>
+<header class="app-header"></header>
+<main class="db" id="main" aria-label="Deck builder"></main>
+<footer class="app-footer"></footer>
+<script src="wf.js"></script>
+<script src="cards.js"></script>
+<script>
+WF.chrome('Decks');
+if (WF.isRoomy()) document.body.classList.add('roomy-db');
+const STATES = [['build', 'Building: validation + coverage'], ['import', 'Import with line report'], ['export', 'Export']];
+// Rocks list 1 (ChinoizeCup #122, 6th) with one Kyo too many to show a failing check
+const LIST = [['OP08-051', 3], ['OP17-050', 2], ['OP17-045', 5], ['OP17-052', 4], ['OP17-054', 4], ['OP17-042', 1], ['OP17-044', 3], ['OP17-046', 4], ['OP17-049', 4], ['OP17-040', 4], ['OP17-048', 4], ['OP17-118', 4], ['OP17-055', 4], ['OP17-056', 4]];
+const UNSCRIPTED = { 'OP17-044': 1, 'OP17-042': 1 };
+function draw() {
+  const st = WF.state() || 'build';
+  const g = { card: [84, 117] };
+  const browse = ['OP17-039', 'OP08-051', 'OP17-040', 'OP17-042', 'OP17-044', 'OP17-045', 'OP17-046', 'OP17-048', 'OP17-049', 'OP17-050', 'OP17-052', 'OP17-054', 'OP17-055', 'OP17-056', 'OP17-118'];
+  const inDeck = Object.fromEntries(LIST);
+  const res = browse.map((id) => { const c = K(id, { hand: true }); const n = inDeck[id] || (id === 'OP17-039' ? 'L' : 0); return `<div class="res" role="listitem" style="--card-w:84px">${WF.cardHTML({ ...c, aria: `${c.full}, ${CARDS[id].kind}, ${n === 'L' ? 'your Leader' : n + ' in deck'}${UNSCRIPTED[id] ? ', effect not automated' : ''}`, chips: UNSCRIPTED[id] ? [{ t: '⚠ not automated', cls: 'warning', pos: 'top' }] : (id === 'OP17-048' ? [{ t: 'alt art', pos: 'top' }] : []) }, [0, 0, 84, 117], g)}<div class="ctl"><button class="btn small" type="button" aria-label="Remove one ${c.full}">−</button><b class="num" style="font-size:13px">${n === 'L' ? 'Leader' : n + '/4'}</b><button class="btn small" type="button" aria-label="Add one ${c.full}">+</button></div></div>`; }).join('');
+  const groups = {};
+  LIST.forEach(([id, q]) => { const c = CARDS[id]; const k = c.kind === 'Event' ? 'Events' : 'Cost ' + c.cost; (groups[k] = groups[k] || []).push([id, q]); });
+  const order = Object.keys(groups).sort((a, b) => (a === 'Events') - (b === 'Events') || parseInt(a.slice(5)) - parseInt(b.slice(5)));
+  const list = order.map((k) => `<div class="grp">${k}</div><ul class="dl">${groups[k].map(([id, q]) => { const c = CARDS[id]; return `<li class="${q > 4 ? 'bad' : ''}"><span class="q num">${q}</span><span class="cst">${c.cost}</span><span>${c.short || c.n} <span class="subtle" style="font-size:12px">${id}</span>${UNSCRIPTED[id] ? ' <span class="chip warning" style="height:16px">⚠ not automated</span>' : ''}${q > 4 ? ' <b>· max 4</b>' : ''}</span>${id === 'OP17-048' ? '<span class="row" style="gap:2px;font-size:12px"><button class="btn small" type="button" aria-label="Previous art for Shiki" style="min-width:24px;padding:0 4px">◂</button><span>Alt art 2 of 2</span><button class="btn small" type="button" aria-label="Next art for Shiki" style="min-width:24px;padding:0 4px">▸</button></span>' : '<span></span>'}<span class="row" style="gap:2px"><button class="btn small" type="button" aria-label="Remove one ${c.n}" style="min-width:24px;padding:0 6px">−</button><button class="btn small" type="button" aria-label="Add one ${c.n}" style="min-width:24px;padding:0 6px">+</button></span></li>`; }).join('')}</ul>`).join('');
+  document.getElementById('main').innerHTML = `
+    <section class="pane" aria-label="Card browser">
+      <header><input class="input" style="max-width:320px" role="combobox" aria-expanded="false" aria-label="Search cards" placeholder="Search name, ID, type or text   /"><span class="muted" style="font-size:13px">15 results · legal for Blue (your Leader)</span></header>
+      <div class="filters" role="group" aria-label="Filters">
+        <button class="opt" type="button" aria-pressed="true">Colour: Blue ✓</button><button class="opt" type="button" aria-pressed="false">Cost</button><button class="opt" type="button" aria-pressed="false">Type</button><button class="opt" type="button" aria-pressed="false">Category</button><button class="opt" type="button" aria-pressed="false">Set</button><button class="opt" type="button" aria-pressed="true">In meta lists ✓</button><button class="opt" type="button" aria-pressed="false">Automated only</button></div>
+      <div class="results" role="list" aria-label="Results" tabindex="0">${res}</div>
+    </section>
+    <section class="pane" aria-label="Your deck">
+      <header><h2>Rocks test</h2><span class="chip outline">Leader OP17-039 Rocks.D.Xebec</span><span style="flex:1"></span>
+        <button class="btn small" type="button" onclick="location.hash='import'">Import</button><button class="btn small" type="button" onclick="location.hash='export'">Export</button></header>
+      <div class="deckbody" role="region" tabindex="0" aria-label="Deck list">
+        <div role="list" aria-label="Checks">
+          <div class="vrow" role="listitem">✓ 50 cards (51)</div>
+          <div class="vrow bad" role="listitem">✕ Max 4 per card number: OP17-045 Kyo ×5 <span class="subtle" style="font-weight:400">(CR 5-1-2-3)</span></div>
+          <div class="vrow" role="listitem">✓ Colours match Leader · ✓ No banned cards or pairs (from 2026-10-12) · ✓ Standard blocks 2–5</div>
+        </div>
+        <div style="margin:8px 0 4px;font-size:13px"><b>Automated: 46 of 51 cards (90%)</b> · 13 of 15 card names</div>
+        <div class="cov" role="img" aria-label="Automated 90 percent"><span style="width:90%"></span></div>
+        <details style="margin:4px 0 6px;font-size:12px"><summary class="muted" style="cursor:pointer">2 cards play for stats only: Captain John, Kaido (OP17-042)</summary><p style="margin:4px 0">Plays for its power and Counter; its effect won't happen. Keywords like Blocker still work where listed.</p></details>
+        ${list}
+      </div>
+      <footer class="row" style="padding:8px 12px;border-top:1px solid var(--color-line);gap:8px"><a class="btn small" href="02-setup.html">Play with this deck</a><a class="btn small" href="02-setup.html">Play against this deck</a><span style="flex:1"></span><span class="subtle" style="font-size:12px"><kbd>+</kbd> <kbd>−</kbd> add / remove</span></footer>
+    </section>`;
+  document.getElementById('main').querySelector('.vrow').textContent = '✕ 50 cards: you have 51';
+  document.getElementById('main').querySelector('.vrow').className = 'vrow bad';
+  document.querySelectorAll('.modal').forEach((m) => m.remove());
+  if (st === 'import' || st === 'export') {
+    const imp = st === 'import';
+    const txt = imp ? `1 OP17-039 Rocks.D.Xebec
+3 OP08-051 Buckin
+4 OP17-040 Edward.Newgate
+1 OP17-042 Kaido
+3 OP17-044 Captain John
+4 OP17-045 Kyo
+4 OP17-046 Gloriosa
+4 OP17-048 Shiki
+4 OP17-999 Charlotte Linlin
+3 OP17-050 Streusen
+4 OP17-052 Don Marlon
+4 OP17-054 Miss Buckingham Stussy
+4 OP17-055 There's No Authority…
+4 OP17-056 Rocks Pirates
+4 OP17-118 Rocks.D.Xebec` : `1xOP17-039
+3xOP08-051
+4xOP17-040
+1xOP17-042
+3xOP17-044
+4xOP17-045
+4xOP17-046
+4xOP17-048
+4xOP17-049
+3xOP17-050
+4xOP17-052
+4xOP17-054
+4xOP17-055
+4xOP17-056
+4xOP17-118`;
+    const rep = imp ? `<p style="margin:0 0 6px" role="status"><b>15 lines read · 14 OK · 1 problem</b></p><ul class="rep">${txt.split('\n').map((l, i) => i === 8 ? `<li style="color:var(--color-danger-text)"><b>Line 9</b><span>Unknown card ID OP17-999. The name matches OP17-049 Charlotte Linlin. <button class="btn small" type="button">Use OP17-049</button> <button class="btn small" type="button">Drop line</button></span></li>` : `<li><span class="subtle">Line ${i + 1}</span><span>✓ ${l.replace(/^\d+ /, '')}</span></li>`).join('')}</ul>` : `<p style="margin:0 0 6px"><b>Format</b></p><div class="seg" role="radiogroup" aria-label="Format"><button type="button" role="radio" aria-checked="true">4xOP01-016</button><button type="button" role="radio" aria-checked="false">4 OP01-016</button><button type="button" role="radio" aria-checked="false">4 Name OP01-016</button></div><p class="muted" style="font-size:13px">A tournament list round-trips: export after import gives back the same list, normalised. Alt-art choices are not exported; they are cosmetic and stay on this device.</p>`;
+    document.body.insertAdjacentHTML('beforeend', `<div class="modal"><section class="dlg" role="dialog" aria-modal="true" aria-labelledby="mh"><header><h2 id="mh">${imp ? 'Import a deck' : 'Export "Rocks"'}</h2><button class="iconbtn" type="button" aria-label="Close (Escape)" onclick="location.hash='build'">✕</button></header>
+      <div class="bd"><div><label class="lbl" for="ta">${imp ? 'Paste a list, or drop a .txt or .json file' : 'Your list'}</label><textarea id="ta">${txt}</textarea></div><div>${rep}</div></div>
+      <footer>${imp ? '<span class="muted" style="font-size:13px;margin-right:auto">Nothing changes until you import.</span><button class="btn" type="button">Cancel</button><button class="btn primary" type="button" aria-disabled="true">Import 50 cards</button>' : '<button class="btn" type="button">Download .txt</button><button class="btn primary" type="button" data-wf-focus>Copy</button>'}</footer></section></div>`);
+  }
+}
+draw(); window.addEventListener('hashchange', draw); WF.statesBar(STATES);
+</script>
+</body>
+</html>

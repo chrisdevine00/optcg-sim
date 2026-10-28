@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Board: why did the AI do that</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+</head>
+<body class="board-page">
+<main class="stage" aria-label="Game: Rocks.D.Xebec (you) vs Kaido (Pirate AI). Position from explanations.md E12"></main>
+<div id="announce-polite" class="sr-only" role="status" aria-live="polite">It blocked with Yamato: the cheapest way to keep its Life.</div>
+<script src="wf.js"></script>
+<script src="cards.js"></script>
+<script src="scenarios.js"></script>
+<script src="expl.js"></script>
+<script>
+const STATES = [['why', 'Why: AI block (E12)'], ['rookie', 'Why: Rookie tier']];
+WF.mountBoard((st) => {
+  const opp = (id, x = {}) => K(id, { who: 'Opponent’s', ...x });
+  const s = {
+    boardLabel: 'Game board, turn 9, your Main Phase',
+    opp: {
+      idText: st === 'rookie' ? 'Kaido · Rookie AI' : 'Kaido · Pirate AI', hand: 3, donDeck: 0, active: 1, rested: 8, life: 2, deck: 27,
+      leader: opp('OP17-058'),
+      trash: { n: 8, top: K('OP17-074') },
+      chars: [null, opp('EB04-031', { r: true }), null, opp('OP17-060', { r: true }), null],
+    },
+    me: {
+      donDeck: 1, active: 2, rested: 7, life: 3, deck: 25,
+      leader: K('OP17-039', { who: 'Your', r: true }),
+      trash: { n: 10, top: K('OP17-056') },
+      chars: [null, K('OP17-049', { st: ['legal'], g: 'attack' }), K('OP17-048', { r: true }), K('OP17-054', { st: ['legal'], g: 'attack' }), null],
+      hand: [K('OP17-046', { hand: true }), K('OP08-051', { hand: true }), K('OP17-055', { hand: true })],
+    },
+    mid: { turn: 'Turn 9 · Your turn', phase: 'Main' },
+    log: [
+      SCN.th('Turn 9 · You'),
+      SCN.you('Refresh · Draw: Buckin · DON!! +2 · 9 DON!!'),
+      SCN.you(`Play ${SCN.lk('Charlotte Linlin')} · 5 DON!!`),
+      '<li>On Play: Kaido chose "you draw 2"</li>',
+      SCN.you(`${SCN.lk('Charlotte Linlin')}… `).replace('…', 'attacks? No: played this turn'),
+      SCN.you(`${SCN.lk('Rocks.D.Xebec')} attacks their Leader · 5000 vs 5000`),
+      SCN.opp('Kaido’s Leader: no target (Characters only)', false),
+      SCN.opp(`Counter: ${SCN.lk('Queen')} +1000 · 5000 → 6000`),
+      '<li>Attack fails</li>',
+      SCN.you(`${SCN.lk('Shiki')} attacks their Leader · 9000 vs 5000`),
+      `<li style="background:var(--color-surface-3)"><span class="chip opp">Opp</span>Block: ${SCN.lk('Yamato')} · 1000 <a class="why" href="09c-why.html" data-wf-focus aria-label="Why did Kaido block with Yamato?">Why?</a></li>`,
+      '<li>Yamato K.O.’d · their Life stays 2</li>',
+    ],
+    coach: 'open', verbosity: 'Standard',
+    coachStrip: { why: 'ready', whyCls: 'ready' },
+  };
+  // Linlin was played this turn: remove the confusing line
+  s.log.splice(4, 1);
+  s.me.chars[1].st = []; s.me.chars[1].g = undefined; s.me.chars[1].p = 5000; s.me.chars[1].chips = [{ t: 'New', pos: 'top' }];
+  const E = EXPL.E.E12;
+  s.coachHtml = st === 'rookie'
+    ? EXPL.coach('why', `<h4 class="claim">Rookie picks a random legal move, except that it always blocks or counters a lethal attack.</h4><p class="subtle" style="margin:0;font-size:12px">That is honest, and it is what the Rookie tier is for. Try Pirate for an opponent with a plan.</p>`, { why: 'Block with Yamato' })
+    : EXPL.coach('why', `<p class="muted" style="margin:0 0 4px;font-size:12px">Kaido's block, turn 9 · only public information</p>` + EXPL.render(E, { verbosity: 'standard', evidenceOpen: true }), { why: 'Block with Yamato' });
+  s.decision = { title: 'Your Main phase', body: '<p style="margin:0">Play a card, give DON!!, attack, or end your turn.</p><ul style="margin:6px 0 0;padding-left:16px"><li><b>1 can attack:</b> Miss Buckingham Stussy</li><li><b>2 DON!! active</b></li></ul>', foot: `${SCN.rewind}${SCN.primary('End turn', '1 can attack · 2 DON!! unused', 'E')}` };
+  return s;
+}, STATES);
+</script>
+</body>
+</html>

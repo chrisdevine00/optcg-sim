@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OPTCG Sim · Wireframes</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+<style>
+  .list { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 12px; list-style: none; padding: 0; margin: 0; }
+  .list li { background: var(--color-surface-1); border: 1px solid var(--color-line); border-radius: 8px; padding: 10px 12px; }
+  .list .n { font: 600 var(--text-lg)/22px var(--font-ui); }
+  .list .n a { color: var(--color-text); text-decoration: none; }
+  .list .n a:hover { text-decoration: underline; }
+  .list .st { font-size: 12px; line-height: 18px; color: var(--color-text-muted); margin-top: 2px; }
+  .list .st a { color: var(--color-accent-text); }
+  .num0 { color: var(--color-text-subtle); font-feature-settings: var(--font-num-features); margin-right: 6px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="app-header"></header>
+  <main class="app-main" style="padding-top:20px">
+    <h1 class="page">OPTCG Sim wireframes</h1>
+    <p class="lede">Phase 4 clickable wireframes in the real visual system. Board geometry is board.md §3.1 (1280×720) and §3.2 (1920×1080). Card art is a labelled placeholder: no card image or Bandai art is used anywhere. Press <kbd>`</kbd> on any screen to show its wireframe state switcher (not product UI). Open-question and conflict notes: <code>NOTES.md</code>.</p>
+    <ol class="list" id="list"></ol>
+  </main>
+  <footer class="app-footer"></footer>
+</div>
+<script src="wf.js"></script>
+<script>
+WF.chrome('');
+const S = [
+  ['01-welcome', 'First launch', 'first launch; returning with a saved game', ['first', 'returning']],
+  ['02-setup', 'Game setup', 'deck, AI deck and tier, mode, first player, coach', ['ready', 'invalid']],
+  ['02b-start', 'Rock-paper-scissors, first or second, mulligan', 'on the board, in the decision panel', ['rps', 'choose', 'mulligan', 'hint']],
+  ['03-main', 'Board: your Main Phase', 'legal moves lit, DON!! mode, selected card, full-scan sign-off', ['idle', 'don', 'select', 'scan']],
+  ['04-attack', 'Board: declaring an attack', 'legal targets, whyNot on a non-target, confirm, declared', ['target', 'confirm', 'declared']],
+  ['05-defend', 'Board: defending', 'lanes, live maths, staged counters, single commit', ['plan', 'tie', 'stop', 'block']],
+  ['06-trigger', 'Trigger reveal', 'private reveal with two equal choices', ['reveal', 'nodon']],
+  ['07-effect-choice', 'Effect choice', 'multi-select with running count; order simultaneous effects', ['one', 'two', 'order']],
+  ['08-ai-turn', 'AI turn', 'highlight and dwell, thinking, speed, skip with recap', ['acting', 'thinking', 'skipped']],
+  ['09-coach', 'Coach: lethal, guided count, DON!! math, tempo', 'E20 position', ['rail', 'tier1', 'tier2', 'count', 'tier3', 'don', 'tempo']],
+  ['09b-hint', 'Coach: hint as a line', 'E15 position', ['thinking', 'result', 'following', 'stale']],
+  ['09c-why', 'Coach: why did the AI do that', 'E12 position', ['why', 'rookie']],
+  ['10-inspector', 'Card preview and inspector', 'preview dock, inspector, whyNot, trash viewer', ['preview', 'inspect', 'whynot', 'trash']],
+  ['11-game-over', 'Game over', 'result card over the board', ['lose']],
+  ['11b-review', 'Post-game review', 'timeline, flags, certainty, restored board, better line, Practice this', ['e05', 'e02', 'e06', 'e19', 'e09', 'unchecked', 'analysing']],
+  ['12-deck-builder', 'Deck builder', 'validation, coverage, alt art, import report, export', ['build', 'import', 'export']],
+  ['13-meta', 'Meta explorer', 'grid with tier, share and as-of date', []],
+  ['13b-guide', 'Archetype guide', 'Rocks.D.Xebec', []],
+  ['13c-matchups', 'Matchup grid', 'records with sources, plan cells, popover', []],
+  ['14-drill-lethal', 'Drill: lethal puzzle', 'untimed by default, timer on, answer, real hand', ['item', 'timed', 'answer', 'real']],
+  ['14b-mulligan', 'Drill: mulligan trainer', 'start, item, answer (E11)', ['start', 'item', 'answer']],
+  ['14c-drill-counter', 'Drill: counter or take it', 'from a review flag (E05)', ['item']],
+  ['15-tutorial', 'Tutorial step', 'T3 Giving DON!!: constrained, highlighted, two sentences', ['step', 'notyet', 'done']],
+  ['16-settings', 'Settings', 'with About: sources and disclaimer', ['game', 'cards', 'about']],
+  ['17-narrow', 'Phone and narrow screens', 'gallery of the honest screens', []],
+  ['17-phone', 'Phone screen (real page)', 'responsive; shot at 390×844 and 844×390 too', []],
+];
+document.getElementById('list').innerHTML = S.map(([f, t, d, st], i) => `<li><div class="n"><span class="num0">${String(i + 1).padStart(2, '0')}</span><a href="${f}.html">${t}</a></div><div class="st">${d}</div>${st.length ? `<div class="st">States: ${st.map((s) => `<a href="${f}.html#${s}">${s}</a>`).join(' · ')}</div>` : ''}<div class="st subtle">shots/${f}${st.length ? '--&lt;state&gt;' : ''}-1280.png, -1920.png</div></li>`).join('');
+</script>
+</body>
+</html>

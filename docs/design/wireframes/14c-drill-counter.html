@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Drill: counter or take it</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+</head>
+<body class="board-page">
+<main class="stage" aria-label="Counter or take it drill. Position from explanations.md E05"></main>
+<script src="wf.js"></script>
+<script src="cards.js"></script>
+<script src="scenarios.js"></script>
+<script>
+const STATES = [['item', 'From your game, turn 13']];
+WF.mountBoard(() => {
+  const opp = (id, x = {}) => K(id, { who: 'Opponent’s', ...x });
+  const s = {
+    boardLabel: 'Counter or take it drill, you are defending',
+    opp: { idText: 'Kaido · drill', hand: 0, donDeck: 0, active: 0, rested: 8, life: 2, deck: 19, leader: opp('OP17-058', { don: 2, p: 7000 }), trash: { n: 16, top: K('OP17-077') }, chars: [null, opp('OP17-060', { r: true, st: ['opp-act', 'battle'], chips: [{ t: '⚔ attacking', cls: 'attack', pos: 'below' }], noRestChip: true }), opp('OP17-062'), null, null] },
+    me: { donDeck: 0, active: 4, rested: 6, life: 1, deck: 16, leader: K('OP17-039', { who: 'Your', st: ['battle'] }), trash: { n: 18, top: K('OP17-049') }, chars: [null, null, null, null, null], hand: [K('OP17-056', { hand: true, st: ['legal'], g: 'play' }), K('OP17-055', { hand: true, st: ['legal'], g: 'play' }), K('OP08-051', { hand: true, st: ['legal'], g: 'play' })] },
+    mid: { turn: 'Drill · Turn 13 · Opponent’s turn', opp: true, battle: 'Counter', left: '<span class="chip outline" style="color:var(--color-text-muted)">Item 1 of 10</span>' },
+    arrows: [{ from: 'opp.c2', to: 'me.leader', cut: 40 }],
+    log: [SCN.th('Drill · Counter or take it (L10)'), '<li>From your game, turn 13</li>', '<li>Three attackers are active: Ulti &amp; Page One, their Leader, Kaido.</li>', '<li>They have 0 cards and 0 active DON!!.</li>'],
+    coachStrip: { hint: 'Show answer' },
+  };
+  s.decision = {
+    title: 'Defend your Leader · 1 Life',
+    body: SCN.battle({ att: { name: 'Ulti &amp; Page One', num: '6000', bd: '6000 base · 1 of 3 attackers' }, def: { name: 'Your Leader', num: '5000', bd: '5000 · 3 counters in hand, up to +5000' }, res: { cls: 'hit', text: 'Hit lands · Life 1 → 0', need: 'Need +2000' } }) + '<p class="subtle" style="margin:4px 0 0;font-size:12px">Plan all three attacks before you choose. Untimed.</p>',
+    foot: `<button class="btn" type="button" aria-disabled="true">Clear</button>${SCN.primary('Take the hit', 'Life 1 → 0 · +1 card', '')}`,
+  };
+  return s;
+}, STATES);
+</script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Board: your Main Phase</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+</head>
+<body class="board-page">
+<main class="stage" aria-label="Game: Rocks.D.Xebec (you) vs Kaido (Pirate AI)"></main>
+<div id="announce-polite" class="sr-only" role="status" aria-live="polite"></div>
+<script src="wf.js"></script>
+<script src="cards.js"></script>
+<script src="scenarios.js"></script>
+<script>
+const STATES = [['idle', 'Main: idle'], ['don', 'DON!! mode'], ['select', 'Hand card selected'], ['scan', 'Full-scan faces (sign-off)']];
+WF.mountBoard((st) => {
+  const s = SCN.mainBase();
+  const me = s.me;
+  if (st === 'idle' || st === 'scan') {
+    me.leader.g = 'attack'; me.leader.st = ['legal'];
+    me.chars[2].g = 'attack'; me.chars[2].st = ['legal'];
+    me.donLegal = true;
+    me.hand.forEach((c) => { if (c.playable) { c.g = 'play'; c.st = ['legal']; } });
+    s.decision = {
+      title: 'Your Main phase',
+      body: `<p style="margin:0 0 6px">Play a card, give DON!!, attack, or end your turn.</p>
+        <ul style="margin:0;padding-left:16px;line-height:20px">
+          <li><b>2 can attack:</b> your Leader, Shiki <span class="subtle">(⚔)</span></li>
+          <li><b>3 cards playable</b> from hand <span class="subtle">(▶)</span></li>
+          <li><b>2 DON!! active</b> · click your cost area to give</li>
+        </ul>
+        <p class="subtle" style="margin:6px 0 0">Stussy was played this turn: no attack until next turn.</p>`,
+      foot: `${SCN.rewind}
+        <a class="btn primary big" href="08-ai-turn.html" aria-label="End turn (E). 2 can attack, 2 DON!! unused"><span class="lbl2">End turn <kbd>E</kbd></span><span class="sub">2 can attack · 2 DON!! unused</span></a>`,
+    };
+    if (st === 'scan') s.face = 'scan';
+  }
+  if (st === 'don') {
+    me.donMode = true; me.donLegal = true;
+    me.leader.don = 3; me.leader.p = 8000; me.leader.st = ['legal']; me.leader.g = 'don';
+    me.leader.chips = [{ t: '◆ +1', cls: 'don', pos: 'below' }];
+    me.active = 1;
+    me.chars[2].st = ['legal']; me.chars[2].g = 'don';
+    me.chars[1].st = ['legal']; me.chars[1].g = 'don';
+    me.chars[3].st = ['legal']; me.chars[3].g = 'don';
+    s.log.push('<li><span class="chip you">You</span>Give 3 DON!! to <a class="lk" href="10-inspector.html">Rocks.D.Xebec</a> · 8000</li>');
+    s.log.splice(1, 1);
+    s.decision = {
+      title: 'Giving DON!! · 1 active',
+      body: `<p style="margin:0 0 6px">Click a lit card (◆) to give it 1 DON!!. Each gives <b>+1000 this turn only</b>.</p>
+        <table class="tbl num" style="font-size:13px"><tbody>
+          <tr><td>Your Leader</td><td style="text-align:right">8000 → 9000</td></tr>
+          <tr><td>Shiki</td><td style="text-align:right">9000 → 10000</td></tr>
+          <tr><td>Stussy, Captain John</td><td style="text-align:right" class="subtle">can't attack this turn</td></tr>
+        </tbody></table>`,
+      foot: `${SCN.rewind}
+        <button class="btn primary big" type="button" aria-label="Done giving DON!! (Escape)"><span class="lbl2">Done <kbd>Esc</kbd></span><span class="sub">1 DON!! left to give</span></button>`,
+    };
+  }
+  if (st === 'select') {
+    const kyo = me.hand[3];
+    kyo.st = ['selected']; kyo.chips = [{ t: '✓ Selected', cls: 'you', pos: 'top' }];
+    me.hand.forEach((c, i) => { if (c.playable && i !== 3) { c.g = 'play'; c.st = ['legal']; } });
+    s.decision = {
+      title: 'Kyo selected',
+      body: `<p style="margin:0 0 8px">Kyo · Character · cost 2 · 4000</p>
+        <div class="stack" style="gap:4px">
+          <button class="opt" style="min-height:32px;font-size:13px" type="button">▶ Play · rest 2 DON!! <span class="subtle" style="font-weight:500">· On Play: draw 1</span> <kbd style="margin-left:auto">P</kbd></button>
+          <button class="opt" style="min-height:32px;font-size:13px" type="button">Inspect <kbd style="margin-left:auto">I</kbd></button>
+        </div>
+        <p class="subtle" style="margin:6px 0 0">Playing uses your last 2 active DON!!. Rewind undoes it.</p>`,
+      foot: `<button class="btn" type="button">Cancel <kbd>Esc</kbd></button><span class="grow"></span>`,
+    };
+    s.extra = (g, R) => {
+      const r = R['me.hand.4'];
+      const w = g === WF.G.roomy ? 300 : 236;
+      return `<div class="pop left" role="menu" aria-label="Actions for Kyo" style="left:${r[0] + r[2] + 14}px;top:${r[1] - (g === WF.G.roomy ? 120 : 96)}px;width:${w}px">
+        <div class="ph">Kyo</div>
+        <button class="mi on" role="menuitem" type="button">▶ Play · 2 DON!! <kbd>P</kbd></button>
+        <button class="mi" role="menuitem" type="button">Inspect <kbd>I</kbd></button>
+        <button class="mi" role="menuitem" type="button" aria-disabled="true">Counter: no Counter value</button></div>`;
+    };
+  }
+  return s;
+}, STATES);
+</script>
+</body>
+</html>

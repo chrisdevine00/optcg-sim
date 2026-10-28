@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OPTCG Sim · Rocks.D.Xebec guide</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+<style>
+  .gwrap { display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: start; }
+  .gmain section { margin-bottom: 20px; }
+  .gmain p, .gmain li { font-size: var(--text-lg); line-height: var(--leading-lg); max-width: 72ch; }
+  .gmain h2 { font: 600 var(--text-2xl)/var(--leading-2xl) var(--font-display); margin: 0 0 6px; }
+  .aside { position: sticky; top: 12px; display: flex; flex-direction: column; gap: 12px; }
+  .kc { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--color-line-strong); border-radius: 999px; padding: 2px 10px 2px 3px; margin: 0 4px 6px 0; font-size: 13px; text-decoration: none; color: var(--color-text); }
+  .kc i { width: 18px; height: 25px; border-radius: 2px; background: repeating-linear-gradient(135deg, rgb(255 255 255 / .06) 0 3px, transparent 3px 6px), #23405e; display: inline-block; }
+  .gtbl td, .gtbl th { font-size: var(--text-sm); vertical-align: top; }
+  @media (max-width: 900px) { .gwrap { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="app-header"></header>
+  <main class="app-main" style="padding-top:16px">
+    <nav aria-label="Breadcrumb" class="muted" style="font-size:13px;margin-bottom:6px"><a href="13-meta.html">Meta explorer</a> › Rocks.D.Xebec</nav>
+    <div class="gwrap">
+      <article class="gmain">
+        <header style="margin-bottom:14px">
+          <h1 class="page" style="margin:0">Rocks.D.Xebec <span class="muted" style="font:500 var(--text-lg)/1 var(--font-ui)">OP17-039 · Blue</span></h1>
+          <p class="muted" style="margin:4px 0 0">Tier S <span class="tag-src">opmetagame</span> · 11.2% of lists, 16.1% since the ban <span class="tag-src">meta-lists</span> · Guide as of 2026-10-28 · confidence: medium</p>
+          <div class="row" style="margin-top:10px"><a class="btn primary" href="02-setup.html" data-wf-focus>Play this deck</a><a class="btn" href="02-setup.html">Play against this deck</a><span class="subtle" style="font-size:13px">"Play against" gives the AI this list and its playbook</span></div>
+        </header>
+        <section aria-labelledby="s1"><h2 id="s1">What the deck is trying to do</h2>
+          <p>Rocks is a blue card-advantage midrange deck built almost entirely from OP17 Rocks Pirates <span class="tag-src">SH-XEB</span>. Every leader attack trades one hand card for a reveal that draws two when the top card is Rocks Pirates, so each attack is a two-for-one <span class="tag-src">SH-XEB</span>. It finishes with the 10-cost Rocks.D.Xebec, which draws and plays two more Rocks Pirates from hand <span class="tag-src">CARD</span>.</p></section>
+        <section aria-labelledby="s2"><h2 id="s2">Game plan by turn</h2>
+          <table class="tbl gtbl"><thead><tr><th>Your turn</th><th>DON!! (1st / 2nd)</th><th>Plan</th></tr></thead><tbody>
+            <tr><td>T1</td><td class="num">1 / 2</td><td>Play Streusen or Buckin; Kyo only going second <span class="tag-src">CARD</span></td></tr>
+            <tr><td>T2</td><td class="num">3 / 4</td><td>Miss Buckingham Stussy or Don Marlon. Start attacking with the leader and paying for the reveal <span class="tag-src">SH-XEB</span></td></tr>
+            <tr><td>T3</td><td class="num">5 / 6</td><td>Charlotte Linlin or Gloriosa plus a 1-drop <span class="tag-src">SH-XEB</span></td></tr>
+            <tr><td>T4</td><td class="num">7 / 8</td><td>Shiki. Rush: Character lets him hit a rested Character at once <span class="tag-src">CARD</span></td></tr>
+          </tbody></table></section>
+        <section aria-labelledby="s3"><h2 id="s3">Defining cards</h2>
+          <div>${['Rocks.D.Xebec (OP17-118)', 'Edward.Newgate', 'Shiki', 'Miss Buckingham Stussy', 'Gloriosa', 'Charlotte Linlin', 'Kyo', 'There’s No Authority…', 'Rocks Pirates', 'Buckin'].map((n) => `<a class="kc" href="10-inspector.html#inspect"><i aria-hidden="true"></i>${n}</a>`).join('')}</div></section>
+        <section aria-labelledby="s4"><h2 id="s4">Mulligan</h2>
+          <p>Sourced baseline: mulligan any opening hand without a 1- to 3-cost Character <span class="tag-src">SH-XEB</span>. Do not chase OP17-118 in the opening hand <span class="tag-inf">our reasoning</span>.</p>
+          <a class="btn small" href="14b-mulligan.html">Try the mulligan trainer for this deck</a></section>
+      </article>
+      <aside class="aside" aria-label="At a glance">
+        <div class="panel"><h3 class="sub" style="font-size:var(--text-md)">Matchups</h3>
+          <table class="tbl"><tbody>
+            <tr><td>Kaido</td><td class="num">16–20</td><td><span class="tag-src">SH-XEB</span></td></tr>
+            <tr><td>Black Luffy</td><td class="num">18–38</td><td><span class="tag-src">SH-XEB</span></td></tr>
+            <tr><td>Luffy &amp; Ace</td><td class="num">24–20</td><td><span class="tag-src">SH-XEB</span></td></tr>
+            <tr><td>Sabo</td><td class="num">18–13</td><td><span class="tag-src">SH-XEB</span></td></tr>
+          </tbody></table><a href="13c-matchups.html" style="font-size:13px">All matchups →</a></div>
+        <div class="panel"><h3 class="sub" style="font-size:var(--text-md)">Sourced lists</h3>
+          <ul style="list-style:none;margin:0;padding:0;font-size:13px;line-height:18px">
+            <li style="padding:4px 0;border-bottom:1px solid var(--color-line)"><b>ChinoizeCup #122</b> · 6th · 13 Oct<br><span class="muted">Gefen H</span> · <a href="02-setup.html">Play this list</a></li>
+            <li style="padding:4px 0;border-bottom:1px solid var(--color-line)"><b>ChinoizeCup #121</b> · 2nd · 12 Oct<br><span class="muted">Frodon</span> · <a href="02-setup.html">Play this list</a></li>
+            <li style="padding:4px 0"><b>Rumble league #12</b> · 5th · 8 Oct<br><span class="muted">Pacio23</span> · <a href="02-setup.html">Play this list</a></li></ul></div>
+        <p class="subtle" style="font-size:12px;margin:0">Sourced claims carry their tag. <span class="tag-inf">our reasoning</span> marks inference.</p>
+      </aside>
+    </div>
+  </main>
+  <footer class="app-footer"></footer>
+</div>
+<script src="wf.js"></script>
+<script>WF.chrome('Meta'); document.querySelector('[data-wf-focus]').focus();</script>
+<script>
+// fill defining-card chips (template literal above is plain HTML)
+const box = document.querySelector('#s3').nextElementSibling;
+box.innerHTML = ['Rocks.D.Xebec (OP17-118)', 'Edward.Newgate', 'Shiki', 'Miss Buckingham Stussy', 'Gloriosa', 'Charlotte Linlin', 'Kyo', 'There’s No Authority…', 'Rocks Pirates', 'Buckin'].map((n) => `<a class="kc" href="10-inspector.html#inspect"><i aria-hidden="true"></i>${n}</a>`).join('');
+</script>
+</body>
+</html>

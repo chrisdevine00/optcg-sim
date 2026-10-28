@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Board: game over</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+<style>
+  .result { position: absolute; z-index: 60; background: var(--color-surface-2); border: 1px solid var(--color-line-strong); border-radius: var(--radius-4); box-shadow: var(--elev-3); padding: 24px 28px; }
+  .result h2 { font: 600 var(--text-4xl)/var(--leading-4xl) var(--font-display); margin: 0 0 4px; }
+  .result .acts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+  .result .acts .btn { min-height: 44px; }
+  .boardscrim { position: absolute; left: 0; top: 0; background: rgb(6 8 11 / 0.55); z-index: 55; }
+</style>
+</head>
+<body class="board-page">
+<main class="stage" aria-label="Game over: Kaido wins on turn 13"></main>
+<div id="announce-assertive" class="sr-only" role="alert">Game over. Kaido wins on turn 13.</div>
+<script src="wf.js"></script>
+<script src="cards.js"></script>
+<script src="scenarios.js"></script>
+<script>
+const STATES = [['lose', 'Game over']];
+WF.mountBoard((st) => {
+  const opp = (id, x = {}) => K(id, { who: 'Opponent’s', ...x });
+  const win = st === 'win';
+  const s = {
+    boardLabel: 'Game board, game over',
+    opp: {
+      idText: 'Kaido · Pirate AI', hand: win ? 2 : 0, donDeck: 0, active: 0, rested: 8, life: win ? 0 : 2, deck: 18,
+      leader: opp('OP17-058', { r: true, don: 2, p: 7000 }),
+      trash: { n: 17, top: K('OP17-077') },
+      chars: [null, opp('OP17-060', { r: true }), opp('OP17-062', { r: true }), null, null],
+    },
+    me: {
+      donDeck: 0, active: 4, rested: 6, life: 0, deck: 15,
+      leader: K('OP17-039', { who: 'Your' }),
+      trash: { n: 21, top: K('OP17-055') },
+      chars: [null, null, null, null, null],
+      hand: [K('OP17-045', { hand: true })],
+    },
+    mid: { turn: 'Turn 13 · Game over', phase: 'End' },
+    log: [
+      SCN.th('Turn 13 · Opp'),
+      SCN.opp(`${SCN.lk('Ulti & Page One')} attacks your Leader · 6000 vs 5000`),
+      SCN.you('No counter · Hit · your Life 1 → 0'),
+      SCN.opp(`${SCN.lk('Kaido')} attacks your Leader · 7000 vs 5000`),
+      SCN.you(`Counter: ${SCN.lk('Rocks Pirates')}, ${SCN.lk('Buckin')} · 5000 → 8000`),
+      '<li>Attack fails</li>',
+      SCN.opp(`${SCN.lk('Kaido')} (12000) attacks your Leader · 12000 vs 5000`),
+      SCN.you(`Counter: ${SCN.lk('There’s No Authority…')} · 5000 → 7000`),
+      '<li><b>Hit at 0 Life · Kaido wins</b></li>',
+    ],
+    coachStrip: {},
+    decision: { title: 'Game over', q: false, body: '<p style="margin:0 0 6px">Kaido wins on turn 13.</p><p class="subtle" style="margin:0">Analysis has started in the background, so the review opens fast. Analysing turn 4 of 13.</p>', foot: `<a class="btn" href="02-setup.html#rps">Rematch</a>${SCN.primary('Review game', 'analysing 4 of 13', 'Enter', '11b-review.html')}` },
+  };
+  s.extra = (g) => {
+    const w = g.W > 1600 ? 560 : 440; const m = g.mat; const x = (m[2] - w) / 2, y = g.W > 1600 ? 300 : 170;
+    return `<div class="boardscrim" style="width:${m[2]}px;height:${m[3]}px"></div>
+    <section class="result" role="dialog" aria-labelledby="rh" style="left:${x}px;top:${y}px;width:${w}px">
+      <h2 id="rh">${win ? 'You win' : 'Kaido wins'}</h2>
+      <p style="margin:0;font-size:var(--text-lg);line-height:var(--leading-lg)">${win ? 'Turn 13 · their Leader hit at 0 Life' : 'Turn 13 · your Leader was hit at 0 Life'}</p>
+      ${win ? '<p style="margin:8px 0 0"><span class="chip warning">⟲ Rewound</span> Not counted in your win rate.</p>' : '<p class="muted" style="margin:8px 0 0">Rematch: you lost, so you choose first or second.</p>'}
+      <div class="acts">
+        <a class="btn primary" href="11b-review.html" data-wf-focus>Review this game <kbd>Enter</kbd></a>
+        <a class="btn" href="02-setup.html#rps">Rematch</a>
+        <a class="btn" href="02-setup.html">New game</a>
+        <a class="btn" href="01-welcome.html">Home</a>
+      </div></section>`;
+  };
+  return s;
+}, STATES);
+</script>
+</body>
+</html>

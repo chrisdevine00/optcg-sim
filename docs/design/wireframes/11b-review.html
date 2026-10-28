@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Game review</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+<style>
+  body { overflow: hidden; }
+  .rv { height: 100vh; display: grid; grid-template-rows: 56px auto auto 1fr 36px; }
+  .rv-title { display: flex; align-items: center; gap: 12px; padding: 8px 24px 0; flex-wrap: wrap; }
+  .rv-title h1 { font: 600 var(--text-2xl)/var(--leading-2xl) var(--font-display); margin: 0; }
+  .tl { margin: 8px 24px 0; border: 1px solid var(--color-line); border-radius: var(--radius-3); background: var(--color-surface-1); padding: 6px 8px 4px; }
+  .tl-grid { display: grid; grid-template-columns: 56px repeat(14, 1fr); align-items: center; }
+  .tl-grid .h { font: 600 12px/16px var(--font-ui); color: var(--color-text-subtle); text-align: center; }
+  .tl-grid .h.cur { color: var(--color-text); }
+  .tl-grid .rl { font: 600 12px/16px var(--font-ui); color: var(--color-text-muted); }
+  .cell { height: 30px; display: flex; align-items: center; justify-content: center; gap: 3px; border-left: 1px solid var(--color-line); }
+  .cell.mine { background: rgb(108 196 255 / 0.05); }
+  .cell.hatch { background: repeating-linear-gradient(135deg, var(--color-line) 0 2px, transparent 2px 7px); }
+  .cell.sel { box-shadow: inset 0 0 0 2px var(--color-accent); border-radius: 4px; }
+  .flag { min-width: 24px; height: 24px; border: 0; background: transparent; padding: 0; display: grid; place-items: center; cursor: pointer; color: var(--color-text); border-radius: 4px; }
+  .flag svg { display: block; }
+  .flag.sev svg { width: 20px; height: 20px; }
+  .flag.mod svg { width: 16px; height: 16px; }
+  .flag.min svg { width: 12px; height: 12px; }
+  .flag[aria-pressed='true'] { background: var(--color-accent); color: var(--color-on-accent); }
+  .why-mk { font: 600 12px/16px var(--font-ui); color: var(--color-opponent-text); }
+  .rv-main { display: grid; grid-template-columns: auto 1fr; gap: 16px; padding: 10px 24px 8px; min-height: 0; }
+  .viewer { display: flex; flex-direction: column; gap: 6px; min-height: 0; }
+  .viewer-box { position: relative; overflow: hidden; border: 1px solid var(--color-line); border-radius: var(--radius-3); }
+  .viewer-box .stage { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+  .ro { position: absolute; left: 8px; top: 8px; z-index: 50; }
+  .detail { background: var(--color-surface-1); border: 1px solid var(--color-line); border-radius: var(--radius-3); padding: 12px 16px; overflow: auto; min-height: 0; }
+  .detail .wyd { padding: 6px 10px; border-radius: 6px; background: var(--color-surface-2); border: 1px solid var(--color-line); margin: 0 0 10px; }
+  .detail .claim { font-size: var(--text-xl); line-height: var(--leading-xl); }
+  .acts { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .legend { display: flex; gap: 12px; font-size: 12px; color: var(--color-text-muted); align-items: center; flex-wrap: wrap; }
+  .legend svg { width: 12px; height: 12px; vertical-align: -2px; }
+</style>
+</head>
+<body>
+<div class="rv">
+  <header class="app-header"></header>
+  <div class="rv-title" id="title"></div>
+  <section class="tl" aria-label="Turn timeline"><div id="tl"></div></section>
+  <div class="rv-main">
+    <section class="viewer" aria-label="Restored board, read-only">
+      <div class="viewer-box" id="vbox"><span class="chip outline ro" style="background:var(--color-surface-2)">Read-only · restored from the record</span><div class="stage" id="vstage"></div></div>
+      <div class="row" style="gap:8px"><button class="btn small" type="button" aria-label="Previous step">◂</button><span class="muted" style="font-size:13px" id="stepl">Step through the better line · 0 of 3</span><button class="btn small" type="button" aria-label="Next step">▸</button><span style="flex:1"></span><button class="btn small" type="button">⤢ Full size</button><span class="subtle" style="font-size:12px">N / Shift+N flags</span></div>
+    </section>
+    <article class="detail" id="detail" tabindex="0" aria-label="Selected flag"></article>
+  </div>
+  <footer class="app-footer"></footer>
+</div>
+<script src="wf.js"></script>
+<script src="cards.js"></script>
+<script src="scenarios.js"></script>
+<script src="expl.js"></script>
+<script>
+WF.chrome('Reviews');
+const SH = {
+  diamond: '<svg viewBox="0 0 16 16"><path d="M8 1l7 7-7 7-7-7z" fill="currentColor"/></svg>',
+  triF: '<svg viewBox="0 0 16 16"><path d="M8 1l7 13H1z" fill="currentColor"/></svg>',
+  triH: '<svg viewBox="0 0 16 16"><path d="M8 2l6 11H2z" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+  sqH: '<svg viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+  cirH: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+  bar: '<svg viewBox="0 0 16 16"><rect x="2" y="6" width="12" height="4" fill="currentColor"/></svg>',
+  eye: '<svg viewBox="0 0 16 16"><path d="M1 8s2.6-4.5 7-4.5S15 8 15 8s-2.6 4.5-7 4.5S1 8 1 8z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="8" r="2.2" fill="currentColor"/></svg>',
+  dash: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="3 2.4"/></svg>',
+};
+// You went second: your turns are even game turns. Flags from explanations.md.
+const FLAGS = {
+  mull: { turn: 0, row: 'me', shape: 'bar', sev: 'min', name: 'Mulligan', e: null },
+  e06: { turn: 8, row: 'me', shape: 'sqH', sev: 'mod', name: 'DON!! left unused', e: 'E06', what: 'Played Charlotte Linlin; your Leader attacked at 5000; Queen (+1000) stopped it. You ended with 3 active DON!!.' },
+  e19: { turn: 9, row: 'me', shape: 'triH', sev: 'mod', name: 'Counter wasted', e: 'E19', what: 'Played Rocks Pirates: your Leader 7000. 7000 vs 7000: the hit landed (Life 3 → 2).' },
+  e09: { turn: 10, row: 'me', shape: 'cirH', sev: 'mod', name: 'Poor attack ordering', e: 'E09', what: 'Shiki attacked Hawkins; Hawkins was K.O.’d.' },
+  e02: { turn: 12, row: 'me', shape: 'eye', sev: 'min', name: 'Hindsight: lethal against their real hand', e: 'E02', what: 'Your Leader hit their Leader (Life 1 → 0). Then Shiki attacked King, Newgate attacked Queen, and Linlin stayed back.' },
+  e05: { turn: 13, row: 'me', shape: 'triF', sev: 'sev', name: 'Hit that should have been countered', e: 'E05', what: 'Took Ulti’s hit (Life 0; the Life card was Kyo, no Counter). Stopped their Leader with Rocks Pirates and Buckin (8000). Played There’s No Authority on Kaido’s attack (7000 against 12000) and lost.' },
+};
+const STATES = [['e05', 'Severe flag (E05)'], ['e02', 'Hindsight flag (E02)'], ['e06', 'DON!! unused (E06)'], ['e19', 'Counter tied (E19)'], ['e09', 'Face over board (E09)'], ['unchecked', 'Not fully checked'], ['analysing', 'Still analysing']];
+const opp = (id, x = {}) => K(id, { who: 'Opponent’s', ...x });
+const BOARDS = {
+  e05: () => ({ opp: { idText: 'Kaido · Pirate AI', hand: 0, donDeck: 0, active: 0, rested: 8, life: 2, deck: 19, leader: opp('OP17-058', { don: 2, p: 7000 }), trash: { n: 16, top: K('OP17-077') }, chars: [null, opp('OP17-060', { r: true, st: ['opp-act'], chips: [{ t: '⚔ attacking', cls: 'opp', pos: 'below' }], noRestChip: true }), opp('OP17-062'), null, null] },
+    me: { donDeck: 0, active: 4, rested: 6, life: 1, deck: 16, leader: K('OP17-039', { who: 'Your' }), trash: { n: 18, top: K('OP17-049') }, chars: [null, null, null, null, null], hand: [K('OP17-056', { hand: true }), K('OP17-055', { hand: true }), K('OP08-051', { hand: true })] },
+    mid: { turn: 'Turn 13 · Opponent’s turn', opp: true, battle: 'Counter' }, arrows: [{ from: 'opp.c2', to: 'me.leader', cut: 40 }] }),
+  e02: () => ({ opp: { idText: 'Kaido · Pirate AI', hand: 4, donDeck: 0, active: 0, rested: 9, life: 0, deck: 20, leader: opp('OP17-058'), trash: { n: 14, top: K('OP17-076') }, chars: [null, opp('EB04-031', { r: true }), opp('EB04-032', { r: true }), null, null] },
+    me: { donDeck: 0, active: 0, rested: 7, life: 2, deck: 18, leader: K('OP17-039', { who: 'Your', r: true, don: 3, p: 8000 }), trash: { n: 15, top: K('OP17-056') }, chars: [K('OP17-049'), K('OP17-048', { st: ['legal'], g: 'attack' }), K('OP17-040'), null, null], hand: [K('OP17-045', { hand: true }), K('OP17-054', { hand: true })] },
+    mid: { turn: 'Turn 12 · Your turn', phase: 'Main' }, arrows: [{ from: 'me.c2', to: 'opp.leader', dashed: true, bend: -40 }] }),
+  e06: () => ({ opp: { idText: 'Kaido · Pirate AI', hand: 5, donDeck: 3, active: 2, rested: 5, life: 3, deck: 28, leader: opp('OP17-058'), trash: { n: 4, top: K('EB04-032') }, chars: [null, opp('OP17-074'), null, null, null] },
+    me: { donDeck: 2, active: 3, rested: 5, life: 4, deck: 30, leader: K('OP17-039', { who: 'Your', r: true }), trash: { n: 3, top: K('OP17-050') }, chars: [null, null, K('OP17-049', { chips: [{ t: 'New', pos: 'top' }] }), null, null], hand: [K('OP17-056', { hand: true }), K('OP17-055', { hand: true }), K('OP17-045', { hand: true }), K('OP17-048', { hand: true })] },
+    mid: { turn: 'Turn 8 · Your turn', phase: 'End' } }),
+  e19: () => ({ opp: { idText: 'Kaido · Pirate AI', hand: 4, donDeck: 1, active: 3, rested: 4, life: 3, deck: 27, leader: opp('OP17-058', { r: true, don: 2, p: 7000, st: ['opp-act'], chips: [{ t: '⚔ attacking', cls: 'opp', pos: 'below' }], noRestChip: true }), trash: { n: 5, top: K('EB04-032') }, chars: [null, opp('OP17-074'), opp('EB04-031'), null, null] },
+    me: { donDeck: 0, active: 3, rested: 5, life: 3, deck: 28, leader: K('OP17-039', { who: 'Your', p: 7000 }), trash: { n: 5, top: K('OP17-055') }, chars: [null, null, K('OP17-049'), null, null], hand: [K('OP17-056', { hand: true, st: ['hand-raise'], chips: [{ t: '+2000 ✓', cls: 'you', pos: 'top' }] }), K('OP08-051', { hand: true }), K('OP17-045', { hand: true }), K('OP17-048', { hand: true })] },
+    mid: { turn: 'Turn 9 · Opponent’s turn', opp: true, battle: 'Counter' }, arrows: [{ from: 'opp.leader', to: 'me.leader', cut: 40 }] }),
+  e09: () => ({ opp: { idText: 'Kaido · Pirate AI', hand: 2, donDeck: 0, active: 3, rested: 6, life: 2, deck: 24, leader: opp('OP17-058'), trash: { n: 9, top: K('OP15-078') }, chars: [null, opp('OP17-073', { r: true }), null, null, null] },
+    me: { donDeck: 0, active: 1, rested: 9, life: 2, deck: 22, leader: K('OP17-039', { who: 'Your', r: true }), trash: { n: 11, top: K('OP17-055') }, chars: [null, K('OP17-049', { r: true, p: 5000 }), K('OP17-048', { st: ['legal'], g: 'attack' }), null, null], hand: [K('OP17-045', { hand: true }), K('OP17-046', { hand: true })] },
+    mid: { turn: 'Turn 10 · Your turn', phase: 'Main' }, arrows: [{ from: 'me.c3', to: 'opp.leader', dashed: true, bend: -60 }] }),
+};
+BOARDS.unchecked = BOARDS.e06; BOARDS.analysing = BOARDS.e06;
+const vstage = document.getElementById('vstage');
+
+function draw() {
+  const st = WF.state() || 'e05';
+  const roomy = WF.isRoomy();
+  const sel = FLAGS[st] ? st : (st === 'analysing' ? 'e06' : null);
+  const analysing = st === 'analysing';
+  document.getElementById('title').innerHTML = `<h1>Game review</h1><span class="muted">Rocks.D.Xebec (you, second) vs Kaido · Pirate · <b style="color:var(--color-text)">Kaido wins, turn 13</b></span>
+    <span style="flex:1"></span>${analysing ? '<span class="chip outline" role="status">Analysing turn 9 of 13 · <a href="#e05">browse finished turns</a></span>' : '<span class="chip outline">5 flags · 1 severe</span><span class="chip outline">1 turn not fully checked</span>'}`;
+  // timeline
+  const turns = Array.from({ length: 14 }, (_, i) => i);
+  let h = '<div class="tl-grid" role="toolbar" aria-label="Turns. Left and Right move between turns."><span class="rl"></span>' + turns.map((t) => `<span class="h ${FLAGS[sel] && FLAGS[sel].turn === t ? 'cur' : ''}">${t === 0 ? 'Mull.' : 'T' + t}</span>`).join('');
+  const row = (who) => {
+    let r = `<span class="rl">${who === 'me' ? 'You' : 'Kaido'}</span>`;
+    turns.forEach((t) => {
+      const mine = t === 0 || t % 2 === 0;
+      const hatched = analysing && t >= 9;
+      const fl = Object.entries(FLAGS).filter(([, f]) => f.turn === t && f.row === who);
+      let inner = '';
+      if (who === 'me') {
+        fl.filter(() => !hatched).forEach(([k, f]) => { inner += `<button type="button" class="flag ${f.sev}" aria-pressed="${k === sel}" aria-label="Turn ${t}, ${f.name}, ${f.sev === 'sev' ? 'severe' : f.sev === 'mod' ? 'moderate' : 'minor'}" title="${f.name}" onclick="location.hash='${k}'" ${(hatched && t > 9) ? 'disabled' : ''}>${SH[f.shape]}</button>`; });
+        if (t === 6) inner += `<a class="flag min" href="#unchecked" title="Not fully checked" aria-label="Turn 6: not fully checked" style="color:var(--color-warning-text)">${SH.dash}</a>`;
+      } else {
+        if ([5, 9, 13].includes(t) && !hatched) inner += '<a class="why-mk" href="09c-why.html" title="Why did Kaido do that?">Why?</a>';
+      }
+      const isSel = (FLAGS[sel] && FLAGS[sel].turn === t && who === 'me') || (st === 'unchecked' && t === 6 && who === 'me');
+      r += `<div class="cell ${mine ? 'mine' : ''} ${hatched ? 'hatch' : ''} ${isSel ? 'sel' : ''}">${hatched && !inner ? '' : inner}</div>`;
+    });
+    return r;
+  };
+  h += row('me') + row('opp') + '</div>';
+  // Life sparkline: you (solid) and Kaido (dashed), Life after each turn
+  const me = [5, 5, 5, 5, 5, 4, 4, 4, 4, 3, 2, 2, 2, 0], kd = [5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 2, 2, 0, 0];
+  const W = 1000, H = 30;
+  const pts = (a) => a.map((v, i) => `${(i + 0.5) / 14 * W},${H - 3 - v / 5 * (H - 6)}`).join(' ');
+  h += `<div class="tl-grid" style="margin-top:2px"><span class="rl">Life</span><svg style="grid-column:2/16;width:100%;height:${H}px" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Life by turn. You: 5 down to 0. Kaido: 5 down to 0 at turn 12, then 0."><polyline points="${pts(me)}" fill="none" stroke="var(--color-accent)" stroke-width="2" vector-effect="non-scaling-stroke"/><polyline points="${pts(kd)}" fill="none" stroke="var(--color-opponent)" stroke-width="2" stroke-dasharray="5 4" vector-effect="non-scaling-stroke"/></svg></div>`;
+  h += `<div class="legend" style="margin:2px 0 0 56px"><span>${SH.triF} should have countered</span><span>${SH.triH} counter wasted</span><span>${SH.sqH} DON!! unused</span><span>${SH.cirH} attack ordering</span><span>${SH.eye} hindsight</span><span style="color:var(--color-warning-text)">${SH.dash} not fully checked</span><span>— you · - - Kaido</span></div>`;
+  document.getElementById('tl').innerHTML = h;
+  // board viewer, scaled
+  const box = document.getElementById('vbox');
+  const avail = roomy ? 620 : 384;
+  const k = avail / 720;
+  box.style.width = Math.round(960 * k) + 'px'; box.style.height = Math.round(720 * k) + 'px';
+  vstage.style.transform = `scale(${k})`;
+  const cfg = BOARDS[st]();
+  WF.renderBoard(vstage, cfg, { density: 'compact', boardOnly: true });
+  vstage.setAttribute('inert', '');
+  // detail
+  const d = document.getElementById('detail');
+  if (st === 'unchecked') {
+    d.innerHTML = `<p class="muted" style="margin:0 0 6px">Turn 6 · your turn</p><h2 class="claim" style="margin:0 0 6px">This turn wasn't fully checked.</h2><p>${EXPL.cert('search-incomplete', 'review')}</p>
+      <p style="margin:6px 0">The analysis ran out of time on this turn. It found no proof either way. A turn that wasn't fully checked is never shown as clean.</p>
+      <div class="acts"><button class="btn primary" type="button">Analyse deeper</button><span class="subtle" style="font-size:12px;align-self:center">10× the time budget, with progress and Cancel</span></div>`;
+    document.getElementById('stepl').textContent = 'No line to step through';
+    return;
+  }
+  const f = FLAGS[sel]; const e = EXPL.E[f.e];
+  const practise = f.e === 'E02' ? '<a class="btn" href="14-drill-lethal.html#real">Practice this <span class="subtle" style="font-weight:500">· their real hand</span></a>' : f.e === 'E05' || f.e === 'E19' ? '<a class="btn" href="14c-drill-counter.html">Practice this</a>' : '<a class="btn" href="14-drill-lethal.html">Practice this</a>';
+  d.innerHTML = `<p class="muted" style="margin:0 0 6px">Turn ${f.turn} · ${f.turn % 2 ? 'Kaido’s turn, your decision' : 'your turn'} · ${f.name} · <b>${f.sev === 'sev' ? 'Severe' : f.sev === 'mod' ? 'Moderate' : 'Minor'}</b></p>
+    <div class="wyd"><b>What you did.</b> ${f.what}</div>
+    ${EXPL.render(e, { mode: 'review', verbosity: 'learner' }).replace('<h4 class="claim">', '<h2 class="claim" style="margin:0 0 6px">').replace('</h4>', '</h2>')}
+    <div class="acts"><a class="btn primary" href="03-main.html">Play from here vs Kaido</a>${practise}</div>
+    <p class="subtle" style="font-size:12px;margin:6px 0 0">Play from here is marked "from review" and not counted in your win rate.</p>`;
+  document.getElementById('stepl').textContent = `Step through the better line · 0 of ${e.line ? e.line.length : 0}`;
+}
+draw();
+window.addEventListener('hashchange', draw);
+WF.statesBar(STATES);
+</script>
+</body>
+</html>

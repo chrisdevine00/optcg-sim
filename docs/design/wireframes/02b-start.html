@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Game start: first player and mulligan</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+<style>
+  .rps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .rps .btn { min-height: 44px; flex-direction: column; gap: 0; }
+</style>
+</head>
+<body class="board-page">
+<main class="stage" aria-label="Game start: Rocks.D.Xebec (you) vs Kaido (Pirate AI)"></main>
+<script src="wf.js"></script>
+<script src="cards.js"></script>
+<script src="scenarios.js"></script>
+<script src="expl.js"></script>
+<script>
+const STATES = [['rps', 'Rock-paper-scissors'], ['choose', 'You won: first or second'], ['mulligan', 'Mulligan'], ['hint', 'Mulligan + coach hint']];
+WF.mountBoard((st) => {
+  const opp = (id, x = {}) => K(id, { who: 'Opponent’s', ...x });
+  const pre = st === 'rps' || st === 'choose';
+  const s = {
+    boardLabel: 'Game board, before turn 1',
+    opp: { idText: 'Kaido · Pirate AI', hand: pre ? 0 : 5, donDeck: 10, active: 0, rested: 0, life: null, deck: pre ? 50 : 45, leader: opp('OP17-058'), trash: { n: 0 }, chars: [null, null, null, null, null] },
+    me: { donDeck: 10, active: 0, rested: 0, life: null, deck: pre ? 50 : 45, leader: K('OP17-039', { who: 'Your' }), trash: { n: 0 }, chars: [null, null, null, null, null], hand: [] },
+    mid: { turn: 'Before turn 1', phase: 'none' },
+    log: [SCN.th('Setup'), '<li>Rocks.D.Xebec (you) vs Kaido · Pirate AI · Practice</li>', '<li>Decks shuffled · same seed for rewinds</li>'],
+    coachStrip: { hint: st === 'mulligan' || st === 'hint' ? 'ask' : '—' },
+  };
+  // Life is placed after the mulligan; before that the Life boxes are empty but not "0 Life · next hit loses"
+  s.extra = (g, R) => '';
+  if (st === 'rps') {
+    s.decision = { title: 'Who chooses first?', body: `<p style="margin:0 0 8px">Rock-paper-scissors decides who chooses to go first or second <span class="subtle">(CR 5-2-1-4)</span>.</p>
+      <div class="rps" role="group" aria-label="Your pick"><button class="btn" type="button" data-wf-focus>Rock <kbd>R</kbd></button><button class="btn" type="button">Paper <kbd>P</kbd></button><button class="btn" type="button">Scissors <kbd>S</kbd></button></div>`,
+      foot: `<button class="btn" type="button">Random for me</button><span class="grow"></span>` };
+  }
+  if (st === 'choose') {
+    s.log.push('<li>You chose Paper · Kaido chose Rock · you choose</li>');
+    s.decision = { title: 'You choose: first or second?', body: `<div class="grid" style="grid-template-columns:1fr 1fr;gap:8px;font-size:12px;line-height:16px">
+      <div><b style="font-size:13px">First</b><br>You attack first, but draw no card and get 1 DON!! on turn 1.</div>
+      <div><b style="font-size:13px">Second</b><br>One card and one DON!! ahead on each of your turns.</div></div>
+      <p class="subtle" style="margin:8px 0 0;font-size:12px">Hint (H) gives the Rocks guide's seat note.</p>`,
+      foot: `<button class="btn primary big" type="button" style="flex:1;min-width:0" data-wf-focus><span class="lbl2">Go first <kbd>1</kbd></span></button><button class="btn primary big" type="button" style="flex:1;min-width:0;margin-left:0"><span class="lbl2">Go second <kbd>2</kbd></span></button>` };
+  }
+  if (st === 'mulligan' || st === 'hint') {
+    s.mid = { turn: 'Mulligan · you go first', phase: 'none' };
+    s.log.push('<li>You chose Paper · Kaido chose Rock · you choose</li>', SCN.you('Go first'), '<li>Both draw 5</li>');
+    s.decision = { title: 'Keep or redraw?', body: `<p style="margin:0">One redraw: all five go back, the deck is shuffled, and you draw five new cards.</p><p class="subtle" style="margin:6px 0 0;font-size:12px">You go first, so you decide first. Then Kaido.</p><p class="subtle" style="margin:4px 0 0;font-size:12px">Your hand is in the centre · ← → move · <kbd>I</kbd> inspects</p>`,
+      foot: `<button class="btn" type="button">Redraw <kbd>R</kbd></button>${SCN.primary('Keep', '5 cards', 'K')}` };
+    if (st === 'hint') { s.coach = 'open'; s.coachHtml = EXPL.coach('hint', EXPL.render(EXPL.E.E11, { verbosity: 'standard', live: false }), { hint: 'ready' }); }
+    s.extra = (g) => {
+      const roomy = g.W > 1600; const cw = roomy ? 144 : 96, ch = Math.round(cw * 88 / 63), gap = 12;
+      const ids = ['OP17-118', 'OP17-048', 'OP17-040', 'OP17-049', 'OP17-056'];
+      const total = 5 * cw + 4 * gap; const x0 = g.axis - total / 2; const y0 = g.myCharY - 4;
+      const prev = document.querySelector('.stage');
+      return `<div class="z" role="group" aria-label="Your opening hand, 5 cards" style="left:0;top:0;width:${g.mat[2]}px;height:${g.H}px;z-index:15;--card-w:${cw}px;--badge-power-size:${roomy ? 20 : 15}px;--badge-num-size:${roomy ? 17 : 13}px;--badge-h:${roomy ? 28 : 22}px">` +
+        ids.map((id, i) => WF.cardHTML(K(id, { hand: true, inHand: true }), [x0 + i * (cw + gap), y0, cw, ch], { card: [cw, ch] })).join('') +
+        '</div>';
+    };
+  }
+  return s;
+}, STATES);
+</script>
+</body>
+</html>

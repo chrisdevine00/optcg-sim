@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Board: card preview and inspector</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+</head>
+<body class="board-page">
+<main class="stage" aria-label="Game: Rocks.D.Xebec (you) vs Kaido (Pirate AI)"></main>
+<script src="wf.js"></script>
+<script src="cards.js"></script>
+<script src="scenarios.js"></script>
+<script>
+const STATES = [['preview', 'Hover/focus preview dock'], ['inspect', 'Inspector dialog (I)'], ['whynot', 'Unlit card: whyNot'], ['trash', 'Trash viewer']];
+WF.mountBoard((st) => {
+  const s = SCN.mainBase();
+  const me = s.me;
+  me.leader.g = 'attack'; me.leader.st = ['legal']; me.chars[2].g = 'attack'; me.chars[2].st = ['legal'];
+  me.hand.forEach((c) => { if (c.playable) { c.g = 'play'; c.st = ['legal']; } });
+  me.donLegal = true;
+  s.decision = { title: 'Your Main phase', body: '<p style="margin:0">Play a card, give DON!!, attack, or end your turn.</p><ul style="margin:6px 0 0;padding-left:16px"><li><b>2 can attack:</b> Leader, Shiki</li><li><b>3 playable</b> from hand</li><li><b>2 DON!! active</b></li></ul>', foot: `${SCN.rewind}${SCN.primary('End turn', '2 can attack · 2 DON!! unused', 'E')}` };
+  const row = (k, v) => `<div class="row" style="justify-content:space-between;gap:8px;border-bottom:1px solid var(--color-line);padding:2px 0"><span class="muted">${k}</span><span class="num" style="text-align:right">${v}</span></div>`;
+  if (st === 'preview') {
+    me.leader.st = ['legal', 'wf-focus'];
+    s.extra = (g) => SCN.dock(g, {
+      col: 'blue', name: 'Rocks.D.Xebec', id: 'OP17-039 · Leader · Blue · Rocks Pirates · Slash · 5 Life',
+      stats: row('Power', '<b>7000 ▲</b>') + `<p class="muted" style="margin:2px 0 6px;font-size:12px">7000 = 5000 base + 2000 DON!!, your turn only</p>` + row('DON!! given', '2') + row('Life', '4 of 5'),
+      text: `<p style="margin:0"><b>[When Attacking]</b> You may trash 1 card from your hand: Reveal 1 card from the top of your deck. If the revealed card's type includes "Rocks Pirates", draw 2 cards.</p><p class="subtle" style="margin:8px 0 0;font-size:12px">No active modifiers. Text from optcgapi.com.</p>`,
+    });
+  }
+  if (st === 'inspect') {
+    me.chars[1].st = ['wf-focus'];
+    s.extra = (g) => {
+      const r = g.rail; const roomy = g.W > 1600; const sw = roomy ? 200 : 132, sh = Math.round(sw * 88 / 63);
+      return `<div class="scrim" style="left:${r[0]}px;top:0;width:${r[2]}px;height:${g.H - g.decision[1]}px"></div>
+      <div class="rdialog" role="dialog" aria-modal="true" aria-labelledby="ih" style="left:${r[0] + 8}px;top:8px;width:${r[2] - 16}px;height:${g.decision[0] - 16}px">
+        <header><h2 id="ih">Captain John</h2><span class="chip warning">⚠ Effect not automated</span><button class="iconbtn" type="button" aria-label="Close inspector (Escape)" data-wf-focus>✕</button></header>
+        <div class="rdb" tabindex="0">
+          <div style="display:flex;gap:10px"><div class="scan c-blue" style="width:${sw}px;height:${sh}px;flex:none"><span class="al">art</span><span class="sample" style="font-size:16px">SAMPLE</span><span class="ptxt"></span></div>
+          <div style="min-width:0"><div class="muted">OP17-044 · Character · Blue<br>Rocks Pirates</div>
+            ${row('Cost', '4')}${row('Power', '6000')}${row('Counter', '—')}${row('State', '⟳ Rested')}</div></div>
+          <p style="margin:8px 0 4px">If your Leader's type includes "Rocks Pirates" and this Character is rested, your opponent cannot attack any card other than the Character [Captain John].</p>
+          <p style="margin:0 0 6px"><b>[Activate: Main]</b> You may rest this Character: Draw 1 card and trash 1 card from your hand.</p>
+          <p style="margin:0 0 6px;padding:6px 8px;border:1px solid var(--color-warning-text);border-radius:6px;font-size:12px;line-height:16px"><b>Effect not automated.</b> Plays for its power; its effect won't happen. Keywords like Blocker still work where listed.</p>
+          <p class="muted" style="margin:0;font-size:12px">Rulings: none recorded · Text from optcgapi.com, not verified · Art: base, 1 of 1</p>
+        </div></div>`;
+    };
+  }
+  if (st === 'whynot') {
+    const glo = me.hand[0]; glo.st = ['wf-focus'];
+    s.extra = (g, R) => { const r = R['me.hand.1']; const roomy = g.W > 1600; return `<div class="pop right" role="tooltip" style="left:${r[0] - (roomy ? 290 : 196)}px;top:${r[1] + 4}px;width:${roomy ? 276 : 184}px"><div class="ph">Can't play Gloriosa</div>Needs 4 DON!!; you have 2 active. <span class="subtle">(CR 6-5-3)</span><br><a href="16-settings.html#rules">Learn more</a></div>`; };
+    s.decision.body = '<p style="margin:0 0 6px" role="status"><b>Gloriosa</b> can’t be played: needs 4 DON!!; you have 2 active.</p><p class="subtle" style="margin:0">Clicking a card that has no legal action explains why and selects nothing.</p>';
+  }
+  if (st === 'trash') {
+    s.extra = (g) => {
+      const r = g.rail; const it = (n, k, t) => `<li class="row" style="justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--color-line)"><span><b>${n}</b> <span class="muted">${k}</span></span><span class="subtle" style="font-size:12px">${t}</span></li>`;
+      return `<div class="scrim" style="left:${r[0]}px;top:0;width:${r[2]}px;height:${g.decision[0]}px"></div>
+      <div class="rdialog" role="dialog" aria-modal="true" aria-labelledby="th" style="left:${r[0] + 8}px;top:8px;width:${r[2] - 16}px;height:${g.decision[0] - 16}px">
+        <header><h2 id="th">Your trash · 6 cards</h2><button class="iconbtn" type="button" aria-label="Close trash viewer (Escape)" data-wf-focus>✕</button></header>
+        <div class="rdb" tabindex="0"><div class="seg" role="group" aria-label="Filter by category" style="margin-bottom:8px"><button type="button" aria-pressed="true">All 6</button><button type="button" aria-pressed="false">Characters 3</button><button type="button" aria-pressed="false">Events 3</button></div>
+          <p class="subtle" style="margin:0 0 4px;font-size:12px">Newest first. Both trashes are open to both players.</p>
+          <ul style="list-style:none;margin:0;padding:0">${it('Rocks Pirates', 'Event', 'T7 · Leader reveal cost')}${it('Rocks Pirates', 'Event', 'T6 · Counter')}${it('Kyo', 'Character', 'T5 · K.O.’d')}${it('There’s No Authority…', 'Event', 'T4 · Counter')}${it('Streusen', 'Character', 'T3 · K.O.’d')}${it('Buckin', 'Character', 'T2 · Leader reveal cost')}</ul></div></div>`;
+    };
+  }
+  return s;
+}, STATES);
+</script>
+</body>
+</html>

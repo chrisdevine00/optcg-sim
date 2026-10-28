@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OPTCG Sim · Mulligan trainer</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+<style>
+  .hand { display: flex; gap: 14px; justify-content: center; margin: 18px 0 14px; }
+  .hand .cb { position: relative; width: 112px; height: 156px; }
+  .roomy-h .hand .cb { width: 150px; height: 209px; }
+  .drill { display: grid; grid-template-columns: 1fr 420px; gap: 20px; align-items: start; }
+  .start { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .ans .claim { font-size: var(--text-xl); line-height: var(--leading-xl); }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="app-header"></header>
+  <main class="app-main" id="main" style="padding-top:16px"></main>
+  <footer class="app-footer"></footer>
+</div>
+<script src="wf.js"></script>
+<script src="cards.js"></script>
+<script src="expl.js"></script>
+<script>
+WF.chrome('Drills');
+const roomy = WF.isRoomy(); if (roomy) document.body.classList.add('roomy-h');
+const STATES = [['start', 'Start screen'], ['item', 'Item: keep or redraw'], ['answer', 'Answer (E11)']];
+function draw() {
+  const st = WF.state() || 'start';
+  const m = document.getElementById('main');
+  const cw = roomy ? 150 : 112, ch = Math.round(cw * 88 / 63);
+  const hand = ['OP17-118', 'OP17-048', 'OP17-040', 'OP17-049', 'OP17-056'].map((id) => `<div class="cb" role="listitem" style="--card-w:${cw}px;--badge-power-size:${roomy ? 20 : 16}px;--badge-num-size:${roomy ? 17 : 14}px;--badge-h:${roomy ? 28 : 24}px">${WF.cardHTML(K(id, { hand: true }), [0, 0, cw, ch], { card: [cw, ch] })}</div>`).join('');
+  const head = `<div class="row" style="align-items:end"><div><p class="muted" style="margin:0">Drills · Lesson L12 Mulligan</p><h1 class="page" style="margin:0">Mulligan trainer</h1></div><span style="flex:1"></span>${st === 'start' ? '' : '<span class="chip outline">Item 3 of 10</span><span class="chip outline">Untimed</span>'}</div>`;
+  if (st === 'start') {
+    m.innerHTML = head + `<p class="lede" style="margin-top:8px">You see an opening hand, your seat and the matchup. Keep or redraw. The answer comes from the archetype guide, with its reasons.</p>
+      <div class="start">
+        <div class="panel"><label class="lbl" for="arch">Archetype</label><select class="input" id="arch"><option>Rocks.D.Xebec (OP17-039)</option><option>Kaido (OP17-058)</option></select>
+          <div class="lbl" style="margin-top:10px">Seat</div><div class="seg" role="radiogroup" aria-label="Seat"><button type="button" role="radio" aria-checked="true">Both</button><button type="button" role="radio" aria-checked="false">First</button><button type="button" role="radio" aria-checked="false">Second</button></div></div>
+        <div class="panel"><div class="lbl">Source</div><div class="seg" role="radiogroup" aria-label="Source"><button type="button" role="radio" aria-checked="true">Bank</button><button type="button" role="radio" aria-checked="false">From my games</button></div>
+          <div class="lbl" style="margin-top:10px">Items</div><div class="seg" role="radiogroup" aria-label="Items"><button type="button" role="radio" aria-checked="false">5</button><button type="button" role="radio" aria-checked="true">10</button><button type="button" role="radio" aria-checked="false">20</button></div></div>
+        <div class="panel"><div class="lbl">Timer</div><button type="button" class="switch" role="switch" aria-checked="false" style="border:0;background:none;padding:0"><span class="track" aria-hidden="true"></span><span>Off</span></button>
+          <p class="muted" style="font-size:13px;margin:8px 0 0">Off by default. When on: 50% to 300% of the base time, pausable, and it never ends an item. Passing is judged untimed.</p></div>
+      </div>
+      <div class="row" style="margin-top:16px"><a class="btn primary big" href="#item" data-wf-focus><span class="lbl2">Start 10 hands <kbd>Enter</kbd></span></a><span class="muted">Your best so far: 7 of 10 · pass mark 8 of 10</span></div>`;
+  } else {
+    const ans = st === 'answer';
+    m.innerHTML = head + `<div class="drill"><section aria-label="Your opening hand">
+      <p style="margin:8px 0 0;font-size:var(--text-lg)"><b>You play Rocks.D.Xebec, going first</b> <span class="muted">against Kaido</span></p>
+      <div class="hand" role="list">${hand}</div>
+      ${ans ? '' : `<div class="row" style="justify-content:center"><button class="btn big" type="button" style="min-width:160px"><span class="lbl2">Keep <kbd>K</kbd></span></button><button class="btn primary big" type="button" style="min-width:160px" data-wf-focus><span class="lbl2">Redraw <kbd>R</kbd></span></button></div>
+      <p class="subtle" style="text-align:center;margin:10px 0 0">Ask yourself: can I act on turns 1 and 2? Do I hold a piece of my plan? Can I defend?</p>`}</section>
+      <aside class="panel ans" aria-label="Answer">${ans ? `<p style="margin:0 0 6px"><span class="chip success">✓ Correct: redraw</span></p>` + EXPL.render(EXPL.E.E11, { verbosity: 'learner' }) + `<div class="row" style="margin-top:8px"><a class="btn primary" href="#item" data-wf-focus>Next hand <kbd>Enter</kbd></a></div>` : '<p class="muted" style="margin:0">The answer appears here after you choose. Hints are off in drills; "Show answer" counts the item as missed.</p><button class="btn small" type="button" style="margin-top:8px">Show answer</button>'}</aside></div>`;
+  }
+  const f = document.querySelector('[data-wf-focus]'); if (f) f.focus();
+}
+draw(); window.addEventListener('hashchange', draw); WF.statesBar(STATES);
+</script>
+</body>
+</html>

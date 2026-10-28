@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Board: AI turn</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+</head>
+<body class="board-page">
+<main class="stage" aria-label="Game: Rocks.D.Xebec (you) vs Kaido (Pirate AI)"></main>
+<div id="announce-polite" class="sr-only" role="status" aria-live="polite">Kaido plays Queen, cost 9, resting 9 DON!!.</div>
+<script src="wf.js"></script>
+<script src="cards.js"></script>
+<script src="scenarios.js"></script>
+<script>
+const STATES = [['acting', 'AI move: highlight + dwell'], ['thinking', 'Thinking (real wait)'], ['skipped', 'After skip: recap']];
+WF.mountBoard((st) => {
+  const opp = (id, x = {}) => K(id, { who: 'Opponent’s', ...x });
+  const speed = (cur = '1×') => `<div class="row" style="gap:8px;margin-top:8px"><span class="lbl" style="margin:0">Speed</span>
+      <div class="seg" role="radiogroup" aria-label="Opponent speed">${['0.5×', '1×', '2×', '4×'].map((v) => `<button type="button" role="radio" aria-checked="${v === cur}">${v}</button>`).join('')}</div>
+      <button type="button" class="switch" role="switch" aria-checked="false" style="border:0;background:none;padding:0"><span class="track" aria-hidden="true"></span><span style="font-size:12px">Step</span></button></div>
+      <p class="subtle" style="margin:6px 0 0;font-size:12px">Pause <kbd>K</kbd> · slower/faster <kbd>[</kbd> <kbd>]</kbd></p>`;
+  const s = {
+    boardLabel: 'Game board, turn 8, opponent’s turn',
+    opp: {
+      idText: 'Kaido · Pirate AI', hand: 4, donDeck: 0, active: 1, rested: 9, life: 3, deck: 28,
+      leader: opp('OP17-058'),
+      trash: { n: 5, top: K('OP15-078') },
+      chars: [null, opp('EB04-031'), null, opp('OP17-060'), null],
+    },
+    me: {
+      donDeck: 3, active: 2, rested: 5, life: 4, deck: 28,
+      leader: K('OP17-039', { who: 'Your', don: 0 }),
+      trash: { n: 7, top: K('OP17-056') },
+      chars: [null, K('OP17-044', { r: true }), K('OP17-048', { r: true }), K('OP17-054'), null],
+      hand: [K('OP17-046', { hand: true }), K('OP08-051', { hand: true }), K('OP17-045', { hand: true }), K('OP17-049', { hand: true }), K('OP17-055', { hand: true })],
+    },
+    mid: { turn: 'Turn 8 · Opponent’s turn', phase: 'Main', opp: true },
+    log: [
+      SCN.th('Turn 7 · You'),
+      SCN.you(`${SCN.lk('Shiki')} attacks ${SCN.lk('King')} · 9000 vs 7000`),
+      SCN.opp(`Block: ${SCN.lk('Yamato')} · 1000`),
+      '<li>Yamato K.O.’d · King safe</li>',
+      SCN.you('End of turn · 2 active DON!!'),
+      SCN.th('Turn 8 · Opp'),
+      SCN.opp('Refresh · Draw · DON!! +2 · 10 DON!!', false),
+    ],
+    coachStrip: { why: 'ready', whyCls: 'ready', tempo: 'frozen' },
+  };
+  const o = s.opp;
+  if (st === 'acting') {
+    o.chars[2] = opp('OP17-065', { st: ['opp-act'], chips: [{ t: 'playing', cls: 'opp', pos: 'top' }] });
+    o.status = 'Playing';
+    s.mid.left = 'played Queen';
+    s.log.push(SCN.opp(`Play ${SCN.lk('Queen')} · 9 DON!!`));
+    s.decision = {
+      title: 'Kaido’s turn · move 2',
+      q: true,
+      body: `<p style="margin:0 0 4px"><b>Queen</b> [On Play] DON!! −1: draw 1, and up to 2 of your Characters with cost 5 or less can't attack until the end of your next turn.</p>
+        <p class="subtle" style="margin:0;font-size:12px">Each move: highlight, then move, then a short hold.</p>${speed()}`,
+      foot: `<button class="btn" type="button" aria-label="Pause (K)">❚❚ Pause</button>${SCN.primary('Skip to my decision', '4 moves queued', 'S')}`,
+    };
+  }
+  if (st === 'thinking') {
+    o.status = 'Thinking';
+    s.mid.left = '<span aria-hidden="true">◔</span> Opponent is thinking…';
+    s.decision = {
+      title: 'Kaido’s turn',
+      body: `<div class="row" style="justify-content:space-between"><b>Thinking</b><span class="subtle" style="font-size:12px">Warlord thinks up to 2.5 s</span></div>
+        <div class="indet" style="margin:6px 0 4px" aria-hidden="true"></div>
+        <p class="subtle" style="margin:0;font-size:12px">Shown only when Kaido has not answered within 300 ms and nothing is animating.</p>${speed()}`,
+      foot: `<button class="btn" type="button">❚❚ Pause</button>${SCN.primary('Skip to my decision', 'plays the rest instantly', 'S')}`,
+    };
+  }
+  if (st === 'skipped') {
+    o.chars[2] = opp('OP17-065', { chips: [{ t: 'New', cls: 'opp', pos: 'top' }] });
+    o.leader = opp('OP17-058', { r: true, don: 2, donOff: true, chips: [{ t: '◆2 · attacked', cls: 'opp', pos: 'below' }], noRestChip: true });
+    s.me.chars[3] = K('OP17-054', { chips: [{ t: 'Can’t attack', cls: 'warning', pos: 'top' }] });
+    s.me.life = 3;
+    s.me.chars[2] = K('OP17-048'); s.me.chars[2].st = ['legal']; s.me.chars[2].g = 'attack';
+    s.me.chars[1] = K('OP17-044', { chips: [{ t: 'Can\u2019t attack', cls: 'warning', pos: 'top' }] });
+    s.me.leader.st = ['legal']; s.me.leader.g = 'attack';
+    s.mid = { turn: 'Turn 9 · Your turn', phase: 'Main' };
+    o.active = 0; o.rested = 8; o.donDeck = 0;
+    s.me.active = 9; s.me.rested = 0; s.me.donDeck = 1;
+    s.log.push(
+      '<li class="skipped"><span class="chip opp">Opp</span>Play Queen · 9 DON!!</li>',
+      '<li class="skipped">On Play: Stussy and Captain John can’t attack</li>',
+      '<li class="skipped"><span class="chip opp">Opp</span>Give 2 DON!! to Kaido · 7000</li>',
+      '<li class="skipped"><span class="chip opp">Opp</span>Kaido attacks your Leader · 7000 vs 5000</li>',
+      '<li class="skipped">No counter · Hit · your Life 4 → 3</li>',
+      SCN.th('Turn 9 · You'),
+      SCN.you('Refresh · Draw: Kyo · DON!! +2 · 9 DON!!'),
+    );
+    s.decision = {
+      title: 'Your Main phase',
+      body: `<div style="padding:6px 8px;border:1px solid var(--color-line-strong);border-radius:6px;margin-bottom:6px;font-size:12px;line-height:16px"><b>While you skipped:</b> Kaido played Queen (Stussy and Captain John can't attack), gave 2 DON!!, attacked once. You took 1 hit: Life 4 → 3.</div>
+        <p style="margin:0">Play a card, give DON!!, attack, or end your turn.</p>`,
+      foot: `${SCN.rewind}${SCN.primary('End turn', '2 can attack · 9 DON!! unused', 'E')}`,
+    };
+  }
+  return s;
+}, STATES);
+</script>
+</body>
+</html>

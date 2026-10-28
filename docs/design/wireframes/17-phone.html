@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OPTCG Sim · Board needs a bigger screen</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+<style>
+  body { min-height: 100vh; display: flex; flex-direction: column; }
+  .msg { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px 16px; gap: 12px; }
+  .msg h1 { font: 600 var(--text-3xl)/var(--leading-3xl) var(--font-display); margin: 0; max-width: 18ch; }
+  .msg p { margin: 0; color: var(--color-text-muted); font-size: var(--text-lg); line-height: var(--leading-lg); max-width: 34ch; }
+  .links { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: min(360px, 100%); margin-top: 8px; }
+  .links .btn { min-height: 44px; }
+  .saved { font-size: 13px; color: var(--color-text-subtle); }
+  .landscape .msg { flex-direction: row; text-align: left; gap: 24px; }
+  .landscape .links { grid-template-columns: 1fr 1fr; }
+  footer { padding: 12px 16px; font-size: 12px; line-height: 16px; color: var(--color-text-subtle); border-top: 1px solid var(--color-line); text-align: center; }
+</style>
+</head>
+<body>
+<main class="msg" id="m"></main>
+<footer>Unofficial fan tool. Not affiliated with or endorsed by Bandai, Shueisha or Toei Animation. One Piece and all card names, text and art belong to their respective owners.</footer>
+<script>
+// mode: phone (default) = "board needs a bigger screen"; tablet = "turn your device sideways"
+const mode = new URLSearchParams(location.search).get('mode') || 'phone';
+const land = window.innerWidth > window.innerHeight && window.innerHeight < 600;
+if (land) document.body.classList.add('landscape');
+const rotate = `<svg width="96" height="96" viewBox="0 0 96 96" aria-hidden="true" fill="none" stroke="var(--color-accent)" stroke-width="3"><rect x="30" y="14" width="36" height="62" rx="5"/><path d="M14 54a34 34 0 0 0 26 30" stroke-linecap="round"/><path d="M36 80l4 4-5 3" stroke-linecap="round"/><rect x="18" y="58" width="62" height="24" rx="4" stroke-dasharray="4 4" opacity=".6"/></svg>`;
+const bigger = `<svg width="96" height="96" viewBox="0 0 96 96" aria-hidden="true" fill="none" stroke="var(--color-accent)" stroke-width="3"><rect x="8" y="18" width="80" height="52" rx="5"/><path d="M36 82h24M48 70v12" stroke-linecap="round"/><rect x="62" y="40" width="16" height="28" rx="3" fill="var(--color-bg)"/></svg>`;
+const links = `<nav class="links" aria-label="Works on this screen"><a class="btn" href="16-settings.html#rules">Rules reference</a><a class="btn" href="13-meta.html">Meta explorer</a><a class="btn" href="16-settings.html#rules">Glossary</a><a class="btn" href="12-deck-builder.html">Card browser</a></nav>`;
+document.getElementById('m').innerHTML = mode === 'tablet'
+  ? `${rotate}<div><h1>Turn your device sideways to play</h1><p>The board is designed for landscape.</p>${links}<p class="saved" style="margin-top:8px">Your game vs Kaido (turn 6) is kept. Rotating resumes it.</p></div>`
+  : `${bigger}<div><h1>The board needs a bigger screen</h1><p>Games are played on a tablet or computer. Everything else works here.</p>${links}<p class="saved" style="margin-top:8px">Your game vs Kaido (turn 6) is saved on this device.</p></div>`;
+</script>
+</body>
+</html>

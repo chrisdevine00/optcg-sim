@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Board: Trigger reveal</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+</head>
+<body class="board-page">
+<main class="stage" aria-label="Game: Kaido (you) vs Rocks.D.Xebec (Warlord AI)"></main>
+<div id="announce-assertive" class="sr-only" role="alert">Life card: Wo Ro Ro Ro Ro... I Think I've Sobered Up. Trigger: DON!! minus 1: draw 2 cards. Activate, or add to hand?</div>
+<script src="wf.js"></script>
+<script src="cards.js"></script>
+<script src="scenarios.js"></script>
+<script>
+const STATES = [['reveal', 'Trigger revealed'], ['nodon', 'Trigger cost unpayable']];
+WF.mountBoard((st) => {
+  const opp = (id, x = {}) => K(id, { who: 'Opponent’s', ...x });
+  const s = {
+    boardLabel: 'Game board, turn 10, opponent’s turn, Trigger decision',
+    opp: {
+      idText: 'Rocks.D.Xebec · Warlord AI', hand: 6, donDeck: 0, active: 3, rested: 4, life: 2, deck: 22,
+      leader: opp('OP17-039'),
+      trash: { n: 14, top: K('OP17-056') },
+      chars: [null, opp('OP17-040'), opp('OP17-048', { r: true, don: 3, p: 12000, st: ['opp-act'], chips: [{ t: '⚔ attacked', cls: 'opp', pos: 'below' }], noRestChip: true }), opp('OP17-049'), null],
+    },
+    me: {
+      donDeck: st === 'nodon' ? 0 : 2, active: st === 'nodon' ? 0 : 5, rested: st === 'nodon' ? 0 : 3, life: 3, deck: 25,
+      leader: K('OP17-058', { who: 'Your' }),
+      trash: { n: 8, top: K('OP17-077') },
+      chars: [null, K('EB04-031'), K('OP17-062'), K('OP17-074', { r: true }), null],
+      hand: [K('OP15-069', { hand: true }), K('EB04-032', { hand: true }), K('OP17-061', { hand: true }), K('OP17-073', { hand: true })],
+    },
+    mid: { turn: 'Turn 10 · Opponent’s turn', opp: true, battle: 'Damage', left: '' },
+    log: [
+      SCN.th('Turn 10 · Opp'),
+      SCN.opp('Refresh · Draw · DON!! +0 · 10 DON!!', false),
+      SCN.opp(`Play ${SCN.lk('Charlotte Linlin')} · 5 DON!!`),
+      '<li>On Play: you chose "they draw 2" · their hand 6</li>',
+      SCN.opp(`Give 3 DON!! to ${SCN.lk('Shiki')} · 12000`, false),
+      SCN.opp(`${SCN.lk('Shiki')} attacks your Leader · 12000 vs 5000`),
+      SCN.you('No block · no counter'),
+      '<li>Hit · your Life 4 → 3 · Life card has [Trigger]</li>',
+    ],
+    coachStrip: { tempo: '—' },
+    arrows: [{ from: 'opp.c3', to: 'me.leader', cut: 40 }],
+  };
+  const canPay = st !== 'nodon';
+  s.decision = {
+    title: 'Trigger · your Life card',
+    body: `<p style="margin:0 0 6px"><b>Wo Ro Ro Ro Ro... I Think I've Sobered Up</b> has <span class="chip outline">[Trigger]</span></p>
+      <p style="margin:0 0 8px;padding:4px 8px;background:var(--color-surface-3);border-radius:4px">DON!! −1: Draw 2 cards.</p>
+      <div class="grid" style="grid-template-columns:1fr 1fr;gap:8px;font-size:12px;line-height:16px">
+        <div><b>Activate</b><br>${canPay ? 'Return 1 DON!! to your DON!! deck · hand 4 → 6. Revealed to Xebec.' : '<span style="color:var(--color-warning-text)">⚠ Needs 1 DON!! on your field; you have 0.</span>'}</div>
+        <div><b>Add to hand</b><br>Hand 4 → 5. Keeps a +3000 [Counter]. Stays hidden from Xebec.</div>
+      </div>`,
+    foot: `<button class="btn ${canPay ? 'primary' : ''} big" type="button" style="flex:1;min-width:0" ${canPay ? 'data-wf-focus' : 'aria-disabled="true"'}><span class="lbl2">Activate Trigger</span><span class="sub">${canPay ? 'DON!! −1 · draw 2' : 'can’t pay DON!! −1'}</span></button>
+      <button class="btn primary big" type="button" style="flex:1;min-width:0;margin-left:0" ${canPay ? '' : 'data-wf-focus'}><span class="lbl2">Add to hand</span><span class="sub">hand 4 → 5</span></button>`,
+  };
+  s.extra = (g) => {
+    const d = g.dock; const roomy = g === WF.G.roomy;
+    const sw = roomy ? 240 : 168, sh = roomy ? 335 : 235;
+    return `<aside class="dock" style="left:${d[0]}px;top:${d[1]}px;width:${d[2]}px;height:${d[3]}px" aria-label="Revealed Life card (only you can see it)">
+      <div class="row" style="padding:8px 12px;border-bottom:1px solid var(--color-line)"><b style="flex:1">Life card · private reveal</b><span class="chip outline">👁 Only you see this</span></div>
+      <div style="display:flex;gap:12px;padding:12px">
+        <div class="scan c-purple" style="width:${sw}px;height:${sh}px"><span class="al">art (full scan)</span><span class="sample">SAMPLE</span><span class="ptxt"></span><span class="pnm"></span></div>
+        <div style="font-size:13px;line-height:18px;min-width:0">
+          <div style="font-weight:600;font-size:${roomy ? 17 : 15}px;line-height:1.3">Wo Ro Ro Ro Ro... I Think I've Sobered Up</div>
+          <div class="muted" style="margin:2px 0 8px">OP17-076 · Event · Purple · cost 0</div>
+          <p style="margin:0 0 6px"><b>[Counter]</b> You may trash 1 card from your hand: Up to 1 of your Leader or Characters gains +3000 power during this battle.</p>
+          <p style="margin:0;padding:4px 6px;border-left:3px solid var(--color-accent)"><b>[Trigger]</b> DON!! −1: Draw 2 cards.</p>
+          <p class="subtle" style="margin:8px 0 0;font-size:12px">Text from optcgapi.com, sign restored.</p>
+        </div>
+      </div></aside>`;
+  };
+  return s;
+}, STATES);
+</script>
+</body>
+</html>

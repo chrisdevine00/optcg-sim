@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Board: effect choice</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+</head>
+<body class="board-page">
+<main class="stage" aria-label="Game: Rocks.D.Xebec (you) vs Kaido (Pirate AI)"></main>
+<div id="announce-polite" class="sr-only" role="status" aria-live="polite">Charlotte Linlin chosen. 1 of up to 2. Total cost 5 of 9.</div>
+<script src="wf.js"></script>
+<script src="cards.js"></script>
+<script src="scenarios.js"></script>
+<script>
+const STATES = [['one', 'Multi-select: 1 chosen'], ['two', 'Multi-select: 2 chosen'], ['order', 'Order simultaneous effects']];
+WF.mountBoard((st) => {
+  const opp = (id, x = {}) => K(id, { who: 'Opponent’s', ...x });
+  const s = {
+    boardLabel: 'Game board, turn 11, your Main Phase, choosing cards for an effect',
+    opp: {
+      idText: 'Kaido · Pirate AI', hand: 5, donDeck: 0, active: 4, rested: 4, life: 2, deck: 24,
+      leader: opp('OP17-058'),
+      trash: { n: 9, top: K('OP15-078') },
+      chars: [null, opp('EB04-031', { r: true }), opp('OP17-062'), opp('OP17-073', { r: true }), null],
+    },
+    me: {
+      donDeck: 0, active: 0, rested: 10, life: 2, deck: 21,
+      leader: K('OP17-039', { who: 'Your' }),
+      trash: { n: 12, top: K('OP17-055') },
+      chars: [null, K('OP17-045', { r: true }), K('OP17-118', { st: ['opp-act'], chips: [{ t: '⚡ On Play resolving', cls: 'you', pos: 'top' }] }), null, null],
+      hand: [K('OP17-049', { hand: true }), K('OP17-046', { hand: true }), K('OP17-049', { hand: true }), K('OP17-048', { hand: true }), K('OP17-045', { hand: true }), K('OP17-054', { hand: true })],
+    },
+    mid: { turn: 'Turn 11 · Your turn', phase: 'Main', right: '<button class="waiting" type="button" aria-label="1 effect waiting: show the queue">⧉ 1 waiting</button>' },
+    log: [
+      SCN.th('Turn 11 · You'),
+      SCN.you('Refresh · Draw: Shiki · DON!! +2 · 10 DON!!'),
+      SCN.you(`${SCN.lk('Kyo')} attacks ${SCN.lk('Basil Hawkins')} · 4000 vs 1000`),
+      '<li>Basil Hawkins K.O.\u2019d</li>',
+      SCN.you(`Play ${SCN.lk('Rocks.D.Xebec')} · 10 DON!!`),
+      '<li>On Play: drew 1 (Stussy)</li>',
+    ],
+    coachStrip: { tempo: '10 of 10' },
+  };
+  const me = s.me; const [lin1, glo, lin2, shiki, kyo, stussy] = me.hand;
+  [me.leader, me.chars[1], ...s.opp.chars.filter(Boolean), s.opp.leader].forEach((c) => { c.st = (c.st || []).concat('dim'); });
+  me.chars[2].st = ['opp-act'];
+  const why = (c, t) => { c.st = ['dim']; c.aria = `${c.n}, can’t be chosen: ${t}`; c.chips = [{ t, cls: '', pos: 'top' }]; };
+  if (st === 'one' || st === 'two') {
+    lin1.st = ['legal', 'hand-raise']; lin1.chips = [{ t: '1', cls: 'you', pos: 'top' }]; lin1.g = 'pick';
+    if (st === 'one') {
+      [glo, kyo, stussy].forEach((c) => { c.st = ['legal']; c.g = 'target'; });
+      why(lin2, 'Same name');
+      why(shiki, 'Cost 12 > 9');
+    } else {
+      glo.st = ['legal', 'hand-raise']; glo.chips = [{ t: '2', cls: 'you', pos: 'top' }]; glo.g = 'pick';
+      [lin2, shiki, kyo, stussy].forEach((c) => why(c, c === lin2 ? 'Same name' : 'Max 2'));
+    }
+    const n = st === 'one' ? 1 : 2, tot = st === 'one' ? 5 : 9;
+    s.decision = {
+      title: 'Rocks.D.Xebec · On Play',
+      body: `<p style="margin:0 0 6px;font-size:12px;line-height:16px" class="muted">Draw 1 card and <mark style="background:var(--color-surface-3);color:var(--color-text);padding:0 2px">play up to 2 {Rocks Pirates} type cards with different card names and a total cost of 9 or less</mark> from your hand.</p>
+        <div class="row" style="justify-content:space-between;font-weight:600" role="status"><span>${n} of up to 2 chosen</span><span class="num">Total cost ${tot} of 9</span></div>
+        <div class="indet" style="margin:4px 0 6px;height:6px" aria-hidden="true"><span style="display:block;height:100%;width:${tot / 9 * 100}%;background:var(--color-accent)"></span></div>
+        <p style="margin:0;font-size:12px;line-height:16px" class="muted">${st === 'one' ? 'Can still add: Gloriosa (4), Stussy (3), Kyo (2). Not: Charlotte Linlin (same name), Shiki (total 12).' : 'Charlotte Linlin (5) + Gloriosa (4). Nothing else fits: 2 is the most.'}</p>`,
+      foot: `<button class="btn" type="button">Reset</button>${SCN.primary(st === 'one' ? 'Play 1 card' : 'Play 2 cards', st === 'one' ? 'Charlotte Linlin' : 'Linlin and Gloriosa', 'Enter')}`,
+    };
+    // the indet bar is reused as a meter: stop its animation
+    s.extra = () => '<style>.dbody .indet::after{display:none}</style>';
+  }
+  if (st === 'order') {
+    s.boardLabel = 'Game board, turn 11, your Main Phase, ordering your effects';
+    me.chars = [null, K('OP17-045', { r: true }), K('OP17-040'), null, null];
+    me.active = 6; me.rested = 4;
+    me.leader = K('OP17-039', { who: 'Your', r: true, st: ['battle'], chips: [{ t: '⚔ Attacking', cls: 'attack', pos: 'below' }], noRestChip: true });
+    me.hand = [K('OP17-049', { hand: true }), K('OP17-046', { hand: true }), K('OP17-048', { hand: true }), K('OP17-045', { hand: true }), K('OP17-054', { hand: true })];
+    s.opp.leader.st = ['battle']; s.opp.chars.forEach((c) => c && (c.st = ['dim']));
+    me.chars[2].st = ['opp-act']; me.chars[2].chips = [{ t: '⚡ triggered', cls: 'you', pos: 'top' }];
+    s.arrows = [{ from: 'me.leader', to: 'opp.leader', bend: -120, cut: 40 }];
+    s.mid = { turn: 'Turn 11 · Your turn', phase: 'Main', battle: 'Attack', right: '<button class="waiting" type="button" aria-label="2 effects waiting: show the queue">⧉ 2 waiting</button>' };
+    s.decision = {
+      title: 'Order your effects',
+      body: `<p style="margin:0 0 4px" class="muted">2 of your effects trigger. Drag or Alt+↑↓.</p>
+        <ol class="line" aria-label="Resolve in this order" style="margin:0">
+          <li><span aria-hidden="true" class="subtle">⠿</span><span class="tx"><b>Rocks.D.Xebec</b> [When Attacking] · trash 1: reveal 1, draw 2 if Rocks Pirates</span></li>
+          <li><span aria-hidden="true" class="subtle">⠿</span><span class="tx"><b>Edward.Newgate</b> · trash 1: your Leader +3000 this battle</span></li>
+        </ol>
+        <p style="margin:4px 0 0;font-size:12px" class="subtle">Then Kaido's [On Your Opponent's Attack], in their window.</p>`,
+      foot: `<button class="btn" type="button">Suggested order</button>${SCN.primary('Resolve in order', 'Leader first', 'Enter')}`,
+    };
+  }
+  return s;
+}, STATES);
+</script>
+</body>
+</html>

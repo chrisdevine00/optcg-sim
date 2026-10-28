@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OPTCG Sim · Meta explorer</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+<style>
+  .mhead { display: flex; align-items: end; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; list-style: none; margin: 0; padding: 0; }
+  .roomy-m .tiles { grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .tile { display: grid; grid-template-columns: 64px 1fr; gap: 10px; padding: 10px; background: var(--color-surface-1); border: 1px solid var(--color-line); border-radius: var(--radius-3); text-decoration: none; color: var(--color-text); position: relative; }
+  .tile:hover { border-color: var(--color-accent); background: var(--color-surface-2); }
+  .tile .cb { position: relative; width: 64px; height: 89px; }
+  .tile .tn { font: 600 var(--text-lg)/22px var(--font-display); }
+  .tile .meta { font-size: 12px; line-height: 16px; color: var(--color-text-muted); }
+  .tile .share { font: 700 var(--text-lg)/22px var(--font-ui); font-feature-settings: var(--font-num-features); }
+  .tier { font: 700 12px/16px var(--font-ui); border: 1px solid var(--color-line-strong); border-radius: 4px; padding: 0 4px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="app-header"></header>
+  <main class="app-main" id="main" style="padding-top:16px"></main>
+  <footer class="app-footer"></footer>
+</div>
+<script src="wf.js"></script>
+<script src="cards.js"></script>
+<script src="meta-data.js"></script>
+<script>
+WF.chrome('Meta');
+if (WF.isRoomy()) document.body.classList.add('roomy-m');
+const COL = { Blue: 'blue', Purple: 'purple', Red: 'red', Green: 'green', Yellow: 'yellow', Black: 'black' };
+const fmt = (d) => { const [y, m, dd] = d.split('-'); return `${+dd} ${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][+m - 1]}`; };
+const arch = [...META.arch].sort((a, b) => b.share - a.share);
+const slice = { 'OP17-039': 1, 'OP17-058': 1 };
+const tiles = arch.map((a) => {
+  const g = { card: [64, 89] };
+  const card = WF.cardHTML({ n: a.name, col: COL[a.colors[0]], aria: '' }, [0, 0, 64, 89], g, { tag: 'span' }).replace('class="card', 'aria-hidden="true" class="card');
+  return `<li><a class="tile" href="13b-guide.html" aria-label="${a.name}, ${a.colors.join(' and ')}, tier ${a.tier} on opmetagame, ${a.share}% of lists, ${a.post}% since the ban. Guide and 3 lists.">
+    <span class="cb" style="--card-w:64px;--badge-power-size:12px;--badge-num-size:12px;--badge-h:16px">${card}</span>
+    <span><span class="tn">${a.name}</span><br><span class="meta">${a.id} · ${a.colors.join(' / ')} · </span><span class="tier" title="Tier from opmetagame.com (October 2026)">Tier ${a.tier}</span> <span class="meta">opmetagame</span><br>
+    <span class="share">${a.share}%</span> <span class="meta">of lists · ${a.post}% since the ban</span><br>
+    <span class="meta">Lists: ${fmt(a.first)} to ${fmt(a.last)}</span><br>
+    <span class="meta">${slice[a.id] ? '✓ 50 of 50 automated' : 'Automation: not yet'}</span></span></a></li>`;
+}).join('');
+document.getElementById('main').innerHTML = `
+  <div class="mhead"><div><h1 class="page" style="margin:0">Meta explorer</h1>
+    <p class="muted" style="margin:2px 0 0">English Standard · <b style="color:var(--color-text)">as of 2026-10-28</b> · 33 online events, 30 Jul to 28 Oct · <a href="16-settings.html#about">how it is counted</a></p></div>
+    <span style="flex:1"></span>
+    <div class="seg" role="radiogroup" aria-label="View"><button type="button" role="radio" aria-checked="true">Grid</button><button type="button" role="radio" aria-checked="false" onclick="location.href='13c-matchups.html'">Matchups <kbd>M</kbd></button></div>
+    <label class="lbl" style="margin:0">Sort <select class="input" style="width:auto;height:30px;display:inline-block;margin-left:4px"><option>Share</option><option>Share since the ban</option><option>Tier</option><option>Colour</option><option>Name</option></select></label></div>
+  <p class="subtle" style="margin:0 0 10px;font-size:12px">Mihawk (OP14-020) is not shown: banned from 2026-10-12. Tier comes from opmetagame only; onepiece.gg could not be read.</p>
+  <ul class="tiles" aria-label="Archetypes">${tiles}</ul>`;
+</script>
+</body>
+</html>
