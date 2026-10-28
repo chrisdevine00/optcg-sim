@@ -1,6 +1,7 @@
 # Status
 
-**Phase:** 4 Design (in progress). Phases 1, 2 and 3 gated 2026-10-28.
+**Phase:** 5 Build, slice pass (ADR 0012), starting at M0. Phases 1–4 gated 2026-10-28.
+**Milestone:** M0 Scaffold (design tokens and fonts into the app)
 **Milestone:** M0 scaffold started (allowed before the Phase 4 gate)
 **Run the app:** `npm install && npm run dev` then open http://localhost:5173/optcg-sim/ (placeholder page only)
 **Deployed:** https://chrisdevine00.github.io/optcg-sim/ (auto-deploys after green CI on `main`)
@@ -12,7 +13,7 @@
 | 1 Research | docs/research/rules-digest.md, data-sources.md, competitive-teardown.md, meta-landscape.md, strategy-concepts.md | **Gated 2026-10-28** (all five deliverables) |
 | 2 Plan | docs/PLAN.md, docs/ARCHITECTURE.md, docs/adr/ | **Gated 2026-10-28** (revision 2 after two reviews; see docs/plan-review-1.md) |
 | 3 Deep research | docs/research/effect-dsl.md, rulings.md; docs/content/archetypes/, curriculum.md, glossary.md, sources.md | **Gated 2026-10-28** (competitive-player review: 20 findings, 0 severity-3 open; see docs/content/review-1.md) |
-| 4 Design | docs/design/principles.md, board.md, flows.md, visual-system.md, learning-ui.md, wireframes/, review-1.md | In progress: design documents being written |
+| 4 Design | docs/design/principles.md, board.md, flows.md, visual-system.md, learning-ui.md, wireframes/, review-1.md | **Gated 2026-10-28** (review 1: 50 findings plus 2 verification passes; 0 severity-3 or severity-4 open) |
 | 5 Build | M0 through M10 per PROMPT.md | Not started |
 
 ## Done
@@ -39,23 +40,26 @@
   - **Guide review:** a competitive-player review found 6 severity-3 errors (misread cards, a curriculum flag that would punish correct play). All are fixed and verified against card text (`docs/content/review-1.md`).
   - **onepiece.gg scrub:** that material was removed from `strategy-concepts.md` (it disallows Anthropic agents). About 26 claims were re-sourced from Shonen TCG and Bounty TCG; 7 heuristics are now listed as gaps.
 
+- Phase 4 (`docs/design/`):
+  - **Documents:** principles, board, visual system with `tokens.css`, card-face study, flows, learning UI, 20 example explanations, accessibility (keyboard spec), usability plan.
+  - **Wireframes:** 31 clickable screens (`wireframes/index.html`; press the backtick key for states).
+  - **Review:** 50 findings, 22 spec conflicts resolved, and two verification passes ending in PASS, with axe at 0 violations.
+  - **Carried to M3** (severity 2): the defence card preview overlaps Character slots 1–2, and tablet button sizes need fixing.
+
 ## In progress
 
-- **Design review 1:** the 11 original severity-3 fixes are verified by an independent reviewer (`review-1.md` §6). The verification pass found 3 new severity-3 findings, so the gate verdict is FAIL:
-  - UX-V1: the Trigger tray and preview dock overlap the tall defence panel and hide focus;
-  - UX-V2: no defence-panel geometry at 1280×600 or 1024×690;
-  - UX-V3: the lethal-drill answer falls below the fold at 1280.
+Nothing running.
 
-  There are also 6 severity-2 findings and a bundle of severity-1 items.
-- **Running:** the fixer subagent is fixing V1–V10 and adding dispositions to §6. The verifier then re-checks. If interrupted, re-launch the fixer with "fix the findings in review-1.md §6", and then the verifier.
+## Next (slice pass, PLAN.md §1)
 
-## Next
-
-1. Phase 4 Design (estimate 40 h). Deliverables in `docs/design/`:
-   - remaining: HTML wireframes (running), screenshots at both resolutions, and owner usability session S0 on the wireframes (optional; see `usability-plan.md`).
-
-   It is gated by a UX-director review recorded in `review-1.md`, with no severity-3 or severity-4 finding open.
-2. Then Phase 5, slice pass (ADR 0012): M0 tokens, M1 cards, M2 engine core, and so on.
+1. **M0:** copy `docs/design/tokens.css` into `app/src/styles/tokens.css`, self-host Inter and Fraunces (@fontsource), and add a build-time contrast check of the token pairs.
+2. **M1 Cards:**
+   - `cards:update` from optcgapi.com, with normalizers and overrides;
+   - verify the stats and types of all 182 meta-list cards;
+   - `standard.json`;
+   - the image module and service worker;
+   - the card browser.
+3. **M2 Engine core:** freeze the fixture API first.
 
 ## Blockers
 
@@ -63,5 +67,6 @@ Owner decisions needed (not blocking progress):
 - The first Track C attempt captured 62 DuelVoyager screenshots (`docs/research/teardown-shots/dv-*.png`, gitignored, local only) against DuelVoyager's robots.txt. They are unused. Deleting them was blocked by the permission system; please delete them: `rm docs/research/teardown-shots/dv-*.png`.
 - Commit 80357a0 (already pushed) contains a partial teardown with DuelVoyager observations; HEAD no longer has them. Rewriting public history needs a force-push, so it is the owner's call.
 - Requested before the Phase 4 gate: about 90 minutes of hands-on time with SeaKing (Learn, Hint, Rewind, Game Review) and the Bandai tutorial (open question C1). It does not block the run; if it has not happened by then, Phase 4 marks every design claim that rests on unobserved competitor behaviour.
+- Card-face sign-off (`docs/design/card-face-study.md` §5) and the board disclaimer form: owner confirmation requested; neither blocks.
 - Optional: contact optcgapi.com's maintainer about image hotlinking and the text errors found (open question B2).
 - Card data comes from optcgapi.com, not the official list, because of the official site's terms (B1, ADR 0007). Overrule if you disagree.

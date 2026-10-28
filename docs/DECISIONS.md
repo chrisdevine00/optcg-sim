@@ -2,6 +2,16 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-10-28 — Phase 4 gated; on-board disclaimer form
+
+Context: PROMPT.md requires the unofficial-fan-tool disclaimer in every page footer, but the full-height game board has no footer (`board.md` OQ-6). The verification pass in `docs/design/review-1.md` §6.7 found no open severity-3 or severity-4 finding.
+
+Decision: Phase 4 is gated.
+- **Disclaimer.** Every non-board page carries the full disclaimer in its footer. The board carries it as a visible two-line notice under the rail header, at 12 px. Its accessible name is the full disclaimer text, and Settings → About carries the full text with all sources. The owner may change the form; that is a one-component change.
+- **Carried to M3** (severity 2): the defence card preview covers both players' Character slots 1–2; on tablet rails two button labels overflow by 6–11 px, and one button is 115 px wide against a 136 px minimum. Screenshots at the adapted sizes (1280×600, 1024×690, 1180×740) are also taken in M3.
+
+Alternatives rejected: a disclaimer only in Settings (it would not be on every page); hiding it on the board behind an info icon (the reviewer showed the hover text was incomplete and easy to miss).
+
 ## 2026-10-28 — Design review 1 fixes; AI-turn target stays at 8 s
 
 Context: review 1 found 11 severity-3 problems, among them a defence panel that overflowed at 1280 and an Enter key that committed counters too small to stop the hit. A fixer applied all 22 conflict rulings and fixed every severity-3 problem, with measurements recorded in `review-1.md`. The review's longer dwell times on attacks and results put a typical Warlord turn at about 9.2 s at 1× speed.

@@ -299,3 +299,36 @@ Probes: `.cache/wireframes/vprobe.mjs` (9-point focus on 7 states, V3, V4, V6, V
 | UX-V10 | **Fixed:**<br>• hand ring: visual-system §4 now says 2 px at a 1 px offset, matching board.md §2.5;<br>• `20-history` table headers are now 13 px, and #empty has an `h1`;<br>• one primary each: `15#complete` keeps the dialog's (the panel's is removed and the board is inert behind the modal), and `11b`'s thumbnail button is now the secondary "Open in Study";<br>• the Progress header no longer says "last 10";<br>• `11b-review#mull` is now a real state, with Mulligan practice;<br>• Storage full: Export is primary, Delete is secondary;<br>• T3 now says "press + then Enter".<br>The sweep also found and fixed older hidden-focus cases:<br>• the `02b-start` mulligan fan container covered the board;<br>• the `12-deck-builder` import and export modals did not make the page inert;<br>• `13c` cells scrolled under the sticky headers.<br>The sweep now finds 0 fully hidden stops on any state.<br>**Not done (out of scope):** the `DECISIONS.md` entry for OQ-6. board.md now records the form as decided, but `DECISIONS.md` is outside `docs/design/`, so the coordinator must add the entry. |
 
 **Gate after fix pass 2:** UX-V1, V2 and V3 are fixed with the measurements above, so no severity 3 or 4 finding is open. The deferred part of UX-R17 is now only the extra-size *shots*; the geometry and its fit are in the spec (§6.4's condition).
+
+### 6.7 Second verification
+
+**As of:** 2026-10-28, after commit ff63b60
+**Reviewer:** the same verifying subagent. It used its own probes in `.cache/verify/` (`v2.mjs`, `sweep2.mjs`, `fold.mjs`, `v6.mjs`, `shots2.mjs`) and not the fixer's `vprobe`, `sweep` or `adapt` scripts.
+
+**How each size was measured:**
+- **1280×720 and 1920×1080:** native renders.
+- **1280×600, 1024×690 and 1180×740:** `wf.js` has no geometry for these sizes, so I emulated them. I loaded the compact layout at the real viewport and set the rail width (320, 264, 280). I measured the notice's real wrapped height and put the tall panel right under it, with the ticker and strip hidden, as board.md §6.2 and §6.3 now specify.
+- **Focus:** obscured means any of 9 sample points covered; I pressed Tab 60 times on every one of the 103 states, at both sizes.
+
+| ID | Verdict | My measurement |
+|---|---|---|
+| UX-V1 | **Verified** | No Tab stop is fully hidden in any of the 103 states at either size (it was 32 of 60 in `06-trigger`).<br>• `06#reveal` and `#nodon`: the Life card renders inside the tall body, using 293 of 420 px at 1280 and 326 of 748 at 1920. No overlay intersects the panel, the rail notice or the board's Trash.<br>• `05#preview`: the dock sits at 16, 40, 400 × 384 (1280) and 24, 60, 480 × 644 (1920), clear of the panel and the notice. See UX-V11 for what it does cover. |
+| UX-V2 | **Verified** (emulated; spec numbers match) | Body content used / available. Every state fits with no scroll, no clipped header and no clipped notice:<br>• **1280×600** (body 424): block 283, plan 309, stop 309, tie 345, Skip stop 362, counter drill 378, Trigger 293, confirm 190.<br>• **1024×690** (notice 46 px, header 45 px when it wraps, body 491–500): stop 403, block 413, plan 419, tie 473, Skip stop 426, drill 464, Trigger 374.<br>• **1180×740** (body 541–550): 224 to 473.<br>• **1920:** the defence header now grows to 61 px with nothing cut (body 731).<br>Footer labels overflow on the tablet rails: see UX-V12. |
+| UX-V3 | **Verified** | `14-drill-lethal#answer` at 1280 (view 435): line step 1 at 146, last step at 240, outcome at 293, all visible. The evidence follows, and "More below ↓" shows. At 1920: line 145–215, outcome 256. |
+| UX-V4 | **Verified** | Cue present and "Make taller" offered on `09b#result` and `#following` and on `09c#why`, at both sizes.<br>• `#tall` at 1280: hint line 145–309 and outcome 362 of 435; Why outcome 378 of 435.<br>• Study at 1280: the line now starts at 184–238 and the outcome is visible in every flag; the cue is present.<br>• The only scrolling body left without a cue is the pinned inspector (UX-V13). |
+| UX-V5 | **Verified** at the two targets | No footer button, decision header or Study footer has overflowing text in any of the 103 states at either size. "Counter +3000" fits. |
+| UX-V6 | **Verified** | Same at both sizes, from page load and from the skip link:<br>• P → "Your Main phase" heading in the panel, and P then Enter changes nothing;<br>• G then L → your Leader; G then Shift+L → "Opponent's Kaido, Leader";<br>• E → `08-ai-turn`; S on `08#acting` from load → Skip.<br>A on your rested Captain John: "can't attack: it is rested." Enter, then P, then Enter on `05#tie` and `#plan`: no commit. |
+| UX-V7 | **Verified** | No spec or wireframe still offers a "turn your device" gate. board.md §6.4 now says "No screen in the product is a 'turn your device' gate". The `17-phone` tablet mode is "The board in portrait" ("Continue in portrait"). |
+| UX-V8 | **Verified** | `?l=` renders: L09 "DON!! efficiency", L12 "Mulligan", L14 "Board or face", L15 "Lethal math", L16 "Reading counters", plus L05 and L10 in full. An unknown id (L99) still falls back to L05 (severity 1). |
+| UX-V9 | **Verified** | `11-game-over` has 0 hidden stops at both sizes. The midline's name is "Game over: Kaido wins on turn 13", the chip reads "Game over", and there is no turn bar. |
+| UX-V10 | Spot-checked; holds | `11b#mull` is now a real state. No text is under 12 px in any state. The `DECISIONS.md` entry for OQ-6 is still for the coordinator to add (process only, not a design finding). |
+
+**New findings from the sweep** (none is severity 3 or 4):
+
+| ID | Sev | Problem (measured) | Fix |
+|---|---|---|---|
+| UX-V11 | 2 | **The defence preview at the board's top-left covers battle-relevant zones.** In `05#preview` the dock covers your Character slots 1–2, the opponent's Character slots 1–2 and the start of the midline ("Turn 8 ·" is cut), at both sizes. At 1920 it also covers the top 12 px of your cost area and your Life. It is transient and closes when focus moves, but a Blocker or the attacker in those slots would be hidden while you read a counter card. | Extend the §3.12 placement rule: also avoid the attacker, the defender and any lit Blocker or target. If no position is clear, shrink the dock. |
+| UX-V12 | 2 | **Footer labels overflow on the tablet rails** (emulated). At 1024×690, "Block with Gloriosa ↵" overflows its 137 px button by 11 px, and "Confirm attack ↵" overflows its 115 px button by 7 px; 115 px is below board.md §3.9's 136 px minimum for a primary. At 1180×740, "Block with Gloriosa" overflows by 6 px. | Give tablet footers a short-label rule, or stack the two buttons. Add a footer overflow assertion to M3's adapted-size layout test. |
+| UX-V13 | 1 | Partial focus covers (no stop fully hidden):<br>• `02b-start#mulligan`: your empty Character slot 1 is 6/9 under the mulligan fan;<br>• `13c-matchups`: cells are 6/9 under the sticky header or column at both sizes;<br>• the pinned inspector body (`10#inspect`, 475/333 at 1280) scrolls with no cue. | Scroll focused cells clear of sticky headers. Skip the empty slot while the fan is up. Apply `scrollCue` to `.rdb`. |
+
+Gate: PASS
