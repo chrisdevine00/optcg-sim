@@ -1,6 +1,6 @@
 # ADR 0009: Local-only persistence in IndexedDB and localStorage
 
-**Status:** Proposed, 2026-10-28
+**Status:** Accepted, 2026-10-28
 
 ## Context
 Replays, reviews, drill results and progress must persist without accounts or servers (PROMPT.md "Things you must not do").

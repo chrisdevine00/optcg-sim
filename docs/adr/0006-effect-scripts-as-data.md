@@ -1,6 +1,6 @@
 # ADR 0006: Effect scripts are hand-written, typed data; text is never parsed into behaviour
 
-**Status:** Proposed, 2026-10-28 (vocabulary defined by Track E in `docs/research/effect-dsl.md`)
+**Status:** Accepted, 2026-10-28 (vocabulary defined by Track E in `docs/research/effect-dsl.md`)
 
 ## Context
 Thousands of cards use natural-language effect text with many one-off wordings. Automatic parsing would silently misread cards; hand-written imperative code per card would be untestable at scale and unsearchable by the AI.

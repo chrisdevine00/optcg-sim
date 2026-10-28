@@ -1,6 +1,6 @@
 # ADR 0010: Learning content is Markdown with front matter, compiled at build time
 
-**Status:** Proposed, 2026-10-28
+**Status:** Accepted, 2026-10-28
 
 ## Context
 Archetype guides, curriculum, glossary, rules reference and coach explanations must cite sources, carry an as-of date, and never drift from the AI playbooks.

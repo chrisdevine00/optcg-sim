@@ -17,6 +17,7 @@ Unresolved ambiguities with the current best answer. Remove an entry when it is 
 - R10. CR 6-5-5-1 "cost area" is a typo for Character area.
 - R11. Stage is not a DON!! −X source (CR 8-3-1-6 over the Q&A).
 - R12. [On Your Opponent's Attack] activates before the end-of-Attack-Step check (CR 7-1-1-3/4).
+- R14. CR 8-1-3-3-5 lets the turn player choose the order of interacting permanent effects. Best answer: canonical layers (set-base, set-to-0, ± modifiers, grants and removals, conditions), turn player first, in timestamp order; it becomes an `order` decision only if a real card interaction makes the order matter. Track F to look for rulings.
 - R13. Tournament procedure (cuts, time limits) is not enforced in v1.
 
 ## Strategy (from Track D part 2; detail in docs/research/strategy-concepts.md "Open questions")
@@ -47,7 +48,7 @@ Unresolved ambiguities with the current best answer. Remove an entry when it is 
 
 ## UX research (from Track C; detail in docs/research/competitive-teardown.md)
 
-- C1. SeaKing, the main baseline, could not be observed (robots.txt disallows Anthropic agents). Best answer: the owner plays one SeaKing game by hand using the checklist in teardown §2 and adds notes before Phase 4 is gated; until then, Phase 4 designs from PROMPT.md's description of SeaKing.
+- C1. SeaKing, the main baseline, could not be observed (robots.txt disallows Anthropic agents). Best answer: about 90 minutes of owner hands-on time (SeaKing Learn, Hint, Rewind, Game Review, plus the Bandai tutorial) is requested before the Phase 4 gate. If it has not happened by then, Phase 4 marks every design claim that rests on unobserved competitor behaviour, and the slice checkpoint revisits them.
 - C2. DuelVoyager is not studied (same reason). Best answer: out of scope unless the owner fills it in by hand.
 - C3. OPlayTCG and OPTCG Web Sim also claim AI opponents and were not opened. Best answer: check their robots.txt and terms during Phase 4 preparation, and study them only if allowed.
 - C4. Bandai's browser Teaching App was observed only up to its Terms of Use, which prohibit unapproved external tools. Best answer: the owner plays its tutorial by hand if Phase 4 needs more than the official play guide.

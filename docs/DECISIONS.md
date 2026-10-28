@@ -2,6 +2,17 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-10-28 — Phase 2 reviews folded in; plan re-baselined to about 720 hours with a vertical slice first
+
+Context: two adversarial reviews (`docs/plan-review-1.md`) found the 264-hour estimate about half of reality, and found that the strict M0–M10 order would start the learning layer about 70% of the way in. They also found engine-model gaps: replacement effects, last-known information, scenario starts, record versioning, projection linkage leaks, and invariants hard-coded to 10 DON!!. Decision:
+- Accept every severity 3–4 finding.
+- Build a vertical slice before breadth (ADR 0012): Rocks and Kaido, Pirate, and the learning slice, then an owner usability session.
+- Add replacement hooks, last-known information and scenarios as engine primitives (ADR 0013).
+- Revise ADRs 0003, 0004, 0005 and 0008.
+- Re-baseline to about 720 hours.
+
+Two findings are only partly accepted. Usability sessions use the owner, plus others at the owner's discretion, because the project cannot recruit participants. Owner hands-on time on SeaKing is requested but does not block the autonomous run. Alternatives rejected: keeping the PROMPT.md milestone order literally (the time-box would cut the learning layer); deferring the engine-model fixes to M2 (they change the data model and the record format).
+
 ## 2026-10-28 — Card data from optcgapi.com, not the official card list
 
 Context: Track B recommended parsing the official card list (the most accurate source, and the only one with block icons), with optcgapi.com as fallback. But the official site's terms say its "text and data … may not be reproduced without permission", and PROMPT.md says to choose another source where terms forbid an intended use. optcgapi.com says it is "open for anyone to use", but it drops minus signs, loses type delimiters, and has a few corrupt rows. Decision: optcgapi.com is the only source `cards:update` fetches. Mechanical repairs are recorded per card. Hand-verified overrides, from a person-scale read of the official entry, are written for every scripted card, and CI requires them. Block, ban and exception data is a hand-kept, cited `cards/format/standard.json`. Full reasoning in ADR 0007. Alternatives rejected: bulk-parsing the official site (terms); optcgapi raw (sign loss changes meaning); Scrydex (paid, no mirroring); arjunkai (private data).
