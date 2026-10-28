@@ -20,3 +20,16 @@ Unresolved ambiguities with the current best answer. Remove an entry when it is 
 - R11. Stage is not a DON!! −X source (CR 8-3-1-6 over the Q&A).
 - R12. [On Your Opponent's Attack] activates before the end-of-Attack-Step check (CR 7-1-1-3/4).
 - R13. Tournament procedure (cuts, time limits) is not enforced in v1.
+
+## Strategy (from Track D part 2; detail in docs/research/strategy-concepts.md "Open questions")
+
+- S1. TCGplayer "How to Swing for Lethal" and a Blue-Green Luffy guide were read only as search snippets (pages rendered without text). Best answer: do not use their claims as coach content until a page is read in full; coach lethal math rests on the CR plus onepiece.gg.
+- S2. Paid Metafy frameworks ("2K Rule", "Power Staircase", life thresholds). Best answer: do not buy or cite paywalled content; the coach cites only freely readable sources (logged in DECISIONS.md).
+- S3. Double Attack at 1 Life does not win (CR 7-1-4-1-1). Track F to confirm with an official ruling.
+- S4. DON!! −X returned DON!! re-enters through later DON!! Phases, within the 10-card cap. Track F to confirm.
+- S5. No sourced first-vs-second win rates. Best answer: compute from our own AI self-play later; say so in the coach rather than quote a number.
+- S6. Counter-density targets (median 33 counter cards, about 9 +2000s per the Shonen TCG sample). Verify against the Track D lists.
+- S7. Current examples of DON!!-return and Blocker-resting cards. Track E vocabulary to list them.
+- S8. Removal timing has no sourced generic heuristic. Best answer: deck-specific timing goes in the playbooks.
+- S9. "Single colour 5 Life, dual colour 4" is a rule of thumb. Best answer: always read Life from card data.
+- S10. Reported rotation of OP-01 to OP-04 out of Standard on 2026-04-01. Cross-check in Track D part 1.
