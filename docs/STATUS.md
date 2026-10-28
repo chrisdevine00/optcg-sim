@@ -41,8 +41,10 @@
 
 ## In progress
 
-- **Phase 4 design documents are done and committed:** principles, board (exact layout at both resolutions), visual system and `tokens.css` (72 colour pairs, all AA), card-face study, flows, learning UI, 20 example explanations, accessibility (keyboard spec), and the usability plan.
-- **Running:** one subagent is building clickable HTML wireframes in `docs/design/wireframes/` (17 screens). Shots go to `docs/design/wireframes/shots/` (gitignored); scratch is in `.cache/wireframes/`. If interrupted, re-launch with the same brief and check `docs/design/wireframes/` for finished screens first.
+- **Done and committed:** the Phase 4 design documents, plus wireframes for 26 screens (`docs/design/wireframes/index.html`; press the backtick key for the state switcher).
+- **Review 1** (`docs/design/review-1.md`) is not yet passed. It has 50 findings: 0 severity-4, 11 severity-3, 32 severity-2, 7 severity-1. It also rules on the 22 conflicts between the design documents.
+- **Running:** one subagent is applying the conflict rulings to the specs and fixing the findings in specs and wireframes. It re-shoots the screenshots, measures each fix, and fills in the Disposition column. If interrupted, re-launch it with the same brief, and check the Disposition column for what is already done.
+- **Next:** a fresh reviewer verifies that the severity-3 fixes hold, then Phase 4 gates.
 
 ## Next
 
