@@ -41,10 +41,8 @@
 
 ## In progress
 
-- **Done and committed:** the Phase 4 design documents, plus wireframes for 26 screens (`docs/design/wireframes/index.html`; press the backtick key for the state switcher).
-- **Review 1** (`docs/design/review-1.md`) is not yet passed. It has 50 findings: 0 severity-4, 11 severity-3, 32 severity-2, 7 severity-1. It also rules on the 22 conflicts between the design documents.
-- **Running:** one subagent is applying the conflict rulings to the specs and fixing the findings in specs and wireframes. It re-shoots the screenshots, measures each fix, and fills in the Disposition column. If interrupted, re-launch it with the same brief, and check the Disposition column for what is already done.
-- **Next:** a fresh reviewer verifies that the severity-3 fixes hold, then Phase 4 gates.
+- **Design review 1:** all 50 findings have a disposition. All 11 severity-3 findings were fixed with measured evidence, and the 22 spec conflicts were resolved. New screens: Learn, Progress, History, Study and error states. axe ran 201 times with 0 violations.
+- **Running:** a fresh verification reviewer is re-measuring every severity-3 fix and looking for new problems. It appends §6 "Verification pass" to `docs/design/review-1.md`. If the verdict is PASS, Phase 4 gates; if FAIL, the open items are fixed and verified again. If interrupted, re-launch the verifier with the same brief.
 
 ## Next
 

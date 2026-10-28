@@ -2,6 +2,22 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-10-28 — Design review 1 fixes; AI-turn target stays at 8 s
+
+Context: review 1 found 11 severity-3 problems, among them a defence panel that overflowed at 1280 and an Enter key that committed counters too small to stop the hit. A fixer applied all 22 conflict rulings and fixed every severity-3 problem, with measurements recorded in `review-1.md`. The review's longer dwell times on attacks and results put a typical Warlord turn at about 9.2 s at 1× speed.
+
+Decision:
+- **Defence panel.** It grows over the log at both resolutions, and its footer keeps the same position.
+- **Defence commits.** Every defence offers "Take the hit" and a separate commit. Enter only commits a counter that actually stops the hit.
+- **Skip.** "Skip to my decision" stops at the player's own defensive decisions.
+- **Review.** It has an Overview mode and a full-size Study mode, with no text under 12 px.
+- **Keyboard.** One tab stop per zone, with shortcuts.
+- **Disclaimer.** The board shows a visible two-line disclaimer whose accessible name is the full text. The owner may still change its form.
+- **New screens.** Learn, Progress, History, Study and error screens.
+- **AI-turn target.** It stays at 8 s or less at 1× speed (the PLAN M5a criterion). Dwell times get tuned against real AI turns in M5a, and Step and 0.5× remain available for anyone who wants a slower pace.
+
+Alternatives rejected: relaxing the target to 10 s (waiting is the most common complaint about AI opponents); dropping the review's dwell increases outright (the reviewer showed that attacks were hard to follow).
+
 ## 2026-10-28 — Phase 4 design decisions (board, flows, accessibility)
 
 Context: three design agents wrote the Phase 4 documents in parallel. Their proposed decisions are accepted as written in each file; the full paragraphs, with the alternatives rejected, are there.
