@@ -2,6 +2,36 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-10-28 — Phase 4 design decisions (board, flows, accessibility)
+
+Context: three design agents wrote the Phase 4 documents in parallel. Their proposed decisions are accepted as written in each file; the full paragraphs, with the alternatives rejected, are there.
+- **`board.md` PD-1 to PD-6:**
+  - a fixed board column plus a fixed right rail (log, coach, decision panel), 320/400 px wide;
+  - the opponent mirrored vertically with the same columns;
+  - click primary, drag as accelerator, and a keyboard path for everything;
+  - AI turns paced as highlight → move → dwell (600 ms per move at 1×), with "thinking" shown only when it is real;
+  - an honest phone screen;
+  - a minimum card of 76×106, below which the layout changes mode instead of shrinking.
+- **`flows.md` decisions 1 to 9:**
+  - commit rather than confirm;
+  - one defence panel with Blocker, Counter and Trigger lanes and a single commit;
+  - multi-select with a running count, sent to the engine one pick at a time;
+  - auto-skip only when no human could learn hidden information from it, and a constant visible AI "considering" time;
+  - rewind by move with the same shuffle, marked and excluded from stats;
+  - "skip to my decision" never skips the player's own decisions;
+  - hotseat privacy via a handoff screen plus hold-to-reveal in battles;
+  - one welcome question and no account;
+  - AI explanations cite public information only.
+- **`accessibility.md`:**
+  - staged picks are validated by replaying them through `reduce` on a scratch state, with an engine helper added only if that exceeds 16 ms;
+  - screen-reader passes use Guidepup automation plus a human VoiceOver pass;
+  - the owner's tutorial runs are labelled "expert proxy".
+
+Reconciled across the documents:
+- the coach uses the rail's full width (`board.md` is the source of truth for layout);
+- `accessibility.md` owns the keyboard map, which resolves the shortcut collision in `flows.md` question 6;
+- the `Evidence` and `Move` shapes from `explanations.md` are added to ARCHITECTURE §4.5.
+
 ## 2026-10-28 — Phase 3 gated after the competitive-player review
 
 Context: PROMPT.md gates Phase 3 on a competitive-player review of the archetype guides. The review found 20 issues: 6 severity-3, including misread leader texts (OP17-058, OP05-098), targets out of a card's cost range, a curriculum flag that would penalize correct OP13-001 play, and missing fundamentals. Decision: a separate agent checked every finding against card text, the rulings and the lists. It accepted 18 and partly accepted 2 (`docs/content/review-1.md`), fixed nine further errors found along the way, added lessons L25–L27 (base vs current values, Leader vs Character targeting, opponent-turn timing), marked every unsourced claim individually, and added the EB05 format note. Lesson IDs are stable, so teaching order follows section order rather than ID. Alternative rejected: gating with the guides marked "low confidence" (they would teach false facts).

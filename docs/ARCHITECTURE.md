@@ -229,7 +229,7 @@ Every decision, hint and review flag carries an `Explanation`:
 ```ts
 { conceptId: 'lethal-math' | 'don-efficiency' | 'life-as-resource' | ...,  // stable slugs, defined in strategy-concepts.md (Phase 3)
   claim: string,                    // "You had lethal this turn."
-  evidence: Evidence[],             // board numbers: "Opponent: 1 Life, 2 cards in hand → at most +4000 counter"
+  evidence: Evidence[],             // { text, figures? }: one line of copy plus every number in it, named, so tests recompute them
   line: Move[] | null,              // the better line, as player-level moves
   outcome: string,                  // in player units: "wins the game", "keeps 2 more Life", "+1 card"
   certainty: 'any-hand' | 'needed-hidden-info' | 'search-incomplete',
@@ -237,6 +237,8 @@ Every decision, hint and review flag carries an `Explanation`:
   lessonId: string,                 // curriculum lesson
   sources: string[] }               // rule or strategy citations
 ```
+
+`Move` is a player-level move for display: `{ kind, text, card?, target?, count? }`, where `kind` is one of play, giveDon, activate, attack, block, counter, take, choose, trigger, keep, redraw or endTurn. The full shapes and 20 worked examples are in `docs/design/explanations.md`. AI "why" explanations cite public information only.
 
 Reasons come from the **feature differences** between the chosen line and its alternatives: which terms of the heuristic changed, by how much, and why. They do not come from MCTS visit counts. Phase 4 writes about 20 example explanations for planted positions. The owner reviews that copy, and the examples become snapshot tests. A test only passes if the evidence numbers match the position.
 
