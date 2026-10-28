@@ -13,7 +13,26 @@ body {
   background: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-ui);
+  font-size: var(--text-md);
+  line-height: var(--leading-md);
+  font-feature-settings: var(--font-ui-features);
   font-variant-numeric: tabular-nums;
+}
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
+}
+h1 {
+  font-size: var(--text-3xl);
+  line-height: var(--leading-3xl);
+}
+:focus-visible {
+  /* Two-tone ring (visual-system.md "Rings"): dark gap, then a 2px light ring 6-8px out. */
+  outline: 2px solid var(--color-focus);
+  outline-offset: 6px;
+  box-shadow: 0 0 0 6px var(--color-focus-gap);
 }
 .shell {
   min-height: 100%;
@@ -24,9 +43,15 @@ body {
   flex: 1;
   padding: var(--space-6);
 }
+.placeholder p {
+  color: var(--color-text-muted);
+  font-size: var(--text-lg);
+  line-height: var(--leading-lg);
+}
 .site-footer {
   padding: var(--space-2) var(--space-4);
-  font-size: 12px;
+  font-size: var(--text-xs);
+  line-height: var(--leading-xs);
   color: var(--color-text-muted);
-  border-top: 1px solid var(--color-surface);
+  border-top: 1px solid var(--color-line);
 }

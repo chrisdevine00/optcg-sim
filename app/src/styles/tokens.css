@@ -1,12 +1,339 @@
-/* Design tokens. Placeholder values for M0; the visual system in docs/design/visual-system.md replaces them. */
+/*
+ * OPTCG Sim design tokens, v1.
+ * This file is the source of truth from M0 on; docs/design/tokens.css is the Phase 4 snapshot and
+ * docs/design/visual-system.md explains every token. Contrast of every declared pair is checked by
+ * scripts/contrast.ts in `npm run build` and in the unit tests, so a failing pair fails CI.
+ *
+ * Themes: dark playmat is the default (:root). Light is opt-in with <html data-theme="light">.
+ * Motion: honours prefers-reduced-motion; <html data-motion="reduced"> forces it on, data-motion="full" forces it off.
+ * Density: compact by default (designed at 1280x720); roomy at >= 1600x900 (designed at 1920x1080).
+ * Card overlay sizes derive from --card-w, which the board sets at runtime from the layout algorithm in board.md.
+ */
+
+/* ---------- Colour: dark (default) ---------- */
 :root {
-  --color-bg: #0f1216;
-  --color-surface: #171b21;
-  --color-text: #e8eaed;
-  --color-text-muted: #a3a9b3;
-  --font-ui: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color-scheme: dark;
+
+  /* Neutrals: cool, low-chroma slate so the card art carries the colour */
+  --color-bg: #0b0e12; /* app background behind everything */
+  --color-mat: #11161d; /* playmat */
+  --color-mat-zone: #18202a; /* empty zone slot fill */
+  --color-mat-line: #2a3441; /* zone slot outline, decorative only */
+  --color-surface-1: #141920; /* rail panels: log, coach */
+  --color-surface-2: #1b212a; /* raised: decision panel, popovers, preview dock */
+  --color-surface-3: #242b36; /* hover rows, selected list items, pressed */
+  --color-line: #2a323d; /* dividers, decorative */
+  --color-line-strong: #6e7a8a; /* control boundaries (inputs, secondary buttons): >= 3:1 */
+
+  /* Text */
+  --color-text: #e8ecf1;
+  --color-text-muted: #aeb7c3;
+  --color-text-subtle: #96a0ad; /* smallest permitted contrast step; never below 4.5:1 on any surface */
+
+  /* Card badge plates: theme-invariant, opaque, sit on card art */
+  --color-plate: #06080b;
+  --color-plate-text: #ffffff;
+  --color-plate-base: #b4bcc8; /* unmodified base value shown beside a live value */
+  --color-plate-buff: #7fe0ae; /* raised above base: always paired with an up-arrow glyph */
+  --color-plate-debuff: #ff9ca6; /* lowered below base: always paired with a down-arrow glyph */
+
+  /* Interaction and identity. Blue = you and your options; orange = the opponent and their actions. */
+  --color-accent: #6cc4ff; /* legal-move ring, primary button fill, your identity */
+  --color-accent-hover: #93d4ff;
+  --color-on-accent: #04121d;
+  --color-accent-text: #8acfff; /* links and "You" labels on surfaces */
+  --color-opponent: #f5a35c; /* opponent highlights during their turn, opponent identity */
+  --color-on-opponent: #1f1000;
+  --color-opponent-text: #f7b277;
+
+  /* Focus: two-tone ring (light outline + dark gap) so it reads on any art or surface */
+  --color-focus: #f4f7fb;
+  --color-focus-gap: #06080b;
+
+  /* Status. Each is always paired with an icon and words (visual-system.md, "Colour never carries meaning alone"). */
+  --color-attack: #ff6b7a; /* attack arrows, "hit lands", lethal */
+  --color-on-attack: #1c0408;
+  --color-danger-text: #ff8f9a;
+  --color-success: #5fd49a; /* "attack fails", "you survive" */
+  --color-on-success: #04170d;
+  --color-success-text: #6edca6;
+  --color-warning: #f2c94c; /* low deck, 0 Life, unscripted effect */
+  --color-on-warning: #1c1300;
+  --color-warning-text: #f4d06a;
+
+  /* DON!! tokens (our own token design, not the printed DON!! card) */
+  --color-don: #b7a3ff;
+  --color-don-rested: #8778c4; /* rested tokens are also rotated and grouped under a "Rested" label */
+  --color-on-don: #140a33;
+
+  /* Translucent layers */
+  --color-scrim: rgb(6 8 11 / 0.72); /* behind dialogs (trash viewer, game menu) */
+  --color-dim: rgb(6 8 11 / 0.5); /* over non-candidate cards during a targeting mode */
+  --color-legal-glow: rgb(108 196 255 / 0.35);
+  --color-opponent-glow: rgb(245 163 92 / 0.35);
+}
+
+/* ---------- Colour: light (opt-in) ---------- */
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --color-bg: #f2f4f7;
+  --color-mat: #e4e8ed;
+  --color-mat-zone: #d8dee5;
+  --color-mat-line: #b9c2cc;
+  --color-surface-1: #ffffff;
+  --color-surface-2: #ffffff;
+  --color-surface-3: #edf1f5;
+  --color-line: #d3d9e0;
+  --color-line-strong: #6b7684;
+
+  --color-text: #11161c;
+  --color-text-muted: #46505d;
+  --color-text-subtle: #56606c;
+
+  /* plates stay dark in both themes so cards render identically */
+  --color-plate: #06080b;
+  --color-plate-text: #ffffff;
+  --color-plate-base: #b4bcc8;
+  --color-plate-buff: #7fe0ae;
+  --color-plate-debuff: #ff9ca6;
+
+  --color-accent: #0a69ae;
+  --color-accent-hover: #08578f;
+  --color-on-accent: #ffffff;
+  --color-accent-text: #0a5e9c;
+  --color-opponent: #b45309;
+  --color-on-opponent: #ffffff;
+  --color-opponent-text: #9a4507;
+
+  --color-focus: #0b0e12;
+  --color-focus-gap: #ffffff;
+
+  --color-attack: #c8283e;
+  --color-on-attack: #ffffff;
+  --color-danger-text: #b3192f;
+  --color-success: #1c7a4c;
+  --color-on-success: #ffffff;
+  --color-success-text: #17683f;
+  --color-warning: #f2c94c;
+  --color-on-warning: #1c1300;
+  --color-warning-text: #7a5300;
+
+  --color-don: #6a4fd6;
+  --color-don-rested: #7a68c8;
+  --color-on-don: #ffffff;
+
+  --color-scrim: rgb(17 22 28 / 0.5);
+  --color-dim: rgb(228 232 237 / 0.6);
+  --color-legal-glow: rgb(10 105 174 / 0.28);
+  --color-opponent-glow: rgb(180 83 9 / 0.28);
+}
+
+/* ---------- Type ---------- */
+:root {
+  /* Self-hosted via @fontsource (OFL-1.1). Fallback stacks are metric-adjusted in base.css at M0. */
+  --font-display: 'Fraunces Variable', 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-ui: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-num: var(--font-ui);
+  /* Numerals: tabular everywhere; open 6/9 (ss01) on badges and battle numbers */
+  --font-num-features: 'tnum' 1, 'ss01' 1;
+  --font-ui-features: 'tnum' 1;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-display: 600;
+
+  /* UI scale (compact). Line heights on a 4px grid. 12px is the floor for any text. */
+  --text-xs: 12px;
+  --leading-xs: 16px; /* captions, zone labels, badge words */
+  --text-sm: 13px;
+  --leading-sm: 18px; /* log lines, secondary labels */
+  --text-md: 14px;
+  --leading-md: 20px; /* default UI text, buttons */
+  --text-lg: 16px;
+  --leading-lg: 24px; /* coach and explanation prose */
+  --text-xl: 20px;
+  --leading-xl: 28px; /* panel titles */
+  /* Display scale (Fraunces): page titles, lesson titles, archetype names, game result */
+  --text-2xl: 24px;
+  --leading-2xl: 32px;
+  --text-3xl: 32px;
+  --leading-3xl: 40px;
+  --text-4xl: 40px;
+  --leading-4xl: 48px;
+
+  /* Numerals (Inter, tabular) */
+  --num-battle: 28px;
+  --num-battle-leading: 32px; /* attacker and defender power in the battle panel */
+  --num-hero: 40px; /* game result, drill score */
+  --num-don: 20px; /* active DON!! count in each cost area: the largest DON!! number on the board (board.md §3.4) */
+
+  /* Card overlays scale with the card. --card-w is set by the board at runtime. */
+  --card-w: 84px;
+  --card-h: calc(var(--card-w) * 88 / 63);
+  --badge-power-size: clamp(13px, calc(var(--card-w) * 0.17), 24px);
+  --badge-num-size: clamp(12px, calc(var(--card-w) * 0.15), 20px);
+  --badge-h: clamp(18px, calc(var(--card-w) * 0.24), 32px);
+  --badge-inset: clamp(2px, calc(var(--card-w) * 0.03), 4px);
+  --badge-icon: clamp(14px, calc(var(--card-w) * 0.19), 24px);
+  --card-radius: calc(var(--card-w) * 0.045);
+}
+
+/* ---------- Space, radius, size ---------- */
+:root {
+  --space-0: 0;
+  --space-0-5: 2px;
+  --space-1: 4px;
   --space-2: 8px;
+  --space-3: 12px;
   --space-4: 16px;
+  --space-5: 20px;
   --space-6: 24px;
-  --radius-2: 6px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  --radius-1: 4px; /* badges, chips */
+  --radius-2: 6px; /* buttons, inputs */
+  --radius-3: 8px; /* panels, popovers */
+  --radius-4: 12px; /* dialogs, preview dock */
+  --radius-pill: 999px;
+
+  --target-min: 24px; /* WCAG 2.5.8 floor */
+  --target-comfort: 44px; /* buttons, touch */
+  --control-h: 36px; /* compact buttons */
+  --control-h-primary: 48px; /* End turn, Confirm */
+
+  --focus-width: 2px;
+  --focus-gap: 2px;
+  --legal-ring: 3px;
+  --select-ring: 3px;
+
+  /* Board layout defaults for the 1280x720 design target (board.md). The app recomputes at runtime. */
+  --rail-w: 320px;
+  --strip-h: 32px;
+  --midline-h: 40px;
+  --board-gap: 8px;
+  --board-margin: 16px;
+  --decision-h: 248px;
+  --decision-tall-h: 520px; /* Block, Counter, Trigger, attack confirm (board.md §3.9) */
+  --coach-collapsed-h: 48px;
+  --coach-open-h: 244px;
+  --coach-tall-h: 468px; /* only on a player request, in your idle Main phase (board.md §3.13) */
+  --rail-header-h: 44px;
+  --rail-notice-h: 32px; /* the board's footer-equivalent disclaimer (board.md §3.1) */
+  --log-row-h: 24px; /* each log line is a 24 px target row (WCAG 2.5.8) */
+  --card-min-w: 76px; /* minimum legible board card; below this the layout changes (board.md) */
+}
+
+/* ---------- Elevation ---------- */
+:root {
+  --elev-0: none;
+  --elev-1: 0 1px 2px rgb(0 0 0 / 0.45); /* cards at rest on the mat */
+  --elev-2: 0 4px 12px rgb(0 0 0 / 0.5); /* raised hand card, popovers */
+  --elev-3: 0 12px 32px rgb(0 0 0 / 0.6); /* preview dock, dialogs */
+  --elev-drag: 0 18px 40px rgb(0 0 0 / 0.65); /* card being dragged */
+
+  --z-board: 0;
+  --z-card-raised: 10;
+  --z-arrow: 20;
+  --z-plate: 25; /* battle power plates and status chips draw above the attack arrow (board.md §2.3) */
+  --z-popover: 30;
+  --z-dock: 40;
+  --z-drag: 50;
+  --z-dialog: 60;
+  --z-toast: 70;
+}
+
+:root[data-theme='light'] {
+  --elev-1: 0 1px 2px rgb(17 22 28 / 0.18);
+  --elev-2: 0 4px 12px rgb(17 22 28 / 0.16);
+  --elev-3: 0 12px 32px rgb(17 22 28 / 0.22);
+  --elev-drag: 0 18px 40px rgb(17 22 28 / 0.28);
+}
+
+/* ---------- Motion ---------- */
+:root {
+  /* UI feedback */
+  --dur-instant: 0ms;
+  --dur-fast: 120ms; /* hover, press, focus ring, number tick */
+  --dur-base: 200ms; /* popovers, panel expand, rest/untap rotation */
+  --dur-slow: 320ms; /* coach expand, dock open */
+  /* Game pacing at 1x. The app multiplies these by 1/speed (0.5x, 1x, 2x, 4x). */
+  --dur-highlight: 120ms; /* source card lights up before it acts */
+  --dur-move: 240ms; /* card travel between zones */
+  --dur-dwell: 400ms; /* hold after a play, give or activate so a human can read it (board.md §5.2) */
+  --dur-dwell-attack: 600ms; /* hold after an attack or a battle result that needs no decision from you */
+  --dur-damage: 360ms; /* Life card flip and travel */
+
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-enter: cubic-bezier(0, 0, 0.2, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-move: cubic-bezier(0.3, 0, 0.2, 1);
+  --ease-linear: linear;
+}
+
+/* Reduced motion: no travel, rotation, scale or parallax. Opacity fades up to --dur-fast remain.
+   Pacing dwell is kept so opponent actions stay followable (board.md, "Pacing"). */
+@media (prefers-reduced-motion: reduce) {
+  :root:not([data-motion='full']) {
+    --dur-base: 0ms;
+    --dur-slow: 0ms;
+    --dur-move: 0ms;
+    --dur-damage: 0ms;
+    --dur-highlight: 120ms;
+    --dur-dwell: 800ms;
+    --dur-dwell-attack: 1200ms;
+  }
+}
+:root[data-motion='reduced'] {
+  --dur-base: 0ms;
+  --dur-slow: 0ms;
+  --dur-move: 0ms;
+  --dur-damage: 0ms;
+  --dur-highlight: 120ms;
+  --dur-dwell: 800ms;
+  --dur-dwell-attack: 1200ms;
+}
+
+/* ---------- Density: roomy (designed at 1920x1080) ---------- */
+@media (min-width: 1600px) and (min-height: 900px) {
+  :root {
+    --text-xs: 13px;
+    --leading-xs: 18px;
+    --text-sm: 14px;
+    --leading-sm: 20px;
+    --text-md: 15px;
+    --leading-md: 22px;
+    --text-lg: 17px;
+    --leading-lg: 26px;
+    --text-xl: 22px;
+    --leading-xl: 30px;
+    --num-battle: 36px;
+    --num-battle-leading: 40px;
+    --num-don: 28px;
+
+    --card-w: 126px;
+    --rail-w: 400px;
+    --strip-h: 48px;
+    --midline-h: 56px;
+    --board-gap: 12px;
+    --board-margin: 24px;
+    --decision-h: 336px;
+    --decision-tall-h: 864px;
+    --coach-collapsed-h: 48px;
+    --coach-open-h: 368px;
+    --coach-tall-h: 796px;
+    --rail-header-h: 56px;
+    --control-h: 40px;
+    --control-h-primary: 56px;
+  }
+}
+
+/* ---------- Alias kept for the M0 placeholder app/src/styles/base.css ---------- */
+:root {
+  --color-surface: var(--color-surface-1);
 }

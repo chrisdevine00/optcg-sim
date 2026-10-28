@@ -9,6 +9,7 @@
     "ai/src",
     "ai/test",
     "app/src",
+    "app/test",
     "app/e2e",
     "scripts",
     "*.config.ts"

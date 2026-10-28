@@ -2,6 +2,16 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-10-28 — M0: tokens in the app, fonts self-hosted, contrast enforced in CI
+
+Context: M0 needs the design tokens in the app, self-hosted fonts within the visual-system budget (about 70 KB Inter, about 40 KB Fraunces, Latin), and a contrast check that fails CI. Decision:
+- `app/src/styles/tokens.css` is the source of truth from now on; `docs/design/tokens.css` stays as the Phase 4 snapshot.
+- `scripts/contrast.ts` checks all 72 declared pairs in both themes. It runs in `npm run build` (`check:contrast`) and in `app/test/tokens.test.ts`.
+- Fonts come from `@fontsource-variable/inter` 5.3.0 (wght, 48 KB Latin) and `@fontsource-variable/fraunces` 5.3.0 using the **wght-only** file (37 KB Latin). The opsz file is 67 KB; Fraunces is used only for headings at 24–40 px, where the default display cut is right, so the optical-size axis is not worth 30 KB.
+- An e2e test proves both fonts load and that numerals are tabular.
+
+Alternatives rejected: the Fraunces opsz file (over budget); a CDN (the product is local-first and offline-capable).
+
 ## 2026-10-28 — Phase 4 gated; on-board disclaimer form
 
 Context: PROMPT.md requires the unofficial-fan-tool disclaimer in every page footer, but the full-height game board has no footer (`board.md` OQ-6). The verification pass in `docs/design/review-1.md` §6.7 found no open severity-3 or severity-4 finding.

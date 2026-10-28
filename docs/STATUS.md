@@ -1,9 +1,9 @@
 # Status
 
 **Phase:** 5 Build, slice pass (ADR 0012), starting at M0. Phases 1–4 gated 2026-10-28.
-**Milestone:** M0 Scaffold (design tokens and fonts into the app)
+**Milestone:** M1 Cards (next). M0 done 2026-10-28.
 **Milestone:** M0 scaffold started (allowed before the Phase 4 gate)
-**Run the app:** `npm install && npm run dev` then open http://localhost:5173/optcg-sim/ (placeholder page only)
+**Run the app:** `npm install && npm run dev` then open http://localhost:5173/optcg-sim/ (placeholder page in the real visual system; the card browser comes in M1)
 **Deployed:** https://chrisdevine00.github.io/optcg-sim/ (auto-deploys after green CI on `main`)
 
 ## Phase plan
@@ -46,20 +46,27 @@
   - **Review:** 50 findings, 22 spec conflicts resolved, and two verification passes ending in PASS, with axe at 0 violations.
   - **Carried to M3** (severity 2): the defence card preview overlaps Character slots 1–2, and tablet button sizes need fixing.
 
+- M0:
+  - design tokens in `app/src/styles/tokens.css`, which is now the source of truth;
+  - Inter (48 KB) and Fraunces (37 KB, wght-only) self-hosted;
+  - `scripts/contrast.ts` runs in `npm run build` and in unit tests, with 72 pairs and 0 failing;
+  - an e2e test proves the fonts load and numerals are tabular.
+
+  Tests: 6 unit and 2 e2e, all green.
+
 ## In progress
 
 Nothing running.
 
 ## Next (slice pass, PLAN.md §1)
 
-1. **M0:** copy `docs/design/tokens.css` into `app/src/styles/tokens.css`, self-host Inter and Fraunces (@fontsource), and add a build-time contrast check of the token pairs.
-2. **M1 Cards:**
+1. **M1 Cards:**
    - `cards:update` from optcgapi.com, with normalizers and overrides;
    - verify the stats and types of all 182 meta-list cards;
    - `standard.json`;
    - the image module and service worker;
    - the card browser.
-3. **M2 Engine core:** freeze the fixture API first.
+2. **M2 Engine core:** freeze the fixture API first.
 
 ## Blockers
 

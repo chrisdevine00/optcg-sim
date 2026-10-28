@@ -10,7 +10,8 @@
   ],
   "scripts": {
     "dev": "npm run dev -w @optcg/app",
-    "build": "npm run typecheck && npm run build -w @optcg/app",
+    "build": "npm run typecheck && npm run check:contrast && npm run build -w @optcg/app",
+    "check:contrast": "tsx scripts/contrast.ts",
     "preview": "npm run preview -w @optcg/app",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint . && prettier --check .",

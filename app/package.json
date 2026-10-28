@@ -9,6 +9,8 @@
     "preview": "vite preview --port 4173 --strictPort"
   },
   "dependencies": {
+    "@fontsource-variable/fraunces": "^5.3.0",
+    "@fontsource-variable/inter": "^5.3.0",
     "@optcg/ai": "0.0.0",
     "@optcg/cards": "0.0.0",
     "@optcg/engine": "0.0.0",

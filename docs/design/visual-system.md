@@ -95,7 +95,7 @@ Every coloured meaning on screen has at least one non-colour cue, listed in §2.
 | Role | Face | Licence | Package | Weights shipped |
 |---|---|---|---|---|
 | **UI and numerals** | **Inter** (variable), by Rasmus Andersson | SIL Open Font License 1.1 | `@fontsource-variable/inter` | variable `wght` 400–700, Latin subset |
-| **Display** | **Fraunces** (variable), by Undercase Type | SIL Open Font License 1.1 | `@fontsource-variable/fraunces` | variable `wght` 600 only in use, `opsz` on, Latin subset |
+| **Display** | **Fraunces** (variable), by Undercase Type | SIL Open Font License 1.1 | `@fontsource-variable/fraunces` | variable `wght` 600 only in use; wght-only file (37 KB; the opsz axis was dropped at M0 for budget, see DECISIONS), Latin subset |
 
 Both are self-hosted from npm through @fontsource. No request goes to a font CDN, which fits "static, local-first" and the offline service worker. Exact package versions are pinned at M0. **M0 also verifies** the OpenType features used below (`tnum`, `ss01`) and the `opsz` axis in the shipped files, by rendering a test string. If either is missing in the @fontsource build, the fallback is the static @fontsource build that has them.
 
