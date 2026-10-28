@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "dev": "npm run dev -w @optcg/app",
-    "build": "npm run typecheck && npm run check:contrast && npm run build -w @optcg/app",
+    "build": "npm run typecheck && npm run check:contrast && npm run build -w @optcg/app && npm run check:bundle",
     "check:contrast": "tsx scripts/contrast.ts",
     "preview": "npm run preview -w @optcg/app",
     "typecheck": "tsc -p tsconfig.json --noEmit",
@@ -21,7 +21,8 @@
     "test:e2e": "playwright test",
     "cards:update": "tsx cards/scripts/update.ts",
     "meta:update": "tsx scripts/meta-update.ts",
-    "cards:verify-meta": "tsx cards/scripts/verify-meta.ts"
+    "cards:verify-meta": "tsx cards/scripts/verify-meta.ts",
+    "check:bundle": "tsx scripts/bundle-budget.ts"
   },
   "engines": {
     "node": ">=22.12"

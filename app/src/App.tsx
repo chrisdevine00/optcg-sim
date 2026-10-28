@@ -1,12 +1,31 @@
+import { lazy, Suspense } from 'react';
 import { Footer } from './Footer.tsx';
+import { Header } from './Header.tsx';
+import { usePath } from './router.tsx';
+import { Home } from './routes/Home.tsx';
+
+const CardBrowser = lazy(() => import('./cards/CardBrowser.tsx'));
 
 export function App() {
+  const path = usePath();
   return (
     <div className="shell">
-      <main className="placeholder">
-        <h1>OPTCG Sim</h1>
-        <p>A One Piece Card Game practice simulator and strategy teacher. Under construction.</p>
-      </main>
+      <a className="skip-link" href="#main">
+        Skip to content
+      </a>
+      <Header />
+      {path === '/cards' ? (
+        <Suspense fallback={<main className="page" id="main" aria-busy="true" />}>
+          <CardBrowser />
+        </Suspense>
+      ) : path === '/' ? (
+        <Home />
+      ) : (
+        <main className="page" id="main">
+          <h1>Page not found</h1>
+          <p>There is nothing at this address.</p>
+        </main>
+      )}
       <Footer />
     </div>
   );

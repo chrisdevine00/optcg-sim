@@ -9,6 +9,8 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:4173/optcg-sim/',
     trace: 'retain-on-failure',
+    // Image requests must reach page.route; the image service worker is unit-tested separately.
+    serviceWorkers: 'block',
   },
   projects: [
     { name: '720p', use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 720 } } },
