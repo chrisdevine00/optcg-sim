@@ -60,6 +60,7 @@ WF.mountBoard((st) => {
     s.decision.body = '<p style="margin:0 0 6px" role="status"><b>Gloriosa</b> can’t be played: needs 4 DON!!; you have 2 active.</p><p class="subtle" style="margin:0">Clicking a card that has no legal action explains why and selects nothing.</p>';
   }
   if (st === 'trash') {
+    s.after = (el) => el.querySelectorAll('.rail .log, .rail .coach').forEach((x) => x.setAttribute('inert', '')); // covered by the scrim (UX-V1)
     s.extra = (g) => {
       const r = g.rail; const it = (n, k, t) => `<li class="row" style="justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--color-line)"><span><b>${n}</b> <span class="muted">${k}</span></span><span class="subtle" style="font-size:12px">${t}</span></li>`;
       const top = g.notice[0] + g.notice[1];

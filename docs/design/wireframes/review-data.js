@@ -44,5 +44,9 @@ BOARDS.unchecked = () => ({ opp: { idText: 'Kaido · Pirate AI', hand: 6, donDec
     me: { donDeck: 4, active: 6, rested: 0, life: 5, deck: 32, leader: K('OP17-039', { who: 'Your' }), trash: { n: 1, top: K('OP17-050') }, chars: [null, null, K('OP17-044'), null, null], hand: [K('OP17-056', { hand: true }), K('OP17-055', { hand: true }), K('OP17-045', { hand: true }), K('OP17-048', { hand: true }), K('OP17-049', { hand: true }), K('OP08-051', { hand: true })] },
     mid: { turn: 'Turn 6 · Your turn', phase: 'Main' } });
 BOARDS.analysing = BOARDS.e06;
+// Mulligan (turn 0): the opening hand before Life is placed
+BOARDS.mull = () => ({ opp: { idText: 'Kaido · Pirate AI', hand: 5, donDeck: 10, active: 0, rested: 0, life: null, deck: 45, leader: opp('OP17-058'), trash: { n: 0 }, chars: [null, null, null, null, null] },
+    me: { donDeck: 10, active: 0, rested: 0, life: null, deck: 45, leader: K('OP17-039', { who: 'Your' }), trash: { n: 0 }, chars: [null, null, null, null, null], hand: [K('OP17-049', { hand: true }), K('OP17-048', { hand: true }), K('OP17-040', { hand: true }), K('OP17-118', { hand: true }), K('OP17-056', { hand: true })] },
+    mid: { turn: 'Mulligan · Turn 0', phase: 'Refresh' } });
 const SEV = { sev: 'Severe', mod: 'Moderate', min: 'Minor' };
 const ORDER = ['mull', 'e06', 'e19', 'e09', 'e02', 'e05'];

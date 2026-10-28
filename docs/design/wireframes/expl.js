@@ -44,7 +44,8 @@
     const les = `<p class="lesson" style="margin:4px 0">Lesson: <a href="18-learn.html?l=${e.lessonId}#lesson">${LESSONS[e.lessonId] || e.lessonId}</a></p>`;
     const src = `<details class="srcs"><summary>Sources</summary><p style="margin:4px 0;font-size:12px">${e.sources.join(' · ')}</p></details>`;
     const head = `${o.noClaim ? '' : `<h4 class="claim">${e.claim}</h4>`}<p style="margin:0 0 4px">${cert(e.certainty, o.mode)}</p>`;
-    if (v === 'learner') return `<section aria-label="${e.claim}">${head}${ev}${line}${out}${nt}${les}${src}</section>`;
+    // Learner order puts the line and outcome before the evidence, so the answer is never below the fold (UX-V3)
+    if (v === 'learner') return `<section aria-label="${e.claim}">${head}${line}${out}<h5 class="evh">Why it works</h5>${ev}${nt}${les}${src}</section>`;
     if (v === 'terse') return `<section aria-label="${e.claim}">${o.noClaim ? '' : `<h4 class="claim">${e.claim}</h4>`}${out}<details class="srcs"><summary>More</summary>${ev}${line}${nt}${les}${src}</details></section>`;
     return `<section aria-label="${e.claim}">${head}${o.evidenceOpen ? ev : ''}${line}${out}<details class="srcs" ${o.moreOpen ? 'open' : ''}><summary>More: evidence, next time, lesson, sources</summary>${o.evidenceOpen ? '' : ev}${nt}${les}${src}</details></section>`;
   }

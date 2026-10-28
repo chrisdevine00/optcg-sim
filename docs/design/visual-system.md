@@ -186,7 +186,7 @@ Prose (coach, guides, rules) is set at `--text-lg` with a 60–72 character meas
 | Focus gap, on a legal or selected card | 2 px | 6–8 px |
 | Focus ring, on a legal or selected card | 2 px | 8–10 px |
 
-- **Hand neighbours.** At compact density the hand's legal ring uses a **2 px offset** (2–5 px out), so two lit neighbours 8 px apart keep a visible gap between their rings instead of reading as one band (UX-R48). A focused hand card is raised, so its outer focus ring never collides with a neighbour's ring.
+- **Hand neighbours.** At compact density the hand's legal ring is **2 px wide at a 1 px offset** (1–3 px out, as `board.md` §2.5), so two lit neighbours 8 px apart keep a 2 px gap between their rings instead of reading as one band (UX-R48). A focused hand card is raised, so its outer focus ring never collides with a neighbour's ring.
 - **Forced colours:** legal ring `ButtonText`, focus ring `Highlight`; both must stay distinguishable (`accessibility.md` §4.1).
 - The cost area's active row, when it is a legal DON!! source, shows the same ring **plus the ◆ glyph** like every other legal element (UX-R45).
 

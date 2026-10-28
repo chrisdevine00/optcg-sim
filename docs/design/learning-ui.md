@@ -54,11 +54,13 @@ One component renders every explanation in the product: hints, "why", review fla
 7. **Lesson link.** "Lesson: Lethal math (L15)", opening the curriculum lesson and its drill.
 8. **Sources.** A disclosure, closed by default: rule numbers link to the rules reference; strategy tags link to `sources.md` entries.
 
+**Order at Learner verbosity** (UX-V3). The anatomy above is the reading order of the *content*, but at Learner verbosity the component shows the **line and the outcome before the evidence**: claim, certainty, line, outcome, then "Why it works" (evidence), next time, lesson. The answer a player came for is then always in the first screen, in the coach, in Study and in drill answers; the evidence follows for whoever wants it. Any explanation body that still scrolls shows a bottom shadow and "More below ↓" until it is scrolled to the end.
+
 **Verbosity** (Settings → Coach):
 
 | Level | Shown open | Behind "More" |
 | --- | --- | --- |
-| Learner | Claim, certainty, evidence, line, outcome, next time, lesson | Sources |
+| Learner | Claim, certainty, line, outcome, then evidence ("Why it works"), next time, lesson | Sources |
 | Standard (default) | Claim, certainty, line, outcome | Evidence, next time, lesson, sources |
 | Terse | Claim, outcome | Everything else |
 

@@ -76,7 +76,7 @@ When an engine decision arrives that the human owes (`block`, `counter`, `trigge
 | Home / End | First or last card in the zone. |
 | Up / Down | The zone visually above or below. The card in the closest column gets focus. This is a sighted-user accelerator; Tab is the canonical order. |
 | `G`, then a letter | **Go to.** A small popover lists the letters and waits with no timeout until the next key or Escape. Lowercase means yours; Shift means the opponent's. `h` hand, `c` Characters, `l` Leader, `s` Stage, `d` DON!! (cost area), `n` DON!! deck, `k` deck, `t` trash, `f` Life, `m` midline band, `b` battle panel, `p` decision panel, `o` coach, `g` game log. |
-| `P` | Jump to the current decision (the decision panel's first choice). |
+| `P` | Jump to the current decision: focus goes to the decision panel's heading, which is read, and Tab then reaches its choices (so `P` then Enter never commits or rewinds by accident; UX-V6). Works from page load and from the skip link. |
 | `Q` | Speak a status summary (§9.2). `Shift+Q` speaks both boards in full. |
 
 ### 3.4 Selecting a card and opening its legal actions
@@ -173,10 +173,10 @@ The engine runs Block Step, then Counter Step, as two decisions (CR 7-1-2, 7-1-3
    | --- | --- | --- | --- |
    | Nothing staged | "Take the hit · Life 3 → 2" | "Counter", disabled: "Stage a lit hand card" | No dedicated key |
    | Staged, not enough (including a tie) | "Take the hit · Life 3 → 2" (staging discarded) | "Play anyway · still hits", warning style | No dedicated key |
-   | Staged, enough | "Counter +3000 · survive" (sub-label "Rocks Pirates + Buckin · hand 5 → 3") | "Take the hit · Life 3 → 2" | Commits the primary |
+   | Staged, enough | "Counter +3000" (sub-label "survive · 8000 vs 7000"; card names stay in the Counter lane) | "Take the hit · Life 3 → 2" | Commits the primary |
    | Blocker chosen | "Block with Gloriosa" | "No block" | Commits the primary |
 
-   "Counter +N · survive" sends the staged actions in staging order, then `done`; any choices an Event needs are asked as they resolve. "Take the hit" sends `done` with nothing staged. **Enter never commits a counter that the preview shows as useless**, and "Take the hit" has no single key: it is reached by Tab or focus, then Enter. `T` is **not** bound to it, because a single-key irreversible action is too easy to press by accident.
+   "Counter +N" sends the staged actions in staging order, then `done`; any choices an Event needs are asked as they resolve. "Take the hit" sends `done` with nothing staged. **Enter never commits a counter that the preview shows as useless**, and "Take the hit" has no single key: it is reached by Tab or focus, then Enter. `T` is **not** bound to it, because a single-key irreversible action is too easy to press by accident.
 6. Escape clears staging. "Clear" is also a button in the Counter lane.
 
 **Trigger.** "Life card: Gum-Gum Red Hawk has [Trigger]: <trigger text>. Activate the Trigger, or add it to hand." There are two equal buttons, arrows move between them, and focus starts on "Activate Trigger". No letter keys (H is Hint). If the card has no [Trigger] or it is unscripted, the card goes to hand, and the announcer says "Added 1 Life card to hand", naming the card for its owner only.
@@ -285,10 +285,12 @@ No author content may cover the focused element, even partly where avoidable, an
 
 | Overlay | Rule |
 | --- | --- |
-| Hover zoom (pointer) | It appears in the preview dock (`board.md` §3.12), which checks the focused or hovered element's rectangle and opens at its alternate position if it would intersect. It never covers the decision panel. After any keyboard input, hover zoom is suppressed until the pointer moves again. |
-| Inspector (`I`) | The pinned, focusable state of the preview dock (`board.md` §3.12), at least the dock's size, with a rail-only scrim. Focus moves into it, and Escape returns focus to the card. It never overlaps the card it describes. |
+| Hover zoom (pointer) | It appears in the preview dock (`board.md` §3.12), which checks the focused or hovered element's rectangle and opens at its alternate position if it would intersect. Its default place is over the log and coach, below the rail notice; while the decision panel is tall it opens on the board's top-left (UX-V1). It never covers the decision panel or the rail notice, and it closes when focus moves on. After any keyboard input, hover zoom is suppressed until the pointer moves again. |
+| Inspector (`I`) | The pinned, focusable state of the preview dock (`board.md` §3.12), with the dock's width and art size, below the rail notice and above the decision panel, with a rail-only scrim over the log and coach, which are inert while it is pinned. Focus moves into it, and Escape returns focus to the card. It never overlaps the card it describes. |
 | Action menu, Count dialog | Placed beside the card, flipping side to stay clear of it. The board never scrolls. |
-| Reveal tray (hidden-zone candidates, Life-card reveal) | Docked over the log with a scrim over the rail only, like the trash viewer (review-1 C2). It never covers the board or the decision panel. |
+| Reveal tray (hidden-zone candidates) | Docked over the log, below the rail notice, with a scrim over the rail only, like the trash viewer (review-1 C2). The log and coach under the scrim are inert. It never covers the board, the rail notice or the decision panel. |
+| Life-card reveal (Trigger) | Not a tray: while the decision panel is tall, the revealed card renders inside the decision body above the two choices (`board.md` §3.12, UX-V1). Nothing covers the panel, the notice or the board. |
+| Any scrim | Whatever a scrim covers is `inert`, so Tab never lands under it. Tested by the 9-point focus probe: 0 stops hidden at any sample point. |
 | Battle panel, defence planner | The decision panel's body in the rail (`board.md` §3.9–3.10), growing upward over the log in its tall state. Never over the board, so never over a legal target or the attacker. |
 | Hand fan (overlapping cards) | The focused card is raised (z-order) and shown in full. Its neighbours never cover it. |
 | Staged counters and card chips | Staged tags and status chips sit inside the card's art window (`board.md` §2.3). **Your Life count plate is never covered** by a raised hand card, a staged tag or a chip (UX-R14). |

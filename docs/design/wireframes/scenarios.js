@@ -33,8 +33,9 @@
   const secondary = (label, sub, extra = '', attrs = '') => `<button type="button" class="btn big sec ${extra}" ${attrs}><span class="lbl2">${label}</span>${sub ? `<span class="sub">${sub}</span>` : ''}</button>`;
 
   // Preview dock (board.md §3.12): full scan with SAMPLE, our own text, live stats with breakdowns
-  function dock(g, d) {
-    const r = g.dock; const roomy = g.W > 1600;
+  // alt = true when the decision panel is tall: the dock opens on the board's top-left (board.md §3.12, UX-V1)
+  function dock(g, d, alt) {
+    const r = alt ? g.dockAlt : g.dock; const roomy = g.W > 1600;
     const sw = roomy ? 240 : 168, sh = roomy ? 335 : 235;
     return `<aside class="dock" aria-hidden="true" style="left:${r[0]}px;top:${r[1]}px;width:${r[2]}px;height:${r[3]}px">
       <div style="display:flex;gap:12px;padding:12px">
@@ -44,7 +45,7 @@
           <div class="muted" style="margin:2px 0 8px">${d.id}</div>
           ${d.stats}
         </div></div>
-      <div style="padding:0 12px 12px;font-size:var(--text-md);line-height:var(--leading-md)">${d.text}</div></aside>`;
+      <div style="padding:0 12px 12px;font-size:var(--text-md);line-height:var(--leading-md);overflow:hidden">${d.text}</div></aside>`;
   }
 
   window.SCN = {

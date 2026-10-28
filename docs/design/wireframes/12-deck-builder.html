@@ -90,6 +90,7 @@ function draw() {
   document.getElementById('main').querySelector('.vrow').textContent = '✕ 50 cards: you have 51';
   document.getElementById('main').querySelector('.vrow').className = 'vrow bad';
   document.querySelectorAll('.modal').forEach((m) => m.remove());
+  document.querySelectorAll('[inert]').forEach((x) => x.removeAttribute('inert'));
   if (st === 'import' || st === 'export') {
     const imp = st === 'import';
     const txt = imp ? `1 OP17-039 Rocks.D.Xebec
@@ -125,6 +126,8 @@ function draw() {
     document.body.insertAdjacentHTML('beforeend', `<div class="modal"><section class="dlg" role="dialog" aria-modal="true" aria-labelledby="mh"><header><h2 id="mh">${imp ? 'Import a deck' : 'Export "Rocks"'}</h2><button class="iconbtn" type="button" aria-label="Close (Escape)" onclick="location.hash='build'">✕</button></header>
       <div class="bd"><div><label class="lbl" for="ta">${imp ? 'Paste a list, or drop a .txt or .json file' : 'Your list'}</label><textarea id="ta">${txt}</textarea></div><div>${rep}</div></div>
       <footer>${imp ? '<span class="muted" style="font-size:13px;margin-right:auto">Nothing changes until you import.</span><button class="btn" type="button">Cancel</button><span id="impwhy" style="font-size:13px;color:var(--color-danger-text)">Fix or drop line 9 first</span><button class="btn primary" type="button" aria-disabled="true" aria-describedby="impwhy">Import 50 cards</button>' : '<button class="btn" type="button">Download .txt</button><button class="btn primary" type="button" data-wf-focus>Copy</button>'}</footer></section></div>`);
+    // A modal makes the page behind it inert, so focus never lands under the scrim (WCAG 2.4.11)
+    document.querySelectorAll('body > *:not(.modal):not(.wf-states)').forEach((x) => x.setAttribute('inert', ''));
   }
 }
 draw(); window.addEventListener('hashchange', draw); WF.statesBar(STATES);

@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="wf.css">
 <style>
   /* Result banner over the midline band only; the final position stays readable (UX-R39) */
-  .gobanner { position: absolute; z-index: 30; display: grid; place-items: center; background: var(--color-surface-3); border: 1px solid var(--color-opponent); border-radius: var(--radius-2); font: 600 var(--text-xl)/1 var(--font-display); color: var(--color-text); box-shadow: var(--elev-2); }
+  .gobanner { display: inline-block; padding: 4px 16px; background: var(--color-surface-3); border: 1px solid var(--color-opponent); border-radius: var(--radius-2); font: 600 var(--text-xl)/1.2 var(--font-display); color: var(--color-text); }
 </style>
 </head>
 <body class="board-page">
@@ -37,7 +37,10 @@ WF.mountBoard((st) => {
       chars: [null, null, null, null, null],
       hand: [K('OP17-045', { hand: true })],
     },
-    mid: { turn: 'Turn 13 · Game over', phase: 'End' },
+    // The result is the midline's own content and name, so its Tab stop is never under a banner; no turn cue at game over (UX-V9)
+    mid: { turn: `<span class="gobanner">${win ? 'You win' : 'Kaido wins'} · Turn 13</span>`, steps: false, label: `Game over: ${win ? 'you win' : 'Kaido wins'} on turn 13` },
+    turnBar: false,
+    turnChip: '<span class="chip outline turnchip">Game over</span>',
     log: [
       SCN.th('Turn 13 · Opp'),
       SCN.opp(`${SCN.lk('Ulti & Page One')} attacks your Leader · 6000 vs 5000`),
@@ -58,10 +61,6 @@ WF.mountBoard((st) => {
         <div class="row" style="gap:6px;flex-wrap:wrap"><a class="btn small" href="02-setup.html">New game</a><a class="btn small" href="01-welcome.html">Home</a></div>`,
       foot: `<a class="btn big sec" href="02-setup.html#rps"><span class="lbl2">Rematch</span><span class="sub">same decks</span></a>${SCN.primary('Review game', '1 severe flag', 'Enter', '11b-review.html')}`,
     },
-  };
-  s.extra = (g) => {
-    const m = g.mid;
-    return `<div class="gobanner" role="status" style="left:${m[0]}px;top:${m[1] + (m[3] - 40) / 2}px;width:${m[2]}px;height:40px">${win ? 'You win' : 'Kaido wins'} · Turn 13</div>`;
   };
   return s;
 }, STATES);

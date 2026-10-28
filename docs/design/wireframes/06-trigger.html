@@ -50,30 +50,23 @@ WF.mountBoard((st) => {
   s.decisionTall = true; // Trigger decisions use the tall panel (board.md §3.9, C16)
   s.decision = {
     title: 'Trigger · your Life card',
-    body: `<p style="margin:0 0 6px"><b>Wo Ro Ro Ro Ro... I Think I've Sobered Up</b> has <span class="chip outline">[Trigger]</span></p>
-      <p style="margin:0 0 8px;padding:4px 8px;background:var(--color-surface-3);border-radius:4px">DON!! −1: Draw 2 cards.</p>
-      <div class="grid" style="grid-template-columns:1fr 1fr;gap:8px;font-size:12px;line-height:16px">
+    // The private reveal lives inside the tall decision body, so nothing covers the panel, the notice or the board (UX-V1, board.md §3.9)
+    body: `<section class="reveal" aria-label="Revealed Life card, only you can see it">
+        <div class="row" style="gap:6px;margin:0 0 6px"><b style="flex:1">Life card · private reveal</b><span class="chip outline">Only you see this</span></div>
+        <div style="display:flex;gap:10px">
+          <div class="scan c-purple" style="width:${WF.isRoomy() ? 150 : 96}px;height:${WF.isRoomy() ? 209 : 134}px;flex:none"><span class="al">art</span><span class="sample" style="font-size:${WF.isRoomy() ? 20 : 14}px">SAMPLE</span><span class="ptxt"></span><span class="pnm"></span></div>
+          <div style="min-width:0;font-size:12px;line-height:16px">
+            <div style="font-weight:600;font-size:13px;line-height:17px">Wo Ro Ro Ro Ro... I Think I've Sobered Up</div>
+            <div class="muted" style="margin:2px 0 4px">OP17-076 · Event · Purple · cost 0</div>
+            <p style="margin:0 0 4px"><b>[Counter]</b> You may trash 1 card from your hand: up to 1 of your Leader or Characters gains +3000 power during this battle.</p>
+            <p style="margin:0;padding:2px 6px;border-left:3px solid var(--color-accent)"><b>[Trigger]</b> DON!! −1: Draw 2 cards.</p>
+          </div></div></section>
+      <div class="grid" style="grid-template-columns:1fr 1fr;gap:8px;font-size:12px;line-height:16px;margin-top:8px;border-top:1px solid var(--color-line);padding-top:6px">
         <div><b>Activate</b><br>${canPay ? 'Return 1 DON!! to your DON!! deck · hand 4 → 6. Revealed to Xebec.' : '<span style="color:var(--color-warning-text)">⚠ Needs 1 DON!! on your field; you have 0.</span>'}</div>
         <div><b>Add to hand</b><br>Hand 4 → 5. Keeps a +3000 [Counter]. Stays hidden from Xebec.</div>
       </div>`,
     foot: `<button class="btn ${canPay ? 'primary' : ''} big" type="button" style="flex:1;min-width:0" ${canPay ? 'data-wf-focus' : 'aria-disabled="true"'}><span class="lbl2">Activate Trigger</span><span class="sub">${canPay ? 'DON!! −1 · draw 2' : 'can’t pay DON!! −1'}</span></button>
       <button class="btn primary big" type="button" style="flex:1;min-width:0;margin-left:0" ${canPay ? '' : 'data-wf-focus'}><span class="lbl2">Add to hand</span><span class="sub">hand 4 → 5</span></button>`,
-  };
-  s.extra = (g) => {
-    const d = g.dock; const roomy = g === WF.G.roomy;
-    const sw = roomy ? 240 : 168, sh = roomy ? 335 : 235;
-    return `<aside class="dock" style="left:${d[0]}px;top:${d[1]}px;width:${d[2]}px;height:${d[3]}px" aria-label="Revealed Life card (only you can see it)">
-      <div class="row" style="padding:8px 12px;border-bottom:1px solid var(--color-line)"><b style="flex:1">Life card · private reveal</b><span class="chip outline">👁 Only you see this</span></div>
-      <div style="display:flex;gap:12px;padding:12px">
-        <div class="scan c-purple" style="width:${sw}px;height:${sh}px"><span class="al">art (full scan)</span><span class="sample">SAMPLE</span><span class="ptxt"></span><span class="pnm"></span></div>
-        <div style="font-size:13px;line-height:18px;min-width:0">
-          <div style="font-weight:600;font-size:${roomy ? 17 : 15}px;line-height:1.3">Wo Ro Ro Ro Ro... I Think I've Sobered Up</div>
-          <div class="muted" style="margin:2px 0 8px">OP17-076 · Event · Purple · cost 0</div>
-          <p style="margin:0 0 6px"><b>[Counter]</b> You may trash 1 card from your hand: Up to 1 of your Leader or Characters gains +3000 power during this battle.</p>
-          <p style="margin:0;padding:4px 6px;border-left:3px solid var(--color-accent)"><b>[Trigger]</b> DON!! −1: Draw 2 cards.</p>
-          <p class="subtle" style="margin:8px 0 0;font-size:12px">Text from optcgapi.com, sign restored.</p>
-        </div>
-      </div></aside>`;
   };
   return s;
 }, STATES);

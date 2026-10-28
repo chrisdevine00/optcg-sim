@@ -199,7 +199,8 @@ All values are CSS px from the viewport's top-left. "Opp" means opponent. The ax
 | *Coach tall:* log ticker | 960 | 76 | 320 | 76 | |
 | *Coach tall:* coach | 960 | 152 | 320 | 468 | 32 px header, a section tab row, then the content (§3.13) |
 | *Coach tall:* decision panel | 960 | 620 | 320 | 100 | Header and footer only; the End turn sub-label carries the summary |
-| Preview dock (default) | 872 | 8 | 400 | 456 | Over the log and coach only; never over the decision panel (§3.12). Never over the rail notice for longer than a hover. |
+| Preview dock (default) | 872 | 80 | 400 | 384 | Over the log and coach only: below the rail notice, above the decision panel (§3.12) |
+| Preview dock (decision tall) | 16 | 40 | 400 | 384 | The board's top-left; never over the tall panel (§3.12) |
 
 The vertical budget: strip 32, five 8 px gaps, a 12 px hand gap, a 40 px midline, five rows of 117, and an 11 px bottom margin, for 720 in total.
 
@@ -238,7 +239,7 @@ The axis is x = 760. Gaps are 12, the hand gap 16, margins 24.
 | *Decision tall:* decision panel (44, **748**, 72) | 1520 | 216 | 400 | 864 |
 | *Coach tall:* log ticker / coach | 1520 | 88 / 168 | 400 | 80 / 796 |
 | *Coach tall:* decision panel (header and footer) | 1520 | 964 | 400 | 116 |
-| Preview dock (default) | 1432 | 8 | 480 | 728 |
+| Preview dock (default / decision tall) | 1432 / 24 | 92 / 60 | 480 | 644 |
 
 At 1920 the extra width becomes space beside the Character rows (272 px each side) and between Stage and Deck. It is not used to grow the cards, because height already binds. We leave that space empty on purpose. It is where attack arrows and their labels travel, and the board stays calm.
 
@@ -328,13 +329,13 @@ The primary button always sits at the same coordinates. Its label is the action 
 | Block step (defending), a Blocker chosen | **Block with Gloriosa** (Enter; "Gloriosa K.O.'d · Life stays 3") | **No block** |
 | Defending, nothing staged | **Take the hit** ("Life 3 → 2"; no dedicated key, C8) | **Counter**, disabled with its reason: "stage a lit hand card" |
 | Defending, staged but short of the need | **Take the hit** ("Life 3 → 2"; the staging is discarded; no key) | **Play anyway** in warning style ("still hits") |
-| Defending, staged enough | **Counter +3000 · survive** (Enter; sub-label "Rocks Pirates + Buckin · hand 5 → 3") | **Take the hit** ("Life 3 → 2") |
-| Trigger revealed | **Activate Trigger** and **Add to hand**: two equal buttons; arrows and Enter, focus starts on Activate (C9) | — |
+| Defending, staged enough | **Counter +3000** (Enter; sub-label "survive · 8000 vs 7000") | **Take the hit** ("Life 3 → 2") |
+| Trigger revealed | **Activate Trigger** and **Add to hand**: two equal buttons; arrows and Enter, focus starts on Activate (C9). The revealed card is shown in the tall body (§3.12). | — |
 | Effect choice | **Done** (Enter; enabled at the minimum count) | Reset |
 | Opponent's turn | **Skip to my decision** (S; "stops when you have a choice") | Pause (K); speed control in the body |
 | Game over | **Review game** (Enter) | Rematch |
 
-**Defence commits** (C17, UX-R2). A defence always shows two commit buttons, so taking the hit is always one action away and never needs Clear first. Enter never commits a Counter that the engine's `preview` shows still loses: in the "short" state the only button with a key is none, and the wasted counter is an explicit, warning-styled choice. Clear (Esc) lives in the body's Counter lane. The labels follow one pattern: a short verb, the number, the outcome; card names and hand cost go in the sub-label. `flows.md` F6.3 and `accessibility.md` §3.10 carry the same wording.
+**Defence commits** (C17, UX-R2). A defence always shows two commit buttons, so taking the hit is always one action away and never needs Clear first. Enter never commits a Counter that the engine's `preview` shows still loses: in the "short" state the only button with a key is none, and the wasted counter is an explicit, warning-styled choice. Clear (Esc) lives in the body's Counter lane. The labels follow one pattern: a short verb and the number on the label, the outcome and the resulting numbers in the sub-label ("survive · 8000 vs 7000"). The staged card names are already in the Counter lane, so they are not repeated in the button. The longest label, "Counter +10000", fits the 1280 primary (177 px: the defence footer gives the primary 1.6 shares of its width) with its ↵ hint (UX-V5). `flows.md` F6.3 and `accessibility.md` §3.10 carry the same wording.
 
 **End Turn is not confirmed.** It is rewindable in practice modes (principle 3). The live sub-label carries the information that a confirm would have nagged about. Shortcuts are in `accessibility.md`; this file reserves one key for the primary button.
 
@@ -394,9 +395,11 @@ The preview shows the card bigger, with our own rendering of its text, so it is 
 - **Effect and Trigger text** at `--text-md`, with an "Effect not automated" warning chip for unscripted cards (ARCH §2.4).
 - **Active modifiers** with their durations ("−1000 until end of turn, from Kaido").
 
-**The dock.** It is 400 × 456 at 1280 (x 872, y 8) and 480 × 728 at 1920. It overlays the log and coach and the board's right margin, and **never covers the decision panel**. While you choose Counters from the hand, you can therefore read a card and see the battle maths at the same time.
+**The dock** (UX-V1). In the normal rail it is 400 × 384 at 1280 (x 872, y 80) and 480 × 644 at 1920 (x 1432, y 92): over the log and coach and the board's right margin, **below the rail notice and above the decision panel**, so it never covers the disclaimer, the rail header or the panel. **While the decision panel is tall** (§3.9) there is no log or coach to cover, so the dock opens at its alternate position, the board's top-left: 400 × 384 at (16, 40) at 1280 and 480 × 644 at (24, 60) at 1920. It never covers the tall panel, so while you choose Counters from the hand you can read a card and see the battle maths at the same time. The preview follows focus: when focus moves, it closes and reopens for the newly focused card after the dwell, placed by the rule below, so it never sits over the focused element.
 
-**Placement rule (WCAG 2.4.11 Focus Not Obscured).** Before opening, the dock checks whether its default rectangle intersects the rectangle of the **focused or hovered element**. That element is the one being previewed or, for a log link, the link itself. If it does, the dock opens at its alternate position: the board's top-left (x = margin, y = strip + gap). If both positions intersect, which no layout here produces, it shrinks to the free side. The preview never takes focus and is `aria-hidden`, because the card's own accessible description carries the same information.
+**Placement rule (WCAG 2.4.11 Focus Not Obscured).** Before opening, the dock checks whether its default rectangle intersects the rectangle of the **focused or hovered element**. That element is the one being previewed or, for a log link, the link itself. If it does, the dock opens at its alternate position: the board's top-left (x = margin, y = strip + gap). If both positions intersect, which no layout here produces, it shrinks to the free side. Whatever a scrim covers (the trash viewer's, the pinned inspector's) is inert, so focus can never land under it.
+
+**The Life-card reveal (Trigger)** is not a dock or a tray: while the decision is tall, the revealed card (art, name, [Counter] and [Trigger] text, "Only you see this") renders **inside the decision body** above the two consequences. It uses about 290 of the 420 px at 1280. Hidden-zone reveals that are not owed decisions in a tall panel (C2's reveal tray, "look at the top 5" during your Main phase) dock over the log below the rail notice, with a rail-only scrim, and the log and coach under the scrim are inert. The preview never takes focus and is `aria-hidden`, because the card's own accessible description carries the same information.
 
 | Trigger | Behaviour |
 |---|---|
@@ -571,7 +574,16 @@ Touch changes the input model more than the geometry:
 | 1024 × 690 (10" iPad and smaller) | 80 × 112 | 264 | x 430 (shifted 50 px right) | Rail 264. Cost area 1.9w (152 px). **Deck and Trash stack** as half-height tiles (80 × 52 each): deck count, and the trash's top card cropped to its art. Hand: 8 cards before overlap. |
 | 1366 × 1024 (13" iPad) | desktop rules | 320 | centre | Same as 1280, with more height. |
 
-The full 1180 and 1024 rectangle sets are produced by the layout script, and M3 renders them from the same code. Representative rows at 1024 × 690:
+**Rail and "decision tall" on tablets** (UX-V2). At rail widths of 280 and 264 px the rail notice wraps to 3 lines (46 px), and the defence content is taller because the lanes wrap. So on tablets the tall panel rises **right under the rail notice**, and the log ticker and the coach strip are hidden while it is tall. The log stays one key away: `G` then `g` shows the log in the panel's place until Esc, and the coach's `C` still works.
+
+| Viewport | Rail | Rail header + notice | Tall panel (top, height) | Header / body / footer | Defence body needed (measured) |
+|---|---|---|---|---|---|
+| 1180 × 740 | 280 | 44 + 46 | 90, 650 | 36–45 / 541–550 / 64 | 367–473 px (block … tie) |
+| 1024 × 690 | 264 | 44 + 46 | 90, 600 | 36–45 / 491–500 / 64 | 403–473 px (stop … tie); Skip stop 426; Trigger 374; counter drill 464 |
+
+The header is 45 px when the title wraps to two lines ("Defend your Leader · Kaido attacks"); it takes the height from the body. Every defence state fits with at least 18 px to spare (the tie at 1024 × 690: 473 of 491). *Measured* by re-rendering the wireframe states at each rail width and height (`.cache/wireframes/adapt.mjs`).
+
+The full 1180 and 1024 rectangle sets are produced by the layout script, and M3 renders them from the same code. **M3's layout test asserts that no defence, Trigger, attack-confirm or Skip-stop body scrolls at 1280 × 600, 1024 × 690 and 1180 × 740**, as well as at the two design targets. Representative rows at 1024 × 690:
 - My Leader slot: 374, 448, 112 × 112;
 - My Character slots: x 134 to 614, y 328;
 - My Deck: 668, 448, 80 × 52;
@@ -588,23 +600,20 @@ A 1280 × 720 **screen** gives a browser viewport of only about 1280 × 600 once
 
 At 1280 × 600 this gives 77 × 108 cards, which is legible. The rail header offers **Fullscreen** (the Fullscreen API), and the first game on a short window suggests it once.
 
+**The rail at 1280 × 600** (UX-V2). Rail header 0–44 and notice 44–76 as at 720. Normal state: log 76–304 (228: 32 header plus 8 rows), coach strip 304–352, decision panel 352–600 (36 / 148 / 64). **Decision tall:** the panel rises to y 76, right under the notice (76–600: 36 / **424** / 64), and the log ticker and coach strip are hidden while it is tall (`G` then `g` shows the log in its place until Esc). The 720 layout's stack (ticker 76 plus strip 48) would leave only 300 px, and three of the four defence states would scroll. *Measured* need at the 320 px rail: block 283, plan 309, stop 309, tie 345, Skip stop 362, counter drill 378, Trigger 293; all fit 424 with at least 46 px to spare. Coach tall at this height gives the coach 76–500 (424) and the decision header and footer 500–600.
+
 ### 6.4 Minimum supported viewport and the phone screens
 
 The board needs a viewport of at least **968 × 590 CSS px**. That figure is computed from the 76 px card with every compaction applied. We test the floor at 1024 × 600. Below it, the board does not render.
 
-**Phone portrait: "rotate to play"**, which PROMPT requires. A full-screen message replaces the board:
-- our own line icon of a device turning, about 96 px;
-- the heading "Turn your device sideways to play";
-- the line "The board is designed for landscape";
-- links to everything that works in portrait (Rules reference, Meta Explorer, Glossary, Card browser).
+**Phones: "The board needs a bigger screen".** PROMPT asks for a "rotate to play" screen on phones in portrait. But a phone in landscape is still below the floor: an iPhone 15 in landscape is about 852 × 393, where cards would come out about 46 px wide. Telling the player to rotate would promise a board the next screen cannot show, so on phones (in either orientation) a full-screen message replaces the board:
+- our own line icon of a device beside a computer, about 96 px;
+- the heading "The board needs a bigger screen";
+- the line "Games are played on a tablet or computer";
+- links to everything that works on a phone (Rules reference, Meta Explorer, Glossary, Card browser);
+- only when a game in progress exists **on this device**: "Your game vs Kaido (turn 6) is saved on this device" and "Export to continue on a computer" (games are local-only, so the line never promises a game the phone does not have; UX-R50).
 
-These reading pages are responsive. The game state is kept, so rotating resumes exactly where the player was.
-
-**But a phone in landscape is still below the floor.** An iPhone 15 in landscape is about 852 × 393 viewport. At that height the cards would come out about 46 px wide, well below the minimum. So the screen is chosen by whether rotating would actually help:
-- **If the device's landscape size meets the floor** (an iPad in portrait, large foldables), show "Turn your device sideways to play".
-- **If it does not** (phones), show "The board needs a bigger screen". It explains that games are played on a tablet or computer and offers the same reading links. Only when a game in progress exists **on this device** does it add "Your game vs Kaido (turn 6) is saved on this device" and "Export to continue on a computer" (games are local-only, so the line never promises a game the phone does not have; UX-R50).
-
-Showing "rotate to play" on a phone that cannot fit the board would promise something the next screen breaks. (Open question OQ-1, proposed decision PD-5.)
+These reading pages are responsive. (Open question OQ-1, proposed decision PD-5.) No screen in the product is a "turn your device" gate (C14, UX-V7).
 
 **Tablets in portrait** (C14). A portrait tablet (for example 820 × 1180) has the width of the 1024 layout's board column (about 760 px) and plenty of height, so a rotate gate there would be an orientation lock that WCAG 1.3.4 does not allow. Tablets in portrait get a **stacked variant**: the board at the 1024 × 690 geometry on top, and the rail (log, coach, decision panel at full width) below it. If M3 defers the stacked variant, the fallback is "Continue in portrait" with the board scaled to the width, never a gate. Phones are below the floor in both orientations because of size, not orientation, so 1.3.4 does not apply to them.
 
@@ -625,7 +634,7 @@ Showing "rotate to play" on a phone that cannot fit the board would promise some
 - **OQ-2. Opponent orientation.** A vertical mirror (zones in the same columns as yours) reads better on a screen. A 180° rotation matches a real table, where their Life is on your right. Does the owner, as a paper player, find the mirror disorienting? *Current best answer:* mirror (PD-2). Confirm in the first owner session (`usability-plan.md`).
 - **OQ-3. End Turn without a confirm.** The proposal relies on the live sub-label ("2 can attack · 3 DON!! unused") plus Rewind. In a mode without Rewind (a future ranked-like mode), should ending the turn with unused attackers need a confirm? *Current best answer:* there is no such mode in v1; revisit if one is added.
 - **OQ-4. Pacing against the baseline.** The 400 / 600 ms dwells and the 8 s target are reasoned from first principles, and a Warlord turn runs about 1.2 s over (§5.2). SeaKing's pacing is **unobserved**. The owner times a clickable prototype at 1× in the first owner session, and the slice checkpoint compares it with the owner's own hands-on notes.
-- **OQ-6. The board's disclaimer form** (C15). PROMPT requires the disclaimer in the footer of every page. The board has no footer, so it carries a visible two-line rail notice (§3.1) whose accessible name is the full disclaimer. It costs the log 32 px and the board nothing. *Current best answer:* this is the board's footer equivalent. The owner confirms the form, and the decision is then recorded in `DECISIONS.md`.
+- **OQ-6. The board's disclaimer form** (C15). *Decided* (PROMPT "make decisions yourself"; OQ-6 is not a DEVINE item): the visible two-line rail notice (§3.1), whose accessible name is the full disclaimer, is the board's footer equivalent. The `DECISIONS.md` entry is to be recorded with this revision; the owner may still change the form.
 - **OQ-5. Turn counter wording.** "Turn 5" counts game turns, as the CR does. Some players count "my turn 3". The proposal shows game turns, with "(your 3rd turn)" on hover. Is that the owner's mental model?
 
 ## Proposed decisions

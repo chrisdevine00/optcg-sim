@@ -73,7 +73,7 @@
     <aside class="col thumbcol" aria-labelledby="thh"><header><h2 id="thh">The position</h2></header>
       <div class="tbody"><div class="thumbbox" id="tbox" aria-hidden="true"><div class="stage thumb" id="tstage"></div></div>
         <p class="muted" style="margin:0;font-size:var(--text-sm)" id="tcap"></p>
-        <a class="btn primary" id="study" href="11c-study.html#e05">Study this moment <kbd>↵</kbd></a>
+        <a class="btn" id="study" href="11c-study.html#e05">Open in Study <kbd>↵</kbd></a>
         <p class="subtle" style="margin:0;font-size:12px">Opens the board at full game size with this explanation beside it.</p></div></aside>
   </div>
   <footer class="app-footer"></footer>
@@ -86,7 +86,7 @@
 <script>
 WF.chrome('Reviews');
 const roomy = WF.isRoomy(); if (roomy) document.body.classList.add('roomy-h');
-const STATES = [['e05', 'Severe flag (E05)'], ['e02', 'Hindsight flag (E02)'], ['e06', 'DON!! unused (E06)'], ['e19', 'Counter tied (E19)'], ['e09', 'Face over board (E09)'], ['unchecked', 'Not fully checked'], ['analysing', 'Still analysing']];
+const STATES = [['e05', 'Severe flag (E05)'], ['mull', 'Mulligan flag (minor)'], ['e02', 'Hindsight flag (E02)'], ['e06', 'DON!! unused (E06)'], ['e19', 'Counter tied (E19)'], ['e09', 'Face over board (E09)'], ['unchecked', 'Not fully checked'], ['analysing', 'Still analysing']];
 const tstage = document.getElementById('tstage');
 
 function draw() {
@@ -146,6 +146,16 @@ function draw() {
       <div class="dfoot2"><button class="btn primary" type="button">Analyse deeper</button><span class="subtle" style="font-size:12px;align-self:center">10× the time budget, with progress and Cancel</span></div>`;
     return;
   }
+  if (st === 'mull') {
+    document.getElementById('tcap').textContent = 'Turn 0: your opening hand, going second.';
+    document.getElementById('study').setAttribute('href', '14b-mulligan.html#item');
+    d.innerHTML = `<header><h2>Mulligan · going second · <b>Minor</b></h2></header><div class="rbody"><div class="wyd"><b>What you did.</b> Kept a hand whose cheapest Character costs 5.</div>
+      <h2 class="claim" style="margin:0 0 6px">The guide would have redrawn this hand.</h2><p>${EXPL.cert('any-hand', 'guide')}</p>
+      <p style="margin:6px 0">Going second you have 2, then 4 DON!!: nothing to play until turn 4 (your 2nd). A fresh five has a 1- to 3-cost Character 90% of the time. It is minor because you went second and drew into Stussy by turn 4.</p>
+      <p class="lesson" style="margin:4px 0">Lesson: <a href="18-learn.html?l=L12-mulligan#lesson">Mulligan (L12)</a></p></div>
+      <div class="dfoot2"><a class="btn primary" href="14b-mulligan.html#item">Practice mulligans</a></div>`;
+    return;
+  }
   const f = FLAGS[sel]; const e = EXPL.E[f.e];
   document.getElementById('tcap').textContent = `Turn ${f.turn}, ${mine(f.turn) ? 'your turn' : 'Kaido’s turn, your decision'}: the moment of the flag.`;
   const practise = f.e === 'E02' ? '<a class="btn" href="14-drill-lethal.html#real">Practice this <span class="subtle" style="font-weight:500">· their real hand</span></a>' : f.e === 'E05' || f.e === 'E19' ? '<a class="btn" href="14c-drill-counter.html">Practice this</a>' : '<a class="btn" href="14-drill-lethal.html">Practice this</a>';
@@ -154,7 +164,7 @@ function draw() {
     ${EXPL.render(e, { mode: 'review', verbosity: 'learner' }).replace('<h4 class="claim">', '<h2 class="claim" style="margin:0 0 6px">').replace('</h4>', '</h2>')}</div>
     <div class="dfoot2"><a class="btn primary" href="${studyHref}">Study this moment <kbd>↵</kbd></a>${practise}<a class="btn" href="03-main.html">Play from here</a></div>`;
   // the review region scrolls only when it must; then it is focusable
-  const rb = d.querySelector('.rbody'); if (rb.scrollHeight > rb.clientHeight + 1) rb.setAttribute('tabindex', '0');
+  WF.scrollCue(d.querySelector('.rbody')); // focusable and cued only when it scrolls (UX-V4)
 }
 draw();
 window.addEventListener('hashchange', draw);

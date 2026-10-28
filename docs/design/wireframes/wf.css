@@ -339,7 +339,8 @@ body.board-page .stage { width: 100vw; height: 100vh; }
 .log { background: var(--color-surface-1); border-bottom: 1px solid var(--color-line); display: flex; flex-direction: column; }
 .log .lh { height: 32px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; font: var(--weight-semibold) var(--text-sm)/1 var(--font-ui); color: var(--color-text-muted); border-bottom: 1px solid var(--color-line); }
 .log ol { list-style: none; margin: 0; padding: 2px 0 6px; }
-.logbody { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; min-height: 0; }
+.logbody { flex: 1; display: flex; flex-direction: column; overflow-y: auto; min-height: 0; scrollbar-width: thin; }
+.logbody > ol { margin-top: auto; }
 .log li { font-size: var(--text-sm); line-height: 20px; min-height: 24px; padding: 2px 12px 2px 24px; text-indent: -12px; color: var(--color-text); }
 .log li.th { color: var(--color-text-subtle); font-size: 12px; font-weight: var(--weight-semibold); border-top: 1px solid var(--color-line); margin-top: 2px; }
 .log li .chip { height: 16px; line-height: 16px; font-size: 12px; padding: 0 4px; margin-right: 4px; vertical-align: 1px; text-indent: 0; }
@@ -369,6 +370,7 @@ body.board-page .stage { width: 100vw; height: 100vh; }
 .csec .cin { padding: 4px 12px 10px; font-size: var(--text-sm); line-height: 20px; }
 .claim { font: var(--weight-semibold) var(--text-lg)/22px var(--font-ui); margin: 2px 0 6px; }
 .ev { margin: 6px 0; padding-left: 16px; }
+.evh { margin: 8px 0 0; font: var(--weight-semibold) 12px/16px var(--font-ui); color: var(--color-text-muted); }
 .ev li { margin: 2px 0; }
 .line { margin: 6px 0; padding: 0; list-style: none; counter-reset: s; }
 .line li { counter-increment: s; display: flex; gap: 6px; align-items: flex-start; padding: 3px 0; border-bottom: 1px solid var(--color-line); }
@@ -385,8 +387,16 @@ details.srcs summary { cursor: pointer; color: var(--color-text-muted); font-siz
 /* Decision panel */
 .decision { background: var(--color-surface-2); display: flex; flex-direction: column; }
 .dhead { flex: none; display: flex; align-items: center; gap: 8px; padding: 0 12px; border-bottom: 1px solid var(--color-line); }
-.dhead h2 { font: var(--weight-semibold) var(--text-md)/18px var(--font-ui); margin: 0; flex: 1; }
-.roomy .dhead h2 { font-size: var(--text-xl); line-height: var(--leading-xl); }
+.dhead h2 { font: var(--weight-semibold) var(--text-md)/18px var(--font-ui); margin: 0; flex: 1; padding: 4px 0; }
+.dhead h2:focus-visible { outline-offset: 2px; }
+/* Scroll cue (UX-V3, V4) */
+.scrolls { position: relative; }
+.morecue { position: sticky; bottom: -1px; height: 0; pointer-events: none; }
+.morecue span { position: absolute; left: 0; right: 0; bottom: 0; height: 40px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 4px; background: linear-gradient(to bottom, transparent, var(--color-surface-1) 70%); font: var(--weight-semibold) 12px/16px var(--font-ui); color: var(--color-text-muted); }
+.decision .morecue span { background: linear-gradient(to bottom, transparent, var(--color-surface-2) 70%); }
+.at-end > .morecue { display: none; }
+.maketaller { min-height: 24px; margin-right: 4px; }
+.roomy .dhead h2 { font-size: var(--text-xl); line-height: 26px; }
 .dhead .q { width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--color-line-strong); background: transparent; cursor: help; font-weight: 700; font-size: 12px; color: var(--color-text-muted); }
 .dbody { flex: 1; overflow: auto; padding: 6px 12px; font-size: var(--text-sm); line-height: 18px; }
 .dfoot { flex: none; display: flex; align-items: center; gap: 8px; padding: 0 12px; border-top: 1px solid var(--color-line); }
@@ -460,7 +470,7 @@ details.srcs summary { cursor: pointer; color: var(--color-text-muted); font-siz
 
 /* Key hints are always shown on buttons that have one (UX-R47) */
 .dfoot > .btn.big { flex: 1 1 0; min-width: 0; margin-left: 0; }
-.dfoot > .btn.big.pri, .dfoot > .btn.primary.big { flex: 1.3 1 0; }
+.dfoot > .btn.big.pri, .dfoot > .btn.primary.big { flex: 1.6 1 0; }
 .dfoot > .btn:not(.big) { flex: none; }
 .btn.big .sub { white-space: normal; text-align: center; }
 .lanehd { display: flex; align-items: center; gap: 6px; }

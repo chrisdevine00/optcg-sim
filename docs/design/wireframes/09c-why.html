@@ -15,7 +15,7 @@
 <script src="scenarios.js"></script>
 <script src="expl.js"></script>
 <script>
-const STATES = [['why', 'Why: AI block (E12)'], ['rookie', 'Why: Rookie tier']];
+const STATES = [['why', 'Why: AI block (E12)'], ['rookie', 'Why: Rookie tier'], ['tall', 'Why made taller']];
 WF.mountBoard((st) => {
   const opp = (id, x = {}) => K(id, { who: 'Opponent’s', ...x });
   const s = {
@@ -55,6 +55,7 @@ WF.mountBoard((st) => {
   s.log.splice(4, 1);
   s.me.chars[1].st = []; s.me.chars[1].g = undefined; s.me.chars[1].p = 5000; s.me.chars[1].chips = [{ t: 'New', pos: 'top' }];
   const E = EXPL.E.E12;
+  if (st === 'tall') s.coach = 'tall'; // "Make taller" (UX-V4)
   s.coachHtml = st === 'rookie'
     ? EXPL.coach('why', `<h4 class="claim">Rookie picks a random legal move, except that it always blocks or counters a lethal attack.</h4><p class="subtle" style="margin:0;font-size:12px">Want an opponent with a plan? Try Pirate.</p>`, { why: 'Block with Yamato' })
     : EXPL.coach('why', `<p class="muted" style="margin:0 0 4px;font-size:12px">Kaido's block, turn 9 · only public information</p>` + EXPL.render(E, { mode: 'why', verbosity: 'standard', evidenceOpen: true }), { why: 'Block with Yamato' });

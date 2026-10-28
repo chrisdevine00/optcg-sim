@@ -162,13 +162,27 @@ function lesson(key) {
     </aside></div></div>`;
 }
 
+// Any lesson without wireframed content renders a labelled stub, so every link lands on the lesson it names (UX-V8)
+function stub(id) {
+  const all = STAGES.flatMap(([stage, , ls]) => ls.map(([i, n, k]) => ({ i, n, k, stage })));
+  const ix = all.findIndex((x) => x.i === id); const L = all[ix];
+  if (!L) return null;
+  const prev = all[ix - 1], next = all[ix + 1];
+  return `<nav aria-label="Breadcrumb" class="muted" style="font-size:var(--text-sm);margin-bottom:6px"><a href="#hub">Learn</a> › ${L.stage.replace(' · ', ' · ')} › ${L.i}</nav>
+    <h1 class="page">${L.i} ${L.n}</h1>
+    <p class="lede">This lesson page uses the same layout as L05 and L10: the idea, a worked example, "Show me" on the board, and its drill with the untimed exit criterion. Its content is in the curriculum (<code>docs/content/curriculum.md</code>, ${L.i}); the wireframe does not repeat it.</p>
+    <div class="row" style="gap:8px"><a class="btn primary" href="#hub">Back to the course</a>${prev ? `<a class="btn" href="?l=${prev.i}#lesson">← ${prev.i} ${prev.n}</a>` : ''}${next ? `<a class="btn" href="?l=${next.i}#lesson">${next.i} ${next.n} →</a>` : ''}</div>`;
+}
 function draw() {
   const st = WF.state() || 'hub';
   const q = new URLSearchParams(location.search).get('l') || '';
+  const id = (q.match(/^L\d+/) || [''])[0];
+  const key = st === 'lesson-l10' || id === 'L10' ? 'L10' : (!id || id === 'L05') ? 'L05' : id;
   const m = document.getElementById('main');
   if (st === 'hub') m.innerHTML = hub();
-  else m.innerHTML = lesson(st === 'lesson-l10' || q.startsWith('L10') ? 'L10' : 'L05');
-  document.title = 'OPTCG Sim · Learn' + (st === 'hub' ? '' : ' · ' + (st === 'lesson-l10' || q.startsWith('L10') ? 'L10' : 'L05'));
+  else if (key === 'L10' || key === 'L05') m.innerHTML = lesson(key);
+  else m.innerHTML = stub(key) || lesson('L05');
+  document.title = 'OPTCG Sim · Learn' + (st === 'hub' ? '' : ' · ' + key);
   window.scrollTo(0, 0);
 }
 draw(); window.addEventListener('hashchange', draw); WF.statesBar(STATES);

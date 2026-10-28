@@ -29,7 +29,8 @@
         dtall: { log: [76, 76], coach: [152, 48], dec: [200, 520], parts: [36, 420, 64] },
       },
       decision: [472, 248], // default decision panel [top, height], for page overlays
-      dock: [872, 8, 400, 456],
+      // Preview dock (board.md §3.12, UX-V1): over the log and coach only; with the decision tall, on the board's top-left
+      dock: [872, 80, 400, 384], dockAlt: [16, 40, 400, 384],
     },
     roomy: {
       W: 1920, H: 1080, card: [126, 176], slot: 176, tok: [36, 51], axis: 760, handGap: 8, handMax: 11,
@@ -50,7 +51,7 @@
         dtall: { log: [88, 80], coach: [168, 48], dec: [216, 864], parts: [44, 748, 72] },
       },
       decision: [744, 336],
-      dock: [1432, 8, 480, 728],
+      dock: [1432, 92, 480, 644], dockAlt: [24, 60, 480, 644],
     },
   };
 
@@ -113,7 +114,7 @@
     const peek = c.don ? `<span class="don-peek" aria-hidden="true">${'<i></i>'.repeat(Math.min(3, c.don))}</span>` : '';
     const label = c.aria || autoName(c);
     const tag = o.tag || 'button';
-    const mine = c.who === 'Your' || c.inHand || c.mine;
+    const mine = c.who === 'Your' || c.inHand || c.mine || o.mine;
     return `<${tag} class="${cls}" ${c.id ? `id="${c.id}"` : ''} style="left:${x}px;top:${y}px;width:${bw}px;height:${bh}px" aria-label="${esc(label)}" ${tag === 'button' ? 'type="button"' : 'role="img"'} data-name="${esc(c.n)}" data-g="${c.g || ''}" ${mine ? 'data-mine="1"' : ''}>
       ${peek}<span class="face" aria-hidden="true"><span class="art"><span class="al">art</span></span><span class="foot"><span class="nm">${esc(c.n).replace(/\.(?=\S)/g, '.​')}</span><span class="band"><span class="ini">${esc((c.colInit) || (COLOURS[c.col || 'blue'] || '')[0])}</span></span></span></span>
       ${cost}${pow}${don}${kw}${ctr}${glyph}${chips}</${tag}>`;
@@ -198,7 +199,7 @@
   }
   function slotHTML(c, rect, g, label, emptyLabel) {
     if (!c) return `<div class="slot empty zitem" style="${px(rect)}" role="group" aria-label="${label}, empty">${emptyLabel ? `<span class="zlabel">${emptyLabel}</span>` : ''}</div>`;
-    return `<div class="slot zitem" style="${px(rect)}" role="group" aria-label="${label}">${cardHTML(c, [0, 0, rect[2], rect[3]], g)}</div>`;
+    return `<div class="slot zitem" style="${px(rect)}" role="group" aria-label="${label}">${cardHTML(c, [0, 0, rect[2], rect[3]], g, { mine: label.startsWith('Your') })}</div>`;
   }
 
   /* ---------- Midline ---------- */
@@ -214,10 +215,10 @@
       if (k === 'grp') { lis.push('<li class="sep" aria-hidden="true">›</li>'); lis.push(`<li class="grp">${s}</li>`); return; }
       lis.push(`<li class="${k === 'cur' ? 'cur' + (m.opp ? ' opp' : '') : k === 'fut' ? 'fut' : ''}" ${k === 'cur' ? 'aria-current="step"' : ''}>${k === 'cur' ? '▸ ' : ''}${s}</li>`);
     });
-    const label = `${String(m.turn || '').replace(/<[^>]+>/g, '')}. Phase: ${m.battle ? 'Battle, ' + m.battle + ' step' : (m.phase || '')}`;
+    const label = m.label || `${String(m.turn || '').replace(/<[^>]+>/g, '')}. Phase: ${m.battle ? 'Battle, ' + m.battle + ' step' : (m.phase || '')}`;
     return `<div class="z midline zitem" style="${px(r)}" role="group" aria-label="${esc(label)}">
       <div class="ml-left">${m.left || ''}</div>
-      <div class="ml-centre" style="left:${c0}px;width:${c1 - c0}px">${m.oppTag ? '<span class="chip opp">Opponent</span>' : ''}<span class="turnword">${m.turn}</span><ol class="steps" aria-label="Phase">${lis.join('')}</ol></div>
+      <div class="ml-centre" style="left:${c0}px;width:${c1 - c0}px">${m.oppTag ? '<span class="chip opp">Opponent</span>' : ''}<span class="turnword">${m.turn}</span>${m.steps === false ? '' : `<ol class="steps" aria-label="Phase">${lis.join('')}</ol>`}</div>
       <div class="ml-right">${m.right || ''}</div></div>`;
   }
 
@@ -270,8 +271,8 @@
   function decisionHTML(d, top, h, parts, mode) {
     const [hh, bh, fh] = parts;
     return `<section class="railsec decision ${mode}" id="decision" style="top:${top}px;height:${h}px" aria-label="Decision panel: ${esc(String(d.title || '').replace(/<[^>]+>/g, ''))}">
-      <div class="dhead" style="height:${hh}px"><h2>${d.title}</h2>${d.q === false ? '' : '<button class="q" type="button" aria-label="Explain this step" title="Explain this step">?</button>'}</div>
-      ${bh ? `<div class="dbody" style="height:${bh}px">${d.body || ''}</div>` : ''}
+      <div class="dhead" style="min-height:${hh}px"><h2 tabindex="-1">${d.title}</h2>${d.q === false ? '' : '<button class="q" type="button" aria-label="Explain this step" title="Explain this step">?</button>'}</div>
+      ${bh ? `<div class="dbody" style="flex:1 1 ${bh}px;min-height:0">${d.body || ''}</div>` : ''}
       <div class="dfoot" style="height:${fh}px">${d.foot || ''}</div></section>`;
   }
 
@@ -431,15 +432,34 @@
       const pick = items[remembered[name] || 0] || items[0];
       if (pick) pick.setAttribute('tabindex', '0');
     });
-    // The log is one stop too: arrows move through its links
+    // The log is one stop too: arrows move through its links. It scrolls (newest at the bottom), so a focused
+    // older line scrolls into view instead of sitting hidden above the ticker (WCAG 2.4.11, UX-V1)
     const log = el.querySelector('.log [role="log"]');
     if (log) {
+      log.scrollTop = log.scrollHeight;
+      log.addEventListener('focusin', (ev) => ev.target.scrollIntoView({ block: 'nearest' }));
       const links = [...log.querySelectorAll('a, button')];
       links.forEach((a, i) => { a.setAttribute('tabindex', i === links.length - 1 ? '0' : '-1'); a.dataset.zi = 'log'; });
       if (!links.length) log.setAttribute('tabindex', '0');
     }
-    // Scroll containers are focusable only when they actually scroll
-    el.querySelectorAll('.dbody, .coachbody, .rbody').forEach((b) => { if (b.scrollHeight > b.clientHeight + 1) b.setAttribute('tabindex', '0'); });
+    // Scroll containers are focusable only when they actually scroll, and then they show a cue
+    el.querySelectorAll('.dbody, .coachbody, .rbody').forEach((b) => scrollCue(b));
+    // A coach section that overflows the open state offers "Make taller" (learning-ui §2.1, UX-V4)
+    const cb = el.querySelector('.coach.open .coachbody');
+    if (cb && cb.scrollHeight > cb.clientHeight + 1) {
+      const head = el.querySelector('.coach.open .chead .iconbtn');
+      if (head && !el.querySelector('.maketaller')) head.insertAdjacentHTML('beforebegin', '<a class="btn small maketaller" href="#tall">Make taller ↕</a>');
+    }
+  }
+  // Scroll cue (UX-V3, V4): a bottom shadow and "More below ↓" whenever a body scrolls; it hides at the end
+  function scrollCue(b) {
+    if (!b || b.scrollHeight <= b.clientHeight + 1) return;
+    b.setAttribute('tabindex', '0');
+    if (b.querySelector(':scope > .morecue')) return;
+    b.classList.add('scrolls');
+    b.insertAdjacentHTML('beforeend', '<div class="morecue" aria-hidden="true"><span>More below ↓</span></div>');
+    const upd = () => b.classList.toggle('at-end', b.scrollTop + b.clientHeight >= b.scrollHeight - 2);
+    b.addEventListener('scroll', upd); upd();
   }
   function itemsOf(el, name) {
     if (name === 'log') return [...el.querySelectorAll('.log [role="log"] a, .log [role="log"] button')];
@@ -473,8 +493,8 @@
   function focusDecision(el) {
     const d = el.querySelector('#decision');
     if (!d) { const r = el.querySelector('.rbody'); if (r) { if (!r.hasAttribute('tabindex')) r.setAttribute('tabindex', '-1'); r.focus(); } return; }
-    const f = d.querySelector('.dbody button:not([aria-disabled="true"]), .dbody a[href], .dbody input, .dfoot [data-key], .dfoot button:not([aria-disabled="true"]), .dfoot a[href]');
-    (f || d).focus();
+    // The decision's heading takes focus and is read; Tab then reaches its choices (UX-V6: P then Enter never rewinds)
+    const h = d.querySelector('.dhead h2'); (h || d).focus();
   }
   const GOTO = { h: ['hand', 0], c: ['my-chars', 0], l: ['my-row', 3], s: ['my-row', 4], d: ['my-row', 1], n: ['my-row', 0], k: ['my-row', 5], t: ['my-row', 6], f: ['my-row', 2],
     H: ['opp-top', 1], C: ['opp-chars', 0], L: ['opp-row', 3], S: ['opp-row', 4], D: ['opp-row', 1], N: ['opp-row', 0], K: ['opp-row', 5], T: ['opp-row', 6], F: ['opp-row', 2] };
@@ -486,10 +506,15 @@
       const a = e.target.closest('[data-skip]');
       if (a) { e.preventDefault(); focusDecision(el); }
     });
-    el.addEventListener('keydown', (e) => {
+    // A preview dock opened by focus or hover closes when focus moves on; it reopens for the next card (board.md §3.12)
+    document.addEventListener('focusin', (e) => { if (!e.target.closest('.dock')) el.querySelectorAll('.dock:not(.pinned)').forEach((d) => d.remove()); });
+    // Listen on the document so keys work from page load (focus on <body>) and from the skip link (UX-V6)
+    document.addEventListener('keydown', (e) => {
       const t = e.target;
+      if (t !== document.body && !el.contains(t)) return;
       if (t.matches('input, textarea, select') || e.ctrlKey || e.metaKey || e.altKey) return;
-      const inBoard = !!t.closest('.board-app') || t === document.body;
+      if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock'].includes(e.key)) return; // modifier-only keydowns never count as the G letter
+      const inBoard = !!t.closest('.board-app') || t === document.body || t.classList.contains('skiplink');
       // Two-key "Go to" (no timeout, WCAG 2.2.1)
       if (pending === 'G') {
         e.preventDefault();
@@ -635,5 +660,5 @@
     if (footer) footer.innerHTML = `<span>${DISCLAIMER}</span><span class="spacer"></span><a href="16-settings.html#about">About and sources</a>`;
   }
 
-  window.WF = { G, cardHTML, renderBoard, mountBoard, statesBar, state, chrome, esc, isRoomy, DISCLAIMER, DISCLAIMER_SHORT, installKeys, announce };
+  window.WF = { scrollCue, G, cardHTML, renderBoard, mountBoard, statesBar, state, chrome, esc, isRoomy, DISCLAIMER, DISCLAIMER_SHORT, installKeys, announce };
 })();

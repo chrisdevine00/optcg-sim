@@ -41,8 +41,8 @@ const SAY = {
   donmode: 'Giving DON!!, 3 active. Now click your Leader to give it 1 DON!!.',
   notyet: 'Not yet. First, give 1 DON!! to your Leader.',
   done: 'Your Leader is 6000 until the end of your turn. Press Enter for step 4.',
-  t5: 'Step 5 of 8: Being attacked. Kaido, 5000, attacks your Leader, 5000. Ties go to the attacker. Click Buckin in your hand to stage it, then press Counter, survive. Or Space on Buckin, then Enter.',
-  t5staged: 'Staged Buckin, plus 1000. Your Leader 6000 against 5000: the attack fails. Press Counter, survive.',
+  t5: 'Step 5 of 8: Being attacked. Kaido, 5000, attacks your Leader, 5000. Ties go to the attacker. Click Buckin in your hand to stage it, then press Counter plus 1000. Or Space on Buckin, then Enter.',
+  t5staged: 'Staged Buckin, plus 1000. Your Leader 6000 against 5000: the attack fails. Press Counter plus 1000.',
   complete: 'Tutorial complete. Play your first full game?',
 };
 WF.mountBoard((st) => {
@@ -112,10 +112,10 @@ WF.mountBoard((st) => {
     s.decision = { title: 'Tutorial · step 5 of 8', q: false,
       body: `${dots}<p style="margin:8px 0 4px"><b>Being attacked</b></p>`
         + SCN.battle({ att: { name: 'Kaido <span class="subtle">(their Leader)</span>', num: '5000', bd: '5000 base' }, def: { name: 'Your Leader', num: staged ? '6000' : '5000', bd: staged ? '5000 + 1000 staged (Buckin)' : '5000 base · 1 counter in hand' }, res: staged ? { cls: 'ok', text: 'Attack fails', need: 'Life stays 5' } : { cls: 'hit', text: 'Ties go to the attacker', need: 'Need +1000' } })
-        + `<p style="margin:6px 0 0">${staged ? 'Buckin is staged. Nothing is played until you press <b>Counter · survive</b>.' : 'First the Block step (you have no Blocker), then the Counter step. Stage a counter from your hand.'}</p><div style="margin-top:8px">${readAgain}</div>`,
-      foot: `<button class="btn big" type="button" aria-disabled="true" title="Not in this step: this one teaches countering"><span class="lbl2">Take the hit</span><span class="sub">not in this step</span></button>${staged ? SCN.primary('Counter +1000 · survive', 'Buckin · hand 4 → 3', 'Enter') : '<button type="button" class="btn primary big" aria-disabled="true"><span class="lbl2">Counter · survive</span><span class="sub">stage Buckin first</span></button>'}` };
+        + `<p style="margin:6px 0 0">${staged ? 'Buckin is staged. Nothing is played until you press <b>Counter +1000</b>.' : 'First the Block step (you have no Blocker), then the Counter step. Stage a counter from your hand.'}</p><div style="margin-top:8px">${readAgain}</div>`,
+      foot: `<button class="btn big" type="button" aria-disabled="true" title="Not in this step: this one teaches countering"><span class="lbl2">Take the hit</span><span class="sub">not in this step</span></button>${staged ? SCN.primary('Counter +1000', 'survive · 6000 vs 5000', 'Enter') : '<button type="button" class="btn primary big" aria-disabled="true"><span class="lbl2">Counter · survive</span><span class="sub">stage Buckin first</span></button>'}` };
   } else if (st === 'complete') {
-    s.decision = { title: 'Tutorial complete', q: false, body: `${dots}<p style="margin:8px 0 0">All 8 steps done.</p>`, foot: `<a class="btn" href="01-welcome.html">Back to Home</a>${SCN.primary('Play your first game', 'Rookie · learner settings', 'Enter', '02-setup.html#first')}` };
+    s.decision = { title: 'Tutorial complete', q: false, body: `${dots}<p style="margin:8px 0 0">All 8 steps done.</p>`, foot: `<span class="muted" style="font-size:12px">Choose in the dialog: one place to start your first game.</span>` };
   } else {
     s.decision = {
       title: 'Tutorial · step 3 of 8', q: false,
@@ -140,21 +140,25 @@ WF.mountBoard((st) => {
     }
     if (T5) {
       const r = R['me.hand.4'];
-      const body = st === 't5staged' ? '<p style="margin:0">Buckin adds +1000: your Leader is 6000, more than 5000, so the attack fails.</p><p class="do"><b>Do:</b> press <b>Counter · survive</b> (or Enter).</p>'
-        : '<p style="margin:0">5000 against 5000 is a tie, and ties go to the attacker. One counter card is enough.</p><p class="do"><b>Do:</b> click Buckin in your hand to stage it, then press Counter · survive (or Space on Buckin, then Enter).</p>';
+      const body = st === 't5staged' ? '<p style="margin:0">Buckin adds +1000: your Leader is 6000, more than 5000, so the attack fails.</p><p class="do"><b>Do:</b> press <b>Counter +1000</b> (or Enter).</p>'
+        : '<p style="margin:0">5000 against 5000 is a tie, and ties go to the attacker. One counter card is enough.</p><p class="do"><b>Do:</b> click Buckin in your hand to stage it, then press Counter +1000 (or Space on Buckin, then Enter).</p>';
       // Anchored above Buckin, over your empty Character row, so it never covers the decision panel or a count.
       const x = Math.max(g.mat[0] + 16, Math.min(g.mat[2] - w - 16, r[0] - 40));
       return card(x, r[1] - 18, 'Being attacked', body + '<p style="margin:6px 0 0;font-size:var(--text-sm)"><a href="16-settings.html#rules">Why? CR 7-1-2, 7-1-3</a></p>', 'above').replace('style="left:', 'style="transform:translateY(-100%);left:');
     }
     const r = R['me.leader']; const x = r[0] + r[2] + 14, y = r[1] - (roomy ? 40 : 64);
     let body;
-    if (st === 'notyet') body = '<p style="margin:0"><b>Not yet.</b> First, give 1 DON!! to your Leader.</p><p class="do"><b>Do:</b> click your active DON!! (or focus your Leader and press <kbd>+</kbd>), then click your Leader.</p>';
+    if (st === 'notyet') body = '<p style="margin:0"><b>Not yet.</b> First, give 1 DON!! to your Leader.</p><p class="do"><b>Do:</b> click your active DON!! (or focus your Leader and press <kbd>+</kbd> then Enter), then click your Leader.</p>';
     else if (done) body = '<p style="margin:0">Your Leader went from 5000 to 6000. On their turn it goes back to 5000; the DON!! stays until your next Refresh.</p>';
     else if (dmode) body = '<p style="margin:0">DON!! mode is on. Every card that can take DON!! is lit with ◆.</p><p class="do"><b>Do:</b> click your Leader to give it 1 DON!!. Esc leaves DON!! mode.</p>';
-    else body = '<p style="margin:0">Each DON!! you give your Leader or a Character adds +1000 power, on your turn only.</p><p class="do"><b>Do:</b> click your active DON!! (or focus your Leader and press <kbd>+</kbd>), then click your Leader.</p>';
+    else body = '<p style="margin:0">Each DON!! you give your Leader or a Character adds +1000 power, on your turn only.</p><p class="do"><b>Do:</b> click your active DON!! (or focus your Leader and press <kbd>+</kbd> then Enter), then click your Leader.</p>';
     return card(x, y, done ? 'That’s it' : 'Giving DON!!', body + '<p style="margin:6px 0 0;font-size:var(--text-sm)"><a href="16-settings.html#rules">Why? CR 6-5-5-2</a></p>');
   };
-  s.after = () => { document.getElementById('announce-polite').textContent = SAY[st] || SAY.step; const f = document.querySelector('[data-wf-focus]'); if (f) f.focus(); };
+  s.after = (el) => {
+    // The completion dialog is modal: everything behind it is inert, so focus never lands under its scrim (WCAG 2.4.11)
+    if (st === 'complete') el.querySelectorAll('.board-app, .rail, .skiplink').forEach((x) => x.setAttribute('inert', ''));
+    document.getElementById('announce-polite').textContent = SAY[st] || SAY.step; const f = document.querySelector('[data-wf-focus]'); if (f) f.focus();
+  };
   s.pageTitle = 'Tutorial';
   return s;
 }, STATES);

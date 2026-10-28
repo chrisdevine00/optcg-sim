@@ -15,7 +15,7 @@
 <script src="scenarios.js"></script>
 <script src="expl.js"></script>
 <script>
-const STATES = [['thinking', 'Hint: thinking'], ['result', 'Hint: the line'], ['following', 'Following: 2 steps done'], ['stale', 'Board changed: stale']];
+const STATES = [['thinking', 'Hint: thinking'], ['result', 'Hint: the line'], ['following', 'Following: 2 steps done'], ['stale', 'Board changed: stale'], ['tall', 'Hint made taller']];
 WF.mountBoard((st) => {
   const opp = (id, x = {}) => K(id, { who: 'Opponent’s', ...x });
   const s = {
@@ -54,7 +54,9 @@ WF.mountBoard((st) => {
     s.coachHtml = EXPL.coach('hint', `<p style="margin:0 0 6px"><b>Thinking…</b> <span class="subtle">(Esc to stop)</span></p><div class="indet" aria-hidden="true" style="--x:1"></div><p class="subtle" style="margin:6px 0 0;font-size:12px">Usually 1.5 to 2.5 s. The board stays yours: keep playing if you like.</p>`, { hint: 'thinking' });
     s.coachStrip = { hint: 'thinking' };
   }
-  if (st === 'result' || st === 'following') {
+  // "Make taller" (shown when the open section overflows) moves the hint into the coach's tall state (learning-ui §2.1, UX-V4)
+  if (st === 'tall') s.coach = 'tall';
+  if (st === 'result' || st === 'following' || st === 'tall') {
     if (st === 'following') {
       me.hand.splice(0, 1);
       me.chars[1] = K('OP14-031', { chips: [{ t: 'New', pos: 'top' }] });

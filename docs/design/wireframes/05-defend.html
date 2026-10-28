@@ -15,7 +15,7 @@
 <script src="cards.js"></script>
 <script src="scenarios.js"></script>
 <script>
-const STATES = [['plan', 'Nothing staged'], ['tie', 'Staged: ties (warning)'], ['stop', 'Staged: stops it'], ['block', 'Blocker chosen']];
+const STATES = [['plan', 'Nothing staged'], ['tie', 'Staged: ties (warning)'], ['stop', 'Staged: stops it'], ['block', 'Blocker chosen'], ['preview', 'Preview of a counter while defending']];
 WF.mountBoard((st) => {
   const opp = (c) => ({ ...c, who: 'Opponent’s' });
   const s = {
@@ -91,7 +91,7 @@ WF.mountBoard((st) => {
     res = { cls: 'ok', text: 'Attack fails', need: 'Exactly enough' };
     ctrOpts = `<button class="opt" type="button" aria-pressed="true">Rocks Pirates +2000 ✓</button><button class="opt" type="button" aria-pressed="true">Buckin +1000 ✓</button><button class="opt" type="button" aria-pressed="false">No Authority +2000 <span class="subtle" style="font-weight:500">· 1 DON!!</span></button>`;
     clear = '<button class="btn small" type="button">Clear <kbd>Esc</kbd></button>';
-    foot = `${SCN.secondary('Take the hit', 'Life 3 → 2')}${SCN.primary('Counter +3000 · survive', 'Rocks Pirates + Buckin · hand 5 → 3', 'Enter')}`;
+    foot = `${SCN.secondary('Take the hit', 'Life 3 → 2')}${SCN.primary('Counter +3000', 'survive · 8000 vs 7000', 'Enter')}`;
     s.mid.battle = 'Counter';
   }
   if (st === 'block') {
@@ -110,6 +110,13 @@ WF.mountBoard((st) => {
       <div class="lane"><span class="ln">Block</span><div class="opts">${blockOpts}</div></div>
       <div class="lane" style="border-bottom:0"><span class="ln">Counter</span><div class="opts">${ctrOpts}</div></div>
       <div class="lanehd" style="margin-top:6px"><span class="subtle" style="font-size:12px">Click lit hand cards to stage · ties go to the attacker</span><span class="grow"></span>${clear}</div></div>`;
+  if (st === 'preview') {
+    // Focus on Buckin opens its preview at the dock's alternate position (board top-left): never over the tall panel (UX-V1)
+    buckin.st = ['legal', 'wf-focus'];
+    s.extra = (g) => SCN.dock(g, { col: 'blue', name: 'Buckin', id: 'OP08-051 · Character · Blue · Rocks Pirates',
+      stats: '<div class="row" style="justify-content:space-between"><span class="muted">Cost</span><b>1</b></div><div class="row" style="justify-content:space-between"><span class="muted">Power</span><b>2000</b></div><div class="row" style="justify-content:space-between"><span class="muted">Counter</span><b>+1000</b></div>',
+      text: '<p style="margin:0"><b>[Counter] +1000.</b> In the Counter step, trash it from your hand: +1000 to your Leader or a Character for this battle.</p>' }, true);
+  }
   s.decision = {
     title: 'Defend your Leader · Kaido attacks',
     body: SCN.battle({ att: { name: 'Kaido <span class="subtle">(their Leader)</span>', num: '7000', bd: '5000 + 2000 DON!!' }, def, res, post: note + lanes }),

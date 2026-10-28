@@ -30,7 +30,7 @@ const roomy = WF.isRoomy();
 const D = [
   ['phone', 390, 844, 'Phone, portrait (390 × 844), no game on this phone. Rotating would not help: landscape is below the 968 × 590 floor, so it says so.'],
   ['phone&saved', 844, 390, 'Phone, landscape (844 × 390), with a game saved in this browser: it offers an export to continue on a computer.'],
-  ['tablet&saved', 820, 1180, 'iPad, portrait (820 × 1180), with a game in progress. Landscape meets the floor, so it asks you to rotate.'],
+  ['tablet&saved', 820, 1180, 'iPad, portrait (820 × 1180), with a game in progress. No rotate gate (C14): "Continue in portrait" until the stacked board ships (board.md §6.4).'],
 ];
 const H = roomy ? 760 : 470, MAXK = roomy ? 0.8 : 0.55;
 document.getElementById('devs').innerHTML = D.map(([m, w, h, c]) => { const k = Math.min(MAXK, H / h); return `<div class="dev"><div class="frame" style="width:${w * k + 20}px;height:${h * k + 20}px"><iframe title="${c}" src="17-phone.html?mode=${m}" width="${w}" height="${h}" style="transform:scale(${k})"></iframe></div><p class="cap" style="max-width:${Math.max(220, w * k)}px">${c}</p></div>`; }).join('');

@@ -9,6 +9,8 @@
 <style>
   .mwrap { overflow: auto; border: 1px solid var(--color-line); border-radius: var(--radius-3); position: relative; max-height: calc(100vh - 56px - 41px - 120px); }
   table.mu { border-collapse: separate; border-spacing: 0; font-size: 12px; }
+  /* A focused cell scrolls clear of the sticky row and column headers (WCAG 2.4.11, UX-V1 sweep) */
+  .mwrap { scroll-padding-left: 190px; scroll-padding-top: 56px; }
   table.mu th, table.mu td { border-right: 1px solid var(--color-line); border-bottom: 1px solid var(--color-line); padding: 0; }
   table.mu thead th { position: sticky; top: 0; z-index: 3; background: var(--color-surface-2); height: 52px; min-width: 78px; font-weight: 600; vertical-align: bottom; padding: 4px; line-height: 14px; }
   table.mu tbody th { position: sticky; left: 0; z-index: 2; background: var(--color-surface-2); text-align: left; padding: 0 8px; white-space: nowrap; font-weight: 600; height: 34px; }
