@@ -2,6 +2,22 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-10-28 — Rulings adopted from Track F
+
+Context: Track F read all 46 official Q&A PDFs, CR v1.2.1 (still the newest), the Rule Manual, the tournament manual and the floor rules, and wrote 49 rulings (`docs/research/rulings.md`). Decision:
+- The open questions are closed as in its section J.
+- Permanent effects apply in the layer order shown by the OP10-042 Q&As (D-3; ARCHITECTURE §2.5).
+- "Until the end of your opponent's next End Phase" is a duration, and every modifier records its creation turn (D-2; merged with Track E's E-D2 names).
+- "Cannot be K.O.'d" Characters stay legal targets for K.O. effects and costs (D-4).
+- Each ruling becomes `engine/test/rulings/RL-xx.test.ts` (D-5).
+
+The rules digest is corrected on three points:
+- OP05-022 is a Leader with [Blocker];
+- an effect that trashes a Character is not a K.O.;
+- the CR and the OP13-079 Q&A conflict on the order of start-of-game effects.
+
+Alternative rejected: an `order` decision for permanent effects (the Q&As fix the order).
+
 ## 2026-10-28 — Effect DSL accepted as specified by Track E
 
 Context: Track E tokenized 2,516 cards with text. 97.7% of clauses were tagged, and every one of the 182 meta cards maps to a vocabulary of 28 effect primitives, 12 costs, 17 timings, 10 condition forms and one replacement shape. Its proposed decisions E-D1 to E-D11 (`docs/research/effect-dsl.md` §8) are accepted:

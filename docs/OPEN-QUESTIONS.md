@@ -3,29 +3,20 @@
 Unresolved ambiguities with the current best answer. Remove an entry when it is settled and the decision is logged in DECISIONS.md.
 
 
-## Rules (from Track A; full reasoning in docs/research/rules-digest.md "Open questions")
+## Rules (from Tracks A and F; answers and sources in docs/research/rulings.md section J)
 
-- R1. Cost payment order when playing a 6th Character. Best answer: reveal → pay → trash 1 → place. Track F to confirm.
-- R2. Does the 5-Character trash procedure apply to effect-played Characters? Best answer: yes (CR 3-7-3, 3-7-6). Track F to confirm.
-- R3. Effect damage ≥2 when Life runs out partway. Best answer: each point is a separate damage event, so a point taken at 0 Life defeats; battle damage (Double Attack) is fixed at determination. Track F to confirm.
-- R4. Simultaneous loss result. Best answer: store `bothLost`, show as a draw; optional tournament setting where the turn player loses (TRM §5.2).
-- R5. Rule-processing granularity for simultaneous actions. Best answer: check after each player's atomic action (turn player first).
-- R6. Replacement effects without "may" are mandatory. Best answer: mandatory unless worded "may/can".
-- R7. [DON!! xX] is a plain state check (≥ X), valid on either turn unless also [Your Turn].
-- R8. [Trigger] does not pay the card's printed cost.
-- R9. A Leader with [Blocker] could block under CR wording; not relevant to current cards.
-- R10. CR 6-5-5-1 "cost area" is a typo for Character area.
-- R11. Stage is not a DON!! −X source (CR 8-3-1-6 over the Q&A).
-- R12. [On Your Opponent's Attack] activates before the end-of-Attack-Step check (CR 7-1-1-3/4).
-- R14. CR 8-1-3-3-5 lets the turn player choose the order of interacting permanent effects. Best answer: canonical layers (set-base, set-to-0, ± modifiers, grants and removals, conditions), turn player first, in timestamp order; it becomes an `order` decision only if a real card interaction makes the order matter. Track F to look for rulings.
+Settled by Track F from official sources: R1 (reveal → pay → trash 1 → place), R2 (effect-plays into a full area use the same trash procedure), R4, R5, R6, R7, R8, R9 (a Leader can block: OP05-022), R10, R11 (moot), R12, R14 (permanent-effect layering), S3, S4, B4. The engine encodes each as `engine/test/rulings/RL-xx.test.ts`.
+
+- R3 / Q-T3. Effect damage of 2 or more when Life runs out partway. No card and no ruling exist yet. Best answer: each point is separate, so a point taken at 0 Life defeats.
 - R13. Tournament procedure (cuts, time limits) is not enforced in v1.
+- Q-T1. Order of "at the start of the game" effects: CR 5-2-1-5-1 says the chooser goes first; the QA-OP13 entry for OP13-079 says the player going first. Best answer: follow the CR, and tag the test `@ruling-conflict`.
+- Q-T2. OP13-001 Luffy's +2000 per rested DON!!: one recipient, or a choice per DON!!? Best answer: one recipient.
+- Q-T4. OP15-058 Enel's "your second turn". Best answer: the owner's own second turn.
 
 ## Strategy (from Track D part 2; detail in docs/research/strategy-concepts.md "Open questions")
 
 - S1. TCGplayer "How to Swing for Lethal" and a Blue-Green Luffy guide were read only as search snippets (pages rendered without text). Best answer: do not use their claims as coach content until a page is read in full; coach lethal math rests on the CR and on freely readable sources allowed by robots.txt (onepiece.gg is excluded; see the 2026-10-28 robots decision).
 - S2. Paid Metafy frameworks ("2K Rule", "Power Staircase", life thresholds). Best answer: do not buy or cite paywalled content; the coach cites only freely readable sources (logged in DECISIONS.md).
-- S3. Double Attack at 1 Life does not win (CR 7-1-4-1-1). Track F to confirm with an official ruling.
-- S4. DON!! −X returned DON!! re-enters through later DON!! Phases, within the 10-card cap. Track F to confirm.
 - S5. No sourced first-vs-second win rates. Best answer: compute from our own AI self-play later; say so in the coach rather than quote a number.
 - S6. Counter-density targets (median 33 counter cards, about 9 +2000s per the Shonen TCG sample). Verify against the Track D lists.
 - S7. Current examples of DON!!-return and Blocker-resting cards. Track E vocabulary to list them.
@@ -58,7 +49,6 @@ Unresolved ambiguities with the current best answer. Remove an entry when it is 
 - B1. The card text originates with Bandai whichever intermediary supplies it. Best answer: PROMPT.md's posture holds (factual game data, cited, no art committed, takedown-ready), sourced from optcgapi.com, which grants use. The owner can overrule this.
 - B2. Courtesy contact with optcgapi's maintainer about hotlinking images and the diff errors. Best answer: yes; the owner does it (outward-facing).
 - B3. The arjunkai image proxy needs its maintainer's approval. Best answer: disabled until approved; request only if optcgapi images prove unreliable.
-- B4. Block varies by printing, and OP15-096 has no block on the official list (its image shows 4). Best answer: newest printing's block from `standard.json` plus exceptions; otherwise legality is "unknown". Track F to confirm the per-printing rule.
 - B5. EB-05 appears in sources before its 2026-10-30 English release. Best answer: import it when optcgapi has it, with legality from the release date plus the product's stated delay.
 - B6. Sign-repair heuristic ("N power/cost" given to an opponent's card with no sign means −N). Best answer: apply it, record each repair in `textFixes`, and verify by hand when the card is scripted. Revisit if the diff report finds a false repair.
 

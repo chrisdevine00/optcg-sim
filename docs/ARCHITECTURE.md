@@ -56,7 +56,7 @@ type Step = { state: GameState; events: GameEvent[] }
 - **Last-known information.** When a card leaves the field, the event carries a snapshot of its derived values at that moment: power, cost, types, given DON!! count, and the cause (battle or effect, whose effect). Effects such as "if the K.O.'d Character had 6000 power or more" and "K.O.'d by your opponent's effect" read the snapshot.
 - **Zones per player:** `deck`, `hand`, `life`, `leader`, `characters` (≤5), `stage` (≤1), `trash`, `donDeck`, `costArea`, plus a shared `resolving` slot for a Trigger card that is in no area (CR 10-1-5-3).
 - **Turn:** `turnNumber`, `activePlayer`, `firstPlayer`, `phase`, `battle` (`null` or `{ attacker, target, step, blockerUsed, ... }`).
-- **Modifiers:** `{ id, source, target, kind, amount, duration }`. `duration` is `battle | untilEndOfTurn | duringThisTurn | untilStartOfYourNextTurn(p) | untilEndOfOpponentsNextTurn(p) | whileSourceOnField` (the last two added from Track E, `effect-dsl.md` E-D2). Each expires at its exact CR sub-step (digest items 67, 72, 97).
+- **Modifiers:** `{ id, source, target, kind, amount, duration }`. `duration` is `battle | untilEndOfTurn | duringThisTurn | untilStartOfYourNextTurn(p) | untilEndOfOpponentsNextTurn(p) | whileSourceOnField` (the last two added from Track E, `effect-dsl.md` E-D2, and confirmed by Track F, `rulings.md` D-2). `untilEndOfOpponentsNextTurn` ends at step 6-6-1-2 (2) of the opponent's next End Phase. Every modifier records the turn number it was created in, so "until end of turn" created during the opponent's turn expires in that turn. Each expires at its exact CR sub-step (digest items 67, 72, 97).
 - **Effect bookkeeping:** `oncePerTurnUsed`, `pendingTriggers` per player (CR 8-6), `resolution` (2.4), `replacementsApplied` (CR 8-1-3-4-3).
 - **Setup facts:** each player's deck size, DON!! deck size (OP15-058 Enel has 6, CR 5-1-2-4) and leader. The invariants read these; they hard-code nothing.
 - **RNG:** `rng: RngState` (mulberry32, `engine/src/rng.ts`). It drives shuffles, ID allocation and any random choice.
@@ -85,6 +85,7 @@ At every moment exactly one player owes a **decision**, or the game is over.
   - **Canonical order.** Picks for an unordered set must be made in candidate order, so search never explores A-then-B and B-then-A as different branches. The UI still presents a multi-select with a running count and a single commit (Phase 4). It sends the picks in canonical order.
 - **DON!! choices by location class.** DON!! picks are made by class, with counts: cost area active, cost area rested, or given to a specific card. The engine assigns concrete instances deterministically (E-D4).
 - **Costs.** An ability is offered only if all its costs are payable together, and every cost pick is exact (E-D6).
+- **"Cannot be K.O.'d" is not "cannot be chosen".** Such Characters remain legal targets for K.O. effects and K.O. costs, per the official Orlumbus and Hakuba Q&As. The effect simply fails on them (`rulings.md` D-4). The AI may prune those choices.
 - **Move grouping.** Every action carries an `intentId`, so a player-level move groups the engine actions it took. "Give 3 DON!! to Zoro" is three actions, and "play Kaido, choose 2 targets" is three more. Rewind, the game log and the review timeline step by move, not by action.
 - **Auto-skip.** When a decision has exactly one legal action that changes nothing, the session store may apply it automatically: an empty Blocker or Counter window, or a forced pick. The default is to auto-skip; the setting is "always ask". The engine still records the action, so replay stays exact.
 
@@ -110,14 +111,14 @@ Effect scripts (vocabulary from Track E) are data in `cards/effects/`. The engin
 - permanent effects of cards on the field;
 - given DON!!: +1000 each, on the owner's turn only (CR 6-5-5-2).
 
-**Permanent effects.** CR 8-1-3-3-5 lets the turn player choose the order in which permanent effects apply when they affect one another. The engine applies them in canonical layers:
-1. set-base;
-2. set-power-to-0;
-3. ± modifiers;
-4. ability grant and removal;
-5. conditions re-checked.
+**Permanent effects** apply in layers. The order follows three official OP10-042 Usopp Q&As (`rulings.md`, Track F decision D-3, closing R14):
+1. the highest set-base value;
+2. permanent modifiers, the turn player's first, then the non-turn player's;
+3. resolved (one-shot) continuous modifiers;
+4. ability grants and removals;
+5. re-check conditions.
 
-Within a layer, order is the turn player's cards then the non-turn player's, in timestamp order. Iteration repeats to a fixed point with a cap of 8 passes. Hitting the cap logs an anomaly event, and the test suite treats that as a failure. If a real card interaction makes the order matter, it becomes an `order` decision (OPEN-QUESTIONS R14).
+Steps repeat until nothing changes, capped at 8 passes. Hitting the cap logs an anomaly event, and the test suite treats that as a failure.
 
 **Incremental derive.** `derive` is cached per card. A step invalidates only the cards whose inputs it touched, plus the cards that depend on any permanent effect whose source or condition changed. This exists for search throughput (ADR 0008).
 
