@@ -155,3 +155,57 @@ Re-review needs `90-zoom-400-1280`, `95-forced-colors-card-focus`, the Tab count
 **Counts for this re-review:** of the original severity-3 findings, all 4 are verified, and M1-04 is verified for the results page only. New findings: severity 3: 1 (M1-30) · severity 2: 4 · severity 1: 2. No new severity 4.
 
 M1 review: FAIL (open: M1-30, inspector unreadable at 320 CSS px)
+
+## Re-review 2 (2026-10-28, commit `95ba79f`)
+
+### Method
+
+- I rebuilt with `npm run build` and served the bundle with `npm run preview`. The server was stopped afterwards.
+- I measured with my own harness, `.cache/m1-review/r3.mjs`, plus a chip-overlap probe, `chip.mjs`.
+- The inspector was measured at 320×256, 320×180, 375×667, 480×270, 560×315, 561×400, 640×360, 800×450, 1280×720 and 1920×1080, using OP05-119 (two paragraphs of text) and OP15-092 (the longest text that has a repair).
+- axe-core was run with the same tag set as before.
+- Screenshots are `.cache/m1-review/r3-*.png`, and the log is `r3-log.json`.
+- Changes to `engine/` were not in scope.
+
+### M1-30: inspector reflow — **verified**
+
+| Viewport | Columns | Overflow (scrollWidth / clientWidth) | Header height / dialog height | Card text column |
+|---|---|---|---|---|
+| 320×256 | one, 278 px | 302 / 302: none | 65 / 240 = **0.27**, not sticky | 278 px wide, readable (`r3-30-insp-320x256-*.png`) |
+| 320×180 | one, 278 px | 302 / 302: none | 65 / 164 = **0.40**, not sticky | 278 px wide, readable (`r3-30-insp-320x180-text.png`) |
+| 375×667 | one | none | 0.08 | 333 px |
+| 480×270 / 560×315 | one | none | 0.21 / 0.18 | 438 / 518 px |
+| 561×400 / 640×360 / 800×450 | two | none | 0.17 / 0.19 / 0.15 (sticky) | 233 / 308 / 458 px |
+| 1280×720 / 1920×1080 | two | none | 0.11 / 0.10 | 586 / 666 px |
+
+- The longest card text (OP15-092) reads in full at 320×256, down to the provenance links (`r3-30-long-320-text.png`, `-bottom.png`).
+- With focus in the dialog, the arrow keys scroll it (scrollTop 0 → 119).
+- axe reports 0 violations at 320×256 and at 320×180.
+
+### Spot checks: M1-31 to M1-36
+
+| ID | Result | Measurement |
+|---|---|---|
+| M1-31 | Verified | Every way of closing returns focus to a card, never to `<body>`: Back after a keyboard open (focus goes to the opener, idx 1, and `:focus-visible` holds), Back after a mouse open (the opener, idx 3), Escape on a deep link from another set (result 0), and Escape at every inspector size. Forward reopens the inspector. |
+| M1-32 | Verified, but it causes M1-37 | The chip is now in the art window's bottom-right corner (x 0.37–0.98, y 0.45–0.57 of the face) and no longer covers faces (`r3-32-rotated.png`). |
+| M1-33 | Verified | A visible label, "Search cards", is 89×20 px and not hidden (`r3-sweep-default-1280.png`, `r3-34-320-open.png`). |
+| M1-34 | Verified | At 640 and 320, pressing Enter on "Filters" puts focus on the Set select, which is in view below the button. Tab then moves through the colours in visual order, and "Show 20 results" returns focus to result 0. No horizontal scroll, and axe reports 0 violations. |
+| M1-35 | Verified | The first results for "Zoro" are three Roronoa Zoro Leaders, then the Characters. "Luffy", "Nami" and "Kaido" likewise start with their Leaders and then Characters of that name. |
+| M1-36 | Verified | No printed frame shows above the power plate (`r3-36-tile-macro.png`). |
+
+### Sweep
+
+- **1280 and 1920:** `/` then ArrowDown reaches result 0, Enter opens the inspector, and Escape returns focus to result 0. The forced-colours ring is a solid 3 px outline.
+- **axe:** 0 violations on the default view, search, the inspector, and the text fallback, at both sizes.
+- **New severity 3 or 4:** none.
+
+### New findings
+
+| ID | Sev | Principle / WCAG | Screen, state, screenshot | Problem | Recommended fix |
+|---|---|---|---|---|---|
+| M1-37 | 2 | Visual system §9 check 3 (numbers are never truncated); P1 | 1280×720 compact tiles, any banned or rotated card with a Counter: `r3-32-counter-chip-1280.png`, `r3-32-rotated.png` | The relocated chip (z 3) overlaps the Counter plate (z 2) by **5.4 px**, so "+2000" reads as "+200(" (26 of 42 visible tiles in the Rotated filter). At 1920 the gap is 21 px, so there is no overlap. The value stays correct in the accessible name and the inspector. This regression came from the M1-32 fix. | At compact density, use an icon-only chip (⟲ or ⛔, with the word in `title` and the accessible name), or stack the chip above the Counter plate. Add a test that no chip intersects any plate. |
+| M1-38 | 1 | WCAG 2.4.11 Focus not obscured (minimum) | Inspector at 561–640 px wide (two-column, sticky header) | When content is scrolled into view programmatically, the sticky header hides the first line of card text (text top at 29–67 px, header bottom at 80–82 px). Manual scrolling is unaffected. | Add `scroll-padding-top` equal to the header height on the dialog. |
+
+**Counts for re-review 2:** M1-30 verified. M1-31 to M1-36: 6 of 6 verified. New findings: severity 3 or 4: 0 · severity 2: 1 · severity 1: 1.
+
+M1 review: PASS
