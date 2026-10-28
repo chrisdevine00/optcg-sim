@@ -11,7 +11,7 @@
 | --- | --- | --- |
 | 1 Research | docs/research/rules-digest.md, data-sources.md, competitive-teardown.md, meta-landscape.md, strategy-concepts.md | **Gated 2026-10-28** (all five deliverables) |
 | 2 Plan | docs/PLAN.md, docs/ARCHITECTURE.md, docs/adr/ | **Gated 2026-10-28** (revision 2 after two reviews; see docs/plan-review-1.md) |
-| 3 Deep research | docs/research/effect-dsl.md, rulings.md; docs/content/archetypes/, curriculum.md, glossary.md, sources.md | Not started |
+| 3 Deep research | docs/research/effect-dsl.md, rulings.md; docs/content/archetypes/, curriculum.md, glossary.md, sources.md | In progress: Tracks E, F, G running in parallel |
 | 4 Design | docs/design/principles.md, board.md, flows.md, visual-system.md, learning-ui.md, wireframes/, review-1.md | Not started |
 | 5 Build | M0 through M10 per PROMPT.md | Not started |
 
@@ -34,7 +34,12 @@
 
 ## In progress
 
-Nothing running.
+Three Phase 3 subagents are running in parallel; each writes only its own files:
+- **Track E** → `docs/research/effect-dsl.md` (scratch in `.cache/track-e/`)
+- **Track F** → `docs/research/rulings.md` (scratch in `.cache/track-f/`)
+- **Track G** → `docs/content/archetypes/*.md`, `curriculum.md`, `glossary.md`, `sources.md`, plus a concept-slug table at the top of `strategy-concepts.md` (scratch in `.cache/track-g/`)
+
+If they are interrupted, re-launch each with the same brief, and check its files for finished sections first. Stage only the files of tracks that have reported.
 
 ## Next
 
