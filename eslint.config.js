@@ -23,6 +23,7 @@ export default tseslint.config(
       'test-results/**',
       'docs/**',
       '.cache/**',
+      '.claude/**',
     ],
   },
   js.configs.recommended,

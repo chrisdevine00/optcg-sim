@@ -8,3 +8,5 @@ docs
 PROMPT.md
 *.md
 package-lock.json
+.claude
+.cache
