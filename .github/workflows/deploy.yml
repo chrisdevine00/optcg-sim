@@ -6,11 +6,19 @@ on:
     types: [completed]
     branches: [main]
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
 jobs:
   deploy:
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -19,12 +27,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - name: Publish app/dist to gh-pages
-        run: |
-          cd app/dist
-          cp index.html 404.html
-          touch .nojekyll
-          git init -q -b gh-pages
-          git add -A
-          git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -qm "deploy ${GITHUB_SHA}"
-          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" gh-pages
+      - run: cp app/dist/index.html app/dist/404.html && touch app/dist/.nojekyll
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: app/dist
+      - id: deployment
+        uses: actions/deploy-pages@v4

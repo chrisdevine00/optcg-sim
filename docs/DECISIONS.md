@@ -10,9 +10,9 @@ Context: scaffold needs a type checker that ESLint understands. TypeScript 7.0 (
 
 Context: the UX teardown and wireframe reviews need screenshots, and screenshots of other simulators show Bandai card art. Decision: such screenshots live in `docs/research/teardown-shots/` and `docs/design/wireframes/shots/`, both gitignored; documents describe them in text and refer to filenames. Alternative rejected: committing cropped or blurred screenshots (still risky and low value).
 
-## 2026-10-28 — GitHub Pages via a gh-pages branch, deploy after green CI
+## 2026-10-28 — GitHub Pages via the Actions artifact flow, deploy after green CI
 
-Context: PROMPT.md default hosting. Decision: `deploy.yml` builds `app/dist` and force-pushes it to `gh-pages` after the CI workflow succeeds on `main`; Vite `base` is `/optcg-sim/` and `404.html` is a copy of `index.html`. Alternative rejected: `actions/deploy-pages` artifact flow (equally fine, but the prompt names a branch).
+Context: PROMPT.md default hosting named a gh-pages branch, but the owner made the repo public and enabled Pages with the "GitHub Actions" source. Decision: `deploy.yml` builds `app/dist`, uploads it with `actions/upload-pages-artifact`, and publishes with `actions/deploy-pages` after CI succeeds on `main`; Vite `base` is `/optcg-sim/`; `404.html` is a copy of `index.html`. URL: https://chrisdevine00.github.io/optcg-sim/. Alternative rejected: pushing to a gh-pages branch (would require changing the owner's Pages setting). The stale `gh-pages` branch from the first run is deleted.
 
 ## 2026-10-23 — Defaults accepted from PROMPT.md
 
