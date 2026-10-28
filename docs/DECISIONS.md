@@ -2,6 +2,18 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-10-28 — M1 card data decisions
+
+Context: building `cards:update` and verifying the 182 meta cards raised five choices.
+
+1. **Blocks follow the printed icons, not a formula.** topics/013.php implies four boosters per block, but official pages and Limitless show OP-13 to OP-15 as block 4 and OP-16 and OP-17 as block 5. `standard.json` uses the printed icons and lists the 9 cards printed with block X. No source gives a block for 9 starter products or for most promos, so 185 cards show legality "unknown" in the browser. The deck builder will say so rather than guess.
+2. **Type vocabulary addendum.** 73 type names never appear alone in optcgapi, so they cannot be learned from it. They live in a cited addendum (official series page entries or Limitless pages). It is a list of names, not card data.
+3. **Disagreement reads.** Disagreements between optcgapi and Limitless were settled one card at a time: 14 meta cards and 7 non-meta cards that blocked the run. Where a cached copy of the official page existed from the Track B or Track F research fetch, it was used instead of a fresh fetch. Only two fresh official pages were read (OP-01, OP-11). Each correction is an override with its source URL. This keeps to ADR 0007: the pipeline itself never fetches the official site.
+4. **Set data loads lazily.** Set JSON is bundled as lazy chunks through `import.meta.glob` (`@optcg/cards/browser` entry), instead of copying the files and fetching them at runtime.
+5. **Browser-only keyword filter.** The card browser's keyword filter matches card text for browsing only. Gameplay keywords come only from verified overrides (E-D7).
+
+Alternatives rejected: a block formula (wrong for OP-16); failing the run on about 90 multi-type strings; fresh bulk fetches of the official list.
+
 ## 2026-10-28 — M0: tokens in the app, fonts self-hosted, contrast enforced in CI
 
 Context: M0 needs the design tokens in the app, self-hosted fonts within the visual-system budget (about 70 KB Inter, about 40 KB Fraunces, Latin), and a contrast check that fails CI. Decision:
