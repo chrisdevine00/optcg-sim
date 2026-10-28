@@ -1077,11 +1077,11 @@
    "legality": {
     "standard": {
      "status": "banned",
-     "reason": "banned from 2026-10-12"
+     "reason": "since 2026-10-12"
     },
     "extra": {
      "status": "banned",
-     "reason": "banned from 2026-10-12"
+     "reason": "since 2026-10-12"
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-020/",

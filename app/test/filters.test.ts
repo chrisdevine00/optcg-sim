@@ -5,6 +5,9 @@ import {
   allTypes,
   emptyFilters,
   filterCards,
+  filtersFromQuery,
+  filtersToQuery,
+  matchRank,
   matches,
   setFromQuery,
 } from '../src/cards/filters.ts';
@@ -53,7 +56,37 @@ describe('card browser filters', () => {
     const ids = run({}).map((c) => c.id);
     expect(ids[0]).toBe('OP01-001');
     const byPower = run({ sort: 'power', categories: ['Character'] });
-    expect(byPower[0]!.power).toBeGreaterThanOrEqual(byPower.at(-1)!.power!);
+    expect(byPower[0]!.power).toBeLessThanOrEqual(byPower.at(-1)!.power!);
+    const desc = run({ sort: 'power', categories: ['Character'], descending: true });
+    expect(desc[0]!.power).toBeGreaterThanOrEqual(desc.at(-1)!.power!);
+    // Cost sorts put Leaders (no cost) last in both directions (M1-29).
+    expect(run({ sort: 'cost' }).at(-1)!.category).toBe('Leader');
+    expect(run({ sort: 'cost', descending: true }).at(-1)!.category).toBe('Leader');
+  });
+
+  it('ranks name matches above text mentions (M1-07)', () => {
+    const nami = run({ query: 'Nami' });
+    expect(nami[0]!.name).toBe('Nami');
+    const ranks = run({ query: 'Rocks' }).map((c) => matchRank(c, 'Rocks'));
+    expect(ranks).toEqual([...ranks].sort((a, b) => a - b));
+    expect(ranks.at(-1)).toBeGreaterThan(ranks[0]!);
+    const xebec = run({ query: 'xebec' });
+    expect(xebec[0]!.name).toMatch(/Xebec/);
+  });
+
+  it('round-trips filters through the query string (M1-13)', () => {
+    const f = {
+      ...emptyFilters('OP-17'),
+      query: 'luffy',
+      colors: ['Red' as const],
+      cost: '3' as const,
+      verifiedOnly: true,
+      sort: 'power' as const,
+      descending: true,
+    };
+    const back = filtersFromQuery(filtersToQuery(f, 'OP-17'), 'OP-17');
+    expect(back).toEqual({ ...f, setPicked: false });
+    expect(filtersToQuery(emptyFilters('OP-17'), 'OP-17').toString()).toBe('');
   });
 
   it('recognises a card number in the query', () => {

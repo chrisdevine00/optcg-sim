@@ -2359,11 +2359,11 @@
    "legality": {
     "standard": {
      "status": "banned",
-     "reason": "banned from 2025-08-30"
+     "reason": "since 2025-08-30"
     },
     "extra": {
      "status": "banned",
-     "reason": "banned from 2025-08-30"
+     "reason": "since 2025-08-30"
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-040/",

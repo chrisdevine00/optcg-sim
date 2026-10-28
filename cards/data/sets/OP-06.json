@@ -2804,11 +2804,11 @@
    "legality": {
     "standard": {
      "status": "banned",
-     "reason": "banned from 2026-04-01"
+     "reason": "since 2026-04-01"
     },
     "extra": {
      "status": "banned",
-     "reason": "banned from 2026-04-01"
+     "reason": "since 2026-04-01"
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP06-047/",
@@ -5362,11 +5362,11 @@
    "legality": {
     "standard": {
      "status": "banned",
-     "reason": "banned from 2025-04-01"
+     "reason": "since 2025-04-01"
     },
     "extra": {
      "status": "banned",
-     "reason": "banned from 2025-04-01"
+     "reason": "since 2025-04-01"
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP06-086/",
@@ -7350,11 +7350,11 @@
    "legality": {
     "standard": {
      "status": "banned",
-     "reason": "banned from 2024-06-21"
+     "reason": "since 2024-06-21"
     },
     "extra": {
      "status": "banned",
-     "reason": "banned from 2024-06-21"
+     "reason": "since 2024-06-21"
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP06-116/",

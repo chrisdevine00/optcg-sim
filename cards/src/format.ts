@@ -92,7 +92,10 @@ export function standardLegality(id: string, block: Block | null, fmt: StandardF
 
   const ban = fmt.banned.find((b) => b.id === id);
   if (ban)
-    return { status: 'banned', reason: `banned from ${ban.effective ?? 'an undated notice'}` };
+    return {
+      status: 'banned',
+      reason: ban.effective ? `since ${ban.effective}` : 'undated notice',
+    };
   const restricted = fmt.restricted.find((r) => r.id === id);
   if (restricted) return withPairs({ status: 'restricted', limit: restricted.limit });
 
@@ -115,7 +118,10 @@ export function standardLegality(id: string, block: Block | null, fmt: StandardF
 export function extraLegality(id: string, fmt: StandardFormat): Legality {
   const ban = fmt.banned.find((b) => b.id === id);
   if (ban)
-    return { status: 'banned', reason: `banned from ${ban.effective ?? 'an undated notice'}` };
+    return {
+      status: 'banned',
+      reason: ban.effective ? `since ${ban.effective}` : 'undated notice',
+    };
   const pairs = fmt.bannedPairs
     .filter((p) => p.cards.some((c) => c.id === id))
     .map((p) => p.cards.find((c) => c.id !== id)!.id);

@@ -10,9 +10,23 @@ export function App() {
   const path = usePath();
   return (
     <div className="shell">
-      <a className="skip-link" href="#main">
-        Skip to content
-      </a>
+      {path === '/cards' ? (
+        <a
+          className="skip-link"
+          href="#results"
+          onClick={(e) => {
+            // Lands on the grid's one tab stop, past the header and filters (WCAG 2.4.1).
+            e.preventDefault();
+            document.getElementById('results')?.focus();
+          }}
+        >
+          Skip to results
+        </a>
+      ) : (
+        <a className="skip-link" href="#main">
+          Skip to content
+        </a>
+      )}
       <Header />
       {path === '/cards' ? (
         <Suspense fallback={<main className="page" id="main" aria-busy="true" />}>

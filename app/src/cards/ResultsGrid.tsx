@@ -7,6 +7,7 @@ import {
   type KeyboardEvent,
 } from 'react';
 import { automation, type Card } from '@optcg/cards';
+import { SCRIPTED_ANY } from './scripts.ts';
 import { CardFace, cardLabel } from '../art/index.ts';
 
 const GAP_X = 16;
@@ -44,6 +45,9 @@ export function ResultsGrid({ cards, active, onActive, onOpen }: Props) {
   const [size, setSize] = useState({ w: 900, h: 600 });
   const [scrollTop, setScrollTop] = useState(0);
   const [focusWanted, setFocusWanted] = useState(false);
+  // Art waits while the user scrolls fast, so passing tiles don't each hotlink an image (M1-25).
+  const [scrolling, setScrolling] = useState(false);
+  const idle = useRef<number | undefined>(undefined);
   const tileW = useTileWidth();
   const tileH = Math.round((tileW * 88) / 63);
   const rowH = tileH + CAPTION + GAP_Y;
@@ -126,9 +130,21 @@ export function ResultsGrid({ cards, active, onActive, onOpen }: Props) {
     <div
       ref={ref}
       className="results"
+      id="results"
       role="list"
       aria-label={`Cards, ${cards.length} results`}
-      onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}
+      tabIndex={-1}
+      onFocus={(e) => {
+        // The skip link lands here; hand focus to the grid's tab stop.
+        if (e.target === e.currentTarget)
+          e.currentTarget.querySelector<HTMLElement>('[tabindex="0"]')?.focus();
+      }}
+      onScroll={(e) => {
+        setScrollTop(e.currentTarget.scrollTop);
+        setScrolling(true);
+        window.clearTimeout(idle.current);
+        idle.current = window.setTimeout(() => setScrolling(false), 150);
+      }}
       onKeyDown={onKeyDown}
       style={{ ['--card-w' as string]: `${tileW}px` }}
     >
@@ -137,11 +153,10 @@ export function ResultsGrid({ cards, active, onActive, onOpen }: Props) {
           const card = cards[i]!;
           const r = Math.floor(i / cols);
           const c = i % cols;
-          const auto = automation(card);
           const extra = [
-            card.verified ? 'verified' : 'not verified',
-            auto === 'not-automated' ? 'effect not automated' : auto,
-          ];
+            card.verified ? 'in the meta decklists, verified' : '',
+            SCRIPTED_ANY ? automation(card) : '',
+          ].filter(Boolean);
           return (
             <div
               key={card.id}
@@ -156,7 +171,7 @@ export function ResultsGrid({ cards, active, onActive, onOpen }: Props) {
                 className="card-btn"
                 data-index={i}
                 tabIndex={i === active ? 0 : -1}
-                aria-label={cardLabel(card, extra)}
+                title={card.name}
                 aria-haspopup="dialog"
                 onClick={(e) => {
                   onActive(i);
@@ -164,7 +179,10 @@ export function ResultsGrid({ cards, active, onActive, onOpen }: Props) {
                 }}
                 onFocus={() => i !== active && onActive(i)}
               >
-                <CardFace card={card} />
+                {/* The name comes from this text, which starts with the visible card name (WCAG 2.5.3);
+                    the drawn face is aria-hidden. */}
+                <span className="sr-only">{cardLabel(card, extra)}</span>
+                <CardFace card={card} tile load={!scrolling} />
               </button>
               <span className="tile-caption" aria-hidden="true">
                 <span className="num">{card.id}</span>

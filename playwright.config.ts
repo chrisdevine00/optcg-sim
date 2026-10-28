@@ -14,6 +14,10 @@ export default defineConfig({
   },
   projects: [
     { name: '720p', use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 720 } } },
+    {
+      name: '1080p',
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1920, height: 1080 } },
+    },
   ],
   webServer: {
     command: 'npm run build -w @optcg/app && npm run preview',

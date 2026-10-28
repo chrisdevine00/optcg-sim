@@ -19,6 +19,8 @@ export function loadSet(code: string): Promise<SetFile> {
     if (!load) return Promise.reject(new Error(`Unknown set ${code}`));
     p = load();
     cache.set(code, p);
+    // A failed load (offline, or a chunk renamed by a deploy) can be retried.
+    p.catch(() => cache.delete(code));
   }
   return p;
 }
