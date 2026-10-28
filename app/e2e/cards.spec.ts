@@ -232,6 +232,85 @@ test.describe('card browser', () => {
     await expectNoAxeViolations(page);
   });
 
+  // M1-30: the inspector reflows at 320 CSS px; the card text is readable.
+  for (const [w, h] of [
+    [320, 256],
+    [320, 180],
+  ] as const) {
+    test(`inspector reflows at ${w}x${h}`, async ({ page }) => {
+      await serveArt(page);
+      await page.setViewportSize({ width: w, height: h });
+      await page.goto('./cards?set=OP-17&card=OP17-087');
+      const dialog = page.getByRole('dialog', { name: 'Nico Robin' });
+      await expect(dialog).toBeVisible();
+      const m = await dialog.evaluate((d) => {
+        const r = (s: string) => d.querySelector(s)!.getBoundingClientRect();
+        return {
+          scrollWidth: d.scrollWidth,
+          clientWidth: d.clientWidth,
+          dialog: d.getBoundingClientRect(),
+          head: r('.inspector-head'),
+          info: r('.inspector-info'),
+          text: r('.text'),
+          headSticky: getComputedStyle(d.querySelector('.inspector-head')!).position,
+        };
+      });
+      expect(m.scrollWidth).toBeLessThanOrEqual(m.clientWidth);
+      expect(m.dialog.right).toBeLessThanOrEqual(w);
+      expect(m.info.width).toBeGreaterThanOrEqual(250);
+      expect(m.text.width).toBeGreaterThanOrEqual(250);
+      expect(m.headSticky).toBe('static');
+      expect(m.head.height).toBeLessThan(m.dialog.height / 2);
+      const text = dialog.getByLabel('Card text');
+      await text.scrollIntoViewIfNeeded();
+      await expect(text).toBeInViewport();
+      await expect(text).toContainText('−3000 power during this turn');
+      await expectNoAxeViolations(page);
+    });
+  }
+
+  // M1-31: focus never falls to body when the inspector closes.
+  test('focus returns to the card after Back and after closing a deep-linked inspector', async ({
+    page,
+  }) => {
+    await serveArt(page);
+    await page.goto('./cards');
+    await tile(page, 'OP17-003').click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await page.goBack();
+    await expect(page.getByRole('dialog')).toBeHidden();
+    await expect(tile(page, 'OP17-003')).toBeFocused();
+    await page.goto('./cards?set=OP-17&card=OP17-005');
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(tile(page, 'OP17-005')).toBeFocused();
+  });
+
+  // M1-34, M1-33: narrow layout keeps focus and view together; the search has a visible label.
+  test('narrow layout: Filters opens below its button with focus inside, and returns to the results', async ({
+    page,
+  }) => {
+    await serveArt(page);
+    await page.setViewportSize({ width: 640, height: 360 });
+    await page.goto('./cards');
+    await expect(page.getByText('Search cards', { exact: true })).toBeVisible();
+    const toggle = page.getByRole('button', { name: 'Filters' });
+    await toggle.focus();
+    await page.keyboard.press('Enter');
+    const set = page.getByLabel('Set', { exact: true });
+    await expect(set).toBeFocused();
+    await expect(set).toBeInViewport();
+    const order = await page.evaluate(() => {
+      const y = (s: string) => document.querySelector(s)!.getBoundingClientRect().top;
+      return { toggle: y('.filters-toggle'), panel: y('#filters'), grid: y('#results') };
+    });
+    expect(order.panel).toBeGreaterThan(order.toggle);
+    expect(order.grid).toBeGreaterThan(order.panel);
+    await page.getByRole('button', { name: /^Show \d+ results$/ }).click();
+    await expect(page.locator('#filters')).toBeHidden();
+    await expectFocusAt(page, '0');
+  });
+
   test('shows banned and rotated status on tiles', async ({ page }) => {
     await serveArt(page);
     await page.goto('./cards?q=OP14-020');

@@ -70,6 +70,8 @@ describe('card browser filters', () => {
     const ranks = run({ query: 'Rocks' }).map((c) => matchRank(c, 'Rocks'));
     expect(ranks).toEqual([...ranks].sort((a, b) => a - b));
     expect(ranks.at(-1)).toBeGreaterThan(ranks[0]!);
+    // A whole word of the name ranks with a prefix, and Leaders and Characters lead (M1-35).
+    expect(run({ query: 'zoro' })[0]!.name).toBe('Roronoa Zoro');
     const xebec = run({ query: 'xebec' });
     expect(xebec[0]!.name).toMatch(/Xebec/);
   });

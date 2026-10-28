@@ -320,6 +320,13 @@ kbd {
   padding: 0 4px;
   font-size: var(--badge-power-size);
 }
+.face-tile .plate-power {
+  top: 0;
+  right: 0;
+  height: calc(var(--badge-h) + var(--badge-inset));
+  padding: var(--badge-inset) 5px 0;
+  border-radius: 0 0 0 var(--radius-1);
+}
 .plate-counter {
   left: 0;
   top: calc(58% - var(--badge-h) - var(--badge-inset));
@@ -353,13 +360,14 @@ kbd {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-/* Standard status on a tile (M1-10): words plus an icon, on an opaque chip in the art window's middle band. */
+/* Standard status on a tile (M1-10): words plus an icon, on an opaque chip in the art window's bottom-right
+   corner, away from faces in the upper band, clear of the name, and opposite the Counter plate (M1-32). */
 .face-chip {
   position: absolute;
   z-index: 3;
-  left: 50%;
-  top: 29%;
-  transform: translate(-50%, -50%);
+  right: var(--badge-inset);
+  top: calc(58% - var(--badge-inset));
+  transform: translateY(-100%);
   padding: 1px 6px;
   border-radius: var(--radius-1);
   font: var(--weight-semibold) 12px/16px var(--font-ui);
@@ -397,7 +405,17 @@ kbd {
   min-height: 0;
   display: grid;
   grid-template-columns: 280px minmax(0, 1fr);
-  grid-template-areas: 'filters results';
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-areas:
+    'filters head'
+    'filters results';
+}
+.results-head {
+  grid-area: head;
+  min-width: 0;
+}
+.filters-done {
+  display: none;
 }
 .filters {
   grid-area: filters;
@@ -518,7 +536,14 @@ kbd {
 }
 .search {
   flex: 1 1 260px;
-  max-width: 420px;
+  max-width: 460px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.search-label {
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
 }
 .count {
   margin: 0;
@@ -639,8 +664,24 @@ kbd {
   .shell:has(> .browser) {
     height: auto;
   }
+  /* Head (search, Filters button), then the filter panel when open, then the grid: the panel opens
+     directly below its button (M1-34). */
   .browser {
-    display: block;
+    display: flex;
+    flex-direction: column;
+  }
+  .filters-done {
+    display: inline-flex;
+    align-self: flex-start;
+  }
+  .results-head {
+    order: 1;
+  }
+  .filters {
+    order: 2;
+  }
+  .results-pane {
+    order: 3;
   }
   .filters-toggle {
     display: inline-flex;
@@ -651,11 +692,6 @@ kbd {
   }
   .filters:not([data-open='true']) {
     display: none;
-  }
-  /* Filters open above the grid when asked for. */
-  .browser:has(.filters[data-open='true']) {
-    display: flex;
-    flex-direction: column-reverse;
   }
   .results {
     flex: none;
@@ -674,15 +710,6 @@ kbd {
   }
   .page {
     padding: var(--space-6) var(--space-4);
-  }
-  .inspector-body {
-    grid-template-columns: 1fr;
-  }
-  .scan {
-    width: min(240px, 100%);
-  }
-  .inspector-head {
-    flex-wrap: wrap;
   }
 }
 
@@ -718,8 +745,26 @@ kbd {
 .esc-hint {
   color: var(--color-text-subtle);
 }
+.inspector-title {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0 var(--space-3);
+}
+.inspector-foot {
+  position: sticky;
+  bottom: 0;
+  justify-content: flex-end;
+  padding: var(--space-2) var(--space-4);
+  border-top: 1px solid var(--color-line);
+  background: var(--color-surface-2);
+}
 .inspector-head h2 {
   margin: 0;
+  overflow-wrap: break-word;
+  min-width: 0;
   font: var(--weight-display) var(--text-2xl) / var(--leading-2xl) var(--font-display);
 }
 .inspector-body {
@@ -816,6 +861,47 @@ kbd {
 }
 .provenance {
   margin-top: var(--space-3);
+}
+
+/* Inspector at narrow widths and high zoom (M1-30, WCAG 1.4.10): one column, nothing sticky, the whole
+   dialog scrolls, so the card text is always reachable and never squeezed. */
+@media (max-width: 560px) {
+  .inspector {
+    width: calc(100vw - 16px);
+    max-width: none;
+    max-height: calc(100vh - 16px);
+    border-radius: var(--radius-3);
+  }
+  .inspector-head,
+  .inspector-foot {
+    position: static;
+  }
+  .inspector-head {
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+  }
+  .inspector-head h2 {
+    font-size: var(--text-xl);
+    line-height: var(--leading-xl);
+  }
+  .esc-hint {
+    display: none;
+  }
+  .inspector-body {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-3);
+    padding: var(--space-3);
+  }
+  .inspector-art {
+    min-width: 0;
+  }
+  .scan {
+    width: min(200px, 100%);
+  }
+  .inspector-foot {
+    justify-content: space-between;
+    padding: var(--space-2) var(--space-3);
+  }
 }
 
 /* ---------- Roomy density (1920x1080) ---------- */

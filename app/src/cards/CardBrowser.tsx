@@ -61,7 +61,6 @@ export default function CardBrowser() {
   const [active, setActive] = useState(0);
   const [openId, setOpenId] = useState<string | null>(initial.card);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const opener = useRef<HTMLElement | null>(null);
   const search = useRef<HTMLInputElement>(null);
   const art = useArtStatus();
 
@@ -166,6 +165,18 @@ export default function CardBrowser() {
     return () => window.removeEventListener('keydown', onKey);
   }, [openId]);
 
+  /** Focus a card's tile if it is in the results, else the results region; never leave focus on body (M1-31). */
+  const focusCardOrResults = (id: string | null) => {
+    const i = id ? results.findIndex((c) => c.id === id) : -1;
+    if (i >= 0) setActive(i);
+    requestAnimationFrame(() => {
+      const tile =
+        i >= 0 ? document.querySelector<HTMLElement>(`#results [data-index="${i}"]`) : null;
+      (tile ?? document.getElementById('results'))?.focus();
+    });
+  };
+  const focusResultsRegion = () =>
+    requestAnimationFrame(() => document.getElementById('results')?.focus());
   const focusResults = () => {
     const grid = document.getElementById('results');
     if (!grid) return;
@@ -180,27 +191,28 @@ export default function CardBrowser() {
     }
   };
 
-  const open = (card: Card, tile: HTMLElement | null) => {
-    opener.current = tile;
+  const open = (card: Card) => {
     window.history.pushState({ inspector: true }, '', urlFor(card.id));
     setOpenId(card.id);
   };
   const close = () => {
     if (window.history.state?.inspector) window.history.back();
     setOpenId(null);
-    // Focus returns to the card now open, which after Previous/Next may differ from the one clicked.
-    const i = results.findIndex((c) => c.id === openId);
-    if (i < 0) return opener.current?.focus();
-    setActive(i);
-    requestAnimationFrame(() =>
-      document.querySelector<HTMLElement>(`#results [data-index="${i}"]`)?.focus(),
-    );
   };
+  // However the inspector closes (Escape, ✕, backdrop, Back, or a deep link), focus goes to the card that
+  // was open (after Previous/Next it may differ from the one clicked), else the results region (M1-31).
+  const wasOpen = useRef<string | null>(openId);
+  useEffect(() => {
+    const prev = wasOpen.current;
+    wasOpen.current = openId;
+    if (prev && !openId) focusCardOrResults(prev);
+    // focusCardOrResults reads the current results; only the open/closed transition matters here.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openId]);
   const step = (d: 1 | -1) => {
     const next = results[openIndex + d];
     if (!next) return;
     setActive(openIndex + d);
-    opener.current = null;
     setOpenId(next.id);
   };
 
@@ -256,21 +268,21 @@ export default function CardBrowser() {
 
   return (
     <main className="browser" id="main" aria-labelledby="browser-title">
-      <section className="results-pane" aria-labelledby="browser-title">
+      <div className="results-head">
         <div className="results-bar">
           <h1 id="browser-title" className="browser-title">
             Cards
           </h1>
           <div className="search">
-            <label htmlFor="f-search" className="sr-only">
-              Search cards by name, number or text
+            <label htmlFor="f-search" className="search-label">
+              Search cards
             </label>
             <input
               ref={search}
               id="f-search"
               className="input"
               type="search"
-              placeholder="Name, number or text   /"
+              placeholder="Name, number or text"
               value={filters.query}
               aria-keyshortcuts="/"
               aria-describedby="search-scope"
@@ -284,7 +296,12 @@ export default function CardBrowser() {
             className="btn small filters-toggle"
             aria-expanded={filtersOpen}
             aria-controls="filters"
-            onClick={() => setFiltersOpen((o) => !o)}
+            onClick={() => {
+              const opening = !filtersOpen;
+              setFiltersOpen(opening);
+              // The panel opens below this button; focus moves into it so focus and view agree (M1-34).
+              if (opening) requestAnimationFrame(() => document.getElementById('f-set')?.focus());
+            }}
           >
             Filters{chips.length ? ` (${chips.length})` : ''}
           </button>
@@ -350,6 +367,8 @@ export default function CardBrowser() {
             </button>
           </div>
         )}
+      </div>
+      <section className="results-pane" aria-label="Results">
         {pending === 0 && failedHere.length === 0 && results.length === 0 ? (
           <div className="empty" id="results" tabIndex={-1}>
             <p>
@@ -385,7 +404,7 @@ export default function CardBrowser() {
             cards={results}
             active={Math.min(active, Math.max(0, results.length - 1))}
             onActive={setActive}
-            onOpen={(card, tile) => open(card, tile)}
+            onOpen={(card) => open(card)}
           />
         )}
       </section>
@@ -545,6 +564,16 @@ export default function CardBrowser() {
           />
           In meta decklists (verified)
         </label>
+        <button
+          type="button"
+          className="btn small filters-done"
+          onClick={() => {
+            setFiltersOpen(false);
+            focusResultsRegion();
+          }}
+        >
+          Show {results.length} result{results.length === 1 ? '' : 's'}
+        </button>
       </aside>
       {openCard && (
         <Inspector

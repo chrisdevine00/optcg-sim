@@ -153,34 +153,10 @@ export function Inspector({ card, position, onPrev, onNext, onClose }: Props) {
       }}
     >
       <header className="inspector-head">
-        <h2 id="inspector-title">{card.name}</h2>
-        <span className="muted num">{card.id}</span>
-        <span className="spacer" />
-        {position && (
-          <div className="card-nav" role="group" aria-label="Browse results">
-            <button
-              type="button"
-              className="btn small"
-              onClick={onPrev}
-              disabled={!onPrev}
-              aria-keyshortcuts="PageUp"
-            >
-              ◂ Previous
-            </button>
-            <span className="small muted num" aria-live="polite">
-              {position.index + 1} of {position.total}
-            </span>
-            <button
-              type="button"
-              className="btn small"
-              onClick={onNext}
-              disabled={!onNext}
-              aria-keyshortcuts="PageDown"
-            >
-              Next ▸
-            </button>
-          </div>
-        )}
+        <div className="inspector-title">
+          <h2 id="inspector-title">{card.name}</h2>
+          <span className="muted num">{card.id}</span>
+        </div>
         <button
           ref={closeBtn}
           type="button"
@@ -362,6 +338,31 @@ export function Inspector({ card, position, onPrev, onNext, onClose }: Props) {
           </p>
         </div>
       </div>
+      {position && (
+        <footer className="inspector-foot card-nav" role="group" aria-label="Browse results">
+          <button
+            type="button"
+            className="btn small"
+            onClick={onPrev}
+            disabled={!onPrev}
+            aria-keyshortcuts="PageUp"
+          >
+            ◂ Previous
+          </button>
+          <span className="small muted num" aria-live="polite">
+            {position.index + 1} of {position.total}
+          </span>
+          <button
+            type="button"
+            className="btn small"
+            onClick={onNext}
+            disabled={!onNext}
+            aria-keyshortcuts="PageDown"
+          >
+            Next ▸
+          </button>
+        </footer>
+      )}
     </dialog>
   );
 }

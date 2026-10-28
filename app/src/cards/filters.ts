@@ -107,12 +107,16 @@ export function matchRank(c: Card, query: string): number {
   const loose = (s: string) => s.replace(/[^a-z0-9]/g, '');
   if (c.id.toLowerCase() === q.replace(/\s+/g, '')) return 0;
   if (name === q || loose(name) === loose(q)) return 1;
-  if (name.startsWith(q) || loose(name).startsWith(loose(q))) return 2;
-  if (name.split(/[\s.]+/).some((w) => w.startsWith(q))) return 3;
+  // A whole word of the name ranks with a name prefix: "Zoro" finds Roronoa Zoro as well as Zoro-Juurou (M1-35).
+  const words = name.split(/[\s.\-"]+/);
+  if (name.startsWith(q) || loose(name).startsWith(loose(q)) || words.includes(q)) return 2;
+  if (words.some((w) => w.startsWith(q))) return 3;
   if (name.includes(q) || loose(name).includes(loose(q))) return 4;
   if (c.types.some((t) => t.toLowerCase().includes(q))) return 5;
   return 6;
 }
+
+const CATEGORY_RANK: Record<CardCategory, number> = { Leader: 0, Character: 1, Event: 2, Stage: 3 };
 
 /** Cost sorts put cards without a cost (Leaders) last in either direction (M1-29). */
 const cost = (c: Card, desc: boolean) => c.cost ?? (desc ? -Infinity : Infinity);
@@ -127,7 +131,12 @@ export function filterCards(
     setOrder(a.set) - setOrder(b.set) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
   const dir = f.descending ? -1 : 1;
   const key: Record<SortKey, (a: Card, b: Card) => number> = {
-    best: (a, b) => (f.query.trim() ? matchRank(a, f.query) - matchRank(b, f.query) : 0),
+    // Equal matches: Leaders and Characters before Events and Stages, then set and card number.
+    best: (a, b) =>
+      f.query.trim()
+        ? matchRank(a, f.query) - matchRank(b, f.query) ||
+          CATEGORY_RANK[a.category] - CATEGORY_RANK[b.category]
+        : 0,
     id: () => 0,
     cost: (a, b) => (cost(a, f.descending) - cost(b, f.descending)) * dir,
     power: (a, b) => ((a.power ?? -1) - (b.power ?? -1)) * dir,
