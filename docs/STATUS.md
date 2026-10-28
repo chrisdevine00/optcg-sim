@@ -41,8 +41,13 @@
 
 ## In progress
 
-- **Design review 1:** all 50 findings have a disposition. All 11 severity-3 findings were fixed with measured evidence, and the 22 spec conflicts were resolved. New screens: Learn, Progress, History, Study and error states. axe ran 201 times with 0 violations.
-- **Running:** a fresh verification reviewer is re-measuring every severity-3 fix and looking for new problems. It appends §6 "Verification pass" to `docs/design/review-1.md`. If the verdict is PASS, Phase 4 gates; if FAIL, the open items are fixed and verified again. If interrupted, re-launch the verifier with the same brief.
+- **Design review 1:** the 11 original severity-3 fixes are verified by an independent reviewer (`review-1.md` §6). The verification pass found 3 new severity-3 findings, so the gate verdict is FAIL:
+  - UX-V1: the Trigger tray and preview dock overlap the tall defence panel and hide focus;
+  - UX-V2: no defence-panel geometry at 1280×600 or 1024×690;
+  - UX-V3: the lethal-drill answer falls below the fold at 1280.
+
+  There are also 6 severity-2 findings and a bundle of severity-1 items.
+- **Running:** the fixer subagent is fixing V1–V10 and adding dispositions to §6. The verifier then re-checks. If interrupted, re-launch the fixer with "fix the findings in review-1.md §6", and then the verifier.
 
 ## Next
 
