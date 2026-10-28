@@ -2,6 +2,18 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-10-28 — Research automation obeys robots.txt; material gathered against it is not used
+
+Context: SeaKing and DuelVoyager disallow `ClaudeBot`, `anthropic-ai` and `Claude-Web` in robots.txt, and SeaKing also reserves text-and-data-mining rights. The first Track C attempt browsed DuelVoyager and took 62 screenshots before checking. Bandai's Teaching App terms prohibit unapproved external tools. Decision: agents check robots.txt and terms before any automated access and do not automate sites that disallow them; material already gathered against a site's policy is not used (the DuelVoyager observations were removed from `competitive-teardown.md`). Where first-hand observation is needed, the owner does it by hand, and documents mark each section as hands-on or secondhand. Alternatives rejected: generic browser user agents (evades the block); keeping the DuelVoyager material because it was already collected (launders the violation).
+
+## 2026-10-28 — Rules are always enforced; no manual sandbox in v1
+
+Context: Untap.in and Tabletop Simulator are free-form tables that enforce nothing, so a learner's mistakes go unnoticed and become habit (`competitive-teardown.md` §4, §5). Decision: the UI offers only actions from `legalActions`; any manual "fix the board" tool waits for a later debug or puzzle editor. Alternatives rejected: a manual override menu; a toggle between enforced and free play.
+
+## 2026-10-28 — Battle panel and deterministic rewind are MVP features
+
+Context: none of the products studied shows live battle maths, and Untap's rewind needs a vote and reshuffles. Decision: every attack opens a panel with live attacker and defender power, the gap, and the Counters available, updating as Blockers and Counters are chosen. Rewind restores the exact prior state, RNG included, so it cannot be used to fish for a better draw. Alternatives rejected: power shown only on hover; rewind that re-randomizes the deck.
+
 ## 2026-10-28 — Meta archetypes keyed by leader ID, counted from Limitless online events
 
 Context: Track D part 1 needed the 10 to 12 archetypes with the most top-8s in the last 90 days, English format. The Limitless tournament database has no events after 2026-07-26, complete in-person standings for the Season 1 Finals and Season 2 Regionals were not available from any source we may crawl, and onepiece.gg disallows Anthropic agents in robots.txt. Decision: an archetype is identified by its leader card ID. Top-8 counts come from the documented Limitless play API (33 English-legal Standard online events with 24+ players, 2026-07-30 to 2026-10-28), with eras split at the OP17 pre-release and the 2026-10-12 ban. In-person results and opmetagame.com are used only as cross-checks, and "top tier" requires two independent sources. Banned leaders (OP14-020 Mihawk) are kept in an `excluded` array rather than in the archetype set. The 12 archetypes and 36 lists are in `docs/research/meta-lists.json`. Alternatives rejected: scraping blocked sites (violates robots.txt); waiting for Limitless to backfill in-person events (blocks Phase 1 with no date); counting by name or colour (ambiguous: two Enels and three Luffys are in the field).

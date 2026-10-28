@@ -45,3 +45,10 @@ Unresolved ambiguities with the current best answer. Remove an entry when it is 
 - M8. Block-1 legality was checked only for the 10 older cards in the chosen lists. Best answer: the deck validator checks every card against block data and the exception list.
 - M9. EB05 (2026-10-30) and OP18 (2026-11-20) will change the format soon. Best answer: build the archetype guides from these lists now, and let `meta:update` flag lists older than 60 days.
 - M10. opmetagame.com contradicts itself on tiers (/tier-list/ vs /decks/). Best answer: report /tier-list/ values and note the disagreement.
+
+## UX research (from Track C; detail in docs/research/competitive-teardown.md)
+
+- C1. SeaKing, the main baseline, could not be observed (robots.txt disallows Anthropic agents). Best answer: the owner plays one SeaKing game by hand using the checklist in teardown §2 and adds notes before Phase 4 is gated; until then, Phase 4 designs from PROMPT.md's description of SeaKing.
+- C2. DuelVoyager is not studied (same reason). Best answer: out of scope unless the owner fills it in by hand.
+- C3. OPlayTCG and OPTCG Web Sim also claim AI opponents and were not opened. Best answer: check their robots.txt and terms during Phase 4 preparation, and study them only if allowed.
+- C4. Bandai's browser Teaching App was observed only up to its Terms of Use, which prohibit unapproved external tools. Best answer: the owner plays its tutorial by hand if Phase 4 needs more than the official play guide.
