@@ -1,6 +1,6 @@
 # Status
 
-**Phase:** 4 Design (next). Phases 1, 2 and 3 gated 2026-10-28.
+**Phase:** 4 Design (in progress). Phases 1, 2 and 3 gated 2026-10-28.
 **Milestone:** M0 scaffold started (allowed before the Phase 4 gate)
 **Run the app:** `npm install && npm run dev` then open http://localhost:5173/optcg-sim/ (placeholder page only)
 **Deployed:** https://chrisdevine00.github.io/optcg-sim/ (auto-deploys after green CI on `main`)
@@ -12,7 +12,7 @@
 | 1 Research | docs/research/rules-digest.md, data-sources.md, competitive-teardown.md, meta-landscape.md, strategy-concepts.md | **Gated 2026-10-28** (all five deliverables) |
 | 2 Plan | docs/PLAN.md, docs/ARCHITECTURE.md, docs/adr/ | **Gated 2026-10-28** (revision 2 after two reviews; see docs/plan-review-1.md) |
 | 3 Deep research | docs/research/effect-dsl.md, rulings.md; docs/content/archetypes/, curriculum.md, glossary.md, sources.md | **Gated 2026-10-28** (competitive-player review: 20 findings, 0 severity-3 open; see docs/content/review-1.md) |
-| 4 Design | docs/design/principles.md, board.md, flows.md, visual-system.md, learning-ui.md, wireframes/, review-1.md | Not started |
+| 4 Design | docs/design/principles.md, board.md, flows.md, visual-system.md, learning-ui.md, wireframes/, review-1.md | In progress: design documents being written |
 | 5 Build | M0 through M10 per PROMPT.md | Not started |
 
 ## Done
@@ -41,7 +41,12 @@
 
 ## In progress
 
-Nothing running.
+Three Phase 4 design subagents are running in parallel; each writes only its own files in `docs/design/`:
+- **Board and visual system:** `principles.md`, `board.md`, `visual-system.md`, `tokens.css`, `card-face-study.md`
+- **Flows and learning:** `flows.md`, `learning-ui.md`, `explanations.md`
+- **Accessibility and usability:** `accessibility.md`, `usability-plan.md`
+
+After they finish come the HTML wireframes, screenshots at both resolutions, and the UX-director review (`review-1.md`). If interrupted, re-launch each with the same brief, and check its files for finished sections first.
 
 ## Next
 
