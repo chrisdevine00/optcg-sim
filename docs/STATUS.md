@@ -56,14 +56,22 @@
 
 ## In progress
 
-M1 Cards is being built by a subagent, which commits and pushes each green step itself:
-- `cards:update` from optcgapi.com, with normalizers and overrides;
-- stats and types verified for all 182 meta cards (Limitless cross-check; the official site only for disagreements, one page at a time);
-- `standard.json`;
-- the image module and service worker;
-- the `/cards` browser.
+- **M1 built and pushed** (commits 50ab71d, 2793807):
+  - 2,799 cards (5,079 printings) through OP-17, generated from optcgapi.com with repairs;
+  - all 182 meta cards verified, with 189 override files;
+  - `standard.json`;
+  - the image module with a text-card fallback;
+  - the `/cards` browser, at 70.8 KB gzipped initial JS.
 
-If interrupted, check `git log` for its last commit, then re-launch with the M1 brief from PLAN.md and ARCHITECTURE §3, telling it to continue from there.
+  Tests: 67 unit and 8 e2e.
+- **M1 review** (`docs/reviews/m1-review.md`): FAIL, with 4 severity-3 findings:
+  - search is scoped to one set by default without saying so;
+  - 18 Tabs from search to the results;
+  - no focus ring in forced-colours mode;
+  - no reflow at 400% zoom.
+
+  There are also 13 severity-2 and 12 severity-1 findings. Image caching by the service worker is unconfirmed.
+- **Running:** the M1 builder subagent is fixing the review findings. Afterwards the reviewer re-checks, and M1 is done on PASS. If interrupted, re-launch it with "fix the findings in docs/reviews/m1-review.md".
 
 ## Next (slice pass, PLAN.md §1)
 
