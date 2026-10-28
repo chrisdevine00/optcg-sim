@@ -1,0 +1,969 @@
+{
+ "set": {
+  "code": "ST-04",
+  "name": "Starter Deck 4: Animal Kingdom Pirates",
+  "kind": "starter",
+  "cardCount": 17,
+  "block": 1
+ },
+ "cards": [
+  {
+   "id": "ST04-001",
+   "name": "Kaido",
+   "category": "Leader",
+   "colors": [
+    "Purple"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 5,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Animal Kingdom Pirates",
+    "The Four Emperors"
+   ],
+   "rarity": "L",
+   "set": "ST-04",
+   "block": 1,
+   "effectText": "[Activate: Main] [Once Per Turn] DON!! −7 (You may return the specified number of DON!! cards from your field to your DON!! deck.): Trash up to 1 of your opponent's Life cards.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST04-001",
+     "imageUrls": {
+      "full": "ST04-001.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-04",
+     "rarity": "L"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST04-001/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST04-002",
+   "name": "Ulti",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Animal Kingdom Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-04",
+   "block": 1,
+   "effectText": "[On Play] DON!! −1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): Play up to 1 [Page One] card with a cost of 4 or less from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST04-002",
+     "imageUrls": {
+      "full": "ST04-002.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-04",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST04-002/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST04-003",
+   "name": "Kaido",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 9,
+   "power": 10000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Animal Kingdom Pirates",
+    "The Four Emperors"
+   ],
+   "rarity": "SR",
+   "set": "ST-04",
+   "block": 1,
+   "effectText": "[On Play] DON!! −5 (You may return the specified number of DON!! cards from your field to your DON!! deck.): K.O. up to 1 of your opponent's Characters with a cost of 6 or less. This Character gains [Rush] during this turn. (This card can attack on the turn in which it is played.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST04-003",
+     "imageUrls": {
+      "full": "ST04-003.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-04",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "ST04-003_p1",
+     "imageUrls": {
+      "full": "ST04-003_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SR",
+     "label": "Wanted Poster"
+    },
+    {
+     "artworkId": "ST04-003_p4",
+     "imageUrls": {
+      "full": "ST04-003_p4.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "ST04-003_r1",
+     "imageUrls": {
+      "full": "ST04-003_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST04-003/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST04-004",
+   "name": "King",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 6,
+   "power": 7000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Animal Kingdom Pirates"
+   ],
+   "rarity": "SR",
+   "set": "ST-04",
+   "block": 1,
+   "effectText": "[On Play] DON!! −1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): K.O. up to 1 of your opponent's Characters with a cost of 4 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST04-004",
+     "imageUrls": {
+      "full": "ST04-004.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-04",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST04-004/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST04-005",
+   "name": "Queen",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Animal Kingdom Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-04",
+   "block": 1,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.) [On Play] DON!! −1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): Draw 2 cards and trash 1 card from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST04-005",
+     "imageUrls": {
+      "full": "ST04-005.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-04",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "ST04-005_p1",
+     "imageUrls": {
+      "full": "ST04-005_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-08",
+     "rarity": "C",
+     "label": "SP"
+    },
+    {
+     "artworkId": "ST04-005_p3",
+     "imageUrls": {
+      "full": "ST04-005_p3.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "C",
+     "label": "Jolly Roger Foil"
+    },
+    {
+     "artworkId": "ST04-005_p4",
+     "imageUrls": {
+      "full": "ST04-005_p4.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "C",
+     "label": "Full Art"
+    },
+    {
+     "artworkId": "ST04-005_r1",
+     "imageUrls": {
+      "full": "ST04-005_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST04-005/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST04-006",
+   "name": "Sasaki",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "Animal Kingdom Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-04",
+   "block": 1,
+   "effectText": "[On Play] DON!! −1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): Draw 1 card.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST04-006",
+     "imageUrls": {
+      "full": "ST04-006.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-04",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST04-006/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST04-007",
+   "name": "Sheepshead",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 2,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Animal Kingdom Pirates",
+    "SMILE"
+   ],
+   "rarity": "C",
+   "set": "ST-04",
+   "block": 1,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "ST04-007",
+     "imageUrls": {
+      "full": "ST04-007.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-04",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST04-007/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST04-008",
+   "name": "Jack",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Animal Kingdom Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-04",
+   "block": 1,
+   "effectText": "[On Play] You may trash 1 card from your hand: Add up to 1 DON!! card from your DON!! deck and set it as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST04-008",
+     "imageUrls": {
+      "full": "ST04-008.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-04",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST04-008/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST04-009",
+   "name": "Ginrummy",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 1,
+   "power": 3000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Animal Kingdom Pirates",
+    "SMILE"
+   ],
+   "rarity": "C",
+   "set": "ST-04",
+   "block": 1,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "ST04-009",
+     "imageUrls": {
+      "full": "ST04-009.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-04",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST04-009/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST04-010",
+   "name": "Who's.Who",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 3,
+   "power": 3000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Animal Kingdom Pirates",
+    "SMILE"
+   ],
+   "rarity": "C",
+   "set": "ST-04",
+   "block": 1,
+   "effectText": "[On Play] DON!! −1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): K.O. up to 1 of your opponent's Characters with a cost of 3 or less.",
+   "triggerText": "Play this card.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST04-010",
+     "imageUrls": {
+      "full": "ST04-010.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-04",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST04-010/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST04-011",
+   "name": "Black Maria",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 2,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Animal Kingdom Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-04",
+   "block": 1,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST04-011",
+     "imageUrls": {
+      "full": "ST04-011.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-04",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST04-011/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST04-012",
+   "name": "Page One",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 4,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Animal Kingdom Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-04",
+   "block": 1,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "ST04-012",
+     "imageUrls": {
+      "full": "ST04-012.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-04",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST04-012/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST04-013",
+   "name": "X.Drake",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 3,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Animal Kingdom Pirates",
+    "Drake Pirates",
+    "Navy"
+   ],
+   "rarity": "C",
+   "set": "ST-04",
+   "block": 1,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "ST04-013",
+     "imageUrls": {
+      "full": "ST04-013.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-04",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST04-013/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST04-014",
+   "name": "Lead Performer \"Disaster\"",
+   "category": "Event",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 4,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Animal Kingdom Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-04",
+   "block": 1,
+   "effectText": "[Main] Draw 1 card, then add up to 1 DON!! card from your DON!! deck and set it as active.",
+   "triggerText": "Activate this card's [Main] effect.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST04-014",
+     "imageUrls": {
+      "full": "ST04-014.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-04",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST04-014/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST04-015",
+   "name": "Brachio Bomber",
+   "category": "Event",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 6,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Animal Kingdom Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-04",
+   "block": 1,
+   "effectText": "[Main] K.O. up to 1 of your opponent's Characters with a cost of 6 or less, then add up to 1 DON!! card from your DON!! deck and set it as active.",
+   "triggerText": "Add up to 1 DON!! card from your DON!! deck and set it as active.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST04-015",
+     "imageUrls": {
+      "full": "ST04-015.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-04",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST04-015/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST04-016",
+   "name": "Blast Breath",
+   "category": "Event",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Animal Kingdom Pirates",
+    "The Four Emperors"
+   ],
+   "rarity": "C",
+   "set": "ST-04",
+   "block": 1,
+   "effectText": "[Counter] DON!! −1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): Up to 1 of your Leader or Character cards gains +4000 power during this battle.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST04-016",
+     "imageUrls": {
+      "full": "ST04-016.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-04",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "ST04-016_p2",
+     "imageUrls": {
+      "full": "ST04-016_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "C",
+     "label": "Jolly Roger Foil"
+    },
+    {
+     "artworkId": "ST04-016_p3",
+     "imageUrls": {
+      "full": "ST04-016_p3.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "C",
+     "label": "Textured Foil"
+    },
+    {
+     "artworkId": "ST04-016_r1",
+     "imageUrls": {
+      "full": "ST04-016_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST04-016/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST04-017",
+   "name": "Onigashima Island",
+   "category": "Stage",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 3,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Animal Kingdom Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-04",
+   "block": 1,
+   "effectText": "[Activate: Main] You may rest this Stage: If your Leader has the {Animal Kingdom Pirates} type, add up to 1 DON!! card from your DON!! deck and rest it.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST04-017",
+     "imageUrls": {
+      "full": "ST04-017.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-04",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST04-017/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  }
+ ]
+}

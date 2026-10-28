@@ -1,0 +1,70 @@
+{
+ "set": {
+  "code": "PRB-01",
+  "name": "Premium Booster -The Best-",
+  "kind": "premium",
+  "cardCount": 1,
+  "block": 3
+ },
+ "cards": [
+  {
+   "id": "PRB01-001",
+   "name": "Sanji",
+   "category": "Leader",
+   "colors": [
+    "Red"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 5,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Straw Hat Crew"
+   ],
+   "rarity": "L",
+   "set": "PRB-01",
+   "block": 3,
+   "effectText": "[Activate:Main] [Once Per Turn] Up to 1 of your Characters without an [On Play] effect and with a cost of 8 or less gains [Rush] during this turn.(This card can attack on the turn in which it is played.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "PRB01-001",
+     "imageUrls": {
+      "full": "PRB01-001.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "L"
+    },
+    {
+     "artworkId": "PRB01-001_p1",
+     "imageUrls": {
+      "full": "PRB01-001_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "L",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/PRB01-001/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  }
+ ]
+}

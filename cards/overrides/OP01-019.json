@@ -1,0 +1,24 @@
+{
+  "id": "OP01-019",
+  "verified": false,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP01-019",
+      "date": "2026-10-28",
+      "use": "cross-check"
+    },
+    {
+      "url": "https://en.onepiece-cardgame.com/cardlist/?series=569101",
+      "date": "2026-10-28",
+      "use": "disagreement"
+    }
+  ],
+  "fields": {
+    "types": {
+      "value": ["Supernovas", "Barto Club"],
+      "upstream": [],
+      "source": "https://en.onepiece-cardgame.com/cardlist/?series=569101"
+    }
+  },
+  "note": "optcgapi: \"Barto Club Pirates Supernovas\"."
+}

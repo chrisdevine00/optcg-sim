@@ -1,0 +1,26 @@
+{
+  "id": "OP17-048",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP17-048",
+      "date": "2026-10-28",
+      "use": "cross-check"
+    },
+    {
+      "url": "https://en.onepiece-cardgame.com/cardlist/?series=569117",
+      "date": "2026-10-28",
+      "use": "disagreement"
+    }
+  ],
+  "keywords": ["Rush: Character"],
+  "textPatches": [
+    {
+      "field": "effectText",
+      "find": "trash 1 cards with",
+      "replace": "trash 1 card with",
+      "note": "Typo.",
+      "source": "https://en.onepiece-cardgame.com/cardlist/?series=569117"
+    }
+  ]
+}

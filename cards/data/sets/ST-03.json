@@ -1,0 +1,988 @@
+{
+ "set": {
+  "code": "ST-03",
+  "name": "Starter Deck 3: The Seven Warlords of The Sea",
+  "kind": "starter",
+  "cardCount": 17,
+  "block": 1
+ },
+ "cards": [
+  {
+   "id": "ST03-001",
+   "name": "Crocodile",
+   "category": "Leader",
+   "colors": [
+    "Blue"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 5,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Baroque Works",
+    "The Seven Warlords of the Sea"
+   ],
+   "rarity": "L",
+   "set": "ST-03",
+   "block": 1,
+   "effectText": "[Activate: Main] [Once Per Turn] DON!! −4 (You may return the specified number of DON!! cards from your field to your DON!! deck.): Return up to 1 Character with a cost of 5 or less to the owner's hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST03-001",
+     "imageUrls": {
+      "full": "ST03-001.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-03",
+     "rarity": "L"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST03-001/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST03-002",
+   "name": "Edward Weevil",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 3,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "The Seven Warlords of the Sea"
+   ],
+   "rarity": "C",
+   "set": "ST-03",
+   "block": 1,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "ST03-002",
+     "imageUrls": {
+      "full": "ST03-002.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST03-002/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST03-003",
+   "name": "Crocodile",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Baroque Works",
+    "The Seven Warlords of the Sea"
+   ],
+   "rarity": "SR",
+   "set": "ST-03",
+   "block": 1,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.) [DON!! x1] [On Block] Place up to 1 Character with a cost of 2 or less at the bottom of the owner's deck.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST03-003",
+     "imageUrls": {
+      "full": "ST03-003.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-03",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST03-003/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST03-004",
+   "name": "Gecko Moria",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "The Seven Warlords of the Sea",
+    "Thriller Bark Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-03",
+   "block": 1,
+   "effectText": "[On Play] Add up to 1 \"The Seven Warlords of the Sea\" or \"Thriller Bark Pirates\" type Character with a cost of 4 or less than [Gecko Moria] from your trash to your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST03-004",
+     "imageUrls": {
+      "full": "ST03-004.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-03",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "ST03-004_p1",
+     "imageUrls": {
+      "full": "ST03-004_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-08",
+     "rarity": "C",
+     "label": "SP"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST03-004/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST03-005",
+   "name": "Dracule Mihawk",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "The Seven Warlords of the Sea"
+   ],
+   "rarity": "C",
+   "set": "ST-03",
+   "block": 1,
+   "effectText": "[DON!! x1] [When Attacking] Draw 2 cards and trash 2 cards from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST03-005",
+     "imageUrls": {
+      "full": "ST03-005.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-03",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "ST03-005_p4",
+     "imageUrls": {
+      "full": "ST03-005_p4.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "C",
+     "label": "Jolly Roger Foil"
+    },
+    {
+     "artworkId": "ST03-005_p5",
+     "imageUrls": {
+      "full": "ST03-005_p5.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "C",
+     "label": "Full Art"
+    },
+    {
+     "artworkId": "ST03-005_r2",
+     "imageUrls": {
+      "full": "ST03-005_r2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST03-005/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST03-006",
+   "name": "Jinbe",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 2,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Fish-Man",
+    "The Seven Warlords of the Sea",
+    "The Sun Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-03",
+   "block": 1,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "ST03-006",
+     "imageUrls": {
+      "full": "ST03-006.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST03-006/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST03-007",
+   "name": "Sentomaru",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Navy"
+   ],
+   "rarity": "C",
+   "set": "ST-03",
+   "block": 1,
+   "effectText": "[DON!! x1] [Activate: Main] [Once Per Turn] (2) (You may rest the specified number of DON!! cards in your cost area.): Play up to 1 [Pacifista] with a cost of 4 or less from your deck, then shuffle your deck.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST03-007",
+     "imageUrls": {
+      "full": "ST03-007.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST03-007/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST03-008",
+   "name": "Trafalgar Law",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 1,
+   "power": 1000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Heart Pirates",
+    "The Seven Warlords of the Sea"
+   ],
+   "rarity": "C",
+   "set": "ST-03",
+   "block": 1,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST03-008",
+     "imageUrls": {
+      "full": "ST03-008.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-03",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "ST03-008_p6",
+     "imageUrls": {
+      "full": "ST03-008_p6.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "C",
+     "label": "Jolly Roger Foil"
+    },
+    {
+     "artworkId": "ST03-008_r2",
+     "imageUrls": {
+      "full": "ST03-008_r2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST03-008/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST03-009",
+   "name": "Donquixote Doflamingo",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 7,
+   "power": 7000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Donquixote Pirates",
+    "The Seven Warlords of the Sea"
+   ],
+   "rarity": "SR",
+   "set": "ST-03",
+   "block": 1,
+   "effectText": "[On Play] Return up to 1 Character with a cost of 7 or less to the owner's hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST03-009",
+     "imageUrls": {
+      "full": "ST03-009.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-03",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "ST03-009_p1",
+     "imageUrls": {
+      "full": "ST03-009_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SR",
+     "label": "Wanted Poster"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST03-009/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST03-010",
+   "name": "Bartholomew Kuma",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 2,
+   "power": 3000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Revolutionary Army",
+    "The Seven Warlords of the Sea"
+   ],
+   "rarity": "C",
+   "set": "ST-03",
+   "block": 1,
+   "effectText": "[On Play] Look at 3 cards from the top of your deck and return them to the top or bottom of the deck in any order.",
+   "triggerText": "Play this card.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST03-010",
+     "imageUrls": {
+      "full": "ST03-010.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST03-010/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST03-011",
+   "name": "Buggy",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 1,
+   "power": 3000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Buggy's Delivery",
+    "The Seven Warlords of the Sea"
+   ],
+   "rarity": "C",
+   "set": "ST-03",
+   "block": 1,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "ST03-011",
+     "imageUrls": {
+      "full": "ST03-011.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST03-011/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST03-012",
+   "name": "Pacifista",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 4,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Biological Weapon",
+    "Navy"
+   ],
+   "rarity": "C",
+   "set": "ST-03",
+   "block": 1,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "ST03-012",
+     "imageUrls": {
+      "full": "ST03-012.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST03-012/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST03-013",
+   "name": "Boa Hancock",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 3,
+   "power": 1000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Kuja Pirates",
+    "The Seven Warlords of the Sea"
+   ],
+   "rarity": "C",
+   "set": "ST-03",
+   "block": 1,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
+   "triggerText": "Play this card.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST03-013",
+     "imageUrls": {
+      "full": "ST03-013.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-03",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "ST03-013_p2",
+     "imageUrls": {
+      "full": "ST03-013_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "C",
+     "label": "Jolly Roger Foil"
+    },
+    {
+     "artworkId": "ST03-013_p3",
+     "imageUrls": {
+      "full": "ST03-013_p3.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "C",
+     "label": "Full Art"
+    },
+    {
+     "artworkId": "ST03-013_p4",
+     "imageUrls": {
+      "full": "ST03-013_p4.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "C",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "ST03-013_r1",
+     "imageUrls": {
+      "full": "ST03-013_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST03-013/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST03-014",
+   "name": "Marshall.D.Teach",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 4,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Blackbeard Pirates",
+    "The Seven Warlords of the Sea"
+   ],
+   "rarity": "C",
+   "set": "ST-03",
+   "block": 1,
+   "effectText": "[On Play] Return up to 1 Character with a cost of 3 or less to the owner's hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST03-014",
+     "imageUrls": {
+      "full": "ST03-014.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST03-014/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST03-015",
+   "name": "Sables",
+   "category": "Event",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 4,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Baroque Works",
+    "The Seven Warlords of the Sea"
+   ],
+   "rarity": "C",
+   "set": "ST-03",
+   "block": 1,
+   "effectText": "[Main] Return up to 1 Character with a cost of 7 or less to the owner's hand.",
+   "triggerText": "Activate this card's [Main] effect.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST03-015",
+     "imageUrls": {
+      "full": "ST03-015.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST03-015/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST03-016",
+   "name": "Thrust Pad Cannon",
+   "category": "Event",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 2,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Revolutionary Army",
+    "The Seven Warlords of the Sea"
+   ],
+   "rarity": "C",
+   "set": "ST-03",
+   "block": 1,
+   "effectText": "[Counter] Return up to 1 Character with a cost of 3 or less to the owner's hand.",
+   "triggerText": "Activate this card's [Counter] effect.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST03-016",
+     "imageUrls": {
+      "full": "ST03-016.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST03-016/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST03-017",
+   "name": "Love-Love Mellow",
+   "category": "Event",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 2,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Kuja Pirates",
+    "The Seven Warlords of the Sea"
+   ],
+   "rarity": "C",
+   "set": "ST-03",
+   "block": 1,
+   "effectText": "[Counter] Up to 1 of your Leader or Character cards gains +4000 power during this battle. Then, draw 1 card if you have 3 or less cards in your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST03-017",
+     "imageUrls": {
+      "full": "ST03-017.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST03-017/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  }
+ ]
+}

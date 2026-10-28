@@ -1,0 +1,274 @@
+{
+ "set": {
+  "code": "ST-24",
+  "name": "Starter Deck 24: GREEN Jewelry Bonney",
+  "kind": "starter",
+  "cardCount": 5,
+  "block": null
+ },
+ "cards": [
+  {
+   "id": "ST24-001",
+   "name": "Capone\"Gang\"Bege",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 2,
+   "power": 1000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "Firetank Pirates",
+    "Supernovas"
+   ],
+   "rarity": "C",
+   "set": "ST-24",
+   "block": null,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[On Play] If you have 6 or more rested cards, draw 1 card and trash 1 card from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST24-001",
+     "imageUrls": {
+      "full": "ST24-001.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-24",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "unknown",
+     "reason": "block not known"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST24-001/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST24-002",
+   "name": "Kid & Killer",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 2,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash",
+    "Special"
+   ],
+   "types": [
+    "Kid Pirates",
+    "Supernovas"
+   ],
+   "rarity": "SR",
+   "set": "ST-24",
+   "block": null,
+   "effectText": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 \"Supernovas\" type card and add it to your hand. Then, place the rest at the bottom of your deck in any order.\n[On Your Opponent's Attack] You may trash this Character: Set up to 1 of your DON!! cards as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST24-002",
+     "imageUrls": {
+      "full": "ST24-002.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-24",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "unknown",
+     "reason": "block not known"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST24-002/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST24-003",
+   "name": "Basil Hawkins",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 4,
+   "power": 4000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Hawkins Pirates",
+    "Supernovas"
+   ],
+   "rarity": "C",
+   "set": "ST-24",
+   "block": null,
+   "effectText": "[End of Your Turn] Set up to 1 of your DON!! cards as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST24-003",
+     "imageUrls": {
+      "full": "ST24-003.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-24",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "unknown",
+     "reason": "block not known"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST24-003/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST24-004",
+   "name": "Law & Bepo",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 10,
+   "power": 11000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash",
+    "Strike"
+   ],
+   "types": [
+    "Heart Pirates",
+    "Minks",
+    "Supernovas"
+   ],
+   "rarity": "SR",
+   "set": "ST-24",
+   "block": null,
+   "effectText": "[On Play] Rest up to 1 of your opponent's Characters and that Character will not become active in your opponent's next Refresh Phase. Then, if your opponent has 2 or more rested Characters, your Leader gains +2000 power until the end of your opponent's next End Phase.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST24-004",
+     "imageUrls": {
+      "full": "ST24-004.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-24",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "unknown",
+     "reason": "block not known"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST24-004/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST24-005",
+   "name": "X.Drake",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 5,
+   "power": 5000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Drake Pirates",
+    "Navy",
+    "Supernovas"
+   ],
+   "rarity": "C",
+   "set": "ST-24",
+   "block": null,
+   "effectText": "[On Play] If your Leader has the \"Supernovas\" type, rest up to 1 of your opponent's Characters with a cost of 5 or less. Then, set up to 1 of your DON!! cards as active at the end of this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST24-005",
+     "imageUrls": {
+      "full": "ST24-005.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-24",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "ST24-005_r1",
+     "imageUrls": {
+      "full": "ST24-005_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-32",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "unknown",
+     "reason": "block not known"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST24-005/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  }
+ ]
+}

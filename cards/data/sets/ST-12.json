@@ -1,0 +1,953 @@
+{
+ "set": {
+  "code": "ST-12",
+  "name": "Starter Deck 12: Zoro and Sanji",
+  "kind": "starter",
+  "cardCount": 17,
+  "block": 2
+ },
+ "cards": [
+  {
+   "id": "ST12-001",
+   "name": "Roronoa Zoro & Sanji",
+   "category": "Leader",
+   "colors": [
+    "Blue",
+    "Green"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 4,
+   "attributes": [
+    "Slash",
+    "Strike"
+   ],
+   "types": [
+    "Straw Hat Crew"
+   ],
+   "rarity": "L",
+   "set": "ST-12",
+   "block": 2,
+   "effectText": "[DON!! x1][When Attacking][Once Per Turn] You may return 1 of your Characters with a cost of 2 or more to the owner's hand: Set up to 1 of your Characters with 7000 power or less as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST12-001",
+     "imageUrls": {
+      "full": "ST12-001.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-12",
+     "rarity": "L"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST12-001/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST12-002",
+   "name": "Kuina",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 3,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Frost Moon Village"
+   ],
+   "rarity": "C",
+   "set": "ST-12",
+   "block": 2,
+   "effectText": "[Activate:Main] You may rest this Character: Rest up to 1 of your opponent's Characters with a cost of 4 or less.",
+   "triggerText": "Play this card.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST12-002",
+     "imageUrls": {
+      "full": "ST12-002.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-12",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST12-002/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST12-003",
+   "name": "Dracule Mihawk",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "The Seven Warlords of the Sea",
+    "Muggy Kingdom"
+   ],
+   "rarity": "SR",
+   "set": "ST-12",
+   "block": 2,
+   "effectText": "[On Play] If you have 2 or less Characters, play up to 1 [Muggy Kingdom] type or \"Slash\" attribute Character card with a cost of 4 or less other than [Dracule Mihawk] from your hand rested.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST12-003",
+     "imageUrls": {
+      "full": "ST12-003.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-12",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST12-003/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST12-004",
+   "name": "Humandrill",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 3,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Animal",
+    "Muggy Kingdom"
+   ],
+   "rarity": "C",
+   "set": "ST-12",
+   "block": 2,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "ST12-004",
+     "imageUrls": {
+      "full": "ST12-004.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-12",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST12-004/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST12-005",
+   "name": "Perona",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 4,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Thriller Bark Pirates",
+    "Muggy Kingdom"
+   ],
+   "rarity": "C",
+   "set": "ST-12",
+   "block": 2,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "ST12-005",
+     "imageUrls": {
+      "full": "ST12-005.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-12",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "ST12-005_p1",
+     "imageUrls": {
+      "full": "ST12-005_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "C",
+     "label": "Pirate Foil"
+    },
+    {
+     "artworkId": "ST12-005_r1",
+     "imageUrls": {
+      "full": "ST12-005_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "C",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST12-005/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST12-006",
+   "name": "Yosaku & Johnny",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 2,
+   "power": 3000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "East Blue"
+   ],
+   "rarity": "C",
+   "set": "ST-12",
+   "block": 2,
+   "effectText": "[DON!! x1][When Attacking] Choose one: • Rest up to 1 of your opponent's Characters with a cost of 2 or less. • K.O. up to 1 of your opponent's rested Characters with a cost of 2 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST12-006",
+     "imageUrls": {
+      "full": "ST12-006.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-12",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST12-006/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST12-007",
+   "name": "Rika",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 2,
+   "power": 0,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "East Blue"
+   ],
+   "rarity": "C",
+   "set": "ST-12",
+   "block": 2,
+   "effectText": "[On Play] (2) (You may rest the specified number of DON!! cards in your cost area.): If your opponent has 3 or more Life cards, set up to 1 of your \"Slash\" attribute Characters with a cost of 4 or less as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST12-007",
+     "imageUrls": {
+      "full": "ST12-007.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-12",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST12-007/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST12-008",
+   "name": "Roronoa Zoro",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 4,
+   "power": 6000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Straw Hat Crew"
+   ],
+   "rarity": "C",
+   "set": "ST-12",
+   "block": 2,
+   "effectText": "[DON!! x1][When Attacking] Rest up to 1 of your opponent's Characters with a cost of 6 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST12-008",
+     "imageUrls": {
+      "full": "ST12-008.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-12",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST12-008/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST12-009",
+   "name": "Elephant True Bluefin",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 1,
+   "power": 3000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Animal"
+   ],
+   "rarity": "C",
+   "set": "ST-12",
+   "block": 2,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "ST12-009",
+     "imageUrls": {
+      "full": "ST12-009.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-12",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST12-009/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST12-010",
+   "name": "Emporio.Ivankov",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Revolutionary Army",
+    "Impel Down"
+   ],
+   "rarity": "SR",
+   "set": "ST-12",
+   "block": 2,
+   "effectText": "[On Play] Reveal 1 card from the top of your deck and play up to 1 Character card with a cost of 2. Then, place the rest at the top or bottom of your deck. [When Attacking][Once Per Turn] Draw 1 card if you have 6 or less cards in your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST12-010",
+     "imageUrls": {
+      "full": "ST12-010.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-12",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST12-010/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST12-011",
+   "name": "Sanji",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 2,
+   "power": 3000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Straw Hat Crew"
+   ],
+   "rarity": "C",
+   "set": "ST-12",
+   "block": 2,
+   "effectText": "[DON!! x1][When Attacking] If you have 5 or less cards in your hand, this Character gains +2000 power until the start of your next turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST12-011",
+     "imageUrls": {
+      "full": "ST12-011.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-12",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST12-011/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST12-012",
+   "name": "Charlotte Pudding",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 2,
+   "power": 2000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-12",
+   "block": 2,
+   "effectText": "[Activate:Main] Return this Character to the owner's hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST12-012",
+     "imageUrls": {
+      "full": "ST12-012.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-12",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "ST12-012_p1",
+     "imageUrls": {
+      "full": "ST12-012_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C",
+     "label": "SP"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST12-012/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST12-013",
+   "name": "Zeff",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 5,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "East Blue"
+   ],
+   "rarity": "C",
+   "set": "ST-12",
+   "block": 2,
+   "effectText": "[On Play] Look at 3 cards from the top of your deck and place them at the top or bottom of the deck in any order. [When Attacking] Reveal 1 card from the top of your deck and play up to 1 Character card with a cost of 2 rested. Then, place the rest at the top or bottom of your deck.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST12-013",
+     "imageUrls": {
+      "full": "ST12-013.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-12",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST12-013/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST12-014",
+   "name": "Duval",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 2,
+   "power": 1000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "The Flying Fish Riders"
+   ],
+   "rarity": "C",
+   "set": "ST-12",
+   "block": 2,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.) [On Play] Look at 3 cards from the top of your deck and place them at the top or bottom of the deck in any order.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST12-014",
+     "imageUrls": {
+      "full": "ST12-014.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-12",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "ST12-014_p2",
+     "imageUrls": {
+      "full": "ST12-014_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "C",
+     "label": "Jolly Roger Foil"
+    },
+    {
+     "artworkId": "ST12-014_p3",
+     "imageUrls": {
+      "full": "ST12-014_p3.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "C",
+     "label": "Full Art"
+    },
+    {
+     "artworkId": "ST12-014_r1",
+     "imageUrls": {
+      "full": "ST12-014_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST12-014/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST12-015",
+   "name": "Patty & Carne",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 2,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "East Blue"
+   ],
+   "rarity": "C",
+   "set": "ST-12",
+   "block": 2,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "ST12-015",
+     "imageUrls": {
+      "full": "ST12-015.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-12",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST12-015/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST12-016",
+   "name": "Lion Strike",
+   "category": "Event",
+   "colors": [
+    "Green"
+   ],
+   "cost": 2,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Straw Hat Crew"
+   ],
+   "rarity": "C",
+   "set": "ST-12",
+   "block": 2,
+   "effectText": "[Main] / [Counter] Rest up to 1 of your opponent's Leader or Character cards with a cost of 4 or less.",
+   "triggerText": "Activate this card's [Main] effect.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST12-016",
+     "imageUrls": {
+      "full": "ST12-016.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-12",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST12-016/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST12-017",
+   "name": "Plastic Surgery Shot",
+   "category": "Event",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Straw Hat Crew"
+   ],
+   "rarity": "C",
+   "set": "ST-12",
+   "block": 2,
+   "effectText": "[Counter] Up to 1 of your Leader or Character cards gains +2000 power during this battle. Then, reveal 1 card from the top of your deck, play up to 1 Character card with a cost of 2, and place the rest at the top or bottom of your deck.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST12-017",
+     "imageUrls": {
+      "full": "ST12-017.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-12",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "ST12-017_p1",
+     "imageUrls": {
+      "full": "ST12-017_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "C",
+     "label": "Pirate Foil"
+    },
+    {
+     "artworkId": "ST12-017_r1",
+     "imageUrls": {
+      "full": "ST12-017_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "C",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST12-017/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  }
+ ]
+}

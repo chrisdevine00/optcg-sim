@@ -1,0 +1,29 @@
+{
+  "id": "OP17-099",
+  "verified": false,
+  "sources": [
+    {
+      "url": "https://en.onepiece-cardgame.com/cardlist/?series=569117",
+      "date": "2026-10-28",
+      "use": "disagreement"
+    }
+  ],
+  "fields": {
+    "power": {
+      "value": 5000,
+      "upstream": null,
+      "source": "https://en.onepiece-cardgame.com/cardlist/?series=569117"
+    },
+    "types": {
+      "value": ["The Four Emperors", "Big Mom Pirates"],
+      "upstream": [],
+      "source": "https://en.onepiece-cardgame.com/cardlist/?series=569117"
+    },
+    "attributes": {
+      "value": ["Special"],
+      "upstream": [],
+      "source": "https://en.onepiece-cardgame.com/cardlist/?series=569117"
+    }
+  },
+  "note": "Shifted columns on both optcgapi rows (Track B diff rows 33-35)."
+}

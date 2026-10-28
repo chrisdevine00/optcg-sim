@@ -1,0 +1,24 @@
+{
+  "id": "OP01-018",
+  "verified": false,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP01-018",
+      "date": "2026-10-28",
+      "use": "cross-check"
+    },
+    {
+      "url": "https://en.onepiece-cardgame.com/cardlist/?series=569101",
+      "date": "2026-10-28",
+      "use": "disagreement"
+    }
+  ],
+  "fields": {
+    "types": {
+      "value": ["Giant", "New Giant Pirates"],
+      "upstream": [],
+      "source": "https://en.onepiece-cardgame.com/cardlist/?series=569101"
+    }
+  },
+  "note": "optcgapi: \"Giant New Giant Pirate Crew\"."
+}

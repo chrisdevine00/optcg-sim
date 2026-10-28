@@ -1,0 +1,24 @@
+{
+  "id": "OP14-118",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP14-118",
+      "date": "2026-10-28",
+      "use": "cross-check"
+    },
+    {
+      "url": "https://en.onepiece-cardgame.com/cardlist/?series=569114",
+      "date": "2026-10-28",
+      "use": "disagreement"
+    }
+  ],
+  "keywords": [],
+  "fields": {
+    "name": {
+      "value": "You'll Frighten Me... ♡",
+      "upstream": "You'll Frighten Me...",
+      "source": "https://en.onepiece-cardgame.com/cardlist/?series=569114"
+    }
+  }
+}

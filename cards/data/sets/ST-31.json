@@ -1,0 +1,291 @@
+{
+ "set": {
+  "code": "ST-31",
+  "name": "Starter Deck 31: RED Monkey.D.Luffy",
+  "kind": "starter",
+  "cardCount": 5,
+  "block": 5
+ },
+ "cards": [
+  {
+   "id": "ST31-001",
+   "name": "Sanji",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 5,
+   "power": 3000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Straw Hat Crew"
+   ],
+   "rarity": "SR",
+   "set": "ST-31",
+   "block": 5,
+   "effectText": "[DON!! x2] This Character gains [Rush]. (This card can attack on the turn in which it is played.)[On Play] Draw 1 card and play up to 1 {Straw Hat Crew} type Character card with a cost of 5 or less other than [Sanji] from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST31-001",
+     "date": "2026-10-28",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST31-001",
+     "imageUrls": {
+      "full": "ST31-001.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-31",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST31-001/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST31-002",
+   "name": "Jinbe",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Fish-Man",
+    "Straw Hat Crew"
+   ],
+   "rarity": "C",
+   "set": "ST-31",
+   "block": 5,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)[On Play] Draw 1 card and play up to 1 {Straw Hat Crew} type card with a cost of 1 from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST31-002",
+     "imageUrls": {
+      "full": "ST31-002.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-31",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST31-002/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST31-003",
+   "name": "Brook",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 2,
+   "power": 3000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Straw Hat Crew"
+   ],
+   "rarity": "C",
+   "set": "ST-31",
+   "block": 5,
+   "effectText": "[Opponent's Turn] If you have a total of 3 or more given DON!! cards, this Character gains [Blocker] and +3000 power. (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST31-003",
+     "imageUrls": {
+      "full": "ST31-003.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-31",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST31-003/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST31-004",
+   "name": "Monkey.D.Luffy",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 7,
+   "power": 9000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Straw Hat Crew",
+    "The Four Emperors"
+   ],
+   "rarity": "SR",
+   "set": "ST-31",
+   "block": 5,
+   "effectText": "If you have a total of 3 or more given DON!! cards, this Character gains [Rush]. (This card can attack on the turn in which it is played.)[On Play] For every {Straw Hat Crew} type card on your field, give up to 1 of your opponent's Characters −1000 power during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST31-004",
+     "date": "2026-10-28",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "sign",
+     "from": "1000 power",
+     "to": "−1000 power"
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "ST31-004",
+     "imageUrls": {
+      "full": "ST31-004.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-31",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "ST31-004_p1",
+     "imageUrls": {
+      "full": "ST31-004_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-17",
+     "rarity": "SR",
+     "label": "SP"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST31-004/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST31-005",
+   "name": "Thousand Sunny",
+   "category": "Stage",
+   "colors": [
+    "Red"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Straw Hat Crew"
+   ],
+   "rarity": "C",
+   "set": "ST-31",
+   "block": 5,
+   "effectText": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 {Straw Hat Crew} type card and add it to your hand. Then, place the rest at the bottom of your deck in any order.[Activate: Main] You may rest this Stage: Give up to 1 rested DON!! card to 1 of your [Monkey.D.Luffy] cards.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST31-005",
+     "date": "2026-10-28",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST31-005",
+     "imageUrls": {
+      "full": "ST31-005.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-31",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST31-005/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  }
+ ]
+}

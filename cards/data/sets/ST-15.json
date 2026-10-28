@@ -1,0 +1,304 @@
+{
+ "set": {
+  "code": "ST-15",
+  "name": "Starter Deck 15: RED Edward.Newgate",
+  "kind": "starter",
+  "cardCount": 5,
+  "block": 3
+ },
+ "cards": [
+  {
+   "id": "ST15-001",
+   "name": "Atmos",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Whitebeard Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-15",
+   "block": 3,
+   "effectText": "[When Attacking] If your Leader is [Edward.Newgate], you cannot add Life cards to your hand using your own effects during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST15-001",
+     "imageUrls": {
+      "full": "ST15-001.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-15",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST15-001/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST15-002",
+   "name": "Edward.Newgate",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 7,
+   "power": 8000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "The Four Emperors",
+    "Whitebeard Pirates"
+   ],
+   "rarity": "SR",
+   "set": "ST-15",
+   "block": 3,
+   "effectText": "[On Play] Give up to 1 rested DON!! card to your Leader or 1 of your Characters.\n\n[Activate: Main] You may rest this Character: K.O. up to 1 of your opponent's Characters with 5000 power or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST15-002",
+     "imageUrls": {
+      "full": "ST15-002.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-15",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "ST15-002_p1",
+     "imageUrls": {
+      "full": "ST15-002_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "SR",
+     "label": "SP"
+    },
+    {
+     "artworkId": "ST15-002_p2",
+     "imageUrls": {
+      "full": "ST15-002_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "ST15-002_r1",
+     "imageUrls": {
+      "full": "ST15-002_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "SR",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST15-002/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST15-003",
+   "name": "Kingdew",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Whitebeard Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-15",
+   "block": 3,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n\n[Opponent's Turn] When this Character is K.O.'d by an effect, up to 1 of your Leader gains +2000 power during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST15-003",
+     "imageUrls": {
+      "full": "ST15-003.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-15",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST15-003/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST15-004",
+   "name": "Thatch",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 1,
+   "power": 2000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Whitebeard Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-15",
+   "block": 3,
+   "effectText": "[On Play] If your Leader's type includes \"Whitebeard Pirates\", give up to 1 of your opponent's Characters −2000 power during this turn. Then, add 1 card from the top of your Life cards to your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "sign",
+     "from": "2000 power",
+     "to": "−2000 power"
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "ST15-004",
+     "imageUrls": {
+      "full": "ST15-004.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-15",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST15-004/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST15-005",
+   "name": "Portgas.D.Ace",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Whitebeard Pirates"
+   ],
+   "rarity": "SR",
+   "set": "ST-15",
+   "block": 3,
+   "effectText": "If your Leader's type includes \"Whitebeard Pirates\", this Character gains [Rush].(This card can attack on the turn in which it is played.)[Once Per Turn] If this Character would be removed from the field by your opponent's effect, you may give this Character 2000 power during this turn instead.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST15-005",
+     "imageUrls": {
+      "full": "ST15-005.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-15",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "ST15-005_p5",
+     "imageUrls": {
+      "full": "ST15-005_p5_aT6zwMj.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-16",
+     "rarity": "SR",
+     "label": "SP"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST15-005/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  }
+ ]
+}

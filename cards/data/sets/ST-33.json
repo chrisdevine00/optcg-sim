@@ -1,0 +1,256 @@
+{
+ "set": {
+  "code": "ST-33",
+  "name": "Starter Deck 33: BLUE Kuzan",
+  "kind": "starter",
+  "cardCount": 5,
+  "block": null
+ },
+ "cards": [
+  {
+   "id": "ST33-001",
+   "name": "Koby",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 2,
+   "power": 1000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Navy"
+   ],
+   "rarity": "C",
+   "set": "ST-33",
+   "block": null,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)[On Play] You may trash 1 card from your hand: Draw 1 card.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST33-001",
+     "imageUrls": {
+      "full": "ST33-001.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-33",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "unknown",
+     "reason": "block not known"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST33-001/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST33-002",
+   "name": "Sakazuki",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Navy"
+   ],
+   "rarity": "C",
+   "set": "ST-33",
+   "block": null,
+   "effectText": "[When Attacking] You may trash 1 card from your hand: If your opponent has 6 or more cards in their hand, your opponent trashes 1 card from their hand.[On K.O.] Play up to 1 {Navy} type Character card with a cost of 4 or less from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST33-002",
+     "imageUrls": {
+      "full": "ST33-002.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-33",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "unknown",
+     "reason": "block not known"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST33-002/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST33-003",
+   "name": "Smoker",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 2,
+   "power": 3000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Navy"
+   ],
+   "rarity": "C",
+   "set": "ST-33",
+   "block": null,
+   "effectText": "[On Play] You may trash 1 card from your hand: Place up to 2 of your opponent's Characters with a cost of 2 or less at the bottom of the owner's deck.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST33-003",
+     "imageUrls": {
+      "full": "ST33-003.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-33",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "unknown",
+     "reason": "block not known"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST33-003/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST33-004",
+   "name": "Borsalino",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 6,
+   "power": 6000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Navy"
+   ],
+   "rarity": "SR",
+   "set": "ST-33",
+   "block": null,
+   "effectText": "During the turn in which a card in your hand is trashed by an effect, give this card in your hand 3 cost.[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST33-004",
+     "imageUrls": {
+      "full": "ST33-004.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-33",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "unknown",
+     "reason": "block not known"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST33-004/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST33-005",
+   "name": "Monkey.D.Garp",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 6,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Navy"
+   ],
+   "rarity": "SR",
+   "set": "ST-33",
+   "block": null,
+   "effectText": "[On Play] If your Leader has the {Navy} type, play up to 1 blue {Navy} type Character card with 8000 power or less other than [Monkey.D.Garp] from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST33-005",
+     "imageUrls": {
+      "full": "ST33-005.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-33",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "unknown",
+     "reason": "block not known"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST33-005/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  }
+ ]
+}

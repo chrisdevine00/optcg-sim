@@ -1,0 +1,267 @@
+{
+ "set": {
+  "code": "ST-35",
+  "name": "Starter Deck 35: RED/BLACK Sabo",
+  "kind": "starter",
+  "cardCount": 5,
+  "block": null
+ },
+ "cards": [
+  {
+   "id": "ST35-001",
+   "name": "Hack",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 4,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Fish-Man",
+    "Revolutionary Army",
+    "Dressrosa"
+   ],
+   "rarity": "C",
+   "set": "ST-35",
+   "block": null,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)[On Play] K.O. up to 1 of your opponent's Characters with 2000 base power or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST35-001",
+     "imageUrls": {
+      "full": "ST35-001.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-35",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "unknown",
+     "reason": "block not known"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST35-001/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST35-002",
+   "name": "Lindbergh",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 4,
+   "power": 4000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Minks",
+    "Revolutionary Army"
+   ],
+   "rarity": "C",
+   "set": "ST-35",
+   "block": null,
+   "effectText": "[On Play] Give up to 1 of your opponent's Characters −3000 power during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "sign",
+     "from": "3000 power",
+     "to": "−3000 power"
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "ST35-002",
+     "imageUrls": {
+      "full": "ST35-002.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-35",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "unknown",
+     "reason": "block not known"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST35-002/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST35-003",
+   "name": "Karasu",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Revolutionary Army"
+   ],
+   "rarity": "C",
+   "set": "ST-35",
+   "block": null,
+   "effectText": "[When Attacking] You may trash 2 cards from the top of your deck: If your opponent has 7 or more cards in their hand, your opponent trashes 1 card from their hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST35-003",
+     "imageUrls": {
+      "full": "ST35-003.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-35",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "unknown",
+     "reason": "block not known"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST35-003/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST35-004",
+   "name": "Koala",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 7,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Revolutionary Army",
+    "Dressrosa"
+   ],
+   "rarity": "SR",
+   "set": "ST-35",
+   "block": null,
+   "effectText": "This Character gains [Blocker] and +1 cost.[On Play] Give up to 1 rested DON!! card to your Leader. Then, play up to 1 Character card with 4000 power or less and the {Revolutionary Army} type from your hand or trash.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST35-004",
+     "imageUrls": {
+      "full": "ST35-004.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-35",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "unknown",
+     "reason": "block not known"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST35-004/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST35-005",
+   "name": "Bartholomew Kuma",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 5,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Revolutionary Army"
+   ],
+   "rarity": "SR",
+   "set": "ST-35",
+   "block": null,
+   "effectText": "This Character gains +3 cost.[On Play] Give up to 1 rested DON!! card to your Leader. Then, play up to 1 Character card with 4000 power or less and the {Revolutionary Army} type from your hand or trash.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST35-005",
+     "imageUrls": {
+      "full": "ST35-005.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-35",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "unknown",
+     "reason": "block not known"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST35-005/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  }
+ ]
+}

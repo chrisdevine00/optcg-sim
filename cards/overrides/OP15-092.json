@@ -1,0 +1,24 @@
+{
+  "id": "OP15-092",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP15-092",
+      "date": "2026-10-28",
+      "use": "cross-check"
+    },
+    {
+      "url": "https://en.onepiece-cardgame.com/cardlist/?series=569115",
+      "date": "2026-10-28",
+      "use": "disagreement"
+    }
+  ],
+  "keywords": [],
+  "fields": {
+    "attributes": {
+      "value": ["Special"],
+      "upstream": [],
+      "source": "https://en.onepiece-cardgame.com/cardlist/?series=569115"
+    }
+  }
+}

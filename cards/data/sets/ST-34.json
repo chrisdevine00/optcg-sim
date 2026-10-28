@@ -1,0 +1,284 @@
+{
+ "set": {
+  "code": "ST-34",
+  "name": "Starter Deck 34: PURPLE Charlotte Katakuri",
+  "kind": "starter",
+  "cardCount": 5,
+  "block": 5
+ },
+ "cards": [
+  {
+   "id": "ST34-001",
+   "name": "Charlotte Katakuri",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 5,
+   "power": 7000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "SR",
+   "set": "ST-34",
+   "block": 5,
+   "effectText": "[Your Turn] [Once Per Turn] When a DON!! card on your field is returned to your DON!! deck, if your Leader has the {Big Mom Pirates} type, add up to 2 DON!! cards from your DON!! deck and rest them.[On K.O.] Play up to 1 Character card with 8000 power or less from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST34-001",
+     "imageUrls": {
+      "full": "ST34-001.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-34",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST34-001/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST34-002",
+   "name": "Charlotte Cracker",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-34",
+   "block": 5,
+   "effectText": "[On Play] If your Leader has the {Big Mom Pirates} type, add up to 1 DON!! card from your DON!! deck and rest it. Then, K.O. up to 1 of your opponent's Characters with a cost of 2 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST34-002",
+     "imageUrls": {
+      "full": "ST34-002.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-34",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST34-002/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST34-003",
+   "name": "Charlotte Brulee",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 1,
+   "power": 2000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-34",
+   "block": 5,
+   "effectText": "[On Play] Look at 3 cards from the top of your deck; reveal up to 1 {Big Mom Pirates} type card and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST34-003",
+     "date": "2026-10-28",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST34-003",
+     "imageUrls": {
+      "full": "ST34-003.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-34",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST34-003/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST34-004",
+   "name": "Charlotte Linlin",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 10,
+   "power": 12000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "The Four Emperors",
+    "Big Mom Pirates"
+   ],
+   "rarity": "SR",
+   "set": "ST-34",
+   "block": 5,
+   "effectText": "[On Play] DON!! −4, you may trash 1 card from your hand: Add up to 1 card from the top of your deck to the top of your Life cards. Then, up to 1 of your opponent's Characters' base power becomes 0 during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST34-004",
+     "date": "2026-10-28",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "sign",
+     "from": "DON!! 4",
+     "to": "DON!! −4"
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "ST34-004",
+     "imageUrls": {
+      "full": "ST34-004.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-34",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST34-004/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST34-005",
+   "name": "Baron Tamago & Pekoms",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Minks",
+    "Big Mom Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-34",
+   "block": 5,
+   "effectText": "[When Attacking] DON!! −1: K.O. up to 1 of your opponent's Characters with 2000 base power or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "sign",
+     "from": "DON!! 1",
+     "to": "DON!! −1"
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "ST34-005",
+     "imageUrls": {
+      "full": "ST34-005.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-34",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST34-005/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  }
+ ]
+}

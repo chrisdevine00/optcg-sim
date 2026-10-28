@@ -1,0 +1,331 @@
+{
+ "set": {
+  "code": "ST-16",
+  "name": "Starter Deck 16: GREEN Uta",
+  "kind": "starter",
+  "cardCount": 5,
+  "block": 3
+ },
+ "cards": [
+  {
+   "id": "ST16-001",
+   "name": "Uta",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 4,
+   "power": 6000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "FILM"
+   ],
+   "rarity": "SR",
+   "set": "ST-16",
+   "block": 3,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n\n[Activate: Main] [Once Per Turn] You may trash 1 \"FILM\" type card from your hand: Give up to 1 rested DON!! card to your Leader or 1 of your Characters.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST16-001",
+     "imageUrls": {
+      "full": "ST16-001.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-16",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST16-001/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST16-002",
+   "name": "Gordon",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 2,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "FILM"
+   ],
+   "rarity": "C",
+   "set": "ST-16",
+   "block": 3,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)[On Your Opponent's Attack] You may trash any number of \"Music\" type cards from your hand. Your Leader or 1 of your Characters gains +1000 power during this battle for every card trashed.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST16-002",
+     "imageUrls": {
+      "full": "ST16-002.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-16",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST16-002/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST16-003",
+   "name": "Charlotte Katakuri",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "FILM",
+    "Big Mom Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-16",
+   "block": 3,
+   "effectText": "If your Leader has the \"FILM\" type and you have 6 or more rested cards, this Character gains +2000 power.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST16-003",
+     "imageUrls": {
+      "full": "ST16-003.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-16",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "ST16-003_p1",
+     "imageUrls": {
+      "full": "ST16-003_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "C",
+     "label": "Pirate Foil"
+    },
+    {
+     "artworkId": "ST16-003_r1",
+     "imageUrls": {
+      "full": "ST16-003_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "C",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST16-003/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST16-004",
+   "name": "Shanks",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 9,
+   "power": 11000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "FILM",
+    "The Four Emperors",
+    "Red-Haired Pirates"
+   ],
+   "rarity": "SR",
+   "set": "ST-16",
+   "block": 3,
+   "effectText": "[On Play] K.O. up to 1 of your opponent's rested Characters.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST16-004",
+     "imageUrls": {
+      "full": "ST16-004.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-16",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "ST16-004_p1",
+     "imageUrls": {
+      "full": "ST16-004_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-11",
+     "rarity": "SR",
+     "label": "SP"
+    },
+    {
+     "artworkId": "ST16-004_p2",
+     "imageUrls": {
+      "full": "ST16-004_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "ST16-004_r1",
+     "imageUrls": {
+      "full": "ST16-004_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "SR",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST16-004/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST16-005",
+   "name": "Monkey.D.Luffy",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 2,
+   "power": 3000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "FILM",
+    "Straw Hat Crew",
+    "Supernovas"
+   ],
+   "rarity": "C",
+   "set": "ST-16",
+   "block": 3,
+   "effectText": "If you have a rested [Uta], this Character gains +1000 power.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST16-005",
+     "imageUrls": {
+      "full": "ST16-005.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-16",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "ST16-005_p1",
+     "imageUrls": {
+      "full": "ST16-005_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "C",
+     "label": "Pirate Foil"
+    },
+    {
+     "artworkId": "ST16-005_r1",
+     "imageUrls": {
+      "full": "ST16-005_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "C",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST16-005/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  }
+ ]
+}

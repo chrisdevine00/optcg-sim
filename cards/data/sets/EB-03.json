@@ -1,0 +1,3411 @@
+{
+ "set": {
+  "code": "EB-03",
+  "name": "Extra Booster: One Piece Heroines Edition",
+  "kind": "extra",
+  "cardCount": 62,
+  "block": 4
+ },
+ "cards": [
+  {
+   "id": "EB03-001",
+   "name": "Nefeltari Vivi",
+   "category": "Leader",
+   "colors": [
+    "Blue",
+    "Red"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 4,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Alabasta"
+   ],
+   "rarity": "L",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Once Per Turn] If your Character with a base cost of 4 or more would be K.O.'d, you may trash 1 card from your hand instead.\n[Activate: Main] You may rest this Leader: Give up to 1 of your opponent's Characters −2000 power during this turn. Then, up to 1 of your Characters without a [When Attacking] effect gains [Rush] during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "sign",
+     "from": "2000 power",
+     "to": "−2000 power"
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "EB03-001",
+     "imageUrls": {
+      "full": "EB03-001_0dBLyMa.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "L"
+    },
+    {
+     "artworkId": "EB03-001_p1",
+     "imageUrls": {
+      "full": "EB03-001_p1_9CT8VHg.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "L",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-001/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-002",
+   "name": "Ain",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "FILM",
+    "Neo Navy"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-002",
+     "imageUrls": {
+      "full": "EB03-002_4uvsBmC.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-002/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-003",
+   "name": "Uta",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 5,
+   "power": 7000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "FILM"
+   ],
+   "rarity": "SR",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[On Play] If your Leader is [Uta], draw 2 cards. Then, play up to 1 Character card with 6000 power or less and no base effect from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-003",
+     "imageUrls": {
+      "full": "EB03-003_a1HWpXc.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "EB03-003_p1",
+     "imageUrls": {
+      "full": "EB03-003_p1_viX3Rl8.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "EB03-003_p2",
+     "imageUrls": {
+      "full": "EB03-003_p2_ZseuWTY.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR",
+     "label": "SP"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-003/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-004",
+   "name": "Carina",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 3,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "FILM",
+    "Grantesoro"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Blocker]\n[Opponent's Turn] If your Leader is multicolored and you have no Characters with 6000 base power or more, this Character gains +4000 power.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-004",
+     "imageUrls": {
+      "full": "EB03-004_DWHgzDZ.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-004/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-005",
+   "name": "Sugar",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 3,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Donquixote Pirates"
+   ],
+   "rarity": "R",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[On Play] If your Leader is [Sugar], play up to 1 {Donquixote Pirates} type Character card with 6000 power or less from your hand rested.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-005",
+     "imageUrls": {
+      "full": "EB03-005_ZvINliB.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-005/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-006",
+   "name": "Nami",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 5,
+   "power": 7000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Alabasta",
+    "Straw Hat Crew"
+   ],
+   "rarity": "R",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[On Play] You may give your active Leader 5000 power during this turn: Draw 1 card.\n[Activate: Main] [Once Per Turn] If your Leader has the {Alabasta} type, give up to 1 of your opponent's Characters −1000 power during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "sign",
+     "from": "1000 power",
+     "to": "−1000 power"
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "EB03-006",
+     "imageUrls": {
+      "full": "EB03-006_xHZctgp.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-006/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-007",
+   "name": "Baccarat",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "FILM",
+    "Grantesoro"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Blocker] [On K.O.] Play up to 1 Character card with 6000 power or less and no base effect from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-007",
+     "imageUrls": {
+      "full": "EB03-007_SZkcJpK.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-007/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-008",
+   "name": "Hibari",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 3,
+   "power": 5000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "Navy",
+    "SWORD"
+   ],
+   "rarity": "R",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[On Play]/[When Attacking] Up to 1 of your {SWORD} type Leader or Character cards can also attack active Characters during this turn.\n[Activate: Main] [Once Per Turn] Give up to 1 of your opponent's Characters −1000 power during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "sign",
+     "from": "1000 power",
+     "to": "−1000 power"
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "EB03-008",
+     "imageUrls": {
+      "full": "EB03-008_2SKwp43.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "EB03-008_p1",
+     "imageUrls": {
+      "full": "EB03-008_p1_feKUzmd.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-008/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-009",
+   "name": "Makino",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 1,
+   "power": 0,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Windmill Village"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Activate: Main] You may rest this Character: Up to 1 of your Characters with no base effect gains +2000 power during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-009",
+     "imageUrls": {
+      "full": "EB03-009_mBvk4wq.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-009/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-010",
+   "name": "Monet",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Donquixote Pirates",
+    "Punk Hazard"
+   ],
+   "rarity": "R",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Blocker] [On Play] Look at 5 cards from the top of your deck; reveal up to 1 Character card with 1000 power or less or up to 1 Event card and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-010",
+     "imageUrls": {
+      "full": "EB03-010_QHsFxSc.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-010/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-011",
+   "name": "But If We Ever See Each Other Again... Will You Call Me Your Shipmate?!!",
+   "category": "Event",
+   "colors": [
+    "Red"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Alabasta"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Counter] If your Leader is [Nefeltari Vivi], up to 1 of your Leader or Character cards gains +4000 power during this battle.",
+   "triggerText": "Give up to 1 of your opponent's Characters −2000 power during this turn.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "triggerText",
+     "kind": "sign",
+     "from": "2000 power",
+     "to": "−2000 power"
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "EB03-011",
+     "imageUrls": {
+      "full": "EB03-011_NTLqies.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-011/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-012",
+   "name": "Otama",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 2,
+   "power": 0,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Land of Wano"
+   ],
+   "rarity": "R",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Activate: Main] You may rest this Character: Rest up to 1 of your opponent's DON!! cards or {Animal} or {SMILE} type Characters with a cost of 3 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-012",
+     "imageUrls": {
+      "full": "EB03-012_gGjJnoh.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-012/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-013",
+   "name": "Carrot",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 6,
+   "power": 7000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Minks"
+   ],
+   "rarity": "R",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Activate: Main] [Once Per Turn] If this Character was played on this turn, K.O. up to 1 of your opponent's rested Characters with a cost of 5 or less. Then, play up to 1 [Zou] from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-013",
+     "imageUrls": {
+      "full": "EB03-013_eHDTl1n.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "EB03-013_p1",
+     "imageUrls": {
+      "full": "EB03-013_p1_RoyqPB5.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-013/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-014",
+   "name": "Kuina",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 2,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "East Blue",
+    "Frost Moon Village"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Activate: Main] You may rest this Character: Give up to 2 rested DON!! cards to your attribute Leader.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-014",
+     "imageUrls": {
+      "full": "EB03-014_NUWnTjm.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-014/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-015",
+   "name": "Camie",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 2,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Merfolk",
+    "Fish-Man Island"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Activate: Main] You may rest this Character: Give up to 1 rested DON!! card to 1 of your {Fish-Man} or {Merfolk} type Leader or Character cards. Then, rest up to 1 of your opponent's Characters with a cost of 2 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-015",
+     "imageUrls": {
+      "full": "EB03-015_TPuF0FD.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-015/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-016",
+   "name": "Kouzuki Hiyori",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 1,
+   "power": 0,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Land of Wano",
+    "Kouzuki Clan"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[On Play] If your Leader is [Kouzuki Oden], draw 1 card.\n[Activate: Main] You may trash this Character: Give up to 1 rested DON!! card to your {Land of Wano} type Leader.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-016",
+     "imageUrls": {
+      "full": "EB03-016_lsNg1M1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-016/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-017",
+   "name": "Jewelry Bonney",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Bonney Pirates",
+    "Supernovas"
+   ],
+   "rarity": "R",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[On Play] If your Leader has the {Supernovas} type, set up to 1 of your DON!! cards as active. Then, up to 1 of your opponent's Characters with a cost of 8 or less cannot be rested until the end of your opponent's next End Phase.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-017",
+     "imageUrls": {
+      "full": "EB03-017_ZlqYpT7.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-017/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-018",
+   "name": "Tashigi",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 4,
+   "power": 6000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Navy"
+   ],
+   "rarity": "SR",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Opponent's Turn] This Character cannot be K.O.'d by your opponent's effects and gains [Blocker].\n[End of Your Turn] You may rest 1 of your DON!! cards and trash 1 card from your hand: Set this Character as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-018",
+     "imageUrls": {
+      "full": "EB03-018_ekJcbSG.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "EB03-018_p1",
+     "imageUrls": {
+      "full": "EB03-018_p1_lycdaZZ.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "EB03-018_p2",
+     "imageUrls": {
+      "full": "EB03-018_p2_4wKZOzJ.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR",
+     "label": "SP"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-018/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-019",
+   "name": "Wanda",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 6,
+   "power": 7000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Minks"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-019",
+     "imageUrls": {
+      "full": "EB03-019_yU44hit.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-019/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-020",
+   "name": "There You Are, Sore Loser!",
+   "category": "Event",
+   "colors": [
+    "Green"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "FILM"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Counter] Up to 1 of your Leader or Character cards gains +2000 power during this battle. Then, if you have 2 or more {FILM} type Characters, that card gains an additional +2000 power during this battle.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-020",
+     "imageUrls": {
+      "full": "EB03-020_nMEgf3n.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-020/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-021",
+   "name": "Alvida",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 4,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Cross Guild"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[On Play] You may trash 1 card from your hand: Place up to 1 of your opponent's Characters with 4000 base power or less and up to 1 Character with a base cost of 3 or less at the bottom of the owner's deck.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-021",
+     "imageUrls": {
+      "full": "EB03-021_iiAXpJW.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-021/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-022",
+   "name": "Isuka",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 6,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Navy"
+   ],
+   "rarity": "R",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[On Play] Place up to 1 Character with a cost of 4 or less at the bottom of the owner's deck.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-022",
+     "imageUrls": {
+      "full": "EB03-022_fSaKtfP.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-022/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-023",
+   "name": "Kaya",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 2,
+   "power": 0,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "East Blue"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[On Play] Look at 5 cards from the top of your deck and place them at the top or bottom of the deck in any order.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-023",
+     "imageUrls": {
+      "full": "EB03-023_2hxgnbe.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-023/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-024",
+   "name": "Nefeltari Vivi",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 5,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Alabasta"
+   ],
+   "rarity": "SR",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Blocker]\n[On Play] Play up to 1 {Alabasta} or {Straw Hat Crew} type Character card with a cost of 5 or less from your hand. Then, you cannot play any Character cards on your field during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-024",
+     "imageUrls": {
+      "full": "EB03-024_feZ5Nqs.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "EB03-024_p1",
+     "imageUrls": {
+      "full": "EB03-024_p1_rPzIWnn.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "EB03-024_p2",
+     "imageUrls": {
+      "full": "EB03-024_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR",
+     "label": "SP"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-024/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-025",
+   "name": "Hina",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Navy"
+   ],
+   "rarity": "R",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[On Play] You may trash 1 card from your hand: Return up to 1 Character with 6000 base power to the owner's hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-025",
+     "imageUrls": {
+      "full": "EB03-025_wuuZxJR.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "EB03-025_p1",
+     "imageUrls": {
+      "full": "EB03-025_p1_TkJFyRd.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-025/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-026",
+   "name": "Boa Hancock",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 6,
+   "power": 8000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Kuja Pirates",
+    "The Seven Warlords of the Sea"
+   ],
+   "rarity": "SR",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[On Play] If your opponent has 5 or more cards in their hand, your opponent places 1 card from their hand at the bottom of their deck.\n[Activate: Main] [Once Per Turn] You may place 1 of your Characters at the bottom of the owner's deck: Give your Leader and 1 Character up to 1 rested DON!! card each.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-026",
+     "imageUrls": {
+      "full": "EB03-026_uqjpoKr.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "EB03-026_p1",
+     "imageUrls": {
+      "full": "EB03-026_p1_eFWOcPG.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "EB03-026_p2",
+     "imageUrls": {
+      "full": "EB03-026_p2_slw9xMj.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR",
+     "label": "SP"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-026/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-027",
+   "name": "Marguerite",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 6,
+   "power": 7000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Amazon Lily"
+   ],
+   "rarity": "R",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[On Play] Return up to 1 Character with 7000 base power to the owner's hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-027",
+     "imageUrls": {
+      "full": "EB03-027_hCDvMsT.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-027/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-028",
+   "name": "Yu",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 2,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "East Blue"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[On Play] Trash 1 card from your hand. [Activate: Main] You may trash this Character: If you have 4 or less cards in your hand, draw 2 cards.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-028",
+     "imageUrls": {
+      "full": "EB03-028_Uovlwlw.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-028/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-029",
+   "name": "Insolent Fool!! Stand Down!!",
+   "category": "Event",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Kuja Pirates",
+    "The Seven Warlords of the Sea"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Main] You may rest 4 of your DON!! cards: If your Leader is [Boa Hancock], play up to 1 {Amazon Lily} or {Kuja Pirates} type Character card with a cost of 6 or less from your hand. [Counter] Up to 1 of your [Boa Hancock] cards gains +3000 power during this battle.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-029",
+     "imageUrls": {
+      "full": "EB03-029_LFPesuP.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-029/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-030",
+   "name": "Viola",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Dressrosa"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-030",
+     "imageUrls": {
+      "full": "EB03-030_Ps0TueZ.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-030/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-031",
+   "name": "Vinsmoke Reiju",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 5,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "The Vinsmoke Family",
+    "GERMA 66"
+   ],
+   "rarity": "SR",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Your Turn] [On Play] DON!! −1: If your Leader is [Sanji], activate the [Main] effect of up to 1 Event card with a cost of 7 or less in your trash.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "sign",
+     "from": "DON!! 1",
+     "to": "DON!! −1"
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "EB03-031",
+     "imageUrls": {
+      "full": "EB03-031_pj32ahE.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "EB03-031_p1",
+     "imageUrls": {
+      "full": "EB03-031_p1_5nabW5C.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "EB03-031_p2",
+     "imageUrls": {
+      "full": "EB03-031_p2_x7r9oMT.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR",
+     "label": "SP"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-031/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-032",
+   "name": "Charlotte Flampe",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 1,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Your Turn] [On Play] Up to 1 of your [Charlotte Katakuri] cards gains +2000 power during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-032",
+     "imageUrls": {
+      "full": "EB03-032_1U6q0Vd.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "EB03-032_r1",
+     "imageUrls": {
+      "full": "EB03-032_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-34",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-032/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-033",
+   "name": "Charlotte Brulee",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Opponent's Turn] [Once Per Turn] When a DON!! card on your field is returned to your DON!! deck by your effect, if your Leader has the {Big Mom Pirates} type, add up to 1 DON!! card from your DON!! deck and rest it.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-033",
+     "imageUrls": {
+      "full": "EB03-033_ouN0qDl.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-033/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-034",
+   "name": "Charlotte Linlin",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 7,
+   "power": 7000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "R",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[On Play] Draw 1 card and place 1 card from your hand at the top of your deck. Then, add up to 1 DON!! card from your DON!! deck and set it as active.\n[On K.O.] DON!! −1: Add up to 1 card from the top of your deck to the top of your Life cards.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "sign",
+     "from": "DON!! 1",
+     "to": "DON!! −1"
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "EB03-034",
+     "imageUrls": {
+      "full": "EB03-034_4yFNGhO.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "EB03-034_p1",
+     "imageUrls": {
+      "full": "EB03-034_p1_56maI5N.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-034/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-035",
+   "name": "Charlotte Pudding",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 4,
+   "power": 4000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "R",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Blocker]\n[On Play] If the number of DON!! cards on your field is equal to or less than the number on your opponent's field, add up to 1 DON!! card from your DON!! deck and rest it.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-035",
+     "imageUrls": {
+      "full": "EB03-035_YunUEht.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "EB03-035_r1",
+     "imageUrls": {
+      "full": "EB03-035_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-34",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-035/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-036",
+   "name": "Baby 5",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 4,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Donquixote Pirates"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[On Play] DON!! −1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): K.O. up to 2 of your opponent's Characters with a base cost of 3 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "sign",
+     "from": "DON!! 1",
+     "to": "DON!! −1"
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "EB03-036",
+     "imageUrls": {
+      "full": "EB03-036_WpCsQ4Q.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-036/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-037",
+   "name": "Lim",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "ODYSSEY"
+   ],
+   "rarity": "R",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[On Play] If you have 7 or more DON!! cards on your field, all of your {ODYSSEY} type Leader and Character cards gain +1000 power until the end of your opponent's next End Phase.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-037",
+     "imageUrls": {
+      "full": "EB03-037_NYL5iV5.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-037/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-038",
+   "name": "Thanks for the Treat.",
+   "category": "Event",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "The Vinsmoke Family",
+    "GERMA 66"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Main] You may rest 1 of your DON!! cards: If the number of DON!! cards on your field is equal to or less than the number on your opponent's field and you only have Characters with a type including \"GERMA\", add up to 2 DON!! cards from your DON!! deck and rest them. [Counter] Your Leader gains +3000 power during this battle.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-038",
+     "imageUrls": {
+      "full": "EB03-038_LFQPkCS.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-038/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-039",
+   "name": "Ulti",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 6,
+   "power": 7000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Animal Kingdom Pirates"
+   ],
+   "rarity": "R",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[On Play] If your Leader has the {Animal Kingdom Pirates} type, draw 1 card and trash 1 card from your hand. Then, play up to 1 Character card with 6000 power or less and no base effect from your trash.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-039",
+     "imageUrls": {
+      "full": "EB03-039_iASzBhM.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-039/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-040",
+   "name": "Kalifa",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-040",
+     "imageUrls": {
+      "full": "EB03-040_P6i7mlb.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-040/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-041",
+   "name": "Kujyaku",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 4,
+   "power": 6000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Navy",
+    "SWORD"
+   ],
+   "rarity": "R",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Opponent's Turn] All of your {SWORD} type Characters with a cost of 6 or less gain +2000 power.\n[On Play] You may trash 1 {Navy} type card from your hand: Draw 2 cards.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-041",
+     "imageUrls": {
+      "full": "EB03-041_OlNExxG.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "EB03-041_p1",
+     "imageUrls": {
+      "full": "EB03-041_p1_oQw07n5.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-041/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-042",
+   "name": "Koala",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Revolutionary Army",
+    "Dressrosa"
+   ],
+   "rarity": "SR",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "If your Leader has the {Revolutionary Army} type, this Character gains +4 cost.\n[Opponent's Turn] [On K.O.] Play up to 1 {Revolutionary Army} type Character card with a cost of 6 or less other than [Koala] or up to 1 [Nico Robin] with a cost of 6 or less from your hand or trash.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-042",
+     "imageUrls": {
+      "full": "EB03-042_lpNLIoz.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "EB03-042_p1",
+     "imageUrls": {
+      "full": "EB03-042_p1_h9LKnFh.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "EB03-042_p2",
+     "imageUrls": {
+      "full": "EB03-042_p2_9UP5kWW.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR",
+     "label": "SP"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-042/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-043",
+   "name": "Stussy",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 7,
+   "power": 7000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "CP0"
+   ],
+   "rarity": "R",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Blocker] [On Play] You may place 2 cards with a type including \"CP\" from your trash at the bottom of your deck in any order: K.O. up to 1 of your opponent's Characters with a cost of 4 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-043",
+     "imageUrls": {
+      "full": "EB03-043_IIrsmV2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-043/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-044",
+   "name": "Black Maria",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Animal Kingdom Pirates"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "If your Leader is multicolored, this Character gains [Blocker]. [On Play] Look at 5 cards from the top of your deck; reveal up to 1 [Onigashima Island] and add it to your hand. Then, place the rest at the bottom of your deck in any order and play up to 1 [Onigashima Island] from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-044",
+     "imageUrls": {
+      "full": "EB03-044_0WuMWQY.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-044/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-045",
+   "name": "Perona",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 4,
+   "power": 6000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Thriller Bark Pirates",
+    "Muggy Kingdom"
+   ],
+   "rarity": "SR",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Blocker]\n[On Play] Give up to 1 rested DON!! card to your Leader or 1 of your Characters. Then, if you have 10 or more cards in your trash, play up to 1 {Thriller Bark Pirates} type Character card with a cost of 2 or less from your trash rested.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-045",
+     "imageUrls": {
+      "full": "EB03-045_TwK7Sqe.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "EB03-045_p1",
+     "imageUrls": {
+      "full": "EB03-045_p1_t1FYjF7.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "EB03-045_p2",
+     "imageUrls": {
+      "full": "EB03-045_p2_FebtrFt.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR",
+     "label": "SP"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-045/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-046",
+   "name": "Miss Doublefinger(Zala)",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Baroque Works"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[On Play] If there is a Character with a cost of 0 or with a cost of 8 or more, draw 1 card. [On K.O.] Trash 2 cards from the top of your deck.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-046",
+     "imageUrls": {
+      "full": "EB03-046_xeG4xhs.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-046/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-047",
+   "name": "Miss.Valentine(Mikita)",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 2,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Baroque Works"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[On Play] Trash 3 cards from the top of your deck.\n[On K.O.] Draw 1 card.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-047",
+     "imageUrls": {
+      "full": "EB03-047_gbjVBb0.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-047/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-048",
+   "name": "Rebecca",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 2,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Dressrosa"
+   ],
+   "rarity": "R",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Blocker] [On Play] Look at 5 cards from the top of your deck; reveal up to 1 {Dressrosa} type Stage card and add it to your hand. Then, place the rest at the bottom of your deck in any order and play up to 1 {Dressrosa} type Stage card with a cost of 1 from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-048",
+     "imageUrls": {
+      "full": "EB03-048_klK1QnD.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-048/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-049",
+   "name": "I Knew You People Were Behind This.",
+   "category": "Event",
+   "colors": [
+    "Black"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Thriller Bark Pirates"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Main] You may rest 7 of your DON!! cards: If your Leader is [Perona], play up to 1 {Thriller Bark Pirates} type Character card with a cost of 6 or less and up to 1 {Thriller Bark Pirates} type Character card with a cost of 4 or less from your hand or trash. [Counter] Your Leader gains +3000 power during this battle.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-049",
+     "imageUrls": {
+      "full": "EB03-049_pm5E11N.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-049/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-050",
+   "name": "Conis",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 2,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Sky Island"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[On Play] Up to 1 of your {Sky Island} type Characters gains [Double Attack] during this turn.(This card deals 2 damage.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-050",
+     "imageUrls": {
+      "full": "EB03-050_sOGpx3U.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-050/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-051",
+   "name": "Charlotte Smoothie",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 3,
+   "power": 3000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[On Play] If you have a face-up Life card, K.O. up to 1 of your opponent's Characters with a cost of 2 or less. Then, turn all of your Life cards face-down.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-051",
+     "imageUrls": {
+      "full": "EB03-051_lxGkCXk.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-051/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-052",
+   "name": "Shirahoshi",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 3,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Merfolk",
+    "Fish-Man Island"
+   ],
+   "rarity": "R",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Activate: Main] You may trash this Character: If your Leader is [Shirahoshi], add 1 card from the top of your deck to the top of your Life cards. Then, all of your {Neptunian} type Characters gain +1000 power during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-052",
+     "imageUrls": {
+      "full": "EB03-052_XY4834Z.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-052/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-053",
+   "name": "Nami",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Straw Hat Crew"
+   ],
+   "rarity": "SR",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[On Play] Give up to 1 rested DON!! card to your Leader. Then, if your opponent has 3 or more Life cards, add up to 1 card from the top of your opponent's Life cards to the owner's hand.\n[On K.O.] You may turn 1 card from the top of your Life cards face-up: Play up to 1 Character card with 6000 power or less from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/EB03-053",
+     "date": "2026-10-28",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-053",
+     "imageUrls": {
+      "full": "EB03-053_arCxpha.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "EB03-053_p1",
+     "imageUrls": {
+      "full": "EB03-053_p1_DxUHBvc.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "EB03-053_p2",
+     "imageUrls": {
+      "full": "EB03-053_p2_5xa1OeQ.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR",
+     "label": "SP"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-053/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-054",
+   "name": "Nico Robin",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 3,
+   "power": 5000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Straw Hat Crew"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[On Play] You may trash 1 card from the top of your Life cards: Add up to 1 card from the top of your deck to the top of your Life cards.",
+   "triggerText": "You may trash 1 card from your hand: Play this card.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-054",
+     "imageUrls": {
+      "full": "EB03-054_iN4H4uy.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-054/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-055",
+   "name": "Nico Robin",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 7,
+   "power": 8000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Straw Hat Crew"
+   ],
+   "rarity": "SR",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[On Play] You may trash 1 card from the top of your Life cards: If your Leader has the {Straw Hat Crew} type, add up to 2 cards from the top of your deck to the top of your Life cards.\n[Opponent's Turn] [On K.O.] You may deal 1 damage to your opponent.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-055",
+     "imageUrls": {
+      "full": "EB03-055_LbFmh29.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "EB03-055_p1",
+     "imageUrls": {
+      "full": "EB03-055_p1_yXhWcpK.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "EB03-055_p2",
+     "imageUrls": {
+      "full": "EB03-055_p2_GwiCq60.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SR",
+     "label": "SP"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-055/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-056",
+   "name": "Belo Betty",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 4,
+   "power": 3000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Revolutionary Army"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[On Play] You may turn 1 card from the top of your Life cards face-up: K.O. up to 1 of your opponent's Characters with a base cost of 3 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-056",
+     "imageUrls": {
+      "full": "EB03-056_P5b9Ncg.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-056/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-057",
+   "name": "Yamato",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Land of Wano"
+   ],
+   "rarity": "R",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[On Play] Give up to 3 rested DON!! cards to your {Land of Wano} type Leader.\n[On K.O.] Trash up to 1 card from the top of your opponent's Life cards.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-057",
+     "imageUrls": {
+      "full": "EB03-057_Nw8rYzC.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "EB03-057_p1",
+     "imageUrls": {
+      "full": "EB03-057_p1_bBwaxOz.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-057/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-058",
+   "name": "Lilith",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Scientist",
+    "Egghead"
+   ],
+   "rarity": "R",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Your Turn] [On Play] If you have 2 or less Life cards, draw 1 card.",
+   "triggerText": "If your Leader is [Vegapunk], play this card.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-058",
+     "imageUrls": {
+      "full": "EB03-058_AqSYCG2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-058/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-059",
+   "name": "S-Snake",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 6,
+   "power": 7000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Egghead",
+    "Seraphim"
+   ],
+   "rarity": "R",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[On Play] If your Leader has the {Egghead} type and you have 2 or more Life cards, add up to 1 Character card with a [Trigger] from your hand to the top of your Life cards face-up.",
+   "triggerText": "Up to 1 of your opponent's Characters with a cost of 6 or less other than [Monkey.D.Luffy] cannot attack during this turn.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-059",
+     "imageUrls": {
+      "full": "EB03-059_rGheFMo.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-059/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-060",
+   "name": "Will You Be My Servant?",
+   "category": "Event",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Straw Hat Crew"
+   ],
+   "rarity": "C",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Main] If your Leader is [Nami], look at 4 cards from the top of your deck; reveal up to 1 card with a cost of 2 to 8 and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": "Activate this card's [Main] effect.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-060",
+     "imageUrls": {
+      "full": "EB03-060_hc9Pgfd.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-060/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-061",
+   "name": "Uta",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 7,
+   "power": 8000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "FILM"
+   ],
+   "rarity": "SEC",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Activate: Main] [Once Per Turn] Set up to 1 of your DON!! cards as active. Then, rest up to 1 of your opponent's DON!! cards or Characters with a cost of 4 or less. [End of Your Turn] You may rest 1 of your DON!! cards: Set up to 1 of your {FILM} type Characters as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-061",
+     "imageUrls": {
+      "full": "EB03-061_HLTqyf1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SEC"
+    },
+    {
+     "artworkId": "EB03-061_p1",
+     "imageUrls": {
+      "full": "EB03-061_p1_6QpKAbT.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SEC",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "EB03-061_p2",
+     "imageUrls": {
+      "full": "EB03-061_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SEC",
+     "label": "Manga"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "SPR exception"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-061/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "EB03-062",
+   "name": "Trafalgar Law",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 8,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Heart Pirates"
+   ],
+   "rarity": "SEC",
+   "set": "EB-03",
+   "block": 4,
+   "effectText": "[Rush] [Activate: Main] You may trash 1 card from your hand and trash this Character: Add up to 1 card from the top of your deck to the top of your Life cards. Then, play up to 1 [Trafalgar Law] with a cost of 7 or less from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "EB03-062",
+     "imageUrls": {
+      "full": "EB03-062_BWvg4OV.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SEC"
+    },
+    {
+     "artworkId": "EB03-062_p1",
+     "imageUrls": {
+      "full": "EB03-062_p1_rVGeO4S.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-03",
+     "rarity": "SEC",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/EB03-062/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  }
+ ]
+}

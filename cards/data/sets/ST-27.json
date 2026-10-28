@@ -1,0 +1,269 @@
+{
+ "set": {
+  "code": "ST-27",
+  "name": "Starter Deck 27: BLACK Marshall.D.Teach",
+  "kind": "starter",
+  "cardCount": 5,
+  "block": 3
+ },
+ "cards": [
+  {
+   "id": "ST27-001",
+   "name": "Avalo Pizarro",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 1,
+   "power": 1000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Blackbeard Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-27",
+   "block": 3,
+   "effectText": "[Activate:Main] [Once Per Turn] You may rest 1 of your [Fullalead] cards: If your Leader has the \"Blackbeard Pirates\" type, this Character gains +4000 power during this turn.\n[On K.O.] Draw 1 card.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST27-001",
+     "imageUrls": {
+      "full": "ST27-001.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-27",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST27-001/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST27-002",
+   "name": "Catarina Devon",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 1,
+   "power": 1000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Blackbeard Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-27",
+   "block": 3,
+   "effectText": "[Activate:Main] You may trash this Character: If your Leader has the \"Blackbeard Pirates\" type, give up to 1 of your opponent's Characters −1 cost during this turn.\n[On K.O.] Draw 1 card.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST27-002",
+     "imageUrls": {
+      "full": "ST27-002.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-27",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST27-002/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST27-003",
+   "name": "Kuzan",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 6,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Blackbeard Pirates",
+    "Former Navy"
+   ],
+   "rarity": "SR",
+   "set": "ST-27",
+   "block": 3,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[On K.O.] Play up to 1 \"Blackbeard Pirates\" type Character card with a cost of 5 or less from your trash rested.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST27-003",
+     "imageUrls": {
+      "full": "ST27-003.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-27",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST27-003/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST27-004",
+   "name": "Sanjuan.Wolf",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 4,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Blackbeard Pirates",
+    "Giant"
+   ],
+   "rarity": "C",
+   "set": "ST-27",
+   "block": 3,
+   "effectText": "If your Leader has the \"Blackbeard Pirates\" type, this Character gains [Blocker] and +1 cost for every 4 cards in your trash.\n(After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[On Play] Trash 1 card from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST27-004",
+     "imageUrls": {
+      "full": "ST27-004.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-27",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST27-004/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST27-005",
+   "name": "Marshall.D.Teach",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 7,
+   "power": 8000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Blackbeard Pirates",
+    "The Four Emperors"
+   ],
+   "rarity": "SR",
+   "set": "ST-27",
+   "block": 3,
+   "effectText": "[Activate:Main] You may rest this Character: K.O. up to 1 Character with a cost of 3 or less.\n[On K.O.] Add up to 1 black card from your trash to your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST27-005",
+     "imageUrls": {
+      "full": "ST27-005.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-27",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "ST27-005_p1",
+     "imageUrls": {
+      "full": "ST27-005_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-17",
+     "rarity": "SR",
+     "label": "SP"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST27-005/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  }
+ ]
+}

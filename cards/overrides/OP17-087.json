@@ -1,0 +1,26 @@
+{
+  "id": "OP17-087",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP17-087",
+      "date": "2026-10-28",
+      "use": "cross-check"
+    },
+    {
+      "url": "https://en.onepiece-cardgame.com/cardlist/?series=569117",
+      "date": "2026-10-28",
+      "use": "disagreement"
+    }
+  ],
+  "keywords": [],
+  "textPatches": [
+    {
+      "field": "effectText",
+      "find": "−3000 poser",
+      "replace": "−3000 power",
+      "note": "Typo.",
+      "source": "https://en.onepiece-cardgame.com/cardlist/?series=569117"
+    }
+  ]
+}

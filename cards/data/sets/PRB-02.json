@@ -1,0 +1,1158 @@
+{
+ "set": {
+  "code": "PRB-02",
+  "name": "Premium Booster -The Best- Vol. 2",
+  "kind": "premium",
+  "cardCount": 18,
+  "block": 3
+ },
+ "cards": [
+  {
+   "id": "PRB02-001",
+   "name": "Koby",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Navy",
+    "SWORD"
+   ],
+   "rarity": "R",
+   "set": "PRB-02",
+   "block": 3,
+   "effectText": "[Opponent's Turn] If your Leader has the \"Navy\" type, this Character gains +1000 power.[When Attacking] K.O. up to 1 of your opponent's Characters with 3000 base power or less. Then, if you have 6 or less cards in your hand, draw 1 card.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "PRB02-001",
+     "imageUrls": {
+      "full": "PRB02-001.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "PRB02-001_p1",
+     "imageUrls": {
+      "full": "PRB02-001_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-001/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "PRB02-002",
+   "name": "Trafalgar Law",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 6,
+   "power": 7000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Heart Pirates",
+    "The Seven Warlords of the Sea",
+    "Punk Hazard"
+   ],
+   "rarity": "SR",
+   "set": "PRB-02",
+   "block": 3,
+   "effectText": "[Once Per Turn] If this Character would be removed from the field by your opponent's effect, you may give this Character −2000 power during this turn instead.[When Attacking] Give up to 1 of your opponent's Characters −2000 power during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "PRB02-002",
+     "imageUrls": {
+      "full": "PRB02-002.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "PRB02-002_p1",
+     "imageUrls": {
+      "full": "PRB02-002_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-002/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "PRB02-003",
+   "name": "Lucky.Roux",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 4,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "Red-Haired Pirates"
+   ],
+   "rarity": "R",
+   "set": "PRB-02",
+   "block": 3,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)[On Play] You may trash 1 Character card with 6000 power or more from your hand: Draw 2 cards.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "PRB02-003",
+     "imageUrls": {
+      "full": "PRB02-003.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "PRB02-003_p1",
+     "imageUrls": {
+      "full": "PRB02-003_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-003/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "PRB02-004",
+   "name": "Jewelry Bonney",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 3,
+   "power": 3000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Bonney Pirates",
+    "Supernovas"
+   ],
+   "rarity": "R",
+   "set": "PRB-02",
+   "block": 3,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)[On Your Opponent's Attack] [Once Per Turn] Set up to 1 of your DON!! cards as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "PRB02-004",
+     "imageUrls": {
+      "full": "PRB02-004_GgQQXru.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "PRB02-004_p1",
+     "imageUrls": {
+      "full": "PRB02-004_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-004/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "PRB02-005",
+   "name": "Monkey.D.Luffy",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Straw Hat Crew",
+    "Supernovas"
+   ],
+   "rarity": "SR",
+   "set": "PRB-02",
+   "block": 3,
+   "effectText": "[Your Turn] [On Play] If your Leader is multicolored and your opponent has 7 or less DON!! cards on their field, your opponent rests 1 of their active DON!! cards at the start of their next Main Phase.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "PRB02-005",
+     "imageUrls": {
+      "full": "PRB02-005.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "PRB02-005#2",
+     "imageUrls": {
+      "full": "Monkey.D.Luffy_Red_Bull_Double_Don_Winner_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "SR",
+     "label": "Red Bull Double Don!! · Winner"
+    },
+    {
+     "artworkId": "PRB02-005_p1",
+     "imageUrls": {
+      "full": "PRB02-005_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "PRB02-005_pr1",
+     "imageUrls": {
+      "full": "Monkey.D.Luffy_Red_Bull_Double_Don_Winner_Textured_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "SR",
+     "label": "Red Bull Double Don!! · Winner · Textured"
+    },
+    {
+     "artworkId": "PRB02-005_pr2",
+     "imageUrls": {
+      "full": "Monkey.D.Luffy_Red_Bull_Double_Don_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "SR",
+     "label": "Red Bull Double Don!!"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-005/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "PRB02-006",
+   "name": "Roronoa Zoro",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 4,
+   "power": 4000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Straw Hat Crew",
+    "Supernovas"
+   ],
+   "rarity": "R",
+   "set": "PRB-02",
+   "block": 3,
+   "effectText": "[Opponent's Turn] If this Character would be rested by your opponent's Character's effect, you may rest 1 of your other Characters instead.[Blocker]",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "PRB02-006",
+     "imageUrls": {
+      "full": "PRB02-006.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "PRB02-006#2",
+     "imageUrls": {
+      "full": "Roronoa_Zoro_Welcome_Pack_2026_Vol.1_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Welcome Pack 2026 Vol.1"
+    },
+    {
+     "artworkId": "PRB02-006_p1",
+     "imageUrls": {
+      "full": "PRB02-006_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "PRB02-006_p2",
+     "imageUrls": {
+      "full": "PRB02-006_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-14",
+     "rarity": "R",
+     "label": "SP"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-006/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "PRB02-007",
+   "name": "Jinbe",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Fish-Man",
+    "The Seven Warlords of the Sea",
+    "The Sun Pirates"
+   ],
+   "rarity": "R",
+   "set": "PRB-02",
+   "block": 3,
+   "effectText": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 \"The Seven Warlords of the Sea\" type card other than [Jinbe] and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "PRB02-007",
+     "imageUrls": {
+      "full": "PRB02-007.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "PRB02-007_p1",
+     "imageUrls": {
+      "full": "PRB02-007_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R",
+     "label": "PRB02-007(Alternate Art)"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-007/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "PRB02-008",
+   "name": "Marco",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 4,
+   "power": 6000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Former Whitebeard Pirates",
+    "Land of Wano"
+   ],
+   "rarity": "SR",
+   "set": "PRB-02",
+   "block": 3,
+   "effectText": "[Blocker](After your opponent declares an attack, you may rest this card to make it the new target of the attack.)[On K.O.] Draw 2 cards.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "PRB02-008",
+     "imageUrls": {
+      "full": "PRB02-008.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "PRB02-008_p1",
+     "imageUrls": {
+      "full": "PRB02-008_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-008/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "PRB02-009",
+   "name": "Mr.3(Galdino)",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 2,
+   "power": 1000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Former Baroque Works",
+    "Cross Guild"
+   ],
+   "rarity": "R",
+   "set": "PRB-02",
+   "block": 3,
+   "effectText": "This effect can be activated when this Character is rested by your opponent's effect. You may trash this Character and draw 2 cards.[Blocker]",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "PRB02-009",
+     "imageUrls": {
+      "full": "PRB02-009.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "PRB02-009_p1",
+     "imageUrls": {
+      "full": "PRB02-009_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-009/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "PRB02-010",
+   "name": "Charlotte Pudding",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 7,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "SR",
+   "set": "PRB-02",
+   "block": 3,
+   "effectText": "[On Play] DON!! −2: If your Leader has the \"Big Mom Pirates\" type and your opponent has 6 or more DON!! cards on their field, draw 2 cards. Then, play up to 1 \"Big Mom Pirates\" type Character card with 6000 to 8000 power from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "PRB02-010",
+     "imageUrls": {
+      "full": "PRB02-010.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "PRB02-010_p1",
+     "imageUrls": {
+      "full": "PRB02-010_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-010/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "PRB02-011",
+   "name": "Donquixote Doflamingo",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Donquixote Pirates",
+    "The Seven Warlords of the Sea"
+   ],
+   "rarity": "R",
+   "set": "PRB-02",
+   "block": 3,
+   "effectText": "[Blocker][On Play] If your Leader is multicolored, add up to 1 DON!! card from your DON!! deck and rest it.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "PRB02-011",
+     "imageUrls": {
+      "full": "PRB02-011.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "PRB02-011_p1",
+     "imageUrls": {
+      "full": "PRB02-011_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-011/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "PRB02-012",
+   "name": "Nami",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 2,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Straw Hat Crew"
+   ],
+   "rarity": "R",
+   "set": "PRB-02",
+   "block": 3,
+   "effectText": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 \"Straw Hat Crew\" type card other than [Nami] and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": "Play this card.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "PRB02-012",
+     "imageUrls": {
+      "full": "PRB02-012.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "PRB02-012#2",
+     "imageUrls": {
+      "full": "Nami_Welcome_Pack_2026_Vol.1_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Welcome Pack 2026 Vol.1"
+    },
+    {
+     "artworkId": "PRB02-012_p1",
+     "imageUrls": {
+      "full": "PRB02-012_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-012/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "PRB02-013",
+   "name": "Gecko Moria",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 6,
+   "power": 7000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "The Seven Warlords of the Sea",
+    "Thriller Bark Pirates"
+   ],
+   "rarity": "R",
+   "set": "PRB-02",
+   "block": 3,
+   "effectText": "[On Play] If your Leader has the \"Thriller Bark Pirates\" type, play up to 1 Character card with a cost of 4 or less from your trash rested. Then, give up to 1 rested DON!! card to your Leader or 1 of your Characters.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "PRB02-013",
+     "imageUrls": {
+      "full": "PRB02-013.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "PRB02-013_p1",
+     "imageUrls": {
+      "full": "PRB02-013_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-013/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "PRB02-014",
+   "name": "Sabo",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 6,
+   "power": 6000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Revolutionary Army",
+    "Dressrosa"
+   ],
+   "rarity": "SR",
+   "set": "PRB-02",
+   "block": 3,
+   "effectText": "If you have 15 or more cards in your trash, give this card in your hand −3 cost.[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "PRB02-014",
+     "imageUrls": {
+      "full": "PRB02-014.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "PRB02-014_p1",
+     "imageUrls": {
+      "full": "PRB02-014_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "PRB02-014_p2",
+     "imageUrls": {
+      "full": "PRB02-014_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-15",
+     "rarity": "SR",
+     "label": "SP"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-014/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "PRB02-015",
+   "name": "Shiryu",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Blackbeard Pirates"
+   ],
+   "rarity": "R",
+   "set": "PRB-02",
+   "block": 3,
+   "effectText": "If your Leader has the \"Blackbeard Pirates\" type, this Character gains [Blocker] and +4 cost.[On K.O.] If your Leader has the \"Blackbeard Pirates\" type, K.O. up to 1 of your opponent's Characters with a base cost of 4 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "PRB02-015",
+     "imageUrls": {
+      "full": "PRB02-015.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "PRB02-015_p1",
+     "imageUrls": {
+      "full": "PRB02-015_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-015/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "PRB02-016",
+   "name": "Otama",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 2,
+   "power": 0,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Land of Wano"
+   ],
+   "rarity": "R",
+   "set": "PRB-02",
+   "block": 3,
+   "effectText": "[Activate: Main] You may rest this Character and add 1 card from the top or bottom of your Life cards to your hand: Up to 1 of your Leader or Character cards gains +3000 power during this turn.",
+   "triggerText": "Rest up to 1 of your opponent's Characters with a cost of 4 or less.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "PRB02-016",
+     "imageUrls": {
+      "full": "PRB02-016.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "PRB02-016_p1",
+     "imageUrls": {
+      "full": "PRB02-016_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-016/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "PRB02-017",
+   "name": "Boa Hancock",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 5,
+   "power": 7000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "FILM",
+    "Kuja Pirates",
+    "The Seven Warlords of the Sea"
+   ],
+   "rarity": "SR",
+   "set": "PRB-02",
+   "block": 3,
+   "effectText": "[Once Per Turn] You may trash 1 card with a [Trigger] from your hand: Your opponent's rested Leader or up to 1 of your opponent's Characters other than [Monkey.D.Luffy] cannot attack until the end of your opponent's next End Phase.",
+   "triggerText": "K.O up to 1 of your opponent's Characters with a cost of 4 or less",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "PRB02-017",
+     "imageUrls": {
+      "full": "PRB02-017.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "PRB02-017_p1",
+     "imageUrls": {
+      "full": "PRB02-017_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-017/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "PRB02-018",
+   "name": "Portgas.D.Ace",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 5,
+   "power": 7000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Whitebeard Pirates"
+   ],
+   "rarity": "R",
+   "set": "PRB-02",
+   "block": 3,
+   "effectText": "[On Play] If you have a face-up Life card, play up to 1 [Sabo], [Portgas.D.Ace], or [Monkey.D.Luffy] with a cost of 2 from your hand or trash.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "PRB02-018",
+     "imageUrls": {
+      "full": "PRB02-018.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "PRB02-018_p1",
+     "imageUrls": {
+      "full": "PRB02-018_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-018/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  }
+ ]
+}

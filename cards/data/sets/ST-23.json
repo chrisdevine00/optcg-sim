@@ -1,0 +1,268 @@
+{
+ "set": {
+  "code": "ST-23",
+  "name": "Starter Deck 23: RED Shanks",
+  "kind": "starter",
+  "cardCount": 5,
+  "block": null
+ },
+ "cards": [
+  {
+   "id": "ST23-001",
+   "name": "Uta",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 6,
+   "power": 4000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "FILM"
+   ],
+   "rarity": "SR",
+   "set": "ST-23",
+   "block": null,
+   "effectText": "If you have a Character with 10000 power or more, give this card in your hand −4 cost.\n[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST23-001",
+     "imageUrls": {
+      "full": "ST23-001.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-23",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "unknown",
+     "reason": "block not known"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST23-001/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST23-002",
+   "name": "Shanks",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 9,
+   "power": 10000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "The Four Emperors",
+    "Red-Haired Pirates"
+   ],
+   "rarity": "SR",
+   "set": "ST-23",
+   "block": null,
+   "effectText": "If your opponent has a Character with 8000 base power or more, give this card in your hand −3 cost.\n[On Play] If your Leader has the \"Red-Haired Pirates\" type or is [Uta], your Leader gains +2000 power until the end of your opponent's next End Phase.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST23-002",
+     "imageUrls": {
+      "full": "ST23-002.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-23",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "unknown",
+     "reason": "block not known"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST23-002/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST23-003",
+   "name": "Benn.Beckman",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "Red-Haired Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-23",
+   "block": null,
+   "effectText": "[On Play] You may trash 1 card from your hand: If your Leader has the \"Red-Haired Pirates\" type, K.O. up to 1 of your opponent's Characters with 4000 base power or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST23-003",
+     "imageUrls": {
+      "full": "ST23-003.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-23",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "unknown",
+     "reason": "block not known"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST23-003/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST23-004",
+   "name": "Monkey.D.Luffy",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 1,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "FILM",
+    "Straw Hat Crew",
+    "Supernovas"
+   ],
+   "rarity": "C",
+   "set": "ST-23",
+   "block": null,
+   "effectText": "[Activate:Main] You may rest 1 of your DON!! cards and this Character: Give up to 1 of your opponent's Characters-1000 power during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST23-004",
+     "imageUrls": {
+      "full": "ST23-004.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-23",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "ST23-004-r1",
+     "imageUrls": {
+      "full": "ST23-004_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-31",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "unknown",
+     "reason": "block not known"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST23-004/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST23-005",
+   "name": "Yasopp",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 1,
+   "power": 1000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "Red-Haired Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-23",
+   "block": null,
+   "effectText": "[Activate:Main] [Once Per Turn] Give up to 1 rested DON!! card to your Leader or 1 of your Characters.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST23-005",
+     "imageUrls": {
+      "full": "ST23-005.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-23",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "unknown",
+     "reason": "block not known"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST23-005/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  }
+ ]
+}

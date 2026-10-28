@@ -1,0 +1,19 @@
+{
+  "id": "P-018",
+  "verified": false,
+  "sources": [
+    {
+      "url": "https://en.onepiece-cardgame.com/cardlist/?series=569901",
+      "date": "2026-10-28",
+      "use": "disagreement"
+    }
+  ],
+  "fields": {
+    "types": {
+      "value": ["FILM", "Supernovas", "Barto Club"],
+      "upstream": [],
+      "source": "https://en.onepiece-cardgame.com/cardlist/?series=569901"
+    }
+  },
+  "note": "optcgapi: \"Barto Club Pirates Film Supernovas\"."
+}

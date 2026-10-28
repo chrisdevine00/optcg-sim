@@ -1,0 +1,922 @@
+{
+ "set": {
+  "code": "ST-10",
+  "name": "Ultra Deck: The Three Captains",
+  "kind": "starter",
+  "cardCount": 17,
+  "block": 2
+ },
+ "cards": [
+  {
+   "id": "ST10-001",
+   "name": "Trafalgar Law",
+   "category": "Leader",
+   "colors": [
+    "Purple",
+    "Red"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 4,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Heart Pirates"
+   ],
+   "rarity": "L",
+   "set": "ST-10",
+   "block": 2,
+   "effectText": "[Activate:Main] [Once Per Turn] DON!! −3 (You may return the specified number of DON!! cards from your field to your DON!! deck.): Place up to 1 of your opponent's Characters with 3000 power or less at the bottom of the owner's deck, and play up to 1 Character card with a cost of 4 or less from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST10-001",
+     "imageUrls": {
+      "full": "ST10-001.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-10",
+     "rarity": "L"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "banned",
+     "reason": "banned from 2024-09-06"
+    },
+    "extra": {
+     "status": "banned",
+     "reason": "banned from 2024-09-06"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST10-001/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST10-002",
+   "name": "Monkey.D.Luffy",
+   "category": "Leader",
+   "colors": [
+    "Purple",
+    "Red"
+   ],
+   "cost": null,
+   "power": 6000,
+   "counter": null,
+   "life": 3,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Straw Hat Crew"
+   ],
+   "rarity": "L",
+   "set": "ST-10",
+   "block": 2,
+   "effectText": "[Activate:Main] [Once Per Turn] If you have 0 DON!! cards on your field or 8 or more DON!! cards on your field, add up to 1 DON!! card from your DON!! deck and set it as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST10-002",
+     "imageUrls": {
+      "full": "ST10-002.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-10",
+     "rarity": "L"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST10-002/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST10-003",
+   "name": "Eustass\"Captain\"Kid",
+   "category": "Leader",
+   "colors": [
+    "Purple",
+    "Red"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 5,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Kid Pirates"
+   ],
+   "rarity": "L",
+   "set": "ST-10",
+   "block": 2,
+   "effectText": "[Your Turn] If you have 4 or more Life cards, give this Leader −1000 power. [When Attacking] DON!! −1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): This Leader gains +2000 power during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST10-003",
+     "imageUrls": {
+      "full": "ST10-003.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-10",
+     "rarity": "L"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST10-003/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST10-004",
+   "name": "Sanji",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 6,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Straw Hat Crew"
+   ],
+   "rarity": "C",
+   "set": "ST-10",
+   "block": 2,
+   "effectText": "[On Play] If your opponent has a Character with 5000 or more power, this Character gains [Rush] during this turn. (This card can attack on the turn in which it is played.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST10-004",
+     "imageUrls": {
+      "full": "ST10-004.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST10-004/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST10-005",
+   "name": "Jinbe",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 2,
+   "power": 2000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Fish-Man",
+    "Straw Hat Crew"
+   ],
+   "rarity": "C",
+   "set": "ST-10",
+   "block": 2,
+   "effectText": "[DON!! x1] [When Attacking] Give up to 1 of your opponent's Characters −2000 power during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST10-005",
+     "imageUrls": {
+      "full": "ST10-005.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-10",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "ST10-005_p2",
+     "imageUrls": {
+      "full": "ST10-005_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "C",
+     "label": "Pirate Foil"
+    },
+    {
+     "artworkId": "ST10-005_r1",
+     "imageUrls": {
+      "full": "ST10-005_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "C",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST10-005/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST10-006",
+   "name": "Monkey.D.Luffy",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 10,
+   "power": 11000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Straw Hat Crew"
+   ],
+   "rarity": "SR",
+   "set": "ST-10",
+   "block": 2,
+   "effectText": "[Rush] (This card can attack on the turn in which it is played.) [Once Per Turn] When your opponent activates a [Blocker], K.O. up to 1 of your opponent's Characters with 8000 power or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST10-006",
+     "imageUrls": {
+      "full": "ST10-006.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-10",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST10-006/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST10-007",
+   "name": "Killer",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Kid Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-10",
+   "block": 2,
+   "effectText": "[Your Turn] [Once Per Turn] When a DON!! card on your field is returned to your DON!! deck, K.O. up to 1 of your opponent's rested Characters with a cost of 3 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST10-007",
+     "imageUrls": {
+      "full": "ST10-007.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST10-007/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST10-008",
+   "name": "Shachi & Penguin",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "Heart Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-10",
+   "block": 2,
+   "effectText": "[On Play] If you have 3 or less DON!! cards on your field, add up to 2 DON!! cards from your DON!! deck and rest them.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST10-008",
+     "imageUrls": {
+      "full": "ST10-008.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-10",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "ST10-008_p3",
+     "imageUrls": {
+      "full": "ST10-008_p3.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "C",
+     "label": "Pirate Foil"
+    },
+    {
+     "artworkId": "ST10-008_r1",
+     "imageUrls": {
+      "full": "ST10-008_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "C",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST10-008/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST10-009",
+   "name": "Jean Bart",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Heart Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-10",
+   "block": 2,
+   "effectText": "[On Play] (1) (You may rest the specified number of DON!! cards in your cost area.): Add up to 1 DON!! card from your DON!! deck and set it as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST10-009",
+     "imageUrls": {
+      "full": "ST10-009.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST10-009/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST10-010",
+   "name": "Trafalgar Law",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Heart Pirates"
+   ],
+   "rarity": "SR",
+   "set": "ST-10",
+   "block": 2,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.) [On Play] DON!! −1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): If your opponent has 7 or more cards in their hand, trash 2 cards from your opponent's hand.",
+   "triggerText": null,
+   "keywords": [
+    "Blocker"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST10-010",
+     "date": "2026-10-28",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST10-010",
+     "imageUrls": {
+      "full": "ST10-010_7CxTZxR.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-10",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "ST10-010_p2",
+     "imageUrls": {
+      "full": "ST10-010_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-07",
+     "rarity": "SR",
+     "label": "TR"
+    },
+    {
+     "artworkId": "ST10-010_p4",
+     "imageUrls": {
+      "full": "ST10-010_p4.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "ST10-010_p7",
+     "imageUrls": {
+      "full": "ST10-010_p7.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "SR",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST10-010/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST10-011",
+   "name": "Heat",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Kid Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-10",
+   "block": 2,
+   "effectText": "[Your Turn] [Once Per Turn] When a DON!! card on your field is returned to your DON!! deck, this Character gains +2000 power until the start of your next turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST10-011",
+     "imageUrls": {
+      "full": "ST10-011.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST10-011/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST10-012",
+   "name": "Bepo",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Heart Pirates",
+    "Minks"
+   ],
+   "rarity": "C",
+   "set": "ST-10",
+   "block": 2,
+   "effectText": "[On Play] / [When Attacking] If your opponent has more DON!! cards on their field than you, add up to 1 DON!! card from your DON!! deck and rest it.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST10-012",
+     "imageUrls": {
+      "full": "ST10-012.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST10-012/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST10-013",
+   "name": "Eustass\"Captain\"Kid",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 7,
+   "power": 8000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Kid Pirates"
+   ],
+   "rarity": "SR",
+   "set": "ST-10",
+   "block": 2,
+   "effectText": "[On Play] / [When Attacking] DON!! −1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): Up to 1 of your Leader gains +1000 power until the start of your next turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST10-013",
+     "imageUrls": {
+      "full": "ST10-013.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-10",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST10-013/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST10-014",
+   "name": "Wire",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 3,
+   "power": 3000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Kid Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-10",
+   "block": 2,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.) [Once Per Turn] When a DON!! card on your field is returned to your DON!! deck, draw 1 card and trash 1 card from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST10-014",
+     "imageUrls": {
+      "full": "ST10-014.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST10-014/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST10-015",
+   "name": "Gum-Gum Giant Sumo Slap",
+   "category": "Event",
+   "colors": [
+    "Red"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Straw Hat Crew"
+   ],
+   "rarity": "C",
+   "set": "ST-10",
+   "block": 2,
+   "effectText": "[Counter] Up to 1 of your Leader or Character cards gains +2000 power during this battle, and K.O. up to 1 of your opponent's Characters with 2000 power or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST10-015",
+     "imageUrls": {
+      "full": "ST10-015.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST10-015/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST10-016",
+   "name": "Gum-Gum Kong Gatling",
+   "category": "Event",
+   "colors": [
+    "Red"
+   ],
+   "cost": 5,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Straw Hat Crew"
+   ],
+   "rarity": "C",
+   "set": "ST-10",
+   "block": 2,
+   "effectText": "[Main] K.O. up to 1 of your opponent's Characters with 7000 power or less.",
+   "triggerText": "Up to 1 of your Leader gains +1000 power until the end of your next turn.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST10-016",
+     "imageUrls": {
+      "full": "ST10-016.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST10-016/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST10-017",
+   "name": "Punk Vise",
+   "category": "Event",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 3,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Kid Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-10",
+   "block": 2,
+   "effectText": "[Main] Rest up to 1 of your opponent's Characters with a cost of 2 or less, and add up to 1 DON!! card from your DON!! deck and rest it.",
+   "triggerText": "Add up to 1 DON!! card from your DON!! deck and set it as active.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST10-017",
+     "imageUrls": {
+      "full": "ST10-017.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST10-017/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  }
+ ]
+}

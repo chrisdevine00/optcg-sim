@@ -1,0 +1,7919 @@
+{
+ "set": {
+  "code": "OP-03",
+  "name": "Pillars of Strength",
+  "kind": "booster",
+  "cardCount": 123,
+  "block": 1
+ },
+ "cards": [
+  {
+   "id": "OP03-001",
+   "name": "Portgas.D.Ace",
+   "category": "Leader",
+   "colors": [
+    "Red"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 5,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Whitebeard Pirates"
+   ],
+   "rarity": "L",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "When this Leader attacks or is attacked, you may trash any number of Event or Stage cards from your hand. This Leader gains +1000 power during this battle for every card trashed.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-001",
+     "imageUrls": {
+      "full": "OP03-001.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "L"
+    },
+    {
+     "artworkId": "OP03-001#2",
+     "imageUrls": {
+      "full": "Portgas.D.Ace_Special_Goods_Set_-AceSaboLuffy-_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "L",
+     "label": "Special Goods Set -Ace/Sabo/Luffy-"
+    },
+    {
+     "artworkId": "OP03-001_p1",
+     "imageUrls": {
+      "full": "OP03-001_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "L",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-001/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-002",
+   "name": "Adio",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "ODYSSEY"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[DON!! x1] [When Attacking] Your opponent cannot activate a [Blocker] Character that has 2000 or less power during this battle.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-002",
+     "imageUrls": {
+      "full": "OP03-002.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-002/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-003",
+   "name": "Izo",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 1,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "Land of Wano",
+    "Whitebeard Pirates"
+   ],
+   "rarity": "R",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 card with a type including \"Whitebeard Pirates\" other than [Izo] and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-003",
+     "imageUrls": {
+      "full": "OP03-003.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP03-003#2",
+     "imageUrls": {
+      "full": "OP03-003_K1VGqSd.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-15",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP03-003_p1",
+     "imageUrls": {
+      "full": "OP03-003_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-07",
+     "rarity": "R",
+     "label": "SP"
+    },
+    {
+     "artworkId": "OP03-003_p4",
+     "imageUrls": {
+      "full": "OP03-003_p4.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "R",
+     "label": "Jolly Roger Foil"
+    },
+    {
+     "artworkId": "OP03-003_p5",
+     "imageUrls": {
+      "full": "OP03-003_p5.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "R",
+     "label": "Full Art"
+    },
+    {
+     "artworkId": "OP03-003_p6",
+     "imageUrls": {
+      "full": "OP03-003_p6.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "R",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "OP03-003_r2",
+     "imageUrls": {
+      "full": "OP03-003_r2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "R",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-003/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-004",
+   "name": "Curiel",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "Whitebeard Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "This Character cannot attack a Leader on the turn in which it is played. [DON!! x1] This Character gains [Rush]. (This card can attack on the turn in which it is played.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-004",
+     "imageUrls": {
+      "full": "OP03-004.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-004/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-005",
+   "name": "Thatch",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 1,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Whitebeard Pirates"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Activate:Main] [Once Per Turn] This Character gains +2000 power during this turn. Then, trash this Character at the end of this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-005",
+     "imageUrls": {
+      "full": "OP03-005.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-005/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-006",
+   "name": "Speed Jil",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 4,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Whitebeard Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "OP03-006",
+     "imageUrls": {
+      "full": "OP03-006_tqFRtL6.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "OP03-006#2",
+     "imageUrls": {
+      "full": "OP03-006_3yphD6n.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-15",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "OP03-006_p1",
+     "imageUrls": {
+      "full": "OP03-006_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-04",
+     "rarity": "C",
+     "label": "Dash Pack"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-006/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-007",
+   "name": "Namule",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 3,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Fish-Man",
+    "Whitebeard Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "OP03-007",
+     "imageUrls": {
+      "full": "OP03-007.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "OP03-007#2",
+     "imageUrls": {
+      "full": "OP03-007_MiElukV.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-15",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-007/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-008",
+   "name": "Buggy",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 1,
+   "power": 3000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Buggy Pirates"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 4,
+   "effectText": "This Character cannot be K.O.'d in battle by \"Slash\" attribute cards. [On Play] Look at 5 cards from the top of your deck; reveal up to 1 red Event and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-008",
+     "imageUrls": {
+      "full": "OP03-008.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    },
+    {
+     "artworkId": "OP03-008#2",
+     "imageUrls": {
+      "full": "Buggy_Judge_Pack_Vol._2_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Judge Pack Vol. 2"
+    },
+    {
+     "artworkId": "OP03-008_p1",
+     "imageUrls": {
+      "full": "OP03-008_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-06",
+     "rarity": "UC",
+     "label": "SP"
+    },
+    {
+     "artworkId": "OP03-008_p2",
+     "imageUrls": {
+      "full": "OP03-008_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "UC",
+     "label": "Pirate Foil"
+    },
+    {
+     "artworkId": "OP03-008_r1",
+     "imageUrls": {
+      "full": "OP03-008_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "UC",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "treated as block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-008/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-009",
+   "name": "Haruta",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 2,
+   "power": 3000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Whitebeard Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Activate:Main] [Once Per Turn] Give up to 1 rested DON!! card to your Leader or 1 of your Characters.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-009",
+     "imageUrls": {
+      "full": "OP03-009.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-009/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-010",
+   "name": "Fossa",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 2,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Whitebeard Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-010",
+     "imageUrls": {
+      "full": "OP03-010.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "OP03-010#2",
+     "imageUrls": {
+      "full": "OP03-010_tKEVok1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-15",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-010/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-011",
+   "name": "Blamenco",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 2,
+   "power": 3000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Whitebeard Pirates"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[DON!! x1] [When Attacking] Give up to 1 of your opponent's Characters −2000 power during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-011",
+     "imageUrls": {
+      "full": "OP03-011.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-011/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-012",
+   "name": "Marshall.D.Teach",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 4,
+   "power": 6000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Whitebeard Pirates"
+   ],
+   "rarity": "R",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[When Attacking] You may trash 1 of your red Characters with 4000 power or more: Draw 1 card. Then, this Character gains +1000 power during this battle.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-012",
+     "imageUrls": {
+      "full": "OP03-012.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-012/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-013",
+   "name": "Marco",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Whitebeard Pirates"
+   ],
+   "rarity": "SR",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Your Turn] [On Play] K.O. up to 1 of your opponent's Characters with 3000 power or less. [On K.O.] You may trash 1 Event from your hand",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-013",
+     "imageUrls": {
+      "full": "OP03-013.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "OP03-013#2",
+     "imageUrls": {
+      "full": "Marco_Championship_2023_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Championship 2023"
+    },
+    {
+     "artworkId": "OP03-013_p1",
+     "imageUrls": {
+      "full": "OP03-013_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "OP03-013_pr1",
+     "imageUrls": {
+      "full": "Marco_Japanese_1st_Anniversary_Set_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "SR",
+     "label": "Japanese 1st Anniversary Set"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-013/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-014",
+   "name": "Monkey.D.Garp",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 3,
+   "power": 5000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Navy"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[When Attacking] Play up to 1 red Character card with a cost of 1 from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-014",
+     "imageUrls": {
+      "full": "OP03-014.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-014/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-015",
+   "name": "Lim",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 3,
+   "power": 2000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "ODYSSEY"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-015",
+     "imageUrls": {
+      "full": "OP03-015.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-015/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-016",
+   "name": "Flame Emperor",
+   "category": "Event",
+   "colors": [
+    "Red"
+   ],
+   "cost": 7,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Whitebeard Pirates"
+   ],
+   "rarity": "R",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Main] If your Leader is [Portgas.D.Ace], K.O. up to 1 of your opponent's Characters with 8000 power or less, and your Leader gains [Double Attack] and +3000 power during this turn. (This card deals 2 damage.)",
+   "triggerText": "K.O. up to 1 of your opponent's Characters with 6000 power or less.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-016",
+     "imageUrls": {
+      "full": "OP03-016.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP03-016#2",
+     "imageUrls": {
+      "full": "Flame_Emperor_Judge_Pack_Vol._2_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Judge Pack Vol. 2"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-016/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-017",
+   "name": "Cross Fire",
+   "category": "Event",
+   "colors": [
+    "Red"
+   ],
+   "cost": 2,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Whitebeard Pirates"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Main] / [Counter] If your Leader's type includes \"Whitebeard Pirates\", give up to 1 of your opponent's Characters −4000 power during this turn.",
+   "triggerText": "Activate this card's [Main] effect.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-017",
+     "imageUrls": {
+      "full": "OP03-017.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-017/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-018",
+   "name": "Fire Fist",
+   "category": "Event",
+   "colors": [
+    "Red"
+   ],
+   "cost": 3,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Whitebeard Pirates"
+   ],
+   "rarity": "R",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Main] You may trash 1 Event from your hand: K.O. up to 1 of your opponent's Characters with 5000 power or less and up to 1 of your opponent's Characters with 4000 power or less.",
+   "triggerText": "K.O. up to 1 of your opponent's Characters with 5000 power or less.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-018",
+     "imageUrls": {
+      "full": "OP03-018.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP03-018_p1",
+     "imageUrls": {
+      "full": "OP03-018_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-018/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-019",
+   "name": "Fiery Doll",
+   "category": "Event",
+   "colors": [
+    "Red"
+   ],
+   "cost": 2,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Whitebeard Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Main] Your Leader gains +4000 power during this turn.",
+   "triggerText": "Give up to 1 of your opponent's Leader or Character cards −10000 power during this turn.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-019",
+     "imageUrls": {
+      "full": "OP03-019.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-019/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-020",
+   "name": "Striker",
+   "category": "Stage",
+   "colors": [
+    "Red"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Whitebeard Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Activate:Main] (2) (You may rest the specified number of DON!! cards in your cost area.) You may rest this Stage: If your Leader is [Portgas.D.Ace], look at 5 cards from the top of your deck; reveal up to 1 Event and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-020",
+     "imageUrls": {
+      "full": "OP03-020.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-020/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-021",
+   "name": "Kuro",
+   "category": "Leader",
+   "colors": [
+    "Green"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 5,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "East Blue",
+    "Black Cat Pirates"
+   ],
+   "rarity": "L",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Activate:Main] (3) (You may rest the specified number of DON!! cards in your cost area.) You may rest 2 of your [East Blue] type Characters: Set this Leader as active, and rest up to 1 of your opponent's Characters with a cost of 5 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-021",
+     "imageUrls": {
+      "full": "OP03-021.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "L"
+    },
+    {
+     "artworkId": "OP03-021_p1",
+     "imageUrls": {
+      "full": "OP03-021_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "L",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-021/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-022",
+   "name": "Arlong",
+   "category": "Leader",
+   "colors": [
+    "Green",
+    "Yellow"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 4,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Fish-Man",
+    "Arlong Pirates",
+    "East Blue"
+   ],
+   "rarity": "L",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[DON!! x2] [When Attacking (1) (You may rest the specified number of DON!! cards in your cost area.): Play up to 1 Character card with a cost of 4 or less and a [Trigger] from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-022",
+     "imageUrls": {
+      "full": "OP03-022.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "L"
+    },
+    {
+     "artworkId": "OP03-022_p1",
+     "imageUrls": {
+      "full": "OP03-022_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "L",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-022/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-023",
+   "name": "Alvida",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 1,
+   "power": 3000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "East Blue",
+    "Alvida Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "OP03-023",
+     "imageUrls": {
+      "full": "OP03-023.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-023/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-024",
+   "name": "Gin",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Krieg Pirates",
+    "East Blue"
+   ],
+   "rarity": "R",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] If your Leader has the [East Blue] type, rest up to 2 of your opponent's Characters with a cost of 4 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-024",
+     "imageUrls": {
+      "full": "OP03-024.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP03-024_p1",
+     "imageUrls": {
+      "full": "OP03-024_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-024/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-025",
+   "name": "Krieg",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 6,
+   "power": 7000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "Krieg Pirates",
+    "East Blue"
+   ],
+   "rarity": "SR",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] You may trash 1 card from your hand: K.O. up to 2 of your opponent's rested Characters with a cost of 4 or less. [DON!! x1] This Character gains [Double Attack]. (This card deals 2 damage.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-025",
+     "imageUrls": {
+      "full": "OP03-025.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "OP03-025_p1",
+     "imageUrls": {
+      "full": "OP03-025_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-025/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-026",
+   "name": "Kuroobi",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 4,
+   "power": 3000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Fish-Man",
+    "Arlong Pirates",
+    "East Blue"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] If your Leader has the [East Blue] type, rest up to 1 of your opponent's Characters.",
+   "triggerText": "Play this card.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-026",
+     "imageUrls": {
+      "full": "OP03-026.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    },
+    {
+     "artworkId": "OP03-026#2",
+     "imageUrls": {
+      "full": "Kuroobi_Offline_Regional_2023_Winner_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Offline Regional 2023 · Winner"
+    },
+    {
+     "artworkId": "OP03-026_pr1",
+     "imageUrls": {
+      "full": "Kuroobi_Online_Regional_2023_Winner_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Online Regional 2023 · Winner"
+    },
+    {
+     "artworkId": "OP03-026_pr2",
+     "imageUrls": {
+      "full": "Kuroobi_Online_Regional_2023_Finalist_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Online Regional 2023 · Finalist"
+    },
+    {
+     "artworkId": "OP03-026_pr3",
+     "imageUrls": {
+      "full": "Kuroobi_Offline_Regional_2023_Finalist_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Offline Regional 2023 · Finalist"
+    },
+    {
+     "artworkId": "OP03-026_pr4",
+     "imageUrls": {
+      "full": "Kuroobi_Offline_Regional_2023_Participant_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Offline Regional 2023 · Participant"
+    },
+    {
+     "artworkId": "OP03-026_pr5",
+     "imageUrls": {
+      "full": "Kuroobi_Online_Regional_2023_Participant_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Online Regional 2023 · Participant"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-026/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-027",
+   "name": "Sham",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "East Blue",
+    "Black Cat Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] If your Leader has the [East Blue] type, rest up to 1 of your opponent's Characters with a cost of 2 or less and, if you don't have [Buchi], play up to 1 [Buchi] from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-027",
+     "imageUrls": {
+      "full": "OP03-027.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-027/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-028",
+   "name": "Jango",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "East Blue",
+    "Black Cat Pirates"
+   ],
+   "rarity": "R",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] Choose one: • Set up to 1 of your [East Blue] type Leader or Character cards with a cost of 6 or less as active. • Rest this Character and up to 1 of your opponent's Characters.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-028",
+     "imageUrls": {
+      "full": "OP03-028.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-028/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-029",
+   "name": "Chew",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 4,
+   "power": 3000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "Fish-Man",
+    "Arlong Pirates",
+    "East Blue"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] K.O. up to 1 of your opponent's rested Characters with a cost of 4 or less.",
+   "triggerText": "Play this card.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-029",
+     "imageUrls": {
+      "full": "OP03-029.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-029/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-030",
+   "name": "Nami",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 2,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Arlong Pirates",
+    "East Blue"
+   ],
+   "rarity": "R",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 green [East Blue] type card other than [Nami] and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": "Play this card.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-030",
+     "imageUrls": {
+      "full": "OP03-030.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-030/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-031",
+   "name": "Pearl",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 2,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Krieg Pirates",
+    "East Blue"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-031",
+     "imageUrls": {
+      "full": "OP03-031.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "OP03-031#2",
+     "imageUrls": {
+      "full": "Pearl_Store_Championship_Participation_Pack_Vol._2_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Store Championship Participation Pack Vol. 2"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-031/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-032",
+   "name": "Buggy",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 3,
+   "power": 5000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Buggy Pirates",
+    "East Blue"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "This Character cannot be K.O.'d in battle by \"Slash\" attribute cards.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-032",
+     "imageUrls": {
+      "full": "OP03-032_EIda3bg.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "OP03-032_p1",
+     "imageUrls": {
+      "full": "OP03-032_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-04",
+     "rarity": "C",
+     "label": "Dash Pack"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-032/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-033",
+   "name": "Hatchan",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 4,
+   "power": 4000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Fish-Man",
+    "Arlong Pirates",
+    "East Blue"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "",
+   "triggerText": "If your Leader has the [East Blue] type, play this card.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-033",
+     "imageUrls": {
+      "full": "OP03-033.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    },
+    {
+     "artworkId": "OP03-033#2",
+     "imageUrls": {
+      "full": "Hatchan_CS_2024_Celebration_Pack_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "UC",
+     "label": "CS 2024 Celebration Pack"
+    },
+    {
+     "artworkId": "OP03-033_pr1",
+     "imageUrls": {
+      "full": "Hatchan_Winner_Pack_Vol._6_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "UC",
+     "label": "Winner Pack Vol. 6"
+    },
+    {
+     "artworkId": "OP03-033_pr2",
+     "imageUrls": {
+      "full": "Hatchan_Tournament_Pack_Vol._6_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "UC",
+     "label": "Tournament Pack Vol. 6"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-033/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-034",
+   "name": "Buchi",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "East Blue",
+    "Black Cat Pirates"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] K.O. up to 1 of your opponent's rested Characters with a cost of 2 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-034",
+     "imageUrls": {
+      "full": "OP03-034.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-034/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-035",
+   "name": "Momoo",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 2,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Animal",
+    "East Blue"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "OP03-035",
+     "imageUrls": {
+      "full": "OP03-035.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-035/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-036",
+   "name": "Out-of-the-Bag",
+   "category": "Event",
+   "colors": [
+    "Green"
+   ],
+   "cost": 3,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "NULL"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Main] You may rest 1 of your [East Blue] type Characters: Set up to 1 of your [Kuro] cards as active.",
+   "triggerText": "K.O. up to 1 of your opponent's rested Characters with a cost of 3 or less.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-036",
+     "imageUrls": {
+      "full": "OP03-036.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-036/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-037",
+   "name": "Tooth Attack",
+   "category": "Event",
+   "colors": [
+    "Green"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Fish-Man",
+    "Arlong Pirates",
+    "East Blue"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Main] You may rest 1 of your [East Blue] type Characters: K.O. up to 1 of your opponent's rested Characters with a cost of 3 or less.",
+   "triggerText": "Play up to 1 Character card with a cost of 4 or less and a [Trigger] from your hand.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-037",
+     "imageUrls": {
+      "full": "OP03-037.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-037/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-038",
+   "name": "Deathly Poison Gas Bomb MH5",
+   "category": "Event",
+   "colors": [
+    "Green"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "NULL"
+   ],
+   "rarity": "R",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Main] Rest up to 2 of your opponent's Characters with a cost of 2 or less.",
+   "triggerText": "Rest up to 1 of your opponent's Characters with a cost of 5 or less.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-038",
+     "imageUrls": {
+      "full": "OP03-038.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-038/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-039",
+   "name": "One, Two, Jango",
+   "category": "Event",
+   "colors": [
+    "Green"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "East Blue",
+    "Black Cat Pirates"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Main] Rest up to 1 of your opponent's Characters with a cost of 1 or less. Then, up to 1 of your Characters gains +1000 power during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-039",
+     "imageUrls": {
+      "full": "OP03-039.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-039/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-040",
+   "name": "Nami",
+   "category": "Leader",
+   "colors": [
+    "Blue"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 5,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "East Blue"
+   ],
+   "rarity": "L",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "When your deck is reduced to 0, you win the game instead of losing, according to the rules. [DON!! x1] When this Leader's attack deals damage to your opponent's Life, you may trash 1 card from the top of your deck.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-040",
+     "imageUrls": {
+      "full": "OP03-040.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "L"
+    },
+    {
+     "artworkId": "OP03-040_p1",
+     "imageUrls": {
+      "full": "OP03-040_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "L",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "banned",
+     "reason": "banned from 2025-08-30"
+    },
+    "extra": {
+     "status": "banned",
+     "reason": "banned from 2025-08-30"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-040/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-041",
+   "name": "Usopp",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "East Blue"
+   ],
+   "rarity": "SR",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Rush] (This card can attack on the turn in which it is played.) [DON!! x1] When this Character's attack deals damage to your opponent's Life, you may trash 7 cards from the top of your deck.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-041",
+     "imageUrls": {
+      "full": "OP03-041.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "OP03-041_p1",
+     "imageUrls": {
+      "full": "OP03-041_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-041/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-042",
+   "name": "Usopp's Pirate Crew",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 1,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "East Blue"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] Add up to 1 blue [Usopp from your trash to your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-042",
+     "imageUrls": {
+      "full": "OP03-042.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-042/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-043",
+   "name": "Gaimon",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 2,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "East Blue"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "When you deal damage to your opponent's Life, you may trash 3 cards from the top of your deck. If you do, trash this Character.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-043",
+     "imageUrls": {
+      "full": "OP03-043.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-043/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-044",
+   "name": "Kaya",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 1,
+   "power": 0,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "East Blue"
+   ],
+   "rarity": "R",
+   "set": "OP-03",
+   "block": 4,
+   "effectText": "[On Play] Draw 2 cards and trash 2 cards from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-044",
+     "imageUrls": {
+      "full": "OP03-044.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP03-044#2",
+     "imageUrls": {
+      "full": "Kaya_CS_2024_Celebration_Pack_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "CS 2024 Celebration Pack"
+    },
+    {
+     "artworkId": "OP03-044_r1",
+     "imageUrls": {
+      "full": "OP03-044_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R",
+     "label": "Reprint"
+    },
+    {
+     "artworkId": "OP03-044_pr1",
+     "imageUrls": {
+      "full": "Kaya_Winner_Pack_Vol._6_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Winner Pack Vol. 6"
+    },
+    {
+     "artworkId": "OP03-044_pr2",
+     "imageUrls": {
+      "full": "Kaya_One_Piece_Japanese_Version_2nd_Anniversary_Set_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "One Piece Japanese Version 2nd Anniversary Set"
+    },
+    {
+     "artworkId": "OP03-044_pr3",
+     "imageUrls": {
+      "full": "Kaya_Tournament_Pack_Vol._6_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Tournament Pack Vol. 6"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "treated as block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-044/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-045",
+   "name": "Carne",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 3,
+   "power": 3000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "East Blue"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.) [Opponent's Turn] If you have 20 or less cards in your deck, this Character gains +3000 power.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-045",
+     "imageUrls": {
+      "full": "OP03-045.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-045/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-046",
+   "name": "Genzo",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 2,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "East Blue"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "OP03-046",
+     "imageUrls": {
+      "full": "OP03-046.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-046/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-047",
+   "name": "Zeff",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "East Blue"
+   ],
+   "rarity": "R",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[DON!! x1] When this Character's attack deals damage to your opponent's Life, you may trash 7 cards from the top of your deck. [On Play] Return up to 1 Character with a cost of 3 or less to the owner's hand, and you may trash 2 cards from the top of your deck.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "This card has been officially errata'd.",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "OP03-047",
+     "imageUrls": {
+      "full": "OP03-047.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP03-047_p1",
+     "imageUrls": {
+      "full": "OP03-047_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-047/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-048",
+   "name": "Nojiko",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 2,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "East Blue"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 4,
+   "effectText": "[On Play] If your Leader is [Nami], return up to 1 of your opponent's Characters with a cost of 5 or less to the owner's hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-048",
+     "imageUrls": {
+      "full": "OP03-048.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    },
+    {
+     "artworkId": "OP03-048_p1",
+     "imageUrls": {
+      "full": "OP03-048_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "UC",
+     "label": "Pirate Foil"
+    },
+    {
+     "artworkId": "OP03-048_r1",
+     "imageUrls": {
+      "full": "OP03-048_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "UC",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "treated as block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-048/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-049",
+   "name": "Patty",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 3,
+   "power": 5000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "East Blue"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] If you have 20 or less cards in your deck, return up to 1 Character with a cost of 3 or less to the owner's hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-049",
+     "imageUrls": {
+      "full": "OP03-049.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-049/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-050",
+   "name": "Boodle",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 2,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "East Blue"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.) [On K.O.] You may trash 1 card from the top of your deck.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-050",
+     "imageUrls": {
+      "full": "OP03-050_aRpUUzt.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    },
+    {
+     "artworkId": "OP03-050_p1",
+     "imageUrls": {
+      "full": "OP03-050_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-04",
+     "rarity": "UC",
+     "label": "Dash Pack"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-050/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-051",
+   "name": "Bell-mere",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "Former Navy",
+    "East Blue"
+   ],
+   "rarity": "R",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[DON!! x1] When this Character's attack deals damage to your opponent's Life, you may trash 7 cards from the top of your deck. [On K.O.] You may trash 3 cards from the top of your deck.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-051",
+     "imageUrls": {
+      "full": "OP03-051.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-051/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-052",
+   "name": "Merry",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 1,
+   "power": 3000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "East Blue"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "OP03-052",
+     "imageUrls": {
+      "full": "OP03-052.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-052/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-053",
+   "name": "Yosaku & Johnny",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 1,
+   "power": 3000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "East Blue"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[DON!! x1] If you have 20 or less cards in your deck, this Character gains +2000 power.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-053",
+     "imageUrls": {
+      "full": "OP03-053.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-053/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-054",
+   "name": "Usopp's Rubber Band of Doom!!!",
+   "category": "Event",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Straw Hat Crew",
+    "East Blue"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Counter] Up to 1 of your Leader or Character cards gains +2000 power during this battle. Then, you may trash 1 card from the top of your deck.",
+   "triggerText": "Draw 1 card and you may trash 1 card from the top of your deck.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "This card has been officially errata'd.",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "OP03-054",
+     "imageUrls": {
+      "full": "OP03-054.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-054/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-055",
+   "name": "Gum-Gum Giant Gavel",
+   "category": "Event",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Straw Hat Crew",
+    "East Blue"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Counter] You may trash 1 card from your hand: Up to 1 of your Leader gains +4000 power during this battle. Then, you may trash 2 cards from the top of your deck.",
+   "triggerText": "Return up to 1 Character with a cost of 4 or less to the owner's hand.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-055",
+     "imageUrls": {
+      "full": "OP03-055.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "OP03-055#2",
+     "imageUrls": {
+      "full": "Gum-Gum_Giant_Gavel_Premium_Card_Collection_-Best_Selection_Vol._2-_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "C",
+     "label": "Premium Card Collection -Best Selection Vol. 2-"
+    },
+    {
+     "artworkId": "OP03-055_p2",
+     "imageUrls": {
+      "full": "OP03-055_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "C",
+     "label": "Jolly Roger Foil"
+    },
+    {
+     "artworkId": "OP03-055_p3",
+     "imageUrls": {
+      "full": "OP03-055_p3.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "C",
+     "label": "Textured Foil"
+    },
+    {
+     "artworkId": "OP03-055_r1",
+     "imageUrls": {
+      "full": "OP03-055_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-055/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-056",
+   "name": "Sanji's Pilaf",
+   "category": "Event",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 3,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "East Blue"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Main] Draw 2 cards.",
+   "triggerText": "Activate this card's [Main] effect.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-056",
+     "imageUrls": {
+      "full": "OP03-056.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    },
+    {
+     "artworkId": "OP03-056_p2",
+     "imageUrls": {
+      "full": "OP03-056_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "UC",
+     "label": "Jolly Roger Foil"
+    },
+    {
+     "artworkId": "OP03-056_p3",
+     "imageUrls": {
+      "full": "OP03-056_p3.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "UC",
+     "label": "Textured Foil"
+    },
+    {
+     "artworkId": "OP03-056_p4",
+     "imageUrls": {
+      "full": "OP03-056_p4.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "UC",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "OP03-056_r1",
+     "imageUrls": {
+      "full": "OP03-056_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-056/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-057",
+   "name": "Three Thousand Worlds",
+   "category": "Event",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 4,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Straw Hat Crew",
+    "East Blue"
+   ],
+   "rarity": "R",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Main] Place up to 1 Character with a cost of 5 or less at the bottom of the owner's deck.",
+   "triggerText": "Place up to 1 Character with a cost of 3 or less at the bottom of the owner's deck.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-057",
+     "imageUrls": {
+      "full": "OP03-057.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP03-057#2",
+     "imageUrls": {
+      "full": "Three_Thousand_Worlds_Judge_Pack_Vol._2_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Judge Pack Vol. 2"
+    },
+    {
+     "artworkId": "OP03-057_p2",
+     "imageUrls": {
+      "full": "OP03-057_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "R",
+     "label": "Jolly Roger Foil"
+    },
+    {
+     "artworkId": "OP03-057_p3",
+     "imageUrls": {
+      "full": "OP03-057_p3.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "R",
+     "label": "Textured Foil"
+    },
+    {
+     "artworkId": "OP03-057_p4",
+     "imageUrls": {
+      "full": "OP03-057_p4.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "R",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "OP03-057_r1",
+     "imageUrls": {
+      "full": "OP03-057_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-057/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-058",
+   "name": "Iceburg",
+   "category": "Leader",
+   "colors": [
+    "Purple"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 5,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Galley-La Company",
+    "Water Seven"
+   ],
+   "rarity": "L",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "This Leader cannot attack. [Activate:Main] DON!! −1 (You may return the specified number of DON!! cards from your field to your DON!! deck.) You may rest this Leader: Play up to 1 [Galley-La Company] type Character card with a cost of 5 or less from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-058",
+     "imageUrls": {
+      "full": "OP03-058.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "L"
+    },
+    {
+     "artworkId": "OP03-058_p1",
+     "imageUrls": {
+      "full": "OP03-058_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "L",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-058/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-059",
+   "name": "Kaku",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Galley-La Company",
+    "Water Seven"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[When Attacking] DON!! −1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): This Character gains [Banish] during this battle. (When this card deals damage, the target card is trashed without activating its Trigger.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-059",
+     "imageUrls": {
+      "full": "OP03-059.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-059/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-060",
+   "name": "Kalifa",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 4,
+   "power": 4000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Galley-La Company",
+    "Water Seven"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[When Attacking] DON!! −1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): Draw 2 cards and trash 1 card from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-060",
+     "imageUrls": {
+      "full": "OP03-060.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    },
+    {
+     "artworkId": "OP03-060_p2",
+     "imageUrls": {
+      "full": "OP03-060_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "UC",
+     "label": "Jolly Roger Foil"
+    },
+    {
+     "artworkId": "OP03-060_p3",
+     "imageUrls": {
+      "full": "OP03-060_p3.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "UC",
+     "label": "Full Art"
+    },
+    {
+     "artworkId": "OP03-060_r1",
+     "imageUrls": {
+      "full": "OP03-060_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "UC",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-060/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-061",
+   "name": "Kiwi & Mozu",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 2,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Water Seven",
+    "The Franky Family"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "OP03-061",
+     "imageUrls": {
+      "full": "OP03-061.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-061/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-062",
+   "name": "Kokoro",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 1,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Water Seven",
+    "Merfolk"
+   ],
+   "rarity": "R",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 [Water Seven] type card other than [Kokoro] and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-062",
+     "imageUrls": {
+      "full": "OP03-062.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-062/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-063",
+   "name": "Zambai",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 3,
+   "power": 2000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Water Seven",
+    "The Franky Family"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.) [On Play] DON!! −1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): If your Leader has the [Water Seven] type, draw 1 card.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-063",
+     "imageUrls": {
+      "full": "OP03-063.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-063/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-064",
+   "name": "Tilestone",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Galley-La Company",
+    "Water Seven"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On K.O.] If your Leader has the [Galley-La Company] type, add up to 1 DON!! card from your DON!! deck and rest it.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-064",
+     "imageUrls": {
+      "full": "OP03-064.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-064/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-065",
+   "name": "Chimney & Gonbe",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 2,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Animal",
+    "Water Seven"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-065",
+     "imageUrls": {
+      "full": "OP03-065.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-065/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-066",
+   "name": "Paulie",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Galley-La Company",
+    "Water Seven"
+   ],
+   "rarity": "SR",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] (2) (You may rest the specified number of DON!! cards in your cost area.): Add up to 1 DON!! card from your DON!! deck and set it as active. Then, if you have 8 or more DON!! cards on your field, K.O. up to 1 of your opponent's Characters with a cost of 4 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-066",
+     "imageUrls": {
+      "full": "OP03-066.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "OP03-066_p1",
+     "imageUrls": {
+      "full": "OP03-066_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-066/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-067",
+   "name": "Peepley Lulu",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 5,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "Galley-La Company",
+    "Water Seven"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[DON!! x1] [When Attacking] If your Leader has the [Galley-La Company] type, add up to 1 DON!! card from your DON!! deck and rest it.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-067",
+     "imageUrls": {
+      "full": "OP03-067.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-067/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-068",
+   "name": "Minozebra",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Impel Down",
+    "Jailer Beast"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Banish] (When this card deals damage, the target card is trashed without activating its Trigger.) [On K.O.] If your Leader has the [Impel Down] type, add up to 1 DON!! card from your DON!! deck and rest it.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-068",
+     "imageUrls": {
+      "full": "OP03-068.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-068/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-069",
+   "name": "Minorhinoceros",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 3,
+   "power": 5000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Impel Down",
+    "Jailer Beast"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On K.O.] If your Leader has the [Impel Down] type, draw 2 cards and trash 1 card from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-069",
+     "imageUrls": {
+      "full": "OP03-069.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "OP03-069#2",
+     "imageUrls": {
+      "full": "Minorhinoceros_Offline_Regional_2023_Winner_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Offline Regional 2023 · Winner"
+    },
+    {
+     "artworkId": "OP03-069_pr1",
+     "imageUrls": {
+      "full": "Minorhinoceros_Online_Regional_2023_Winner_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Online Regional 2023 · Winner"
+    },
+    {
+     "artworkId": "OP03-069_pr2",
+     "imageUrls": {
+      "full": "Minorhinoceros_Offline_Regional_2023_Finalist_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Offline Regional 2023 · Finalist"
+    },
+    {
+     "artworkId": "OP03-069_pr3",
+     "imageUrls": {
+      "full": "Minorhinoceros_Online_Regional_2023_Participant_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Online Regional 2023 · Participant"
+    },
+    {
+     "artworkId": "OP03-069_pr4",
+     "imageUrls": {
+      "full": "Minorhinoceros_Online_Regional_2023_Finalist_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Online Regional 2023 · Finalist"
+    },
+    {
+     "artworkId": "OP03-069_pr5",
+     "imageUrls": {
+      "full": "Minorhinoceros_Offline_Regional_2023_Participant_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Offline Regional 2023 · Participant"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-069/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-070",
+   "name": "Monkey.D.Luffy",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 6,
+   "power": 7000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Straw Hat Crew",
+    "Water Seven"
+   ],
+   "rarity": "R",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] DON!! −1 (You may return the specified number of DON!! cards from your field to your DON!! deck.) You may trash 1 Character card with a cost of 5 from your hand: This Character gains [Rush] during this turn. (This card can attack on the turn in which it is played.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-070",
+     "imageUrls": {
+      "full": "OP03-070_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-04",
+     "rarity": "R",
+     "label": "Dash Pack"
+    },
+    {
+     "artworkId": "OP03-070#2",
+     "imageUrls": {
+      "full": "OP03-070_3BQJvDU.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP03-070#3",
+     "imageUrls": {
+      "full": "Monkey.D.Luffy_Judge_Pack_Vol._2_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Judge Pack Vol. 2"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-070/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-071",
+   "name": "Rob Lucci",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Galley-La Company",
+    "Water Seven"
+   ],
+   "rarity": "R",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[When Attacking] DON!! −1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): Rest up to 1 of your opponent's Characters with a cost of 5 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-071",
+     "imageUrls": {
+      "full": "OP03-071.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-071/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-072",
+   "name": "Gum-Gum Jet Gatling",
+   "category": "Event",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 0,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Straw Hat Crew",
+    "Water Seven"
+   ],
+   "rarity": "R",
+   "set": "OP-03",
+   "block": 4,
+   "effectText": "[Counter] You may trash 1 card from your hand: Up to 1 of your Leader or Character cards gains +3000 power during this battle.",
+   "triggerText": "Add up to 1 DON!! card from your DON!! deck and set it as active.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-072",
+     "imageUrls": {
+      "full": "OP03-072.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP03-072_p1",
+     "imageUrls": {
+      "full": "OP03-072_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "OP03-072_r1",
+     "imageUrls": {
+      "full": "OP03-072_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "treated as block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-072/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-073",
+   "name": "Hull Dismantler Slash",
+   "category": "Event",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Water Seven",
+    "The Franky Family"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Main] DON!! −1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): If your Leader has the [Water Seven] type, K.O. up to 1 of your opponent's Characters with a cost of 2 or less.",
+   "triggerText": "Activate this card's [Main] effect.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-073",
+     "imageUrls": {
+      "full": "OP03-073.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-073/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-074",
+   "name": "Top Knot",
+   "category": "Event",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 2,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Galley-La Company",
+    "Water Seven"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Main] DON!! −1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): Place up to 1 of your opponent's Characters with a cost of 4 or less at the bottom of the owner's deck.",
+   "triggerText": "Activate this card's [Main] effect.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-074",
+     "imageUrls": {
+      "full": "OP03-074.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-074/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-075",
+   "name": "Galley-La Company",
+   "category": "Stage",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 3,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Galley-La Company",
+    "Water Seven"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Activate:Main] You may rest this Stage: If your Leader is [Iceburg], add up to 1 DON!! card from your DON!! deck and rest it.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-075",
+     "imageUrls": {
+      "full": "OP03-075.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-075/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-076",
+   "name": "Rob Lucci",
+   "category": "Leader",
+   "colors": [
+    "Black"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 5,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "L",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Your Turn] [Once Per Turn] You may trash 2 cards from your hand: When your opponent's Character is K.O.'d, set this Leader as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-076",
+     "imageUrls": {
+      "full": "OP03-076.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "L"
+    },
+    {
+     "artworkId": "OP03-076_p1",
+     "imageUrls": {
+      "full": "OP03-076_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "L",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-076/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-077",
+   "name": "Charlotte Linlin",
+   "category": "Leader",
+   "colors": [
+    "Yellow",
+    "Black"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 4,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "The Four Emperors",
+    "Big Mom Pirates"
+   ],
+   "rarity": "L",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[DON!! x2] [When Attacking] (2) (You may rest the specified number of DON!! cards in your cost area.) You may trash 1 card from your hand: If you have 1 or less Life cards, add up to 1 card from the top of your deck to the top of your Life cards.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-077",
+     "imageUrls": {
+      "full": "OP03-077.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "L"
+    },
+    {
+     "artworkId": "OP03-077_p1",
+     "imageUrls": {
+      "full": "OP03-077_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "L",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-077/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-078",
+   "name": "Issho",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 8,
+   "power": 9000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Navy"
+   ],
+   "rarity": "SR",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[DON!! x1] [Your Turn] Give all of your opponent's Characters −3 cost. [On Play] If your opponent has 6 or more cards in their hand, trash 2 cards from your opponent's hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-078",
+     "imageUrls": {
+      "full": "OP03-078.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "OP03-078_p1",
+     "imageUrls": {
+      "full": "OP03-078_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "OP03-078_p2",
+     "imageUrls": {
+      "full": "OP03-078_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-07",
+     "rarity": "SR",
+     "label": "SP"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-078/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-079",
+   "name": "Vergo",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 5,
+   "power": 5000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Donquixote Pirates",
+    "Navy"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[DON!! x1] This Character cannot be K.O.'d in battle.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-079",
+     "imageUrls": {
+      "full": "OP03-079.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    },
+    {
+     "artworkId": "OP03-079_p3",
+     "imageUrls": {
+      "full": "OP03-079_p3.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "UC",
+     "label": "Jolly Roger Foil"
+    },
+    {
+     "artworkId": "OP03-079_p4",
+     "imageUrls": {
+      "full": "OP03-079_p4.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "UC",
+     "label": "Full Art"
+    },
+    {
+     "artworkId": "OP03-079_r1",
+     "imageUrls": {
+      "full": "OP03-079_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-19",
+     "rarity": "UC"
+    },
+    {
+     "artworkId": "OP03-079_r2",
+     "imageUrls": {
+      "full": "OP03-079_r2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "UC",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-079/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-080",
+   "name": "Kaku",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "SR",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] You may place 2 cards with a type including \"CP\" from your trash at the bottom of your deck in any order: K.O. up to 1 of your opponent's Characters with a cost of 3 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-080",
+     "imageUrls": {
+      "full": "OP03-080.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "OP03-080_p1",
+     "imageUrls": {
+      "full": "OP03-080_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-080/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-081",
+   "name": "Kalifa",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 4,
+   "power": 4000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "R",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] Draw 2 cards and trash 2 cards from your hand. Then, give up to 1 of your opponent's Characters −2 cost during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-081",
+     "imageUrls": {
+      "full": "OP03-081_vUclrLA.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP03-081#2",
+     "imageUrls": {
+      "full": "Kalifa_Judge_Pack_Vol._2_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Judge Pack Vol. 2"
+    },
+    {
+     "artworkId": "OP03-081_p1",
+     "imageUrls": {
+      "full": "OP03-081_p1_cCn0Rtb.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-04",
+     "rarity": "R",
+     "label": "Dash Pack"
+    },
+    {
+     "artworkId": "OP03-081_p1#2",
+     "imageUrls": {
+      "full": "OP03-081_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R",
+     "label": "Alternate Art"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-081/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-082",
+   "name": "Kumadori",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 4,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "OP03-082",
+     "imageUrls": {
+      "full": "OP03-082.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-082/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-083",
+   "name": "Corgy",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 1,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "World Government"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] Look at 5 cards from the top of your deck and trash up to 2 cards. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-083",
+     "imageUrls": {
+      "full": "OP03-083.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-083/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-084",
+   "name": "Jerry",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 2,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "CP6"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "OP03-084",
+     "imageUrls": {
+      "full": "OP03-084.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-084/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-085",
+   "name": "Jabra",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 5,
+   "power": 7000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "OP03-085",
+     "imageUrls": {
+      "full": "OP03-085.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-085/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-086",
+   "name": "Spandam",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 1,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "R",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] If your Leader's type include \"CP\", look at 3 cards from the top of your deck; reveal up to 1 card with a type including \"CP\" other than [Spandam] and add it to your hand. Then, trash the rest.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-086",
+     "imageUrls": {
+      "full": "OP03-086.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP03-086#2",
+     "imageUrls": {
+      "full": "Spandam_Online_Regional_2023_Winner_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Online Regional 2023 · Winner"
+    },
+    {
+     "artworkId": "OP03-086_p1",
+     "imageUrls": {
+      "full": "OP03-086_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "OP03-086_pr1",
+     "imageUrls": {
+      "full": "Spandam_Offline_Regional_2023_Winner_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Offline Regional 2023 · Winner"
+    },
+    {
+     "artworkId": "OP03-086_pr2",
+     "imageUrls": {
+      "full": "Spandam_Online_Regional_2023_Finalist_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Online Regional 2023 · Finalist"
+    },
+    {
+     "artworkId": "OP03-086_pr3",
+     "imageUrls": {
+      "full": "Spandam_Offline_Regional_2023_Finalist_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Offline Regional 2023 · Finalist"
+    },
+    {
+     "artworkId": "OP03-086_pr4",
+     "imageUrls": {
+      "full": "Spandam_Offline_Regional_2023_Participant_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Offline Regional 2023 · Participant"
+    },
+    {
+     "artworkId": "OP03-086_pr5",
+     "imageUrls": {
+      "full": "Spandam_Online_Regional_2023_Participant_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Online Regional 2023 · Participant"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-086/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-087",
+   "name": "Nero",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 3,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "OP03-087",
+     "imageUrls": {
+      "full": "OP03-087.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-087/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-088",
+   "name": "Fukurou",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 3,
+   "power": 3000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "This Character cannot be K.O.'d by effects. [Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-088",
+     "imageUrls": {
+      "full": "OP03-088.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    },
+    {
+     "artworkId": "OP03-088#2",
+     "imageUrls": {
+      "full": "Fukurou_Tournament_Pack_Vol._6_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "UC",
+     "label": "Tournament Pack Vol. 6"
+    },
+    {
+     "artworkId": "OP03-088_pr1",
+     "imageUrls": {
+      "full": "Fukurou_CS_2024_Celebration_Pack_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "UC",
+     "label": "CS 2024 Celebration Pack"
+    },
+    {
+     "artworkId": "OP03-088_pr2",
+     "imageUrls": {
+      "full": "Fukurou_Premium_Card_Collection_-BANDAI_CARD_GAMES_Fest._23-24_Edition-_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "UC",
+     "label": "Premium Card Collection -BANDAI CARD GAMES Fest. 23-24 Edition-"
+    },
+    {
+     "artworkId": "OP03-088_pr3",
+     "imageUrls": {},
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "UC",
+     "label": "Winner Pack Vol. 6"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-088/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-089",
+   "name": "Brannew",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 2,
+   "power": 3000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Navy"
+   ],
+   "rarity": "R",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] Look at 3 cards from the top of your deck; reveal up to 1 [Navy] type card other than [Brannew] and add it to your hand. Then, trash the rest.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-089",
+     "imageUrls": {
+      "full": "OP03-089.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP03-089#2",
+     "imageUrls": {
+      "full": "Brannew_Online_Regional_2024_Winner_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Online Regional 2024 · Winner"
+    },
+    {
+     "artworkId": "OP03-089_p4",
+     "imageUrls": {
+      "full": "OP03-089_p4.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "R",
+     "label": "Jolly Roger Foil"
+    },
+    {
+     "artworkId": "OP03-089_p5",
+     "imageUrls": {
+      "full": "OP03-089_p5.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "R",
+     "label": "Full Art"
+    },
+    {
+     "artworkId": "OP03-089_p6",
+     "imageUrls": {
+      "full": "OP03-089_p6.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "R",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "OP03-089_r1",
+     "imageUrls": {
+      "full": "OP03-089_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-19",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP03-089_r2",
+     "imageUrls": {
+      "full": "OP03-089_r2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "R",
+     "label": "Reprint"
+    },
+    {
+     "artworkId": "OP03-089_pr1",
+     "imageUrls": {
+      "full": "Brannew_Offline_Regional_2024_Winner_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Offline Regional 2024 · Winner"
+    },
+    {
+     "artworkId": "OP03-089_pr2",
+     "imageUrls": {
+      "full": "Brannew_Online_Regional_2024_Finalist_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Online Regional 2024 · Finalist"
+    },
+    {
+     "artworkId": "OP03-089_pr3",
+     "imageUrls": {
+      "full": "Brannew_Online_Regional_2024_Participant_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Online Regional 2024 · Participant"
+    },
+    {
+     "artworkId": "OP03-089_pr4",
+     "imageUrls": {
+      "full": "Brannew_Offline_Regional_2024_Finalist_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Offline Regional 2024 · Finalist"
+    },
+    {
+     "artworkId": "OP03-089_pr5",
+     "imageUrls": {
+      "full": "Brannew_Offline_Regional_2024_Participant_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Offline Regional 2024 · Participant"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-089/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-090",
+   "name": "Blueno",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "R",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[DON!! x1] [This Character gains [Blocker]. (After your opponent declares an attack, you may rest this card to make it the new target of the attack.) [On K.O.] Play up to 1 Character card with a type including \"CP\" and a cost of 4 or less from your trash rested.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-090",
+     "imageUrls": {
+      "full": "OP03-090.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-090/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-091",
+   "name": "Helmeppo",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 1,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Navy"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] Set the cost of up to 1 of your opponent's Characters with no base effect to 0 during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-091",
+     "imageUrls": {
+      "full": "OP03-091.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "OP03-091#2",
+     "imageUrls": {
+      "full": "Helmeppo_Store_Championship_Participation_Pack_Vol._2_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Store Championship Participation Pack Vol. 2"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-091/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-092",
+   "name": "Rob Lucci",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 6,
+   "power": 7000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "SR",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] You may place 2 cards with a type including \"CP\" from your trash at the bottom of your deck in any order: This Character gains [Rush] during this turn. (This card can attack on the turn in which it is played.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-092",
+     "imageUrls": {
+      "full": "OP03-092.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "OP03-092_p1",
+     "imageUrls": {
+      "full": "OP03-092_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "OP03-092_p2",
+     "imageUrls": {
+      "full": "OP03-092_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-05",
+     "rarity": "SR",
+     "label": "SP"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-092/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-093",
+   "name": "Wanze",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 2,
+   "power": 4000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "CP7"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] You may trash 1 card from your hand: If your Leader's type includes \"CP\", K.O. up to 1 of your opponent's Characters with a cost of 1 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-093",
+     "imageUrls": {
+      "full": "OP03-093.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-093/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-094",
+   "name": "Air Door",
+   "category": "Event",
+   "colors": [
+    "Black"
+   ],
+   "cost": 4,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Main] If your Leader's type includes \"CP\", look at 5 cards from the top of your deck; play up to 1 Character card with a type including \"CP\" and a cost of 5 or less. Then, trash the rest.",
+   "triggerText": "Play up to 1 black Character card with a cost of 3 or less from your trash.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-094",
+     "imageUrls": {
+      "full": "OP03-094.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    },
+    {
+     "artworkId": "OP03-094_p3",
+     "imageUrls": {
+      "full": "OP03-094_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "UC",
+     "label": "Jolly Roger Foil"
+    },
+    {
+     "artworkId": "OP03-094_p3#2",
+     "imageUrls": {
+      "full": "OP03-094_p3_ThOtDyx.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "UC",
+     "label": "Textured Foil"
+    },
+    {
+     "artworkId": "OP03-094_r1",
+     "imageUrls": {
+      "full": "OP03-094_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-094/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-095",
+   "name": "Soap Sheep",
+   "category": "Event",
+   "colors": [
+    "Black"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Main] Give up to 2 of your opponent's Characters −2 cost during this turn.",
+   "triggerText": "Your opponent trashes 1 card from their hand.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-095",
+     "imageUrls": {
+      "full": "OP03-095.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-095/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-096",
+   "name": "Tempest Kick Sky Slicer",
+   "category": "Event",
+   "colors": [
+    "Black"
+   ],
+   "cost": 2,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Main] K.O. up to 1 of your opponent's Characters with a cost of 0 or your opponent's Stages with a cost of 3 or less.",
+   "triggerText": "Draw 2 cards.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-096",
+     "imageUrls": {
+      "full": "OP03-096.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-096/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-097",
+   "name": "Six King Pistol",
+   "category": "Event",
+   "colors": [
+    "Black"
+   ],
+   "cost": 0,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "R",
+   "set": "OP-03",
+   "block": 4,
+   "effectText": "[Counter] You may trash 1 card from your hand: Up to 1 of your Leader or Character cards gains +3000 power during this battle.",
+   "triggerText": "Draw 1 card. Then, K.O. up to 1 of your opponent's Characters with a cost of 1 or less.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-097",
+     "imageUrls": {
+      "full": "OP03-097.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP03-097_r1",
+     "imageUrls": {
+      "full": "OP03-097_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "treated as block 4"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-097/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-098",
+   "name": "Enies Lobby",
+   "category": "Stage",
+   "colors": [
+    "Black"
+   ],
+   "cost": 2,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "World Government"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Activate:Main] You may rest this Stage: If your Leader's type includes \"CP\", give up to 1 of your opponent's Characters −2 cost during this turn.",
+   "triggerText": "Play this card.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-098",
+     "imageUrls": {
+      "full": "OP03-098.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-098/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-099",
+   "name": "Charlotte Katakuri",
+   "category": "Leader",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 5,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "L",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[DON!! x1] [When Attacking] Look at up to 1 card from the top of your or your opponent's Life cards, and place it at the top or bottom of the Life cards. Then, this Leader gains +1000 power during this battle.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-099",
+     "imageUrls": {
+      "full": "OP03-099.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "L"
+    },
+    {
+     "artworkId": "OP03-099_p1",
+     "imageUrls": {
+      "full": "OP03-099_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "L",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "OP03-099_p2",
+     "imageUrls": {
+      "full": "OP03-099_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-20",
+     "rarity": "L"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-099/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-100",
+   "name": "Kingbaum",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 3,
+   "power": 5000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Big Mom Pirates",
+    "Homies"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "",
+   "triggerText": "You may trash 1 card from the top or bottom of your Life cards: Play this card.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-100",
+     "imageUrls": {
+      "full": "OP03-100.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-100/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-101",
+   "name": "Camie",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 1,
+   "power": 3000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Merfolk"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "OP03-101",
+     "imageUrls": {
+      "full": "OP03-101.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-101/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-102",
+   "name": "Sanji",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 2,
+   "power": 3000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "The Vinsmoke Family"
+   ],
+   "rarity": "R",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[DON!! x2] [When Attacking] You may add 1 card from the top or bottom of your Life cards to your hand: Add up to 1 card from the top of your deck to the top of your Life cards.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-102",
+     "imageUrls": {
+      "full": "OP03-102.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP03-102#2",
+     "imageUrls": {
+      "full": "Sanji_Premium_Card_Collection_-BANDAI_CARD_GAMES_Fest._23-24_Edition-_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Premium Card Collection -BANDAI CARD GAMES Fest. 23-24 Edition-"
+    },
+    {
+     "artworkId": "OP03-102_pr1",
+     "imageUrls": {
+      "full": "Sanji_Offline_Regional_2024_Winner_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Offline Regional 2024 · Winner"
+    },
+    {
+     "artworkId": "OP03-102_pr2",
+     "imageUrls": {
+      "full": "Sanji_Online_Regional_2024_Winner_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Online Regional 2024 · Winner"
+    },
+    {
+     "artworkId": "OP03-102_pr3",
+     "imageUrls": {
+      "full": "Sanji_Online_Regional_2024_Finalist_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Online Regional 2024 · Finalist"
+    },
+    {
+     "artworkId": "OP03-102_pr4",
+     "imageUrls": {
+      "full": "Sanji_Online_Regional_2024_Participant_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Online Regional 2024 · Participant"
+    },
+    {
+     "artworkId": "OP03-102_pr5",
+     "imageUrls": {
+      "full": "Sanji_Offline_Regional_2024_Finalist_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Offline Regional 2024 · Finalist"
+    },
+    {
+     "artworkId": "OP03-102_pr6",
+     "imageUrls": {
+      "full": "Sanji_Offline_Regional_2024_Participant_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Offline Regional 2024 · Participant"
+    },
+    {
+     "artworkId": "OP03-102_pr7",
+     "imageUrls": {
+      "full": "Sanji_Store_Championship_Participation_Pack_Vol._2_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Store Championship Participation Pack Vol. 2"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-102/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-103",
+   "name": "Bobbin the Disposer",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 2,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "OP03-103",
+     "imageUrls": {
+      "full": "OP03-103.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-103/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-104",
+   "name": "Shirley",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 3,
+   "power": 3000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Merfolk"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.) [On Play] Look at up to 1 card from the top of your or your opponent's Life cards, and place it at the top or bottom of the Life cards.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-104",
+     "imageUrls": {
+      "full": "OP03-104.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    },
+    {
+     "artworkId": "OP03-104#2",
+     "imageUrls": {
+      "full": "Shirley_Judge_Pack_Vol._3_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "UC",
+     "label": "Judge Pack Vol. 3"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-104/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-105",
+   "name": "Charlotte Oven",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[DON!! x1] [When Attacking] You may trash 1 card with a [Trigger] from your hand: This Character gains +3000 power during this battle.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-105",
+     "imageUrls": {
+      "full": "OP03-105.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-105/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-106",
+   "name": "Charlotte Opera",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 4,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "OP03-106",
+     "imageUrls": {
+      "full": "OP03-106.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "OP03-106_r1",
+     "imageUrls": {
+      "full": "OP03-106_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-20",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-106/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-107",
+   "name": "Charlotte Galette",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 2,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-107",
+     "imageUrls": {
+      "full": "OP03-107.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "OP03-107_r1",
+     "imageUrls": {
+      "full": "OP03-107_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-20",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-107/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-108",
+   "name": "Charlotte Cracker",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "SR",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[DON!! x1] If you have less Life cards than your opponent, this Character gains [Double Attack] and +1000 power. (This card deals 2 damage.)",
+   "triggerText": "You may trash 1 card from your hand: Play this card.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-108",
+     "imageUrls": {
+      "full": "OP03-108.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "OP03-108_p1",
+     "imageUrls": {
+      "full": "OP03-108_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "OP03-108_p3",
+     "imageUrls": {
+      "full": "OP03-108_p3.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "OP03-108_p7",
+     "imageUrls": {
+      "full": "OP03-108_p7.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "SR",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-108/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-109",
+   "name": "Charlotte Chiffon",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 2,
+   "power": 3000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] You may trash 1 card from the top or bottom of your Life cards: Add up to 1 card from the top of your deck to the top of your Life cards.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-109",
+     "imageUrls": {
+      "full": "OP03-109.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "OP03-109#2",
+     "imageUrls": {
+      "full": "Charlotte_Chiffon_Offline_Regional_2023_Winner_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Offline Regional 2023 · Winner"
+    },
+    {
+     "artworkId": "OP03-109_pr1",
+     "imageUrls": {
+      "full": "Charlotte_Chiffon_Online_Regional_2023_Finalist_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Online Regional 2023 · Finalist"
+    },
+    {
+     "artworkId": "OP03-109_pr2",
+     "imageUrls": {
+      "full": "Charlotte_Chiffon_Online_Regional_2023_Winner_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Online Regional 2023 · Winner"
+    },
+    {
+     "artworkId": "OP03-109_pr3",
+     "imageUrls": {
+      "full": "Charlotte_Chiffon_Offline_Regional_2023_Finalist_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Offline Regional 2023 · Finalist"
+    },
+    {
+     "artworkId": "OP03-109_pr4",
+     "imageUrls": {
+      "full": "Charlotte_Chiffon_Online_Regional_2023_Participant_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Online Regional 2023 · Participant"
+    },
+    {
+     "artworkId": "OP03-109_pr5",
+     "imageUrls": {
+      "full": "Charlotte_Chiffon_Offline_Regional_2023_Participant_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Offline Regional 2023 · Participant"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-109/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-110",
+   "name": "Charlotte Smoothie",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "R",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[When Attacking] You may add 1 card from the top or bottom of your Life cards to your hand: This Character gains +2000 power during this battle.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-110",
+     "imageUrls": {
+      "full": "OP03-110.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP03-110_p3",
+     "imageUrls": {
+      "full": "OP03-110_p3.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "R",
+     "label": "Jolly Roger Foil"
+    },
+    {
+     "artworkId": "OP03-110_p4",
+     "imageUrls": {
+      "full": "OP03-110_p4.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "R",
+     "label": "Full Art"
+    },
+    {
+     "artworkId": "OP03-110_p5",
+     "imageUrls": {
+      "full": "OP03-110_p5.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "R",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "OP03-110_r1",
+     "imageUrls": {
+      "full": "OP03-110_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-20",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP03-110_r2",
+     "imageUrls": {
+      "full": "OP03-110_r2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "R",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-110/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-111",
+   "name": "Charlotte Praline",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 3,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "The Sun Pirates",
+    "Merfolk"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "cleanup",
+     "from": "NULL",
+     "to": ""
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "OP03-111",
+     "imageUrls": {
+      "full": "OP03-111.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-111/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-112",
+   "name": "Charlotte Pudding",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 1,
+   "power": 2000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "R",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] Look at 4 cards from the top of your deck; reveal up to 1 [Sanji] or [Big Mom Pirates] type card other than [Charlotte Pudding] and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-112",
+     "imageUrls": {
+      "full": "OP03-112.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP03-112#2",
+     "imageUrls": {
+      "full": "Charlotte_Pudding_Judge_Pack_Vol._2_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "PR",
+     "label": "Judge Pack Vol. 2"
+    },
+    {
+     "artworkId": "OP03-112_p1",
+     "imageUrls": {
+      "full": "OP03-112_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "OP03-112_p4",
+     "imageUrls": {
+      "full": "OP03-112_p4.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-08",
+     "rarity": "R",
+     "label": "SP"
+    },
+    {
+     "artworkId": "OP03-112_r1",
+     "imageUrls": {
+      "full": "OP03-112_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-20",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP03-112_pr1",
+     "imageUrls": {
+      "full": "Charlotte_Pudding_Championship_2024_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Championship 2024"
+    },
+    {
+     "artworkId": "OP03-112_pr2",
+     "imageUrls": {},
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "CS 25-26 Celebration Pack"
+    },
+    {
+     "artworkId": "OP03-112_pr3",
+     "imageUrls": {},
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Tournament Pack 2024 Oct.-Dec."
+    },
+    {
+     "artworkId": "OP03-112_pr4",
+     "imageUrls": {
+      "full": "Charlotte_Pudding_Winner_Pack_2024_Oct.-Dec._img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Winner Pack 2024 Oct.-Dec."
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-112/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-113",
+   "name": "Charlotte Perospero",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 3,
+   "power": 5000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "SR",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On K.O.] Look at 3 cards from the top of your deck; reveal up to 1 [Big Mom Pirates] type card and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": "You may trash 1 card from your hand: Play this card.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-113",
+     "imageUrls": {
+      "full": "OP03-113.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "OP03-113_p1",
+     "imageUrls": {
+      "full": "OP03-113_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "OP03-113_p3",
+     "imageUrls": {
+      "full": "OP03-113_p3.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "OP03-113_r1",
+     "imageUrls": {
+      "full": "OP03-113_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "SR",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-113/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-114",
+   "name": "Charlotte Linlin",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 10,
+   "power": 12000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "SR",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] If your Leader has the [Big Mom Pirates] type, add up to 1 card from the top of your deck to the top of your Life cards. Then, trash up to 1 card from the top of your opponent's Life cards.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-114",
+     "imageUrls": {
+      "full": "OP03-114.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "OP03-114#2",
+     "imageUrls": {
+      "full": "Charlotte_Linlin_Championship_2024_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "SR",
+     "label": "Championship 2024"
+    },
+    {
+     "artworkId": "OP03-114_p1",
+     "imageUrls": {
+      "full": "OP03-114_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SR",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "OP03-114_p2",
+     "imageUrls": {
+      "full": "OP03-114_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-06",
+     "rarity": "SR",
+     "label": "SP"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-114/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-115",
+   "name": "Streusen",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 1,
+   "power": 1000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "R",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] You may trash 1 card with a [Trigger] from your hand: K.O. up to 1 of your opponent's Characters with a cost of 1 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-115",
+     "imageUrls": {
+      "full": "OP03-115.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-115/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-116",
+   "name": "Shirahoshi",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 5,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Merfolk"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] Draw 3 cards and trash 2 cards from your hand.",
+   "triggerText": "Play this card.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-116",
+     "imageUrls": {
+      "full": "OP03-116.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    },
+    {
+     "artworkId": "OP03-116_p5",
+     "imageUrls": {
+      "full": "OP03-116_p5.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "UC",
+     "label": "Jolly Roger Foil"
+    },
+    {
+     "artworkId": "OP03-116_p6",
+     "imageUrls": {
+      "full": "OP03-116_p6.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "UC",
+     "label": "Full Art"
+    },
+    {
+     "artworkId": "OP03-116_p8",
+     "imageUrls": {
+      "full": "OP03-116_p8.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-04",
+     "rarity": "UC",
+     "label": "Dash Pack"
+    },
+    {
+     "artworkId": "OP03-116_r1",
+     "imageUrls": {
+      "full": "OP03-116_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "UC",
+     "label": "Reprint"
+    },
+    {
+     "artworkId": "OP03-116_pr1",
+     "imageUrls": {
+      "full": "Shirahoshi_ST15_-_ST20_Release_Event_Winner_Pack_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "UC",
+     "label": "ST15 - ST20 Release Event Winner Pack"
+    },
+    {
+     "artworkId": "OP03-116_pr2",
+     "imageUrls": {
+      "full": "Shirahoshi_ST15_-_ST20_Release_Event_Pack_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "UC",
+     "label": "ST15 - ST20 Release Event Pack"
+    },
+    {
+     "artworkId": "OP03-116_pr3",
+     "imageUrls": {
+      "full": "Shirahoshi_October_Championship_2024_Online_Regional_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "UC",
+     "label": "October Championship 2024 Online Regional"
+    },
+    {
+     "artworkId": "OP03-116_pr4",
+     "imageUrls": {
+      "full": "Shirahoshi_CS_2024_Celebration_Pack_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "UC",
+     "label": "CS 2024 Celebration Pack"
+    },
+    {
+     "artworkId": "OP03-116_pr5",
+     "imageUrls": {
+      "full": "Shirahoshi_Winner_Pack_Vol._6_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "UC",
+     "label": "Winner Pack Vol. 6"
+    },
+    {
+     "artworkId": "OP03-116_pr6",
+     "imageUrls": {
+      "full": "Shirahoshi_Premium_Card_Collection_-BANDAI_CARD_GAMES_Fest._23-24_Edi_L4xVzvJ.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "UC",
+     "label": "Premium Card Collection -BANDAI CARD GAMES Fest. 23-24 Edition-"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-116/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-117",
+   "name": "Napoleon",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 3,
+   "power": 3000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Big Mom Pirates",
+    "Homies"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Activate:Main] You may rest this Character: Up to 1 of your [Charlotte Linlin] cards gains +1000 power until the start of your next turn.",
+   "triggerText": "Play this card.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-117",
+     "imageUrls": {
+      "full": "OP03-117.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-117/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-118",
+   "name": "Ikoku Sovereignty",
+   "category": "Event",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 2,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "The Four Emperors",
+    "Big Mom Pirates"
+   ],
+   "rarity": "UC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Counter] Up to 1 of your Leader or Character cards gains +5000 power during this battle.",
+   "triggerText": "You may trash 2 cards from your hand: Add up to 1 card from the top of your deck to the top of your Life cards.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-118",
+     "imageUrls": {
+      "full": "OP03-118.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-118/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-119",
+   "name": "Buzz Cut Mochi",
+   "category": "Event",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 2,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "R",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Main] If you have less Life cards than your opponent, K.O. up to 1 of your opponent's Characters with a cost of 4 or less.",
+   "triggerText": "Play up to 1 Character card with a cost of 4 or less and a [Trigger] from your hand.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-119",
+     "imageUrls": {
+      "full": "OP03-119.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-119/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-120",
+   "name": "Tropical Torment",
+   "category": "Event",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 3,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Main] If your opponent has 4 or more Life cards, trash up to 1 card from the top of your opponent's Life cards.",
+   "triggerText": "Activate this card's [Main] effect.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-120",
+     "imageUrls": {
+      "full": "OP03-120.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-120/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-121",
+   "name": "Thunder Bolt",
+   "category": "Event",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 2,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "The Four Emperors",
+    "Big Mom Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[Main] You may trash 1 card from the top of your Life cards: K.O. up to 1 of your opponent's Characters with a cost of 5 or less.",
+   "triggerText": "K.O. up to 1 of your opponent's Characters with a cost of 5 or less.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-121",
+     "imageUrls": {
+      "full": "OP03-121.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "OP03-121#2",
+     "imageUrls": {
+      "full": "Thunder_Bolt_Premium_Card_Collection_-Best_Selection_Vol._1-_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "C",
+     "label": "Premium Card Collection -Best Selection Vol. 1-"
+    },
+    {
+     "artworkId": "OP03-121_p3",
+     "imageUrls": {
+      "full": "OP03-121_p3.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "C",
+     "label": "Jolly Roger Foil"
+    },
+    {
+     "artworkId": "OP03-121_p4",
+     "imageUrls": {
+      "full": "OP03-121_p4.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "C",
+     "label": "Textured Foil"
+    },
+    {
+     "artworkId": "OP03-121_r2",
+     "imageUrls": {
+      "full": "OP03-121_r2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-121/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-122",
+   "name": "Sogeking",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 7,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "Sniper Island"
+   ],
+   "rarity": "SEC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "Also treat this card's name as [Usopp] according to the rules. [On Play] Return up to 1 Character with a cost of 6 or less to the owner's hand. Then, draw 2 cards and trash 2 cards from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-122",
+     "imageUrls": {
+      "full": "OP03-122.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SEC"
+    },
+    {
+     "artworkId": "OP03-122_p1",
+     "imageUrls": {
+      "full": "OP03-122_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SEC",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "OP03-122_p2",
+     "imageUrls": {
+      "full": "OP03-122_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SEC",
+     "label": "Alternate Art · Manga"
+    },
+    {
+     "artworkId": "OP03-122_r1",
+     "imageUrls": {
+      "full": "OP03-122_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "SEC",
+     "label": "Manga"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "SPR exception"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-122/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP03-123",
+   "name": "Charlotte Katakuri",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 8,
+   "power": 8000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "SEC",
+   "set": "OP-03",
+   "block": 1,
+   "effectText": "[On Play] Add up to 1 Character with a cost of 8 or less to the top or bottom of the owner's Life cards face-up.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP03-123",
+     "imageUrls": {
+      "full": "OP03-123.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SEC"
+    },
+    {
+     "artworkId": "OP03-123#2",
+     "imageUrls": {
+      "full": "Charlotte_Katakuri_Championship_2024_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "SEC",
+     "label": "Championship 2024"
+    },
+    {
+     "artworkId": "OP03-123_p1",
+     "imageUrls": {
+      "full": "OP03-123_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-03",
+     "rarity": "SEC",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "OP03-123_p4",
+     "imageUrls": {
+      "full": "OP03-123_p4.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "SEC",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "OP03-123_r1",
+     "imageUrls": {
+      "full": "OP03-123_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-01",
+     "rarity": "SEC",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "rotated",
+     "reason": "block 1"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP03-123/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  }
+ ]
+}

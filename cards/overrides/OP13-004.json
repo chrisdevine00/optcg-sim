@@ -1,0 +1,26 @@
+{
+  "id": "OP13-004",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP13-004",
+      "date": "2026-10-28",
+      "use": "cross-check"
+    },
+    {
+      "url": "https://en.onepiece-cardgame.com/cardlist/?series=569113",
+      "date": "2026-10-28",
+      "use": "disagreement"
+    }
+  ],
+  "keywords": [],
+  "textPatches": [
+    {
+      "field": "effectText",
+      "find": "give this Leader 1000 power",
+      "replace": "give this Leader −1000 power",
+      "note": "Self-directed dropped sign (effect-dsl E-Q8); the pipeline rule does not repair it.",
+      "source": "https://en.onepiece-cardgame.com/cardlist/?series=569113"
+    }
+  ]
+}

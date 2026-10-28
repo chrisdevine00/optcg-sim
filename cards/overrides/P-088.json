@@ -1,0 +1,22 @@
+{
+  "id": "P-088",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/P-088",
+      "date": "2026-10-28",
+      "use": "cross-check"
+    },
+    {
+      "url": "https://en.onepiece-cardgame.com/cardlist/?series=569901",
+      "date": "2026-10-28",
+      "use": "disagreement"
+    }
+  ],
+  "keywords": [],
+  "block": {
+    "value": 3,
+    "source": "https://en.onepiece-cardgame.com/cardlist/?series=569901"
+  },
+  "note": "Promotion cards have no product block; block 3 is printed (official 569901 and Limitless)."
+}

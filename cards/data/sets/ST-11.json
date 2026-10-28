@@ -1,0 +1,289 @@
+{
+ "set": {
+  "code": "ST-11",
+  "name": "Starter Deck 11: Uta",
+  "kind": "starter",
+  "cardCount": 5,
+  "block": 2
+ },
+ "cards": [
+  {
+   "id": "ST11-001",
+   "name": "Uta",
+   "category": "Leader",
+   "colors": [
+    "Green"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 5,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "FILM"
+   ],
+   "rarity": "L",
+   "set": "ST-11",
+   "block": 2,
+   "effectText": "[DON!! x1][When Attacking][Once Per Turn] Reveal 1 card from the top of your deck and add up to 1 [FILM] type card to your hand. Then, place the rest at the bottom of your deck.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST11-001",
+     "imageUrls": {
+      "full": "ST11-001.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-11",
+     "rarity": "L"
+    },
+    {
+     "artworkId": "ST11-001_p1",
+     "imageUrls": {
+      "full": "ST11-001_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-16",
+     "rarity": "L"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST11-001/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST11-002",
+   "name": "Uta",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "FILM"
+   ],
+   "rarity": "SR",
+   "set": "ST-11",
+   "block": 2,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.) [End of Your Turn] You may trash 1 Event from your hand: Set up to 1 of your [FILM] type Characters as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST11-002",
+     "imageUrls": {
+      "full": "ST11-002.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-11",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST11-002/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST11-003",
+   "name": "Backlight",
+   "category": "Event",
+   "colors": [
+    "Green"
+   ],
+   "cost": 2,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "FILM",
+    "Music"
+   ],
+   "rarity": "C",
+   "set": "ST-11",
+   "block": 2,
+   "effectText": "[Main] If your Leader is [Uta], choose one: • Rest up to 1 of your opponent's Characters with a cost of 5 or less. • K.O. up to 1 of your opponent's rested Characters with a cost of 5 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST11-003",
+     "imageUrls": {
+      "full": "ST11-003.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-11",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "ST11-003_p2",
+     "imageUrls": {
+      "full": "ST11-003_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-16",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST11-003/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST11-004",
+   "name": "New Genesis",
+   "category": "Event",
+   "colors": [
+    "Green"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "FILM",
+    "Music"
+   ],
+   "rarity": "SR",
+   "set": "ST-11",
+   "block": 2,
+   "effectText": "[Main] If your Leader is [Uta], look at 3 cards from the top of your deck, reveal up to 1 [FILM] type card other than [New Genesis] and add it to your hand. Then, place the rest at the bottom of your deck in any order and set up to 1 of your DON!! cards as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST11-004",
+     "imageUrls": {
+      "full": "ST11-004.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-11",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "ST11-004_p2",
+     "imageUrls": {
+      "full": "ST11-004_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-16",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST11-004/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST11-005",
+   "name": "I'm invincible",
+   "category": "Event",
+   "colors": [
+    "Green"
+   ],
+   "cost": 3,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "FILM",
+    "Music"
+   ],
+   "rarity": "C",
+   "set": "ST-11",
+   "block": 2,
+   "effectText": "[Main] Set up to 1 of your [Uta] Leader as active.",
+   "triggerText": "Up to 1 of your Leader or Character cards gains +1000 power during this turn.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST11-005",
+     "imageUrls": {
+      "full": "ST11-005.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-11",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "ST11-005_p2",
+     "imageUrls": {
+      "full": "ST11-005_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-16",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 2"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST11-005/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  }
+ ]
+}

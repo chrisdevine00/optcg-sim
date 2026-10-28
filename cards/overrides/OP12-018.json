@@ -1,0 +1,35 @@
+{
+  "id": "OP12-018",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP12-018",
+      "date": "2026-10-28",
+      "use": "cross-check"
+    },
+    {
+      "url": "https://en.onepiece-cardgame.com/cardlist/?series=569112",
+      "date": "2026-10-28",
+      "use": "disagreement"
+    }
+  ],
+  "keywords": [],
+  "fields": {
+    "cost": {
+      "value": 0,
+      "upstream": null,
+      "source": "https://en.onepiece-cardgame.com/cardlist/?series=569112"
+    },
+    "types": {
+      "value": ["Former Roger Pirates"],
+      "upstream": [],
+      "source": "https://en.onepiece-cardgame.com/cardlist/?series=569112"
+    },
+    "attributes": {
+      "value": [],
+      "upstream": [],
+      "source": "https://en.onepiece-cardgame.com/cardlist/?series=569112"
+    }
+  },
+  "note": "Every optcgapi row has the types in the cost column. The official list prints cost 0 as \"-\"; Limitless shows 0 Cost."
+}

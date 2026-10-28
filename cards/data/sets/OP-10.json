@@ -1,0 +1,6829 @@
+{
+ "set": {
+  "code": "OP-10",
+  "name": "Royal Blood",
+  "kind": "booster",
+  "cardCount": 119,
+  "block": 3
+ },
+ "cards": [
+  {
+   "id": "OP10-001",
+   "name": "Smoker",
+   "category": "Leader",
+   "colors": [
+    "Green",
+    "Red"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 4,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Navy",
+    "Punk Hazard"
+   ],
+   "rarity": "L",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Opponent's Turn] All of your {Navy} or {Punk Hazard} type Characters gain +1000 power.[Activate: Main] [Once Per Turn] If you have a Character with 7000 power or more, set up to 2 of your DON!! cards as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-001",
+     "imageUrls": {
+      "full": "OP10-001.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "L"
+    },
+    {
+     "artworkId": "OP10-001_p1",
+     "imageUrls": {
+      "full": "OP10-001_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "L",
+     "label": "Parallel"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-001/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-002",
+   "name": "Caesar Clown",
+   "category": "Leader",
+   "colors": [
+    "Blue",
+    "Red"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 4,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Punk Hazard",
+    "Scientist"
+   ],
+   "rarity": "L",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[DON!! x2] [When Attacking] You may return 1 of your {Punk Hazard} type Characters with a cost of 2 or more to the owner's hand: K.O. up to 1 of your opponent's Characters with 4000 power or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-002",
+     "imageUrls": {
+      "full": "OP10-002.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "L"
+    },
+    {
+     "artworkId": "OP10-002_p1",
+     "imageUrls": {
+      "full": "OP10-002_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "L",
+     "label": "Parallel"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-002/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-003",
+   "name": "Sugar",
+   "category": "Leader",
+   "colors": [
+    "Purple",
+    "Red"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 4,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Donquixote Pirates"
+   ],
+   "rarity": "L",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[End of Your Turn] If you have a {Donquixote Pirates} type Character with 6000 power or more, set up to 1 of your DON!! cards as active.[Opponent's Turn] [Once Per Turn] When you activate an Event, add up to 1 DON!! card from your DON!! deck and set it as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-003",
+     "imageUrls": {
+      "full": "OP10-003.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "L"
+    },
+    {
+     "artworkId": "OP10-003_p1",
+     "imageUrls": {
+      "full": "OP10-003_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "L",
+     "label": "Parallel"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-003/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-004",
+   "name": "Vergo",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 1,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Donquixote Pirates",
+    "Navy",
+    "Punk Hazard"
+   ],
+   "rarity": "R",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 {Punk Hazard} type card other than [Vergo] and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-004",
+     "imageUrls": {
+      "full": "OP10-004.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-004/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-005",
+   "name": "Sanji",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 3,
+   "power": 3000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Straw Hat Crew",
+    "Punk Hazard"
+   ],
+   "rarity": "SR",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Your Turn] This Character gains +3000 power.\n[On K.O.] Draw 1 card.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-005",
+     "imageUrls": {
+      "full": "OP10-005.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "OP10-005#2",
+     "imageUrls": {
+      "full": "Sanji_Treasure_Cup_2025_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "SR",
+     "label": "Treasure Cup 2025"
+    },
+    {
+     "artworkId": "OP10-005_p1",
+     "imageUrls": {
+      "full": "OP10-005_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "SR",
+     "label": "Parallel"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-005/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-006",
+   "name": "Caesar Clown",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 7,
+   "power": 7000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Punk Hazard",
+    "Scientist"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 [Smiley] and add it to your hand. Then, place the rest at the bottom of your deck in any order and play up to 1 [Smiley] from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-006",
+     "imageUrls": {
+      "full": "OP10-006.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-006/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-007",
+   "name": "Ceaser Soldier",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Punk Hazard"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] Play up to 1 \"Punk Hazard\" type Character card with a cost of 2 or less from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-007",
+     "imageUrls": {
+      "full": "OP10-007.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-007/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-008",
+   "name": "Scotch",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 2,
+   "power": 1000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "Punk Hazard"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[On Play] If you don't have [Rock], play up to 1 [Rock] from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-008",
+     "imageUrls": {
+      "full": "OP10-008.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-008/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-009",
+   "name": "Smiley",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Biological Weapon",
+    "Punk Hazard"
+   ],
+   "rarity": "R",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] If your Leader has the \"Punk Hazard\" type, give up to 1 of your opponent's Characters −3000 power during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "sign",
+     "from": "3000 power",
+     "to": "−3000 power"
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "OP10-009",
+     "imageUrls": {
+      "full": "OP10-009.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-009/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-010",
+   "name": "Chadros.Higelyges",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 3,
+   "power": 5000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Punk Hazard",
+    "Brownbeard Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[When Attacking] If you have 1 or less Characters with 6000 power or more, this Character gains +1000 power during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-010",
+     "imageUrls": {
+      "full": "OP10-010.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C",
+     "label": "Brownbeard"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-010/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-011",
+   "name": "Tony Tony.Chopper",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 4,
+   "power": 4000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Straw Hat Crew",
+    "Punk Hazard"
+   ],
+   "rarity": "R",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[Opponent's Turn] This Character gains +2000 power.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-011",
+     "imageUrls": {
+      "full": "OP10-011.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP10-011#2",
+     "imageUrls": {
+      "full": "Tony_Tony.Chopper_Judge_Pack_Vol._6_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Judge Pack Vol. 6"
+    },
+    {
+     "artworkId": "OP10-011_p1",
+     "imageUrls": {
+      "full": "OP10-011_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "OP10-011_r1",
+     "imageUrls": {
+      "full": "OP10-011_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-011/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-012",
+   "name": "Dragon Number Thirteen",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 2,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Biological Weapon",
+    "Punk Hazard"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-012",
+     "imageUrls": {
+      "full": "OP10-012.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-012/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-013",
+   "name": "Nami",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 5,
+   "power": 7000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Straw Hat Crew",
+    "Punk Hazard"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-013",
+     "imageUrls": {
+      "full": "OP10-013.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-013/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-014",
+   "name": "Franky",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 6,
+   "power": 8000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Animal",
+    "Straw Hat Crew",
+    "Punk Hazard"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-014",
+     "imageUrls": {
+      "full": "OP10-014.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-014/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-015",
+   "name": "Mocha",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 3,
+   "power": 3000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Punk Hazard"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] Give up to 1 of your opponent's Characters −1000 power during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "sign",
+     "from": "1000 power",
+     "to": "−1000 power"
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "OP10-015",
+     "imageUrls": {
+      "full": "OP10-015.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-015/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-016",
+   "name": "Monet",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 2,
+   "power": 3000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Donquixote Pirates",
+    "Punk Hazard"
+   ],
+   "rarity": "SR",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Activate: Main] You may rest this Character: Give up to 2 rested DON!! cards to your Leader or 1 of your Characters. Then, give up to 1 of your opponent's Characters −1000 power during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "sign",
+     "from": "1000 power",
+     "to": "−1000 power"
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "OP10-016",
+     "imageUrls": {
+      "full": "OP10-016.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "OP10-016_p1",
+     "imageUrls": {
+      "full": "OP10-016_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "SR",
+     "label": "Parallel"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-016/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-017",
+   "name": "Rock",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 2,
+   "power": 3000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "Punk Hazard"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] If you don't have [Scotch], play up to 1 [Scotch] from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-017",
+     "imageUrls": {
+      "full": "OP10-017.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-017/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-018",
+   "name": "Ten-Layer Igloo",
+   "category": "Event",
+   "colors": [
+    "Red"
+   ],
+   "cost": 2,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Donquixote Pirates",
+    "Punk Hazard"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Counter] Up to 1 of your Leader or Character cards gains +3000 power during this battle. Then, give up to 1 of your opponent's Leader or Character cards −2000 power during this turn.",
+   "triggerText": "Up to 1 of your Leader or Character cards gains +1000 power during this turn.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "sign",
+     "from": "2000 power",
+     "to": "−2000 power"
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "OP10-018",
+     "imageUrls": {
+      "full": "OP10-018.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "OP10-018#2",
+     "imageUrls": {
+      "full": "OP10-018_OO8g5lU.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "C",
+     "label": "Pirate Foil"
+    },
+    {
+     "artworkId": "OP10-018_r1",
+     "imageUrls": {
+      "full": "OP10-018_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "C",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-018/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-019",
+   "name": "Divine Departure",
+   "category": "Event",
+   "colors": [
+    "Red"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "The Four Emperors",
+    "Red-Haired Pirates"
+   ],
+   "rarity": "R",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Main] You may rest 5 of your DON!! cards: K.O. up to 1 of your opponent's Characters with 8000 power or less.\n[Counter] Up to 1 of your Leader gains +3000 power during this battle.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-019",
+     "imageUrls": {
+      "full": "OP10-019.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP10-019_p1",
+     "imageUrls": {
+      "full": "OP10-019_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R",
+     "label": "Parallel"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-019/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-020",
+   "name": "Gum-Gum UFO",
+   "category": "Event",
+   "colors": [
+    "Red"
+   ],
+   "cost": 2,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Straw Hat Crew",
+    "Punk Hazard"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Main] Give up to 1 of your opponent's Characters −4000 power during this turn. Then, if you have 2 or less Life cards, up to 1 of your Leader or Character cards gains +1000 power during this turn.",
+   "triggerText": "K.O. up to 1 of your opponent's Characters with 3000 power or less.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "sign",
+     "from": "4000 power",
+     "to": "−4000 power"
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "OP10-020",
+     "imageUrls": {
+      "full": "OP10-020.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    },
+    {
+     "artworkId": "OP10-020#2",
+     "imageUrls": {
+      "full": "Gum-Gum_UFO_Judge_Pack_Vol._6_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "UC",
+     "label": "Judge Pack Vol. 6"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-020/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-021",
+   "name": "Punk Hazard",
+   "category": "Stage",
+   "colors": [
+    "Red"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Punk Hazard"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Activate: Main] You may rest this Stage: If your Leader is [Caesar Clown], give up to 1 rested DON!! card to your Leader or 1 of your Characters.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-021",
+     "imageUrls": {
+      "full": "OP10-021.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-021/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-022",
+   "name": "Trafalgar Law",
+   "category": "Leader",
+   "colors": [
+    "Green",
+    "Yellow"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 4,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Heart Pirates",
+    "Supernovas",
+    "Dressrosa"
+   ],
+   "rarity": "L",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[DON!! x1] [Activate: Main] [Once Per Turn] If the total cost of your Characters is 5 or more, you may return 1 of your Characters to the owner's hand: Reveal 1 card from the top of your Life cards. If that card is a \"Supernovas\" type Character card with a cost of 5 or less, you may play that card.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-022",
+     "imageUrls": {
+      "full": "OP10-022.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "L"
+    },
+    {
+     "artworkId": "OP10-022_p1",
+     "imageUrls": {
+      "full": "OP10-022_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "L",
+     "label": "Parallel"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-022/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-023",
+   "name": "Issho",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Navy",
+    "Dressrosa"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] If your Leader has the \"Navy\" type, rest up to 2 of your opponent's Characters with a cost of 5 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-023",
+     "imageUrls": {
+      "full": "OP10-023.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-023/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-024",
+   "name": "Edward.Newgate",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "The Four Emperors",
+    "Whitebeard Pirates",
+    "ODYSSEY"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] If you have 2 or more rested Characters, rest up to 1 of your opponent's Characters with a cost of 5 or less. Then, K.O. up to 1 of your opponent's rested Characters with a cost of 3 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-024",
+     "imageUrls": {
+      "full": "OP10-024.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-024/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-025",
+   "name": "Enel",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "ODYSSEY",
+    "Sky Island"
+   ],
+   "rarity": "R",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] If you have 2 or more rested Characters, draw 3 cards and trash 2 cards from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-025",
+     "imageUrls": {
+      "full": "OP10-025.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP10-025#2",
+     "imageUrls": {
+      "full": "Enel_Judge_Pack_Vol._6_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Judge Pack Vol. 6"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-025/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-026",
+   "name": "Kin'emon",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 2,
+   "power": 1000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Land of Wano",
+    "The Akazaya Nine",
+    "Punk Hazard"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Activate: Main] You may place this Character and 1 [Kin'emon] with 0 power from your trash at the bottom of your deck in any order: Play up to 1 [Kin'emon] with a cost of 6 from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-026",
+     "imageUrls": {
+      "full": "OP10-026.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-026/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-027",
+   "name": "Kin'emon",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 2,
+   "power": 0,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Land of Wano",
+    "The Akazaya Nine",
+    "Punk Hazard"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Activate: Main] You may place this Character and 1 [Kin'emon] with 1000 power from your trash at the bottom of your deck in any order: Play up to 1 [Kin'emon] with a cost of 6 from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-027",
+     "imageUrls": {
+      "full": "OP10-027.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-027/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-028",
+   "name": "Kouzuki Momonosuke",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 1,
+   "power": 1000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Land of Wano",
+    "Kouzuki Clan",
+    "Punk Hazard"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Activate: Main] You may rest 2 of your DON!! cards and trash this Character: Look at 5 cards from the top of your deck; reveal up to 2 \"The Akazaya Nine\" type cards and add them to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-028",
+     "imageUrls": {
+      "full": "OP10-028.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    },
+    {
+     "artworkId": "OP10-028#2",
+     "imageUrls": {
+      "full": "Kouzuki_Momonosuke_Premium_Card_Collection_-Best_Selection_Vol._4-_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "UC",
+     "label": "Premium Card Collection -Best Selection Vol. 4-"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-028/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-029",
+   "name": "Dracule Mihawk",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "The Seven Warlords of the Sea",
+    "ODYSSEY"
+   ],
+   "rarity": "R",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] If you have 2 or more rested Characters, set up to 1 of your rested \"ODYSSEY\" type Characters with a cost of 5 or less as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-029",
+     "imageUrls": {
+      "full": "OP10-029.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-029/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-030",
+   "name": "Smoker",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 5,
+   "power": 7000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Navy",
+    "Punk Hazard"
+   ],
+   "rarity": "SR",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Banish] (When this card deals damage, the target card is trashed without activating its Trigger.)\n[Activate: Main] Set up to 1 of your DON!! cards as active. Then, you cannot set DON!! cards as active using Character effects during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-030",
+     "imageUrls": {
+      "full": "OP10-030.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "OP10-030_p1",
+     "imageUrls": {
+      "full": "OP10-030_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "SR",
+     "label": "Parallel"
+    },
+    {
+     "artworkId": "OP10-030_p2",
+     "imageUrls": {
+      "full": "OP10-030_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-13",
+     "rarity": "SR",
+     "label": "SP"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-030/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-031",
+   "name": "Sengoku",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 5,
+   "power": 7000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Navy",
+    "Dressrosa"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-031",
+     "imageUrls": {
+      "full": "OP10-031.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-031/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-032",
+   "name": "Tashigi",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Navy",
+    "Punk Hazard"
+   ],
+   "rarity": "SR",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "If you have a green Character other than [Tashigi] that would be removed from the field by your opponent's effect, you may rest this Character instead.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-032",
+     "imageUrls": {
+      "full": "OP10-032.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "OP10-032_p1",
+     "imageUrls": {
+      "full": "OP10-032_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "SR",
+     "label": "Parallel"
+    },
+    {
+     "artworkId": "OP10-032_r1",
+     "imageUrls": {
+      "full": "OP10-032_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "SR",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-032/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-033",
+   "name": "Nami",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 2,
+   "power": 2000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Straw Hat Crew",
+    "ODYSSEY"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] If you have 2 or more rested \"ODYSSEY\" type Characters, up to 1 of your opponent's rested DON!! cards will not become active in your opponent's next Refresh Phase.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-033",
+     "imageUrls": {
+      "full": "OP10-033.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    },
+    {
+     "artworkId": "OP10-033#2",
+     "imageUrls": {
+      "full": "Nami_CS_25-26_Finalist_Card_Set_1_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "UC",
+     "label": "CS 25-26 Finalist Card Set 1"
+    },
+    {
+     "artworkId": "OP10-033_pr1",
+     "imageUrls": {
+      "full": "Nami_CS_25-26_Top_Player_Pack_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "UC",
+     "label": "CS 25-26 Top Player Pack"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-033/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-034",
+   "name": "Franky",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Straw Hat Crew",
+    "ODYSSEY"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Once Per Turn] If this Character would be K.O.'d in battle, you may add 1 card from the top of your Life cards to your hand instead.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-034",
+     "imageUrls": {
+      "full": "OP10-034.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-034/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-035",
+   "name": "Brook",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 3,
+   "power": 5000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Straw Hat Crew",
+    "ODYSSEY"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On K.O.] Rest up to 1 of your opponent's Leader or Character cards with a cost of 5 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-035",
+     "imageUrls": {
+      "full": "OP10-035.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-035/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-036",
+   "name": "Perona",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Thriller Bark Pirates",
+    "ODYSSEY",
+    "Muggy Kingdom"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Your Turn] [Once Per Turn] If a Character is rested by your effect, set up to 1 of your DON!! cards as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-036",
+     "imageUrls": {
+      "full": "OP10-036.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "OP10-036_r1",
+     "imageUrls": {
+      "full": "OP10-036_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-32",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-036/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-037",
+   "name": "Lim",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 1,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "ODYSSEY"
+   ],
+   "rarity": "R",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Once Per Turn] If this Character would be removed from the field by your opponent's effect, you may rest 1 of your \"ODYSSEY\" type Characters instead.[End of Your Turn] Set up to 1 of your \"ODYSSEY\" type Characters as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-037",
+     "imageUrls": {
+      "full": "OP10-037.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP10-037_p1",
+     "imageUrls": {
+      "full": "OP10-037_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R",
+     "label": "Parallel"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-037/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-038",
+   "name": "Roronoa Zoro",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Straw Hat Crew",
+    "Supernovas",
+    "ODYSSEY"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Opponent's Turn] If you have 2 or more rested Characters, this Character gains +2000 power.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-038",
+     "imageUrls": {
+      "full": "OP10-038.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-038/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-039",
+   "name": "Gum-Gum Dragon Fire Pistol Twister Star",
+   "category": "Event",
+   "colors": [
+    "Green"
+   ],
+   "cost": 3,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Straw Hat Crew",
+    "Supernovas",
+    "ODYSSEY"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Main] If your Leader has the \"ODYSSEY\" type, look at 5 cards from the top of your deck; reveal up to 2 \"ODYSSEY\" type Character cards and add them to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": "Rest up to 1 of your opponent's Characters with a cost of 5 or less.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-039",
+     "imageUrls": {
+      "full": "OP10-039.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-039/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-040",
+   "name": "The Weak Do Not Have the Right to Choose How They Die",
+   "category": "Event",
+   "colors": [
+    "Green"
+   ],
+   "cost": 5,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Heart Pirates",
+    "The Seven Warlords of the Sea",
+    "Punk Hazard"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Main]/[Counter] K.O. up to 1 of your opponent's rested Characters with a cost of 7 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-040",
+     "imageUrls": {
+      "full": "OP10-040.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-040/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-041",
+   "name": "Radio Knife",
+   "category": "Event",
+   "colors": [
+    "Green"
+   ],
+   "cost": 4,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Heart Pirates",
+    "Supernovas",
+    "Dressrosa"
+   ],
+   "rarity": "R",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Main] Rest up to 1 of your opponent's Characters with a cost of 6 or less. Then, K.O. up to 1 of your opponent's rested Characters with a cost of 5 or less.",
+   "triggerText": "Rest up to 1 of your opponent's Characters with a cost of 4 or less.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-041",
+     "imageUrls": {
+      "full": "OP10-041.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-041/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-042",
+   "name": "Usopp",
+   "category": "Leader",
+   "colors": [
+    "Blue",
+    "Black"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 4,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "Straw Hat Crew",
+    "Dressrosa"
+   ],
+   "rarity": "L",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "All of your \"Dressrosa\" type Characters with a cost of 2 or more gain +1 cost.[Opponent's Turn] [Once Per Turn] This effect can be activated when your \"Dressrosa\" type Character is removed from the field by your opponent's effect or K.O.'d. If you have 5 or less cards in your hand, draw 1 card.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-042",
+     "imageUrls": {
+      "full": "OP10-042.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "L"
+    },
+    {
+     "artworkId": "OP10-042_p1",
+     "imageUrls": {
+      "full": "OP10-042_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "L",
+     "label": "Parallel"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-042/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-043",
+   "name": "Moocy",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 2,
+   "power": 2000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Animal",
+    "Dressrosa"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] You may rest 1 of your \"Dressrosa\" type Leader or Stage cards: Up to 1 of your [Monkey.D.Luffy] Characters gains [Banish] during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-043",
+     "imageUrls": {
+      "full": "OP10-043.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-043/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-044",
+   "name": "Cub",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 1,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Dressrosa",
+    "The Tontattas"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] You may rest 1 of your \"Dressrosa\" type Leader or Stage cards: Return up to 1 of your opponent's Characters with a cost of 1 or less to the owner's hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-044",
+     "imageUrls": {
+      "full": "OP10-044.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-044/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-045",
+   "name": "Cavendish",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 4,
+   "power": 6000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Beautiful Pirates",
+    "Dressrosa"
+   ],
+   "rarity": "R",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[When Attacking] [Once Per Turn] Draw 2 cards and trash 1 card from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-045",
+     "imageUrls": {
+      "full": "OP10-045.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP10-045_p1",
+     "imageUrls": {
+      "full": "OP10-045_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R",
+     "label": "Parallel"
+    },
+    {
+     "artworkId": "OP10-045_p2",
+     "imageUrls": {
+      "full": "OP10-045_p2_RGABvhV.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-16",
+     "rarity": "R",
+     "label": "SP"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-045/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-046",
+   "name": "Kyros",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 7,
+   "power": 9000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Dressrosa"
+   ],
+   "rarity": "SR",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] Return up to 1 Character with a cost of 5 or less to the owner's hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-046",
+     "imageUrls": {
+      "full": "OP10-046.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "OP10-046_p1",
+     "imageUrls": {
+      "full": "OP10-046_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "SR",
+     "label": "Parallel"
+    },
+    {
+     "artworkId": "OP10-046_r1",
+     "imageUrls": {
+      "full": "OP10-046_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "SR",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-046/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-047",
+   "name": "Koala",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 2,
+   "power": 3000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Revolutionary Army",
+    "Dressrosa"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[When Attacking] You may return 1 of your \"Revolutionary Army\" type Characters with a cost of 3 or more to the owner's hand: This Character gains +3000 power during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-047",
+     "imageUrls": {
+      "full": "OP10-047.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-047/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-048",
+   "name": "Sai",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 3,
+   "power": 5000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Happosui Army",
+    "Dressrosa"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] You may rest 1 of your \"Dressrosa\" type Leader or Stage cards: Return up to 1 of your opponent's Characters with a cost of 1 or less to the owner's hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-048",
+     "imageUrls": {
+      "full": "OP10-048.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-048/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-049",
+   "name": "Sabo",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Revolutionary Army",
+    "Dressrosa"
+   ],
+   "rarity": "R",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "If your Character with a base cost of 7 or less other than [Sabo] would be removed from the field by your opponent's effect, you may return this Character to the owner's hand instead.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-049",
+     "imageUrls": {
+      "full": "OP10-049.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP10-049#2",
+     "imageUrls": {
+      "full": "Sabo_-_OP10-049_3rd_Anniversary_Treasure_Campaign_Pack_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "3rd Anniversary Treasure Campaign Pack"
+    },
+    {
+     "artworkId": "OP10-049_pr1",
+     "imageUrls": {
+      "full": "Sabo_Premium_Card_Collection_-Best_Selection_Vol._4-_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Premium Card Collection -Best Selection Vol. 4-"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-049/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-050",
+   "name": "Hajrudin",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 7,
+   "power": 9000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Giant",
+    "Dressrosa",
+    "New Giant Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-050",
+     "imageUrls": {
+      "full": "OP10-050.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-050/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-051",
+   "name": "Hack",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Fish-Man",
+    "Revolutionary Army",
+    "Dressrosa"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[DON!! x1] [When Attacking] Look at 3 cards from the top of your deck; reveal up to 1 \"Revolutionary Army\" type Character card and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-051",
+     "imageUrls": {
+      "full": "OP10-051.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-051/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-052",
+   "name": "Bartolomeo",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Dressrosa",
+    "Barto Club"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[On Play] Place up to 1 Character with a cost of 1 or less at the bottom of the owner's deck.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-052",
+     "imageUrls": {
+      "full": "OP10-052.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-052/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-053",
+   "name": "Bian",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 1,
+   "power": 1000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Dressrosa",
+    "The Tontattas"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "If you have a \"The Tontattas\" type Character other than [Bian], this Character gains [Blocker].",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-053",
+     "imageUrls": {
+      "full": "OP10-053.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-053/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-054",
+   "name": "Blue Gilly",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 3,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Dressrosa"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-054",
+     "imageUrls": {
+      "full": "OP10-054.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-054/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-055",
+   "name": "Marco",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 3,
+   "power": 5000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Whitebeard Pirates"
+   ],
+   "rarity": "R",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[On K.O.] Return up to 1 of your opponent's Characters with a cost of 4 or less to the owner's hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-055",
+     "imageUrls": {
+      "full": "OP10-055.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-055/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-056",
+   "name": "Mansherry",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 2,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Dressrosa",
+    "The Tontattas"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] You may rest 1 of your \"Dressrosa\" type Leader or Stage cards, and return 1 of your \"Dressrosa\" type Characters with a cost of 4 or more to the owner's hand: Return up to 1 of your opponent's Characters with a cost of 4 or less to the owner's hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-056",
+     "imageUrls": {
+      "full": "OP10-056.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-056/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-057",
+   "name": "Leo",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 1,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Dressrosa",
+    "The Tontattas"
+   ],
+   "rarity": "R",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] You may rest your Leader or 1 of your Stage cards: If your Leader is [Usopp], look at 5 cards from the top of your deck; reveal up to 2 \"Dressrosa\" type cards other than [Leo] and add them to your hand. Then, place the rest at the bottom of your deck in any order, and trash 1 card from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-057",
+     "imageUrls": {
+      "full": "OP10-057.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP10-057#2",
+     "imageUrls": {
+      "full": "Leo_Judge_Pack_Vol._6_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Judge Pack Vol. 6"
+    },
+    {
+     "artworkId": "OP10-057_pr1",
+     "imageUrls": {
+      "full": "Leo_Premium_Card_Collection_-6_assort_vol.1-_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Premium Card Collection -6 assort vol.1-"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-057/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-058",
+   "name": "Rebecca",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 7,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Dressrosa"
+   ],
+   "rarity": "SR",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] If there is a Character with a cost of 8 or more, draw 1 card. Then, reveal up to 2 \"Dressrosa\" type Character cards with a cost of 7 or less other than [Rebecca] from your hand. Play 1 of the revealed cards and play the other card rested if it has a cost of 4 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-058",
+     "imageUrls": {
+      "full": "OP10-058.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "OP10-058_p1",
+     "imageUrls": {
+      "full": "OP10-058_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "SR",
+     "label": "Parallel"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-058/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-059",
+   "name": "Fo...llow...Me...and...I...Will...Gui...de...You",
+   "category": "Event",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Straw Hat Crew",
+    "Dressrosa"
+   ],
+   "rarity": "R",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Main] Look at 5 cards from the top of your deck; reveal up to 1 \"Dressrosa\" type Character card and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": "Activate this card's [Main] effect.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-059",
+     "imageUrls": {
+      "full": "OP10-059.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-059/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-060",
+   "name": "Barrier-Barrier Pistol",
+   "category": "Event",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 5,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Dressrosa",
+    "Barto Club"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Main] Place up to 1 of your opponent's Characters with 6000 power or less at the bottom of the owner's deck.",
+   "triggerText": "Activate this card's [Main] effect.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-060",
+     "imageUrls": {
+      "full": "OP10-060.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-060/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-061",
+   "name": "Special Long-Range Attack!! Bagworm",
+   "category": "Event",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 3,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Straw Hat Crew",
+    "Dressrosa"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Main] Draw 1 card. Then, return up to 1 of your opponent's Characters with a cost of 2 or less to the owner's hand.",
+   "triggerText": "Return up to 1 Character with a cost of 2 or less to the owner's hand.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-061",
+     "imageUrls": {
+      "full": "OP10-061.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-061/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-062",
+   "name": "Violet",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Donquixote Pirates"
+   ],
+   "rarity": "R",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Blocker]\n[On K.O.] DON!! −1: If your Leader has the \"Donquixote Pirates\" type, add up to 1 purple Event from your trash to your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "sign",
+     "from": "DON!! 1",
+     "to": "DON!! −1"
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "OP10-062",
+     "imageUrls": {
+      "full": "OP10-062.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-062/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-063",
+   "name": "Vinsmoke Sanji",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 1,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "The Vinsmoke Family",
+    "Kingdom of GERMA"
+   ],
+   "rarity": "R",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] If your Leader's type includes \"GERMA\", look at 5 cards from the top of your deck; reveal up to 1 card with a type including \"GERMA\" and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-063",
+     "imageUrls": {
+      "full": "OP10-063.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP10-063#2",
+     "imageUrls": {
+      "full": "OP10-063_p3.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-12",
+     "rarity": "TR",
+     "label": "TR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-063/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-064",
+   "name": "Clone Soldier",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 2,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "The Vinsmoke Family",
+    "Kingdom of GERMA"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-064",
+     "imageUrls": {
+      "full": "OP10-064.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-064/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-065",
+   "name": "Sugar",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 1,
+   "power": 1000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Donquixote Pirates"
+   ],
+   "rarity": "R",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Activate: Main] You may rest 1 of your DON!! cards and this Character: Look at 5 cards from the top of your deck; reveal up to 1 \"Donquixote Pirates\" type card and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-065",
+     "imageUrls": {
+      "full": "OP10-065.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP10-065#2",
+     "imageUrls": {
+      "full": "Sugar_Judge_Pack_Vol._6_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Judge Pack Vol. 6"
+    },
+    {
+     "artworkId": "OP10-065_p1",
+     "imageUrls": {
+      "full": "OP10-065_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-14",
+     "rarity": "R",
+     "label": "SP"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-065/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-066",
+   "name": "Giolla",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 2,
+   "power": 2000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Donquixote Pirates"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Your Opponent's Attack] [Once Per Turn] You may rest 2 of your DON!! cards: Rest up to 1 of your opponent's Characters with a cost of 4 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-066",
+     "imageUrls": {
+      "full": "OP10-066.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-066/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-067",
+   "name": "Senor Pink",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Donquixote Pirates"
+   ],
+   "rarity": "R",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] DON!! −1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): Add up to 1 purple Event with a cost of 5 or less from your trash to your hand. Then, set up to 1 of your DON!! cards as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/OP10-067",
+     "date": "2026-10-28",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "sign",
+     "from": "DON!! 1",
+     "to": "DON!! −1"
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "OP10-067",
+     "imageUrls": {
+      "full": "OP10-067.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP10-067_p1",
+     "imageUrls": {
+      "full": "OP10-067_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R",
+     "label": "Parallel"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-067/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-068",
+   "name": "Diamante",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 5,
+   "power": 7000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Donquixote Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-068",
+     "imageUrls": {
+      "full": "OP10-068.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-068/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-069",
+   "name": "Fighting Fish",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 4,
+   "power": 6000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Animal",
+    "Dressrosa"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[DON!! x1] [When Attacking] DON!! −1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): K.O. up to 1 of your opponent's Characters with a cost of 1 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "sign",
+     "from": "DON!! 1",
+     "to": "DON!! −1"
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "OP10-069",
+     "imageUrls": {
+      "full": "OP10-069.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-069/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-070",
+   "name": "Trebol",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Donquixote Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[On Play] All of your Characters with 1000 base power or less cannot be K.O.'d by your opponent's effects until the end of your opponent's next turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-070",
+     "imageUrls": {
+      "full": "OP10-070.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-070/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-071",
+   "name": "Donquixote Doflamingo",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 8,
+   "power": 9000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Donquixote Pirates",
+    "The Seven Warlords of the Sea"
+   ],
+   "rarity": "SR",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] DON!! −1: Play up to 1 \"Donquixote Pirates\" type Character card with a cost of 5 or less from your hand.\n[On Your Opponent's Attack] [Once Per Turn] You may rest 1 of your DON!! cards: Add up to 1 DON!! card from your DON!! deck and set it as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "sign",
+     "from": "DON!! 1",
+     "to": "DON!! −1"
+    }
+   ],
+   "artworks": [
+    {
+     "artworkId": "OP10-071",
+     "imageUrls": {
+      "full": "OP10-071.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "OP10-071_p1",
+     "imageUrls": {
+      "full": "OP10-071_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "SR",
+     "label": "Parallel"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-071/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-072",
+   "name": "Donquixote Rosinante",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Donquixote Pirates",
+    "Navy"
+   ],
+   "rarity": "SR",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] You may trash 1 Event from your hand: Draw 2 cards.\n[End of Your Turn] If you have 7 or more DON!! cards on your field, set up to 2 of your DON!! cards as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-072",
+     "imageUrls": {
+      "full": "OP10-072.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "OP10-072_p1",
+     "imageUrls": {
+      "full": "OP10-072_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "SR",
+     "label": "Parallel"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-072/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-073",
+   "name": "Buffalo",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 4,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Donquixote Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-073",
+     "imageUrls": {
+      "full": "OP10-073.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-073/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-074",
+   "name": "Pica",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Donquixote Pirates"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Once Per Turn] If this Character would be K.O.'d by your opponent's effect, you may rest 2 of your active DON!! cards instead.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-074",
+     "imageUrls": {
+      "full": "OP10-074.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-074/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-075",
+   "name": "Foxy",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 2,
+   "power": 1000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Foxy Pirates"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Activate: Main] You may trash this Character: If the number of DON!! cards on your field is equal to or less than the number on your opponent's field, draw 1 card.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-075",
+     "imageUrls": {
+      "full": "OP10-075.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-075/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-076",
+   "name": "Baby 5",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 3,
+   "power": 1000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Donquixote Pirates"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] You may trash 1 card from your hand: If your Leader has the \"Donquixote Pirates\" type, add up to 1 DON!! card from your DON!! deck and set it as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-076",
+     "imageUrls": {
+      "full": "OP10-076.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    },
+    {
+     "artworkId": "OP10-076#2",
+     "imageUrls": {
+      "full": "Baby_5_Judge_Pack_Vol._5_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "UC",
+     "label": "Judge Pack Vol. 5"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-076/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-077",
+   "name": "Bellamy",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Donquixote Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[On Block] You may rest 2 of your DON!! cards: Add up to 1 DON!! card from your DON!! deck and set it as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-077",
+     "imageUrls": {
+      "full": "OP10-077.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-077/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-078",
+   "name": "I Do Not Forgive Those Who Laugh at My Family!!!",
+   "category": "Event",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Donquixote Pirates",
+    "The Seven Warlords of the Sea"
+   ],
+   "rarity": "R",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Main]/[Counter] Look at 3 cards from the top of your deck; reveal up to 1 \"Donquixote Pirates\" type card other than [I Do Not Forgive Those Who Laugh at My Family!!!] and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-078",
+     "imageUrls": {
+      "full": "OP10-078.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-078/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-079",
+   "name": "God Thread",
+   "category": "Event",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 5,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Donquixote Pirates",
+    "The Seven Warlords of the Sea"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Main] K.O. up to 1 of your opponent's Characters with a cost 5 or less. Then, add up to 1 DON!! card from your DON!! deck and set it as active.",
+   "triggerText": "Add up to 1 DON!! card from your DON!! deck and set it as active.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-079",
+     "imageUrls": {
+      "full": "OP10-079.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    },
+    {
+     "artworkId": "OP10-079_p1",
+     "imageUrls": {
+      "full": "OP10-079_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "UC",
+     "label": "Pirate Foil"
+    },
+    {
+     "artworkId": "OP10-079_r1",
+     "imageUrls": {
+      "full": "OP10-079_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "UC",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-079/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-080",
+   "name": "Little Black Bears",
+   "category": "Event",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 3,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Donquixote Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Counter] Up to 1 of your Leader or Character cards gains +4000 power during this battle. Then, if you have 7 or more DON!! cards on your field and 5 or less cards in your hand, draw 1 card.",
+   "triggerText": "Add up to 1 DON!! card from your DON!! deck and set it as active.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-080",
+     "imageUrls": {
+      "full": "OP10-080.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-080/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-081",
+   "name": "Usopp",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "Straw Hat Crew",
+    "Dressrosa"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] You may rest 1 of your \"Dressrosa\" type Leader or Stage cards: K.O. up to 1 of your opponent's Characters with a cost of 2 or less. Then, trash 2 cards from the top of your deck.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-081",
+     "imageUrls": {
+      "full": "OP10-081.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-081/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-082",
+   "name": "Kuzan",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 5,
+   "power": 5000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Blackbeard Pirates",
+    "Former Navy"
+   ],
+   "rarity": "SR",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "This Character cannot be removed from the field by your opponent's effects.\n[Activate: Main] You may trash this Character: Draw 1 card. Then, play up to 1 \"Blackbeard Pirates\" type Character card with a cost of 5 or less other than [Kuzan] from your trash.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-082",
+     "imageUrls": {
+      "full": "OP10-082.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "OP10-082_p1",
+     "imageUrls": {
+      "full": "OP10-082_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "SR",
+     "label": "Parallel"
+    },
+    {
+     "artworkId": "OP10-082_p2",
+     "imageUrls": {
+      "full": "OP10-082_p2_0rQ9fvR.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-12",
+     "rarity": "SR",
+     "label": "SP"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-082/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-083",
+   "name": "Kouzuki Momonosuke",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 2,
+   "power": 0,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Land of Wano",
+    "Kouzuki Clan",
+    "Dressrosa"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Activate: Main] You may rest this Character and 1 of your \"Dressrosa\" type Leader or Stage cards: Give up to 1 of your opponent's Characters −2 cost during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-083",
+     "imageUrls": {
+      "full": "OP10-083.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-083/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-084",
+   "name": "Sanjuan.Wolf",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 5,
+   "power": 7000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Blackbeard Pirates",
+    "Giant"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-084",
+     "imageUrls": {
+      "full": "OP10-084.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "OP10-084_r1",
+     "imageUrls": {
+      "full": "OP10-084_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-27",
+     "rarity": "C",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-084/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-085",
+   "name": "Jesus Burgess",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Blackbeard Pirates",
+    "Dressrosa"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[DON!! x1] If you have 8 or more cards in your trash, this Character gains [Rush].",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-085",
+     "imageUrls": {
+      "full": "OP10-085.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    },
+    {
+     "artworkId": "OP10-085#2",
+     "imageUrls": {
+      "full": "Jesus_Burgess_Beginners_Deck_Party_ST-23_-_ST-28_Winner_Pack_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "UC",
+     "label": "Beginners Deck Party [ST-23] - [ST-28] Winner Pack"
+    },
+    {
+     "artworkId": "OP10-085_pr1",
+     "imageUrls": {
+      "full": "Jesus_Burgess_Beginners_Deck_Party_ST-23_-_ST-28_Participation_Pack_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "UC",
+     "label": "Beginners Deck Party [ST-23] - [ST-28] Participation Pack"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-085/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-086",
+   "name": "Shiryu",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Blackbeard Pirates"
+   ],
+   "rarity": "R",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Opponent's Turn] This Character gains +2000 power.\n[Activate: Main] [Once Per Turn] If your Leader has the \"Blackbeard Pirates\" type, and this Character was played on this turn, K.O. up to 1 of your opponent's Characters with a base cost of 3 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-086",
+     "imageUrls": {
+      "full": "OP10-086.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-086/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-087",
+   "name": "Tony Tony.Chopper",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 2,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Animal",
+    "Straw Hat Crew",
+    "Dressrosa"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Activate: Main] You may rest this Character and 1 of your \"Dressrosa\" type Leader or Stage cards: If your opponent has 5 or more cards in their hand, your opponent trashes 1 card from their hand. Then, trash 2 cards from the top of your deck.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-087",
+     "imageUrls": {
+      "full": "OP10-087.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-087/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-088",
+   "name": "Nami",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 2,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Straw Hat Crew",
+    "Dressrosa"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Activate: Main] You may rest this Character and 1 of your \"Dressrosa\" type Leader or Stage cards: Draw 1 card. Then, trash 2 cards from the top of your deck.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-088",
+     "imageUrls": {
+      "full": "OP10-088.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-088/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-089",
+   "name": "Nico Robin",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 6,
+   "power": 8000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Straw Hat Crew",
+    "Dressrosa"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-089",
+     "imageUrls": {
+      "full": "OP10-089.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-089/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-090",
+   "name": "Franky",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Straw Hat Crew",
+    "Dressrosa"
+   ],
+   "rarity": "R",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Blocker]\n[On K.O.] Play up to 1 \"Dressrosa\" type Character card with a cost of 3 or less from your trash rested.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-090",
+     "imageUrls": {
+      "full": "OP10-090.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP10-090_p1",
+     "imageUrls": {
+      "full": "OP10-090_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R",
+     "label": "Parallel"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-090/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-091",
+   "name": "Brook",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 3,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Straw Hat Crew",
+    "Dressrosa"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Activate: Main] You may rest this Character and 1 of your \"Dressrosa\" type Leader or Stage cards: K.O. up to 1 of your opponent's Characters with a cost of 1 or less. Then, trash 2 cards from the top of your deck.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-091",
+     "imageUrls": {
+      "full": "OP10-091.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-091/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-092",
+   "name": "Perona",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Thriller Bark Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Activate: Main] [Once Per Turn] You may place 2 \"Thriller Bark Pirates\" type cards from your trash at the bottom of your deck in any order: Up to 1 of your Characters other than [Perona] gains +2000 power during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-092",
+     "imageUrls": {
+      "full": "OP10-092.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "OP10-092#2",
+     "imageUrls": {
+      "full": "Perona_CS_25-26_Top_Player_Pack_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "C",
+     "label": "CS 25-26 Top Player Pack"
+    },
+    {
+     "artworkId": "OP10-092_pr1",
+     "imageUrls": {
+      "full": "Perona_CS_25-26_Finalist_Card_Set_1_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "C",
+     "label": "CS 25-26 Finalist Card Set 1"
+    },
+    {
+     "artworkId": "OP10-092_pr2",
+     "imageUrls": {
+      "full": "Perona_Premium_Card_Collection_-Best_Selection_Vol._4-_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "C",
+     "label": "Premium Card Collection -Best Selection Vol. 4-"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-092/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-093",
+   "name": "Saint Homing",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 1,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Celestial Dragons"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Activate: Main] You may trash this Character: Up to 1 of your black Characters gains +3 cost until the end of your opponent's next turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-093",
+     "imageUrls": {
+      "full": "OP10-093.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-093/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-094",
+   "name": "Ryuma",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 4,
+   "power": 6000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Land of Wano",
+    "Thriller Bark Pirates"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[DON!! x1] This Character gains [Double Attack].",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-094",
+     "imageUrls": {
+      "full": "OP10-094.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-094/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-095",
+   "name": "Roronoa Zoro",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 4,
+   "power": 6000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Straw Hat Crew",
+    "Supernovas",
+    "Dressrosa"
+   ],
+   "rarity": "R",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] You may rest 1 of your \"Dressrosa\" type Leader or Stage cards: K.O. up to 1 of your opponent's Characters with a cost of 4 or less. Then, trash 2 cards from the top of your deck.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-095",
+     "imageUrls": {
+      "full": "OP10-095.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP10-095_p1",
+     "imageUrls": {
+      "full": "OP10-095_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "OP10-095_r1",
+     "imageUrls": {
+      "full": "OP10-095_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-095/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-096",
+   "name": "There's No Longer Any Need for the Seven Warlords of the Sea!!!",
+   "category": "Event",
+   "colors": [
+    "Black"
+   ],
+   "cost": 4,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Navy"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Main] K.O. up to 1 of your opponent's \"The Seven Warlords of the Sea\" type Characters with a cost of 8 or less.",
+   "triggerText": "K.O. up to 1 of your opponent's \"The Seven Warlords of the Sea\" type Characters with a cost of 4 or less.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-096",
+     "imageUrls": {
+      "full": "OP10-096.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-096/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-097",
+   "name": "Gum-Gum Rhino Schneider",
+   "category": "Event",
+   "colors": [
+    "Black"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Straw Hat Crew",
+    "Supernovas",
+    "Dressrosa"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Main] Up to 1 of your \"Dressrosa\" type Characters gains +2000 power during this turn. Then, if you have 10 or more cards in your trash, that card gains [Banish] during this turn.",
+   "triggerText": "Draw 2 cards and trash 1 card from your hand.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-097",
+     "imageUrls": {
+      "full": "OP10-097.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-097/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-098",
+   "name": "Liberation",
+   "category": "Event",
+   "colors": [
+    "Black"
+   ],
+   "cost": 6,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Blackbeard Pirates"
+   ],
+   "rarity": "R",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Main] If the number of your Characters is at least 2 less than the number of your opponent's Characters, K.O. up to 1 of your opponent's Characters with a base cost of 6 or less and up to 1 of your opponent's Characters with a base cost of 4 or less.",
+   "triggerText": "Negate the effect of up to 1 of each of your opponent's Leader and Character cards during this turn.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-098",
+     "imageUrls": {
+      "full": "OP10-098.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-098/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-099",
+   "name": "Eustass\"Captain\"Kid",
+   "category": "Leader",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 5,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Kid Pirates",
+    "Supernovas"
+   ],
+   "rarity": "L",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[End of Your Turn] You may turn 1 card from the top of your Life cards face-up: Set up to 1 of your \"Supernovas\" type Characters with a cost of 3 to 8 as active. That Character gains [Blocker] until the end of your opponent's next turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-099",
+     "imageUrls": {
+      "full": "OP10-099.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "L"
+    },
+    {
+     "artworkId": "OP10-099_p1",
+     "imageUrls": {
+      "full": "OP10-099_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "L",
+     "label": "Parallel"
+    },
+    {
+     "artworkId": "OP10-099_p2",
+     "imageUrls": {
+      "full": "OP10-099_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-36",
+     "rarity": "L"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-099/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-100",
+   "name": "Inazuma",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Revolutionary Army"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[DON!! x1] [When Attacking] Rest up to 1 of your opponent's Characters with a cost equal to or less than the total of your and your opponent's Life cards.",
+   "triggerText": "If your Leader has the \"Revolutionary Army\" type and you and your opponent have a total of 5 or less Life cards, play this card.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-100",
+     "imageUrls": {
+      "full": "OP10-100.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-100/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-101",
+   "name": "Urouge",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 5,
+   "power": 7000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Fallen Monk Pirates",
+    "Supernovas"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-101",
+     "imageUrls": {
+      "full": "OP10-101.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "OP10-101_r1",
+     "imageUrls": {
+      "full": "OP10-101_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-36",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-101/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-102",
+   "name": "Emporio.Ivankov",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Revolutionary Army"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Activate: Main] [Once Per Turn] Up to 3 of your \"Revolutionary Army\" type Characters gain +1000 power during this turn. Then, add 1 card from the top of your Life cards to your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-102",
+     "imageUrls": {
+      "full": "OP10-102.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-102/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-103",
+   "name": "Capone\"Gang\"Bege",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 1,
+   "power": 0,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "Firetank Pirates",
+    "Supernovas"
+   ],
+   "rarity": "R",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] You may add 1 card from the top or bottom of your Life cards to your hand: Add up to 1 \"Supernovas\" type Character card from your hand to the top of your Life cards face-up.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-103",
+     "imageUrls": {
+      "full": "OP10-103.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP10-103_r1",
+     "imageUrls": {
+      "full": "OP10-103_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-36",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-103/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-104",
+   "name": "Caribou",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Caribou Pirates",
+    "Supernovas"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[DON!! x1] If your Leader has the \"Supernovas\" type and your opponent has 3 or more Life cards, this Character cannot be K.O.'d in battle.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-104",
+     "imageUrls": {
+      "full": "OP10-104.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-104/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-105",
+   "name": "Cavendish",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 6,
+   "power": 8000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Beautiful Pirates",
+    "Supernovas",
+    "Dressrosa"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-105",
+     "imageUrls": {
+      "full": "OP10-105.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "OP10-105_p1",
+     "imageUrls": {
+      "full": "OP10-105_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "C",
+     "label": "Pirate Foil"
+    },
+    {
+     "artworkId": "OP10-105_r1",
+     "imageUrls": {
+      "full": "OP10-105_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "C",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-105/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-106",
+   "name": "Killer",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 3,
+   "power": 5000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Kid Pirates",
+    "Supernovas"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On K.O.] If your Leader has the \"Supernovas\" type, look at 3 cards from the top of your deck; reveal up to 1 \"Supernovas\" or \"Kid Pirates\" type card and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-106",
+     "imageUrls": {
+      "full": "OP10-106.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    },
+    {
+     "artworkId": "OP10-106#2",
+     "imageUrls": {
+      "full": "Killer_Judge_Pack_Vol._5_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "UC",
+     "label": "Judge Pack Vol. 5"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-106/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-107",
+   "name": "Jewelry Bonney",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Bonney Pirates",
+    "Supernovas"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Blocker]\n[On Play] You may add 1 card from the top or bottom of your Life cards to your hand: Add up to 1 \"Supernovas\" type Character card with a cost of 5 from your hand to the top of your Life cards face-up.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-107",
+     "imageUrls": {
+      "full": "OP10-107.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    },
+    {
+     "artworkId": "OP10-107#2",
+     "imageUrls": {
+      "full": "Jewelry_Bonney_Judge_Pack_Vol._7_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "UC",
+     "label": "Judge Pack Vol. 7"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-107/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-108",
+   "name": "Scratchmen Apoo",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 1,
+   "power": 1000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "On-Air Pirates",
+    "Supernovas"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "If you have a yellow \"Supernovas\" type Character other than [Scratchmen Apoo], this Character gains [Blocker].",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-108",
+     "imageUrls": {
+      "full": "OP10-108.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "OP10-108_p1",
+     "imageUrls": {
+      "full": "OP10-108_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "C",
+     "label": "Pirate Foil"
+    },
+    {
+     "artworkId": "OP10-108_r1",
+     "imageUrls": {
+      "full": "OP10-108_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "C",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-108/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-109",
+   "name": "Basil Hawkins",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Hawkins Pirates",
+    "Supernovas"
+   ],
+   "rarity": "R",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On K.O.] Trash up to 1 card from the top of your opponent's Life cards.",
+   "triggerText": "Draw 2 cards and trash 1 card from your hand.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-109",
+     "imageUrls": {
+      "full": "OP10-109.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP10-109_p1",
+     "imageUrls": {
+      "full": "OP10-109_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "OP10-109_r1",
+     "imageUrls": {
+      "full": "OP10-109_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "R",
+     "label": "Reprint"
+    },
+    {
+     "artworkId": "OP10-109_r1#2",
+     "imageUrls": {
+      "full": "OP10-103_r1_QmckfUc.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-36",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-109/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-110",
+   "name": "Heat & Wire",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash",
+    "Special"
+   ],
+   "types": [
+    "Kid Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] Rest up to 1 of your opponent's Characters with a cost equal to or less than the number of your opponent's Life cards.",
+   "triggerText": "If you have 2 or less Life cards, play this card.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-110",
+     "imageUrls": {
+      "full": "OP10-110.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-110/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-111",
+   "name": "Monkey.D.Luffy",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 1,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Straw Hat Crew",
+    "Supernovas"
+   ],
+   "rarity": "R",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 \"Supernovas\" type card other than [Monkey.D.Luffy] and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-111",
+     "imageUrls": {
+      "full": "OP10-111.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP10-111_p1",
+     "imageUrls": {
+      "full": "OP10-111_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R",
+     "label": "Parallel"
+    },
+    {
+     "artworkId": "OP10-111_r1",
+     "imageUrls": {
+      "full": "OP10-111_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-36",
+     "rarity": "R"
+    },
+    {
+     "artworkId": "OP10-111_pr1",
+     "imageUrls": {
+      "full": "Monkey.D.Luffy_Learn_Together_Deck_Set_-_Set_Sail_Event_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Learn Together Deck Set - Set Sail Event"
+    },
+    {
+     "artworkId": "OP10-111_pr2",
+     "imageUrls": {
+      "full": "Monkey.D.Luffy_Premium_Card_Collection_-6_assort_vol.1-_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "R",
+     "label": "Premium Card Collection -6 assort vol.1-"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-111/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-112",
+   "name": "Eustass\"Captain\"Kid",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 8,
+   "power": 9000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Kid Pirates",
+    "Supernovas"
+   ],
+   "rarity": "SR",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] You may rest this Character: Trash up to 1 card from the top of your opponent's Life cards.\n[End of Your Turn] If your opponent has 2 or less Life cards, draw 1 card and trash 1 card from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-112",
+     "imageUrls": {
+      "full": "OP10-112.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "SR"
+    },
+    {
+     "artworkId": "OP10-112_p1",
+     "imageUrls": {
+      "full": "OP10-112_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "SR",
+     "label": "Parallel"
+    },
+    {
+     "artworkId": "OP10-112_r1",
+     "imageUrls": {
+      "full": "OP10-112_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "SR",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-112/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-113",
+   "name": "Roronoa Zoro",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 3,
+   "power": 5000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Straw Hat Crew",
+    "Supernovas"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "If you have less Life cards than your opponent, this Character gains [Rush].",
+   "triggerText": "You may trash 1 card from your hand: If your Leader has the \"Supernovas\" type, play this card.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-113",
+     "imageUrls": {
+      "full": "OP10-113.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    },
+    {
+     "artworkId": "OP10-113#2",
+     "imageUrls": {
+      "full": "Roronoa_Zoro_Judge_Pack_Vol._6_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "UC",
+     "label": "Judge Pack Vol. 6"
+    },
+    {
+     "artworkId": "OP10-113_pr1",
+     "imageUrls": {
+      "full": "Roronoa_Zoro_Learn_Together_Deck_Set_-_Set_Sail_Event_img.jpg"
+     },
+     "source": "optcgapi",
+     "product": "P",
+     "rarity": "UC",
+     "label": "Learn Together Deck Set - Set Sail Event"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-113/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-114",
+   "name": "X.Drake",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 3,
+   "power": 3000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Drake Pirates",
+    "Navy",
+    "Supernovas"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Activate: Main] You may rest this Character: If the number of your Life cards is equal to or less than the number of your opponent's Life cards, rest up to 1 of your opponent's Characters with a cost of 4 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/OP10-114",
+     "date": "2026-10-28",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-114",
+     "imageUrls": {
+      "full": "OP10-114.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    },
+    {
+     "artworkId": "OP10-114_p1",
+     "imageUrls": {
+      "full": "OP10-114_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "UC",
+     "label": "Pirate Foil"
+    },
+    {
+     "artworkId": "OP10-114_p2",
+     "imageUrls": {
+      "full": "OP10-114_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "UC",
+     "label": "Alternate Art"
+    },
+    {
+     "artworkId": "OP10-114_r1",
+     "imageUrls": {
+      "full": "OP10-114_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "UC",
+     "label": "Reprint"
+    },
+    {
+     "artworkId": "OP10-114_r2",
+     "imageUrls": {
+      "full": "OP10-114_r2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-36",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-114/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-115",
+   "name": "Let's Meet Again in the New World",
+   "category": "Event",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 2,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Kid Pirates",
+    "Supernovas"
+   ],
+   "rarity": "C",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Counter] Up to 1 of your Leader or Character cards gains +4000 power during this battle. Then, if you have 0 Life cards, draw 1 card.",
+   "triggerText": "K.O. up to 1 of your opponent's Characters with a cost equal to or less than the number of your opponent's Life cards.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-115",
+     "imageUrls": {
+      "full": "OP10-115.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-115/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-116",
+   "name": "Damned Punk",
+   "category": "Event",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 4,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Kid Pirates",
+    "Supernovas"
+   ],
+   "rarity": "R",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Main] Look at up to 1 card from the top of your or your opponent's Life cards and place it at the top or bottom of the Life cards. Then, K.O. up to 1 of your opponent's Characters with a cost of 5 or less.",
+   "triggerText": "Draw 2 cards and trash 1 card from your hand.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-116",
+     "imageUrls": {
+      "full": "OP10-116.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-116/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-117",
+   "name": "ROOM",
+   "category": "Event",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Heart Pirates",
+    "Supernovas"
+   ],
+   "rarity": "UC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[Counter] If you have 1 or less Life cards, up to 1 of your Leader or Character cards gains +3000 power during this battle. Then, set up to 1 of your Characters with a cost of 5 or less as active.",
+   "triggerText": "Draw 1 card.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-117",
+     "imageUrls": {
+      "full": "OP10-117.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-117/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-118",
+   "name": "Monkey.D.Luffy",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 6,
+   "power": 7000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Straw Hat Crew",
+    "Supernovas",
+    "Dressrosa"
+   ],
+   "rarity": "SEC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "Once per turn, this Character cannot be K.O.'d by your opponent's effects.\n[When Attacking] You may place 3 cards from your trash at the bottom of your deck in any order: If your opponent has 5 or more cards in their hand, your opponent trashes 1 card from their hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-118",
+     "imageUrls": {
+      "full": "OP10-118.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "SEC"
+    },
+    {
+     "artworkId": "OP10-118_p1",
+     "imageUrls": {
+      "full": "OP10-118_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "SEC",
+     "label": "Parallel"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-118/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  },
+  {
+   "id": "OP10-119",
+   "name": "Trafalgar Law",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 7,
+   "power": 9000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Heart Pirates",
+    "Supernovas",
+    "Dressrosa"
+   ],
+   "rarity": "SEC",
+   "set": "OP-10",
+   "block": 3,
+   "effectText": "[On Play] Reveal up to 1 \"Supernovas\" type Character card from your hand and add it to the top of your Life cards face-down. Then, give up to 1 rested DON!! card to 1 of your \"Supernovas\" type Leader.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP10-119",
+     "imageUrls": {
+      "full": "OP10-119.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "SEC"
+    },
+    {
+     "artworkId": "OP10-119_p1",
+     "imageUrls": {
+      "full": "OP10-119_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "SEC",
+     "label": "Parallel"
+    },
+    {
+     "artworkId": "OP10-119_p1#2",
+     "imageUrls": {
+      "full": "OP10-119_p1_sEtXfvx.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "SEC",
+     "label": "SP"
+    },
+    {
+     "artworkId": "OP10-119_p2",
+     "imageUrls": {
+      "full": "OP10-119_p2.jpg"
+     },
+     "source": "optcgapi",
+     "product": "OP-10",
+     "rarity": "SEC",
+     "label": "Manga"
+    },
+    {
+     "artworkId": "OP10-119_r1",
+     "imageUrls": {
+      "full": "OP10-119_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "SEC",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "SPR exception"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/sets/card/OP10-119/",
+   "fetchedAt": "2026-10-28T13:47:17.000Z"
+  }
+ ]
+}

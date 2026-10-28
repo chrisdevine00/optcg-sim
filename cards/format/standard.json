@@ -1,0 +1,915 @@
+{
+  "format": "standard",
+  "asOf": "2026-10-28",
+  "regulation": {
+    "from": "2026-04-01",
+    "to": "2027-03-31",
+    "allowedBlocks": [2, 3, 4, 5, "X"],
+    "source": {
+      "url": "https://en.onepiece-cardgame.com/topics/013.php",
+      "checked": "2026-10-28",
+      "pageDate": "2025-07-23",
+      "note": "\"booster packs 1 to 4 being Block 1, booster packs 5 to 8 being Block 2, and so on\"; Standard from April 2026 to March 2027 allows blocks 2 to 5. Read from the copy cached by Track F (.cache/track-f/topics013.html)."
+    }
+  },
+  "blocksByProduct": {
+    "EB-01": {
+      "block": 2,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569201",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on every base printing of the product in this series page (cached by Track B, 2026-10-28)."
+      }
+    },
+    "EB-02": {
+      "block": 3,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569202",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on every base printing of the product in this series page (cached by Track B, 2026-10-28)."
+      }
+    },
+    "EB-03": {
+      "block": 4,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569203",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on every base printing of the product in this series page (cached by Track B, 2026-10-28)."
+      }
+    },
+    "EB-04": {
+      "block": 4,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569114",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on every base printing of the product in this series page (cached by Track B, 2026-10-28). EB-04 cards are inserted in OP-14 (569114) and OP-15 (569115)."
+      }
+    },
+    "OP-01": {
+      "block": 1,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569101",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on the base printings of this booster in its own series page (cached 2026-10-28)."
+      }
+    },
+    "OP-02": {
+      "block": 1,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569301",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on this booster's cards where they are reprinted in this series page (cached 2026-10-28); every printing seen agrees."
+      }
+    },
+    "OP-03": {
+      "block": 1,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569103",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on the base printings of this booster in its own series page (cached 2026-10-28)."
+      }
+    },
+    "OP-04": {
+      "block": 1,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569301",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on this booster's cards where they are reprinted in this series page (cached 2026-10-28); every printing seen agrees."
+      }
+    },
+    "OP-05": {
+      "block": 2,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569301",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on this booster's cards where they are reprinted in this series page (cached 2026-10-28); every printing seen agrees. Two OP-05 reprints in 569801 show block 1; 99 others show 2."
+      }
+    },
+    "OP-06": {
+      "block": 2,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569106",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on the base printings of this booster in its own series page (cached 2026-10-28)."
+      }
+    },
+    "OP-07": {
+      "block": 2,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569107",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on the base printings of this booster in its own series page (cached 2026-10-28)."
+      }
+    },
+    "OP-08": {
+      "block": 2,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569302",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on this booster's cards where they are reprinted in this series page (cached 2026-10-28); every printing seen agrees."
+      }
+    },
+    "OP-09": {
+      "block": 3,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569302",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on this booster's cards where they are reprinted in this series page (cached 2026-10-28); every printing seen agrees."
+      }
+    },
+    "OP-10": {
+      "block": 3,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569302",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on this booster's cards where they are reprinted in this series page (cached 2026-10-28); every printing seen agrees."
+      }
+    },
+    "OP-11": {
+      "block": 3,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569111",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on the base printings of this booster in its own series page (cached 2026-10-28)."
+      }
+    },
+    "OP-12": {
+      "block": 3,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569112",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on the base printings of this booster in its own series page (cached 2026-10-28)."
+      }
+    },
+    "OP-13": {
+      "block": 4,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569113",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on the base printings of this booster in its own series page (cached 2026-10-28)."
+      }
+    },
+    "OP-14": {
+      "block": 4,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569114",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on the base printings of this booster in its own series page (cached 2026-10-28)."
+      }
+    },
+    "OP-15": {
+      "block": 4,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569115",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on the base printings of this booster in its own series page (cached 2026-10-28). OP15-096 has no block on the site (rulings.md RL-37)."
+      }
+    },
+    "OP-16": {
+      "block": 5,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569116",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on the base printings of this booster in its own series page (cached 2026-10-28)."
+      }
+    },
+    "OP-17": {
+      "block": 5,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569117",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on the base printings of this booster in its own series page (cached 2026-10-28)."
+      }
+    },
+    "PRB-01": {
+      "block": 3,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569301",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on every base printing of the product in this series page (cached by Track B, 2026-10-28)."
+      }
+    },
+    "PRB-02": {
+      "block": 3,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569302",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on every base printing of the product in this series page (cached by Track B, 2026-10-28)."
+      }
+    },
+    "ST-01": {
+      "block": 1,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569001",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on every base printing of the product in this series page (cached by Track B, 2026-10-28)."
+      }
+    },
+    "ST-02": {
+      "block": 1,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569301",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on this product's cards where they are reprinted in this series page (cached by Track B, 2026-10-28); every printing seen agrees. Only OP01-016, OP04-016 and EB04-061 were reprinted with an updated block (blockicon-card.html), so other reprints carry the product block."
+      }
+    },
+    "ST-03": {
+      "block": 1,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569103",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on this product's cards where they are reprinted in this series page (cached by Track B, 2026-10-28); every printing seen agrees. Only OP01-016, OP04-016 and EB04-061 were reprinted with an updated block (blockicon-card.html), so other reprints carry the product block."
+      }
+    },
+    "ST-04": {
+      "block": 1,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569103",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on this product's cards where they are reprinted in this series page (cached by Track B, 2026-10-28); every printing seen agrees. Only OP01-016, OP04-016 and EB04-061 were reprinted with an updated block (blockicon-card.html), so other reprints carry the product block."
+      }
+    },
+    "ST-05": {
+      "block": 1,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569005",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on every base printing of the product in this series page (cached by Track B, 2026-10-28)."
+      }
+    },
+    "ST-06": {
+      "block": 1,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569301",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on this product's cards where they are reprinted in this series page (cached by Track B, 2026-10-28); every printing seen agrees. Only OP01-016, OP04-016 and EB04-061 were reprinted with an updated block (blockicon-card.html), so other reprints carry the product block."
+      }
+    },
+    "ST-07": {
+      "block": 1,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569301",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on this product's cards where they are reprinted in this series page (cached by Track B, 2026-10-28); every printing seen agrees. Only OP01-016, OP04-016 and EB04-061 were reprinted with an updated block (blockicon-card.html), so other reprints carry the product block."
+      }
+    },
+    "ST-09": {
+      "block": 1,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569301",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on this product's cards where they are reprinted in this series page (cached by Track B, 2026-10-28); every printing seen agrees. Only OP01-016, OP04-016 and EB04-061 were reprinted with an updated block (blockicon-card.html), so other reprints carry the product block."
+      }
+    },
+    "ST-10": {
+      "block": 2,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569010",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on every base printing of the product in this series page (cached by Track B, 2026-10-28)."
+      }
+    },
+    "ST-11": {
+      "block": 2,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569016",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on this product's cards where they are reprinted in this series page (cached by Track B, 2026-10-28); every printing seen agrees. Only OP01-016, OP04-016 and EB04-061 were reprinted with an updated block (blockicon-card.html), so other reprints carry the product block."
+      }
+    },
+    "ST-12": {
+      "block": 2,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569012",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on every base printing of the product in this series page (cached by Track B, 2026-10-28)."
+      }
+    },
+    "ST-13": {
+      "block": 2,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569302",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on this product's cards where they are reprinted in this series page (cached by Track B, 2026-10-28); 12 of the 13 printings seen show 2. Only OP01-016, OP04-016 and EB04-061 were reprinted with an updated block (blockicon-card.html), so other reprints carry the product block."
+      },
+      "note": "One ST-13 printing in the promotion series (569901) shows block 1; the product block is taken as 2 from the other 12. Flagged in gaps."
+    },
+    "ST-14": {
+      "block": 2,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569302",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on this product's cards where they are reprinted in this series page (cached by Track B, 2026-10-28); every printing seen agrees. Only OP01-016, OP04-016 and EB04-061 were reprinted with an updated block (blockicon-card.html), so other reprints carry the product block."
+      }
+    },
+    "ST-15": {
+      "block": 3,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569302",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on this product's cards where they are reprinted in this series page (cached by Track B, 2026-10-28); every printing seen agrees. Only OP01-016, OP04-016 and EB04-061 were reprinted with an updated block (blockicon-card.html), so other reprints carry the product block."
+      }
+    },
+    "ST-16": {
+      "block": 3,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569016",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on every base printing of the product in this series page (cached by Track B, 2026-10-28)."
+      }
+    },
+    "ST-17": {
+      "block": 3,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569302",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on this product's cards where they are reprinted in this series page (cached by Track B, 2026-10-28); every printing seen agrees. Only OP01-016, OP04-016 and EB04-061 were reprinted with an updated block (blockicon-card.html), so other reprints carry the product block."
+      }
+    },
+    "ST-18": {
+      "block": 3,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569302",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on this product's cards where they are reprinted in this series page (cached by Track B, 2026-10-28); every printing seen agrees. Only OP01-016, OP04-016 and EB04-061 were reprinted with an updated block (blockicon-card.html), so other reprints carry the product block."
+      }
+    },
+    "ST-19": {
+      "block": 3,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569302",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on this product's cards where they are reprinted in this series page (cached by Track B, 2026-10-28); every printing seen agrees. Only OP01-016, OP04-016 and EB04-061 were reprinted with an updated block (blockicon-card.html), so other reprints carry the product block."
+      }
+    },
+    "ST-20": {
+      "block": 3,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569302",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on this product's cards where they are reprinted in this series page (cached by Track B, 2026-10-28); every printing seen agrees. Only OP01-016, OP04-016 and EB04-061 were reprinted with an updated block (blockicon-card.html), so other reprints carry the product block."
+      }
+    },
+    "ST-21": {
+      "block": 3,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569302",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on this product's cards where they are reprinted in this series page (cached by Track B, 2026-10-28); every printing seen agrees. Only OP01-016, OP04-016 and EB04-061 were reprinted with an updated block (blockicon-card.html), so other reprints carry the product block."
+      }
+    },
+    "ST-26": {
+      "block": 3,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569115",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on this product's cards where they are reprinted in this series page (cached by Track B, 2026-10-28); every printing seen agrees. Only OP01-016, OP04-016 and EB04-061 were reprinted with an updated block (blockicon-card.html), so other reprints carry the product block."
+      }
+    },
+    "ST-27": {
+      "block": 3,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569117",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on this product's cards where they are reprinted in this series page (cached by Track B, 2026-10-28); every printing seen agrees. Only OP01-016, OP04-016 and EB04-061 were reprinted with an updated block (blockicon-card.html), so other reprints carry the product block."
+      }
+    },
+    "ST-29": {
+      "block": 4,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569029",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on every base printing of the product in this series page (cached by Track B, 2026-10-28)."
+      }
+    },
+    "ST-30": {
+      "block": 5,
+      "basis": "printed",
+      "source": {
+        "url": "https://onepiece.limitlesstcg.com/cards/ST30-001",
+        "checked": "2026-10-28",
+        "note": "Block 5 shown for ST30-001 and ST30-012 (Limitless card pages, read 2026-10-28). No official ST-30 page was read."
+      }
+    },
+    "ST-31": {
+      "block": 5,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569117",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on this product's cards where they are reprinted in this series page (cached by Track B, 2026-10-28); every printing seen agrees. Only OP01-016, OP04-016 and EB04-061 were reprinted with an updated block (blockicon-card.html), so other reprints carry the product block."
+      }
+    },
+    "ST-32": {
+      "block": 5,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569117",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on this product's cards where they are reprinted in this series page (cached by Track B, 2026-10-28); every printing seen agrees. Only OP01-016, OP04-016 and EB04-061 were reprinted with an updated block (blockicon-card.html), so other reprints carry the product block."
+      }
+    },
+    "ST-34": {
+      "block": 5,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569034",
+        "checked": "2026-10-28",
+        "note": "Block icon printed on every base printing of the product in this series page (cached by Track B, 2026-10-28)."
+      }
+    }
+  },
+  "exceptions": {
+    "superParallel": {
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/news/blockicon-card.html",
+        "checked": "2026-10-28",
+        "pageDate": "2026-07-17 (list updated 2026-08-21)",
+        "note": "Read from the copy cached by Track B (.cache/track-b/raw/official-blockicon.html), 2026-10-28. Names are as printed on the page."
+      },
+      "cards": [
+        {
+          "id": "EB01-006",
+          "name": "Tony Tony Chopper"
+        },
+        {
+          "id": "EB02-061",
+          "name": "Monkey D. Luffy"
+        },
+        {
+          "id": "EB03-061",
+          "name": "Uta"
+        },
+        {
+          "id": "EB04-044",
+          "name": "Koby"
+        },
+        {
+          "id": "OP01-016",
+          "name": "Nami"
+        },
+        {
+          "id": "OP01-120",
+          "name": "Shanks"
+        },
+        {
+          "id": "OP02-013",
+          "name": "Portgaz D. Ace"
+        },
+        {
+          "id": "OP03-122",
+          "name": "Sniper King"
+        },
+        {
+          "id": "OP04-083",
+          "name": "Sabo"
+        },
+        {
+          "id": "OP05-069",
+          "name": "Trafalgar Law"
+        },
+        {
+          "id": "OP05-074",
+          "name": "Eustass Kid"
+        },
+        {
+          "id": "OP05-119",
+          "name": "Monkey D. Luffy"
+        },
+        {
+          "id": "OP06-118",
+          "name": "Roronoa Zolo"
+        },
+        {
+          "id": "OP06-119",
+          "name": "Sanji"
+        },
+        {
+          "id": "OP07-051",
+          "name": "Boa Hancock"
+        },
+        {
+          "id": "OP08-118",
+          "name": "Silvers Rayleigh"
+        },
+        {
+          "id": "OP09-004",
+          "name": "Shanks"
+        },
+        {
+          "id": "OP09-051",
+          "name": "Buggy"
+        },
+        {
+          "id": "OP09-093",
+          "name": "Marshall D. Teech"
+        },
+        {
+          "id": "OP09-118",
+          "name": "Gold D. Roger"
+        },
+        {
+          "id": "OP09-119",
+          "name": "Monkey D. Luffy"
+        },
+        {
+          "id": "OP10-119",
+          "name": "Trafalgar Law"
+        },
+        {
+          "id": "OP11-118",
+          "name": "Monkey D. Luffy"
+        },
+        {
+          "id": "OP12-118",
+          "name": "Jewelry Bonney"
+        },
+        {
+          "id": "OP13-118",
+          "name": "Monkey.D.Luffy"
+        },
+        {
+          "id": "OP13-119",
+          "name": "Portgas.D.Ace"
+        },
+        {
+          "id": "OP13-120",
+          "name": "Sabo"
+        },
+        {
+          "id": "OP14-119",
+          "name": "Dracule Mihawk"
+        },
+        {
+          "id": "OP15-118",
+          "name": "Enel"
+        },
+        {
+          "id": "OP16-063",
+          "name": "Kuzan"
+        },
+        {
+          "id": "OP16-065",
+          "name": "Sakazuki"
+        },
+        {
+          "id": "OP16-073",
+          "name": "Borsalino"
+        },
+        {
+          "id": "OP17-005",
+          "name": "Edward.Newgate"
+        },
+        {
+          "id": "OP17-022",
+          "name": "Shanks"
+        },
+        {
+          "id": "OP17-062",
+          "name": "Kaido"
+        },
+        {
+          "id": "OP17-112",
+          "name": "Charlotte Linlin"
+        },
+        {
+          "id": "OP17-118",
+          "name": "Rocks.D.Xebec"
+        }
+      ]
+    },
+    "fixedBlock": {
+      "block": 4,
+      "legalFrom": "2026-04-01",
+      "legalUntil": "2029-03-31",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/news/blockicon-card.html",
+        "checked": "2026-10-28",
+        "pageDate": "2026-07-17 (list updated 2025-07-23)",
+        "note": "Read from the copy cached by Track B (.cache/track-b/raw/official-blockicon.html), 2026-10-28. Names are as printed on the page."
+      },
+      "cards": [
+        {
+          "id": "OP01-039",
+          "name": "Killer"
+        },
+        {
+          "id": "OP01-055",
+          "name": "You Can Be My Samurai!!"
+        },
+        {
+          "id": "OP02-005",
+          "name": "Curly Dadan"
+        },
+        {
+          "id": "OP02-068",
+          "name": "Gum-Gum Rain"
+        },
+        {
+          "id": "OP03-008",
+          "name": "Buggy"
+        },
+        {
+          "id": "OP03-044",
+          "name": "Kaya"
+        },
+        {
+          "id": "OP03-048",
+          "name": "Nojiko"
+        },
+        {
+          "id": "OP03-072",
+          "name": "Gum-Gum Jet Gatling"
+        },
+        {
+          "id": "OP03-097",
+          "name": "Six King Pistol"
+        },
+        {
+          "id": "OP04-016",
+          "name": "Bad Manners Kick Course"
+        },
+        {
+          "id": "OP04-077",
+          "name": "Ideo"
+        },
+        {
+          "id": "OP04-096",
+          "name": "Corrida Coliseum"
+        },
+        {
+          "id": "ST01-011",
+          "name": "Brook"
+        },
+        {
+          "id": "ST02-007",
+          "name": "Jewelry Bonney"
+        },
+        {
+          "id": "ST06-008",
+          "name": "Hina"
+        }
+      ]
+    },
+    "reprintUpdated": {
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/news/blockicon-card.html",
+        "checked": "2026-10-28",
+        "pageDate": "2026-07-17 (list updated 2026-08-21)",
+        "note": "Read from the copy cached by Track B (.cache/track-b/raw/official-blockicon.html), 2026-10-28. Names are as printed on the page."
+      },
+      "cards": [
+        {
+          "id": "OP01-016",
+          "name": "Nami"
+        },
+        {
+          "id": "OP04-016",
+          "name": "Bad Manners Kick Course"
+        },
+        {
+          "id": "EB04-061",
+          "name": "Monkey.D.Luffy"
+        }
+      ]
+    },
+    "newestPrintedBlock": {
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569117",
+        "checked": "2026-10-28",
+        "note": "Card numbers whose newest printing carries a different block from their product (RL-37: legality follows the newest block of any printing). OP-16 Super Parallel Rare numbers are printed X on series 569116; OP-17 numbers and the EB04-061 reprint (EB04-061_p2) on 569117. Pages cached by Track B, 2026-10-28."
+      },
+      "cards": [
+        {
+          "id": "OP16-063",
+          "name": "Kuzan",
+          "block": "X"
+        },
+        {
+          "id": "OP16-065",
+          "name": "Sakazuki",
+          "block": "X"
+        },
+        {
+          "id": "OP16-073",
+          "name": "Borsalino",
+          "block": "X"
+        },
+        {
+          "id": "OP17-005",
+          "name": "Edward.Newgate",
+          "block": "X"
+        },
+        {
+          "id": "OP17-022",
+          "name": "Shanks",
+          "block": "X"
+        },
+        {
+          "id": "OP17-062",
+          "name": "Kaido",
+          "block": "X"
+        },
+        {
+          "id": "OP17-112",
+          "name": "Charlotte Linlin",
+          "block": "X"
+        },
+        {
+          "id": "OP17-118",
+          "name": "Rocks.D.Xebec",
+          "block": "X"
+        },
+        {
+          "id": "EB04-061",
+          "name": "Monkey.D.Luffy",
+          "block": "X"
+        }
+      ]
+    }
+  },
+  "banned": [
+    {
+      "id": "OP14-020",
+      "name": "Dracule Mihawk",
+      "effective": "2026-10-12",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/news/restriction.html",
+        "checked": "2026-10-28",
+        "pageDate": "2026-10-12",
+        "note": "\"Banned/Restricted Cards effective from October 12, 2026\". Read from the copy cached by Track B (.cache/track-b/raw/official-restriction.html). Announced 2026-09-24 (news/restriction-261001.html). Parallel (alt-art) printings included."
+      }
+    },
+    {
+      "id": "OP06-047",
+      "name": "Charlotte Pudding",
+      "effective": "2026-04-01",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/news/restriction.html",
+        "checked": "2026-10-28",
+        "pageDate": "2026-10-12",
+        "note": "\"Banned/Restricted Cards effective from October 12, 2026\". Read from the copy cached by Track B (.cache/track-b/raw/official-restriction.html). Effective date from topics/029.php per docs/research/meta-landscape.md."
+      }
+    },
+    {
+      "id": "OP03-040",
+      "name": "Nami",
+      "effective": "2025-08-30",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/news/restriction.html",
+        "checked": "2026-10-28",
+        "pageDate": "2026-10-12",
+        "note": "\"Banned/Restricted Cards effective from October 12, 2026\". Read from the copy cached by Track B (.cache/track-b/raw/official-restriction.html). Effective date from topics/019.php per docs/research/meta-landscape.md."
+      }
+    },
+    {
+      "id": "OP06-086",
+      "name": "Gecko Moria",
+      "effective": "2025-04-01",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/news/restriction.html",
+        "checked": "2026-10-28",
+        "pageDate": "2026-10-12",
+        "note": "\"Banned/Restricted Cards effective from October 12, 2026\". Read from the copy cached by Track B (.cache/track-b/raw/official-restriction.html). Effective date from the official ban archive per docs/research/meta-landscape.md."
+      }
+    },
+    {
+      "id": "ST10-001",
+      "name": "Trafalgar Law",
+      "effective": "2024-09-06",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/news/restriction.html",
+        "checked": "2026-10-28",
+        "pageDate": "2026-10-12",
+        "note": "\"Banned/Restricted Cards effective from October 12, 2026\". Read from the copy cached by Track B (.cache/track-b/raw/official-restriction.html). Effective date from the official ban archive per docs/research/meta-landscape.md."
+      }
+    },
+    {
+      "id": "OP06-116",
+      "name": "Reject",
+      "effective": "2024-06-21",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/news/restriction.html",
+        "checked": "2026-10-28",
+        "pageDate": "2026-10-12",
+        "note": "\"Banned/Restricted Cards effective from October 12, 2026\". Read from the copy cached by Track B (.cache/track-b/raw/official-restriction.html). Effective date from the official ban archive per docs/research/meta-landscape.md."
+      }
+    }
+  ],
+  "restricted": [],
+  "bannedPairs": [
+    {
+      "cards": [
+        {
+          "id": "OP07-115",
+          "name": "I Re-Quasar Helllp!!"
+        },
+        {
+          "id": "EB04-058",
+          "name": "Borsalino"
+        }
+      ],
+      "effective": null,
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/news/restriction.html",
+        "checked": "2026-10-28",
+        "pageDate": "2026-10-12",
+        "note": "\"Banned/Restricted Cards effective from October 12, 2026\". Read from the copy cached by Track B (.cache/track-b/raw/official-restriction.html). No effective date appears on the pages read (meta-landscape.md open question)."
+      }
+    },
+    {
+      "cards": [
+        {
+          "id": "OP11-040",
+          "name": "Monkey.D.Luffy"
+        },
+        {
+          "id": "OP11-067",
+          "name": "Charlotte Katakuri"
+        }
+      ],
+      "effective": "2025-08-30",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/news/restriction.html",
+        "checked": "2026-10-28",
+        "pageDate": "2026-10-12",
+        "note": "\"Banned/Restricted Cards effective from October 12, 2026\". Read from the copy cached by Track B (.cache/track-b/raw/official-restriction.html). Effective date per docs/research/meta-landscape.md."
+      }
+    },
+    {
+      "cards": [
+        {
+          "id": "OP11-040",
+          "name": "Monkey.D.Luffy"
+        },
+        {
+          "id": "OP08-069",
+          "name": "Charlotte Linlin"
+        }
+      ],
+      "effective": "2025-08-30",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/news/restriction.html",
+        "checked": "2026-10-28",
+        "pageDate": "2026-10-12",
+        "note": "\"Banned/Restricted Cards effective from October 12, 2026\". Read from the copy cached by Track B (.cache/track-b/raw/official-restriction.html). Effective date per docs/research/meta-landscape.md."
+      }
+    }
+  ],
+  "gaps": [
+    "topics/013.php says booster packs 1 to 4 are block 1, 5 to 8 block 2, \"and so on\", but the printed icons do not follow that past OP-12: OP-13 to OP-15 are block 4 and OP-16 and OP-17 are block 5 (official series pages; Limitless agrees for every meta card). This file uses the printed icons for every booster. rulings.md RL-37 applies the formula to OP15-096; that still gives 4, which matches.",
+    "No cited block for starter decks ST-08, ST-22, ST-23, ST-24, ST-25, ST-28, ST-33, ST-35 and ST-36: none of their printings is on a cached official series page or a Limitless page read so far. Their Standard legality is \"unknown\" until a source is read.",
+    "Promotion cards (P-xxx) have no product block: each promo carries its own printed block. Only promos with a verified override (P-088, P-093, block 3 on Limitless) have one; the rest are \"unknown\".",
+    "ST-13: one printing in the promotion series (569901) shows block 1 while 12 others show 2; the product block is taken as 2.",
+    "OP15-096 has no block on the official site; the booster formula gives 4 (rulings.md RL-37).",
+    "The OP07-115 + EB04-058 banned pair has no effective date on the pages read.",
+    "Whether the banned list also applies to Extra Regulation is not stated on restriction.html; this file applies it to both.",
+    "EB-05 (2026-10-30) and OP-18 (2026-11-20) are not in optcgapi yet; they enter through cards:update when upstream has them."
+  ]
+}

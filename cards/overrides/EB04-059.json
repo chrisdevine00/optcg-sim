@@ -1,0 +1,25 @@
+{
+  "id": "EB04-059",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/EB04-059",
+      "date": "2026-10-28",
+      "use": "cross-check"
+    },
+    {
+      "url": "https://en.onepiece-cardgame.com/cardlist/?series=569115",
+      "date": "2026-10-28",
+      "use": "disagreement"
+    }
+  ],
+  "keywords": [],
+  "fields": {
+    "name": {
+      "value": "Black Rope Dragon Twister",
+      "upstream": "Black Rope Dragon Twiste",
+      "source": "https://en.onepiece-cardgame.com/cardlist/?series=569115"
+    }
+  },
+  "note": "optcgapi truncates the name."
+}

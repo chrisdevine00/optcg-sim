@@ -1,0 +1,277 @@
+{
+ "set": {
+  "code": "ST-20",
+  "name": "Starter Deck 20: YELLOW Charlotte Katakuri",
+  "kind": "starter",
+  "cardCount": 5,
+  "block": 3
+ },
+ "cards": [
+  {
+   "id": "ST20-001",
+   "name": "Charlotte Katakuri",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "SR",
+   "set": "ST-20",
+   "block": 3,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n\n[Activate: Main] [Once Per Turn] You may turn 1 card from the top of your Life cards face-up: Give up to 1 rested DON!! card to your Leader or 1 of your Characters.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST20-001",
+     "imageUrls": {
+      "full": "ST20-001.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-20",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST20-001/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST20-002",
+   "name": "Charlotte Cracker",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-20",
+   "block": 3,
+   "effectText": "[Once Per Turn] If this Character would be K.O.'d by an effect, you may trash 1 card from the top of your Life cards instead.",
+   "triggerText": "You may trash 1 card from your hand: Play this card.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST20-002",
+     "imageUrls": {
+      "full": "ST20-002.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-20",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST20-002/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST20-003",
+   "name": "Charlotte Brulee",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 3,
+   "power": 3000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-20",
+   "block": 3,
+   "effectText": "",
+   "triggerText": "Look at up to 1 card from the top of your or your opponent's Life cards, and place it at the top or bottom of the Life cards. Then, add this card to your hand.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST20-003",
+     "imageUrls": {
+      "full": "ST20-003.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-20",
+     "rarity": "C"
+    },
+    {
+     "artworkId": "ST20-003_p1",
+     "imageUrls": {
+      "full": "ST20-003_p1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "C",
+     "label": "Pirate Foil"
+    },
+    {
+     "artworkId": "ST20-003_r1",
+     "imageUrls": {
+      "full": "ST20-003_r1.jpg"
+     },
+     "source": "optcgapi",
+     "product": "PRB-02",
+     "rarity": "C",
+     "label": "Reprint"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST20-003/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST20-004",
+   "name": "Charlotte Pudding",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 3,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "C",
+   "set": "ST-20",
+   "block": 3,
+   "effectText": "[On Play] You may add 1 card from the top of your Life cards to your hand: Set up to 1 of your \"Big Mom Pirates\" type Characters with a cost of 3 or less as active.",
+   "triggerText": "Rest up to 1 of your opponent's Characters with a cost of 3 or less.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST20-004",
+     "imageUrls": {
+      "full": "ST20-004.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-20",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST20-004/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  },
+  {
+   "id": "ST20-005",
+   "name": "Charlotte Linlin",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 6,
+   "power": 7000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "The Four Emperors",
+    "Big Mom Pirates"
+   ],
+   "rarity": "SR",
+   "set": "ST-20",
+   "block": 3,
+   "effectText": "[On Play] You may trash 1 card from your hand: Your opponent chooses one:\n\n• Your opponent trashes 2 cards from their hand.\n\n• Trash 1 card from the top of your opponent's Life cards.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "ST20-005",
+     "imageUrls": {
+      "full": "ST20-005.jpg"
+     },
+     "source": "optcgapi",
+     "product": "ST-20",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 3"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://optcgapi.com/api/decks/card/ST20-005/",
+   "fetchedAt": "2026-10-28T13:47:21.000Z"
+  }
+ ]
+}
