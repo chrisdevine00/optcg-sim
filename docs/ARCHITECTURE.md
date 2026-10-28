@@ -1,6 +1,6 @@
 # Architecture
 
-**As of:** 2026-10-28 (Phase 2 draft; the card-source section waits on Track B)
+**As of:** 2026-10-28 (Phase 2 draft, before reviews)
 **Inputs:** `PROMPT.md`, `docs/research/rules-digest.md` (CR v1.2.1), `docs/research/strategy-concepts.md`, `docs/research/meta-landscape.md`. ADRs in `docs/adr/` record the reasoning behind each choice here.
 
 ## 1. Packages and boundaries
@@ -103,11 +103,12 @@ After every atomic action: check defeat conditions (Leader damaged at 0 Life, de
 
 ## 3. Cards
 
-- `cards/data/manifest.json`, `cards/data/sets/<SET>.json` (generated; never hand-edited), loaded per set on demand by the app and eagerly in Node tests.
+- `cards/data/manifest.json`, `cards/data/sets/<SET>.json` (generated; never hand-edited; corrections go in `cards/overrides/`), loaded per set on demand by the app and eagerly in Node tests.
 - `cards/scripts/` holds `update.ts` (`npm run cards:update`): fetch, normalize to the schema in `cards/src/schema.ts`, write, print the diff report, and fail when a scripted card's text changed.
 - `cards/effects/<SET>/<CARD-ID>.ts` holds one effect script per card, a typed data object. A coverage index lists which IDs are scripted.
-- `cards/format/standard.json` holds block numbers, block exceptions, banned list and banned pairs, with effective dates and source URLs.
-- **Source:** decided by Track B and recorded in ADR 0007 (pending).
+- `cards/format/standard.json` (hand-kept, cited) holds blocks per product, block exceptions, the banned list and banned pairs, with effective dates and source URLs.
+- **Source (ADR 0007):** optcgapi.com bulk endpoints, normalized by `cards:update` (sign repair recorded as `textFixes[]`, vocabulary type splitting, junk cleanup, trigger split). `cards/overrides/<CARD-ID>.json` holds hand-verified corrections; every scripted card must be `verified`. The pipeline never fetches the official site (its terms forbid reproduction).
+- **Schema additions in M1:** `block`, `verified`, `textFixes`, printing-level `artworkId`s (`OP17-005_p1`).
 
 The four-copy limit groups by card number, not artwork (digest correction 13). Alternate arts are `artworks[]` on one card.
 

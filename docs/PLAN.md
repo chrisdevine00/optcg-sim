@@ -1,6 +1,6 @@
 # Plan
 
-**As of:** 2026-10-28 (Phase 2 draft; awaiting Track B for the card source, Track C for UX inputs, and two reviews)
+**As of:** 2026-10-28 (Phase 2 draft, before reviews)
 **Companion:** `docs/ARCHITECTURE.md` (how it is built), `docs/adr/` (why).
 
 ## 1. Order of work
@@ -36,7 +36,7 @@ Each ends with `npm test` and `npm run test:e2e` green, screenshots reviewed by 
 | Milestone | Scope | Done when |
 | --- | --- | --- |
 | M0 Scaffold | Done except the design tokens file, which Phase 4 produces | `npm run dev` serves a page; CI runs lint, typecheck, unit and e2e; deploy after green CI |
-| M1 Cards | `cards:update`, per-set JSON, manifest, diff report, format data, image module with fallbacks and service-worker cache, card browser with search and filters | Every English-release card browsable with art; diff report demonstrated against a doctored snapshot; screenshot reviewed |
+| M1 Cards | `cards:update` from optcgapi.com with normalizers and overrides, per-set JSON, manifest, diff report, `standard.json`, image module with fallbacks and service-worker cache, card browser with search and filters | Every English-release card browsable with art; diff report demonstrated against a doctored snapshot; screenshot reviewed |
 | M2 Engine core | State, zones, setup and mulligan, phases, DON!!, play, give DON!!, battle steps, damage, Life and Trigger window, keywords, rule processing, legal actions, projection, replay, hash, invariants | One test per digest rule; 10,000 random games clean; golden replay hashes stable; reduce median under 20 µs for non-effect actions |
 | M3 Playable board | Playmat per Phase 4, hotseat, click and drag, phase stepper, confirm and rewind, inspector, live region | Playwright plays a full hotseat game; keyboard-only run passes; screenshots at both resolutions reviewed |
 | M4 Effects | DSL runtime; scripts for every card in the 36 meta lists, then by meta frequency; coverage report | 100% of meta-list cards scripted, each with a test; coverage shown in the browser |
@@ -54,7 +54,7 @@ Each ends with `npm test` and `npm run test:e2e` green, screenshots reviewed by 
 | 1 | **Card-text parsing.** Effect text is natural language with many one-off wordings; automatic parsing will misread cards. | High / high | Do not parse text into scripts. Track E tokenizes text only to measure the vocabulary; every script is hand-written against the DSL with a test, and the diff report fails CI when a scripted card's text changes. | Tokenizer leaves more than 10% of meta-card clauses untagged |
 | 2 | **Effect coverage.** 36 lists across 12 archetypes mean several hundred distinct cards, each a script plus a test. | High / high | Implement DSL actions in meta-frequency order; script whole archetypes at a time so each becomes fully playable early; unscripted cards still play for stats with a badge. Track coverage per archetype in STATUS.md. | M4 velocity under 6 cards/hour after the first 50 |
 | 3 | **AI strength versus speed.** ISMCTS in a browser worker within 1.5 s may be too shallow in a game with long turns and hidden hands. | Medium / high | Keep reduce allocation-light (copy on write, memoized derive); action abstraction (one pick at a time); playbook priors for move ordering; turn-scoped search with a heuristic at end of turn; fallback to expectimax over the current turn. Benchmark in M2 before writing the AI. | Fewer than 2,000 simulations per second in the M2 benchmark |
-| 4 | **Art-source terms change** or the source goes down. | Medium / medium | One image module with one base URL per source, a fallback source, a text-only card that keeps the game playable, and a service-worker cache. Terms and the date checked are recorded in ADR 0007. | Image error rate in the card browser smoke test |
+| 4 | **Data or art source terms change**, the source goes down, or upstream text errors reach the engine. | Medium / medium | One image module with one base URL per source, a disabled second source, a text-only card that keeps the game playable, and a service-worker cache. Card text: normalizers plus hand-verified overrides, with every scripted card required to be verified. Terms and the date checked are in ADR 0007. | Image error rate in the card browser smoke test; new `textFixes` in the diff report |
 | 5 | **Scope creep in the learning layer.** Coach, review, drills and guides can absorb unlimited time. | High / medium | The learning layer ships in the PROMPT.md order (coach M7, review M8, drills M9) with fixed done criteria; every additional idea goes to `docs/BACKLOG.md`. Content claims need a source or an *(inference)* mark, which caps writing effort. | Any M7–M9 milestone passing 2× its estimate |
 | 6 | **Meta drift.** EB05 (2026-10-30) and OP18 (2026-11-20) change the format during the build. | Certain / medium | Guides and playbooks key on leader ID with an as-of date; `meta:update` flags lists older than 60 days; card data updates only through `cards:update`. Do not chase the meta mid-milestone; refresh at M9. | n/a (scheduled) |
 
@@ -62,7 +62,8 @@ Each ends with `npm test` and `npm run test:e2e` green, screenshots reviewed by 
 
 **cards**
 - Schema validation of every generated record (required fields, enums, numeric ranges).
-- `cards:update` normalizer unit tests against recorded fixtures (no network in CI).
+- `cards:update` normalizer unit tests against recorded fixtures (no network in CI), including every defect class in the Track B diff: sign loss, lost type delimiters, shifted columns, NULL text, reprint disclaimers.
+- Every scripted card has `verified: true` from an override or a matching upstream record.
 - Diff report test against a doctored snapshot (added, changed, removed card; changed text on a scripted card fails).
 - Format data tests: every banned card and pair exists; block exceptions resolve to real IDs.
 
@@ -129,7 +130,7 @@ scripts/          meta-update.ts
 | `npm test` | Vitest across all packages |
 | `npm run test:e2e` | Playwright against a production build |
 | `npm run lint` | ESLint (including boundary rules) and Prettier check |
-| `npm run cards:update` | Fetch from the Track B source, normalize, write JSON, print the diff, fail on changed text of scripted cards |
+| `npm run cards:update` | Fetch optcgapi.com bulk endpoints, normalize, apply overrides, write JSON, print the diff, fail on changed text of scripted cards |
 | `npm run meta:update` | Fetch tournament data from the Limitless API, refresh `meta-lists.json`, flag guides with lists older than 60 days |
 
 ## 7. CI

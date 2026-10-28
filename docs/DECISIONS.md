@@ -2,6 +2,14 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-10-28 — Card data from optcgapi.com, not the official card list
+
+Context: Track B recommended parsing the official card list (the most accurate source, and the only one with block icons), with optcgapi.com as fallback. But the official site's terms say its "text and data … may not be reproduced without permission", and PROMPT.md says to choose another source where terms forbid an intended use. optcgapi.com says it is "open for anyone to use", but it drops minus signs, loses type delimiters, and has a few corrupt rows. Decision: optcgapi.com is the only source `cards:update` fetches. Mechanical repairs are recorded per card. Hand-verified overrides, from a person-scale read of the official entry, are written for every scripted card, and CI requires them. Block, ban and exception data is a hand-kept, cited `cards/format/standard.json`. Full reasoning in ADR 0007. Alternatives rejected: bulk-parsing the official site (terms); optcgapi raw (sign loss changes meaning); Scrydex (paid, no mirroring); arjunkai (private data).
+
+## 2026-10-28 — Images: optcgapi, then arjunkai (off until approved), then text-only
+
+Context: no candidate offers clean art; every source serves the official SAMPLE-watermarked scans, and official image URLs are blocked cross-site. Decision: hotlink optcgapi images through one image module and cache them in a service worker. The arjunkai proxy is wired in but disabled until its maintainer approves. A text-only card keeps the game playable. Alternatives rejected: official URLs (blocked by CORP); Scrydex (paid); Limitless and TCGplayer CDNs (no permission).
+
 ## 2026-10-28 — Research automation obeys robots.txt; material gathered against it is not used
 
 Context: SeaKing and DuelVoyager disallow `ClaudeBot`, `anthropic-ai` and `Claude-Web` in robots.txt, and SeaKing also reserves text-and-data-mining rights. The first Track C attempt browsed DuelVoyager and took 62 screenshots before checking. Bandai's Teaching App terms prohibit unapproved external tools. Decision: agents check robots.txt and terms before any automated access and do not automate sites that disallow them; material already gathered against a site's policy is not used (the DuelVoyager observations were removed from `competitive-teardown.md`). Where first-hand observation is needed, the owner does it by hand, and documents mark each section as hands-on or secondhand. Alternatives rejected: generic browser user agents (evades the block); keeping the DuelVoyager material because it was already collected (launders the violation).

@@ -2,7 +2,6 @@
 
 Unresolved ambiguities with the current best answer. Remove an entry when it is settled and the decision is logged in DECISIONS.md.
 
-- Which card-data source gives clean, non-watermarked images with display rights, and what is its newest-set coverage today? (Resolve in Phase 1, Track B.)
 
 ## Rules (from Track A; full reasoning in docs/research/rules-digest.md "Open questions")
 
@@ -52,3 +51,12 @@ Unresolved ambiguities with the current best answer. Remove an entry when it is 
 - C2. DuelVoyager is not studied (same reason). Best answer: out of scope unless the owner fills it in by hand.
 - C3. OPlayTCG and OPTCG Web Sim also claim AI opponents and were not opened. Best answer: check their robots.txt and terms during Phase 4 preparation, and study them only if allowed.
 - C4. Bandai's browser Teaching App was observed only up to its Terms of Use, which prohibit unapproved external tools. Best answer: the owner plays its tutorial by hand if Phase 4 needs more than the official play guide.
+
+## Card data (from Track B; detail in docs/research/data-sources.md)
+
+- B1. The card text originates with Bandai whichever intermediary supplies it. Best answer: PROMPT.md's posture holds (factual game data, cited, no art committed, takedown-ready), sourced from optcgapi.com, which grants use. The owner can overrule this.
+- B2. Courtesy contact with optcgapi's maintainer about hotlinking images and the diff errors. Best answer: yes; the owner does it (outward-facing).
+- B3. The arjunkai image proxy needs its maintainer's approval. Best answer: disabled until approved; request only if optcgapi images prove unreliable.
+- B4. Block varies by printing, and OP15-096 has no block on the official list (its image shows 4). Best answer: newest printing's block from `standard.json` plus exceptions; otherwise legality is "unknown". Track F to confirm the per-printing rule.
+- B5. EB-05 appears in sources before its 2026-10-30 English release. Best answer: import it when optcgapi has it, with legality from the release date plus the product's stated delay.
+- B6. Sign-repair heuristic ("N power/cost" given to an opponent's card with no sign means −N). Best answer: apply it, record each repair in `textFixes`, and verify by hand when the card is scripted. Revisit if the diff report finds a false repair.
