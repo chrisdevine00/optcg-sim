@@ -3,7 +3,6 @@
 Unresolved ambiguities with the current best answer. Remove an entry when it is settled and the decision is logged in DECISIONS.md.
 
 - Which card-data source gives clean, non-watermarked images with display rights, and what is its newest-set coverage today? (Resolve in Phase 1, Track B.)
-- Is a rotation or block format in force for the English game as of today? (Resolve in Phase 1, Track D.)
 
 ## Rules (from Track A; full reasoning in docs/research/rules-digest.md "Open questions")
 
@@ -32,4 +31,17 @@ Unresolved ambiguities with the current best answer. Remove an entry when it is 
 - S7. Current examples of DON!!-return and Blocker-resting cards. Track E vocabulary to list them.
 - S8. Removal timing has no sourced generic heuristic. Best answer: deck-specific timing goes in the playbooks.
 - S9. "Single colour 5 Life, dual colour 4" is a rule of thumb. Best answer: always read Life from card data.
-- S10. Reported rotation of OP-01 to OP-04 out of Standard on 2026-04-01. Cross-check in Track D part 1.
+- S10. Settled by Track D part 1: Standard Regulation (blocks 2 to 5) applies since 2026-04-01, with exceptions. Logged in DECISIONS.md.
+
+## Meta (from Track D part 1; detail in docs/research/meta-landscape.md "Gaps and open questions")
+
+- M1. No complete in-person top-8 data for the window (Season 1 Finals, about 13 Season 2 Regionals). Best answer: counts rest on Limitless online events; re-run `meta:update` when Limitless backfills in-person events.
+- M2. onepiece.gg tiers are missing because its robots.txt disallows Anthropic agents. Best answer: leave `tierOnepieceGg` null; use opmetagame.com plus Limitless as the two sources.
+- M3. Online best-of-one simulator results may not represent paper best-of-three play. Best answer: show both online share and in-person notes in the Meta Explorer, and say which is which.
+- M4. Effective date of the OP07-115 + EB04-058 banned pair is not stated on the notices opened. Best answer: treat it as in force (it is on the current master list).
+- M5. P-163 Dracule Mihawk (replacement leader) is not yet distributed. Best answer: no Mihawk archetype until results appear.
+- M6. The window spans three formats (OP16, OP17 with Mihawk, OP17 without). Best answer: rank by window top-8s but show post-ban share for "today".
+- M7. OP17 legality from its 2026-08-21 pre-release (product page) versus "7 days after release" (other product pages). Best answer: per-product legality dates in the card data.
+- M8. Block-1 legality was checked only for the 10 older cards in the chosen lists. Best answer: the deck validator checks every card against block data and the exception list.
+- M9. EB05 (2026-10-30) and OP18 (2026-11-20) will change the format soon. Best answer: build the archetype guides from these lists now, and let `meta:update` flag lists older than 60 days.
+- M10. opmetagame.com contradicts itself on tiers (/tier-list/ vs /decks/). Best answer: report /tier-list/ values and note the disagreement.
