@@ -74,13 +74,9 @@ If interrupted: check `git log` and the branch, then re-launch each with its bri
 
 ## Next (slice pass, PLAN.md §1)
 
-1. ~~M1 Cards~~ (done). Then:
-   - `cards:update` from optcgapi.com, with normalizers and overrides;
-   - verify the stats and types of all 182 meta-list cards;
-   - `standard.json`;
-   - the image module and service worker;
-   - the card browser.
-2. **M2 Engine core:** freeze the fixture API first.
+1. **M2:** when the engine author reports, merge `m2-independent-tests` and triage its failures. Then the M2 review: a skeptical-engineer subagent and the done criteria (one test per non-effect rule, the replacement-hook and last-known-information tests, the projection leak test, 500/10,000 clean games, stable golden records, reduce benchmark).
+2. **M3 Playable board:** the board from `docs/design/board.md`, hotseat, play vs Rookie, every decision type, rewind by move, the keyboard path, and the live region. It also fixes the carried items: the two Phase 4 severity-2 findings and M1-37/38.
+3. **M4a:** the DSL runtime, then the Rocks and Kaido archetypes and a throughput benchmark. Then M5a (Pirate), the learning slice L, and owner usability session S1.
 
 ## Blockers
 
