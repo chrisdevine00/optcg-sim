@@ -41,19 +41,13 @@
 
 ## In progress
 
-Three Phase 4 design subagents are running in parallel; each writes only its own files in `docs/design/`:
-- **Board and visual system:** `principles.md`, `board.md`, `visual-system.md`, `tokens.css`, `card-face-study.md`
-- **Flows and learning:** `flows.md`, `learning-ui.md`, `explanations.md`
-- **Accessibility and usability:** `accessibility.md`, `usability-plan.md`
-
-After they finish come the HTML wireframes, screenshots at both resolutions, and the UX-director review (`review-1.md`). If interrupted, re-launch each with the same brief, and check its files for finished sections first.
+- **Phase 4 design documents are done and committed:** principles, board (exact layout at both resolutions), visual system and `tokens.css` (72 colour pairs, all AA), card-face study, flows, learning UI, 20 example explanations, accessibility (keyboard spec), and the usability plan.
+- **Running:** one subagent is building clickable HTML wireframes in `docs/design/wireframes/` (17 screens). Shots go to `docs/design/wireframes/shots/` (gitignored); scratch is in `.cache/wireframes/`. If interrupted, re-launch with the same brief and check `docs/design/wireframes/` for finished screens first.
 
 ## Next
 
 1. Phase 4 Design (estimate 40 h). Deliverables in `docs/design/`:
-   - the core documents: `principles.md`, `board.md`, `flows.md`, `visual-system.md`, `learning-ui.md`;
-   - added after plan review 1: `accessibility.md` (with the keyboard spec), `usability-plan.md`, about 20 example explanations, and a card-face study under the SAMPLE watermark;
-   - HTML wireframes in `docs/design/wireframes/`, screenshotted at 1280×720 and 1920×1080.
+   - remaining: HTML wireframes (running), screenshots at both resolutions, and owner usability session S0 on the wireframes (optional; see `usability-plan.md`).
 
    It is gated by a UX-director review recorded in `review-1.md`, with no severity-3 or severity-4 finding open.
 2. Then Phase 5, slice pass (ADR 0012): M0 tokens, M1 cards, M2 engine core, and so on.
