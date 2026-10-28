@@ -1,7 +1,7 @@
 # Status
 
 **Phase:** 5 Build, slice pass (ADR 0012), starting at M0. Phases 1–4 gated 2026-10-28.
-**Milestone:** M1 Cards (in progress). M0 done 2026-10-28.
+**Milestone:** M1 Cards (final review fixes) and M2 Engine core (in progress), in parallel. M0 done 2026-10-28.
 **Milestone:** M0 scaffold started (allowed before the Phase 4 gate)
 **Run the app:** `npm install && npm run dev` then open http://localhost:5173/optcg-sim/ (placeholder page in the real visual system; the card browser comes in M1)
 **Deployed:** https://chrisdevine00.github.io/optcg-sim/ (auto-deploys after green CI on `main`)
@@ -56,22 +56,22 @@
 
 ## In progress
 
-- **M1 built and pushed** (commits 50ab71d, 2793807):
-  - 2,799 cards (5,079 printings) through OP-17, generated from optcgapi.com with repairs;
-  - all 182 meta cards verified, with 189 override files;
-  - `standard.json`;
-  - the image module with a text-card fallback;
-  - the `/cards` browser, at 70.8 KB gzipped initial JS.
+Three subagents are running:
 
-  Tests: 67 unit and 8 e2e.
-- **M1 review** (`docs/reviews/m1-review.md`): FAIL, with 4 severity-3 findings:
-  - search is scoped to one set by default without saying so;
-  - 18 Tabs from search to the results;
-  - no focus ring in forced-colours mode;
-  - no reflow at 400% zoom.
+1. **M1 builder** (works in `app/`), fixing the M1 re-review findings:
+   - M1-30 (severity 3): the card inspector doesn't reflow at 320 px;
+   - M1-31 to M1-34 (severity 2).
 
-  There are also 13 severity-2 and 12 severity-1 findings. Image caching by the service worker is unconfirmed.
-- **Running:** the M1 builder subagent is fixing the review findings. Afterwards the reviewer re-checks, and M1 is done on PASS. If interrupted, re-launch it with "fix the findings in docs/reviews/m1-review.md".
+   The re-review already confirmed the first four severity-3 fixes and the working image service worker. After these fixes the reviewer re-checks, and M1 is done on PASS.
+2. **M2 engine author** (works in `engine/` on `main`). It implements the frozen API (`engine/src/api.ts`):
+   - rules, scenarios, replacement hooks, last-known information;
+   - leak-proof projection, records, invariants;
+   - property tests (500 games per push, 10,000 nightly) and benchmarks.
+
+   It commits each green step.
+3. **M2 independent test author**, in a git worktree on branch `m2-independent-tests`. It writes rule and ruling tests from the digest and `rulings.md` without seeing the engine source. The branch is merged once the engine is ready; failures are triaged as engine bugs or test errors.
+
+If interrupted: check `git log` and the branch, then re-launch each with its brief (PLAN M1 and M2 rows, ARCHITECTURE §2 and §3), continuing from the last commit.
 
 ## Next (slice pass, PLAN.md §1)
 
