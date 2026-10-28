@@ -1,0 +1,18 @@
+{
+  "name": "@optcg/app",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 4173 --strictPort"
+  },
+  "dependencies": {
+    "@optcg/ai": "0.0.0",
+    "@optcg/cards": "0.0.0",
+    "@optcg/engine": "0.0.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  }
+}

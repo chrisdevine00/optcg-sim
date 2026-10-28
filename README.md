@@ -4,37 +4,39 @@ A browser-based One Piece Card Game practice simulator that is also a strategy t
 
 ## Status
 
-See `docs/STATUS.md`. If it says "Not started", nothing has been built yet.
+See `docs/STATUS.md` for the current phase, milestone, and what is next.
 
-## Start Claude Code on this repo
+## Run it
 
 ```bash
-git init && git add -A && git commit -m "chore: seed repo with PROMPT.md"
-# create an empty repo on GitHub, then:
-git remote add origin git@github.com:<you>/optcg-sim.git
-git push -u origin main
-claude
+npm install
+npm run dev          # http://localhost:5173/optcg-sim/
+npm test             # unit tests (Vitest)
+npm run test:e2e     # Playwright, against a production build
+npm run build        # static build in app/dist
+npm run cards:update # refresh card data from the source
+npm run meta:update  # refresh tournament data, flag stale guides
 ```
 
-First message to Claude Code:
+## Design principles
 
-```
-Read PROMPT.md and execute it end to end.
-```
+1. **The board reads at a glance.** Whose turn, what phase, how much DON!! each side has, and every card's current power are readable without reading anything. Numbers that change are always live and always where the eye expects them.
+2. **Legal moves are visible; illegal ones are not offered.** Attackable targets, playable cards, and attachable DON!! are highlighted. The player is never allowed to attempt something the engine will reject.
+3. **Irreversible steps are confirmable, and most steps are rewindable.** Attacks, counters, and effect choices get a clear confirm; rewind steps back through the event log in practice modes.
+4. **No hidden state and no surprise.** Pending effects, waiting triggers, and the opponent's visible resources are always on screen. Opponent actions are animated at a followable pace, with a speed control.
+5. **Teach by doing, explain on demand.** Every zone, keyword, and prompt has a one-tap explanation. The coach never interrupts unless asked.
+6. **Real card art is the hero.** Chrome is quiet, dark, and low-contrast around high-contrast art.
+7. **Landscape first, keyboard complete.** Designed at 1280×720 and 1920×1080, adapted to tablet landscape. Phone portrait gets a "rotate to play" screen.
 
-To resume later:
-
-```
-Read PROMPT.md and docs/STATUS.md, then continue.
-```
-
-## Layout once built
+## Layout
 
 - `engine/` pure TypeScript rules engine, no DOM
 - `cards/` card data as static JSON plus effect scripts
 - `ai/` opponent and analysis, runs in a Web Worker
 - `app/` React UI
 - `docs/` research, plan, design, content, status
+
+Dependency arrows point downward only: `app → ai → engine → cards`. ESLint enforces the boundaries.
 
 ## Legal
 

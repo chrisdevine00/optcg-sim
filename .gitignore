@@ -1,0 +1,12 @@
+.DS_Store
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+*.log
+.vite/
+# Screenshots of third-party products and card art are never committed (PROMPT.md: no Bandai art in repo)
+docs/research/teardown-shots/
+docs/design/wireframes/shots/
+.cache/

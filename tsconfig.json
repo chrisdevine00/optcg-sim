@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.base.json",
+  "include": [
+    "engine/src",
+    "engine/test",
+    "cards/src",
+    "cards/scripts",
+    "cards/test",
+    "ai/src",
+    "ai/test",
+    "app/src",
+    "app/e2e",
+    "scripts",
+    "*.config.ts"
+  ]
+}

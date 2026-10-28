@@ -1,0 +1,14 @@
+{
+  "name": "@optcg/ai",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./worker": "./src/worker.ts"
+  },
+  "dependencies": {
+    "@optcg/cards": "0.0.0",
+    "@optcg/engine": "0.0.0"
+  }
+}

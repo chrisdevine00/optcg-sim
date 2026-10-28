@@ -1,0 +1,12 @@
+/* Design tokens. Placeholder values for M0; the visual system in docs/design/visual-system.md replaces them. */
+:root {
+  --color-bg: #0f1216;
+  --color-surface: #171b21;
+  --color-text: #e8eaed;
+  --color-text-muted: #a3a9b3;
+  --font-ui: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --space-2: 8px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --radius-2: 6px;
+}

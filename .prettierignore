@@ -1,0 +1,10 @@
+node_modules
+dist
+coverage
+playwright-report
+test-results
+cards/data
+docs
+PROMPT.md
+*.md
+package-lock.json

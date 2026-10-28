@@ -1,0 +1,32 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-variant-numeric: tabular-nums;
+}
+.shell {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.placeholder {
+  flex: 1;
+  padding: var(--space-6);
+}
+.site-footer {
+  padding: var(--space-2) var(--space-4);
+  font-size: 12px;
+  color: var(--color-text-muted);
+  border-top: 1px solid var(--color-surface);
+}

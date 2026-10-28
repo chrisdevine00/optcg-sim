@@ -1,0 +1,45 @@
+{
+  "name": "optcg-sim",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "engine",
+    "cards",
+    "ai",
+    "app"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @optcg/app",
+    "build": "npm run typecheck && npm run build -w @optcg/app",
+    "preview": "npm run preview -w @optcg/app",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint . && prettier --check .",
+    "format": "prettier --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "cards:update": "tsx cards/scripts/update.ts",
+    "meta:update": "tsx scripts/meta-update.ts"
+  },
+  "engines": {
+    "node": ">=22.12"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "eslint": "^10.13.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "fast-check": "^4.10.2",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.10",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "vite": "^8.3.5",
+    "vitest": "^4.1.12"
+  }
+}
