@@ -1,7 +1,7 @@
 # Status
 
 **Phase:** 5 Build, slice pass (ADR 0012), starting at M0. Phases 1–4 gated 2026-10-28.
-**Milestone:** M1 Cards (next). M0 done 2026-10-28.
+**Milestone:** M1 Cards (in progress). M0 done 2026-10-28.
 **Milestone:** M0 scaffold started (allowed before the Phase 4 gate)
 **Run the app:** `npm install && npm run dev` then open http://localhost:5173/optcg-sim/ (placeholder page in the real visual system; the card browser comes in M1)
 **Deployed:** https://chrisdevine00.github.io/optcg-sim/ (auto-deploys after green CI on `main`)
@@ -56,7 +56,14 @@
 
 ## In progress
 
-Nothing running.
+M1 Cards is being built by a subagent, which commits and pushes each green step itself:
+- `cards:update` from optcgapi.com, with normalizers and overrides;
+- stats and types verified for all 182 meta cards (Limitless cross-check; the official site only for disagreements, one page at a time);
+- `standard.json`;
+- the image module and service worker;
+- the `/cards` browser.
+
+If interrupted, check `git log` for its last commit, then re-launch with the M1 brief from PLAN.md and ARCHITECTURE §3, telling it to continue from there.
 
 ## Next (slice pass, PLAN.md §1)
 
