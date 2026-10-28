@@ -22,7 +22,7 @@ Unresolved ambiguities with the current best answer. Remove an entry when it is 
 
 ## Strategy (from Track D part 2; detail in docs/research/strategy-concepts.md "Open questions")
 
-- S1. TCGplayer "How to Swing for Lethal" and a Blue-Green Luffy guide were read only as search snippets (pages rendered without text). Best answer: do not use their claims as coach content until a page is read in full; coach lethal math rests on the CR plus onepiece.gg.
+- S1. TCGplayer "How to Swing for Lethal" and a Blue-Green Luffy guide were read only as search snippets (pages rendered without text). Best answer: do not use their claims as coach content until a page is read in full; coach lethal math rests on the CR and on freely readable sources allowed by robots.txt (onepiece.gg is excluded; see the 2026-10-28 robots decision).
 - S2. Paid Metafy frameworks ("2K Rule", "Power Staircase", life thresholds). Best answer: do not buy or cite paywalled content; the coach cites only freely readable sources (logged in DECISIONS.md).
 - S3. Double Attack at 1 Life does not win (CR 7-1-4-1-1). Track F to confirm with an official ruling.
 - S4. DON!! −X returned DON!! re-enters through later DON!! Phases, within the 10-card cap. Track F to confirm.
@@ -61,3 +61,11 @@ Unresolved ambiguities with the current best answer. Remove an entry when it is 
 - B4. Block varies by printing, and OP15-096 has no block on the official list (its image shows 4). Best answer: newest printing's block from `standard.json` plus exceptions; otherwise legality is "unknown". Track F to confirm the per-printing rule.
 - B5. EB-05 appears in sources before its 2026-10-30 English release. Best answer: import it when optcgapi has it, with legality from the release date plus the product's stated delay.
 - B6. Sign-repair heuristic ("N power/cost" given to an opponent's card with no sign means −N). Best answer: apply it, record each repair in `textFixes`, and verify by hand when the card is scripted. Revisit if the diff report finds a false repair.
+
+## Content (from Track G; detail in docs/content/)
+
+- G1. Drill thresholds and playbook-seed percentages are inference. Best answer: calibrate them from AI self-play in M5, and keep them marked as inference until then.
+- G2. Can OP15-088 Pirates Docking Six reach cost 12 with ST14-017 Thousand Sunny and so gain [Blocker] under OP17-079 Luffy? Best answer: unknown; resolve from the card texts and rulings when both cards are scripted (M4b).
+- G3. TCGplayer calls Docking Six "a pretty mandatory four-of", but all three of our Sabo lists run three copies. Best answer: guides follow the sourced lists and note the disagreement.
+- G4. Settled: the Kalgara win at ChinoizeCup #117 (2026-09-30) is not counted because that event was Extra Regulation (`[EGB]`, API format `EXTRA`), which the method excludes.
+- G5. Settled: OP17-020 Shanks is Green (optcgapi and Limitless). Shonen TCG's "Red" is an error.

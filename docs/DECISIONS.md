@@ -2,6 +2,20 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-10-28 — Content conventions from Track G
+
+Context: Track G wrote 12 archetype guides, a 24-lesson curriculum, a glossary and a sources list, and it needed shared conventions for turn numbers, matchup data and lesson tags. Decision:
+- Turn numbers in guides and playbook assertions count the deck's own turns: T1 is that player's first turn.
+- Matchup cells show the newest post-ban sample with at least 8 games, with older samples as secondary.
+- Rules-only lessons (L01–L07) carry CR numbers instead of concept slugs.
+- Drill thresholds and playbook-seed percentages are marked as inference until calibrated in self-play (M5).
+
+Alternatives rejected: game-turn numbering, which is ambiguous between first and second player; pooling matchup records across formats, which mixes pre-ban and post-ban data.
+
+## 2026-10-28 — onepiece.gg material removed from Phase 1 research
+
+Context: `strategy-concepts.md` (Track D part 2) cited six onepiece.gg articles read in full and several onepiece.gg snippets, and `rules-digest.md` listed one onepiece.gg page as a cross-check. onepiece.gg's robots.txt disallows Anthropic agents. Decision: under the robots decision below, that material is removed. The rules-digest entry is withdrawn; CR 6-5-6-1 stands on its own. `strategy-concepts.md` is being scrubbed, with heuristics re-sourced from allowed sources where possible and otherwise listed as gaps. The Track G content never used onepiece.gg. Alternative rejected: keeping already-collected material (launders the violation).
+
 ## 2026-10-28 — Phase 2 reviews folded in; plan re-baselined to about 720 hours with a vertical slice first
 
 Context: two adversarial reviews (`docs/plan-review-1.md`) found the 264-hour estimate about half of reality, and found that the strict M0–M10 order would start the learning layer about 70% of the way in. They also found engine-model gaps: replacement effects, last-known information, scenario starts, record versioning, projection linkage leaks, and invariants hard-coded to 10 DON!!. Decision:

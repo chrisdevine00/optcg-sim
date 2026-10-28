@@ -31,8 +31,8 @@ Official (en.onepiece-cardgame.com):
 14. https://en.onepiece-cardgame.com/rules/errata_card/ (fetched to confirm it exists; per-card errata are left to Track F)
 15. https://en.onepiece-cardgame.com/topics/013.php (Block Number System / Standard Regulation)
 
-Third party, opened only to cross-check how one rule is read in practice (not used as a source):
-16. https://onepiece.gg/rules/ (via WebFetch; confirms the community reads CR 6-5-6-1 as "no one attacks on their own first turn; the earliest battle is turn 3").
+Third party:
+16. (Removed 2026-10-28. A community rules page was opened here as a cross-check, but its robots.txt disallows Anthropic agents, so under the robots decision in DECISIONS.md it is not used. CR 6-5-6-1 stands on its own.)
 17. One web search: "One Piece Card Game player going second attack on their first turn rule".
 
 Every source I tried to open loaded. Nothing was blocked. I saw `/pdf/rule_buddy_event.pdf` (team-match rules) in search results but did not open it; it is out of scope.
