@@ -2,6 +2,23 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-10-28 — Effect DSL accepted as specified by Track E
+
+Context: Track E tokenized 2,516 cards with text. 97.7% of clauses were tagged, and every one of the 182 meta cards maps to a vocabulary of 28 effect primitives, 12 costs, 17 timings, 10 condition forms and one replacement shape. Its proposed decisions E-D1 to E-D11 (`docs/research/effect-dsl.md` §8) are accepted:
+- scripts are typed TS data with a CI schema;
+- two new durations: until the end of the opponent's next turn, and until the start of your next turn;
+- one `leaveField` choke point with a cause;
+- DON!! picks by location class;
+- one `move` verb over whitelisted zone pairs;
+- full cost lookahead with exact cost picks;
+- printed keywords come from verified overrides;
+- unscripted Events and [Trigger]s are not offered;
+- Once Per Turn is keyed by instance and ability;
+- the tagger is kept as a per-set measurement tool;
+- scripting order is leaders first, then meta weight.
+
+ARCHITECTURE.md §2.2, §2.3, §2.4 and §3 are updated. Alternatives rejected are recorded per decision in §8.
+
 ## 2026-10-28 — Content conventions from Track G
 
 Context: Track G wrote 12 archetype guides, a 24-lesson curriculum, a glossary and a sources list, and it needed shared conventions for turn numbers, matchup data and lesson tags. Decision:

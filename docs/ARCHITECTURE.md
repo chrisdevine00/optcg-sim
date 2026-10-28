@@ -56,7 +56,7 @@ type Step = { state: GameState; events: GameEvent[] }
 - **Last-known information.** When a card leaves the field, the event carries a snapshot of its derived values at that moment: power, cost, types, given DON!! count, and the cause (battle or effect, whose effect). Effects such as "if the K.O.'d Character had 6000 power or more" and "K.O.'d by your opponent's effect" read the snapshot.
 - **Zones per player:** `deck`, `hand`, `life`, `leader`, `characters` (≤5), `stage` (≤1), `trash`, `donDeck`, `costArea`, plus a shared `resolving` slot for a Trigger card that is in no area (CR 10-1-5-3).
 - **Turn:** `turnNumber`, `activePlayer`, `firstPlayer`, `phase`, `battle` (`null` or `{ attacker, target, step, blockerUsed, ... }`).
-- **Modifiers:** `{ id, source, target, kind, amount, duration }`. `duration` is `battle | untilEndOfTurn | duringThisTurn | untilStartOfNextTurn(p) | whileSourceOnField`. Each expires at its exact CR sub-step (digest items 67, 72, 97).
+- **Modifiers:** `{ id, source, target, kind, amount, duration }`. `duration` is `battle | untilEndOfTurn | duringThisTurn | untilStartOfYourNextTurn(p) | untilEndOfOpponentsNextTurn(p) | whileSourceOnField` (the last two added from Track E, `effect-dsl.md` E-D2). Each expires at its exact CR sub-step (digest items 67, 72, 97).
 - **Effect bookkeeping:** `oncePerTurnUsed`, `pendingTriggers` per player (CR 8-6), `resolution` (2.4), `replacementsApplied` (CR 8-1-3-4-3).
 - **Setup facts:** each player's deck size, DON!! deck size (OP15-058 Enel has 6, CR 5-1-2-4) and leader. The invariants read these; they hard-code nothing.
 - **RNG:** `rng: RngState` (mulberry32, `engine/src/rng.ts`). It drives shuffles, ID allocation and any random choice.
@@ -83,6 +83,8 @@ At every moment exactly one player owes a **decision**, or the game is over.
 - **One pick at a time.** Multi-card choices are a sequence of `pick(handle)` actions and then `done`. That keeps the branching factor small for search and keeps keyboard play simple. Two rules make it sound:
   - **Completability lookahead.** A pick is offered only if the remaining choice can still be completed: exact-N counts, total-cost limits, and cost payability, which is all-or-nothing (CR 8-3-1-3).
   - **Canonical order.** Picks for an unordered set must be made in candidate order, so search never explores A-then-B and B-then-A as different branches. The UI still presents a multi-select with a running count and a single commit (Phase 4). It sends the picks in canonical order.
+- **DON!! choices by location class.** DON!! picks are made by class, with counts: cost area active, cost area rested, or given to a specific card. The engine assigns concrete instances deterministically (E-D4).
+- **Costs.** An ability is offered only if all its costs are payable together, and every cost pick is exact (E-D6).
 - **Move grouping.** Every action carries an `intentId`, so a player-level move groups the engine actions it took. "Give 3 DON!! to Zoro" is three actions, and "play Kaido, choose 2 targets" is three more. Rewind, the game log and the review timeline step by move, not by action.
 - **Auto-skip.** When a decision has exactly one legal action that changes nothing, the session store may apply it automatically: an empty Blocker or Counter window, or a forced pick. The default is to auto-skip; the setting is "always ask". The engine still records the action, so replay stays exact.
 
@@ -90,7 +92,7 @@ At every moment exactly one player owes a **decision**, or the game is over.
 
 Effect scripts (vocabulary from Track E) are data in `cards/effects/`. The engine runs them with an explicit, serializable **resolution stack** of frames (effect reference, instruction pointer, chosen targets, locals). A choice suspends the frame; the next `reduce` resumes it.
 
-**Replacement effects (CR 8-1-3-4)** use hooks. Every atomic operation goes through one choke point in `engine/src/ops/`: K.O., trash from field, Life to hand, Life to trash, rest, DON!! return, draw, and damage. Before the operation runs, the engine collects every replacement that applies. Ordering follows CR 8-1-3-4-2: the replacement on the card that created the situation goes first, then the turn player's in the order they choose, then the non-turn player's. A replacement worded with "may" becomes an `optional` decision. That decision can suspend the operation mid-battle or mid-loop ("K.O. up to 2"). Each replacement applies to a given event at most once (`replacementsApplied`, CR 8-1-3-4-3). OP12-061 Rosinante ("take a Life card instead") is the reference case and gets a test in M2.
+**Replacement effects (CR 8-1-3-4)** use hooks. Every atomic operation goes through one choke point in `engine/src/ops/`: K.O., trash from field, Life to hand, Life to trash, rest, DON!! return, draw, and damage. Every way a card leaves the field goes through `leaveField(card, dest, cause)`, where `cause` is battle, effect, rule or cost, plus the controller. That covers K.O., return to hand, place in deck, trash from field, and place into Life. Cards that care about "removed from the field by your opponent's effect" match on the cause (E-D3). Zone transfers in scripts use one `move` verb over a whitelist of (from, to) pairs, each bound to a typed op and event (E-D5). Before the operation runs, the engine collects every replacement that applies. Ordering follows CR 8-1-3-4-2: the replacement on the card that created the situation goes first, then the turn player's in the order they choose, then the non-turn player's. A replacement worded with "may" becomes an `optional` decision. That decision can suspend the operation mid-battle or mid-loop ("K.O. up to 2"). Each replacement applies to a given event at most once (`replacementsApplied`, CR 8-1-3-4-3). OP12-061 Rosinante ("take a Life card instead") is the reference case and gets a test in M2.
 
 **Ordering** follows CR 8-6 (digest items 127–130):
 - Auto effects queue per player.
@@ -98,7 +100,7 @@ Effect scripts (vocabulary from Track E) are data in `cards/effects/`. The engin
 - New turn-player effects queue behind effects the opponent already has pending.
 - Effects triggered during damage processing wait until damage processing finishes. [Trigger] is the exception: it pauses damage processing.
 
-**Unscripted cards** play for their stats. Their text carries an "effect not automated" badge, and they lower the coverage number.
+**Unscripted cards** play for their stats. Their printed keywords ([Blocker], [Rush] and so on) still work when the verified override lists them (E-D7). Their text carries an "effect not automated" badge, and they lower the coverage number. An unscripted Event cannot be activated; `whyNot` says "effect not automated yet". An unscripted [Trigger] is not offered, so the Life card goes to hand (E-D8). [Once Per Turn] is keyed by instance and ability ID (E-D9). The DSL is specified in `docs/research/effect-dsl.md`; scripts are typed data validated by a schema in CI (E-D1).
 
 ### 2.5 Derived values
 
@@ -168,7 +170,7 @@ Events drive animation, the game log, the screen-reader live region and the revi
 
 - **Generated data.** `cards/data/manifest.json` and `cards/data/sets/<SET>.json`, written by `cards:update` from optcgapi.com (ADR 0007). Never hand-edited.
 - **Normalization.** Sign repair is recorded in `textFixes[]`. Type splitting uses a vocabulary and **fails the run on any type string with more than one valid split** ("Navy" vs "Neo Navy" vs "Former Navy"). Junk values are cleaned. The trigger text is split out. Printings are reconciled by card number: game fields come from the base printing, and any printing that disagrees is reported.
-- **Overrides.** `cards/overrides/<CARD-ID>.json` holds hand-verified corrections with a source URL and date. **Every card in any meta list (182 today) gets its stats and types verified in M1**, because scripted searches depend on the types of unscripted cards too. Every scripted card is `verified: true`.
+- **Overrides.** `cards/overrides/<CARD-ID>.json` holds hand-verified corrections and printed `keywords` with a source URL and date. **Every card in any meta list (182 today) gets its stats and types verified in M1**, because scripted searches depend on the types of unscripted cards too. Every scripted card is `verified: true`.
 - **Effect scripts.** `cards/effects/<SET>/<CARD-ID>.ts`, one typed data object per card, plus a coverage index.
 - **Format data.** `cards/format/standard.json` is hand-kept and cited: blocks per product, block exceptions, banned cards and banned pairs, each with effective dates and source URLs.
 - **Schema additions (M1).** `block`, `verified`, `textFixes` and printing-level `artworkId`s (`OP17-005_p1`). The four-copy limit groups by card number (digest correction 13).

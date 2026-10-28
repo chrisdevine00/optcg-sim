@@ -69,3 +69,16 @@ Unresolved ambiguities with the current best answer. Remove an entry when it is 
 - G3. TCGplayer calls Docking Six "a pretty mandatory four-of", but all three of our Sabo lists run three copies. Best answer: guides follow the sourced lists and note the disagreement.
 - G4. Settled: the Kalgara win at ChinoizeCup #117 (2026-09-30) is not counted because that event was Extra Regulation (`[EGB]`, API format `EXTRA`), which the method excludes.
 - G5. Settled: OP17-020 Shanks is Green (optcgapi and Limitless). Shonen TCG's "Red" is an error.
+
+## Effects (from Track E; full paragraphs with best answers in docs/research/effect-dsl.md §7)
+
+- E-Q1. Does a negated Character's [On K.O.] activate when it is then K.O.'d?
+- E-Q2. Is OP12-061 Rosinante's "next time you play [Trafalgar Law] … from your hand" discount used up by a play from hand made by an effect?
+- E-Q3. What can OP15-035 Laboon's "rest 2 of your cards" rest?
+- E-Q4. Is OP17-118's "If you only have Characters without a Counter" true when you have no Characters?
+- E-Q5. Who picks the card in "trash … from your opponent's hand" (ST10-010, OP17-075)?
+- E-Q6. May a player choose a "choose one" mode that would do nothing?
+- E-Q7. Which events does "removed from the field by your opponent's effect" cover, and how is it ordered against a K.O. replacement?
+- E-Q8. Are unsigned power and cost values on self-directed effects sign defects? Best answer: check each by hand in the M1 verification of the 182 meta cards.
+- E-Q9. Should printed keywords work on otherwise unscripted cards? Settled: yes, via verified overrides (E-D7).
+- E-Q10. Data defects found by Track E for M1 overrides: OP13-004 Sabo's sign defect is not caught by the repair rule; one Sakazuki's name is truncated to "Sakazuk"; OP12-018 has shifted columns; two meta cards have empty text (vanillas per Limitless).
