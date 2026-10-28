@@ -10,7 +10,7 @@
 | Phase | Gate deliverables | State |
 | --- | --- | --- |
 | 1 Research | docs/research/rules-digest.md, data-sources.md, competitive-teardown.md, meta-landscape.md, strategy-concepts.md | In progress: 3 of 5 deliverables done (A, D1, D2); B and C running |
-| 2 Plan | docs/PLAN.md, docs/ARCHITECTURE.md, docs/adr/ | Not started |
+| 2 Plan | docs/PLAN.md, docs/ARCHITECTURE.md, docs/adr/ | Drafted while B and C run (ADR 0007 waits on B); reviews not yet run |
 | 3 Deep research | docs/research/effect-dsl.md, rulings.md; docs/content/archetypes/, curriculum.md, glossary.md, sources.md | Not started |
 | 4 Design | docs/design/principles.md, board.md, flows.md, visual-system.md, learning-ui.md, wireframes/, review-1.md | Not started |
 | 5 Build | M0 through M10 per PROMPT.md | Not started |
@@ -34,7 +34,7 @@ If they are interrupted again, re-launch them with the same briefs; check whethe
 ## Next
 
 1. When B and C report: review both documents, copy their open questions and proposed decisions into OPEN-QUESTIONS.md / DECISIONS.md, and gate Phase 1.
-2. Phase 2: PLAN.md, ARCHITECTURE.md, ADRs, two reviewer subagents (skeptical senior engineer, UX director).
+2. Phase 2: finish ADR 0007 from Track B, fold Track C into PLAN.md, then two reviewer subagents (skeptical senior engineer, UX director) and fold in their notes.
 
 ## Blockers
 
