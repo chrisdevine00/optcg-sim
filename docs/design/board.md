@@ -1,6 +1,6 @@
 # Board
 
-**As of:** 2026-10-28 (Phase 4, revision 1)
+**As of:** 2026-10-28 (Phase 4, revision 2: review-1 fixes)
 **Inputs:** `PROMPT.md` (Phase 4 "Board layout", Accessibility, Performance), `principles.md`, `docs/research/rules-digest.md` §D, §E, §I, `docs/ARCHITECTURE.md` §2.3, §2.7, §4.1, §5, `docs/plan-review-1.md` UX-5, UX-7, UX-9, UX-10, `docs/research/competitive-teardown.md`.
 **Companion files:**
 - `visual-system.md` and `tokens.css`: colours, type, motion.
@@ -21,12 +21,13 @@ This file owns geometry, zone behaviour, the input model and pacing. Where it to
 
 The screen has two columns, and neither ever reflows during a game:
 - **The board** (left). It holds both players' fields, the midline band and your hand.
-- **The rail** (right). From top to bottom it holds the rail header, the event log, the coach and the decision panel.
+- **The rail** (right). From top to bottom it holds the rail header, the rail notice (the disclaimer, §3.1), the event log, the coach and the decision panel. The rail has three states (§3.9, §3.13): normal, **decision tall** (an owed defensive or battle decision takes the log's space) and **coach tall** (a long explanation the player asked for).
 
 ```
 1280×720                                               board 960 │ rail 320
 ┌──────────────────────────────────────────────────────────────────┬──────────────────────┐
-│ Opp identity      [▯▯▯▯▯▯  6 cards]  opponent hand (backs)        │ ≡  Rules  ⚙  ⤢       │ rail header
+│ Opp identity      [▯▯▯▯▯▯  6 cards]  opponent hand (backs)        │ [Your turn] ≡ Rules ⚙│ rail header
+│                                                                    │ Unofficial fan tool… ⓘ│ rail notice
 │ ┌DON┐┌cost area──┐┌Life──┐  ┌Leader┐  ┌Stage─┐        ┌Deck┐┌Trash┐ │ Event log            │
 │ │ 6 ││▮▮▮▮ ▬▬    ││≡≡≡≡ 4│  │ OPP  │  │      │        │ 32 ││ 12  │ │  T5 Opp · Kaido…     │
 │ └───┘└───────────┘└──────┘  └──────┘  └──────┘        └────┘└─────┘ │  T5 You · Countered… │
@@ -41,7 +42,9 @@ The screen has two columns, and neither ever reflows during a game:
 └──────────────────────────────────────────────────────────────────┴──────────────────────┘
 ```
 
-**Reading order.** Read from top to bottom: opponent hand, opponent Leader row, opponent Characters, midline, your Characters, your Leader row, your hand. Then the rail: log, coach, decision. This is also the Tab order (principle 7). Character rows face each other across the midline, because Characters are what attack and get attacked. The Leader rows sit behind them, as on the official playmat (Play Guide zone diagram, teardown §6).
+**Reading order.** Read from top to bottom: opponent hand, opponent Leader row, opponent Characters, midline, your Characters, your Leader row, your hand. Then the rail: log, coach, decision. Character rows face each other across the midline, because Characters are what attack and get attacked. The Leader rows sit behind them, as on the official playmat (Play Guide zone diagram, teardown §6).
+
+**Tab order departs from the rail's visual order on purpose** (C3). The board zones are one tab stop each, in the reading order above. After your hand, Tab goes to the **decision panel**, then the coach, then the log, then the rail header with its notice. The decision panel is what you act on next, and it sits next to the hand, so it comes first; WCAG 2.4.3 needs a meaningful order, not the visual one. A "Skip to decision" link (key `P`) is the first stop on the page. `accessibility.md` §3.1 owns the table.
 
 **The opponent is mirrored vertically, not rotated.** The opponent's rows are reflected across the midline: their Leader row is at the top and their Characters face yours. Their zones stay in the **same columns** as yours: Life above Life, DON!! above DON!!, Deck above Deck. A real table rotates the opponent 180°, which puts their Life on your right. We do not copy that, because comparing like with like in one vertical glance is what makes principle 1 work. Opponent cards are drawn upright, never upside down. (Proposed decision PD-2.)
 
@@ -108,10 +111,17 @@ Board card (Leader, Character, Stage):
 | Top-left | **Cost** disc | Live cost (Characters, Stage, Events in hand). The Leader has none. | A modified cost shows the live value in buff or debuff colour with an ▲ or ▼ glyph. The base value is in the preview. A cost below 0 shows as 0, the floor outside calculations (digest item 18). |
 | Top-right | **Power** plate | Live power from `derive` (ARCH §2.5) | Up from base: `--color-plate-buff` plus ▲. Down: `--color-plate-debuff` plus ▼. Negative power shows with a minus sign (digest item 17). During a battle, the attacker's and defender's power plates grow 1.25× to tie them to the battle panel. |
 | Bottom-left | **DON!!** badge | ◆ glyph plus the number given | On your turn the badge is solid. On the opponent's turn your given DON!! stay attached but add no power (digest item 82), so the badge turns to outline style and its accessible name says "2 DON!! given, no power on opponent's turn". |
-| Bottom-right | **Keywords** | Icons for [Blocker], [Rush], [Double Attack], [Banish], [Unblockable], [Rush: Character] | Each icon has its keyword as its accessible name and tooltip. At most 2 show, then a "+N" chip. |
+| Bottom-right | **Keywords** | At roomy density, a short word: "Blocker", "Rush", "Rush: C", "Double", "Banish", "Unblockable", "Trigger" (first keyword, then "+N"). At compact density, a glyph: ⛨, », »C, ×2, ⊘, ⤳, T (at most 2, then "+N"). | Every glyph has its keyword as its accessible name and tooltip, and a legend in the shortcut sheet and the Rules page (UX-R16). The usability plan tests glyph recognition. |
 | Left edge, 36% down (hand only) | **Counter** plate | "+1000" or "+2000" | Only in the hand and in the Counter step, where it matters (digest item 93). It sits where the counter is printed, so it covers it. |
-| Above or below the card, centred (rested only) | **State** chip | ⟳ icon plus the word "Rested" | It sits in the free band a rotated card leaves inside its square slot. That band is 16.5 px at 1280, enough for a 16 px chip. |
-| Top edge, centred (when it applies) | **Status** chip | "New" (played this turn, can't attack); "Effect not automated" (unscripted, ARCH §2.4) | Icon plus word at roomy density. Icon only at compact density, with the word in the tooltip and accessible name. |
+| Below the card, centred (rested only) | **State** chip | ⟳ icon plus the word "Rested" | It sits in the free band a rotated card leaves inside its square slot. That band is 16.5 px at 1280, enough for an 18 px chip that may overhang 2 px. |
+| Art window, middle band (upright cards) | **Status** chip | "New" (played this turn, can't attack); "Can't attack"; "Effect not automated"; "✓ Selected"; "+2000 ✓" (a staged Counter); "⚡ resolving" | See **chip slots** below. |
+
+**Chip slots** (UX-R14, R15). A card has exactly two chip slots, and chips never sit on a plate, on another chip, or outside the card's own slot:
+- **Middle slot** (upright cards): the band of the art window between the top plates (cost, power) and the bottom badges (DON!!, keywords). At 1280 that band is 24 px tall (y 22–46 on a 117 px card), and the chip centres in it at y = 29% of the card height. A chip may overhang the card's sides into the slot's free margin (16.5 px each side at 1280), never further.
+- **Below slot** (rested cards): the band below the rotated card, shared with the "⟳ Rested" chip, which merges: "⟳ Rested · attacked".
+- **One chip per slot.** When two states apply, they merge into one chip with a middle dot ("⟳ Rested · Can't attack"). "New" already means "can't attack this turn", so a new card shows only "New".
+- **Stacking.** Chips and the battle power plates draw above the attack arrow (`--z-plate`, above `--z-arrow`), and arrows end at the ⌖ in the lower half of the target, so the arrow never crosses the number a decision depends on (UX-R13).
+- **In the hand** the staged Counter tag "+2000 ✓" also uses the middle slot, so it never covers your Life count (accessibility §4.2: "Life count never covered").
 
 Hand cards use the same positions, plus the Counter plate. Events show cost (TL) and a timing chip ("[Counter]", "[Main]") where power would sit. A card with [Trigger] shows a Trigger icon among its keywords.
 
@@ -134,14 +144,17 @@ Motion: the rotation takes `--dur-base` (200 ms) with `--ease-standard`. Under r
 | Selected (source of the current move) | Raised 6 px with `--elev-2`, a solid ring, and a ✓ "Selected" chip; the decision panel names it |
 | Target candidate (in targeting mode) | Legal ring plus a ⌖ crosshair glyph. Non-candidates get `--color-dim` (50%) only while the mode lasts. |
 | Chosen (in a multi-pick) | Ring plus a numbered chip (1, 2, …) in pick order; the decision panel shows "2 of 3 chosen" |
-| Staged Counter (hand) | Raised 16 px, a ✓ chip, and a "+2000 staged" tag |
+| Staged Counter (hand) | Raised 16 px, a ✓ glyph, and a "+2000 ✓" tag in the middle chip slot |
 | Attacking / attacked | Attack arrow (§3.10); an "Attacking" chip on the source; ⌖ on the target |
 | Opponent's acting card (AI turn) | 3 px `--color-opponent` ring plus a "playing", "attacking" or "activating" word chip during the highlight and dwell |
+| Your resolving or triggered card | 3 px `--color-accent` ring plus a "⚡ resolving" or "⚡ triggered" chip. Orange stays the opponent's colour only (UX-R18). |
 | Hover | Raised 2 px; preview after 250 ms (§3.12) |
 | Focus | Two-tone focus ring: 2 px `--color-focus` outside a 2 px `--color-focus-gap`, at 4 px offset, outside any legal ring. Never covered (§3.12). |
 | Changed since you last looked (after "Skip") | A "New", "+2000" or "K.O.'d" ghost chip for 2 s or until the next input |
 
-Focus and legal combine: the legal ring sits inside and the focus ring outside it, and the two read as different things. That was checked in the mock-up (`card-face-study.md`).
+Focus and legal combine: the legal ring sits inside and the focus ring outside it, and the two read as different things. That was checked in the mock-up (`card-face-study.md`). The stacked values are in `visual-system.md` §4 (C7).
+
+**Hand at compact density** (UX-R48). With an 8 px gap, two 3 px rings at 3 px offset touch and the lit set reads as one band. In the hand at compact density the legal ring is 2 px at 1 px offset with a smaller glow, which leaves 2 px of mat between neighbours. Board cards keep the 3 px ring.
 
 ---
 
@@ -173,13 +186,20 @@ All values are CSS px from the viewport's top-left. "Opp" means opponent. The ax
 | My Deck | 768 | 463 | 84 | 117 | |
 | My Trash | 860 | 463 | 84 | 117 | |
 | My hand | 16 | 592 | 928 | 117 | Cards 84×117, 8 px gap, centred on the axis; 10 cards before overlap |
-| Rail header | 960 | 0 | 320 | 44 | Game menu (Concede, Rematch, Settings), Rules reference, Fullscreen |
-| Event log (coach collapsed) | 960 | 44 | 320 | 380 | 32 px header plus about 17 lines at 20 px |
-| Coach (collapsed) | 960 | 424 | 320 | 48 | Strip of coach buttons (Hint, Why, Lethal, DON!! math, Tempo) with state badges, per `learning-ui.md` |
-| Event log (coach open) | 960 | 44 | 320 | 148 | At least 5 lines |
-| Coach (open) | 960 | 192 | 320 | 280 | Content per `learning-ui.md` |
-| Decision panel | 960 | 472 | 320 | 248 | 36 header, 148 body, 64 footer (Rewind plus a 48 px primary button) |
-| Preview dock (default) | 872 | 8 | 400 | 456 | Over the log and coach only; never over the decision panel (§3.12) |
+| Rail header | 960 | 0 | 320 | 44 | Turn chip ("Your turn" / "Opponent's turn"), game menu (Concede, Rematch, Settings, Keyboard shortcuts), Rules reference, Settings, Fullscreen |
+| **Rail notice** | 960 | 44 | 320 | 32 | "Unofficial fan tool. Not affiliated with or endorsed by Bandai, Shueisha or Toei Animation." in 12 px on two lines, plus a 24 × 24 ⓘ whose tooltip and accessible name carry the full disclaimer, including "One Piece and all card names, text and art belong to their respective owners." The notice's own accessible name is the full text too. The board's footer equivalent (C15). |
+| Event log (coach collapsed) | 960 | 76 | 320 | 348 | 32 px header plus 13 rows of 24 px |
+| Coach (collapsed) | 960 | 424 | 320 | 48 | Strip of coach buttons (Hint, Why, Lethal, Math, Tempo): one word each, the live state as a badge (`learning-ui.md` §2.1) |
+| Decision panel | 960 | 472 | 320 | 248 | 36 header, 148 body, 64 footer (two buttons; primary 48 px tall) |
+| *Coach open:* event log | 960 | 76 | 320 | 152 | 32 px header plus 5 rows |
+| *Coach open:* coach | 960 | 228 | 320 | 244 | Content per `learning-ui.md` |
+| *Decision tall:* log ticker | 960 | 76 | 320 | 76 | The last 3 rows, newest at the bottom (§3.11) |
+| *Decision tall:* coach strip | 960 | 152 | 320 | 48 | Collapsed strip; the coach can't open while the decision is tall |
+| *Decision tall:* decision panel | 960 | 200 | 320 | 520 | 36 header, **420 body**, 64 footer at the same coordinates as always (§3.9) |
+| *Coach tall:* log ticker | 960 | 76 | 320 | 76 | |
+| *Coach tall:* coach | 960 | 152 | 320 | 468 | 32 px header, a section tab row, then the content (§3.13) |
+| *Coach tall:* decision panel | 960 | 620 | 320 | 100 | Header and footer only; the End turn sub-label carries the summary |
+| Preview dock (default) | 872 | 8 | 400 | 456 | Over the log and coach only; never over the decision panel (§3.12). Never over the rail notice for longer than a hover. |
 
 The vertical budget: strip 32, five 8 px gaps, a 12 px hand gap, a 40 px midline, five rows of 117, and an 11 px bottom margin, for 720 in total.
 
@@ -210,9 +230,14 @@ The axis is x = 760. Gaps are 12, the hand gap 16, margins 24.
 | My Trash | 1370 | 692 | 126 | 176 |
 | My hand (11 cards before overlap) | 24 | 884 | 1472 | 176 |
 | Rail header | 1520 | 0 | 400 | 56 |
-| Event log (coach collapsed / open) | 1520 | 56 | 400 | 640 / 288 |
-| Coach (collapsed / open) | 1520 | 696 / 344 | 400 | 48 / 400 |
-| Decision panel | 1520 | 744 | 400 | 336 |
+| Rail notice (two lines at 12 px; full text as its name) | 1520 | 56 | 400 | 32 |
+| Event log (coach collapsed / open) | 1520 | 88 | 400 | 608 / 288 |
+| Coach (collapsed / open) | 1520 | 696 / 376 | 400 | 48 / 368 |
+| Decision panel (44 header, 220 body, 72 footer) | 1520 | 744 | 400 | 336 |
+| *Decision tall:* log ticker / coach strip | 1520 | 88 / 168 | 400 | 80 / 48 |
+| *Decision tall:* decision panel (44, **748**, 72) | 1520 | 216 | 400 | 864 |
+| *Coach tall:* log ticker / coach | 1520 | 88 / 168 | 400 | 80 / 796 |
+| *Coach tall:* decision panel (header and footer) | 1520 | 964 | 400 | 116 |
 | Preview dock (default) | 1432 | 8 | 480 | 728 |
 
 At 1920 the extra width becomes space beside the Character rows (272 px each side) and between Stage and Deck. It is not used to grow the cards, because height already binds. We leave that space empty on purpose. It is where attack arrows and their labels travel, and the board stays calm.
@@ -229,15 +254,18 @@ At 1920 the extra width becomes space beside the Character rows (272 px each sid
 
 The real DON!! card art is not used. DON!! appear as our own **tokens**: a rounded rectangle at 63:88 with a ◆ glyph, `--color-don` fill. The token is about 0.29 card width (24 × 34 px at 1280).
 
-- **DON!! deck:** a token back plus a count ("6"). It is an open area (CR 3-3-2), so hover lists its contents, which are always DON!!.
-- **Cost area:** two labelled rows inside the zone.
-  - **Active row**, on top: upright tokens, labelled "Active 4".
-  - **Rested row**, below: tokens **rotated 90°** in `--color-don-rested`, labelled "⟳ Rested 2".
+**Hierarchy** (UX-R4). The number a player needs at a glance is **active DON!!**, so it is the biggest DON!! number on each side. The DON!! deck is the smallest.
 
-  Rested DON!! are told apart by four cues: row, rotation, icon and label. When there are more than 7 tokens in a row, they overlap with an even pitch, and the label keeps the exact count. Each row's count is also part of the zone's accessible name: "Your cost area: 4 active, 2 rested".
+- **DON!! deck:** a faded token back plus a caption plate "DON!! deck" over the count at 13 px semibold (caption weight, like the "30 Deck" label, never at power size), so "3" never reads as "I have 3 DON!!". It is an open area (CR 3-3-2), so hover lists its contents, which are always DON!!.
+- **Cost area:** a label column on the left (58 px at 1280, 84 at 1920) and token rows to its right.
+  - **Active row**, on top: upright tokens. Its label is the active count as a numeral at `--num-don` (20 px at 1280, 28 at 1920, bold, tabular) over the word "active".
+  - **Rested row**, below: tokens **rotated 90°** in `--color-don-rested`. Its label is "⟳ 3" at 14 px bold over "rested".
+  - **Given line**, at the bottom: "+2 given to cards" (12 px), so active + rested + given + DON!! deck add up to 10 without arithmetic on the board.
+
+  Rested DON!! are told apart by four cues: row, rotation, icon and label. When a row runs out of width, its tokens overlap with an even pitch, and the label keeps the exact count. The counts are also the zone's accessible name: "Your cost area: 2 active, 3 rested, 2 given to cards". When the active row is a legal source, it carries the legal ring **and** the ◆ corner glyph like every other legal element (UX-R45).
 - **Given DON!!:** shown on the card they boost. There is a BL badge "◆2", and up to 3 token edges peek 3 px below the card's bottom edge, echoing the physical tuck. The card's live power already includes their +1000 each, on its owner's turn only (§2.3). When a card with given DON!! leaves the field, its tokens animate back to the **rested** row (digest item 84). At Refresh they animate to the rested row and then everything untaps (digest item 67), in that order, so the rule is visible.
 - **DON!! −X costs** return tokens to the DON!! deck (digest item 86). The animation goes to the deck, not the cost area, and the log line says so.
-- **Glance totals.** The midline band does not repeat the DON!! counts. Each cost area's labels are the single home (principle 8).
+- **Glance totals.** The midline band does not repeat the DON!! counts. Each cost area's label column is the single home (principle 8).
 
 ### 3.5 Deck, trash and hand
 
@@ -266,12 +294,14 @@ The midline band is the board's one fixed status line. It sits between the Chara
 - **Centre (on the axis): turn and phase in words.** It reads `Turn 5 · Your turn`, then a five-step phase stepper: `Refresh › Draw › DON!! › Main › End`.
   - **The current phase** is a filled chip with an ▸ marker, `aria-current="step"` and bold weight. Past phases are muted; future phases are outlined.
   - **On the opponent's turn** it reads `Turn 6 · Opponent's turn`, with the opponent identity tag (orange fill plus the word "Opponent").
-  - **During a battle** the Main chip expands into battle sub-steps: `Main › Battle: Attack › Block › Counter › Damage`. They collapse back at End of the Battle (CR 7-1-5).
+  - **During a battle** the stepper shows `Main › Battle: Attack › Block › Counter › Damage`. Refresh, Draw, DON!! and End are hidden for the battle, because the full stepper plus the sub-steps does not fit 520 px at 14 px, and they add nothing mid-battle. They come back at End of the Battle (CR 7-1-5). The midline is the only stepper: the battle panel shows only the current step's status, such as "Kaido is considering a block…" (C18).
   - **The turn counter counts game turns from 1**, as the CR does (digest item 71: "no battle on your first turn" is turn 1 or turn 2). Hover adds "(your 3rd turn)".
 - **Left: opponent activity.** "Opponent is thinking…" with a static icon plus an animated ellipsis (static under reduced motion). Or the last AI move in a few words ("played Kaido"). It is empty on your turn.
 - **Right: the pending-effects chip.** "⧉ 2 waiting" whenever the resolution queue or `pendingTriggers` is not empty (principle 4). Clicking it shows the queue in order in the decision panel.
 
 The band is 40 px high at 1280 and 56 px at 1920. All of its text is 14 px or larger.
+
+**Whose turn, without reading** (UX-R12). Besides the words and the phase-chip colour, a 4 px bar runs along the mat's left edge on the acting player's half (accent on your turn, opponent orange on theirs), and the rail header carries a "Your turn" / "Opponent's turn" chip. Neither is colour alone: the chip has words, and the bar's position (your half or theirs) is the cue.
 
 ### 3.9 End Turn and the decision panel
 
@@ -279,21 +309,32 @@ The **decision panel** is the single home for "what am I deciding" (principle 8)
 
 - **Header (36 px):** the decision in words, for example "Your Main phase" or "Counter step · you are defending", plus a `?` that explains the step.
 - **Body (148 px at 1280, 220 at 1920):** context and choices for the decision, or the battle panel (§3.10).
-- **Footer (64 px):** **Rewind** (secondary, left; hidden in modes without rewind) and the **primary button** (right, 48 px tall at 1280 and 56 at 1920, at least 136 px wide).
+- **Footer (64 px at 1280, 72 at 1920):** a **secondary** button (left) and the **primary button** (right, 48 px tall at 1280 and 56 at 1920, at least 136 px wide). Both show their key hint, if they have one, at every density (UX-R47).
 
-The primary button always sits at the same coordinates. Its label is the action:
+**Decision tall** (C16, UX-R1). The 148 px body was sized for the idle Main phase. The hardest decisions need more: the defence planner's three lanes (When attacked, Block, Counter) plus the battle maths need about 260 px at 1280. So for a **Block, Counter or Trigger decision, the attack confirm, a battle in progress, and any owed engine decision whose body would otherwise scroll**, the panel grows upward into the log's space:
+- 1280: the panel spans y 200–720 (36 / **420** / 64). The log becomes its 3-row ticker (y 76–152) and the coach collapses to its strip (y 152–200).
+- 1920: the panel spans y 216–1080 (44 / **748** / 72). Ticker y 88–168, strip y 168–216.
+- The footer and the primary button stay at the same coordinates, and the board does not move. **The body never scrolls in a defence**: every lane is visible at both sizes.
+- It returns to normal height when the decision is committed. If the coach was open or tall, it returns to that state; nothing the player opened is lost.
+- With the coach's DON!! math on, its additions (what the opponent can make, its certainty, the rule footnotes) appear as a "Coach" note inside the battle panel while the decision is tall (UX-R24).
 
-| State | Primary | Secondary |
+The primary button always sits at the same coordinates. Its label is the action and its outcome:
+
+| State | Primary (key) | Secondary |
 |---|---|---|
-| Your Main phase, idle | **End turn** (sub-label: "2 can attack · 3 DON!! unused") | Rewind |
-| Source selected | none; the action list is in the body | Cancel |
-| Attack target chosen | **Confirm attack** (sub-label: "7000 vs 5000") | Cancel |
-| Block step (defending) | **No block** or **Block with Nami** | (choices in the body) |
-| Counter step (defending) | **Take the hit** (Life 4 → 3), or **Counter +2000 · survive** once a Counter is staged | Clear |
-| Trigger revealed | **Activate Trigger** or **Add to hand** (two equal buttons) | none |
-| Effect choice | **Done** (enabled at the minimum count) | Reset |
-| Opponent's turn | **Skip to my decision** | speed control in the body |
-| Game over | **Review game** | Rematch |
+| Your Main phase, idle | **End turn** (E; sub-label "2 can attack · 3 DON!! unused") | Rewind (U) |
+| Source selected | none; the action list is in the body | Cancel (Esc) |
+| Attack target chosen | **Confirm attack** (Enter; "9000 vs 7000") | Cancel (Esc) |
+| Block step (defending), a Blocker chosen | **Block with Gloriosa** (Enter; "Gloriosa K.O.'d · Life stays 3") | **No block** |
+| Defending, nothing staged | **Take the hit** ("Life 3 → 2"; no dedicated key, C8) | **Counter**, disabled with its reason: "stage a lit hand card" |
+| Defending, staged but short of the need | **Take the hit** ("Life 3 → 2"; the staging is discarded; no key) | **Play anyway** in warning style ("still hits") |
+| Defending, staged enough | **Counter +3000 · survive** (Enter; sub-label "Rocks Pirates + Buckin · hand 5 → 3") | **Take the hit** ("Life 3 → 2") |
+| Trigger revealed | **Activate Trigger** and **Add to hand**: two equal buttons; arrows and Enter, focus starts on Activate (C9) | — |
+| Effect choice | **Done** (Enter; enabled at the minimum count) | Reset |
+| Opponent's turn | **Skip to my decision** (S; "stops when you have a choice") | Pause (K); speed control in the body |
+| Game over | **Review game** (Enter) | Rematch |
+
+**Defence commits** (C17, UX-R2). A defence always shows two commit buttons, so taking the hit is always one action away and never needs Clear first. Enter never commits a Counter that the engine's `preview` shows still loses: in the "short" state the only button with a key is none, and the wasted counter is an explicit, warning-styled choice. Clear (Esc) lives in the body's Counter lane. The labels follow one pattern: a short verb, the number, the outcome; card names and hand cost go in the sub-label. `flows.md` F6.3 and `accessibility.md` §3.10 carry the same wording.
 
 **End Turn is not confirmed.** It is rewindable in practice modes (principle 3). The live sub-label carries the information that a confirm would have nagged about. Shortcuts are in `accessibility.md`; this file reserves one key for the primary button.
 
@@ -302,22 +343,25 @@ The primary button always sits at the same coordinates. Its label is the action:
 The battle panel lives in the decision panel's body for the whole battle, from target selection to End of the Battle, on both sides. It is the "DON!! math overlay" of PROMPT's learning UI, made a permanent part of play (teardown decision 3). `learning-ui.md` adds the coach layer on top: the explanations, and the lethal context.
 
 ```
-BATTLE · Counter step              Attack › Block › [Counter] › Damage
-Attacker  Roronoa Zoro                         7000
-          5000 base + 2000 DON!!
-Defender  Your Leader · Monkey.D.Luffy   5000 → 7000
-          5000 + 2000 staged (Sanji)
-──────────────────────────────────────────────────
-✕ Hit lands. Ties go to the attacker.  Need +1000 more.
-Counters in hand: 3 cards, up to +5000 · 1 Event needs 1 DON!!
-[ Clear ]                       [ Take the hit · Life 4 → 3 ]
+Defend your Leader · Kaido attacks                         ?      (header; the midline is the stepper)
+Attacker  Kaido (their Leader)                         7000
+          5000 + 2000 DON!!
+Defender  Your Leader                                  7000
+          5000 + 2000 staged (Rocks Pirates)
+──────────────────────────────────────────────────────────
+✕ Ties go to the attacker                   Need +1000 more
+⚠ 7000 vs 7000 still hits. Add Buckin (+1000) to stop it, or take the hit and keep Rocks Pirates.
+When attacked  [Newgate: trash 1 → Leader +3000]
+Block          [No block ✓] [Gloriosa 1000 · K.O.'d]
+Counter        [Rocks Pirates +2000 ✓] [Buckin +1000] [No Authority +2000 · 1 DON!!]
+               Click lit hand cards to stage                    [Clear Esc]
+[ Play anyway · still hits ]                  [ Take the hit · Life 3 → 2 ]
 ```
 
 - **Numbers:** attacker power and defender power at `--num-battle` (28 px at 1280, 36 px at 1920), tabular, right-aligned so the digits line up. Each has a one-line breakdown from `preview` (ARCH §2.1): base, DON!!, effects, staged Counters.
-- **Gap and result:** one line with an icon, a word and colour together.
-  - "✕ Hit lands", in attack colour.
-  - "✓ Attack fails", in success colour.
-  - "✕ K.O.", for a Character target.
+- **Gap and result:** one line with an icon, a word and colour together, styled by **your** perspective (UX-R19), so the icon and colour say whether the result is good for you and the words stay the same:
+  - defending: "✕ Hit lands" or "✕ K.O. · Gloriosa" in danger colour; "✓ Attack fails" in success colour;
+  - attacking: "✓ Hit lands" or "✓ K.O.s King" in success colour; "✕ Attack fails" in danger colour.
 
   When it is a tie, the line says "Ties go to the attacker" (CR 7-1-4-1). The need is stated as "Need +1000 more", the smallest step that reverses the result.
 - **Counters available:** from your hand, as a count and a total: "3 cards, up to +5000". [Counter] Events show their DON!! cost, and affordability comes from `legalActions`. Each listed Counter is also lit in the hand. Clicking a lit hand card stages it and updates every number at once through `preview`.
@@ -333,11 +377,13 @@ Counters in hand: 3 cards, up to +5000 · 1 Event needs 1 DON!!
 ### 3.11 Event log (always visible)
 
 - **One line per player-level move**, grouped by `intentId` (ARCH §2.3). A chevron expands a line into its engine actions. Turn headers separate turns: "Turn 5 · You".
+- **Rows and targets** (UX-R37). Each line is a row at least 24 px tall. "Why?" is a 24 px chip, and card names are links inside the row's text (the inline exception of WCAG 2.5.8 applies to them; the row and the chip meet the 24 px size on their own).
+- **Never truncated** (UX-R20). A line wraps to a second row instead of ending in an ellipsis, with a hanging indent, so the numbers at its end are always visible. The decision panel's header and the battle panel's breakdown lines wrap the same way.
 - **Line anatomy:** `[You|Opp tag] verb phrase · numbers`. For example: "Opp · Kaido attacks your Leader · 9000 vs 5000", "You · Counter: Nami +1000 · 5000 → 6000", "Hit · your Life 4 → 3". The actor tag is a filled chip with a word (You / Opp), so the actor is never shown by colour alone. The verbs and numbers are the battle panel's own, so the two never disagree.
 - **Linked cards:** card names in a line are buttons. Hovering or focusing one highlights the card on the board and opens its preview. On your own moves in practice modes, a "Rewind to here" action appears.
 - **Scroll:** newest at the bottom, and it auto-follows unless the user has scrolled up. Then a "↓ 3 new" pill appears.
 - **Semantics:** `role="log"`. Screen-reader announcements go through a separate live region (`accessibility.md`), so the visual log can be dense without being chatty.
-- **Never fully hidden.** When the coach is "tall" (§3.13), the log keeps a 3-line ticker.
+- **Never fully hidden.** When the coach or the decision panel is tall, the log keeps a ticker of its last 3 rows (76 px at 1280, 80 at 1920). A wrapped line shows whole; older rows drop off the top.
 
 ### 3.12 Hover, long-press and focus preview
 
@@ -361,17 +407,28 @@ The preview shows the card bigger, with our own rendering of its text, so it is 
 
 Raised hand cards, popovers and the dock all keep the focused element visible. The rail and decision panel are columns, not overlays, so sticky chrome never covers focus.
 
+**Inspector** (C19, UX-R40). The inspector is the **pinned, focusable state of the preview dock**, not a second component. `I`, "Inspect" in the action menu, or a long-press pins the dock: it gains a header ("Captain John · pinned", ✕ "Unpin and close (Esc)"), takes focus, and adds what the preview leaves out: rulings, the "Effect not automated" detail, art variant and data source. It opens at the dock's x and width with the dock's art size (art 168 × 235 at 1280, 240 × 335 at 1920), so the "large" view is never smaller than the hover preview. Because it stays open, it starts below the rail notice and ends above the decision panel (400 × 384 at 1280, 480 × 644 at 1920), so the disclaimer and the rail header stay visible and usable; its body scrolls inside itself. Esc unpins it and returns focus to the card. The board and the decision panel stay usable while it is pinned, and it never covers the decision panel. The log and coach it covers are inert under a rail-only scrim, so Tab never lands on something hidden behind it (WCAG 2.4.11).
+
 ### 3.13 Coach dock and reflow
 
 The coach is a **collapsible panel in the rail**, between the log and the decision panel. It is never a modal. `learning-ui.md` owns its content.
 
-| Coach state | 1280 height | 1920 height | Log height | Board |
-|---|---|---|---|---|
-| Collapsed (default) | 48 | 48 | 380 / 640 | unchanged |
-| Open | 280 | 400 | 148 / 288 (≥ 5 lines) | unchanged |
-| Tall (for a long explanation or a lethal walkthrough) | to the log ticker | to the log ticker | 3-line ticker (76 px) | unchanged |
+| Coach state | 1280 height | 1920 height | Log height (1280 / 1920) | Decision panel | Board |
+|---|---|---|---|---|---|
+| Collapsed (default) | 48 | 48 | 348 / 608 | normal | unchanged |
+| Open | 244 | 368 | 152 / 288 (≥ 5 rows) | normal | unchanged |
+| Tall | 468 | 796 | 3-row ticker (76 / 80) | header and footer only (100 / 116) | unchanged |
+| (Decision tall, §3.9) | 48, strip only | 48 | 3-row ticker | tall | unchanged |
 
-**The board does not reflow when the coach opens.** The coach takes height from the log, never width from the board. This is deliberate: a board that shifts when help appears punishes the player for asking (principle 8). The panel animates its height over `--dur-slow` (instant under reduced motion). Focus moves into the coach only when the player opened it by keyboard. The collapsed header still shows the coach's live state ("Lethal: off", "Hint ready"), so nothing the coach knows is hidden behind the collapse.
+**Tall is entered only by the player** (C5, UX-R6): asking for lethal tier 3, starting the guided count, or expanding a hint or a "why" that does not fit "open". The coach never goes tall on its own. Tall is available only while the decision panel is a summary, which means your idle Main phase. There the body only repeats what the End turn sub-label already says ("3 can attack · 10 DON!! unused"), so collapsing it to its header and footer loses nothing. In the open and tall states the coach's five sections are one tab row (Hint · Why · Lethal · DON!! math · Tempo) and only the chosen section shows, so no height goes on five stacked headers, which gives lethal tier 3 about 400 px at 1280: its claim, certainty, the numbered line with Show and "Do step 1", and the outcome all fit without scrolling at Standard verbosity.
+
+**An owed decision wins.** If a decision arrives while the coach is tall or open (you start an attack, or the opponent attacks you), the decision goes tall and the coach drops to its strip; its content and section are kept, and the Lethal badge reads "line kept". Committing the decision restores the coach. **Guided count step 4** ("Split your DON!!") runs on the board itself, in a labelled **sandbox** mode: the midline shows "Sandbox · nothing is played", the attackers show their "stop: 4000" chips and numbered ghost arrows, and the coach is the questionnaire (`learning-ui.md` §3.2). "Leave sandbox" (Esc) restores the real position.
+
+**The board does not reflow when the coach opens.** The coach takes height from the log (and, when tall, from the decision panel's summary body), never width from the board. This is deliberate: a board that shifts when help appears punishes the player for asking (principle 8). The panel animates its height over `--dur-slow` (instant under reduced motion). Focus moves into the coach only when the player opened it by keyboard. The collapsed header still shows the coach's live state ("Lethal: off", "Hint ready"), so nothing the coach knows is hidden behind the collapse.
+
+### 3.14 Mulligan
+
+(C20.) The opening hand fans out **over your empty Character row**, which is empty before turn 1, at most 1.15 × the hand-card size (97 × 135 at 1280, 145 × 202 at 1920), centred on the axis. The fan never covers your Leader: at 1280 the Character row ends at y 455 and the Leader slot starts at y 463, so a 135 px card centred on the row (y 329–464) is moved up 4 px to clear it. Keep and Redraw are in the decision panel (one home, principle 8), with Keep on the left; the hand is a readable list for screen readers, and `I` inspects a card. Life is not placed yet ("Life · placed after the mulligan").
 
 ---
 
@@ -429,9 +486,10 @@ There is at most **one selected source** at a time. The board is always in one o
 
 ### 4.4 Keyboard (summary; `accessibility.md` owns the key map)
 
-- Tab moves between regions in reading order (§1). Arrow keys move within a region, Enter or Space selects, and Esc steps back.
+- Tab moves between zones, one stop per zone, in the order of §1 (decision panel straight after the hand). Arrow keys move within a zone (roving tabindex; the zone remembers its last card), Up and Down jump to the zone above or below, Enter or Space selects, and Esc steps back. `P` jumps to the decision, and `G` then a letter goes to a zone.
 - Every mode in §4.2 is reachable. Targets are cycled with the arrow keys in targeting mode.
-- The primary button has one dedicated key in every state.
+- The primary button has one dedicated key in every state, shown on the button (E, Enter, S), **except Take the hit**, which is reached by Tab or focus, then Enter (C8): a defence deserves a deliberate action, and Strict mode cannot rewind it.
+- The clickable wireframes implement this model (`wf.js`): one stop per zone, arrows, Up/Down, `P`, `G` + letter, `A`, `+`, `E`, `U`, `S` and the skip link.
 - Focus is never moved by the AI's actions. When a decision arrives for the human, focus goes to the decision panel's first choice, and a live-region announcement accompanies it.
 
 ---
@@ -442,7 +500,9 @@ There is at most **one selected source** at a time. The board is always in one o
 
 ### 5.1 How a move is shown
 
-Each AI move plays as **highlight → move → dwell**, then the log line. The source card gets the orange ring and a word chip for `--dur-highlight`. The card or token travels for `--dur-move`. The board then holds still for `--dur-dwell` so a person can read the result. Moves never overlap. The next move's highlight starts only after the previous dwell ends (principle 4).
+Each AI move plays as **highlight → move → dwell**, then the log line. The source card gets the orange ring and a word chip for `--dur-highlight`. The card or token travels for `--dur-move`. The board then holds still for `--dur-dwell` (plays) or `--dur-dwell-attack` (attacks and battle results) so a person can read the result. Moves never overlap. The next move's highlight starts only after the previous dwell ends (principle 4).
+
+**Why the dwell is at least 400 ms** (C12, UX-R21). A single fixation takes about 250 ms, and reading a changed number and its card takes two or three. The first budget's 240 ms dwell was below the time needed to read a result. Plays now hold at least 400 ms and attacks and results at least 600 ms at 1×. `flows.md` F21 points here instead of keeping its own table.
 
 ### 5.2 Time budget at 1×
 
@@ -450,28 +510,34 @@ Each AI move plays as **highlight → move → dwell**, then the log line. The s
 |---|---:|---|
 | Refresh + Draw + DON!! | 700 ms | One composite animation: given DON!! return rested, then untap, then draw, then the new DON!! arrive. The worker starts `planTurn` at the **start** of this segment, because these steps are forced. |
 | Visible thinking (Warlord) | ≤ 1,800 ms | The 2.5 s plan minus the overlap with the segment above. Rookie and Pirate: 0. Emperor: up to about 5.3 s, and the UI says "Emperor thinks longer". |
-| Each main-phase move (play, give DON!! group, activate) | 600 ms | 120 highlight + 240 move + 240 dwell |
-| Each attack declaration | 600 ms | 120 highlight + 240 arrow + 240 dwell. The battle panel opens for the human. |
-| Each damage resolution | 600 ms | 360 Life flip and travel + 240 dwell |
+| Each main-phase move (play, give DON!! group, activate) | 760 ms | 120 highlight + 240 move + **400 dwell** |
+| Each attack declaration | 360 ms, then the human's decision | 120 highlight + 240 arrow. If you owe a Block or Counter decision, your decision is the dwell (excluded from the budget). If you owe none (no Blocker, no counter in hand, auto-skip on), a **600 ms** hold follows so the attack can be read. |
+| Each battle result (hit, K.O., attack fails) | 960 ms | 360 Life flip and travel + **600 dwell** |
 | End Phase | 300 ms | |
-| **Typical turn:** 3 moves, 3 attacks, 2 hits | **7,500 ms** | 700 + 1,800 + 1,800 + 1,800 + 1,200 + 300 |
-| Heavy turn: 6 moves, 4 attacks, 3 hits | 10,600 ms, then compressed to ≈ 8,900 ms | See the compression rule below |
+| **Typical turn, Pirate** (0 visible thinking): 3 moves, 3 attacks (2 with a decision from you), 3 results | **≈ 7,800 ms** | 700 + 2,280 + 1,080 + 600 (the one attack with no decision) + 2,880 + 300 |
+| **Typical turn, Warlord** (≤ 1,800 visible thinking) | ≈ 9,600 ms, compressed to **≈ 9,200 ms** | See the compression rule below |
+| Heavy turn, Warlord: 6 moves, 4 attacks, 4 results | ≈ 13,200 ms, compressed to ≈ 12,300 ms | |
 
-**Compression rule.** Once a turn's queued animation passes 6 s, the dwell on **non-attack** moves drops from 240 to 120 ms for the rest of that turn. Attacks keep the full dwell, because the human must follow every attack aimed at them. Compression never applies under 0.5× or in step mode.
+**Compression rule.** The AI plans its whole turn before the first move is shown, so the UI knows the turn's queued length up front. If it exceeds 8 s at 1×, the dwell on **non-attack** moves drops from 400 to 240 ms for that whole turn. Attacks and battle results keep their full 600 ms, because the human must follow every attack aimed at them (principle 10). Compression never applies under 0.5× or in step mode.
+
+**The 8 s target, honestly.** With the longer dwells, a typical turn meets 8 s at Rookie and Pirate (the vertical slice's tier) but not at Warlord, which runs about 1.2 s over after compression because its up to 1.8 s of visible thinking is real. We do not hide that by cutting the attack dwell. The owner session (OQ-4) times a clickable prototype at 1× and decides between accepting ≈ 9.2 s for Warlord and starting its plan during the human's End Phase.
+
+**The considering beat.** `flows.md` G5 keeps a uniform 600 ms "considering…" beat before every AI defensive decision (Block, Counter, Trigger), whether or not the AI is slow, so its timing never leaks what it holds. That beat is not "thinking": it is shown on every AI defensive decision, which happens during **your** turn's battles, so it is outside this AI-turn budget.
 
 **Thinking only when it is real.** The "thinking" state appears only if the animation queue is empty **and** the worker has not answered within 300 ms. That avoids a flicker on every move. In thinking:
 - the midline left reads "Opponent is thinking…";
 - the opponent identity chip shows "Thinking";
 - the decision panel shows an indeterminate bar (a static "Thinking" label under reduced motion) and the speed control.
 
-Defensive decisions by the AI (block, counter, trigger; 0.4 s budget) follow the same rule, so a fast answer shows no thinking state.
+Defensive decisions by the AI (block, counter, trigger; 0.4 s budget) show the uniform 600 ms considering beat above, and the "thinking" state only if the answer is later than that.
 
 ### 5.3 Controls
 
-- **Speed:** a segmented control with `0.5×`, `1×`, `2×`, `4×`, in the decision panel during AI turns and in Settings. It scales highlight, move and dwell by 1/speed. Think time does not scale. At 4×, attacks aimed at the human keep at least 240 ms of dwell. The default is 1×; the tutorial forces 0.5×.
-- **Step mode** ("Pause after each opponent move", off by default, on in the tutorial): the AI waits after each move. The primary button reads "Next move", and the AI continues on that key.
-- **Skip to my decision** (the primary button during AI turns): finishes the queued animations instantly until the human owes a decision or the AI turn ends. Skipped moves are still logged, and those log lines are marked "skipped". On return, every card that changed carries a "changed" chip for 2 s, and the decision panel shows a one-line recap ("While skipped: played Kaido, gave 2 DON!!, attacked twice").
-- **Reduced motion** sets move and damage times to 0 (instant placement with a 120 ms fade) and **doubles the dwell to 480 ms** (`tokens.css`). Turn length therefore changes by about ±10%, and the opponent never becomes harder to follow because motion is reduced (principle 10).
+- **Speed** (C11): one segmented control everywhere, **Step · 0.5× · 1× · 2× · 4×**, in the decision panel during AI turns and in Settings; `[` and `]` move along it. It scales highlight, move and dwell by 1/speed. Think time does not scale. At 4×, attacks aimed at the human keep at least 240 ms of dwell. The default is 1×; the tutorial forces Step.
+- **Step** is a pace on the same scale, not a separate toggle: the AI waits after each move, the primary button reads "Next move", and the AI continues on that key (or `.`).
+- **There is no "Instant".** Its real use, "never make me watch", is met by the setting **"Always skip to my decisions"** (off by default), which presses Skip for you at the start of every opponent turn and keeps every stop below.
+- **Skip to my decision** (the primary button during AI turns, `S`): finishes the queued animations instantly **until the human owes any decision with a legal action other than pass**: a Block, a Counter (any counter in hand, or a [Counter] Event you can pay for), a Trigger, or an optional "you may" window. **Skip never takes a decision for you** (UX-R3): it stops at the decision, with the attack drawn and the decision panel tall. Skipped moves are still logged and marked "skipped". Every card that changed carries a ghost chip ("New", "+2000", "K.O.'d") for 2 s, and the decision panel opens with a recap: "Stopped: Kaido attacks your Leader (7000 vs 5000). Your decision. While you skipped: Kaido played Queen … and gave 2 DON!! to Kaido." Only if no decision is owed does Skip run to the end of the AI turn, with the same recap in your Main phase. M3 tests it: skip with a counter in hand always halts at the Block step (`flows.md` F21).
+- **Reduced motion** sets move and damage times to 0 (instant placement with a 120 ms fade) and **doubles the dwells to 800 / 1,200 ms** (`tokens.css`). Turn length therefore changes by about +15%, and the opponent never becomes harder to follow because motion is reduced (principle 10).
 
 **Unobserved.** We do not know how SeaKing paces its AI or what speed control it offers. The owner hands-on (PLAN §1 row 6) should note it, and the slice checkpoint should revisit this budget against it.
 
@@ -536,9 +602,11 @@ These reading pages are responsive. The game state is kept, so rotating resumes 
 
 **But a phone in landscape is still below the floor.** An iPhone 15 in landscape is about 852 × 393 viewport. At that height the cards would come out about 46 px wide, well below the minimum. So the screen is chosen by whether rotating would actually help:
 - **If the device's landscape size meets the floor** (an iPad in portrait, large foldables), show "Turn your device sideways to play".
-- **If it does not** (phones), show "The board needs a bigger screen". It explains that games are played on a tablet or computer, offers the same reading links, and says that a game in progress is saved on this device.
+- **If it does not** (phones), show "The board needs a bigger screen". It explains that games are played on a tablet or computer and offers the same reading links. Only when a game in progress exists **on this device** does it add "Your game vs Kaido (turn 6) is saved on this device" and "Export to continue on a computer" (games are local-only, so the line never promises a game the phone does not have; UX-R50).
 
 Showing "rotate to play" on a phone that cannot fit the board would promise something the next screen breaks. (Open question OQ-1, proposed decision PD-5.)
+
+**Tablets in portrait** (C14). A portrait tablet (for example 820 × 1180) has the width of the 1024 layout's board column (about 760 px) and plenty of height, so a rotate gate there would be an orientation lock that WCAG 1.3.4 does not allow. Tablets in portrait get a **stacked variant**: the board at the 1024 × 690 geometry on top, and the rail (log, coach, decision panel at full width) below it. If M3 defers the stacked variant, the fallback is "Continue in portrait" with the board scaled to the width, never a gate. Phones are below the floor in both orientations because of size, not orientation, so 1.3.4 does not apply to them.
 
 ---
 
@@ -556,7 +624,8 @@ Showing "rotate to play" on a phone that cannot fit the board would promise some
 - **OQ-1. Phone landscape.** PROMPT gives phone portrait a "rotate to play" screen, but a phone in landscape (about 850 × 390) is below the board's minimum (968 × 590) at legible card sizes. Should v1 tell phone users the board needs a bigger screen (PD-5)? Or does the owner want a separate phone-landscape layout, for example Leader and Characters in one row, Life and DON!! as counters, and the hand as a drawer? That would be new scope, and its cards would still be about 60 px wide. *Current best answer:* tell the truth on phones; no phone board in v1.
 - **OQ-2. Opponent orientation.** A vertical mirror (zones in the same columns as yours) reads better on a screen. A 180° rotation matches a real table, where their Life is on your right. Does the owner, as a paper player, find the mirror disorienting? *Current best answer:* mirror (PD-2). Confirm in the first owner session (`usability-plan.md`).
 - **OQ-3. End Turn without a confirm.** The proposal relies on the live sub-label ("2 can attack · 3 DON!! unused") plus Rewind. In a mode without Rewind (a future ranked-like mode), should ending the turn with unused attackers need a confirm? *Current best answer:* there is no such mode in v1; revisit if one is added.
-- **OQ-4. Pacing against the baseline.** The 600 ms per move and the 8 s target are reasoned from first principles. SeaKing's pacing is **unobserved**. The owner hands-on should time one SeaKing AI turn and note its speed controls, and the slice checkpoint should compare.
+- **OQ-4. Pacing against the baseline.** The 400 / 600 ms dwells and the 8 s target are reasoned from first principles, and a Warlord turn runs about 1.2 s over (§5.2). SeaKing's pacing is **unobserved**. The owner times a clickable prototype at 1× in the first owner session, and the slice checkpoint compares it with the owner's own hands-on notes.
+- **OQ-6. The board's disclaimer form** (C15). PROMPT requires the disclaimer in the footer of every page. The board has no footer, so it carries a visible two-line rail notice (§3.1) whose accessible name is the full disclaimer. It costs the log 32 px and the board nothing. *Current best answer:* this is the board's footer equivalent. The owner confirms the form, and the decision is then recorded in `DECISIONS.md`.
 - **OQ-5. Turn counter wording.** "Turn 5" counts game turns, as the CR does. Some players count "my turn 3". The proposal shows game turns, with "(your 3rd turn)" on hover. Is that the owner's mental model?
 
 ## Proposed decisions
@@ -574,12 +643,12 @@ Showing "rotate to play" on a phone that cannot fit the board would promise some
 - drag as primary: imprecise on trackpads and touch, and no keyboard analogue;
 - a modal action menu for every click: it adds a step to the most common move, the attack.
 
-**PD-4. AI turns are paced as highlight, move and dwell (600 ms per move at 1×), with thinking shown only when it is real.** *Context:* UX-5 requires an AI turn of 8 s or less at 1× and a design for perceived time. *Decision:* the per-segment budget in §5.2 (typical turn about 7.5 s), with the worker planning while the forced phases animate, dwell compression after 6 s (never on attacks), speeds of 0.5× to 4×, step mode, and "Skip to my decision" with a recap. Reduced motion keeps or lengthens the dwell instead of removing it. *Alternatives rejected:*
+**PD-4. AI turns are paced as highlight, move and dwell (760 ms per play, 600 ms holds on attacks and results at 1×), with thinking shown only when it is real.** *Context:* UX-5 requires an AI turn of 8 s or less at 1× and a design for perceived time. *Decision:* the per-segment budget in §5.2 (typical Pirate turn about 7.5 s), with the worker planning while the forced phases animate, up-front dwell compression for long turns (never on attacks or results), one speed control (Step, 0.5× to 4×), and "Skip to my decision", which stops at every decision the human owes and recaps what it skipped. Reduced motion keeps or lengthens the dwell instead of removing it. *Alternatives rejected:*
 - a fixed per-move delay with no thinking state: it hides real waits;
 - an instant AI with only a log: it fails principle 4;
 - a "thinking" spinner on every move: it flickers and teaches the user to ignore it.
 
-**PD-5. Phones get an honest screen.** *Context:* the board needs at least 968 × 590 at legible card size, and phones are below that in either orientation. *Decision:* a device whose landscape size meets the floor gets "Turn your device sideways to play". A phone gets "The board needs a bigger screen" with links to the reading features. Both keep the game state. *Alternatives rejected:*
+**PD-5. Phones get an honest screen; portrait tablets get a stacked board.** *Context:* the board needs at least 968 × 590 at legible card size, and phones are below that in either orientation. *Decision:* a phone gets "The board needs a bigger screen" with links to the reading features, and the saved-game line only when a game exists on that device. A tablet in portrait gets the stacked variant (§6.4), not a rotate gate (WCAG 1.3.4; C14). `accessibility.md` PD-5 says the same. *Alternatives rejected:*
 - "rotate to play" on every portrait phone: it promises a board that then cannot render;
 - a scaled-down board on phones: about 46 px cards breaks principles 1 and 6.
 

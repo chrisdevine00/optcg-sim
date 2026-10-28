@@ -1,6 +1,6 @@
 # Example explanations
 
-**As of:** 2026-10-28 (Phase 4, for owner review)
+**As of:** 2026-10-28 (Phase 4, revision 2: review-1 fixes)
 **Purpose:** about 20 finished `Explanation` objects (ARCHITECTURE §4.5), each for a concrete, rules-correct position. Plan-review UX-3 requires them: the owner reviews the copy, and each becomes a snapshot test in M5a/M7/M8 that passes only if the evidence numbers match the position.
 **Card text:** every card used here appears in a list in `docs/research/meta-lists.json`. Text was read from `.cache/track-b/raw/optcgapi-allSetCards.json` and, where a sign or wording mattered, checked on Limitless card pages on 2026-10-28 (OP13-004, OP13-027, OP14-031, OP17-040, OP17-046, OP17-056, OP17-074, OP17-080, OP17-119). Leader rulings come from `docs/research/rulings.md` (RL-13, RL-20, RL-45, RL-46).
 **Rules arithmetic used throughout:**
@@ -57,6 +57,29 @@ interface Explanation {
 | Review flag (lethal) | Proven in `public` mode: wins against any hand the opponent could hold | Proven only in `actual` mode, against the hand they held | Search hit its cap |
 | Review flag (other kinds), hint, drill answer | The reasons rest only on information the player had | The judgment leans on the opponent's hidden cards | Search hit its cap before ranking the lines |
 | AI "why" | Always the value for a single decision, because AI explanations cite only public information (flows D9) | Used for turn plans whose payoff depends on the player's hidden hand | AI ran out of budget (shown as "best found") |
+
+### Certainty labels by context
+
+The chip's words depend on where the explanation appears, not only on its `certainty` value (review-1 UX-R25). A label must never contradict the text beside it.
+
+| Where it appears | `any-hand` | `needed-hidden-info` | `search-incomplete` |
+| --- | --- | --- | --- |
+| Review flag, review marker | "Holds whatever they held" | "Hindsight: needed their hidden cards" | "Not fully checked" |
+| Live coach: hint, lethal detector, DON!! math | "Works against any hand" | "Depends on their hand" | "Best found, not fully checked" |
+| AI "Why" (E12–E14, E16) | "Public information only" | "Public information only · depends on your hand" | "Best found in its time" |
+| Guide-sourced answer: mulligan trainer, mulligan hint (E10, E11) | "From the Rocks guide (sourced)" (the archetype's name) | not used | not used |
+| Drill answer from a search (lethal puzzle, counter or take, DON!! allocation) | "Works against any hand" | "Their real hand: one way to see it" | "Best found, not fully checked" |
+
+- **Estimates are labelled as estimates.** An outcome that depends on a choice the opponent has not made yet states the condition ("unless they spend 6000 of counters") or carries an "Estimate" chip. "Likely" is never used beside "Works against any hand".
+- **Snapshot rule.** The snapshot tests render each example in every context it is listed for (the Index's "Where it appears" column) and assert that the chip text equals this table's cell. A new context needs a new row before it ships.
+
+### Turn vocabulary
+
+One rule everywhere (review-1 UX-R26; `board.md` OQ-5):
+- **Turns are game turns**, counted from 1 as the CR counts them: "Turn 9", "on turn 5".
+- Where the player's own count matters, add it in brackets: "by turn 5 (your 3rd)". Never write "your turn 3" alone.
+- Positions in this file still say which seat the player is in ("going second, game turn 8") so the DON!! count can be checked.
+- **Puzzles keep the source game's turn number** ("From your game, turn 12"), and the puzzle header uses the same number ("Puzzle · turn 12").
 
 ### Copy rules
 
@@ -302,7 +325,7 @@ Rocks (OP17-039) and Kaido (OP17-058) dominate because they are the slice decks 
 
 **Where:** Game Review flag (moderate, 3 DON!!); also the tempo meter's end-of-turn text.
 
-**Position.** Your turn 4, going second: 8 DON!!. You played Charlotte Linlin (OP17-049, cost 5): 3 active DON!! left. Your Leader (5000, no DON!! given) attacked their Leader: Kaido (OP17-058), 5000, 3 Life. They played Queen (EB04-032, +1000): 6000, attack stopped. You ended the turn with **3 active DON!!**. Your hand: Rocks Pirates and There's No Authority… (both cost 0), Kyo, Shiki. Nothing on your board or in your hand spends DON!! on their turn.
+**Position.** Game turn 8 (your 4th), going second: 8 DON!!. You played Charlotte Linlin (OP17-049, cost 5): 3 active DON!! left. Your Leader (5000, no DON!! given) attacked their Leader: Kaido (OP17-058), 5000, 3 Life. They played Queen (EB04-032, +1000): 6000, attack stopped. You ended the turn with **3 active DON!!**. Your hand: Rocks Pirates and There's No Authority… (both cost 0), Kyo, Shiki. Nothing on your board or in your hand spends DON!! on their turn.
 
 ```ts
 {
@@ -328,7 +351,7 @@ Rocks (OP17-039) and Kaido (OP17-058) dominate because they are the slice decks 
 }
 ```
 
-**Check.** Going second, turn 4: 2 + 2 + 2 + 2 = 8 DON!!. Linlin 5 → 3 left. 5000 vs 5000 is a tie, a hit unless they add 1000. With 3 DON!!: 8000 − 5000 + 1000 = 4000. Kaido's +4000 Events (Kundali Dragon Swarm, Flame Dragon Torch) are "[Counter] DON!! −1", hence "also costs them a DON!!". Kaido's leader −2000 cannot target your Leader (RL-45).
+**Check.** Going second, game turn 8 (your 4th): 2 + 2 + 2 + 2 = 8 DON!!. Linlin 5 → 3 left. 5000 vs 5000 is a tie, a hit unless they add 1000. With 3 DON!!: 8000 − 5000 + 1000 = 4000. Kaido's +4000 Events (Kundali Dragon Swarm, Flame Dragon Torch) are "[Counter] DON!! −1", hence "also costs them a DON!!". Kaido's leader −2000 cannot target your Leader (RL-45).
 
 ---
 
@@ -336,7 +359,7 @@ Rocks (OP17-039) and Kaido (OP17-058) dominate because they are the slice decks 
 
 **Where:** the tempo meter's explanation at the end of your turn; the review's "not flagged" note for this turn (learning-ui §4.2).
 
-**Position.** Your turn 4, going second: 8 DON!!. You: Monkey.D.Luffy (OP13-001) Leader. You played Usopp (OP14-022, cost 4): 4 active, 4 rested. You gave 1 DON!! to your Leader (3 active) and attacked with it. End of turn: Usopp ("[End of Your Turn] If your Leader has the FILM or Straw Hat Crew type, set up to 2 of your DON!! cards as active") sets 2 active. You end with **5 active, 2 rested, 1 given to your Leader**. Them: Rocks.D.Xebec.
+**Position.** Game turn 8 (your 4th), going second: 8 DON!!. You: Monkey.D.Luffy (OP13-001) Leader. You played Usopp (OP14-022, cost 4): 4 active, 4 rested. You gave 1 DON!! to your Leader (3 active) and attacked with it. End of turn: Usopp ("[End of Your Turn] If your Leader has the FILM or Straw Hat Crew type, set up to 2 of your DON!! cards as active") sets 2 active. You end with **5 active, 2 rested, 1 given to your Leader**. Them: Rocks.D.Xebec.
 
 ```ts
 {
@@ -461,7 +484,7 @@ Rocks (OP17-039) and Kaido (OP17-058) dominate because they are the slice decks 
   ],
   outcome: 'A turn-1 search, a restand piece and 6000 of counter.',
   certainty: 'any-hand',
-  nextTime: 'Ask three questions: can I act on turns 1 and 2, do I hold a piece of my plan, can I defend? Two yeses is a keep.',
+  nextTime: 'Ask three questions: can I act on my first two turns, do I hold a piece of my plan, can I defend? Two yeses is a keep.',
   lessonId: 'L12-mulligan',
   sources: ['CR 5-2-1-6', 'SH-MUL', 'SH-RGL'],
 }
@@ -482,8 +505,8 @@ Rocks (OP17-039) and Kaido (OP17-058) dominate because they are the slice decks 
   conceptId: 'mulligan',
   claim: 'Redraw this hand.',
   evidence: [
-    { text: 'Your cheapest Character costs 5. Going first you have 1, 3, then 5 DON!!: nothing to play until your turn 3.',
-      figures: { cheapestCharacter: 5, firstPlayableTurn: 3 } },
+    { text: 'Your cheapest Character costs 5. Going first you have 1, 3, then 5 DON!!: nothing to play until turn 5 (your 3rd).',
+      figures: { cheapestCharacter: 5, firstPlayableGameTurn: 5 } },
     { text: 'Your deck has 18 Characters that cost 1 to 3. A fresh five has at least one of them 90% of the time.',
       figures: { earlyPlays: 18, deckSize: 50, chanceAtLeastOne: 0.90 } },
     { text: 'It defends with one card: Rocks Pirates, +2000.',
@@ -494,7 +517,7 @@ Rocks (OP17-039) and Kaido (OP17-058) dominate because they are the slice decks 
   line: [
     { kind: 'redraw', text: 'Redraw all five.' },
   ],
-  outcome: 'A 90% chance of a turn-1 to turn-3 play, instead of none until turn 3.',
+  outcome: 'A 90% chance of a play by turn 3 (your 2nd), instead of none until turn 5.',
   certainty: 'any-hand',
   nextTime: 'Going first with Rocks, redraw any hand with no Character costing 1 to 3.',
   lessonId: 'L12-mulligan',
@@ -503,7 +526,7 @@ Rocks (OP17-039) and Kaido (OP17-058) dominate because they are the slice decks 
 ```
 
 **Check.** DON!! going first: 1, 3, 5 (CR 6-4-1). P(at least one of 18 in 5 from 50) = 1 − C(32,5)/C(50,5) = 1 − 201,376 / 2,118,760 = 0.905. OP17-118's in-hand +2000 Counter applies only "if you only have Characters without a Counter", so it is not counted as a sure counter. "Usually finds it by 10 DON!!": SH-XEB's simulation, 76% going first and 77% going second (Rocks guide). The guide's sourced baseline mulligans any hand without a 1- to 3-cost Character.
-**Copy note for review:** outcome says "turn-1 to turn-3 play" to stay true for Stussy and Don Marlon (cost 3, playable on turn 2 going first with 3 DON!!). Owner may prefer "an early play".
+**Copy note for review:** the outcome follows the turn vocabulary rule: "by turn 3 (your 2nd)" stays true for Stussy and Don Marlon (cost 3, playable on game turn 3 going first with 3 DON!!). Owner may prefer "an early play".
 
 ---
 
@@ -585,7 +608,7 @@ Rocks (OP17-039) and Kaido (OP17-058) dominate because they are the slice decks 
 
 **Where:** "Why?" on the AI's turn, available once its turn ends (executed steps only, flows D9). AI: Rocks.D.Xebec, Warlord, going second.
 
-**Position.** AI's turn 5 (game turn 10): 10 DON!!. AI: Shiki (OP17-048) 9000 and Edward.Newgate (OP17-040) 8000, both active. You: Monkey.D.Luffy (OP13-001) Leader 5000, **1 Life, 4 cards**, 1 DON!! given to your Leader, **3 active DON!!** in your cost area; Nami (OP14-031), 2000, active, [Blocker], cost 4.
+**Position.** Game turn 10 (the AI's 5th): 10 DON!!. AI: Shiki (OP17-048) 9000 and Edward.Newgate (OP17-040) 8000, both active. You: Monkey.D.Luffy (OP13-001) Leader 5000, **1 Life, 4 cards**, 1 DON!! given to your Leader, **3 active DON!!** in your cost area; Nami (OP14-031), 2000, active, [Blocker], cost 4.
 
 **AI's executed turn:** played Gloriosa (OP17-046, cost 4): Nami to the bottom of your deck. Gave 3 DON!! to Shiki (12000) and 3 to its Leader (8000). Attacked your Leader with Shiki, then with its Leader, then with Newgate.
 
@@ -628,7 +651,7 @@ Rocks (OP17-039) and Kaido (OP17-058) dominate because they are the slice decks 
 
 **Where:** Coach hint (flows F9).
 
-**Position.** Your turn 3, going second (game turn 6): **6 DON!!, all active**. You: Monkey.D.Luffy (OP13-001) Leader 5000, 4 Life; Jewelry Bonney (EB04-002), 2000, active (played on your turn 1). Hand: Nami (OP14-031), Sanji (OP13-027), Laboon, Bad Manners Kick Course, Usopp (OP14-022). Them: Kaido (OP17-058), 5 Life, 5 cards; Yamato (OP17-074, 1000, [Blocker], cost 3) and Queen (EB04-032, 1000, cost 1), both **active**.
+**Position.** Game turn 6 (your 3rd), going second: **6 DON!!, all active**. You: Monkey.D.Luffy (OP13-001) Leader 5000, 4 Life; Jewelry Bonney (EB04-002), 2000, active (played on turn 2, your 1st). Hand: Nami (OP14-031), Sanji (OP13-027), Laboon, Bad Manners Kick Course, Usopp (OP14-022). Them: Kaido (OP17-058), 5 Life, 5 cards; Yamato (OP17-074, 1000, [Blocker], cost 3) and Queen (EB04-032, 1000, cost 1), both **active**.
 
 ```ts
 {
@@ -653,7 +676,7 @@ Rocks (OP17-039) and Kaido (OP17-058) dominate because they are the slice decks 
     { kind: 'attack', text: 'Attack Queen with Bonney.', card: 'EB04-002', target: 'EB04-032' },
     { kind: 'endTurn', text: 'End your turn: Nami sets your 5 DON!! active.' },
   ],
-  outcome: 'Likely K.O.s their Blocker, and loads +10000 of defence for their turn.',
+  outcome: 'K.O.s their Blocker unless they spend 6000 of counters, and keeps +10000 of defence for their turn.',
   certainty: 'any-hand',
   nextTime: 'With this Leader, plan each turn backwards from the DON!! you want active at the end.',
   lessonId: 'L09-don-efficiency',
@@ -661,7 +684,7 @@ Rocks (OP17-039) and Kaido (OP17-058) dominate because they are the slice decks 
 }
 ```
 
-**Check.** Going second, turn 3: 6 DON!!. Nami costs 4: 2 active, 4 rested. Give 1: 1 active, 4 rested, 1 given. Nami's text: "Rest up to 2 of your opponent's Characters with a cost of 8 or less. Then, set up to 5 of your DON!! cards as active at the end of this turn." Cost area holds 5 at the end, all set active. Yamato and Queen cost 3 and 1. 6000 vs 1000: save needs 6000; 2000 vs 1000: save needs 2000. Kaido's −2000 targets "your opponent's Characters" (RL-45). Sanji line: 6 − 5 = 1, + 2 (On Play) = 3, − 1 given = 2, + 1 (End of Your Turn) = 3 active; 3 × 2000 = 6000. "Likely" in the outcome because they may spend 6000 of counters to save Yamato.
+**Check.** Going second, game turn 6 (your 3rd): 6 DON!!. Nami costs 4: 2 active, 4 rested. Give 1: 1 active, 4 rested, 1 given. Nami's text: "Rest up to 2 of your opponent's Characters with a cost of 8 or less. Then, set up to 5 of your DON!! cards as active at the end of this turn." Cost area holds 5 at the end, all set active. Yamato and Queen cost 3 and 1. 6000 vs 1000: save needs 6000; 2000 vs 1000: save needs 2000. Kaido's −2000 targets "your opponent's Characters" (RL-45). Sanji line: 6 − 5 = 1, + 2 (On Play) = 3, − 1 given = 2, + 1 (End of Your Turn) = 3 active; 3 × 2000 = 6000. The outcome states its condition ("unless they spend 6000 of counters") instead of "Likely", so it agrees with the "Works against any hand" chip (UX-R25).
 
 ---
 
@@ -706,7 +729,7 @@ Rocks (OP17-039) and Kaido (OP17-058) dominate because they are the slice decks 
 
 **Where:** Blunder warning at the commit of an effect choice (learning-ui §2.8). The setting is on.
 
-**Position.** Your turn 4, going second: 8 DON!!. You: Monkey.D.Luffy (OP13-001). You played Nami (OP14-031) for 4, gave 1 DON!! to your Leader and attacked. End of turn: Nami's "set up to 5 of your DON!! cards as active" resolves. Your cost area: **3 active, 4 rested**; 1 given to your Leader. In the choice tray you set the stepper to **4** and press commit.
+**Position.** Game turn 8 (your 4th), going second: 8 DON!!. You: Monkey.D.Luffy (OP13-001). You played Nami (OP14-031) for 4, gave 1 DON!! to your Leader and attacked. End of turn: Nami's "set up to 5 of your DON!! cards as active" resolves. Your cost area: **3 active, 4 rested**; 1 given to your Leader. In the decision panel you set the stepper to **4** and press commit.
 
 ```ts
 {
@@ -788,9 +811,10 @@ Rocks (OP17-039) and Kaido (OP17-058) dominate because they are the slice decks 
       figures: { stopNeeded: 3000, withBuckin: 8000 } },
   ],
   line: [
-    { kind: 'take', text: 'Take the hit and keep Rocks Pirates.' },
+    { kind: 'take', text: 'Best: take the hit and keep Rocks Pirates for a later attack.' },
+    { kind: 'counter', text: 'Also fine: add Buckin (8000 vs 7000), spending 2 cards to save 1 Life.', card: 'OP08-051' },
   ],
-  outcome: '+1 card: the hit landed either way.',
+  outcome: 'Keeps Rocks Pirates (+2000) for a later attack, for the same 1 Life.',
   certainty: 'any-hand',
   nextTime: 'A counter has to put you above their power, not level with it. Check the "need" number before you play one.',
   lessonId: 'L05-block-and-counter',
@@ -798,7 +822,7 @@ Rocks (OP17-039) and Kaido (OP17-058) dominate because they are the slice decks 
 }
 ```
 
-**Check.** 5000 + 2000 = 7000 = attacker: attacker wins (CR 7-1-4-1). Stop needs 3000; 2000 + 1000 = 3000 → 8000 > 7000. The line is "take it" rather than "add Buckin" because spending 2 cards to save 1 Life at 3 Life is a judgment call the review does not make here; the claim is only about the tie.
+**Check.** 5000 + 2000 = 7000 = attacker: attacker wins (CR 7-1-4-1). Stop needs 3000; 2000 + 1000 = 3000 → 8000 > 7000. The line compares both remedies (UX-R27): taking the hit costs 1 Life and keeps the +2000 card; adding Buckin costs 2 cards and saves 1 Life. At 3 Life with a +2000 card in hand, keeping the card is ranked first, and the second is shown as also fine so the player sees the trade. The outcome names what the best line gains compared with what was done: the same Life lost, one counter card kept.
 
 ---
 
@@ -806,7 +830,7 @@ Rocks (OP17-039) and Kaido (OP17-058) dominate because they are the slice decks 
 
 **Where:** Lethal detector (learning-ui §3.1). Tier 1: "Lethal is on the board. Works against any hand." Tier 2: "You need 3 hits. You have 3 attackers that can hit their Leader." Tier 3: the object below. The guided count for this position: hits 3; attackers Ulti, Leader, Kaido; their defence 1 card now (+3000 at most, through Newgate), one more card per hit; DON!! split 2 / 5 / 0, smallest first.
 
-**Position.** Your turn 6, going first (game turn 11): **10 DON!!, all active, none given**. You: Kaido (OP17-058) Leader 5000; Ulti & Page One (OP17-060) 6000 and Kaido (OP17-062) 12000, both active, played on earlier turns. Them: Rocks.D.Xebec Leader 5000, **2 Life, 1 card in hand**; their only Character is Edward.Newgate (OP17-040), rested ("[Once Per Turn] When your Leader … is attacked, you may trash 1 card from your hand: your Leader gains +3000 power during this battle"). No Blockers. No [Trigger] cards in Rocks's lists; biggest counter +2000.
+**Position.** Game turn 11 (your 6th), going first: **10 DON!!, all active, none given**. You: Kaido (OP17-058) Leader 5000; Ulti & Page One (OP17-060) 6000 and Kaido (OP17-062) 12000, both active, played on earlier turns. Them: Rocks.D.Xebec Leader 5000, **2 Life, 1 card in hand**; their only Character is Edward.Newgate (OP17-040), rested ("[Once Per Turn] When your Leader … is attacked, you may trash 1 card from your hand: your Leader gains +3000 power during this battle"). No Blockers. No [Trigger] cards in Rocks's lists; biggest counter +2000.
 
 ```ts
 {
@@ -846,7 +870,7 @@ Rocks (OP17-039) and Kaido (OP17-058) dominate because they are the slice decks 
 
 ## Notes for the owner's review
 
-- **E11's outcome** wording is open: "a turn-1 to turn-3 play" is exact; "an early play" is friendlier.
-- **E14 and E15** use "Likely" and "Depends on your hand". If the owner prefers no hedging words in claims, the certainty chip carries it and the words can go.
+- **E11's outcome** wording is open: "a play by turn 3 (your 2nd)" is exact; "an early play" is friendlier.
+- **E14** uses "Depends on your hand"; E15 no longer hedges ("Likely" was replaced by its condition, UX-R25).
 - **AI explanations (E12, E13, E14, E16)** name the AI by its Leader. The alternative is "The AI". Naming the Leader reads better in mirror matches only if both sides are not the same Leader; mirrors need "their Kaido".
 - **Hindsight (E02)** is phrased to avoid blame. The owner may want it firmer for players who play conservatively by habit.

@@ -1,13 +1,13 @@
 # Accessibility plan
 
-**As of:** 2026-10-28 (Phase 4, revision 1)
+**As of:** 2026-10-28 (Phase 4, revision 2: review-1 fixes)
 **Target:** WCAG 2.2 level AA for the whole product, plus PROMPT.md's "a full game vs AI is playable with keyboard alone".
 **Inputs:** `PROMPT.md` (Done when, Phase 4, Accessibility, Learning layer); `docs/plan-review-1.md` (UX-2, UX-8, UX-9); `docs/PLAN.md` §2, §3, §5; `docs/ARCHITECTURE.md` §2.3, §2.7, §2.8, §5; `docs/research/rules-digest.md` §D–K; `docs/research/effect-dsl.md` §4.11, E-D4; `docs/content/curriculum.md` (untimed exit criteria).
 **Companions written in parallel:** `board.md` (geometry), `flows.md` (interaction scripts, confirm vs undo), `visual-system.md` (tokens), `learning-ui.md` (coach, review). Where this file and one of those disagree on **keyboard, focus, announcements or timing**, this file wins and the other is corrected. Where they disagree on **geometry or visual styling**, they win and this file's tables are updated to match. §14 lists what each one must carry over.
 
 ## 1. The model in one paragraph
 
-The board is a DOM (not canvas) composite widget. It has one tab stop per zone, and the zones are in reading order. Arrow keys move within a zone. Enter opens a menu of the focused card's legal actions, built only from `view.decision.actions`. Every multi-step action (attack, give N DON!!, pick several cards, order effects, defend) runs as a named **mode** with its own instructions in the prompt bar. Escape always backs out one level, and nothing reaches the engine until the mode's single commit. Single-letter shortcuts work only while focus is inside the board, and can be switched off. Screen-reader output comes from one announcer that consumes **projected** events grouped by `intentId`, so there is one sentence per player move. AI turns are paced, pausable and summarised. Nothing in the product is timed unless the player switches on timed drills.
+The board is a DOM (not canvas) composite widget. It has one tab stop per zone, and the zones are in reading order. Arrow keys move within a zone. Enter opens a menu of the focused card's legal actions, built only from `view.decision.actions`. Every multi-step action (attack, give N DON!!, pick several cards, order effects, defend) runs as a named **mode** with its own instructions in the decision panel (`board.md` §3.9). Escape always backs out one level, and nothing reaches the engine until the mode's single commit. Single-letter shortcuts work only while focus is inside the board, and can be switched off. Screen-reader output comes from one announcer that consumes **projected** events grouped by `intentId`, so there is one sentence per player move. AI turns are paced, pausable and summarised. Nothing in the product is timed unless the player switches on timed drills.
 
 ## 2. Ground rules
 
@@ -25,40 +25,32 @@ The board element has `role="application"`, `aria-roledescription="game board"`,
 
 Why `role="application"`: NVDA and JAWS in browse mode take arrow keys and single letters for their own navigation. Inside an application region they switch to focus mode and pass keys through, so the board's arrows and shortcuts work. Long-form reading (card text, coach explanations, the game log, review) lives **outside** the application region in normal document semantics, where browse mode works. The risk and its fallback are in §12, R1.
 
-**Tab order follows rows top to bottom, then left to right as rendered.** For the default layout (official playmat arrangement, opponent rotated 180° at the top), the order is:
+**Tab order** follows `board.md`'s geometry (its §1 owns the arrangement: the opponent mirrored vertically at the top, the midline band, your rows, your hand, and the rail on the right). One tab stop per zone; arrow keys move within a zone (roving tabindex). The order is:
 
 | # | Tab stop | Inner items (arrow keys) |
 | --- | --- | --- |
-| 1 | Game status bar: turn, active player, phase stepper, game menu | Phase steps are read-only; menu is a button |
-| 2 | Opponent's hand | One item: "Opponent's hand, 6 cards; 1 known: Kaido". Known cards come from `view.known` |
-| 3 | Opponent's Trash | Top card; Enter opens the trash list |
-| 4 | Opponent's cost area | Two items: "4 active DON!!", "2 rested DON!!" |
-| 5 | Opponent's DON!! deck | One item: count |
-| 6 | Opponent's Deck | One item: count (plus "top card known" when the view says so) |
-| 7 | Opponent's Stage | The Stage, or "empty" |
-| 8 | Opponent's Leader | The Leader |
-| 9 | Opponent's Life | "4 Life, face down", plus one item per face-up Life card (CR 3-10-2-1) |
-| 10 | Opponent's Characters | 0–5 cards in slot order, or "empty" |
-| 11 | Centre lane: prompt bar and battle panel | Prompt text, then its buttons |
-| 12 | Your Characters | 0–5 cards |
-| 13 | Your Life | as 9 |
-| 14 | Your Leader | |
-| 15 | Your Stage | |
-| 16 | Your Deck | |
-| 17 | Your DON!! deck | |
-| 18 | Your cost area | "6 active DON!!", "1 rested DON!!" |
-| 19 | Your Trash | |
-| 20 | Your hand | Cards in your chosen order |
-| 21 | Coach panel (outside the board, `<aside>`) | Normal tab order |
-| 22 | Game log (outside the board, `role="log"`) | Normal document |
+| 0 | **Skip link "Skip to decision"** (the first focusable element; visible on focus) | Enter moves focus to the decision panel's first choice |
+| 1 | Opponent identity and hand | Two items: "Opponent: Kaido, Pirate AI" (with "Thinking" when it is); "Opponent's hand, 6 cards; 1 known: Kaido". Known cards come from `view.known` |
+| 2 | Opponent's Leader row | DON!! deck ("Opponent's DON!! deck, 2"), cost area ("1 active DON!!", "6 rested DON!!"), Life ("3 Life, face down", plus one item per face-up Life card, CR 3-10-2-1), Leader, Stage (or "empty"), Deck, Trash (Enter opens the trash viewer), in that left-to-right order |
+| 3 | Opponent's Characters | 0–5 cards in slot order, or "empty" |
+| 4 | Midline band | Turn and phase ("Turn 8, opponent's turn, Main phase"), opponent activity, the pending-effects chip (Enter shows the queue) |
+| 5 | Your Characters | 0–5 cards |
+| 6 | Your Leader row | DON!! deck, cost area ("2 active DON!!", "3 rested DON!!"), Life, Leader, Stage, Deck, Trash, as 2 |
+| 7 | Your hand | Cards in your chosen order |
+| 8 | **Decision panel** (outside the board's application region) | Its header `?`, the body's choices in reading order, then the footer: Rewind, then the primary. Normal Tab within it |
+| 9 | Coach (`<aside>`, outside the board) | Normal tab order: the strip's buttons, then the open section's content |
+| 10 | Game log (`role="log"`, outside the board) | Normal document; each row is one 24 px button with its "Why?" chip (§5) |
+| 11 | Rail header and rail notice | Game menu, Rules, Settings, Fullscreen, the turn chip, then the notice's ⓘ (its name is the full disclaimer) |
 
-If `board.md` places a zone differently, the rule (rows top to bottom, left to right as rendered) wins, and this table is updated in the same commit. A Playwright test asserts the DOM tab sequence against this table at both resolutions.
+**Why the decision panel comes straight after the hand.** `board.md` §1 lists the rail top to bottom (log, coach, decision), but the decision panel is where almost every keyboard turn ends (End turn, Confirm attack, Counter). Putting it right after the hand makes End turn about 11 Tabs from the top of the page, or 2 with the skip link and `P`. WCAG 2.4.3 asks for a meaningful order, not the visual one; `board.md` §1 records the departure.
+
+The rule: if `board.md` moves a zone, this table is updated in the same commit. A Playwright test asserts the DOM tab sequence against this table at both resolutions, and the wireframes implement it (`wireframes/wf.js`).
 
 Empty zones stay tab stops so that the order never shifts. A zone with nothing to act on is still announced ("Your Stage, empty").
 
 ### 3.2 Modes
 
-Every keystroke is interpreted in the current **mode**. The prompt bar always shows the mode's name, what is being decided, and its keys, and the mode's name is announced on entry.
+Every keystroke is interpreted in the current **mode**. The decision panel always shows the mode's name, what is being decided, and its keys, and the mode's name is announced on entry.
 
 | Mode | Entered by | Arrows / Tab | Enter / Space | Escape |
 | --- | --- | --- | --- | --- |
@@ -68,23 +60,23 @@ Every keystroke is interpreted in the current **mode**. The prompt bar always sh
 | **Count** | give N DON!!, or any DON!! pick by location class | Up/Down change the count; Tab moves between rows | commit | cancel with nothing sent |
 | **Pick** | a `choose` decision with max > 1 | move between candidates | Space toggles; Enter commits when valid | clear the selection; a second Escape returns to the decision |
 | **Order** | an `order` decision | move between items | Space grabs or drops; Enter commits | drop the grabbed item back; a second Escape restores the suggested order |
-| **Defend** | the human owes a `block`, `counter` or `trigger` decision | move between Blockers, hand cards and the staging tray | Space stages or unstages; Enter commits | clear staging (never "take the hit") |
+| **Defend** | the human owes a `block`, `counter` or `trigger` decision | move between Blockers, hand cards and the Counter lane | Space stages or unstages; Enter commits only a working counter or a block (§3.10) | clear staging (never "take the hit") |
 | **Dialog** | inspector, trash list, rewind list, shortcut sheet, confirms | per dialog | per dialog | close and return focus to the invoking element |
 
 Escape never commits anything. In particular, Escape in Defend mode clears staging, and it does not mean "take the hit".
 
-When an engine decision arrives that the human owes (`block`, `counter`, `trigger`, `choose`, `order`, `optional`, `mulligan`, `chooseFirst`), focus moves to the prompt bar or the mode's first item, and the prompt is read as the focused element's name. This is the default; the setting "Move focus to new decisions" can switch it off (§9.3).
+When an engine decision arrives that the human owes (`block`, `counter`, `trigger`, `choose`, `order`, `optional`, `mulligan`, `chooseFirst`), focus moves to the decision panel or the mode's first item, and the prompt is read as the focused element's name. This is the default; the setting "Move focus to new decisions" can switch it off (§9.3).
 
 ### 3.3 Moving between zones and within a zone
 
 | Key | Action |
 | --- | --- |
-| Tab / Shift+Tab | Next or previous zone (table in §3.1). Leaving zone 20 goes to the coach panel. |
+| Tab / Shift+Tab | Next or previous zone (table in §3.1). Leaving your hand goes to the decision panel. |
 | Left / Right | Previous or next card in the zone. It stops at the ends and does not wrap, so the edge is unambiguous. |
 | Home / End | First or last card in the zone. |
 | Up / Down | The zone visually above or below. The card in the closest column gets focus. This is a sighted-user accelerator; Tab is the canonical order. |
-| `G`, then a letter | **Go to.** A small popover lists the letters and waits with no timeout until the next key or Escape. Lowercase means yours; Shift means the opponent's. `h` hand, `c` Characters, `l` Leader, `s` Stage, `d` DON!! (cost area), `n` DON!! deck, `k` deck, `t` trash, `f` Life, `b` battle panel, `p` prompt, `g` game log. |
-| `P` | Jump to the current decision (prompt bar). |
+| `G`, then a letter | **Go to.** A small popover lists the letters and waits with no timeout until the next key or Escape. Lowercase means yours; Shift means the opponent's. `h` hand, `c` Characters, `l` Leader, `s` Stage, `d` DON!! (cost area), `n` DON!! deck, `k` deck, `t` trash, `f` Life, `m` midline band, `b` battle panel, `p` decision panel, `o` coach, `g` game log. |
+| `P` | Jump to the current decision (the decision panel's first choice). |
 | `Q` | Speak a status summary (§9.2). `Shift+Q` speaks both boards in full. |
 
 ### 3.4 Selecting a card and opening its legal actions
@@ -141,7 +133,7 @@ Return 2 DON!! to your DON!! deck (DON!! −2).        0 of 2 chosen
 
 Applies to `choose` decisions with `max > 1` (for example "K.O. up to 2", "add up to 1 from the top 5", or a "total cost of 4 or less" search).
 
-1. The candidates appear in place if they are on the board, or in a **Reveal tray** (a non-modal dialog) if they come from a hidden zone ("Look at the top 5 cards of your deck"). Only the chooser's view shows looked-at cards (ARCHITECTURE §2.7).
+1. The candidates appear in place if they are on the board, or in a **Reveal tray** (a non-modal dialog docked over the log, with a scrim over the rail only, like the trash viewer; review-1 C2) if they come from a hidden zone ("Look at the top 5 cards of your deck"). The count, constraint and commit stay in the decision panel. Only the chooser's view shows looked-at cards (ARCHITECTURE §2.7).
 2. The candidate list is a `listbox` with `aria-multiselectable="true"`. Arrows move; Space toggles; each option reads "Kaido, cost 10, not selected".
 3. A status line keeps a running count and the constraint: "2 selected of up to 3. Total cost 3 of 4." Changes are announced politely.
 4. A candidate that cannot join the current selection is marked unavailable, with a reason from the engine ("would exceed total cost 4"). The rule for validity: the store sorts the selection into canonical order, applies each `pick` to a scratch copy of state with `reduce`, and checks that every step and the following `done` (or a further pick, if below min) appear in that step's `legalActions`. No component computes legality. If this proves too slow in M3, the fallback is an engine helper with the same contract (proposed decision PD-3, §13).
@@ -160,9 +152,9 @@ Applies to `order` decisions: simultaneous triggers, replacements, cards going t
 
 ### 3.10 Defending: Blocker, Counter staging and commit, Trigger
 
-The engine runs Block Step, then Counter Step, as two decisions (CR 7-1-2, 7-1-3), and [On Block] effects resolve between them. The UI shows both in one **Defend panel** so the player can plan, but it commits them in that order.
+The engine runs Block Step, then Counter Step, as two decisions (CR 7-1-2, 7-1-3), and [On Block] effects resolve between them. The UI shows both in one **defence planner** in the decision panel, which goes tall for the whole defence (`board.md` §3.9) so the planner never scrolls. It commits them in that order.
 
-**Arrival.** Focus moves to the Defend panel. Its heading is read: "Opponent's Kaido, 9000, attacks your Leader, 5000. You need 5000 more to survive. Block or counter." Battle numbers come from `preview`.
+**Arrival.** Focus moves to the defence planner. Its heading is read: "Opponent's Kaido, 9000, attacks your Leader, 5000. You need 5000 more to survive. Block or counter." Battle numbers come from `preview`.
 
 **Block step.**
 1. Tab or arrows move through the eligible Blockers (active, with [Blocker], not the card being attacked; CR 10-1-4-1) and the button "Don't block". Each Blocker reads its `preview`: "Block with Jinbe, 6000: Jinbe would be K.O.'d unless you add 4000."
@@ -172,22 +164,28 @@ The engine runs Block Step, then Counter Step, as two decisions (CR 7-1-2, 7-1-3
 
 **Counter step (staging).**
 1. Focus moves to your hand, filtered to the playable counters: Character cards with a Counter value, and [Counter] Events whose cost you can pay. Other hand cards are present but marked "not usable now".
-2. Space **stages** or unstages the focused card. Staged cards move to the **staging tray** (numbered, in staging order), and the battle line updates: "Staged +3000. Leader 8000 vs 9000: still loses; 2000 more needed." Ties go to the attacker (CR 7-1-4-1), so "needed" always means enough to go strictly above the attacker, and a tie says so: "Tied: the attacker wins ties."
-3. Each staged Character Counter targets the defending card by default (the attacked card, or the Blocker). To change it: focus the item in the tray, press Enter, and choose "Change target…" (any of your Leader or Characters; CR 7-1-3-1-1).
+2. Space **stages** or unstages the focused card. Staged cards rise in the hand with a "+2000 ✓" tag inside the card and are listed, numbered in staging order, in the Counter lane, and the battle line updates: "Staged +3000. Leader 8000 vs 9000: still loses; 2000 more needed." Ties go to the attacker (CR 7-1-4-1), so "needed" always means enough to go strictly above the attacker, and a tie says so: "Tied: the attacker wins ties."
+3. Each staged Character Counter targets the defending card by default (the attacked card, or the Blocker). To change it: focus the item in the Counter lane, press Enter, and choose "Change target…" (any of your Leader or Characters; CR 7-1-3-1-1).
 4. Staged [Counter] Events show "+? (resolves on commit)" when their effect needs choices; otherwise they use `preview`. The store validates the whole staged set, including DON!! for event costs, with the scratch-`reduce` rule from §3.8. An item that would make the set unpayable cannot be staged, and the engine's reason is announced.
-5. Two commit buttons, always in this order:
-   - **"Play 2 counters"**: sends the staged actions in tray order, then `done`. Any choices an Event needs are asked as they resolve.
-   - **"Take the hit"**: sends `done` with nothing staged. If cards are staged, this button is relabelled "Take the hit (discard staging)".
-   Enter on the tray commits "Play N counters". `T` is **not** bound to "take the hit", because a single-key irreversible action is too easy to press by accident.
-6. Escape clears staging.
+5. **Two commit buttons, always** (review-1 C17, UX-R2). The footer's primary and secondary are chosen by the staging state, and their wording matches `board.md` §3.9 and `flows.md` F6:
 
-**Trigger.** "Life card: Gum-Gum Red Hawk has [Trigger]: <trigger text>. Activate the Trigger, or add it to hand." There are two buttons, and focus is on the first. If the card has no [Trigger] or it is unscripted, the card goes to hand, and the announcer says "Added 1 Life card to hand", naming the card for its owner only.
+   | Staging state | Primary (right) | Secondary (left) | Enter |
+   | --- | --- | --- | --- |
+   | Nothing staged | "Take the hit · Life 3 → 2" | "Counter", disabled: "Stage a lit hand card" | No dedicated key |
+   | Staged, not enough (including a tie) | "Take the hit · Life 3 → 2" (staging discarded) | "Play anyway · still hits", warning style | No dedicated key |
+   | Staged, enough | "Counter +3000 · survive" (sub-label "Rocks Pirates + Buckin · hand 5 → 3") | "Take the hit · Life 3 → 2" | Commits the primary |
+   | Blocker chosen | "Block with Gloriosa" | "No block" | Commits the primary |
+
+   "Counter +N · survive" sends the staged actions in staging order, then `done`; any choices an Event needs are asked as they resolve. "Take the hit" sends `done` with nothing staged. **Enter never commits a counter that the preview shows as useless**, and "Take the hit" has no single key: it is reached by Tab or focus, then Enter. `T` is **not** bound to it, because a single-key irreversible action is too easy to press by accident.
+6. Escape clears staging. "Clear" is also a button in the Counter lane.
+
+**Trigger.** "Life card: Gum-Gum Red Hawk has [Trigger]: <trigger text>. Activate the Trigger, or add it to hand." There are two equal buttons, arrows move between them, and focus starts on "Activate Trigger". No letter keys (H is Hint). If the card has no [Trigger] or it is unscripted, the card goes to hand, and the announcer says "Added 1 Life card to hand", naming the card for its owner only.
 
 ### 3.11 Other decisions
 
 - **Choose first or second / mulligan:** a dialog with two buttons. For the mulligan, your hand is a readable list above the buttons (arrows, `I` to inspect).
 - **Optional ("you may")**: Yes/No buttons. The text names the cost, if any.
-- **End turn:** `E`, or the End Turn button in the prompt bar. Whether a confirm appears (for example "You have 3 active DON!! and 2 Characters that can attack") is a `flows.md` decision. With a confirm, the key path is `E`, then Enter.
+- **End turn:** `E`, or the End turn button in the decision panel. Whether a confirm appears (for example "You have 3 active DON!! and 2 Characters that can attack") is a `flows.md` decision. With a confirm, the key path is `E`, then Enter.
 
 ### 3.12 Rewind, hint, coach panel, lethal, battle maths
 
@@ -210,8 +208,11 @@ The coach never takes focus on its own. Detector lights and the tempo meter chan
 | Key | Action |
 | --- | --- |
 | `K` | Pause or resume AI playback (the YouTube convention). WCAG 2.2.2 requires a way to pause auto-updating content. |
-| `.` | While paused: advance one AI move. |
-| `[` / `]` | Slower / faster: Step (wait for me), 0.5×, 1×, 2×, Instant. |
+| `.` | While paused or at Step pace: advance one AI move. |
+| `[` / `]` | Slower / faster through one scale: **Step · 0.5× · 1× · 2× · 4×** (Step waits for `.` after each move). The same control is in the decision panel during AI turns and in Settings. |
+| `S` | Skip to my decision (the decision panel's primary during AI turns). It stops at every decision you owe that has a legal action other than pass (Block, Counter, Trigger, optional windows); it never decides for you. |
+
+There is no "Instant" speed: it would remove the dwell on attacks aimed at the player. The setting "Always skip to my decisions" serves "never make me watch" and keeps every stop.
 
 Pace never limits the human. The engine is waiting for the AI, not for the player, and the player's own decisions have no clock.
 
@@ -228,27 +229,43 @@ Board scope (focus inside the board's application region; no dialog or menu open
 | `A` | Attack with focused card | `C` | Coach panel |
 | `+` or `=` | Give DON!! to focused card | `U` / `Shift+U` | Rewind one move / to my last decision |
 | `I` | Inspect focused card | `R` | Rewind list |
-| `E` | End turn | `K`, `.`, `[`, `]` | AI playback |
+| `E` | End turn | `K`, `.`, `[`, `]`, `S` | AI playback, Skip to my decision |
 | Enter, Space, Shift+F10 | Action menu / activate | Escape | Back out one level |
 
-**The shortcut sheet** opens with `?`, from the game menu ("Keyboard shortcuts") and from the Help entry in the app header. That Help entry is in the same place on every page (WCAG 3.2.6). The sheet is a modal dialog with the tables above, grouped by task, and with the current settings shown ("Single-key shortcuts: on"). It is printable, and its content is also a page in the rules reference.
+**The shortcut sheet** opens with `?`, from the game menu ("Keyboard shortcuts") and from the Help entry in the app header. That Help entry is in the same place on every page (WCAG 3.2.6). The sheet is a modal dialog with the tables above, grouped by task, and with the current settings shown ("Single-key shortcuts: on"). It is printable, and its content is also a page in the rules reference. It includes a **legend of the keyword glyphs** used at compact density (⛨ Blocker, » Rush, »C Rush: Character, ×2 Double Attack, ⊘ Banish, ⤳ Unblockable, T Trigger) and of the legal-action glyphs (▶ ⚔ ◆ ⌖ ⚡); the Rules page carries the same legend (UX-R16).
 
 ### 3.15 Conflict rules (WCAG 2.1.4 and screen readers)
 
 1. **Scoped to focus.** Single-character shortcuts fire only while focus is inside the board region. They never fire in text inputs, in search fields, inside dialogs, menus or the coach panel, or on any other page. This meets 2.1.4's "active only on focus" option.
-2. **Switch-off.** Settings → Keyboard → "Single-key shortcuts" (on by default) can be turned off. When off, every command is still available through the action menu, the prompt bar buttons, the game menu and the coach panel. 2.1.4's "turn off" option is met too. A remapping editor is in the backlog, not v1.
+2. **Switch-off.** Settings → Keyboard → "Single-key shortcuts" (on by default) can be turned off. When off, every command is still available through the action menu, the decision panel buttons, the game menu and the coach panel. 2.1.4's "turn off" option is met too. A remapping editor is in the backlog, not v1.
 3. **Reserved keys we never bind:** screen-reader modifier chords (NVDA key Insert or CapsLock, JAWS Insert, VoiceOver Ctrl+Option); Alt+letter (browser menus, Windows); Ctrl+letter and Cmd+letter except the Z alias; function keys (F6 cycles the browser's address bar, F7 is caret browsing); and Tab traps.
 4. **Default actions handled in the board:** the board calls `preventDefault` for keys it consumes. These include Space (page scroll), `/` and `'` (Firefox quick find; `?` is Shift+/), and arrows (scroll).
 5. **Screen-reader modes.** Inside the application region, NVDA and JAWS pass keys to the page. Outside it, the virtual cursor works normally. VoiceOver's Quick Nav and Single-Key Quick Nav intercept arrows and letters when they are on. The board's help text, and the VoiceOver test script (§11.3), tell the user to turn Quick Nav off on the board (press Left and Right arrow together) and to leave Single-Key Quick Nav off.
 6. **Two-key sequences have no timeout.** After `G`, the popover waits for the next key or Escape (WCAG 2.2.1).
+7. **Decision-scoped letters** (review-1 C22, UX-R36). A letter shown on a decision's button is active only while that decision is open, is always printed on the button, and overrides the board-scope meaning of the same letter for that time. One letter never has two meanings inside one scope. The complete context-key table:
+
+   | Scope (active only while open) | Keys | Board key it overrides |
+   | --- | --- | --- |
+   | Rock-paper-scissors (only when chosen in Settings; "Roll for it" is the default and needs no keys) | `R` rock, `P` paper, `S` scissors | `R` rewind list, `P` current decision, `S` skip |
+   | First or second | `1` first, `2` second | none |
+   | Mulligan | `K` keep, `R` redraw | `K` pause AI, `R` rewind list |
+   | Action menu (a card's popover) | the letter printed on each item (`P` Play, `I` Inspect) | `P`, `I` |
+   | Lethal puzzle | `N` No lethal | none |
+   | Mulligan trainer item | `K` keep, `R` redraw | as mulligan |
+   | Drills, any item (timer on) | `Space` pause the clock (shown on the timer) | none |
+   | Hotseat defence | hold `R` to see your hand | `R` rewind list |
+   | Review, Overview | `N` / `Shift+N` next / previous flag, Enter Study | none (review is not the board) |
+   | Review, Study | `N` / `Shift+N` next / previous flag, Esc back to Overview | Esc's "back out" meaning |
+
+   These are removed as double meanings: the tutorial has no "re-read" key (the step text is the current decision, so `P` focuses it as anywhere else, and a **Read again** button repeats it); the Trigger has no `A`/`H`; optional prompts have no `U`/`N`; drills pause on the timer's own control, not `P`.
 
 ### 3.16 Other screens
 
 | Screen | Keyboard model |
 | --- | --- |
-| Tutorial | Same board model. The step text lives in a region outside the board (`P` reads it). Constrained steps offer only the taught action, and "Show me" moves focus to the highlighted target. Exit and Resume are buttons and are always reachable. |
-| Review | The turn timeline is a `toolbar` with roving focus (Left/Right between turns). Flags within a turn are a list (Up/Down). `N` / `Shift+N` jump to the next / previous flag. Enter restores the board read-only and moves focus to the flag's explanation, which is a document region. "Practice this" and "Replay from here" are buttons. |
-| Drills | The board model for puzzles. Mulligan and Counter-or-take use the dialogs above. Timer controls are in §8. |
+| Tutorial | Same board model. The step text is the current decision and lives in the decision panel, outside the board's application region: `P` focuses it like any decision, and its **Read again** button repeats it. Every instruction names a real input (`flows.md` F2). Constrained steps offer only the taught action, and "Show me" moves focus to the highlighted target. Leave tutorial is a button and is always reachable. |
+| Review | Two modes (review-1 C21, `learning-ui.md` §4.1). **Overview:** the turn timeline is a `toolbar` with roving focus (Left/Right between turns); the flag list under it is a sortable `listbox` and a tab stop of its own; `N` / `Shift+N` jump to the next / previous flag; the explanation is a document region; the pinned footer holds Study this moment, Play from here and Practice this. **Study:** Enter on a flag (or "Study this moment") switches to the restored board at native size, read-only, using the board's own tab order and `Q`; the rail holds the explanation and the footer; the rail header holds "← Overview" and the previous/next flag stepper. Escape returns to Overview with focus on the same flag. |
+| Drills | The board model for puzzles. Mulligan and Counter-or-take use the dialogs above. **No answer is pre-focused or pre-styled** (UX-R7): focus starts on the hand or the prompt, the answer buttons have equal weight in a fixed order (Keep, then Redraw). Timer controls are in §8. |
 | Deck builder, card browser | Search is a `combobox`; results are a `grid` with arrow navigation; Enter adds; `Delete` removes from the list; import and export use a textarea and buttons. |
 | Meta explorer | Archetype tiles are links in a list; the matchup grid is a `table` with row and column headers. |
 | Settings, rules reference, glossary | Standard document and form semantics. Text reflows at 320 CSS px (WCAG 1.4.10). |
@@ -257,10 +274,10 @@ Board scope (focus inside the board's application region; no dialog or menu open
 
 ### 4.1 Visible focus (WCAG 2.4.7; aiming at 2.4.13)
 
-- The focus indicator is a **two-tone ring**: a 2 px light outline outside a 2 px dark outline, offset 2 px. One of the two tones gives at least 3:1 against any card art or playmat behind it (WCAG 1.4.11). The tokens live in `visual-system.md`, and the M0 contrast check covers them.
+- The focus indicator is a **two-tone ring**: a 2 px light outline outside a 2 px dark outline, at a **4 px offset** (`visual-system.md` §4 "Rings"). On a legal or selected card the focus ring sits **outside the legal ring**: legal ring 3 px at 3 px offset (3–6 px out), focus gap 6–8 px, focus ring 8–10 px. Hand neighbours must not overlap each other's rings at compact density (`board.md` §3.5; UX-R48). One of the two tones gives at least 3:1 against any card art or playmat behind it (WCAG 1.4.11). The tokens live in `visual-system.md`, and the M0 contrast check covers them.
 - Focus is shown with `:focus-visible` for keyboard and programmatic focus. A pointer click does not draw the ring, but a decision that moves focus does.
-- In Target, Pick and Defend modes, the **legal-target** decoration and the **focus** ring are different shapes (dashed outline plus a crosshair glyph for "legal", solid ring for "focused"), so a focused legal target shows both.
-- In forced-colors mode (Windows High Contrast) the ring uses `Highlight`, and decorations use borders, never backgrounds alone.
+- The **legal** decoration is a **solid ring plus an action glyph** in the card's corner (▶ play, ⚔ attack, ◆ receive DON!!, ⌖ target, ⚡ ability; `board.md` §2.5). The glyph carries the non-colour meaning. Focus stays distinct from it by position (outside) and by its two-tone ring, so a focused legal target shows both. (Review-1 C6: a dashed outline on busy art read as noise or as "disabled".)
+- In forced-colors mode (Windows High Contrast) the legal ring uses `ButtonText` and the focus ring uses `Highlight`, and decorations use borders, never backgrounds alone. Both must stay distinguishable; a forced-colours screenshot of a focused legal card is reviewed at M3.
 
 ### 4.2 Focus never obscured (WCAG 2.4.11)
 
@@ -268,23 +285,25 @@ No author content may cover the focused element, even partly where avoidable, an
 
 | Overlay | Rule |
 | --- | --- |
-| Hover zoom (pointer) | It appears in a fixed preview well (position from `board.md`), never over the board's focused card. After any keyboard input, hover zoom is suppressed until the pointer moves again. |
-| Inspector (`I`) | It opens as a side panel. Focus moves into it, and Escape returns focus to the card. It never overlaps the card it describes. |
-| Action menu, Count dialog, Reveal tray | Placed beside the card, flipping side to stay clear of it. If no side fits at 1280×720, the board scrolls the card into view, using `scroll-padding` equal to the sticky bars. |
-| Battle panel, Defend panel | Docked in the centre lane. They never cover a legal target or the attacker. |
+| Hover zoom (pointer) | It appears in the preview dock (`board.md` §3.12), which checks the focused or hovered element's rectangle and opens at its alternate position if it would intersect. It never covers the decision panel. After any keyboard input, hover zoom is suppressed until the pointer moves again. |
+| Inspector (`I`) | The pinned, focusable state of the preview dock (`board.md` §3.12), at least the dock's size, with a rail-only scrim. Focus moves into it, and Escape returns focus to the card. It never overlaps the card it describes. |
+| Action menu, Count dialog | Placed beside the card, flipping side to stay clear of it. The board never scrolls. |
+| Reveal tray (hidden-zone candidates, Life-card reveal) | Docked over the log with a scrim over the rail only, like the trash viewer (review-1 C2). It never covers the board or the decision panel. |
+| Battle panel, defence planner | The decision panel's body in the rail (`board.md` §3.9–3.10), growing upward over the log in its tall state. Never over the board, so never over a legal target or the attacker. |
 | Hand fan (overlapping cards) | The focused card is raised (z-order) and shown in full. Its neighbours never cover it. |
-| Coach panel | A docked column that resizes the board; it does not float over it. At 1280×720 the board area shrinks per `board.md`. |
-| Toasts and announcements | None are visual-only and none float over the board. Status text sits in the prompt bar. |
-| Sticky status bar and prompt bar | `scroll-padding-top` and `scroll-padding-bottom` match their heights. |
+| Staged counters and card chips | Staged tags and status chips sit inside the card's art window (`board.md` §2.3). **Your Life count plate is never covered** by a raised hand card, a staged tag or a chip (UX-R14). |
+| Coach panel | A docked section of the rail; it takes height from the log, and never resizes or overlays the board (review-1 C4). |
+| Toasts and announcements | None are visual-only and none float over the board. Status text sits in the decision panel or the log. |
+| Rail notice and rail header | Columns, not overlays: they never cover focus. |
 
-A Playwright check focuses every focusable element in each mode at both resolutions and asserts that the element's bounding box is not fully covered by any other element (`elementsFromPoint` sampled at its centre and four inset points).
+A Playwright check focuses every focusable element in each mode at both resolutions and asserts that the element's bounding box is not fully covered by any other element (`elementsFromPoint` sampled at its centre and four inset points). The same check samples the four Life count plates and the two cost-area counts in every board state and fails if any is covered.
 
 ### 4.3 Focus management rules
 
 - Opening a dialog moves focus into it. Closing it returns focus to the element that opened it, or, if that element is gone (a card that left the field), to its zone.
 - When a focused card leaves its zone (K.O.'d, returned), focus moves to the same slot index in that zone, or to the zone itself if it is now empty. Focus is never lost to `<body>`.
 - After an AI move, focus stays where the player left it unless a new human decision arrives (§3.2).
-- A rewind restores focus to the zone of the rewound move's first card, or to the prompt bar.
+- A rewind restores focus to the zone of the rewound move's first card, or to the decision panel.
 
 ## 5. Target size (WCAG 2.5.8)
 
@@ -297,8 +316,10 @@ The minimum for every pointer target is **24×24 CSS px** at 1280×720 and 100% 
 | Cost-area DON!! | Two targets ("active", "rested") of at least 44×24, not one per DON!! card. |
 | Opponent's hand backs | One target for the zone. |
 | Phase stepper chips | Read-only; not targets. |
-| Count steppers, staging-tray remove buttons, timeline flags | At least 24×24. |
+| Count steppers, Counter-lane unstage buttons, timeline flags, flag-list rows | At least 24×24. |
 | Card text links in the inspector (keywords to glossary) | Inline links in a sentence are exempt under 2.5.8; they are still at least 24 px line height. |
+| Event log rows | Each line is **one 24 px-tall row button** (focus or hover highlights the cards it names); "Why?" is a **24 px chip** at the row's end; card names are secondary targets inside the row, never stacked targets under 24 px (UX-R37). |
+| Rail notice ⓘ | At least 24×24. |
 
 A Playwright script measures every interactive element's box in each mode at both resolutions, and fails on any target under 24×24 that does not meet the spacing exception.
 
@@ -309,14 +330,15 @@ A Playwright script measures every interactive element's box in each mode at bot
 | Meaning | Colour is backed by |
 | --- | --- |
 | Active vs rested | 90° rotation, plus a "rested" icon, plus the accessible-name state |
-| Playable or legal target | Dashed outline plus a glyph (play arrow; crosshair for targets), plus the action menu |
+| Playable or legal target | Solid ring plus an action glyph (▶ play, ⚔ attack, ◆ receive DON!!, ⌖ target, ⚡ ability), plus the action menu |
 | Your side vs the opponent's | Position, zone labels, and names ("Opponent's Leader") |
 | Power raised or lowered | ▲ or ▼ and a signed number ("+2000"), never only green or red text |
-| Battle result in the panel | Words: "Attacker ahead by 2000", "Defender survives", "Tied: attacker wins ties" |
+| Battle result in the panel | Words and an icon, styled from the player's side: "✓ Hit lands" or "✓ K.O.s King" on your attack, "✕ Hit lands" when defending, "Ties go to the attacker" |
+| Whose turn it is | The words in the midline and the rail-header chip ("Your turn" / "Opponent's turn"), plus a 4 px bar on the acting player's half of the mat edge (UX-R12) |
 | Card colours (game data: Red, Green, …) | Colour names next to swatches in the inspector, filters and deck builder; multicolour cards list each name |
 | Review flags | A distinct icon shape per category, plus a text label |
 | Lethal detector, coach alerts | Icon plus text ("Lethal: yes"); never a coloured light alone |
-| Staged vs unstaged | Position in the tray, a number, and the state "staged" |
+| Staged vs unstaged | The card rises with a ✓ and a "+2000" tag, a number in the Counter lane, and the state "staged" in its name |
 | Errors and unavailable options | Text reason from `whyNot`, plus an icon |
 
 ### 6.2 Contrast
@@ -334,7 +356,7 @@ A Playwright script measures every interactive element's box in each mode at bot
   - rest and active rotation becomes instant;
   - no screen shake, no parallax, and no zoom-in transitions.
 - **No flashing.** Nothing flashes more than three times in any second (WCAG 2.3.1). Attention cues (lethal available, a new decision) are static outlines or icons. Any pulse lasts at least 2 s per cycle, stops after three cycles, and is off under reduced motion. Damage feedback never uses full-screen colour flashes.
-- **Animation speed** is separate from reduced motion: AI pace (§3.13) and "Animation speed" in Settings. Reduced motion does not slow the game down; it removes movement.
+- **Opponent speed** is separate from reduced motion: one control, Step · 0.5× · 1× · 2× · 4× (§3.13), in the decision panel during AI turns and in Settings. Reduced motion does not slow the game down; it removes movement.
 - **Auto-moving content** (AI playback) can be paused, stepped and slowed (WCAG 2.2.2).
 - Sound cues, if any (PROMPT.md allows a few), are off by default. They never carry information that is not also shown and announced.
 
@@ -346,10 +368,10 @@ A Playwright script measures every interactive element's box in each mode at bot
 | AI turns | Paced for following along, pausable, steppable (§3.13). The ≤8 s AI-turn target (ARCHITECTURE §4.1) is about not making the player wait; it never makes the player hurry. |
 | Blunder warning | The 300 ms cap (ARCHITECTURE §5) limits the system, not the player. The warning never auto-dismisses; it stays in the confirm until the player acts. |
 | Tutorial | No timers. Text never auto-advances. Exit and resume at any step. The timing log (`usability-plan.md` §7) records time; it never limits it. |
-| Drills and puzzles | **Untimed by default** (`curriculum.md`). "Timed drills" is a setting that is off by default. When on, the player can set 1×, 2×, 4× or 10× time, or switch it off at any time, including mid-item. Pausing stops the clock, and timed results never gate progress. |
+| Drills and puzzles | **Untimed by default** (`curriculum.md`). One option list, in Settings and on each start screen: **Untimed (default) · 50% · 100% · 200% · 400% · 1000%** of the base time (review-1 C13; 1000% meets 2.2.1's "at least ten times the default"). It can be changed or switched off at any time, including mid-item. Pausing stops the clock, and timed results never gate progress. |
 | Go-to (`G`) and other key sequences | No timeout. |
 | Hover and focus content | Persists until dismissed or until focus or hover leaves (WCAG 1.4.13); Escape dismisses it. |
-| Messages | No toast-only messages. Every status also lands in the prompt bar or the game log. |
+| Messages | No toast-only messages. Every status also lands in the decision panel or the game log. |
 | Sessions | No session expiry: everything is local. |
 
 ## 9. Screen readers
@@ -417,7 +439,7 @@ Rules for names:
 | `CardMoved`: to trash, deck, Life | Named for open destinations; counts only for secret ones. | polite |
 | `DonPlaced`, `DonGiven` | Folded into the move: "Opponent gave 2 DON!! to Kaido; Kaido 12000." | polite |
 | `PowerModified` (by effect) | Merged into the move's sentence: "…; your Zoro −2000 this turn, now 3000." Battle-only modifiers go in the battle sentence. | polite |
-| `AttackDeclared` against you | When focus moves to the Defend panel, the panel heading carries it and no live message is sent. With "move focus" off: "Opponent's Kaido, 12000, attacks your Leader, 5000. Your decision." | **assertive** when focus does not move; otherwise none |
+| `AttackDeclared` against you | When focus moves to the defence planner, the panel heading carries it and no live message is sent. With "move focus" off: "Opponent's Kaido, 12000, attacks your Leader, 5000. Your decision." | **assertive** when focus does not move; otherwise none |
 | `AttackDeclared` by you | "Zoro attacks opponent's Leader, 7000 vs 5000." | polite |
 | `BlockerActivated` | "Opponent blocks with Jinbe, 6000." | polite |
 | `CounterPlayed` | Merged per Counter Step: "Opponent countered +3000; Leader now 8000 vs your 7000." | polite |
@@ -434,9 +456,9 @@ Rules for names:
 
 **AI turns: summarised, not flooded.**
 1. **Each move (default).** The AI's moves play one at a time at the chosen pace (§3.13). The announcer emits one sentence per move, timed to the animation. Speech cannot be detected, so the pace setting is the user's control. Step pace (wait for `.`) is suggested on the accessibility settings page for screen-reader users.
-2. **Auto-collapse.** At 2× or Instant pace, or when more than 3 AI moves would be announced within 4 s, the announcer stops speaking each move and holds them for the summary. It still announces attacks that need your decision.
+2. **Auto-collapse.** At 2× or 4× pace, after a Skip, or when more than 3 AI moves would be announced within 4 s, the announcer stops speaking each move and holds them for the summary. It still announces attacks that need your decision.
 3. **End-of-turn summary**, always: "Opponent's turn 6: played Kaido and Nami; 3 attacks; you took 2 damage, Life 4 to 2; your Zoro was K.O.'d. Your turn 7. Drew Usopp. 7 DON!! active." Every detail is in the game log (`G`, `g`).
-4. **Decisions inside the AI turn** (block, counter, trigger) always interrupt playback. The AI waits for you; nothing is skipped.
+4. **Decisions inside the AI turn** (block, counter, trigger, optional windows) always interrupt playback, and "Skip to my decision" always stops at them. The AI waits for you; nothing is decided for you.
 
 **Hidden information.** The announcer takes only projected events and the player's view. A unit test runs the announcer on two states that differ only by a permutation of hidden cards (the same pair the engine's leak test uses) and asserts the strings are identical.
 
@@ -449,7 +471,7 @@ The criteria that need design decisions are listed here. The rest (for example 2
 | 1.1.1 Non-text content | Card art `alt=""`, with the name on the element; icons have labels; decorative chrome is hidden. |
 | 1.3.1 Info and relationships | Zones are named groups; landmarks for header, board, coach (`aside`), log, main content; review timeline and matchup grid use real list and table semantics. |
 | 1.3.2 / 2.4.3 Meaningful sequence, focus order | §3.1 table and test. |
-| 1.3.4 Orientation | Exception risk R5 (§12). |
+| 1.3.4 Orientation | No orientation lock: phones get "The board needs a bigger screen" in both orientations (a size limit, not an orientation one), and portrait tablets get the stacked variant (R5, closed). |
 | 1.4.1 Use of colour | §6.1. |
 | 1.4.3 / 1.4.11 Contrast | §6.2, §4.1. |
 | 1.4.4 / 1.4.10 Resize, reflow | Documents reflow at 320 px. The board is a two-dimensional layout under the reflow exception, and at 200% it switches to `board.md`'s tablet layout. Risk R6. |
@@ -518,16 +540,16 @@ Scenario: `a11y-m3` (hotseat off, vs Rookie, both decks with Blockers, Counters,
 
 | # | Do | Expect |
 | --- | --- | --- |
-| 1 | Load the game; press Tab from the page top | Skip link "Skip to board"; then the board's name "Game board, turn 1, your Main Phase" and its role description |
-| 2 | Tab through every zone | Each zone in §3.1 order, with its name and count; empty zones say "empty" |
+| 1 | Load the game; press Tab from the page top | Skip link "Skip to decision"; then the board's name "Game board, turn 1, your Main Phase" and its role description |
+| 2 | Tab through every zone | Each zone in §3.1 order, with its name and count; empty zones say "empty"; the decision panel comes right after your hand |
 | 3 | `Q` | The status summary (§9.2) |
 | 4 | Your hand: arrows; `I` on a card; Escape | Each card's name and playable state; the inspector opens with full text; focus returns to the card |
 | 5 | Enter on a playable Character; choose Play | Menu items with costs; after playing: "Played Nami, rested 2 DON!!." Focus is on the new card or the hand |
 | 6 | `+` on your Leader; Up twice; Enter | Count dialog "1 of N"; "3: Leader 8000"; "Gave 3 DON!! to Leader. Leader 8000." |
 | 7 | `A` on a Character played this turn | "Nami can't attack: it was played this turn." No dialog |
 | 8 | `E`, then confirm; let Rookie play its turn at Step pace, pressing `.` for each move | One sentence per AI move; the end-of-turn summary |
-| 9 | When attacked: Defend panel | Focus moves to it; the heading reads the attack; Blockers listed with previews |
-| 10 | Choose "Don't block"; stage two counters with Space; change one counter's target; Enter | Running total announced after each Space, including the tie wording; "Played 2 counters…"; then the result |
+| 9 | When attacked: the defence planner | Focus moves to it; the heading reads the attack; Blockers listed with previews; the primary reads "Take the hit" and Enter alone does not commit it |
+| 10 | Choose "No block"; stage one counter that ties; check the footer; stage a second; change one counter's target; Enter | After the first Space: the tie wording and a footer of "Take the hit" (primary) and "Play anyway · still hits"; after the second: "Counter plus 3000, survive" as the primary; Enter plays the counters; then the result |
 | 11 | Take a hit that reveals a [Trigger] | The Trigger prompt with two buttons; the result is announced |
 | 12 | Your turn: `A` on the Leader; arrows; Enter; Enter | Only legal targets cycle; the confirm reads the `preview` maths; "Leader attacks…" |
 | 13 | Resolve the two-target effect (Pick mode) | Count line "1 selected of up to 2"; an unavailable candidate gives its reason; commit |
@@ -559,7 +581,7 @@ Scenario: `a11y-l` (Rocks vs Kaido, a planted position with lethal available, th
 
 | # | Do | Expect |
 | --- | --- | --- |
-| 1 | First launch, choose the beginner path, start the tutorial | The step text region is read; `P` re-reads it; no timers anywhere |
+| 1 | First launch, choose the beginner path, start the tutorial | The step text is read; `P` moves focus to it (it is the current decision) and **Read again** repeats it; no timers anywhere |
 | 2 | Each of the 8 steps: follow the instructions using only keys from the step text and the shortcut sheet | Each constrained step offers only the taught action; "Show me" moves focus to it; the step completes |
 | 3 | Exit at step 4; reload; resume | Resumes at step 4 with focus on the step text |
 | 4 | Finish the tutorial; start a game vs Rookie | Game starts; nothing explains it except the app |
@@ -586,8 +608,8 @@ All three scripts on all three reader and browser pairs, plus:
 | R2 | **Card images contain the card text** (1.1.1, 1.4.5). | Certain / medium | The image is decorative (`alt=""`). The card's text comes from the data in the name, the description and the inspector. Card art is third-party content whose presentation is the card itself; our own UI never uses images of text. |
 | R3 | **Upstream card-text errors** reach the screen-reader user unseen (optcgapi defects, ADR 0007). | Medium / medium | Verified overrides for all 182 meta cards (PLAN M1). The inspector names the data source; the "effect not automated" badge is spoken. |
 | R4 | **Single-key shortcuts** collide with assistive technology or habits. | Medium / medium | Focus-scoped, can be switched off, reserved keys never used (§3.15); verified in every manual pass. |
-| R5 | **Orientation (1.3.4).** PROMPT.md specifies a "rotate to play" screen for phone portrait. Locking the board to landscape needs the "essential" exception. | Medium / medium | Only the board shows the prompt. Every other route works in portrait. The prompt has a "Continue in portrait" link that renders the board scaled with scrolling, never a dead end (proposed decision PD-5). |
-| R6 | **Resize and reflow on the board** (1.4.4, 1.4.10). At 200% zoom, a 1280×720 window is effectively 640×360. | High / medium | The board is a two-dimensional layout, which the reflow exception covers. At small effective viewports `board.md`'s tablet layout applies. The prompt bar, battle panel and inspector are the readable channels and scale with text. Checked at M10. |
+| R5 | **Orientation (1.3.4).** **Closed** by review-1 C14. | — | Phones are below the board's minimum viewport in both orientations (`board.md` §6.4), so "The board needs a bigger screen" is a size limit, not an orientation lock, and 1.3.4 does not apply. A portrait tablet (820 × 1180) has the width of the 1024 layout's board column, so it gets a **stacked variant** (the board, then the rail below it), never a "turn your device" gate. If the stacked variant is deferred past v1, portrait tablets get "Continue in portrait" with a scaled board instead. Every other route works in portrait. The phone screen shows "Your game is saved on this device" only when one exists, with "Export to continue on a computer" (UX-R50). |
+| R6 | **Resize and reflow on the board** (1.4.4, 1.4.10). At 200% zoom, a 1280×720 window is effectively 640×360. | High / medium | The board is a two-dimensional layout, which the reflow exception covers. At small effective viewports `board.md`'s tablet layout applies. The decision panel, battle panel and inspector are the readable channels and scale with text. Checked at M10. |
 | R7 | **Live-region reliability**, especially VoiceOver with Safari (dropped or merged messages). | Medium / medium | Persistent regions, alternating nodes, no identical repeats, one sentence per move, and the game log as the fallback record. Verified per pass. |
 | R8 | **AI pace vs speech.** The app cannot know when speech has finished, so moves can overrun speech. | Medium / medium | Step pace, the turn summary mode, auto-collapse (§9.3), and pause on `K`. |
 | R9 | **No Windows machine** for a human NVDA pass. | Medium / medium | The scripted Guidepup NVDA run on a Windows CI runner; a human pass when the owner has Windows access (a VM is enough). Records state which kind of pass ran. |
@@ -612,14 +634,14 @@ Each is ready to be copied into `docs/DECISIONS.md` (which this agent does not e
 **PD-4. Screen-reader passes are scripted with Guidepup plus a human VoiceOver pass.** *Context:* PLAN requires manual NVDA and VoiceOver passes, the agent cannot listen, and the owner is on macOS. *Decision:* §11.2. *Alternatives rejected:* axe only (it cannot judge announcements); skipping NVDA (it is the most-used screen reader on Windows); paying for a remote audit (not in scope).
 **Open question for the owner (not blocking):** do you have access to Windows (a machine or a VM) for a human NVDA pass at M10?
 
-**PD-5. Phone portrait shows the rotate prompt with a way past it.** *Context:* PROMPT.md asks for a rotate screen; WCAG 1.3.4 forbids orientation lock unless essential. *Decision:* a rotate prompt only on the board route, with "Continue in portrait". *Alternatives rejected:* a hard lock (fails 1.3.4 for mounted devices); a full portrait board (non-goal in PROMPT.md).
+**PD-5. Phones get an honest size screen; portrait tablets get a stacked board** (revised by review-1 C14, now the same as `board.md` PD-5). *Context:* PROMPT.md asks for a rotate screen; WCAG 1.3.4 forbids orientation lock unless essential; phones are below the board's minimum in either orientation. *Decision:* phones (either orientation) show "The board needs a bigger screen" with the reading routes; portrait tablets render the stacked variant (board, then rail); no route is locked to an orientation. *Alternatives rejected:* "rotate to play" on phones (promises a board that then cannot render); a "turn your device" gate on tablets (an orientation lock 1.3.4 does not allow); a scaled board on phones (cards about 46 px wide).
 
-**PD-6. Focus moves to decisions the human owes by default.** *Context:* when the AI attacks, a keyboard or screen-reader user must find the Defend panel. *Decision:* focus moves there, and a setting turns it off. *Alternatives rejected:* announcement only (users must hunt for the prompt); a modal dialog (it hides the board the player needs in order to decide).
+**PD-6. Focus moves to decisions the human owes by default.** *Context:* when the AI attacks, a keyboard or screen-reader user must find the defence planner. *Decision:* focus moves there, and a setting turns it off. *Alternatives rejected:* announcement only (users must hunt for the prompt); a modal dialog (it hides the board the player needs in order to decide).
 
 ## 14. What the other Phase 4 documents must carry over
 
-- **`board.md`:** the §3.1 order, or an updated table here; the preview well for hover zoom (§4.2); one DON!! badge per card, at least 20 px tall at 1280×720 (§5); cost-area targets as two class buttons; the coach panel docked, not floating; the tablet layout used at 200% zoom.
-- **`flows.md`:** the modes in §3.2 and their Escape rules; Defend panel order (§3.10); which steps confirm; that "take the hit" is never a single key.
+- **`board.md`:** the §3.1 order (and the note in its §1 that the decision panel follows the hand); the preview dock and inspector for hover zoom (§4.2); one DON!! badge per card, at least 20 px tall at 1280×720 (§5); cost-area targets as two class buttons; the coach docked in the rail; the decision tall state for defence; the tablet layout used at 200% zoom.
+- **`flows.md`:** the modes in §3.2 and their Escape rules; the defence planner's order and two-button footer (§3.10); which steps confirm; that "take the hit" is never a single key; the context-key table (§3.15).
 - **`visual-system.md`:** focus-ring tokens (§4.1), legal-target vs focus decorations (§4.1, §6.1), chip and scrim tokens (§6.2), reduced-motion replacements (§7).
 - **`learning-ui.md`:** coach panel structure (§3.12), tiered lethal text, review keyboard model (§3.16), and the rule that the coach never takes focus.
-- **Wireframes:** must support the keyboard path for S0's keyboard task (`usability-plan.md` §5.1).
+- **Wireframes:** must support the keyboard path for S0's keyboard task (`usability-plan.md` §5.1): roving tabindex per zone in the §3.1 order, the skip link, and `P`, `G`, `A`, `+`, `E` and `U` wired (`wireframes/wf.js`).

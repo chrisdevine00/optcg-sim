@@ -37,13 +37,13 @@ const arch = [...META.arch].sort((a, b) => b.share - a.share);
 const slice = { 'OP17-039': 1, 'OP17-058': 1 };
 const tiles = arch.map((a) => {
   const g = { card: [64, 89] };
-  const card = WF.cardHTML({ n: a.name, col: COL[a.colors[0]], aria: '' }, [0, 0, 64, 89], g, { tag: 'span' }).replace('class="card', 'aria-hidden="true" class="card');
-  return `<li><a class="tile" href="13b-guide.html" aria-label="${a.name}, ${a.colors.join(' and ')}, tier ${a.tier} on opmetagame, ${a.share}% of lists, ${a.post}% since the ban. Guide and 3 lists.">
+  const card = WF.cardHTML({ n: META.nameOf(a), col: COL[a.colors[0]], aria: '' }, [0, 0, 64, 89], g, { tag: 'span' }).replace('class="card', 'aria-hidden="true" class="card');
+  return `<li><a class="tile" href="13b-guide.html" aria-label="${META.nameOf(a)}, ${a.colors.join(' and ')}, tier ${a.tier} on opmetagame, ${a.share}% of lists, ${a.post}% since the ban. Guide and 3 lists.">
     <span class="cb" style="--card-w:64px;--badge-power-size:12px;--badge-num-size:12px;--badge-h:16px">${card}</span>
-    <span><span class="tn">${a.name}</span><br><span class="meta">${a.id} · ${a.colors.join(' / ')} · </span><span class="tier" title="Tier from opmetagame.com (October 2026)">Tier ${a.tier}</span> <span class="meta">opmetagame</span><br>
+    <span><span class="tn">${META.nameOf(a)}</span><br><span class="meta">${a.id} · ${a.colors.join(' / ')} · </span><span class="tier" title="Tier from opmetagame.com (October 2026)">Tier ${a.tier}</span> <span class="meta">opmetagame</span><br>
     <span class="share">${a.share}%</span> <span class="meta">of lists · ${a.post}% since the ban</span><br>
     <span class="meta">Lists: ${fmt(a.first)} to ${fmt(a.last)}</span><br>
-    <span class="meta">${slice[a.id] ? '✓ 50 of 50 automated' : 'Automation: not yet'}</span></span></a></li>`;
+    <span class="meta">${slice[a.id] ? '✓ Full AI playbook · all 50 cards automated' : `Plays with a generic AI · ${META.unscripted[a.id]} card effects not automated`}</span></span></a></li>`;
 }).join('');
 document.getElementById('main').innerHTML = `
   <div class="mhead"><div><h1 class="page" style="margin:0">Meta explorer</h1>
@@ -51,7 +51,7 @@ document.getElementById('main').innerHTML = `
     <span style="flex:1"></span>
     <div class="seg" role="radiogroup" aria-label="View"><button type="button" role="radio" aria-checked="true">Grid</button><button type="button" role="radio" aria-checked="false" onclick="location.href='13c-matchups.html'">Matchups <kbd>M</kbd></button></div>
     <label class="lbl" style="margin:0">Sort <select class="input" style="width:auto;height:30px;display:inline-block;margin-left:4px"><option>Share</option><option>Share since the ban</option><option>Tier</option><option>Colour</option><option>Name</option></select></label></div>
-  <p class="subtle" style="margin:0 0 10px;font-size:12px">Mihawk (OP14-020) is not shown: banned from 2026-10-12. Tier comes from opmetagame only; onepiece.gg could not be read.</p>
+  <p class="subtle" style="margin:0 0 10px;font-size:12px">Mihawk (OP14-020) is not shown: banned from 2026-10-12. Tier comes from opmetagame.com.</p>
   <ul class="tiles" aria-label="Archetypes">${tiles}</ul>`;
 </script>
 </body>

@@ -8,7 +8,7 @@
   const opp = (t, why = true) => `<span class="chip opp">Opp</span>${t}${why ? ' <a class="why" href="09c-why.html">Why?</a>' : ''}`;
   const lk = (n) => `<a class="lk" href="10-inspector.html">${n}</a>`;
   const th = (t) => `<li class="th">${t}</li>`;
-  const rewind = '<button class="btn" type="button" aria-label="Rewind one move (U)">⟲ Rewind <kbd>U</kbd></button>';
+  const rewind = '<button class="btn" type="button" data-key="U" aria-label="Rewind one move (U)">⟲ Rewind <kbd>U</kbd></button>';
 
   function oppKaidoStd() {
     return {
@@ -26,7 +26,11 @@
     return `${b.pre || ''}${row('Attacker', b.att)}${row('Defender', b.def)}
       <div class="bp-res ${b.res.cls}" role="status"><span aria-hidden="true">${b.res.cls === 'ok' ? '✓' : '✕'}</span>${b.res.text}${b.res.need ? `<span class="need">${b.res.need}</span>` : ''}</div>${b.post || ''}`;
   }
-  const primary = (label, sub, key, href, extra = '') => `<${href ? `a href="${href}"` : 'button type="button"'} class="btn primary big ${extra}"><span class="lbl2">${label}${key ? ` <kbd aria-label="${key}">${key === 'Enter' ? '↵' : key}</kbd>` : ''}</span>${sub ? `<span class="sub">${sub}</span>` : ''}</${href ? 'a' : 'button'}>`;
+  // Results by perspective (UX-R19): good for you = ok (✓, success colour), bad for you = hit (✕, danger colour)
+  // Primary button: one dedicated key, shown on the button and wired by wf.js through data-key (board.md §4.4)
+  const primary = (label, sub, key, href, extra = '') => `<${href ? `a href="${href}"` : 'button type="button"'} class="btn primary big pri ${extra}" ${key ? `data-key="${key}"` : ''}><span class="lbl2">${label}${key ? ` <kbd aria-label="${key}">${key === 'Enter' ? '↵' : key}</kbd>` : ''}</span>${sub ? `<span class="sub">${sub}</span>` : ''}</${href ? 'a' : 'button'}>`;
+  // Secondary commit in the same footer: equal height, never the default (board.md §3.9, UX-R2)
+  const secondary = (label, sub, extra = '', attrs = '') => `<button type="button" class="btn big sec ${extra}" ${attrs}><span class="lbl2">${label}</span>${sub ? `<span class="sub">${sub}</span>` : ''}</button>`;
 
   // Preview dock (board.md §3.12): full scan with SAMPLE, our own text, live stats with breakdowns
   function dock(g, d) {
@@ -44,7 +48,7 @@
   }
 
   window.SCN = {
-    you, opp, lk, th, rewind, battle, primary, dock,
+    you, opp, lk, th, rewind, battle, primary, secondary, dock,
     // Turn 7, your Main Phase (your 4th turn, going first): 7 DON!!
     mainBase() {
       const o = oppKaidoStd();

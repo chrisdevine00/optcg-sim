@@ -45,6 +45,7 @@ WF.mountBoard((st) => {
     };
   }
   if (st === 'confirm' || st === 'declared') {
+    s.decisionTall = true; // attack confirm and battle use the tall decision panel (board.md §3.9, C16)
     shiki.st = ['selected', 'battle'];
     king.st = ['legal', 'battle']; king.g = 'target';
     [o.leader, ulti, yam].forEach((c) => { c.st = ['dim']; });
@@ -53,13 +54,13 @@ WF.mountBoard((st) => {
     const body = SCN.battle({
       att: { name: 'Shiki', num: '9000', bd: '9000 base' },
       def: { name: 'King <span class="subtle">(rested)</span>', num: '7000', bd: '7000 base · its DON!! add nothing now' },
-      res: { cls: 'hit', text: 'K.O.', need: 'They need +3000 · 5 cards' },
+      res: { cls: 'ok', text: 'K.O.s King', need: 'They need +3000 · 5 cards' },
       post: st === 'confirm'
-        ? `<div style="font-size:12px;line-height:16px;color:var(--color-text-muted)"><b style="color:var(--color-text)">They can see:</b> Yamato can block (King safe, Yamato K.O.'d). Kaido's Leader −2000 on Shiki: 7000 vs 7000, still K.O. <a href="09-coach.html#don">Their hand: ask the coach</a></div>`
-        : `<div class="row" style="gap:6px;margin-top:2px"><span class="chip success">✓ Attack</span><span class="chip outline">Block · Kaido is considering…</span></div><div class="indet" style="margin-top:8px" aria-hidden="true"></div>`,
+        ? `<div style="font-size:12px;line-height:16px;color:var(--color-text-muted)"><b style="color:var(--color-text)">They can:</b> block with Yamato (King safe, Yamato K.O.'d), or use Kaido's −2000 on Shiki: 7000 vs 7000 still K.O.s King. <a href="09-coach.html#don">What their hand can do: ask the coach</a></div>`
+        : `<p style="margin:4px 0 0" role="status">Kaido is considering a block…</p><div class="indet" style="margin-top:8px" aria-hidden="true"></div>`,
     });
     s.decision = {
-      title: st === 'confirm' ? 'Attack King with Shiki?' : 'Battle · Block step · Kaido deciding',
+      title: st === 'confirm' ? 'Attack King with Shiki?' : 'Shiki attacks King',
       body,
       foot: st === 'confirm'
         ? `<button class="btn" type="button">Cancel <kbd>Esc</kbd></button>${SCN.primary('Confirm attack', '9000 vs 7000', 'Enter', '04-attack.html#declared')}`

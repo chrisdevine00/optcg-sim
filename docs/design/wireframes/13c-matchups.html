@@ -18,6 +18,14 @@
   .cellb.plan { color: var(--color-text-subtle); font-weight: 500; }
   .cellb.mirror { color: var(--color-text-subtle); font-style: italic; cursor: default; }
   .cellb.on { box-shadow: inset 0 0 0 2px var(--color-accent); }
+  .dis { color: var(--color-warning-text); font-weight: 700; }
+  /* Scroll cue: shadows appear at an edge only while more columns are hidden that way */
+  .mwrap { background:
+      linear-gradient(to right, var(--color-bg) 30%, transparent) left / 40px 100% no-repeat local,
+      linear-gradient(to left, var(--color-bg) 30%, transparent) right / 40px 100% no-repeat local,
+      radial-gradient(farthest-side at 0 50%, rgb(0 0 0 / .6), transparent) left / 14px 100% no-repeat scroll,
+      radial-gradient(farthest-side at 100% 50%, rgb(0 0 0 / .6), transparent) right / 14px 100% no-repeat scroll; }
+  table.mu tbody th { box-shadow: 4px 0 6px -2px rgb(0 0 0 / .5); }
 </style>
 </head>
 <body>
@@ -31,32 +39,49 @@
 <script>
 WF.chrome('Meta');
 const A = [...META.arch].sort((a, b) => b.share - a.share);
-const short = (a) => ({ 'OP17-079': 'Luffy (Black)', 'OP13-001': 'Luffy (R/G)', 'OP15-058': 'Enel (Purple)', 'OP05-098': 'Enel (Yellow)', 'OP12-061': 'Rosinante', 'ST30-001': 'Luffy & Ace', 'OP17-039': 'Rocks', 'OP09-062': 'Nico Robin', 'OP14-041': 'Boa Hancock' }[a.id] || a.name);
+const short = (a) => META.nameOf(a);
+const byId = Object.fromEntries(A.map((a) => [a.id, a]));
+const flip = (rec) => rec.split('–').reverse().join('–');
+// Two sources disagree when the reverse cell's record, flipped, is not the same record.
+const disagree = (r, c) => { const m = META.mu[r + '|' + c], n = META.mu[c + '|' + r]; return m && n && m.rec && n.rec && flip(n.rec) !== m.rec; };
+const sel = (WF.state() || 'kaido') === 'robin' ? 'OP09-062' : 'OP17-058';
 let rows = '';
 A.forEach((r) => {
   rows += `<tr><th scope="row">${short(r)} <span class="subtle" style="font-weight:500">${r.id}</span></th>`;
   A.forEach((c) => {
     if (r.id === c.id) { rows += '<td><span class="cellb mirror" style="display:grid;place-items:center">mirror</span></td>'; return; }
     const m = META.mu[r.id + '|' + c.id];
-    const on = r.id === 'OP17-039' && c.id === 'OP17-058';
-    const lab = m && m.rec ? `${short(r)} against ${short(c)}: record ${m.rec}, source ${m.src}` : `${short(r)} against ${short(c)}: plan available${m && m.inf ? ', inference' : ''}`;
-    rows += `<td><button type="button" class="cellb ${m && m.rec ? '' : 'plan'} ${on ? 'on' : ''}" aria-label="${lab}. Enter for details." ${on ? 'data-wf-focus' : ''}>${m && m.rec ? m.rec : '◇ plan'}</button></td>`;
+    const on = r.id === 'OP17-039' && c.id === sel;
+    const dis = disagree(r.id, c.id);
+    const lab = m && m.rec ? `${short(r)} against ${short(c)}: ${m.rec} (${short(r)} wins–losses), source ${m.src}${dis ? '. Sources disagree' : ''}` : `${short(r)} against ${short(c)}: plan available${m && m.inf ? ', inference' : ''}`;
+    rows += `<td><button type="button" class="cellb ${m && m.rec ? '' : 'plan'} ${on ? 'on' : ''}" aria-label="${lab}. Enter for details." ${on ? 'data-wf-focus' : ''} onclick="${r.id === 'OP17-039' && (c.id === 'OP09-062' || c.id === 'OP17-058') ? `location.hash='${c.id === 'OP09-062' ? 'robin' : 'kaido'}'` : ''}">${m && m.rec ? m.rec : '◇ plan'}${dis ? ' <span class="dis" aria-hidden="true">≠</span>' : ''}</button></td>`;
   });
   rows += '</tr>';
 });
-const m = META.mu['OP17-039|OP17-058'];
+const m = META.mu['OP17-039|' + sel], n = META.mu[sel + '|OP17-039'];
+const opp = short(byId[sel]);
+const pop = disagree('OP17-039', sel)
+  ? `<p style="margin:0 0 6px"><span class="chip warning">≠ Sources disagree</span></p>
+     <table class="tbl" style="margin:0 0 8px"><thead><tr><th>Source</th><th style="text-align:right;white-space:nowrap">Rocks W–L</th><th style="text-align:right">Games</th></tr></thead><tbody>
+       <tr><td>Rocks guide <span class="tag-src">${m.src}</span></td><td class="num" style="text-align:right">${m.rec}</td><td class="num" style="text-align:right">${m.rec.split('–').reduce((a, b) => +a + +b, 0)}</td></tr>
+       <tr><td>${opp} guide <span class="tag-src">${n.src}</span></td><td class="num" style="text-align:right">${flip(n.rec)}</td><td class="num" style="text-align:right">${n.rec.split('–').reduce((a, b) => +a + +b, 0)}</td></tr></tbody></table>
+     <p style="margin:0 0 8px;font-size:13px;line-height:19px">The two guides count different events, so their records differ. Read both as close to even; neither is a win rate we computed.</p>`
+  : `<p style="margin:0 0 6px"><b class="num">${m.rec}</b> <span class="muted">(Rocks W–L) · slightly behind</span> <span class="tag-src">${m.src}</span></p>
+     <p class="subtle" style="font-size:12px;margin:0 0 8px">${opp}'s guide has the same games from its side: ${n.rec} (${opp} W–L). Records under about 30 games are a hint, not a fact.</p>`;
 document.getElementById('main').innerHTML = `
-  <div class="row" style="align-items:end;margin-bottom:10px"><div><h1 class="page" style="margin:0">Matchups</h1><p class="muted" style="margin:2px 0 0">Rows: you play · columns: against · records are wins–losses from the source named, never a win rate we computed</p></div><span style="flex:1"></span>
+  <div class="row" style="align-items:end;margin-bottom:10px"><div><h1 class="page" style="margin:0">Matchups</h1><p class="muted" style="margin:2px 0 0">Rows: you play · columns: against · each record is the row deck's wins–losses, from the source named</p></div><span style="flex:1"></span>
     <div class="seg" role="radiogroup" aria-label="View"><button type="button" role="radio" aria-checked="false" onclick="location.href='13-meta.html'">Grid</button><button type="button" role="radio" aria-checked="true">Matchups <kbd>M</kbd></button></div></div>
-  <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start">
-    <div class="mwrap" role="region" tabindex="0" aria-label="Matchup grid, scrollable"><table class="mu"><thead><tr><th scope="col">You play ↓ · against →</th>${A.map((a) => `<th scope="col">${short(a)}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>
-    <section class="panel raised" role="dialog" aria-labelledby="ph"><h2 id="ph" class="sub" style="margin:0 0 4px">Rocks against Kaido</h2>
-      <p style="margin:0 0 6px"><b class="num">16–20</b> <span class="muted">slightly behind</span> <span class="tag-src">${m.src}</span></p>
-      <p style="margin:0 0 6px;font-size:13px;line-height:19px">Their leader gives one of your Characters −2000 once per turn on either player's attack, never your Leader (RL-45), so Shiki and your Blockers come up short while your leader's reveal attacks are safe. <span class="tag-inf">our reasoning</span></p>
-      <p class="subtle" style="font-size:12px;margin:0 0 8px">Records under about 30 games are a hint, not a fact. Kaido's guide has the same pairing as 20–16 from its side.</p>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start">
+    <div><div class="mwrap" role="region" tabindex="0" aria-label="Matchup grid, scrolls sideways"><table class="mu"><thead><tr><th scope="col">You play ↓ · against →</th>${A.map((a) => `<th scope="col">${short(a)}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>
+      <p class="subtle" style="margin:6px 0 0;font-size:12px">${A.length} decks · scroll sideways for more · ≠ marks a pairing where the two guides' records disagree</p></div>
+    <section class="panel raised" role="dialog" aria-labelledby="ph"><h2 id="ph" class="sub" style="margin:0 0 4px">Rocks.D.Xebec against ${opp}</h2>
+      ${pop}
+      <p style="margin:0 0 8px;font-size:13px;line-height:19px">${m.plan.length > 260 ? m.plan.slice(0, m.plan.indexOf('.', 120) + 1) : m.plan} <span class="tag-inf">our reasoning</span></p>
       <div class="row"><a class="btn primary" href="02-setup.html">Play this matchup</a><a class="btn" href="13b-guide.html">Rocks guide</a></div></section>
   </div>`;
 const f = document.querySelector('[data-wf-focus]'); if (f) f.focus();
+WF.statesBar([['kaido', 'Rocks vs Kaido (sources agree)'], ['robin', 'Rocks vs Nico Robin (sources disagree)']]);
+window.addEventListener('hashchange', () => location.reload());
 </script>
 </body>
 </html>

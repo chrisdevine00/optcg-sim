@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OPTCG Sim · Errors and empty states</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+<style>
+  .gal { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; max-width: 1400px; margin: 0 auto; }
+  .ex { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .ex > h2 { font: 600 var(--text-md)/var(--leading-md) var(--font-ui); margin: 0; color: var(--color-text-muted); }
+  .ex .cap { font-size: var(--text-xs); line-height: var(--leading-xs); color: var(--color-text-subtle); margin: 0; }
+  .mock { border: 1px solid var(--color-line-strong); border-radius: var(--radius-3); background: var(--color-bg); padding: 12px; position: relative; min-height: 200px; }
+  .dp { background: var(--color-surface-2); border: 1px solid var(--color-line); border-radius: 6px; overflow: hidden; }
+  .dp .dh { padding: 8px 12px; border-bottom: 1px solid var(--color-line); font-weight: 600; display: flex; gap: 8px; align-items: center; }
+  .dp .dbx { padding: 10px 12px; font-size: var(--text-sm); line-height: var(--leading-sm); }
+  .dp .dfx { padding: 8px 12px; border-top: 1px solid var(--color-line); display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+  .ic { width: 20px; height: 20px; border-radius: 50%; display: inline-grid; place-items: center; font: 700 12px/1 var(--font-ui); flex: none; }
+  .ic.err { background: var(--color-attack); color: var(--color-on-attack); }
+  .ic.warn { background: var(--color-warning); color: var(--color-on-warning); }
+  .ic.info { background: var(--color-surface-3); color: var(--color-text); border: 1px solid var(--color-line-strong); }
+  .lines { margin: 6px 0 0; padding: 0; list-style: none; }
+  .lines li { display: grid; grid-template-columns: 72px 1fr; gap: 6px; padding: 2px 0; }
+  .lines li b { color: var(--color-text-muted); font-weight: 600; font-size: var(--text-xs); }
+  .tcard { width: 112px; height: 156px; border-radius: 6px; background: var(--color-plate); color: var(--color-plate-text); position: relative; padding: 6px; display: flex; flex-direction: column; gap: 4px; box-shadow: var(--elev-1); }
+  .tcard .row1 { display: flex; justify-content: space-between; }
+  .tcard .pl { background: #000; border-radius: 4px; padding: 2px 4px; font: 700 13px/1 var(--font-num); }
+  .tcard .nm { font: 600 12px/14px var(--font-ui); }
+  .tcard .bandx { position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: #4f8fd6; border-radius: 0 0 6px 6px; }
+  @media (max-width: 1100px) { .gal { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="app-header"></header>
+  <main class="app-main" style="padding-top:16px">
+    <h1 class="page" style="font-size:var(--text-2xl);line-height:var(--leading-2xl)">Errors and empty states <span class="muted" style="font:500 14px var(--font-ui)">flows.md G4, G8 · each says what happened, whether anything changed, and what to do next</span></h1>
+    <div class="gal" id="gal"></div>
+  </main>
+  <footer class="app-footer"></footer>
+</div>
+<script src="wf.js"></script>
+<script>
+WF.chrome('');
+const X = [
+  ['Engine could not apply a move', 'In the decision panel, where the move was made. Assertive SR line: "Move failed, nothing changed."',
+    `<div class="dp" role="group" aria-label="Example decision panel"><div class="dh"><span class="ic err" aria-hidden="true">!</span>That move couldn't be applied</div>
+      <div class="dbx"><p style="margin:0">Playing Shiki failed inside the rules engine. This is our bug, not your mistake.</p>
+      <ul class="lines"><li><b>Changed</b><span>Nothing. The board is as it was before the move.</span></li><li><b>Next</b><span>Try a different move, or rewind one step. A bug report holds the game file and the move.</span></li></ul></div>
+      <div class="dfx"><button class="btn" type="button">Copy bug report</button><button class="btn" type="button">⟲ Rewind <kbd>U</kbd></button><button class="btn primary" type="button">Back to the board</button></div></div>`],
+  ['The AI stopped responding', 'After one silent restart fails. The coach sections show "Coach unavailable" in place, never a dialog.',
+    `<div class="dp" role="group" aria-label="Example decision panel"><div class="dh"><span class="ic warn" aria-hidden="true">!</span>The AI stopped responding</div>
+      <div class="dbx"><p style="margin:0">Kaido's turn stopped while it was choosing an attack. We restarted it once; it failed again.</p>
+      <ul class="lines"><li><b>Changed</b><span>Nothing since Kaido's last move. Your game is saved.</span></li><li><b>Next</b><span>Retry, or save and come back later.</span></li></ul></div>
+      <div class="dfx"><button class="btn" type="button">Save and quit</button><button class="btn primary" type="button">Retry</button></div></div>`],
+  ['Card art failed or is slow', 'The text card fills the same box, so nothing moves when art arrives or fails. Play never waits for art.',
+    `<div class="row" style="gap:16px;align-items:flex-start"><div class="tcard" role="img" aria-label="Text card: Shiki, cost 7, 9000 power, Blue"><div class="row1"><span class="pl" style="border-radius:50%;width:20px;text-align:center">7</span><span class="pl">9000</span></div><span class="nm">Shiki</span><span style="font-size:12px;color:var(--color-plate-base)">Character · Rocks Pirates</span><span class="bandx" aria-hidden="true"></span></div>
+      <div class="dp" style="flex:1"><div class="dbx"><p style="margin:0"><b>Card pictures aren't loading.</b> Cards show as text until they arrive.</p><ul class="lines"><li><b>Changed</b><span>Nothing. Every number and rule works the same.</span></li><li><b>Next</b><span>Keep playing. Pictures retry by themselves.</span></li></ul><button class="btn small" type="button" style="margin-top:6px">Show text cards always</button></div></div></div>`],
+  ['Storage full', 'A toast, then the saved-games list. Settings and the current game keep working.',
+    `<div class="dp"><div class="dh"><span class="ic warn" aria-hidden="true">!</span>Saved games are full</div>
+      <div class="dbx"><p style="margin:0">This browser has no room for another review (38 saved games).</p><ul class="lines"><li><b>Changed</b><span>Your current game is safe and still saving. The newest review was not saved yet.</span></li><li><b>Next</b><span>Delete old reviews, or export them first.</span></li></ul></div>
+      <div class="dfx"><button class="btn" type="button">Export reviews</button><a class="btn primary" href="20-history.html#list">Delete old reviews…</a></div></div>`],
+  ['Review made with an older version', 'Opens from snapshots. The timeline, flags and explanations stay; replay actions are off with their reason.',
+    `<div class="dp"><div class="dh"><span class="ic info" aria-hidden="true">i</span>Read-only review</div>
+      <div class="dbx"><p style="margin:0">This game was played on an older version of the rules engine, so it can't be replayed exactly.</p><ul class="lines"><li><b>Changed</b><span>Nothing is lost. Flags and explanations are kept.</span></li><li><b>Next</b><span>Read it as it is. "Play from here" and "Practice this" are off for this game.</span></li></ul></div>
+      <div class="dfx"><button class="btn" type="button" aria-disabled="true" title="Made with an older version">Play from here</button><button class="btn" type="button" aria-disabled="true" title="Made with an older version">Practice this</button></div></div>`],
+  ['Meta lists older than 60 days', 'On the meta explorer and every guide. Lists still open; the date is never hidden.',
+    `<div class="dp"><div class="dbx" style="display:flex;gap:10px"><span class="ic warn" aria-hidden="true">!</span><div><p style="margin:0"><b>These lists are 74 days old</b> (as of 2026-08-15). The meta may have moved since.</p><ul class="lines"><li><b>Changed</b><span>Nothing. Decks and guides still play as before.</span></li><li><b>Next</b><span>Update the app for newer lists, or play these as they are.</span></li></ul></div></div></div>`],
+  ['No reviews yet', 'The empty Reviews page: one sentence and two ways forward.',
+    `<div style="text-align:center;padding:10px 0"><p style="font:600 var(--text-xl)/var(--leading-xl) var(--font-display);margin:0 0 6px">No games yet</p><p class="muted" style="margin:0 0 12px">Play a game and its review appears here.</p><div class="row" style="justify-content:center"><a class="btn primary" href="02-setup.html">Play a game</a><a class="btn" href="15-tutorial.html">Take the tutorial</a></div><p style="margin:10px 0 0;font-size:var(--text-sm)"><a href="20-history.html#empty">Full page</a></p></div>`],
+  ['Coach unavailable', 'Inside the coach section, in place. The game carries on.',
+    `<div class="dp"><div class="dh" style="font-size:var(--text-sm)">▾ Hint</div><div class="dbx"><p style="margin:0"><b>Coach unavailable.</b> The analysis stopped responding.</p><ul class="lines"><li><b>Changed</b><span>Nothing in your game.</span></li><li><b>Next</b><span>Ask again in a moment, or keep playing without hints.</span></li></ul><button class="btn small" type="button" style="margin-top:6px">Ask again <kbd>H</kbd></button></div></div>`],
+  ['Resume after a reload or crash', 'First screen after a reload. The game resumes from its last checkpoint.',
+    `<div class="dp"><div class="dh">Resume your game vs Kaido?</div><div class="dbx"><p style="margin:0">Turn 6, your Main Phase. Saved 2 minutes ago on this device.</p><ul class="lines"><li><b>Changed</b><span>Nothing. Every move up to the save is kept.</span></li><li><b>Next</b><span>Resume, or start something else (the game stays saved).</span></li></ul></div><div class="dfx"><a class="btn" href="01-welcome.html">Not now</a><a class="btn primary" href="03-main.html">Resume</a></div></div>`],
+];
+document.getElementById('gal').innerHTML = X.map(([t, cap, mock]) => `<section class="ex" aria-label="${t}"><h2>${t}</h2><div class="mock">${mock}</div><p class="cap">${cap}</p></section>`).join('');
+</script>
+</body>
+</html>

@@ -47,6 +47,7 @@ WF.mountBoard((st) => {
     arrows: [{ from: 'opp.c3', to: 'me.leader', cut: 40 }],
   };
   const canPay = st !== 'nodon';
+  s.decisionTall = true; // Trigger decisions use the tall panel (board.md §3.9, C16)
   s.decision = {
     title: 'Trigger · your Life card',
     body: `<p style="margin:0 0 6px"><b>Wo Ro Ro Ro Ro... I Think I've Sobered Up</b> has <span class="chip outline">[Trigger]</span></p>

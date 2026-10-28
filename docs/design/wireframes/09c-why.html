@@ -56,8 +56,8 @@ WF.mountBoard((st) => {
   s.me.chars[1].st = []; s.me.chars[1].g = undefined; s.me.chars[1].p = 5000; s.me.chars[1].chips = [{ t: 'New', pos: 'top' }];
   const E = EXPL.E.E12;
   s.coachHtml = st === 'rookie'
-    ? EXPL.coach('why', `<h4 class="claim">Rookie picks a random legal move, except that it always blocks or counters a lethal attack.</h4><p class="subtle" style="margin:0;font-size:12px">That is honest, and it is what the Rookie tier is for. Try Pirate for an opponent with a plan.</p>`, { why: 'Block with Yamato' })
-    : EXPL.coach('why', `<p class="muted" style="margin:0 0 4px;font-size:12px">Kaido's block, turn 9 · only public information</p>` + EXPL.render(E, { verbosity: 'standard', evidenceOpen: true }), { why: 'Block with Yamato' });
+    ? EXPL.coach('why', `<h4 class="claim">Rookie picks a random legal move, except that it always blocks or counters a lethal attack.</h4><p class="subtle" style="margin:0;font-size:12px">Want an opponent with a plan? Try Pirate.</p>`, { why: 'Block with Yamato' })
+    : EXPL.coach('why', `<p class="muted" style="margin:0 0 4px;font-size:12px">Kaido's block, turn 9 · only public information</p>` + EXPL.render(E, { mode: 'why', verbosity: 'standard', evidenceOpen: true }), { why: 'Block with Yamato' });
   s.decision = { title: 'Your Main phase', body: '<p style="margin:0">Play a card, give DON!!, attack, or end your turn.</p><ul style="margin:6px 0 0;padding-left:16px"><li><b>1 can attack:</b> Miss Buckingham Stussy</li><li><b>2 DON!! active</b></li></ul>', foot: `${SCN.rewind}${SCN.primary('End turn', '1 can attack · 2 DON!! unused', 'E')}` };
   return s;
 }, STATES);

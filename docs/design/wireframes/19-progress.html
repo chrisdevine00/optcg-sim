@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OPTCG Sim · Progress</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+<style>
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  .work { display: grid; grid-template-columns: 1fr auto; gap: 16px 24px; align-items: center; padding: 18px 22px; border: 1px solid var(--color-accent); border-radius: var(--radius-4); background: var(--color-surface-1); margin: 12px 0 20px; }
+  .work .k { font: 600 var(--text-xs)/var(--leading-xs) var(--font-ui); color: var(--color-accent-text); text-transform: uppercase; letter-spacing: .06em; margin: 0; }
+  .work h2 { font: 600 var(--text-2xl)/var(--leading-2xl) var(--font-display); margin: 2px 0 6px; }
+  .work .why { margin: 0; font-size: var(--text-lg); line-height: var(--leading-lg); }
+  .work details { grid-column: 1 / -1; border-top: 1px solid var(--color-line); padding-top: 8px; }
+  .work details summary { cursor: pointer; color: var(--color-text-muted); font-weight: 600; }
+  .others { list-style: none; margin: 8px 0 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .others li { padding: 8px 10px; border: 1px solid var(--color-line); border-radius: var(--radius-2); font-size: var(--text-sm); line-height: var(--leading-sm); }
+  .grid2 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .card2 { background: var(--color-surface-1); border: 1px solid var(--color-line); border-radius: var(--radius-3); padding: 12px 14px; min-width: 0; }
+  .card2 h3 { font: 600 var(--text-md)/var(--leading-md) var(--font-ui); margin: 0 0 8px; }
+  .card2 .tbl td, .card2 .tbl th { font-size: var(--text-sm); padding: 4px 6px; }
+  .card2 .tbl td.n { text-align: right; font-feature-settings: var(--font-num-features); white-space: nowrap; }
+  .chart text { font: 500 12px var(--font-ui); fill: var(--color-text-muted); }
+  .chart .lab { fill: var(--color-text); font-weight: 600; }
+  .bar { display: grid; grid-template-columns: 1fr 120px 44px; gap: 8px; align-items: center; font-size: var(--text-sm); padding: 3px 0; }
+  .bar .tr { height: 10px; border-radius: 5px; background: var(--color-surface-3); overflow: hidden; }
+  .bar .tr span { display: block; height: 100%; background: var(--color-text-muted); }
+  .bar .n { text-align: right; font-weight: 600; font-feature-settings: var(--font-num-features); }
+  .shp svg { width: 14px; height: 14px; vertical-align: -2px; margin-right: 4px; }
+  .course { list-style: none; margin: 0; padding: 0; }
+  .course li { break-inside: avoid; display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; border-bottom: 1px solid var(--color-line); font-size: var(--text-sm); }
+  .course .st { color: var(--color-text-muted); font-size: var(--text-xs); white-space: nowrap; }
+  .course .st.p { color: var(--color-success-text); }
+  .empty { max-width: 680px; margin: 40px auto; text-align: center; }
+  .empty h2 { font: 600 var(--text-2xl)/var(--leading-2xl) var(--font-display); margin: 0 0 8px; }
+  @media (max-width: 1000px) { .grid2 { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="app-header"></header>
+  <main class="app-main" id="main" style="padding-top:16px"></main>
+  <footer class="app-footer"></footer>
+</div>
+<script src="wf.js"></script>
+<script>
+WF.chrome('Progress');
+const STATES = [['progress', 'Progress: Work on'], ['new', 'Fewer than 3 reviewed games']];
+const SH = {
+  triF: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1l7 13H1z" fill="currentColor"/></svg>',
+  triH: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2l6 11H2z" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+  sqH: '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="2" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+  cirH: '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+  diamond: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1l7 7-7 7-7-7z" fill="currentColor"/></svg>',
+  bar: '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="6" width="12" height="4" fill="currentColor"/></svg>',
+};
+// Small accuracy chart: one line per drill, untimed solid, timed dashed. Text equivalent in aria-label and the table beside it.
+function chart(title, untimed, timed, pass) {
+  const W = 300, H = 120, L = 34, R = 8, T = 10, B = 26;
+  const x = (i, n) => L + (i / (n - 1)) * (W - L - R), y = (v) => T + (1 - v / 10) * (H - T - B);
+  const pts = (a) => a.map((v, i) => `${x(i, a.length).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  const desc = `${title}: untimed scores by session ${untimed.join(', ')} out of 10${timed.length ? `; timed ${timed.join(', ')}` : '; no timed sessions'}; pass mark ${pass}.`;
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${desc}">
+    ${[0, 5, 10].map((v) => `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--color-line)"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${v}</text>`).join('')}
+    <line x1="${L}" x2="${W - R}" y1="${y(pass)}" y2="${y(pass)}" stroke="var(--color-success-text)" stroke-dasharray="3 3"/><text x="${W - R}" y="${y(pass) - 4}" text-anchor="end">pass ${pass}</text>
+    <polyline points="${pts(untimed)}" fill="none" stroke="var(--color-accent)" stroke-width="2"/>
+    ${untimed.map((v, i) => `<circle cx="${x(i, untimed.length)}" cy="${y(v)}" r="3" fill="var(--color-accent)"/>`).join('')}
+    ${timed.length ? `<polyline points="${pts(timed)}" fill="none" stroke="var(--color-text-muted)" stroke-width="2" stroke-dasharray="5 4"/>` : ''}
+    <text x="${L}" y="${H - 6}">session 1</text><text x="${W - R}" y="${H - 6}" text-anchor="end">latest</text></svg>`;
+}
+function progress() {
+  return `<div class="wrap">
+    <div class="row" style="align-items:end"><div><h1 class="page" style="margin:0">Progress</h1><p class="muted" style="margin:2px 0 0">From your last 10 reviewed games and your drills. Kept on this device only.</p></div></div>
+    <section class="work" aria-labelledby="wk">
+      <div><p class="k">Work on next</p><h2 id="wk">When to counter or take the hit</h2>
+        <p class="why">5 flags in your last 6 games, 2 of them severe. Your counter-or-take drill: 6 of 10.</p>
+        <p class="muted" style="margin:6px 0 0;font-size:var(--text-sm)">Supporting: you asked for a hint on 4 of your last 9 defences.</p></div>
+      <div class="stack" style="align-items:stretch"><a class="btn primary big" href="18-learn.html?l=L10-counter-or-take#lesson-l10" style="min-width:220px"><span class="lbl2">Start lesson L10</span><span class="sub">read, see it, then the drill</span></a><a class="btn" href="14c-drill-counter.html">Go straight to the drill</a></div>
+      <details><summary>Other suggestions</summary><ul class="others">
+        <li><b>DON!! efficiency (L09).</b> 3 "DON!! left unused" flags in your last 6 games, all moderate. Drill not tried yet.</li>
+        <li><b>Board or face (L14).</b> 2 "Poor attack ordering" flags in your last 6 games. Drill not tried yet.</li></ul>
+        <p class="subtle" style="font-size:var(--text-xs);margin:8px 0 0">How it is chosen: recent review flags weigh most (severe 3, moderate 2, minor 1), plus drill results below the pass mark. Lessons you passed with no flags since are left out.</p></details>
+    </section>
+    <div class="grid2">
+      <section class="card2" aria-labelledby="h-course"><h3 id="h-course">Course <span class="muted" style="font-weight:500">· 12 of 27 passed</span></h3>
+        <ul class="course">${[['L08 First full game', 'Passed', 1], ['L18 Hand management', 'Passed', 1], ['L10 Counter or take', 'In progress', 0], ['L12 Mulligan', 'In progress', 0], ['L09 DON!! efficiency', 'Not started', 0], ['L11 Life as a resource', 'Not started', 0], ['L13 Turn order', 'Not started', 0], ['L14 Board or face', 'Not started', 0]].map(([n, s, p]) => `<li><a href="18-learn.html#hub">${n}</a><span class="st ${p ? 'p' : ''}">${p ? '✓ ' : ''}${s}</span></li>`).join('')}</ul>
+        <p style="margin:8px 0 0;font-size:var(--text-sm)"><a href="18-learn.html#hub">All 27 lessons →</a></p></section>
+      <section class="card2" aria-labelledby="h-drills"><h3 id="h-drills">Drills <span class="muted" style="font-weight:500">· score out of 10</span></h3>
+        <p style="margin:0;font-size:var(--text-sm);font-weight:600">Counter or take it</p>
+        ${chart('Counter or take it', [4, 5, 5, 6], [], 8)}
+        <p style="margin:6px 0 0;font-size:var(--text-sm);font-weight:600">Mulligan trainer</p>
+        ${chart('Mulligan trainer', [6, 7, 7], [5, 6], 8)}
+        <p class="muted" style="margin:4px 0 0;font-size:var(--text-xs)">Solid: untimed · dashed: timed (counted separately) · dotted: pass mark</p></section>
+      <section class="card2" aria-labelledby="h-games"><h3 id="h-games">Games</h3>
+        <table class="tbl"><thead><tr><th>Your deck</th><th>vs tier</th><th style="text-align:right">Won</th></tr></thead><tbody>
+          <tr><td>Rocks.D.Xebec</td><td>Pirate</td><td class="n">7 of 11</td></tr>
+          <tr><td>Rocks.D.Xebec</td><td>Warlord</td><td class="n">1 of 4</td></tr>
+          <tr><td>Kaido</td><td>Pirate</td><td class="n">2 of 3</td></tr></tbody></table>
+        <p class="muted" style="margin:6px 0 0;font-size:var(--text-xs)">3 rewound games and 2 games played from a review are not counted.</p></section>
+      <section class="card2" aria-labelledby="h-flags"><h3 id="h-flags">Flags in your last 20 games</h3>
+        ${[['triF', 'Hit that should have been countered', 4], ['triH', 'Counter wasted', 6], ['sqH', 'DON!! left unused', 5], ['cirH', 'Poor attack ordering', 3], ['diamond', 'Missed lethal', 1], ['bar', 'Mulligan', 2]].map(([s, n, c]) => `<div class="bar"><span class="shp">${SH[s]}${n}</span><span class="tr" aria-hidden="true"><span style="width:${c / 6 * 100}%"></span></span><span class="n">${c}</span></div>`).join('')}</section>
+      <section class="card2" aria-labelledby="h-lethal"><h3 id="h-lethal">Lethal</h3>
+        <p style="margin:0 0 6px"><b class="num" style="font-size:var(--text-xl)">2 of 5</b> <span class="muted">lethal turns found on your own</span></p>
+        <table class="tbl"><tbody><tr><td>Found alone</td><td class="n">2</td></tr><tr><td>After tier 1 (is there lethal?)</td><td class="n">1</td></tr><tr><td>After tier 2 (how many hits)</td><td class="n">0</td></tr><tr><td>After the guided count</td><td class="n">1</td></tr><tr><td>After the full line</td><td class="n">1</td></tr></tbody></table></section>
+      <section class="card2" aria-labelledby="h-data"><h3 id="h-data">Your data</h3>
+        <p style="margin:0 0 10px;font-size:var(--text-sm);line-height:var(--leading-sm)">Games, reviews, decks and progress live only in this browser. Export to keep a copy or move to another computer.</p>
+        <div class="row" style="flex-wrap:wrap;gap:8px"><button class="btn" type="button">Export everything</button><button class="btn" type="button">Import…</button><button class="btn" type="button" style="color:var(--color-danger-text)">Delete all…</button></div></section>
+    </div></div>`;
+}
+function fresh() {
+  return `<div class="wrap"><h1 class="page" style="margin:0">Progress</h1>
+    <section class="work" aria-labelledby="wk"><div><p class="k">Work on next</p><h2 id="wk">L08 First full game</h2>
+      <p class="why">Not enough games yet: next in the course is L08. You have 1 reviewed game; recommendations from your own games start at 3.</p></div>
+      <div class="stack"><a class="btn primary big" href="18-learn.html#hub" style="min-width:220px"><span class="lbl2">Start lesson L08</span><span class="sub">3 games against Rookie</span></a></div></section>
+    <div class="empty"><h2>Your charts appear after a few games</h2><p class="muted" style="font-size:var(--text-lg);line-height:var(--leading-lg)">Each game you finish is reviewed on this device. Flags, drill scores and win rates build up here. Nothing is sent anywhere.</p>
+      <div class="row" style="justify-content:center;margin-top:12px"><a class="btn primary" href="02-setup.html">Play a game</a><a class="btn" href="18-learn.html#hub">Browse lessons</a></div></div></div>`;
+}
+function draw() { const st = WF.state() || 'progress'; document.getElementById('main').innerHTML = st === 'new' ? fresh() : progress(); }
+draw(); window.addEventListener('hashchange', draw); WF.statesBar(STATES);
+</script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 # Design principles
 
-**As of:** 2026-10-28 (Phase 4, revision 1)
+**As of:** 2026-10-28 (Phase 4, revision 2: review-1 fixes)
 **Inputs:** `PROMPT.md` (Phase 4, Accessibility, Performance), `docs/research/competitive-teardown.md`, `docs/plan-review-1.md` (UX-5, UX-7, UX-9, UX-10), `docs/ARCHITECTURE.md` §2.3, §2.7, §5.
 **Used by:** every screen review. The Phase 4 heuristic review (`review-1.md`) and the per-milestone screenshot reviews (PLAN §2) score each screen against this file. The app README will quote the seven principle titles and their one-line meanings.
 
@@ -72,9 +72,9 @@ The answers are numbers and positions that always sit in the same place. Live va
 
 ## 7. Landscape first, keyboard complete
 
-**What it means here.** The board is designed at 1280×720 and 1920×1080, then adapted to tablet landscape. Phone portrait gets a rotate screen, not a cramped board (`board.md`). Every action in a full game can be done from the keyboard alone, with a visible focus that is never covered (WCAG 2.4.7, 2.4.11). `accessibility.md` owns the key map. This file only requires that one exists and is complete.
+**What it means here.** The board is designed at 1280×720 and 1920×1080, then adapted to tablet landscape. Phones get an honest "The board needs a bigger screen" (they are below the board's minimum in either orientation), and a portrait tablet gets a stacked board, not a rotate gate (`board.md` §6.4; review-1 C14). Every action in a full game can be done from the keyboard alone, with a visible focus that is never covered (WCAG 2.4.7, 2.4.11). `accessibility.md` owns the key map. This file only requires that one exists and is complete.
 
-- **Do:** follow the board's reading order with Tab: opponent, midline, your field, your hand, rail. Arrow keys move within a zone. Every drag has a click equivalent, and every click has a key equivalent.
+- **Do:** follow the board's reading order with Tab: opponent, midline, your field, your hand, then the decision panel, coach, log and rail header (`accessibility.md` §3.1: the decision panel comes straight after the hand on purpose). One tab stop per zone, plus a "Skip to decision" link first. Arrow keys move within a zone. Every drag has a click equivalent, and every click has a key equivalent.
 - **Don't:** make any action drag-only or hover-only. Don't let the preview dock, a popover or a raised hand card cover the focused element.
 - **Check:** the Playwright keyboard-only game (PLAN, M3) passes. Screenshots of the focus ring at both resolutions show it unobscured on every focusable element type. Below the minimum supported size, the board does not render (see `board.md`).
 

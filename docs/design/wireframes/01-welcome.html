@@ -19,6 +19,7 @@
   .mini { display: flex; gap: 6px; margin-top: 14px; }
   .mini span { width: 34px; height: 47px; border-radius: 3px; }
   .keys { color: var(--color-text-subtle); font-size: var(--text-sm); }
+  @media (min-width: 1600px) and (min-height: 900px) { .welcome { max-width: 1000px; padding-top: 12vh; } }
   @media (max-width: 700px) { .choices { grid-template-columns: 1fr; } .welcome h1 { font-size: 30px; line-height: 38px; } }
 </style>
 </head>
@@ -36,7 +37,7 @@ function draw() {
   const st = WF.state() || 'first';
   const ret = st === 'returning';
   const choices = `
-    <a class="choice" href="02-setup.html" ${ret ? '' : 'data-wf-focus'}><span class="t">I know the rules: start a game</span><span class="s">Rocks vs Kaido, Pirate AI. Change anything first if you like.</span><span class="go">Set up a game →</span></a>
+    <a class="choice" href="02-setup.html" ${ret ? '' : 'data-wf-focus'}><span class="t">I know the rules: start a game</span><span class="s">Rocks vs Kaido, Pirate AI. Change anything first if you like.</span><span class="go">Choose decks and start →</span></a>
     <a class="choice" href="15-tutorial.html"><span class="t">I'm new: teach me</span><span class="s">About 20 minutes. You can leave and come back.</span><span class="go">Start the tutorial →</span></a>`;
   document.getElementById('main').innerHTML = `<div class="welcome">
     ${ret ? `<a class="choice resume" href="03-main.html" data-wf-focus style="min-height:0;margin-bottom:28px"><span class="t">Resume your game vs Kaido (turn 6)</span><span class="s">Saved on this device 2 hours ago. Practice mode.</span><span class="go">Resume →</span></a>` : ''}

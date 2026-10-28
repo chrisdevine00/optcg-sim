@@ -33,15 +33,17 @@ WF.mountBoard((st) => {
     mid: { turn: 'Puzzle · Turn 9 · Your turn', phase: 'Main', left: '<span class="chip outline" style="color:var(--color-text-muted)">Item 3 of 10</span>' },
     log: [SCN.th('Puzzle · Lethal (L15)'), '<li>Find lethal, or declare none.</li>', '<li>Their hand: 2 cards, up to +2000 each.</li>', '<li class="subtle">Their deck runs no [Trigger] cards.</li>'],
     coach: 'open', verbosity: 'Learner',
-    coachHtml: EXPL.coach('lethal', `<p style="margin:0 0 6px">The guided count is free in drills: using it doesn't mark the item wrong. <b>Show answer</b> does.</p><div class="row" style="gap:6px"><button class="btn small primary" type="button">Count it with me</button><button class="btn small" type="button">Show answer</button></div>`, { lethal: 'puzzle', hint: 'Show answer' }),
+    coachHtml: EXPL.coach('lethal', `<p style="margin:0 0 6px">Counting with the coach is free: it doesn't mark the item wrong. Showing the answer counts the item as missed.</p><div class="row" style="gap:6px"><button class="btn small" type="button">Count it with me</button><button class="btn small" type="button">Show answer</button></div>`, { lethal: 'puzzle', hint: 'off in drills', why: 'off in drills' }),
+    coachStrip: { labels: { hint: 'Answer' } },
   };
   const timer = st === 'timed'
-    ? `<div class="row" style="gap:8px;margin:6px 0"><span class="num" style="font-weight:700">0:42</span><div style="flex:1;height:4px;background:var(--color-surface-3);border-radius:2px"><div style="width:70%;height:100%;background:var(--color-accent)"></div></div><button class="btn small" type="button">❚❚ Pause <kbd>P</kbd></button></div><p class="subtle" style="margin:0;font-size:12px">Time never ends the item: past 0:00 it says "Over time" and still counts untimed.</p>`
-    : `<div class="row" style="gap:8px;margin:6px 0"><button type="button" class="switch" role="switch" aria-checked="false" style="border:0;background:none;padding:0"><span class="track" aria-hidden="true"></span><span>Timer off</span></button><span class="subtle" style="font-size:12px">Untimed by default</span></div>`;
+    ? `<div class="row" style="gap:8px;margin:6px 0"><span class="num" style="font-weight:700" role="timer" aria-label="42 seconds left of 60">0:42</span><div style="flex:1;height:4px;background:var(--color-surface-3);border-radius:2px" aria-hidden="true"><div style="width:70%;height:100%;background:var(--color-accent)"></div></div><button class="btn small" type="button">❚❚ Pause <kbd>P</kbd></button></div><p class="subtle" style="margin:0;font-size:12px">Time allowed: 100% (60 s). At 0:00 it shows "Over time" and you can still answer; it counts toward the untimed score.</p>`
+    : `<div class="row" style="gap:8px;margin:6px 0;font-size:12px"><span class="chip outline">Untimed</span><span class="subtle">Time allowed is set on the start screen</span></div>`;
   s.decision = {
     title: 'Lethal puzzle · find lethal',
-    body: `<p style="margin:0">Play the turn on the board, with Rewind. Or declare there is none.</p><p class="muted" style="margin:4px 0 0;font-size:12px">Their hand: 2 cards, up to +2000 each <span class="chip outline" style="height:16px">public</span> · a line that wins here wins against any hand.</p>${timer}`,
-    foot: `<button class="btn" type="button">No lethal <kbd>N</kbd></button>${SCN.primary('End turn', '2 can attack · 4 DON!! unused', 'E')}`,
+    body: `<p style="margin:0">Play the turn on the board, with Rewind, or declare there is none.</p><p class="muted" style="margin:4px 0 0;font-size:12px">Their hand: 2 cards, up to +2000 each. Win against any 2 cards.</p>${timer}`,
+    // Drill answers have equal weight: neither "No lethal" nor "Submit turn" is styled or focused as the default (review UX-R7).
+    foot: `<button class="btn big" type="button" style="flex:1;min-width:0"><span class="lbl2">No lethal <kbd>N</kbd></span><span class="sub">declare there is none</span></button><button class="btn big" type="button" style="flex:1;min-width:0;margin-left:0"><span class="lbl2">Submit turn</span><span class="sub">after your attacks</span></button>`,
   };
   if (st === 'answer') {
     s.me.leader = K('OP17-058', { who: 'Your', r: true, don: 2, p: 7000 });
@@ -53,12 +55,19 @@ WF.mountBoard((st) => {
     s.log.push(SCN.you('Kaido attacks their Leader · 14000 vs 5000'), '<li>Hit · their Life 1 → 0 · 3 cards</li>', SCN.you('Your Leader attacks · 7000 vs 5000'), SCN.opp('Counter: +2000, +2000 · 5000 → 9000', false), '<li>Attack fails · puzzle missed</li>');
   }
   if (st === 'real') {
-    s.mid.left = '<span class="chip outline" style="color:var(--color-text-muted)">From your game, turn 12</span>';
+    s.mid.left = '<span class="chip outline" style="color:var(--color-text-muted)">From your game</span>';
+    s.mid.turn = 'Turn 12 · Your turn (your 6th)';
     s.opp = { idText: 'Kaido · their real hand', hand: 4, known: ['Kaido', 'Lead Performers', 'Gum-Gum Lightning', 'Yamato'], donDeck: 0, active: 0, rested: 9, life: 0, deck: 20, leader: opp('OP17-058'), trash: { n: 14, top: K('OP17-076') }, chars: [null, opp('EB04-031', { r: true }), opp('EB04-032', { r: true }), null, null] };
     s.me = { donDeck: 0, active: 0, rested: 7, life: 2, deck: 18, leader: K('OP17-039', { who: 'Your', r: true, don: 3, p: 8000 }), trash: { n: 15, top: K('OP17-056') }, chars: [K('OP17-049', { st: ['legal'], g: 'attack' }), K('OP17-048', { st: ['legal'], g: 'attack' }), K('OP17-040', { st: ['legal'], g: 'attack' }), null, null], hand: [K('OP17-045', { hand: true }), K('OP17-054', { hand: true })] };
     s.decision.title = 'Practice · their real hand';
-    s.decision.foot = `<button class="btn" type="button">No lethal <kbd>N</kbd></button>${SCN.primary('End turn', '3 can attack', 'E')}`;
-    s.decision.body = `<p style="margin:0">${EXPL.cert('needed-hidden-info', 'review')}</p><p style="margin:6px 0 0">Their real hand is face up: one way to see it. Against a hand you can't see, this line is not proven.</p>`;
+    s.decision.body = `<p style="margin:0">${EXPL.cert('needed-hidden-info', 'review')}</p><p style="margin:6px 0 4px">Their real hand is face up. Against a hand you can't see, this line is not proven.</p>
+      <p style="margin:0;font-size:12px;line-height:16px"><b>Known:</b> Kaido · Lead Performers · Gum-Gum Lightning · Yamato</p>`;
+    // Face-up minis over the opponent-hand strip (board.md §3.5): the strip is 32 px tall, too small for names, so names sit in the panel above and the strip shows the faces.
+    s.boardExtra = (g) => {
+      const [x, y, w, hgt] = g.oppHand; const cw = Math.round(g.card[0] * 0.4), ch = Math.round(g.card[1] * 0.4), n = 4;
+      const ox = x + w / 2 - (n * (cw + 4)) / 2; const cols = ['purple', 'purple', 'purple', 'black'];
+      return `<span class="zlabel" style="left:${ox - 52}px;top:${(hgt - 16) / 2}px;color:var(--color-text);font-weight:600;z-index:3">Known</span>` + cols.map((c, i) => `<span class="kmini c-${c}" aria-hidden="true" style="position:absolute;z-index:3;left:${ox + i * (cw + 4)}px;top:${hgt - ch - 4}px;width:${cw}px;height:${ch}px;border-radius:0 0 3px 3px;background:repeating-linear-gradient(135deg,rgb(255 255 255/.08) 0 4px,transparent 4px 8px),var(--art);box-shadow:inset 0 0 0 2px var(--color-accent)"></span>`).join('');
+    };
     s.log = [SCN.th('Practice · from review'), '<li>Turn 12 · after your Leader’s hit</li>', '<li>Their hand shown: Kaido, Lead Performers, Gum-Gum Lightning, Yamato</li>'];
   }
   return s;

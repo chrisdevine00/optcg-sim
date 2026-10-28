@@ -3,62 +3,159 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tutorial: giving DON!!</title>
+<title>Tutorial</title>
 <link rel="stylesheet" href="../tokens.css">
 <link rel="stylesheet" href="wf.css">
 <style>
   .tcard { position: absolute; z-index: 30; background: var(--color-surface-2); border: 2px solid var(--color-accent); border-radius: var(--radius-3); box-shadow: var(--elev-2); padding: 10px 12px; font-size: var(--text-lg); line-height: var(--leading-lg); }
   .tcard h2 { font: 600 var(--text-xl)/var(--leading-xl) var(--font-display); margin: 0 0 4px; }
+  .tcard .do { margin: 8px 0 0; padding: 6px 8px; border-radius: 6px; background: var(--color-surface-3); font-size: var(--text-md); line-height: var(--leading-md); }
+  .tcard .do b { color: var(--color-accent-text); }
   .tcard::before { content: ''; position: absolute; left: -9px; top: 40px; width: 14px; height: 14px; background: var(--color-surface-2); border-left: 2px solid var(--color-accent); border-bottom: 2px solid var(--color-accent); transform: rotate(45deg); }
+  .tcard.below::before { left: 40px; top: -9px; transform: rotate(135deg); }
+  .tcard.noarrow::before { display: none; }
+  .tcard.above::before { left: 60px; top: auto; bottom: -9px; transform: rotate(-45deg); }
+  .zonehi { position: absolute; z-index: 25; border: 3px solid var(--color-accent); border-radius: 8px; box-shadow: 0 0 0 4px var(--color-focus-gap), 0 0 18px 4px var(--color-legal-glow); pointer-events: none; }
   .dots { display: flex; gap: 4px; }
   .dots span { width: 22px; height: 6px; border-radius: 3px; background: var(--color-surface-3); }
   .dots span.done { background: var(--color-text-muted); }
   .dots span.cur { background: var(--color-accent); }
+  .finish { position: absolute; z-index: 60; inset: 0; background: var(--color-scrim); display: grid; place-items: center; }
+  .finish .box { width: min(560px, 90%); background: var(--color-surface-2); border: 1px solid var(--color-line-strong); border-radius: var(--radius-4); box-shadow: var(--elev-3); padding: 24px 28px; }
+  .finish h2 { font: 600 var(--text-3xl)/var(--leading-3xl) var(--font-display); margin: 0 0 6px; }
+  .finish ul { margin: 8px 0 16px; padding-left: 20px; font-size: var(--text-md); line-height: var(--leading-md); }
 </style>
 </head>
 <body class="board-page">
-<main class="stage" aria-label="Tutorial step 3 of 8: Giving DON!!"></main>
-<div id="announce-polite" class="sr-only" role="status" aria-live="polite">Giving DON!!. Each DON!! you give adds 1000 power, on your turn only. Highlighted: your Leader. Press Enter to give 1 DON!!.</div>
+<main class="stage" aria-label="Tutorial"></main>
+<div id="announce-polite" class="sr-only" role="status" aria-live="polite"></div>
 <script src="wf.js"></script>
 <script src="cards.js"></script>
 <script src="scenarios.js"></script>
 <script>
-const STATES = [['step', 'Step 3: constrained action'], ['notyet', 'Tried something else'], ['done', 'Done: Next']];
+// Tutorial steps follow flows.md F2. Every instruction is the real input (board.md §4.2, accessibility.md §3): nothing here exists only in the tutorial.
+const STATES = [['t1', 'T1 Zones'], ['step', 'T3 Giving DON!!'], ['donmode', 'T3 DON!! mode on'], ['notyet', 'T3 Tried something else'], ['done', 'T3 Done: Next'], ['t5', 'T5 Being attacked'], ['t5staged', 'T5 Counter staged'], ['complete', 'Tutorial complete']];
+const SAY = {
+  t1: 'Step 1 of 8: Zones. Each player has the same zones. Highlighted: your Life. Click each lit zone, or press Tab to move from zone to zone. 3 of 9 zones visited.',
+  step: 'Step 3 of 8: Giving DON!!. Each DON!! you give your Leader or a Character adds 1000 power, on your turn only. Highlighted: your active DON!! and your Leader. Click your active DON!!, then your Leader. Or focus your Leader and press plus.',
+  donmode: 'Giving DON!!, 3 active. Now click your Leader to give it 1 DON!!.',
+  notyet: 'Not yet. First, give 1 DON!! to your Leader.',
+  done: 'Your Leader is 6000 until the end of your turn. Press Enter for step 4.',
+  t5: 'Step 5 of 8: Being attacked. Kaido, 5000, attacks your Leader, 5000. Ties go to the attacker. Click Buckin in your hand to stage it, then press Counter, survive. Or Space on Buckin, then Enter.',
+  t5staged: 'Staged Buckin, plus 1000. Your Leader 6000 against 5000: the attack fails. Press Counter, survive.',
+  complete: 'Tutorial complete. Play your first full game?',
+};
 WF.mountBoard((st) => {
   const opp = (id, x = {}) => K(id, { who: 'Opponent’s', ...x });
+  const T5 = st === 't5' || st === 't5staged';
+  const T1 = st === 't1';
+  const step = T1 ? 1 : T5 ? 5 : st === 'complete' ? 8 : 3;
   const done = st === 'done';
+  const dmode = st === 'donmode';
   const s = {
-    boardLabel: 'Tutorial board, step 3 of 8',
+    boardLabel: `Tutorial board, step ${step} of 8`,
     opp: { idText: 'Kaido · Rookie (scripted)', hand: 5, donDeck: 8, active: 0, rested: 2, life: 5, deck: 39, leader: opp('OP17-058'), trash: { n: 0 }, chars: [null, null, opp('EB04-032', { r: true }), null, null] },
     me: {
       donDeck: 7, active: done ? 2 : 3, rested: 0, life: 5, deck: 39,
-      leader: K('OP17-039', { who: 'Your', don: done ? 1 : 0, p: done ? 6000 : 5000, st: done ? [] : ['legal', 'wf-focus'], g: done ? undefined : 'don', chips: done ? [{ t: '◆ +1 · 6000', cls: 'don', pos: 'below' }] : [] }),
+      leader: K('OP17-039', { who: 'Your', don: done ? 1 : 0, p: done ? 6000 : 5000 }),
       trash: { n: 0 }, chars: [null, null, K('OP17-045'), null, null],
       hand: [K('OP17-046', { hand: true }), K('OP17-056', { hand: true }), K('OP17-049', { hand: true }), K('OP08-051', { hand: true })],
-      donLegal: !done,
     },
     mid: { turn: 'Turn 3 · Your turn', phase: 'Main', left: '<span class="chip you">Tutorial</span>' },
-    log: [SCN.th('Tutorial · step 3 of 8'), '<li>Step 1 Zones ✓ · Step 2 Your first turn ✓</li>', SCN.you('Refresh · Draw · DON!! +2 · 3 DON!!')],
+    log: [SCN.th(`Tutorial · step ${step} of 8`), '<li>Step 1 Zones ✓ · Step 2 Your first turn ✓</li>', SCN.you('Refresh · Draw · DON!! +2 · 3 DON!!')],
     coachStrip: {},
   };
-  if (done) s.log.push(SCN.you('Give 1 DON!! to Rocks.D.Xebec · 6000'));
-  const dots = `<div class="dots" role="img" aria-label="Step 3 of 8">${[1, 2, 3, 4, 5, 6, 7, 8].map((i) => `<span class="${i < 3 ? 'done' : i === 3 ? 'cur' : ''}"></span>`).join('')}</div>`;
-  s.decision = {
-    title: 'Tutorial · step 3 of 8',
-    q: false,
-    body: `${dots}<p style="margin:8px 0 4px"><b>Giving DON!!</b></p><p style="margin:0">${done ? 'Your Leader is 6000 until the end of your turn.' : 'Give 1 DON!! to your Leader. Only that move works in this step.'}</p><p class="subtle" style="margin:6px 0 0;font-size:12px">No timers. <kbd>P</kbd> reads this step again.</p>`,
-    foot: `<a class="btn" href="01-welcome.html">Leave tutorial</a>${done ? SCN.primary('Next', 'Step 4: Attacking', 'Enter', '04-attack.html') : '<button type="button" class="btn primary big" aria-disabled="true"><span class="lbl2">Next</span><span class="sub">after the move</span></button>'}`,
-  };
+  const me = s.me;
+  if (st === 'step' || st === 'notyet') {
+    // Both entry points are lit: the active DON!! row (DON!! mode) and the Leader (focus it and press +).
+    me.donLegal = true;
+    me.leader.st = ['legal']; me.leader.g = 'don';
+  }
+  if (dmode) {
+    me.donLegal = true; me.donMode = true;
+    me.leader.st = ['legal']; me.leader.g = 'don';
+    me.chars[2].st = ['dim'];
+  }
+  if (done) { me.leader.chips = [{ t: '◆ +1 · 6000', cls: 'don', pos: 'below' }]; s.log.push(SCN.you('Give 1 DON!! to Rocks.D.Xebec · 6000')); }
+  if (st === 'notyet') { me.chars[2].st = ['wf-focus']; }
+  if (T1) {
+    s.log = [SCN.th('Tutorial · step 1 of 8'), '<li>Zones visited: Leader, Characters, Life</li>'];
+    s.mid = { turn: 'Before turn 1', phase: 'none', left: '<span class="chip you">Tutorial</span>' };
+    me.chars = [null, null, null, null, null]; s.opp.chars = [null, null, null, null, null];
+    me.active = 0; s.opp.rested = 0; me.donDeck = 10; s.opp.donDeck = 10;
+  }
+  if (T5) {
+    s.boardLabel = 'Tutorial board, step 5 of 8, you are defending';
+    s.decisionTall = true;
+    s.mid = { turn: 'Turn 4 · Opponent’s turn', opp: true, battle: 'Counter', left: '<span class="chip you">Tutorial</span>' };
+    s.opp.leader = opp('OP17-058', { r: true, st: ['opp-act', 'battle'], chips: [{ t: '⚔ attacking', cls: 'attack', pos: 'below' }], noRestChip: true });
+    s.opp.rested = 4; s.opp.active = 0;
+    me.chars = [null, null, null, null, null];
+    me.leader.st = ['battle']; me.leader.p = T5 && st === 't5staged' ? 6000 : 5000;
+    s.arrows = [{ from: 'opp.leader', to: 'me.leader', cut: 40 }];
+    s.log = [SCN.th('Tutorial · step 5 of 8'), SCN.opp('Kaido attacks your Leader · 5000 vs 5000', false)];
+    const buckin = me.hand[3];
+    me.hand.forEach((c, i) => { if (i !== 3) c.st = ['dim']; });
+    if (st === 't5') { buckin.st = ['legal']; buckin.g = 'play'; }
+    else { buckin.st = ['legal', 'hand-raise']; buckin.g = 'pick'; buckin.chips = [{ t: '+1000 ✓', cls: 'you', pos: 'mid' }]; }
+  }
+
+  const dots = `<div class="dots" role="img" aria-label="Step ${step} of 8">${[1, 2, 3, 4, 5, 6, 7, 8].map((i) => `<span class="${i < step ? 'done' : i === step ? 'cur' : ''}"></span>`).join('')}</div>`;
+  const readAgain = '<button class="btn small" type="button" aria-label="Read this step again">Read again</button>';
+  const leave = '<a class="btn" href="01-welcome.html">Leave tutorial</a>';
+  if (T1) {
+    s.decision = { title: 'Tutorial · step 1 of 8', q: false,
+      body: `${dots}<p style="margin:8px 0 4px"><b>Zones</b> · 3 of 9 visited</p><p style="margin:0">Both players have the same zones, facing each other. Visit each lit zone to see what it holds.</p><div style="margin-top:8px">${readAgain}</div>`,
+      foot: `${leave}<button type="button" class="btn primary big" aria-disabled="true"><span class="lbl2">Next</span><span class="sub">after all 9 zones</span></button>` };
+  } else if (T5) {
+    const staged = st === 't5staged';
+    s.decision = { title: 'Tutorial · step 5 of 8', q: false,
+      body: `${dots}<p style="margin:8px 0 4px"><b>Being attacked</b></p>`
+        + SCN.battle({ att: { name: 'Kaido <span class="subtle">(their Leader)</span>', num: '5000', bd: '5000 base' }, def: { name: 'Your Leader', num: staged ? '6000' : '5000', bd: staged ? '5000 + 1000 staged (Buckin)' : '5000 base · 1 counter in hand' }, res: staged ? { cls: 'ok', text: 'Attack fails', need: 'Life stays 5' } : { cls: 'hit', text: 'Ties go to the attacker', need: 'Need +1000' } })
+        + `<p style="margin:6px 0 0">${staged ? 'Buckin is staged. Nothing is played until you press <b>Counter · survive</b>.' : 'First the Block step (you have no Blocker), then the Counter step. Stage a counter from your hand.'}</p><div style="margin-top:8px">${readAgain}</div>`,
+      foot: `<button class="btn big" type="button" aria-disabled="true" title="Not in this step: this one teaches countering"><span class="lbl2">Take the hit</span><span class="sub">not in this step</span></button>${staged ? SCN.primary('Counter +1000 · survive', 'Buckin · hand 4 → 3', 'Enter') : '<button type="button" class="btn primary big" aria-disabled="true"><span class="lbl2">Counter · survive</span><span class="sub">stage Buckin first</span></button>'}` };
+  } else if (st === 'complete') {
+    s.decision = { title: 'Tutorial complete', q: false, body: `${dots}<p style="margin:8px 0 0">All 8 steps done.</p>`, foot: `<a class="btn" href="01-welcome.html">Back to Home</a>${SCN.primary('Play your first game', 'Rookie · learner settings', 'Enter', '02-setup.html#first')}` };
+  } else {
+    s.decision = {
+      title: 'Tutorial · step 3 of 8', q: false,
+      body: `${dots}<p style="margin:8px 0 4px"><b>Giving DON!!</b></p><p style="margin:0">${done ? 'Your Leader is 6000 until the end of your turn.' : dmode ? 'DON!! mode is on: 3 active. Now click your Leader.' : 'Give 1 DON!! to your Leader. Only that move works in this step.'}</p><div style="margin-top:8px">${readAgain}</div>`,
+      foot: `${leave}${done ? SCN.primary('Next', 'Step 4: Attacking', 'Enter', '04-attack.html') : '<button type="button" class="btn primary big" aria-disabled="true"><span class="lbl2">Next</span><span class="sub">after the move</span></button>'}`,
+    };
+  }
   s.extra = (g, R) => {
-    const r = R['me.leader']; const roomy = g.W > 1600; const w = roomy ? 400 : 300;
-    const x = r[0] + r[2] + 14, y = r[1] - (roomy ? 40 : 64);
-    const body = st === 'notyet'
-      ? '<p style="margin:0"><b>Not yet.</b> First, give 1 DON!! to your Leader.</p>'
-      : done ? '<p style="margin:0">Your Leader went from 5000 to 6000. On their turn, it goes back to 5000 while the DON!! stays.</p>'
-        : '<p style="margin:0">Each DON!! you give a Leader or Character adds +1000 power, on your turn only. Click your Leader (or press Enter) to give it 1 DON!!.</p>';
-    return `<section class="tcard" role="region" aria-label="Step explanation" style="left:${x}px;top:${y}px;width:${w}px"><h2>${done ? 'That’s it' : 'Giving DON!!'}</h2>${body}<p style="margin:6px 0 0;font-size:var(--text-sm)"><a href="16-settings.html#rules">Why? CR 6-5-5-2</a></p></section>`;
+    const roomy = g.W > 1600; const w = roomy ? 420 : 300;
+    const card = (x, y, title, body, cls = '') => `<section class="tcard ${cls}" role="region" aria-label="Step explanation" style="left:${x}px;top:${y}px;width:${w}px"><h2>${title}</h2>${body}</section>`;
+    if (st === 'complete') {
+      return `<div class="finish"><section class="box" role="dialog" aria-modal="true" aria-labelledby="fin"><h2 id="fin">Tutorial complete</h2><p class="muted" style="margin:0 0 4px">17 minutes. You can now play a full game.</p>
+        <ul><li>Zones, the turn and your first plays</li><li>Giving DON!! (+1000 on your turn only)</li><li>Attacking, and being attacked: Block, then Counter</li><li>Triggers, your Leader's ability, and the last two hits</li></ul>
+        <p style="margin:0 0 16px;font-size:var(--text-md)">Your first game is set for learning: Rookie AI, the coach in Learner mode, and "lethal on board" switched on. You can change any of it.</p>
+        <div class="row"><a class="btn primary big" href="02-setup.html#first" data-wf-focus><span class="lbl2">Play your first full game <kbd>Enter</kbd></span><span class="sub">Rocks vs Kaido · Rookie</span></a><a class="btn big" href="01-welcome.html"><span class="lbl2">Back to Home</span></a></div></section></div>`;
+    }
+    if (T1) {
+      const r = g.myLife;
+      return `<span class="zonehi" style="left:${r[0] - 4}px;top:${r[1] - 4}px;width:${r[2] + 8}px;height:${r[3] + 8}px"></span>`
+        + `<span class="zonehi" style="left:${g.oppLife[0] - 4}px;top:${g.oppLife[1] - 4}px;width:${g.oppLife[2] + 8}px;height:${g.oppLife[3] + 8}px;border-style:dashed;opacity:.7"></span>`
+        + card(g.myStage[0] - 10, g.myCharY + 2, 'Life', '<p style="margin:0">Your Life: face-down cards. When an attack hits your Leader, the top card goes to your hand. Theirs is in the same place, above.</p><p class="do"><b>Do:</b> click each lit zone (or press Tab to move from zone to zone).</p>', 'noarrow');
+    }
+    if (T5) {
+      const r = R['me.hand.4'];
+      const body = st === 't5staged' ? '<p style="margin:0">Buckin adds +1000: your Leader is 6000, more than 5000, so the attack fails.</p><p class="do"><b>Do:</b> press <b>Counter · survive</b> (or Enter).</p>'
+        : '<p style="margin:0">5000 against 5000 is a tie, and ties go to the attacker. One counter card is enough.</p><p class="do"><b>Do:</b> click Buckin in your hand to stage it, then press Counter · survive (or Space on Buckin, then Enter).</p>';
+      // Anchored above Buckin, over your empty Character row, so it never covers the decision panel or a count.
+      const x = Math.max(g.mat[0] + 16, Math.min(g.mat[2] - w - 16, r[0] - 40));
+      return card(x, r[1] - 18, 'Being attacked', body + '<p style="margin:6px 0 0;font-size:var(--text-sm)"><a href="16-settings.html#rules">Why? CR 7-1-2, 7-1-3</a></p>', 'above').replace('style="left:', 'style="transform:translateY(-100%);left:');
+    }
+    const r = R['me.leader']; const x = r[0] + r[2] + 14, y = r[1] - (roomy ? 40 : 64);
+    let body;
+    if (st === 'notyet') body = '<p style="margin:0"><b>Not yet.</b> First, give 1 DON!! to your Leader.</p><p class="do"><b>Do:</b> click your active DON!! (or focus your Leader and press <kbd>+</kbd>), then click your Leader.</p>';
+    else if (done) body = '<p style="margin:0">Your Leader went from 5000 to 6000. On their turn it goes back to 5000; the DON!! stays until your next Refresh.</p>';
+    else if (dmode) body = '<p style="margin:0">DON!! mode is on. Every card that can take DON!! is lit with ◆.</p><p class="do"><b>Do:</b> click your Leader to give it 1 DON!!. Esc leaves DON!! mode.</p>';
+    else body = '<p style="margin:0">Each DON!! you give your Leader or a Character adds +1000 power, on your turn only.</p><p class="do"><b>Do:</b> click your active DON!! (or focus your Leader and press <kbd>+</kbd>), then click your Leader.</p>';
+    return card(x, y, done ? 'That’s it' : 'Giving DON!!', body + '<p style="margin:6px 0 0;font-size:var(--text-sm)"><a href="16-settings.html#rules">Why? CR 6-5-5-2</a></p>');
   };
-  if (st === 'notyet') { s.me.chars[2].st = ['wf-focus']; s.me.leader.st = ['legal']; }
+  s.after = () => { document.getElementById('announce-polite').textContent = SAY[st] || SAY.step; const f = document.querySelector('[data-wf-focus]'); if (f) f.focus(); };
+  s.pageTitle = 'Tutorial';
   return s;
 }, STATES);
 </script>

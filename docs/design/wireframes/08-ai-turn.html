@@ -10,6 +10,7 @@
 <body class="board-page">
 <main class="stage" aria-label="Game: Rocks.D.Xebec (you) vs Kaido (Pirate AI)"></main>
 <div id="announce-polite" class="sr-only" role="status" aria-live="polite">Kaido plays Queen, cost 9, resting 9 DON!!.</div>
+<style>.recap{padding:6px 8px;border:1px solid var(--color-line-strong);border-radius:6px;margin-bottom:6px;font-size:12px;line-height:16px}</style>
 <script src="wf.js"></script>
 <script src="cards.js"></script>
 <script src="scenarios.js"></script>
@@ -17,10 +18,10 @@
 const STATES = [['acting', 'AI move: highlight + dwell'], ['thinking', 'Thinking (real wait)'], ['skipped', 'After skip: recap']];
 WF.mountBoard((st) => {
   const opp = (id, x = {}) => K(id, { who: 'Opponent’s', ...x });
+  // One speed control everywhere (board.md §5.3, C11): Step is a pace on the same scale
   const speed = (cur = '1×') => `<div class="row" style="gap:8px;margin-top:8px"><span class="lbl" style="margin:0">Speed</span>
-      <div class="seg" role="radiogroup" aria-label="Opponent speed">${['0.5×', '1×', '2×', '4×'].map((v) => `<button type="button" role="radio" aria-checked="${v === cur}">${v}</button>`).join('')}</div>
-      <button type="button" class="switch" role="switch" aria-checked="false" style="border:0;background:none;padding:0"><span class="track" aria-hidden="true"></span><span style="font-size:12px">Step</span></button></div>
-      <p class="subtle" style="margin:6px 0 0;font-size:12px">Pause <kbd>K</kbd> · slower/faster <kbd>[</kbd> <kbd>]</kbd></p>`;
+      <div class="seg" role="radiogroup" aria-label="Opponent speed">${['Step', '0.5×', '1×', '2×', '4×'].map((v) => `<button type="button" role="radio" aria-checked="${v === cur}">${v}</button>`).join('')}</div></div>
+      <p class="subtle" style="margin:6px 0 0;font-size:12px">Pause <kbd>K</kbd> · slower / faster <kbd>[</kbd> <kbd>]</kbd></p>`;
   const s = {
     boardLabel: 'Game board, turn 8, opponent’s turn',
     opp: {
@@ -50,16 +51,16 @@ WF.mountBoard((st) => {
   };
   const o = s.opp;
   if (st === 'acting') {
-    o.chars[2] = opp('OP17-065', { st: ['opp-act'], chips: [{ t: 'playing', cls: 'opp', pos: 'top' }] });
+    o.chars[2] = opp('OP17-065', { st: ['opp-act'], chips: [{ t: 'playing', cls: 'opp' }] });
     o.status = 'Playing';
     s.mid.left = 'played Queen';
     s.log.push(SCN.opp(`Play ${SCN.lk('Queen')} · 9 DON!!`));
     s.decision = {
       title: 'Kaido’s turn · move 2',
       q: true,
-      body: `<p style="margin:0 0 4px"><b>Queen</b> [On Play] DON!! −1: draw 1, and up to 2 of your Characters with cost 5 or less can't attack until the end of your next turn.</p>
-        <p class="subtle" style="margin:0;font-size:12px">Each move: highlight, then move, then a short hold.</p>${speed()}`,
-      foot: `<button class="btn" type="button" aria-label="Pause (K)">❚❚ Pause</button>${SCN.primary('Skip to my decision', '4 moves queued', 'S')}`,
+      // Narration names the actor of each clause (UX-R22); the printed text stays in the preview
+      body: `<p style="margin:0 0 4px"><b>Kaido plays Queen.</b> On Play, DON!! −1: Kaido draws 1. Your Stussy and Captain John can’t attack until the end of your next turn.</p>${speed()}`,
+      foot: `<button class="btn" type="button" data-key="K" aria-label="Pause (K)">❚❚ Pause <kbd>K</kbd></button>${SCN.primary('Skip to my decision', 'stops when you have a choice', 'S')}`,
     };
   }
   if (st === 'thinking') {
@@ -67,37 +68,40 @@ WF.mountBoard((st) => {
     s.mid.left = '<span aria-hidden="true">◔</span> Opponent is thinking…';
     s.decision = {
       title: 'Kaido’s turn',
-      body: `<div class="row" style="justify-content:space-between"><b>Thinking</b><span class="subtle" style="font-size:12px">Warlord thinks up to 2.5 s</span></div>
-        <div class="indet" style="margin:6px 0 4px" aria-hidden="true"></div>
-        <p class="subtle" style="margin:0;font-size:12px">Shown only when Kaido has not answered within 300 ms and nothing is animating.</p>${speed()}`,
-      foot: `<button class="btn" type="button">❚❚ Pause</button>${SCN.primary('Skip to my decision', 'plays the rest instantly', 'S')}`,
+      body: `<p style="margin:0" role="status"><b>Kaido is thinking…</b></p>
+        <div class="indet" style="margin:6px 0 4px" aria-hidden="true"></div>${speed()}`,
+      foot: `<button class="btn" type="button" data-key="K">❚❚ Pause <kbd>K</kbd></button>${SCN.primary('Skip to my decision', 'stops when you have a choice', 'S')}`,
     };
   }
   if (st === 'skipped') {
-    o.chars[2] = opp('OP17-065', { chips: [{ t: 'New', cls: 'opp', pos: 'top' }] });
-    o.leader = opp('OP17-058', { r: true, don: 2, donOff: true, chips: [{ t: '◆2 · attacked', cls: 'opp', pos: 'below' }], noRestChip: true });
-    s.me.chars[3] = K('OP17-054', { chips: [{ t: 'Can’t attack', cls: 'warning', pos: 'top' }] });
-    s.me.life = 3;
-    s.me.chars[2] = K('OP17-048'); s.me.chars[2].st = ['legal']; s.me.chars[2].g = 'attack';
-    s.me.chars[1] = K('OP17-044', { chips: [{ t: 'Can\u2019t attack', cls: 'warning', pos: 'top' }] });
-    s.me.leader.st = ['legal']; s.me.leader.g = 'attack';
-    s.mid = { turn: 'Turn 9 · Your turn', phase: 'Main' };
+    // Skip finished the queued moves and STOPPED at the first decision you owe (UX-R3, board.md §5.3).
+    s.boardLabel = 'Game board, turn 8, opponent’s turn, you are defending';
+    s.decisionTall = true;
+    o.chars[2] = opp('OP17-065', { chips: [{ t: 'New', cls: 'opp' }] });
+    o.leader = opp('OP17-058', { r: true, don: 2, p: 7000, st: ['opp-act', 'battle'], chips: [{ t: '⚔ attacking', cls: 'attack', pos: 'below' }], noRestChip: true });
     o.active = 0; o.rested = 8; o.donDeck = 0;
-    s.me.active = 9; s.me.rested = 0; s.me.donDeck = 1;
+    s.me.chars[3] = K('OP17-054', { chips: [{ t: 'Can’t attack', cls: 'warning' }] });
+    s.me.chars[1] = K('OP17-044', { r: true, chips: [{ t: 'Can’t attack', cls: 'warning', pos: 'below' }] });
+    s.me.leader.st = ['battle'];
+    const [glo, buck, kyo, lin, auth] = s.me.hand;
+    [buck, auth].forEach((c) => { c.st = ['legal']; c.g = 'play'; });
+    [glo, kyo, lin].forEach((c) => { c.st = ['dim']; });
+    s.mid = { turn: 'Turn 8 · Opponent’s turn', opp: true, battle: 'Block', left: '' };
+    s.arrows = [{ from: 'opp.leader', to: 'me.leader', cut: 40 }];
     s.log.push(
       '<li class="skipped"><span class="chip opp">Opp</span>Play Queen · 9 DON!!</li>',
-      '<li class="skipped">On Play: Stussy and Captain John can’t attack</li>',
+      '<li class="skipped">On Play: Kaido draws 1 · your Stussy and Captain John can’t attack</li>',
       '<li class="skipped"><span class="chip opp">Opp</span>Give 2 DON!! to Kaido · 7000</li>',
-      '<li class="skipped"><span class="chip opp">Opp</span>Kaido attacks your Leader · 7000 vs 5000</li>',
-      '<li class="skipped">No counter · Hit · your Life 4 → 3</li>',
-      SCN.th('Turn 9 · You'),
-      SCN.you('Refresh · Draw: Kyo · DON!! +2 · 9 DON!!'),
+      SCN.opp(`${SCN.lk('Kaido')} attacks your Leader · 7000 vs 5000`),
     );
     s.decision = {
-      title: 'Your Main phase',
-      body: `<div style="padding:6px 8px;border:1px solid var(--color-line-strong);border-radius:6px;margin-bottom:6px;font-size:12px;line-height:16px"><b>While you skipped:</b> Kaido played Queen (Stussy and Captain John can't attack), gave 2 DON!!, attacked once. You took 1 hit: Life 4 → 3.</div>
-        <p style="margin:0">Play a card, give DON!!, attack, or end your turn.</p>`,
-      foot: `${SCN.rewind}${SCN.primary('End turn', '2 can attack · 9 DON!! unused', 'E')}`,
+      title: 'Defend your Leader · Kaido attacks',
+      body: `<div class="recap" role="status"><b>Stopped: Kaido attacks your Leader (7000 vs 5000). Your decision.</b><br><span class="muted">While you skipped: Kaido played Queen (your Stussy and Captain John can’t attack until the end of your next turn) and gave 2 DON!! to Kaido.</span></div>`
+        + SCN.battle({ att: { name: 'Kaido <span class="subtle">(their Leader)</span>', num: '7000', bd: '5000 + 2000 DON!!' }, def: { name: 'Your Leader', num: '5000', bd: 'no counters staged · 2 in hand, up to +3000' }, res: { cls: 'hit', text: 'Hit lands', need: 'Need +3000' },
+          post: `<div class="lane"><span class="ln">Block</span><div class="opts"><span class="muted">No Blocker on your field</span></div></div>
+            <div class="lane" style="border-bottom:0"><span class="ln">Counter</span><div class="opts"><button class="opt" type="button" aria-pressed="false">Buckin +1000</button><button class="opt" type="button" aria-pressed="false">No Authority +2000 <span class="subtle" style="font-weight:500">· 1 DON!!</span></button></div></div>
+            <p class="subtle" style="margin:4px 0 0;font-size:12px">Both together make +3000: exactly enough. Click lit hand cards to stage.</p>` }),
+      foot: `${SCN.secondary('Counter', 'stage a lit hand card', '', 'aria-disabled="true"')}${SCN.primary('Take the hit', 'Life 4 → 3 · +1 card', '')}`,
     };
   }
   return s;

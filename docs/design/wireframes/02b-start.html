@@ -18,10 +18,10 @@
 <script src="scenarios.js"></script>
 <script src="expl.js"></script>
 <script>
-const STATES = [['rps', 'Rock-paper-scissors'], ['choose', 'You won: first or second'], ['mulligan', 'Mulligan'], ['hint', 'Mulligan + coach hint']];
+const STATES = [['rps', 'Roll: you choose first or second'], ['manual-rps', 'Rock-paper-scissors (setting)'], ['mulligan', 'Mulligan'], ['hint', 'Mulligan + coach hint']];
 WF.mountBoard((st) => {
   const opp = (id, x = {}) => K(id, { who: 'Opponent’s', ...x });
-  const pre = st === 'rps' || st === 'choose';
+  const pre = st === 'rps' || st === 'manual-rps';
   const s = {
     boardLabel: 'Game board, before turn 1',
     opp: { idText: 'Kaido · Pirate AI', hand: pre ? 0 : 5, donDeck: 10, active: 0, rested: 0, life: null, deck: pre ? 50 : 45, leader: opp('OP17-058'), trash: { n: 0 }, chars: [null, null, null, null, null] },
@@ -32,22 +32,22 @@ WF.mountBoard((st) => {
   };
   // Life is placed after the mulligan; before that the Life boxes are empty but not "0 Life · next hit loses"
   s.extra = (g, R) => '';
-  if (st === 'rps') {
+  if (st === 'manual-rps') {
     s.decision = { title: 'Who chooses first?', body: `<p style="margin:0 0 8px">Rock-paper-scissors decides who chooses to go first or second <span class="subtle">(CR 5-2-1-4)</span>.</p>
       <div class="rps" role="group" aria-label="Your pick"><button class="btn" type="button" data-wf-focus>Rock <kbd>R</kbd></button><button class="btn" type="button">Paper <kbd>P</kbd></button><button class="btn" type="button">Scissors <kbd>S</kbd></button></div>`,
       foot: `<button class="btn" type="button">Random for me</button><span class="grow"></span>` };
   }
-  if (st === 'choose') {
-    s.log.push('<li>You chose Paper · Kaido chose Rock · you choose</li>');
-    s.decision = { title: 'You choose: first or second?', body: `<div class="grid" style="grid-template-columns:1fr 1fr;gap:8px;font-size:12px;line-height:16px">
+  if (st === 'rps') {
+    s.log.push('<li>Roll for first player: you won · you choose</li>');
+    s.decision = { title: 'You won the roll: first or second?', body: `<div class="grid" style="grid-template-columns:1fr 1fr;gap:8px;font-size:12px;line-height:16px">
       <div><b style="font-size:13px">First</b><br>You attack first, but draw no card and get 1 DON!! on turn 1.</div>
       <div><b style="font-size:13px">Second</b><br>One card and one DON!! ahead on each of your turns.</div></div>
-      <p class="subtle" style="margin:8px 0 0;font-size:12px">Hint (H) gives the Rocks guide's seat note.</p>`,
-      foot: `<button class="btn primary big" type="button" style="flex:1;min-width:0" data-wf-focus><span class="lbl2">Go first <kbd>1</kbd></span></button><button class="btn primary big" type="button" style="flex:1;min-width:0;margin-left:0"><span class="lbl2">Go second <kbd>2</kbd></span></button>` };
+      <p class="subtle" style="margin:8px 0 0;font-size:12px">Hint (H) gives the Rocks guide's seat note. Setup's "Who goes first" can make this rock-paper-scissors instead.</p>`,
+      foot: `<button class="btn big" type="button" style="flex:1;min-width:0" data-wf-focus><span class="lbl2">Go first <kbd>1</kbd></span><span class="sub">attack first</span></button><button class="btn big" type="button" style="flex:1;min-width:0;margin-left:0"><span class="lbl2">Go second <kbd>2</kbd></span><span class="sub">+1 card, +1 DON!!</span></button>` };
   }
   if (st === 'mulligan' || st === 'hint') {
     s.mid = { turn: 'Mulligan · you go first', phase: 'none' };
-    s.log.push('<li>You chose Paper · Kaido chose Rock · you choose</li>', SCN.you('Go first'), '<li>Both draw 5</li>');
+    s.log.push('<li>Roll for first player: you won · you choose</li>', SCN.you('Go first'), '<li>Both draw 5</li>');
     s.decision = { title: 'Keep or redraw?', body: `<p style="margin:0">One redraw: all five go back, the deck is shuffled, and you draw five new cards.</p><p class="subtle" style="margin:6px 0 0;font-size:12px">You go first, so you decide first. Then Kaido.</p><p class="subtle" style="margin:4px 0 0;font-size:12px">Your hand is in the centre · ← → move · <kbd>I</kbd> inspects</p>`,
       foot: `<button class="btn" type="button">Redraw <kbd>R</kbd></button>${SCN.primary('Keep', '5 cards', 'K')}` };
     if (st === 'hint') { s.coach = 'open'; s.coachHtml = EXPL.coach('hint', EXPL.render(EXPL.E.E11, { verbosity: 'standard', live: false }), { hint: 'ready' }); }

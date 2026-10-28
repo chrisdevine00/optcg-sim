@@ -158,6 +158,7 @@
   /* Numerals (Inter, tabular) */
   --num-battle: 28px; --num-battle-leading: 32px; /* attacker and defender power in the battle panel */
   --num-hero: 40px; /* game result, drill score */
+  --num-don: 20px; /* active DON!! count in each cost area: the largest DON!! number on the board (board.md §3.4) */
 
   /* Card overlays scale with the card. --card-w is set by the board at runtime. */
   --card-w: 84px;
@@ -208,9 +209,13 @@
   --board-gap: 8px;
   --board-margin: 16px;
   --decision-h: 248px;
+  --decision-tall-h: 520px; /* Block, Counter, Trigger, attack confirm (board.md §3.9) */
   --coach-collapsed-h: 48px;
-  --coach-open-h: 280px;
+  --coach-open-h: 244px;
+  --coach-tall-h: 468px; /* only on a player request, in your idle Main phase (board.md §3.13) */
   --rail-header-h: 44px;
+  --rail-notice-h: 32px; /* the board's footer-equivalent disclaimer (board.md §3.1) */
+  --log-row-h: 24px; /* each log line is a 24 px target row (WCAG 2.5.8) */
   --card-min-w: 76px; /* minimum legible board card; below this the layout changes (board.md) */
 }
 
@@ -225,6 +230,7 @@
   --z-board: 0;
   --z-card-raised: 10;
   --z-arrow: 20;
+  --z-plate: 25; /* battle power plates and status chips draw above the attack arrow (board.md §2.3) */
   --z-popover: 30;
   --z-dock: 40;
   --z-drag: 50;
@@ -249,7 +255,8 @@
   /* Game pacing at 1x. The app multiplies these by 1/speed (0.5x, 1x, 2x, 4x). */
   --dur-highlight: 120ms; /* source card lights up before it acts */
   --dur-move: 240ms; /* card travel between zones */
-  --dur-dwell: 240ms; /* hold after a move so a human can read it */
+  --dur-dwell: 400ms; /* hold after a play, give or activate so a human can read it (board.md §5.2) */
+  --dur-dwell-attack: 600ms; /* hold after an attack or a battle result that needs no decision from you */
   --dur-damage: 360ms; /* Life card flip and travel */
 
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
@@ -268,7 +275,8 @@
     --dur-move: 0ms;
     --dur-damage: 0ms;
     --dur-highlight: 120ms;
-    --dur-dwell: 480ms;
+    --dur-dwell: 800ms;
+    --dur-dwell-attack: 1200ms;
   }
 }
 :root[data-motion='reduced'] {
@@ -277,7 +285,8 @@
   --dur-move: 0ms;
   --dur-damage: 0ms;
   --dur-highlight: 120ms;
-  --dur-dwell: 480ms;
+  --dur-dwell: 800ms;
+  --dur-dwell-attack: 1200ms;
 }
 
 /* ---------- Density: roomy (designed at 1920x1080) ---------- */
@@ -289,6 +298,7 @@
     --text-lg: 17px; --leading-lg: 26px;
     --text-xl: 22px; --leading-xl: 30px;
     --num-battle: 36px; --num-battle-leading: 40px;
+    --num-don: 28px;
 
     --card-w: 126px;
     --rail-w: 400px;
@@ -297,8 +307,10 @@
     --board-gap: 12px;
     --board-margin: 24px;
     --decision-h: 336px;
+    --decision-tall-h: 864px;
     --coach-collapsed-h: 48px;
-    --coach-open-h: 400px;
+    --coach-open-h: 368px;
+    --coach-tall-h: 796px;
     --rail-header-h: 56px;
     --control-h: 40px;
     --control-h-primary: 56px;

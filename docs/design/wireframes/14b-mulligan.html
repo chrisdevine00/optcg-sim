@@ -13,6 +13,9 @@
   .drill { display: grid; grid-template-columns: 1fr 420px; gap: 20px; align-items: start; }
   .start { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
   .ans .claim { font-size: var(--text-xl); line-height: var(--leading-xl); }
+  .ans-btn { min-width: 180px; }
+  .handlist:focus-visible { outline-offset: 6px; border-radius: 8px; }
+  .cert.guide { border-color: var(--color-accent-text); color: var(--color-accent-text); }
 </style>
 </head>
 <body>
@@ -27,6 +30,12 @@
 <script>
 WF.chrome('Drills');
 const roomy = WF.isRoomy(); if (roomy) document.body.classList.add('roomy-h');
+// E11 with game-turn wording (one rule: game turn numbers, "(your Nth)" where it matters) and the guide's certainty label.
+const E11 = { ...EXPL.E.E11,
+  evidence: ['Your cheapest Character costs 5. Going first you have 1, 3, then 5 DON!!: nothing to play until turn 5 (your 3rd).', ...EXPL.E.E11.evidence.slice(1)],
+  outcome: 'A 90% chance of a play on turn 1, 3 or 5 (your first three turns), instead of none until turn 5.' };
+const GUIDE_CERT = '<span class="cert guide" title="This answer comes from the Rocks.D.Xebec guide\u2019s mulligan section, which cites its source. No opponent hand is involved."><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2h7l3 3v9H3z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M5.5 8h5M5.5 11h5" stroke="currentColor" stroke-width="1.4"/></svg>From the Rocks guide (sourced)</span>';
+function renderAnswer() { return EXPL.render(E11, { verbosity: 'learner' }).replace(/<span class="cert [^"]*"[^>]*>[\s\S]*?<\/span>/, GUIDE_CERT); }
 const STATES = [['start', 'Start screen'], ['item', 'Item: keep or redraw'], ['answer', 'Answer (E11)']];
 function draw() {
   const st = WF.state() || 'start';
@@ -41,20 +50,20 @@ function draw() {
           <div class="lbl" style="margin-top:10px">Seat</div><div class="seg" role="radiogroup" aria-label="Seat"><button type="button" role="radio" aria-checked="true">Both</button><button type="button" role="radio" aria-checked="false">First</button><button type="button" role="radio" aria-checked="false">Second</button></div></div>
         <div class="panel"><div class="lbl">Source</div><div class="seg" role="radiogroup" aria-label="Source"><button type="button" role="radio" aria-checked="true">Bank</button><button type="button" role="radio" aria-checked="false">From my games</button></div>
           <div class="lbl" style="margin-top:10px">Items</div><div class="seg" role="radiogroup" aria-label="Items"><button type="button" role="radio" aria-checked="false">5</button><button type="button" role="radio" aria-checked="true">10</button><button type="button" role="radio" aria-checked="false">20</button></div></div>
-        <div class="panel"><div class="lbl">Timer</div><button type="button" class="switch" role="switch" aria-checked="false" style="border:0;background:none;padding:0"><span class="track" aria-hidden="true"></span><span>Off</span></button>
-          <p class="muted" style="font-size:13px;margin:8px 0 0">Off by default. When on: 50% to 300% of the base time, pausable, and it never ends an item. Passing is judged untimed.</p></div>
+        <div class="panel"><div class="lbl" id="tm">Time allowed</div><div class="seg" role="radiogroup" aria-labelledby="tm" style="flex-wrap:wrap">${['Untimed', '50%', '100%', '200%', '400%', '1000%'].map((v, i) => `<button type="button" role="radio" aria-checked="${i === 0}">${v}</button>`).join('')}</div>
+          <p class="muted" style="font-size:13px;margin:8px 0 0">Untimed by default. A timer can be paused and never ends an item; passing is judged untimed. Base time: 30 s a hand.</p></div>
       </div>
       <div class="row" style="margin-top:16px"><a class="btn primary big" href="#item" data-wf-focus><span class="lbl2">Start 10 hands <kbd>Enter</kbd></span></a><span class="muted">Your best so far: 7 of 10 · pass mark 8 of 10</span></div>`;
   } else {
     const ans = st === 'answer';
     m.innerHTML = head + `<div class="drill"><section aria-label="Your opening hand">
       <p style="margin:8px 0 0;font-size:var(--text-lg)"><b>You play Rocks.D.Xebec, going first</b> <span class="muted">against Kaido</span></p>
-      <div class="hand" role="list">${hand}</div>
-      ${ans ? '' : `<div class="row" style="justify-content:center"><button class="btn big" type="button" style="min-width:160px"><span class="lbl2">Keep <kbd>K</kbd></span></button><button class="btn primary big" type="button" style="min-width:160px" data-wf-focus><span class="lbl2">Redraw <kbd>R</kbd></span></button></div>
-      <p class="subtle" style="text-align:center;margin:10px 0 0">Ask yourself: can I act on turns 1 and 2? Do I hold a piece of my plan? Can I defend?</p>`}</section>
-      <aside class="panel ans" aria-label="Answer">${ans ? `<p style="margin:0 0 6px"><span class="chip success">✓ Correct: redraw</span></p>` + EXPL.render(EXPL.E.E11, { verbosity: 'learner' }) + `<div class="row" style="margin-top:8px"><a class="btn primary" href="#item" data-wf-focus>Next hand <kbd>Enter</kbd></a></div>` : '<p class="muted" style="margin:0">The answer appears here after you choose. Hints are off in drills; "Show answer" counts the item as missed.</p><button class="btn small" type="button" style="margin-top:8px">Show answer</button>'}</aside></div>`;
+      <div class="hand handlist" role="list" tabindex="-1" id="handlist" aria-label="Your opening hand: Rocks.D.Xebec (cost 10), Shiki (cost 7), Edward.Newgate (cost 9), Charlotte Linlin (cost 5), Rocks Pirates (Event, Counter +2000). Keep or redraw?">${hand}</div>
+      ${ans ? '' : `<div class="row" style="justify-content:center" role="group" aria-label="Your answer"><button class="btn big ans-btn" type="button"><span class="lbl2">Keep <kbd>K</kbd></span><span class="sub">play these five</span></button><button class="btn big ans-btn" type="button"><span class="lbl2">Redraw <kbd>R</kbd></span><span class="sub">five new cards</span></button></div>
+      <p class="subtle" style="text-align:center;margin:10px 0 0">Ask yourself: can I play something on each of my first two turns? Do I hold a piece of my plan? Can I defend?</p>`}</section>
+      <aside class="panel ans" aria-label="Answer">${ans ? `<p style="margin:0 0 6px"><span class="chip success">✓ Correct: redraw</span></p>` + renderAnswer() + `<div class="row" style="margin-top:8px"><a class="btn primary" href="#item" data-wf-focus>Next hand <kbd>Enter</kbd></a></div>` : '<p class="muted" style="margin:0">The answer appears here after you choose. Hints are off in drills; "Show answer" counts the item as missed.</p><button class="btn small" type="button" style="margin-top:8px">Show answer</button>'}</aside></div>`;
   }
-  const f = document.querySelector('[data-wf-focus]'); if (f) f.focus();
+  const f = document.querySelector('[data-wf-focus]') || (st === 'item' ? document.getElementById('handlist') : null); if (f) f.focus();
 }
 draw(); window.addEventListener('hashchange', draw); WF.statesBar(STATES);
 </script>

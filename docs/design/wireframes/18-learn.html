@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OPTCG Sim · Learn</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+<style>
+  .wrap { max-width: 1120px; margin: 0 auto; }
+  .lhead { display: flex; align-items: end; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+  .cont { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; padding: 16px 20px; border: 1px solid var(--color-accent); border-radius: var(--radius-4); background: var(--color-surface-1); margin-bottom: 20px; }
+  .cont .t { font: 600 var(--text-xl)/var(--leading-xl) var(--font-display); margin: 0; }
+  .stages { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .stage-c { background: var(--color-surface-1); border: 1px solid var(--color-line); border-radius: var(--radius-3); padding: 12px 14px; }
+  .stage-c h2 { font: 600 var(--text-lg)/var(--leading-lg) var(--font-display); margin: 0 0 2px; }
+  .stage-c .goal { margin: 0 0 8px; color: var(--color-text-muted); font-size: var(--text-sm); line-height: var(--leading-sm); }
+  .ls { list-style: none; margin: 0; padding: 0; }
+  .ls li { border-top: 1px solid var(--color-line); }
+  .ls a { display: grid; grid-template-columns: 44px 1fr auto; gap: 8px; align-items: center; min-height: 32px; padding: 4px 4px; text-decoration: none; color: var(--color-text); border-radius: 4px; }
+  .ls a:hover { background: var(--color-surface-3); }
+  .ls .id { font: 600 var(--text-xs)/var(--leading-xs) var(--font-ui); color: var(--color-text-muted); font-feature-settings: var(--font-num-features); }
+  .st { display: inline-flex; align-items: center; gap: 5px; font: 600 var(--text-xs)/var(--leading-xs) var(--font-ui); color: var(--color-text-muted); white-space: nowrap; }
+  .st svg { width: 14px; height: 14px; flex: none; }
+  .st.pass { color: var(--color-success-text); }
+  .st.prog { color: var(--color-accent-text); }
+  /* lesson */
+  .lgrid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 28px; align-items: start; }
+  .lmain section { margin-bottom: 22px; }
+  .lmain p, .lmain li { font-size: var(--text-lg); line-height: var(--leading-lg); max-width: 70ch; }
+  .lmain h2 { font: 600 var(--text-2xl)/var(--leading-2xl) var(--font-display); margin: 0 0 6px; }
+  .ex { border: 1px solid var(--color-line-strong); border-radius: var(--radius-3); background: var(--color-surface-1); padding: 12px 16px; }
+  .ex table { border-collapse: collapse; width: 100%; max-width: 560px; }
+  .ex td { padding: 6px 8px; border-bottom: 1px solid var(--color-line); font-size: var(--text-md); }
+  .ex td.n { text-align: right; font-weight: 700; font-feature-settings: var(--font-num-features); white-space: nowrap; }
+  .res { display: inline-flex; gap: 6px; align-items: center; font-weight: 600; }
+  .res.bad { color: var(--color-danger-text); }
+  .res.ok { color: var(--color-success-text); }
+  .side { position: sticky; top: 12px; display: flex; flex-direction: column; gap: 12px; }
+  .side h3 { font: 600 var(--text-md)/var(--leading-md) var(--font-ui); margin: 0 0 6px; }
+  .pager { display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid var(--color-line); padding-top: 12px; margin-top: 8px; }
+  .pager a { text-decoration: none; display: flex; flex-direction: column; color: var(--color-text); padding: 6px 10px; border-radius: 6px; border: 1px solid var(--color-line); min-width: 220px; }
+  .pager a:hover { border-color: var(--color-accent); }
+  .pager small { color: var(--color-text-muted); font-size: var(--text-xs); }
+  @media (max-width: 900px) { .stages, .lgrid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="app-header"></header>
+  <main class="app-main" id="main" style="padding-top:16px"></main>
+  <footer class="app-footer"></footer>
+</div>
+<script src="wf.js"></script>
+<script>
+WF.chrome('Learn');
+const STATES = [['hub', 'Course (hub)'], ['lesson', 'Lesson: L05 Block and counter'], ['lesson-l10', 'Lesson: L10 Counter or take']];
+// docs/content/curriculum.md: stages, lesson IDs and titles. Status is illustrative for a player midway through Stage 2.
+const STAGES = [
+  ['Stage 1 · First game (rules)', 'Play a complete legal game and know why each step happens.', [
+    ['L01', 'Zones and setup', 'pass'], ['L02', 'Turn structure', 'pass'], ['L03', 'DON!! basics', 'pass'], ['L04', 'Battle basics', 'timed'],
+    ['L05', 'Block and counter', 'pass'], ['L06', 'Life and Triggers', 'pass'], ['L07', 'Keywords', 'pass'], ['L25', 'Base and current values', 'pass'],
+    ['L26', 'Leader or Character', 'pass'], ['L27', 'Opponent-turn timing', 'pass'], ['L08', 'First full game', 'pass']]],
+  ['Stage 2 · Core strategy', 'Stop the habits that lose most games.', [
+    ['L18', 'Hand management', 'pass'], ['L10', 'Counter or take the hit', 'prog'], ['L09', 'DON!! efficiency', 'none'], ['L11', 'Life as a resource', 'none'],
+    ['L12', 'Mulligan', 'prog'], ['L13', 'Turn order', 'none'], ['L14', 'Board or face', 'none']]],
+  ['Stage 3 · Seeing the whole turn', 'Count lethal, read counters, use tempo.', [
+    ['L15', 'Lethal math', 'none'], ['L16', 'Reading counters', 'none'], ['L17', 'Tempo and Rush', 'none'], ['L19', 'Leader identity', 'none']]],
+  ['Stage 4 · Competitive-ready', 'Win against Warlord with a meta deck.', [
+    ['L20', 'Card advantage', 'none'], ['L21', 'Removal and denial', 'none'], ['L22', 'Pilot an archetype', 'none'], ['L23', 'Matchup plans', 'none'], ['L24', 'Competitive-ready', 'none']]],
+];
+const SHAPE = {
+  pass: '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="currentColor"/><path d="M4.5 8.3l2.2 2.2 4.6-4.8" stroke="var(--color-surface-1)" stroke-width="2" fill="none"/></svg>',
+  timed: '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="currentColor"/><path d="M8 4v4.5l3 1.5" stroke="var(--color-surface-1)" stroke-width="2" fill="none"/></svg>',
+  prog: '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 1.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg>',
+  none: '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>',
+};
+const WORD = { pass: 'Passed', timed: 'Passed (timed)', prog: 'In progress', none: 'Not started' };
+const status = (k) => `<span class="st ${k === 'pass' || k === 'timed' ? 'pass' : k === 'prog' ? 'prog' : ''}">${SHAPE[k]}${WORD[k]}</span>`;
+const SLUG = { L05: 'L05-block-and-counter', L10: 'L10-counter-or-take' };
+
+function hub() {
+  const total = STAGES.reduce((a, s) => a + s[2].length, 0);
+  const passed = STAGES.reduce((a, s) => a + s[2].filter((l) => l[2] === 'pass' || l[2] === 'timed').length, 0);
+  return `<div class="wrap">
+    <div class="lhead"><div><h1 class="page" style="margin:0">Learn</h1>
+      <p class="muted" style="margin:2px 0 0">The course: ${total} lessons in 4 stages. Each lesson has a short read, a "Show me" on the board, and a drill. Exit criteria are untimed.</p></div>
+      <span style="flex:1"></span><span class="chip outline">${passed} of ${total} passed</span><a class="btn small" href="15-tutorial.html">Replay the tutorial</a></div>
+    <div class="cont"><div><p class="muted" style="margin:0 0 2px;font-size:var(--text-sm)">Continue where you left off</p>
+      <p class="t">L10 Counter or take the hit</p>
+      <p style="margin:2px 0 0" class="muted">Drill 6 of 10 so far · pass mark 8 of 10, plus 3 games against Pirate with at most one counter flag each</p></div>
+      <a class="btn primary big" href="?l=L10-counter-or-take#lesson-l10" data-first><span class="lbl2">Continue L10</span><span class="sub">about 8 minutes</span></a></div>
+    <div class="stages">${STAGES.map(([t, goal, ls]) => `<section class="stage-c" aria-labelledby="${t.slice(0, 7).replace(/\W/g, '')}"><h2 id="${t.slice(0, 7).replace(/\W/g, '')}">${t}</h2><p class="goal">${goal}</p>
+      <ul class="ls">${ls.map(([id, name, k]) => `<li><a href="?l=${SLUG[id] || id}#${id === 'L10' ? 'lesson-l10' : 'lesson'}" aria-label="${id} ${name}: ${WORD[k]}"><span class="id">${id}</span><span>${name}</span>${status(k)}</a></li>`).join('')}</ul></section>`).join('')}</div>
+    <p class="subtle" style="font-size:var(--text-xs);margin:14px 0 0">Your progress is kept on this device. See <a href="19-progress.html">Progress</a> for what to work on next.</p></div>`;
+}
+
+const LESSON = {
+  L05: {
+    id: 'L05', title: 'Block and counter', stage: 'Stage 1 · First game (rules)', status: 'pass', prev: ['L04', 'Battle basics'], next: ['L06', 'Life and Triggers'],
+    rules: 'CR 7-1-2-1, 10-1-4-1, 7-1-3-1, 7-1-3-1-1, 7-1-3-1-2, 10-2-4-1', short: 'Rules: CR 7-1-2 and 7-1-3',
+    concept: [
+      'When you are attacked, you get two chances to answer, always in this order: the <b>Block step</b>, then the <b>Counter step</b>.',
+      '<b>Block:</b> one of your active [Blocker] Characters may rest to become the new target. Only one per battle.',
+      '<b>Counter:</b> trash Characters from your hand for their printed Counter value at no cost, or pay for and play [Counter] Events. Play as many as you like. To stop the attack, your card must end <b>strictly higher</b> than the attacker: ties go to the attacker.',
+    ],
+    example: `<p style="margin:0 0 8px">Kaido (their Leader, 5000 + 2 DON!!) attacks your Leader.</p>
+      <table><tbody>
+        <tr><td>Kaido attacks at</td><td class="n">7000</td><td></td></tr>
+        <tr><td>Your Leader</td><td class="n">5000</td><td><span class="res bad">✕ Hit lands</span></td></tr>
+        <tr><td>+ Rocks Pirates [Counter] +2000</td><td class="n">7000</td><td><span class="res bad">✕ Tie: still hits</span></td></tr>
+        <tr><td>+ Buckin (Counter +1000)</td><td class="n">8000</td><td><span class="res ok">✓ Attack fails</span></td></tr>
+      </tbody></table>
+      <p style="margin:8px 0 0">7000 vs 7000 is a tie, and ties go to the attacker, so Rocks Pirates alone is a wasted card. You need 7000 − 5000 + 1000 = <b>3000</b>.</p>`,
+    drill: ['Survive this attack', '10 attacks with your hand shown. Pick the cheapest set of counters that stops each one, or say it can\'t be stopped.', 'Pass: 8 of 10 with the fewest cards. Untimed.', '05-defend.html#plan', '14c-drill-counter.html'],
+    sources: 'CR 7-1-2, 7-1-3, 7-1-4-1 · Shonen TCG, "Counter Rules: Counter Step and Values" [SH-CTR]',
+  },
+  L10: {
+    id: 'L10', title: 'Counter or take the hit', stage: 'Stage 2 · Core strategy', status: 'prog', prev: ['L18', 'Hand management'], next: ['L09', 'DON!! efficiency'],
+    rules: 'CR 7-1-3, 7-1-4-1, 1-2-1-1', short: 'Rules: CR 7-1-3 and 7-1-4-1',
+    concept: [
+      'A counter card is worth spending when the attack would cost you more than the card. Taking a hit costs a Life card, but that Life card comes to your hand: you lose 1 Life and gain 1 card.',
+      'High on Life against a plain attacker: taking the hit is often right, and it refuels your hand. Near 0 Life, or against Double Attack or Banish: block or counter.',
+      'Before you spend, look at the next attacks. Spending every card on one attack that can\'t win the game leaves nothing for the one that can.',
+    ],
+    example: `<p style="margin:0 0 8px">Turn 9. Kaido attacks your Leader at 7000. You have 3 Life and Rocks Pirates (+2000), Buckin (+1000) and There's No Authority (+2000) in hand.</p>
+      <table><tbody>
+        <tr><td>Take the hit</td><td class="n">Life 3 → 2</td><td><span class="res ok">+1 card · keep 3 counters</span></td></tr>
+        <tr><td>Rocks Pirates + Buckin</td><td class="n">8000 vs 7000</td><td><span class="res ok">Stops it · 2 cards spent</span></td></tr>
+        <tr><td>Rocks Pirates alone</td><td class="n">7000 vs 7000</td><td><span class="res bad">✕ Still hits · 1 card wasted</span></td></tr>
+      </tbody></table>
+      <p style="margin:8px 0 0"><b>Best here:</b> take the hit and keep Rocks Pirates for a later attack. You are at 3 Life and this attack doesn't threaten the game.</p>`,
+    drill: ['Counter or take it', '10 incoming attacks with your hand shown. Decide: block, counter (with which cards) or take it. The analysis explains each answer.', 'Pass: 8 of 10 agree with the analysis, and at most one counter flag per game over 3 games against Pirate. Untimed.', '05-defend.html#plan', '14c-drill-counter.html'],
+    sources: 'Shonen TCG, "Counter Rules" [SH-CTR] · Shonen TCG, "Common mistakes" [SH-MIS] · CR 7-1-4-1',
+    progress: 'Your drill so far: 6 of 10. Games: 1 of 3 clean.',
+  },
+};
+
+function lesson(key) {
+  const L = LESSON[key];
+  return `<div class="wrap">
+    <nav aria-label="Breadcrumb" class="muted" style="font-size:var(--text-sm);margin-bottom:6px"><a href="#hub">Learn</a> › ${L.stage} › ${L.id}</nav>
+    <div class="lgrid"><article class="lmain">
+      <header style="margin-bottom:14px"><h1 class="page" style="margin:0">${L.id} ${L.title}</h1>
+        <p class="muted" style="margin:4px 0 0">${status(L.status)} · about 8 minutes · <a href="16-settings.html#rules">${L.short}</a></p></header>
+      <section aria-labelledby="c1"><h2 id="c1">The idea</h2>${L.concept.map((p) => `<p style="margin:0 0 10px">${p}</p>`).join('')}</section>
+      <section aria-labelledby="c2"><h2 id="c2">Worked example</h2><div class="ex">${L.example}</div></section>
+      <section aria-labelledby="c3"><h2 id="c3">See it on the board</h2>
+        <p style="margin:0 0 10px">Open this exact position on the board. Stage counters, watch the numbers change, and take it back. Nothing counts.</p>
+        <a class="btn" href="${L.drill[3]}">▶ Show me on the board</a></section>
+      <details class="srcs" style="margin-bottom:12px"><summary>Sources</summary><p style="margin:4px 0;font-size:var(--text-sm)">${L.sources}</p><p style="margin:4px 0;font-size:var(--text-sm)">Rule numbers: ${L.rules}</p></details>
+      <nav class="pager" aria-label="Lessons"><a href="#hub"><small>← Previous</small>${L.prev[0]} ${L.prev[1]}</a><a href="#hub" style="text-align:right"><small>Next →</small>${L.next[0]} ${L.next[1]}</a></nav>
+    </article>
+    <aside class="side" aria-label="Practise this lesson">
+      <div class="panel"><h3>Drill: ${L.drill[0]}</h3><p style="margin:0 0 8px;font-size:var(--text-sm);line-height:var(--leading-sm)">${L.drill[1]}</p>
+        <p style="margin:0 0 10px;font-size:var(--text-sm);line-height:var(--leading-sm)"><b>${L.drill[2]}</b></p>
+        ${L.progress ? `<p class="muted" style="margin:0 0 10px;font-size:var(--text-sm)">${L.progress}</p>` : ''}
+        <a class="btn primary" href="${L.drill[4]}" style="width:100%">Start the drill · 10 items</a>
+        <a class="btn" href="${L.drill[3]}" style="width:100%;margin-top:8px">▶ Show me on the board</a>
+        <p class="subtle" style="margin:8px 0 0;font-size:var(--text-xs)">Timer off by default. You can switch it on at the start.</p></div>
+      <div class="panel"><h3>Where this shows up</h3><p style="margin:0;font-size:var(--text-sm);line-height:var(--leading-sm)">Review flags "Counter wasted" and "Hit that should have been countered" link here. <a href="19-progress.html">Your progress</a></p></div>
+    </aside></div></div>`;
+}
+
+function draw() {
+  const st = WF.state() || 'hub';
+  const q = new URLSearchParams(location.search).get('l') || '';
+  const m = document.getElementById('main');
+  if (st === 'hub') m.innerHTML = hub();
+  else m.innerHTML = lesson(st === 'lesson-l10' || q.startsWith('L10') ? 'L10' : 'L05');
+  document.title = 'OPTCG Sim · Learn' + (st === 'hub' ? '' : ' · ' + (st === 'lesson-l10' || q.startsWith('L10') ? 'L10' : 'L05'));
+  window.scrollTo(0, 0);
+}
+draw(); window.addEventListener('hashchange', draw); WF.statesBar(STATES);
+</script>
+</body>
+</html>

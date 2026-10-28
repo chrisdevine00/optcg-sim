@@ -29,7 +29,7 @@ WF.mountBoard((st) => {
       donDeck: 0, active: 0, rested: 10, life: 2, deck: 21,
       leader: K('OP17-039', { who: 'Your' }),
       trash: { n: 12, top: K('OP17-055') },
-      chars: [null, K('OP17-045', { r: true }), K('OP17-118', { st: ['opp-act'], chips: [{ t: '⚡ On Play resolving', cls: 'you', pos: 'top' }] }), null, null],
+      chars: [null, K('OP17-045', { r: true }), K('OP17-118', { st: ['you-act'], chips: [{ t: '⚡ resolving', cls: 'you' }] }), null, null],
       hand: [K('OP17-049', { hand: true }), K('OP17-046', { hand: true }), K('OP17-049', { hand: true }), K('OP17-048', { hand: true }), K('OP17-045', { hand: true }), K('OP17-054', { hand: true })],
     },
     mid: { turn: 'Turn 11 · Your turn', phase: 'Main', right: '<button class="waiting" type="button" aria-label="1 effect waiting: show the queue">⧉ 1 waiting</button>' },
@@ -45,7 +45,7 @@ WF.mountBoard((st) => {
   };
   const me = s.me; const [lin1, glo, lin2, shiki, kyo, stussy] = me.hand;
   [me.leader, me.chars[1], ...s.opp.chars.filter(Boolean), s.opp.leader].forEach((c) => { c.st = (c.st || []).concat('dim'); });
-  me.chars[2].st = ['opp-act'];
+  me.chars[2].st = ['you-act'];
   const why = (c, t) => { c.st = ['dim']; c.aria = `${c.n}, can’t be chosen: ${t}`; c.chips = [{ t, cls: '', pos: 'top' }]; };
   if (st === 'one' || st === 'two') {
     lin1.st = ['legal', 'hand-raise']; lin1.chips = [{ t: '1', cls: 'you', pos: 'top' }]; lin1.g = 'pick';
@@ -76,7 +76,7 @@ WF.mountBoard((st) => {
     me.leader = K('OP17-039', { who: 'Your', r: true, st: ['battle'], chips: [{ t: '⚔ Attacking', cls: 'attack', pos: 'below' }], noRestChip: true });
     me.hand = [K('OP17-049', { hand: true }), K('OP17-046', { hand: true }), K('OP17-048', { hand: true }), K('OP17-045', { hand: true }), K('OP17-054', { hand: true })];
     s.opp.leader.st = ['battle']; s.opp.chars.forEach((c) => c && (c.st = ['dim']));
-    me.chars[2].st = ['opp-act']; me.chars[2].chips = [{ t: '⚡ triggered', cls: 'you', pos: 'top' }];
+    me.chars[2].st = ['you-act']; me.chars[2].chips = [{ t: '⚡ triggered', cls: 'you' }];
     s.arrows = [{ from: 'me.leader', to: 'opp.leader', bend: -120, cut: 40 }];
     s.mid = { turn: 'Turn 11 · Your turn', phase: 'Main', battle: 'Attack', right: '<button class="waiting" type="button" aria-label="2 effects waiting: show the queue">⧉ 2 waiting</button>' };
     s.decision = {

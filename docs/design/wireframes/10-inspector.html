@@ -31,21 +31,27 @@ WF.mountBoard((st) => {
     });
   }
   if (st === 'inspect') {
+    s.after = (el) => el.querySelectorAll('.rail .log, .rail .coach').forEach((x) => x.setAttribute('inert', ''));
+    // The inspector is the pinned, focusable state of the preview dock: same place, same size or larger, plus rulings (board.md §3.12, C19)
     me.chars[1].st = ['wf-focus'];
     s.extra = (g) => {
-      const r = g.rail; const roomy = g.W > 1600; const sw = roomy ? 200 : 132, sh = Math.round(sw * 88 / 63);
-      return `<div class="scrim" style="left:${r[0]}px;top:0;width:${r[2]}px;height:${g.H - g.decision[1]}px"></div>
-      <div class="rdialog" role="dialog" aria-modal="true" aria-labelledby="ih" style="left:${r[0] + 8}px;top:8px;width:${r[2] - 16}px;height:${g.decision[0] - 16}px">
-        <header><h2 id="ih">Captain John</h2><span class="chip warning">⚠ Effect not automated</span><button class="iconbtn" type="button" aria-label="Close inspector (Escape)" data-wf-focus>✕</button></header>
-        <div class="rdb" tabindex="0">
-          <div style="display:flex;gap:10px"><div class="scan c-blue" style="width:${sw}px;height:${sh}px;flex:none"><span class="al">art</span><span class="sample" style="font-size:16px">SAMPLE</span><span class="ptxt"></span></div>
-          <div style="min-width:0"><div class="muted">OP17-044 · Character · Blue<br>Rocks Pirates</div>
-            ${row('Cost', '4')}${row('Power', '6000')}${row('Counter', '—')}${row('State', '⟳ Rested')}</div></div>
-          <p style="margin:8px 0 4px">If your Leader's type includes "Rocks Pirates" and this Character is rested, your opponent cannot attack any card other than the Character [Captain John].</p>
+      // Pinned: same x, width and art size as the dock, but below the rail notice and above the decision panel
+      const r = g.dock; const roomy = g.W > 1600; const sw = roomy ? 240 : 168, sh = roomy ? 335 : 235;
+      const top = g.notice[0] + g.notice[1] + 4, hgt = g.decision[0] - top - 8;
+      // While pinned, the log and coach it covers are inert under a rail-only scrim, so focus is never obscured (WCAG 2.4.11)
+      return `<div class="scrim" aria-hidden="true" style="z-index:39;left:${g.rail[0]}px;top:${top}px;width:${g.rail[2]}px;height:${g.decision[0] - top}px"></div>
+      <aside class="dock pinned" role="dialog" aria-labelledby="ih" style="left:${r[0]}px;top:${top}px;width:${r[2]}px;height:${hgt}px">
+        <header class="row" style="gap:8px;padding:8px 8px 8px 12px;border-bottom:1px solid var(--color-line);flex:none"><h2 id="ih" style="margin:0;font:600 var(--text-md)/20px var(--font-ui);flex:1">Captain John <span class="subtle" style="font-weight:500">· pinned</span></h2><span class="chip warning">⚠ Effect not automated</span><button class="iconbtn" type="button" aria-label="Unpin and close inspector (Escape)" data-wf-focus>✕</button></header>
+        <div class="rdb" tabindex="0" aria-label="Card details" style="padding:10px 12px;overflow:auto;flex:1;font-size:var(--text-sm);line-height:18px">
+          <div style="display:flex;gap:12px"><div class="scan c-blue" style="width:${sw}px;height:${sh}px;flex:none"><span class="al">art (full scan)</span><span class="sample">SAMPLE</span><span class="ptxt"></span><span class="pnm"></span></div>
+          <div style="min-width:0;flex:1"><div class="muted">OP17-044 · Character · Blue<br>Rocks Pirates · Slash</div>
+            ${row('Cost', '4')}${row('Power', '6000')}${row('Counter', '—')}${row('State', '⟳ Rested')}${row('Art', 'base · 1 of 1')}</div></div>
+          <p style="margin:10px 0 4px">If your Leader's type includes "Rocks Pirates" and this Character is rested, your opponent cannot attack any card other than the Character [Captain John].</p>
           <p style="margin:0 0 6px"><b>[Activate: Main]</b> You may rest this Character: Draw 1 card and trash 1 card from your hand.</p>
-          <p style="margin:0 0 6px;padding:6px 8px;border:1px solid var(--color-warning-text);border-radius:6px;font-size:12px;line-height:16px"><b>Effect not automated.</b> Plays for its power; its effect won't happen. Keywords like Blocker still work where listed.</p>
-          <p class="muted" style="margin:0;font-size:12px">Rulings: none recorded · Text from optcgapi.com, not verified · Art: base, 1 of 1</p>
-        </div></div>`;
+          <p style="margin:0 0 6px;padding:6px 8px;border:1px solid var(--color-warning-text);border-radius:6px;font-size:12px;line-height:16px"><b>Effect not automated.</b> Plays for its power; its effect won't happen. Rewind if you relied on it.</p>
+          <p style="margin:0 0 4px"><b>Rulings</b> <span class="muted">none recorded for this card</span></p>
+          <p class="muted" style="margin:0;font-size:12px">Text from optcgapi.com, not verified · Esc closes and returns focus to the card</p>
+        </div></aside>`;
     };
   }
   if (st === 'whynot') {
@@ -56,8 +62,9 @@ WF.mountBoard((st) => {
   if (st === 'trash') {
     s.extra = (g) => {
       const r = g.rail; const it = (n, k, t) => `<li class="row" style="justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--color-line)"><span><b>${n}</b> <span class="muted">${k}</span></span><span class="subtle" style="font-size:12px">${t}</span></li>`;
-      return `<div class="scrim" style="left:${r[0]}px;top:0;width:${r[2]}px;height:${g.decision[0]}px"></div>
-      <div class="rdialog" role="dialog" aria-modal="true" aria-labelledby="th" style="left:${r[0] + 8}px;top:8px;width:${r[2] - 16}px;height:${g.decision[0] - 16}px">
+      const top = g.notice[0] + g.notice[1];
+      return `<div class="scrim" style="left:${r[0]}px;top:${top}px;width:${r[2]}px;height:${g.decision[0] - top}px"></div>
+      <div class="rdialog" role="dialog" aria-modal="true" aria-labelledby="th" style="left:${r[0] + 8}px;top:${top + 6}px;width:${r[2] - 16}px;height:${g.decision[0] - top - 12}px">
         <header><h2 id="th">Your trash · 6 cards</h2><button class="iconbtn" type="button" aria-label="Close trash viewer (Escape)" data-wf-focus>✕</button></header>
         <div class="rdb" tabindex="0"><div class="seg" role="group" aria-label="Filter by category" style="margin-bottom:8px"><button type="button" aria-pressed="true">All 6</button><button type="button" aria-pressed="false">Characters 3</button><button type="button" aria-pressed="false">Events 3</button></div>
           <p class="subtle" style="margin:0 0 4px;font-size:12px">Newest first. Both trashes are open to both players.</p>

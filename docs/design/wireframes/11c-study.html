@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Game review: study</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+<style>
+  /* Review Study mode (learning-ui §4.1, C21): the restored board at native game size, the explanation in the rail. */
+  .rsec { position: absolute; left: 0; right: 0; overflow: hidden; }
+  .rbody { overflow: auto; padding: 10px 12px; background: var(--color-surface-1); border-bottom: 1px solid var(--color-line); font-size: var(--text-sm); line-height: 18px; }
+  .rbody .wyd { padding: 6px 8px; border-radius: 6px; background: var(--color-surface-2); border: 1px solid var(--color-line); margin: 0 0 8px; }
+  .rbody .claim { font-size: var(--text-lg); line-height: 22px; }
+  .stepper { display: flex; align-items: center; gap: 6px; padding: 0 12px; background: var(--color-surface-2); border-bottom: 1px solid var(--color-line); font-size: var(--text-sm); }
+  .rfoot { display: flex; align-items: center; gap: 8px; padding: 0 12px; background: var(--color-surface-2); }
+  .rfoot .btn { flex: 1 1 0; min-width: 0; }
+  .studyhead .btn { min-height: 32px; }
+  .studyhead .flagnav { display: inline-flex; align-items: center; gap: 2px; font-size: var(--text-sm); color: var(--color-text-muted); }
+</style>
+</head>
+<body class="board-page">
+<main class="stage" aria-label="Game review, study mode: restored board, read-only"></main>
+<div id="announce-polite" class="sr-only" role="status" aria-live="polite"></div>
+<script src="wf.js"></script>
+<script src="cards.js"></script>
+<script src="scenarios.js"></script>
+<script src="expl.js"></script>
+<script src="review-data.js"></script>
+<script>
+const STATES = [['e05', 'Study: severe flag (E05)'], ['e19', 'Study: counter tied (E19)'], ['e02', 'Study: hindsight (E02)'], ['e06', 'Study: DON!! unused (E06)'], ['e09', 'Study: board vs face (E09)'], ['unchecked', 'Study: not fully checked']];
+const STUDY = ['e06', 'e19', 'e09', 'e02', 'e05'];
+WF.mountBoard((st) => {
+  const k = FLAGS[st] ? st : 'unchecked';
+  const b = BOARDS[k]();
+  const f = FLAGS[k];
+  const mine = (t) => t % 2 === 0;
+  const idx = STUDY.indexOf(k);
+  const prev = STUDY[idx - 1], next = STUDY[idx + 1];
+  const s = {
+    boardLabel: `Restored board, read-only, ${f ? `turn ${f.turn}` : 'turn 6'}`,
+    opp: b.opp, me: b.me, arrows: b.arrows,
+    mid: { ...b.mid, left: '<span class="chip outline">Read-only · restored</span>' },
+    // Rail header: back to Overview, and previous / next flag (C21)
+    railHeadHtml: `<span class="studyhead row" style="gap:6px;width:100%"><a class="btn small" href="11b-review.html#${k}">← Overview <kbd>Esc</kbd></a><span class="grow"></span>
+      <span class="flagnav">${f ? `Flag ${idx + 1} of 5` : 'Turn 6'}<a class="iconbtn" href="${prev ? '#' + prev : '#' + k}" aria-label="Previous flag (Shift+N)" ${prev ? '' : 'aria-disabled="true"'}>◂</a><a class="iconbtn" href="${next ? '#' + next : '#' + k}" aria-label="Next flag (N)" ${next ? '' : 'aria-disabled="true"'}>▸</a></span></span>`,
+    turnChip: false,
+    skipLabel: 'Skip to explanation',
+  };
+  const practise = !f ? '' : f.e === 'E02' ? '<a class="btn" href="14-drill-lethal.html#real">Practice this</a>' : f.e === 'E05' || f.e === 'E19' ? '<a class="btn" href="14c-drill-counter.html">Practice this</a>' : '<a class="btn" href="14-drill-lethal.html">Practice this</a>';
+  s.railHtml = (g, top) => {
+    const roomy = g.W > 1600; const fh = roomy ? 72 : 64, sh = roomy ? 44 : 40;
+    const bodyH = g.H - top - fh - sh;
+    let body;
+    if (!f) {
+      body = `<p class="muted" style="margin:0 0 6px">Turn 6 · your turn · start of the turn</p><h2 class="claim" style="margin:0 0 6px">This turn wasn't fully checked.</h2><p>${EXPL.cert('search-incomplete', 'review')}</p><p>The analysis ran out of time here. No better line was computed.</p>`;
+    } else {
+      const e = EXPL.E[f.e];
+      body = `<p class="muted" style="margin:0 0 6px">Turn ${f.turn} · ${mine(f.turn) ? 'your turn' : 'Kaido’s turn, your decision'} · ${f.name} · <b style="color:var(--color-text)">${SEV[f.sev]}</b></p>
+        <div class="wyd"><b>What you did.</b> ${f.what}</div>${EXPL.render(e, { mode: 'review', verbosity: 'learner' }).replace('<h4 class="claim">', '<h2 class="claim" style="margin:0 0 6px">').replace('</h4>', '</h2>')}`;
+    }
+    const steps = f && EXPL.E[f.e].line ? EXPL.E[f.e].line.length : 0;
+    return `<section class="rsec rbody" aria-label="Explanation" style="top:${top}px;height:${bodyH}px">${body}</section>
+      <div class="rsec stepper" style="top:${top + bodyH}px;height:${sh}px" role="group" aria-label="Step through the better line">${steps ? `<span>Better line · step <b>0</b> of ${steps}</span><span class="grow" style="flex:1"></span><button class="btn small" type="button" aria-label="Previous step">◂</button><button class="btn small" type="button" aria-label="Next step (Right arrow)">▸ Step</button>` : '<span class="muted">No better line computed</span>'}</div>
+      <div class="rsec rfoot" style="top:${g.H - fh}px;height:${fh}px">${f ? `${practise}<a class="btn primary" href="03-main.html">Play from here</a>` : '<button class="btn primary" type="button">Analyse deeper</button>'}</div>`;
+  };
+  s.after = (el) => {
+    const rb = el.querySelector('.rbody'); if (rb && rb.scrollHeight > rb.clientHeight + 1) rb.setAttribute('tabindex', '0');
+  };
+  return s;
+}, STATES);
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !document.querySelector('.kbd-pop')) location.href = '11b-review.html#' + (WF.state() || 'e05');
+  if ((e.key === 'n' || e.key === 'N') && !e.ctrlKey && !e.metaKey) { const a = document.querySelector(`.flagnav a[aria-label^="${e.shiftKey ? 'Previous' : 'Next'}"]`); if (a) location.href = a.href; }
+});
+</script>
+</body>
+</html>

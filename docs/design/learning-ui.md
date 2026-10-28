@@ -1,6 +1,6 @@
 # Learning UI
 
-**As of:** 2026-10-28 (Phase 4, first draft for the UX-director review)
+**As of:** 2026-10-28 (Phase 4, revision 2: review-1 fixes)
 **Inputs:** `PROMPT.md` (Learning layer, AI opponent, Phase 4 "Learning UI"); `docs/plan-review-1.md` (UX-1, UX-3, UX-4, UX-9, UX-12); `docs/ARCHITECTURE.md` §4.4 (lethal search), §4.5 (`Explanation`), §5 (worker priorities, 300 ms blunder cap); `docs/content/curriculum.md` (lesson IDs, untimed exit criteria); `docs/research/strategy-concepts.md` (concept slugs).
 **Companions:** `flows.md` (how each screen is reached and operated, keyboard paths, announcements), `explanations.md` (finished copy for 20 explanations, used as snapshot tests). Layout dimensions and tokens belong to `board.md` and `visual-system.md`.
 
@@ -17,10 +17,14 @@ SeaKing is reported to tell a player that they missed lethal (unobserved). This 
 
 ### 2.1 Placement and states
 
-- **Where.** The right-hand column that `board.md` reserves for the log. The coach and the log share that column: when the coach is expanded, the log collapses to its last three lines at the bottom of the column. The coach never covers the playmat, the hands or the battle panel. (This depends on `board.md` keeping that column; if it does not, this section must change, not the playmat.)
-- **Collapsed (the rail).** A 48 px strip with five icon buttons, each with a text label on hover and focus and an accessible name: Hint, Why, Lethal, DON!! math, Tempo. A button can carry a **badge**: a small shape with a number or glyph. Badges are the only way the coach signals anything unprompted, and only for features the player has switched on (§2.2).
-- **Expanded.** The rail's full width: 320 px at 1280×720 and 400 px at 1920×1080 (`board.md` is the source of truth for layout). Sections stack in a fixed order: **Hint**, **Why**, **Lethal**, **DON!! math**, **Tempo**. Each section has a header row that collapses it on its own. The panel scrolls inside itself.
-- **Toggle:** the rail's chevron or `/` (proposal; `accessibility.md` owns keys). Expanding never moves focus into the panel unless the player pressed a coach key (H, W, L), in which case focus goes to that section's result.
+- **Where.** A docked section of the rail, between the log and the decision panel (`board.md` §3.13). It takes height from the log and never width from the board, so the board never reflows. The coach never covers the playmat, the hands or the decision panel.
+- **States and heights** are owned by `board.md` §3.13:
+  - **Collapsed (the strip, default).** 48 px.
+  - **Open.** The log keeps at least 5 lines above it.
+  - **Tall.** The log becomes a 3-line ticker and the decision panel shrinks to its header and footer. **Tall is entered only by a player request**: tier 3 of the lethal detector, the guided count, or "Make taller" on a long hint. The coach never enters it on its own. It is available only in your idle Main phase, where the decision panel's body is a summary that End turn's sub-label already carries. If a decision you owe arrives (an attack on you, an effect choice), the coach drops to its strip, the decision panel goes tall, and the coach remembers its section and scroll position: the strip's Lethal badge reads "line kept" until you reopen it.
+- **The strip.** Five buttons, each **one word**: Hint, Why, Lethal, Math, Tempo, plus the open chevron. A button's state shows as a **badge** (a small shape with a glyph or number: "◆" for "lethal on board", "5/7" for tempo, "ready" for a finished hint), never as a second line of micro-text. Badges are the only way the coach signals anything unprompted, and only for features the player has switched on (§2.2). The longest strings ("Tempo 10/10", "Answer") are tested at 1280 so nothing collides. In drills, Hint is renamed **Answer**, with no sub-label (flows F9).
+- **Open and tall.** The rail's full width (`board.md` is the source of truth for layout). The sections keep a fixed order, **Hint**, **Why**, **Lethal**, **DON!! math**, **Tempo**, as one tab row at the top of the panel; only the chosen section shows, so no height goes on five stacked headers (`board.md` §3.13). In the open state the section scrolls inside itself; content that needs more room (tier 3, the guided count) offers the tall state instead of three screens of scrolling.
+- **Toggle:** the strip's chevron or `C` (`accessibility.md` §3.12). Expanding never moves focus into the panel unless the player pressed a coach key (H, W, L), in which case focus goes to that section's result.
 - **Remembered** per profile: expanded or collapsed, and which sections are open.
 
 ### 2.2 The interruption contract
@@ -58,6 +62,8 @@ One component renders every explanation in the product: hints, "why", review fla
 | Standard (default) | Claim, certainty, line, outcome | Evidence, next time, lesson, sources |
 | Terse | Claim, outcome | Everything else |
 
+**Verbosity is applied everywhere the component renders**, including the coach's tier 3: at Standard the evidence is behind "More", so the numbered line with Show and Do step 1 is visible without scrolling in the tall coach at 1280. Review and drill answers use Learner by default, because the player came to read.
+
 Verbosity never changes the words, only how much is open. The snapshot tests in `explanations.md` therefore cover every level at once.
 
 **SR:** the component is a region named by the claim. Reading order is the anatomy order. Evidence lines are a list. "Show" buttons have names such as "Show step 2 on the board: attack Kaido with your Leader".
@@ -73,7 +79,7 @@ Verbosity never changes the words, only how much is open. The snapshot tests in 
 ### 2.5 Why
 
 - **Request:** Why or W for the last AI move; "Why?" links on any AI log line or battle-panel row (flows F10).
-- **Content:** the stored `Explanation` from that decision. Only public information (flows D9). AI turn plans show executed steps only; the rest reads "Further steps hidden until played".
+- **Content:** the stored `Explanation` from that decision. Only public information (flows D9), and its certainty chip reads **"Public information only"** (`explanations.md`, certainty by context). AI turn plans show executed steps only; the rest reads "Further steps hidden until played".
 - **Empty states:** "Only legal move." for forced moves. "Rookie picks a random legal move, except that it always blocks or counters a lethal attack." for Rookie.
 - Examples: `explanations.md` E12 (block), E13 (counter), E14 (turn plan), E16 (leader ability).
 
@@ -85,6 +91,7 @@ Covered in §3, because it is the centre of lethal teaching. In the panel it is 
 
 The arithmetic of every battle, shown where the battle is.
 
+- **The coach section adds only what the battle panel lacks** (UX-R24): what they can make and its certainty, and the rule footnotes. It does not repeat the sum ("see the battle panel"), because both sit in the same rail.
 - **In the battle panel (always on).** Attacker power, defender power, and the line **"Need 3000 to stop it"**. The arithmetic ("7000 − 5000 + 1000; ties go to the attacker") shows on hover, focus, or permanently at Learner verbosity.
   - **On your attack**, the panel adds "What they could have": active Blockers, visible on-attack effects with their numbers, and the public bound on their hand ("3 cards: up to +12000 if each is one of their deck's +4000 Events"). The bound comes from the archetype prior used by `public` lethal search (ARCHITECTURE §4.4).
   - **On defence**, it adds "What you have": staged and available counters, active DON!! for Event costs and leader effects (flows F6).
@@ -110,7 +117,7 @@ A small horizontal bar in the rail (and a larger one in the expanded panel) of t
 - **Segments**, left to right, each with a distinct pattern as well as a tint: **Paid** (rested to pay costs), **Given** (attached), **Held for a purpose**, **Unused**. Example label: "8 DON!! · 4 paid · 1 given · 3 held".
 - **Held for a purpose** is what makes the meter honest. Active DON!! count as held, not unused, when something can spend them on the opponent's turn: the cost of a [Counter] Event in your hand, or an opponent-turn effect such as OP13-001 Luffy's leader (up to 5 active DON!!). This is the same rule as curriculum L09's exit criterion, so the meter and the review agree.
 - **Expanded view** shows a one-line explanation of DON!! efficiency and the current state: "3 active DON!! with nothing to spend them on their turn. Giving them to an attacker adds +3000 now." With OP13-001: "5 active DON!! held for your Leader: up to +10000 on their turn." (`explanations.md` E06, E07)
-- **End of turn:** the meter freezes for the opponent's turn showing your last turn's split, then resets at your Refresh.
+- **End of turn:** the meter freezes for the opponent's turn showing your last turn's split, then resets at your Refresh. No end-of-turn message is shown (§2.2).
 
 ## 3. Lethal teaching
 
@@ -139,12 +146,12 @@ Plan-review UX-4: lethal must be taught, not only detected. The detector answers
 
 ### 3.2 Guided count ("Count it with me")
 
-Before the line is revealed, the player can work through the count the curriculum teaches (L15, L16). Four questions, answered on the board.
+Before the line is revealed, the player can work through the count the curriculum teaches (L15, L16). Four questions, answered on the board. The guided count opens the coach **tall** (§2.1), so all four questions and their answers fit at 1280×720 without scrolling.
 
 1. **"How many hits do you need?"** The player types a number or clicks their opponent's Life stack (which counts out loud: "2 Life, plus 1"). Check: Life + 1. Double Attack note when relevant (`explanations.md` E18).
 2. **"Which of your cards can attack their Leader this turn?"** The player clicks them. Check: active, not summoning-sick (or Rush), not [Rush: Character], no "cannot attack". Missed or wrong cards are explained by `whyNot`.
 3. **"How much can they stop?"** The panel helps them build it: active Blockers (one per battle), visible on-attack effects (Newgate: +3000 for a card, once per turn; Kaido: −2000 to a Character), and cards in hand times their deck's biggest counter. It adds the line players most often miss: **"Each hit gives them a card. After 1 hit they have 2 cards; after 2 hits, 3."**
-4. **"Split your DON!!."** The player drags DON!! onto attackers in a sandbox copy of the board (nothing is committed). Each attacker shows "needs X to stop · they can have Y by then". The player orders the attacks by dragging their numbers.
+4. **"Split your DON!!."** This step runs **on the board itself** in a labelled **sandbox mode**: the midline band reads "Sandbox · nothing is played" with an Exit sandbox button, the board edge takes the sandbox outline, and gives are made with the normal inputs (DON!! mode, `+`, drag). Each attacker shows "needs X to stop · they can have Y by then". The player orders the attacks by clicking the numbered order chips. The coach is the questionnaire beside it (tall state); the decision panel's footer reads **Check my split** and Exit sandbox. Leaving sandbox restores the real position exactly. Nothing reaches the engine's real game state.
 
 **"Check my count"** compares the four answers with the search's line and marks each one right or wrong, with the reason for anything wrong. **"Show the line"** reveals tier 3. Using the guided count is not "showing the answer" in drills (flows F19b).
 
@@ -154,14 +161,23 @@ Worked example: `explanations.md` E20 (Kaido against Rocks: 3 hits, 3 attackers,
 
 ## 4. Game Review
 
-### 4.1 Layout
+### 4.1 Layout: Overview and Study
 
-From top to bottom, at 1280×720 (1920×1080 adds width to the board and the detail panel):
+Review has two modes (review-1 C21, UX-R5). The board is the evidence, so it is only ever shown at game size; a scaled-down board would put its text under the 12 px floor. **No rendered text is under 12 px anywhere in review.** Wireframes: `wireframes/11b-review.html` (Overview) and `11c-study.html` (Study).
 
-1. **Header.** Result, decks, AI tier, turns, "Rewound" tag if any, analysis status ("Analysing turn 4 of 11", or "3 flags · 1 severe").
-2. **Turn timeline.** A horizontal strip, one column per game turn, alternating your turns and theirs. Two rows: your decisions (top) and the opponent's (bottom; the AI's notable moves carry "Why?" markers). Flags sit on the row and turn where they happened. Turns not yet analysed are hatched; turns whose search hit its cap carry a "not fully checked" marker. A Life sparkline for both players runs under the strip, so the shape of the game reads at a glance. The mulligan is column 0.
-3. **Board viewer** (left, large). The restored position at the selected moment, read-only, with a "Step through the better line" control.
-4. **Detail panel** (right). The selected flag's `Explanation`, preceded by **"What you did"** (one line, from the record) and followed by **Play from here** and **Practice this**.
+**Overview** (the default; a normal page with the app header and footer). From top to bottom at 1280×720:
+1. **Header.** Result, decks, AI tier, turns, "Rewound" tag if any, analysis status ("Analysing turn 4 of 11", or "5 flags · 1 severe").
+2. **Turn timeline.** A horizontal strip, one column per game turn, each column headed with its turn and actor ("T9 · Kaido", "T8 · You"). Two rows: your decisions (top) and **"Kaido's notable moves"** (bottom; they carry "Why?" markers). Flags sit on the row and turn where they happened, **sized by severity** (severe 20 px with the word "Severe", moderate 16 px, minor 12 px) as well as by shape (§4.2). Turns not yet analysed are hatched; turns whose search hit its cap carry a "not fully checked" marker. A Life sparkline for both players runs under the strip. The mulligan is column 0.
+3. **Flag list.** Under the timeline: one row per flag (turn, kind, severity word, certainty), sortable by turn or severity (severity first by default). It is a keyboard target of its own (`accessibility.md` §3.16).
+4. **Selected flag.** Left: a **text-free thumbnail** of the restored position (shapes and arrows only, `aria-hidden`; it shows where things are, not the numbers) with **Study this moment (Enter)**. Right: **"What you did"** (one line, from the record) and the flag's `Explanation` at Learner verbosity.
+5. **Pinned action footer** in the detail panel, which never scrolls: **Study this moment**, **Play from here**, **Practice this** (UX-R29).
+
+**Study** (the board page). Enter on a flag, or "Study this moment":
+- The restored position renders **at native size in the game's own two-column layout** (`board.md` §3.1/§3.2), read-only, with the battle panel, arrows and log as they were at that decision.
+- The **rail** holds the explanation (in place of the log and coach) and a pinned footer, **Play from here · Practice this**, in the decision panel's position. The rail header holds **← Overview** (Esc) and a **previous/next flag stepper** ("Flag 2 of 5", N / Shift+N). The rail notice stays.
+- **Step through the better line** plays the line on this board, one move per press, from the explanation's Show buttons.
+
+At 1920×1080 Overview and Study stay separate pages in v1; side by side is possible later (the ruling allows it) and is not designed yet.
 
 ### 4.2 Flags
 
@@ -175,10 +191,10 @@ From top to bottom, at 1280×720 (1920×1080 adds width to the board and the det
 | Poor attack ordering (face vs board, order) | `board-vs-face` | Moderate | Hollow circle |
 | Mulligan | `mulligan` | Minor | Small bar at turn 0 |
 
-- **Severity** controls size and the order of the flag list, never only colour. "Severe" is the set curriculum L24 counts.
+- **Severity** controls glyph size (20 / 16 / 12 px) and the order of the flag list, never only colour; severe flags also carry the word "Severe". "Severe" is the set curriculum L24 counts.
 - **Certainty changes severity.** A flag with `needed-hidden-info` is always shown as **Hindsight**, a separate small style, and is never severe (it was not a mistake you could have seen). A `search-incomplete` turn is not a flag; it is a marker meaning "not fully checked".
 - **Not flagged, with a note.** Where a rule would flag correct play, the review shows nothing on the timeline but the detail of that turn says why, for example "5 active DON!! held for your Leader: not counted as unused" (`explanations.md` E07). This keeps the review consistent with the tempo meter and with L09's exit rule.
-- **Keyboard:** Left/Right move between flags across the timeline; Up/Down between rows; Enter selects; F filters by kind. **SR:** each flag's name is "Turn 9, your turn: missed lethal, severe, works against any hand."
+- **Keyboard:** Left/Right move between turns on the timeline; Up/Down between rows; the flag list is its own tab stop; N / Shift+N next and previous flag; Enter opens Study; F filters by kind. **SR:** each flag's name is "Turn 9, your turn: missed lethal, severe, works against any hand."
 
 ### 4.3 Certainty labels
 
@@ -190,11 +206,11 @@ The three values of `certainty` (ARCHITECTURE §4.5) have fixed copy, a shape an
 | `needed-hidden-info` | **Hindsight: needed their hidden cards** | Eye | "This only works against the hand they actually held, which you couldn't see. Shown to help you read hands, not as a mistake." |
 | `search-incomplete` | **Not fully checked** | Dashed circle | "The analysis ran out of time on this turn. It found no proof either way. Analyse deeper?" |
 
-"Analyse deeper" (on `search-incomplete`) re-runs that turn's search with ten times the budget, with progress and a cancel. For live coach use (hint, lethal detector) the same labels read "Works against any hand", "Depends on their hand" and "Best found, not fully checked".
+"Analyse deeper" (on `search-incomplete`) re-runs that turn's search with ten times the budget, with progress and a cancel. For live coach use (hint, lethal detector) the same labels read "Works against any hand", "Depends on their hand" and "Best found, not fully checked". Labels are chosen **by context**, not only by value (UX-R25): an AI "Why" reads "Public information only"; a guide-sourced answer (the mulligan trainer) reads "From the Rocks guide (sourced)"; a hint outcome that is an estimate reads "Estimate". The full table is in `explanations.md` ("Certainty labels by context"), and its snapshot tests check it.
 
 ### 4.4 Restore and replay
 
-- Selecting a flag restores that position in the board viewer (read-only).
+- Selecting a flag selects it in Overview; Study restores that position on the read-only board. A "not fully checked" turn restores that turn's **starting** position, and its step control reads "No better line computed" (UX-R31).
 - **Step through the better line** plays the line's moves on the viewer, one per press, with the opponent's best responses from the analysis.
 - **Play from here** starts a new game from that exact state, including hidden cards, against the same AI tier (flows F16). It is marked "from review" and excluded from win rate.
 - **Stale records** (version mismatch, ARCHITECTURE §2.9) open read-only from snapshots: the timeline, flags and explanations are visible; Step through, Play from here and Practice this are disabled with the reason.
@@ -212,7 +228,7 @@ Turns a flag into a puzzle (plan-review UX-4: puzzles drawn from flags).
 
 ### 4.6 Saving
 
-Reviews are saved locally with the record (ARCHITECTURE §5). History lists games with result, date, flags by severity and a "Review" button. A game whose analysis did not finish shows "Analysis incomplete · Resume".
+Reviews are saved locally with the record (ARCHITECTURE §5). The **History** page (the "Reviews" nav item) is specified in §9.
 
 ## 5. Meta Explorer
 
@@ -221,12 +237,12 @@ Reviews are saved locally with the record (ARCHITECTURE §5). History lists game
 A responsive grid of archetype tiles (12 today, `meta-lists.json`). Header: **"English Standard · as of 2026-10-28 · 33 online events, 30 Jul to 28 Oct"** with a link to how it is counted.
 
 **Tile anatomy:**
-- Leader art (with the SAMPLE watermark caveat handled by the card-face study in `board.md`), name and leader ID: "Rocks.D.Xebec · OP17-039".
+- Leader art (with the SAMPLE watermark caveat handled by the card-face study in `board.md`), name and leader ID: "Rocks.D.Xebec · OP17-039". Where two archetypes share a Leader name, the tile uses the **same disambiguated name as the matchup grid** everywhere ("Luffy (Black)", "Enel (Purple)"), never the card ID alone (UX-R42).
 - Colours as text and icon, never colour alone: "Blue".
 - **Tier** from the only source we can use: opmetagame ("S"), labelled with its source on hover. The onepiece.gg tier is `null` for every archetype (robots), so the tile never shows a blank where a tier "should" be; it shows the opmetagame tier with its source.
 - **Share:** "11.2% of lists" and "16.1% since the ban".
 - **Guide freshness:** the date range of its three lists ("Lists: 8 to 13 Oct" for Rocks today), or "Lists may be out of date (73 days)" when older than 60 days (PROMPT Meta Explorer).
-- **Automation:** "50 of 50 cards automated", so the player knows whether the deck plays fully.
+- **Automation:** "50 of 50 cards automated", so the player knows whether the deck plays fully. When it does not, the tile states the consequence, not a status: "Plays with a generic AI; 7 card effects not automated" (UX-R42).
 
 **Sort and filter:** by share (default), share since the ban, tier, colour, name; filter by colour. Keyboard: arrows move across tiles in grid order; Enter opens; M switches to the matchup grid. **SR:** "Rocks.D.Xebec, Blue, tier S on opmetagame, 11.2% of lists, 16.1% since the ban. Guide and 3 lists."
 
@@ -243,6 +259,8 @@ Sections in the order of the guide files: What the deck is trying to do; Game pl
 A 12 × 12 grid: rows "you play", columns "against". Each cell shows a short marker (sourced record such as "6–2" where a source gives one; otherwise a neutral "plan" glyph) and opens a popover with the one-line plan, its source or "inference" mark, and **Play this matchup**. The diagonal shows "mirror". Row and column headers stay pinned while scrolling.
 
 - **No fake precision.** Cells do not show win percentages the project does not have. A colour scale is not used, because most cells are inference.
+- **Records say whose they are** ("16–20 (Rocks W–L)", also on the guide page). **When two sources disagree** about one pairing (the Rocks row and the Robin row give different records), both rows show the same marker and the popover lists both records with "Sources disagree" and each source (UX-R41).
+- **Overflow:** at 1280 the grid scrolls horizontally inside its frame with a scroll shadow on the clipped edge and a sticky first column.
 - **Keyboard:** arrows move cell by cell; Enter opens the popover; Esc closes. **SR:** "Rocks against Kaido: plan available, inference. Enter for details."
 
 ## 6. Progress
@@ -283,7 +301,7 @@ Four drills (PROMPT Learning layer §5), one shared shell (flows F19).
 ### 7.1 Shell
 
 - **Start screen:** drill name, the lesson it belongs to, filters (archetype, seat, source: "from my games" or "bank"), number of items (default 10), and the timer option.
-- **Item screen:** the scenario on the real board or the defence planner; a progress line "Item 3 of 10"; Show answer; Skip.
+- **Item screen:** the scenario on the real board or the defence planner; a progress line "Item 3 of 10"; one **Show answer** (the coach strip's "Answer" button on board drills); Skip. **The item never telegraphs its answer** (UX-R7): answer buttons have equal weight, none is pre-focused, focus starts on the hand or the prompt, and their order is fixed (Keep left, Redraw right). Lethal puzzles use **Submit turn** as the primary (not End turn) and evaluate themselves after the last legal attack (UX-R32).
 - **Answer screen:** right or wrong in words and shape, then the `Explanation`. Next (Enter).
 - **Summary:** score against the lesson's untimed exit criterion ("8 of 10: passed"), and, if timing was on, the timed result separately.
 
@@ -292,8 +310,8 @@ Four drills (PROMPT Learning layer §5), one shared shell (flows F19).
 Timing is never required to learn or to pass (curriculum "Exit criteria are untimed by default"; plan-review UX-9).
 
 - **Off by default.** Settings → Drills → Timed drills, or the timer toggle on each start screen.
-- **Adjustable:** 50% to 300% of the base time, or untimed, before and during a session. The base times are the curriculum's optional timed criteria (for example 60 s per lethal puzzle).
-- **Pausable:** Pause (P) stops the clock and hides nothing.
+- **Adjustable:** one option list, **Untimed (default) · 50% · 100% · 200% · 400% · 1000%** of the base time (review-1 C13; 1000% meets WCAG 2.2.1's ten-times rule; 50% serves players who want pressure), before and during a session. The base times are the curriculum's optional timed criteria (for example 60 s per lethal puzzle). The same list is in Settings → Drills and on each start screen.
+- **Pausable:** the timer's own Pause button (Space while the timer is focused) stops the clock and hides nothing. `P` keeps its board meaning.
 - **Never gates.** When time runs out the item does not end; the clock shows "Over time" and the item can still be answered and counted for the untimed criterion. Only the separate "passed (timed)" badge needs answers within time.
 - **Warnings:** a polite SR announcement at 10 s left; no sound by default; no flashing.
 - **Visual:** a thin bar and a number, both with text equivalents.
@@ -307,4 +325,40 @@ Timing is never required to learn or to pass (curriculum "Exit criteria are unti
 | Counter or take it | L10 | The defence planner | The analysis's comparison of block, counter and take (`explanations.md` E04, E05, E19) |
 | DON!! allocation | L09 | Play the turn and submit, or choose from 3–4 described lines | The analysis's scores for each line, explained in tempo-meter terms |
 
-Each drill bank holds at least 20 items (PROMPT M9). Items from the player's own games are marked "From your game, turn 9" and come first when the source filter allows.
+Each drill bank holds at least 20 items (PROMPT M9). Items from the player's own games are marked "From your game, turn 9" (the source game's turn number, `explanations.md` turn vocabulary) and come first when the source filter allows.
+
+## 8. Learn
+
+The teaching loop is flag → lesson → drill → Progress "Work on" (§6.1). Every explanation's lesson link and the "Learn" nav item land here (UX-R11). Wireframe: `wireframes/18-learn.html` (`#hub`, `#lesson`).
+
+### 8.1 Course hub
+
+- **Header:** "Learn" and one line: "27 lessons in 4 stages. Untimed; leave and come back any time."
+- **Continue card** at the top: the next unfinished lesson in teaching order, or the Progress page's "Work on" lesson when that differs, with its reason in numbers (the same text as §6.1).
+- **Stages** in curriculum order (`docs/content/curriculum.md`): Stage 1 First game (rules), Stage 2 Core strategy, Stage 3 Seeing the whole turn, Stage 4 Competitive-ready. Each lesson row shows its ID and title ("L10 Counter or take the hit"), status in words and shape (not started, in progress, passed, passed timed), its drill if it has one, and an estimated time. The tutorial is Stage 1's first row.
+- **Keyboard:** each stage is a list; rows are links. **SR:** "L10, Counter or take the hit, in progress, drill 6 of 10."
+
+### 8.2 Lesson page
+
+One page per lesson, opened from the hub, from an explanation's "Lesson:" link, or from the Progress "Work on" card. Sections in order:
+
+1. **Header:** lesson ID and title, stage, status, "Back to Learn".
+2. **The idea:** the concept in two or three short paragraphs, from the curriculum entry, with glossary terms linked.
+3. **Worked example:** one `Explanation` from `explanations.md` (for example L05 uses E04/E05; L10 uses E05 and E19; L15 uses E01 and E20), rendered at Learner verbosity, with a text-free thumbnail and **Show me**.
+4. **Show me:** opens the example's position as a scenario on the real board (a "Show me" mode, flows G2), with the coach open on the same explanation; Esc returns to the lesson.
+5. **Practise:** the drill entry for that lesson (mulligan, lethal puzzles, counter or take it, DON!! allocation), with the untimed **exit criterion** stated ("Pass: 8 of 10 untimed") and the player's best result. Lessons with no drill say how they are passed (a tutorial step, or "Finish a game with no flag of this kind").
+6. **Rules and sources:** the rule numbers and strategy sources the lesson cites.
+
+Lesson links resolve for every `lessonId` used in `explanations.md`; a CI check fails on a lesson ID with no page.
+
+## 9. History (Reviews)
+
+The "Reviews" nav item. Wireframe: `wireframes/20-history.html` (`#list`, `#empty`).
+
+- **List**, newest first: one row per game with result in words ("Won", "Lost", "Conceded", "Draw"), opponent and tier, your deck, date, turns, flags by severity as shapes with counts ("1 severe · 3 moderate · 1 hindsight"), tags ("Rewound", "From review", "Tutorial"), and **Review**. A game whose analysis did not finish shows **"Analysis incomplete · Resume"**. A stale record (older engine or card data) shows **"Read-only: older version"** and opens Overview read-only (§4.4).
+- **Filters:** result, opponent archetype, has severe flags. **Sort:** date, severe flags.
+- **Empty state:** "No games yet: play a game and its review appears here." with **Play a game** and **Try the tutorial**.
+- **Storage full** (`flows.md` G8) opens this list with a note: "Saved games are full. Delete old reviews to keep saving." and a select-and-delete mode.
+- **Keyboard:** the list is a table with row headers; Enter on a row opens its review. **SR:** "Lost to Kaido, Pirate, 28 October, 13 turns, 1 severe flag. Review."
+
+Progress (§6) is wireframed in `wireframes/19-progress.html` (`#progress`, and `#new` for a player with fewer than 3 reviewed games). Errors and empty states for the learning pages (stale review, analysis failed, art failed, storage full) are in `wireframes/21-errors.html`.

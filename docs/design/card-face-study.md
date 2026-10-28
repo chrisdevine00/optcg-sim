@@ -1,6 +1,6 @@
 # Card-face study: showing cards under the SAMPLE watermark
 
-**As of:** 2026-10-28 (Phase 4, revision 1)
+**As of:** 2026-10-28 (Phase 4, revision 2: review-1 fixes)
 **Why this exists:** plan review finding UX-10. Every available card image carries a SAMPLE watermark, which works against principle 6 ("Real card art is the hero"). This study compares ways to draw a card on the board and in the hand at the minimum legible size, recommends one, and asks the owner to sign off early.
 **Inputs:** `docs/research/data-sources.md` (image sources and terms), `board.md` §2 (sizes, badges), `visual-system.md`, `principles.md`.
 **No images are committed.** The sketches below use placeholder rectangles labelled "art". The watermark position was measured on the scans that Track B already cached locally under `.cache/track-b/img/`, which is gitignored and never published.
@@ -88,7 +88,7 @@ Our own frame on a plate background. The name and type are the primary content, 
 │[◆2]              [⛨] │  DON!! and keywords sit at the window's bottom edge
 ├──────────────────────┤
 │ Charlotte Pudding    │  footer on a plate: name 12/14 semibold, 2 lines
-│▀▀▀▀▀▀▀▀ colour band ▀│  colour band (initials at roomy density)
+│▀▀▀▀▀▀▀▀ colour band ▀│  colour band (initials at roomy density, 12 px or larger)
 └──────────────────────┘
 ```
 
@@ -164,6 +164,8 @@ Estimates are from the HTML mock-up (`.cache/design/cards/cards.html`, placehold
 > **Card faces.** All card images we can use carry a "SAMPLE" watermark across the lower middle of the art. On the board and in your hand, I propose showing each card as an *art window*: the clean upper part of the official art, enlarged, with the card's name in our type below it and our live cost and power on top. The full official scan, watermark included, appears whenever you hover, long-press or focus a card. You can switch the board to full scans in Settings.
 >
 > Do you sign off on the art window as the default? Please answer from two screenshots of the same mid-game board at 1280×720, one with each treatment (produced in the wireframe pass and stored under `docs/design/wireframes/shots/`, which is gitignored).
+>
+> Placeholder art cannot show crop failures, so the sign-off happens on a **local page that uses real cached scans** (fetched from the image source at runtime into the browser cache, never committed), at 1280×720, 1280×600 and 1024×690, for the 20 most-played cards in the slice decks (review-1 UX-R17).
 >
 > If you prefer the full scan as the default, the cost is the watermark on every card in view. The rest of the design is unchanged.
 

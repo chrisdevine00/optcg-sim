@@ -35,31 +35,32 @@
 <script src="cards.js"></script>
 <script>
 WF.chrome('Play');
-const STATES = [['ready', 'Defaults: ready'], ['invalid', 'Invalid deck'], ['rps', 'Start → first player']];
+const STATES = [['ready', 'Defaults: ready'], ['invalid', 'Invalid deck'], ['first', 'Set for your first game'], ['rps', 'Start → first player']];
 function draw() {
   const st = WF.state() || 'ready';
   if (st === 'rps') { location.replace('02b-start.html#rps'); return; }
   const bad = st === 'invalid';
+  const first = st === 'first';
   const g = { card: [84, 117] };
   const card = (id) => `<div class="cardbox" style="--card-w:84px">${WF.cardHTML(K(id, { st: [] }), [0, 0, 84, 117], g, { tag: 'span' })}</div>`;
   const radio = (on, t, d, tm) => `<li class="radio" role="radio" aria-checked="${on}" tabindex="${on ? 0 : -1}"><span class="dot" aria-hidden="true"></span><span>${t}${d ? `<small>${d}</small>` : ''}</span>${tm ? `<span class="tm">${tm}</span>` : '<span></span>'}</li>`;
   document.getElementById('main').innerHTML = `
     <h1 class="page">Set up a game</h1>
-    <p class="muted" style="margin:0 0 16px">Everything is preselected. Change anything, or press Start.</p>
+    ${first ? '<p style="margin:0 0 16px;padding:8px 12px;border:1px solid var(--color-accent);border-radius:8px;background:var(--color-surface-1)"><b>Set for your first game.</b> Rookie AI, the coach in Learner mode and the lethal detector on. Change in Settings later.</p>' : '<p class="muted" style="margin:0 0 16px">Everything is preselected. Change anything, or press Start.</p>'}
     <div class="cols">
       <section class="col panel" aria-labelledby="h1"><h2 id="h1">Your deck</h2>
-        <div class="deck">${card('OP17-039')}<div><div class="dn">${bad ? 'Rocks test' : 'Rocks.D.Xebec'}</div><div class="muted">Blue · OP17-039</div>
-          <div style="font-size:13px;margin-top:4px">${bad ? 'Your saved deck · edited today' : 'List: ChinoizeCup #122, 6th, 13 Oct'}</div>
-          <div style="font-size:13px;margin-top:4px"><span class="chip success">✓</span> 50 of 50 cards automated</div></div></div>
-        ${bad ? `<ul class="val" aria-label="Deck problems"><li class="bad">✕ 5 copies of OP17-045 Kyo: the limit is 4 per card number <span class="subtle">(CR 5-1-2-3)</span></li><li>✓ 50 cards · ✓ colours · ✓ no banned cards (from 2026-10-12)</li></ul><p style="margin:8px 0 0"><a href="12-deck-builder.html">Fix in the deck builder →</a></p>` : ''}
+        <div class="deck">${card('OP17-039')}<div><div class="dn">${bad ? 'Rocks test' : first ? 'Rocks starter (tutorial)' : 'Rocks.D.Xebec'}</div><div class="muted">Blue · OP17-039</div>
+          <div style="font-size:13px;margin-top:4px">${bad ? 'Your saved deck · edited today' : first ? 'The tutorial’s list' : 'List: ChinoizeCup #122, 6th, 13 Oct'}</div>
+          <div style="font-size:13px;margin-top:4px">${bad ? '<span class="chip warning">✕</span> 46 of 51 cards automated' : '<span class="chip success">✓</span> 50 of 50 cards automated'}</div></div></div>
+        ${bad ? `<ul class="val" aria-label="Deck problems, same checks as the deck builder"><li class="bad">✕ 50 cards: you have 51</li><li class="bad">✕ Max 4 per card number: OP17-045 Kyo ×5 <span class="subtle">(CR 5-1-2-3)</span></li><li>✓ Colours match Leader · ✓ No banned cards or pairs (from 2026-10-12)</li></ul><p style="margin:8px 0 0"><a href="12-deck-builder.html">Fix in the deck builder →</a></p>` : ''}
         <div class="row" style="margin-top:12px;gap:8px"><button class="btn small" type="button">Change deck</button><a class="btn small ghost" href="12-deck-builder.html">Edit</a></div></section>
       <section class="col panel" aria-labelledby="h2"><h2 id="h2">Opponent</h2>
         <div class="deck">${card('OP17-058')}<div><div class="dn">Kaido</div><div class="muted">Purple · OP17-058 · archetype list</div>
           <div style="font-size:13px;margin-top:4px">Playbook: Kaido's game plan</div><div style="font-size:13px;margin-top:4px"><span class="chip success">✓</span> 50 of 50 cards automated</div></div></div>
         <div class="lbl" style="margin-top:12px" id="tier">AI tier</div>
         <ul class="opt-list" role="radiogroup" aria-labelledby="tier">
-          ${radio(false, 'Rookie', 'Random legal moves, but always blocks or counters a lethal attack.', '~3 s turns')}
-          ${radio(true, 'Pirate', 'Plays its deck’s plan. Default.', '~6 s')}
+          ${radio(first, 'Rookie', 'Random legal moves, but always blocks or counters a lethal attack.', '~3 s turns')}
+          ${radio(!first, 'Pirate', 'Plays its deck’s plan. Default.', '~6 s')}
           ${radio(false, 'Warlord', 'Searches ahead on every decision.', '~8 s')}
           ${radio(false, 'Emperor', 'Deepest search. Thinks longer.', '~11 s')}
         </ul><p class="subtle" style="font-size:12px;margin:6px 0 0">Turn times at 1× speed, from the pacing budget.</p></section>
@@ -72,17 +73,17 @@ function draw() {
           ${radio(false, 'Open hands', 'You play both sides.')}
         </ul>
         <div class="lbl" style="margin-top:12px" id="first">Who goes first</div>
-        <div class="seg" role="radiogroup" aria-labelledby="first"><button type="button" role="radio" aria-checked="true">Rock-paper-scissors</button><button type="button" role="radio" aria-checked="false">Me</button><button type="button" role="radio" aria-checked="false">AI</button></div>
+        <div class="seg" role="radiogroup" aria-labelledby="first" style="flex-wrap:wrap"><button type="button" role="radio" aria-checked="true">Roll for it</button><button type="button" role="radio" aria-checked="false">I go first</button><button type="button" role="radio" aria-checked="false">I go second</button><button type="button" role="radio" aria-checked="false">AI chooses</button></div>
         <div class="lbl" style="margin-top:12px" id="coach">Coach verbosity</div>
-        <div class="seg" role="radiogroup" aria-labelledby="coach"><button type="button" role="radio" aria-checked="false">Learner</button><button type="button" role="radio" aria-checked="true">Standard</button><button type="button" role="radio" aria-checked="false">Terse</button></div></section>
+        <div class="seg" role="radiogroup" aria-labelledby="coach"><button type="button" role="radio" aria-checked="${first}">Learner</button><button type="button" role="radio" aria-checked="${!first}">Standard</button><button type="button" role="radio" aria-checked="false">Terse</button></div></section>
     </div>
     <div class="startbar">
       ${bad ? `<button class="btn primary big" type="button" aria-disabled="true" aria-describedby="why"><span class="lbl2">Start game</span><span class="sub">fix your deck first</span></button><span id="why" class="muted">Start is off until your deck passes the checks.</span>`
-        : `<a class="btn primary big" href="02b-start.html#rps" data-wf-focus><span class="lbl2">Start game <kbd>S</kbd></span><span class="sub">Rocks vs Kaido · Pirate · Practice</span></a><span class="muted">Rock-paper-scissors decides who chooses first or second.</span>`}
+        : `<a class="btn primary big" href="02b-start.html#rps" data-wf-focus><span class="lbl2">Start game <kbd>S</kbd></span><span class="sub">Rocks vs Kaido · ${first ? 'Rookie' : 'Pirate'} · Practice</span></a><span class="muted">${first ? 'Set for your first game: Rookie AI, Learner coach, lethal detector tier 1 on. Change in Settings later.' : 'A roll decides who chooses first or second.'}</span>`}
     </div>`;
   const f = document.querySelector('[data-wf-focus]'); if (f) f.focus();
 }
-draw(); window.addEventListener('hashchange', draw); WF.statesBar(STATES.slice(0, 2));
+draw(); window.addEventListener('hashchange', draw); WF.statesBar(STATES.slice(0, 3));
 </script>
 </body>
 </html>

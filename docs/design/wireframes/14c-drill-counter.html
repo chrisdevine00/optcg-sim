@@ -21,14 +21,23 @@ WF.mountBoard(() => {
     opp: { idText: 'Kaido · drill', hand: 0, donDeck: 0, active: 0, rested: 8, life: 2, deck: 19, leader: opp('OP17-058', { don: 2, p: 7000 }), trash: { n: 16, top: K('OP17-077') }, chars: [null, opp('OP17-060', { r: true, st: ['opp-act', 'battle'], chips: [{ t: '⚔ attacking', cls: 'attack', pos: 'below' }], noRestChip: true }), opp('OP17-062'), null, null] },
     me: { donDeck: 0, active: 4, rested: 6, life: 1, deck: 16, leader: K('OP17-039', { who: 'Your', st: ['battle'] }), trash: { n: 18, top: K('OP17-049') }, chars: [null, null, null, null, null], hand: [K('OP17-056', { hand: true, st: ['legal'], g: 'play' }), K('OP17-055', { hand: true, st: ['legal'], g: 'play' }), K('OP08-051', { hand: true, st: ['legal'], g: 'play' })] },
     mid: { turn: 'Drill · Turn 13 · Opponent’s turn', opp: true, battle: 'Counter', left: '<span class="chip outline" style="color:var(--color-text-muted)">Item 1 of 10</span>' },
-    arrows: [{ from: 'opp.c2', to: 'me.leader', cut: 40 }],
-    log: [SCN.th('Drill · Counter or take it (L10)'), '<li>From your game, turn 13</li>', '<li>Three attackers are active: Ulti &amp; Page One, their Leader, Kaido.</li>', '<li>They have 0 cards and 0 active DON!!.</li>'],
-    coachStrip: { hint: 'Show answer' },
+    // Attack 1 is live (solid); attacks 2 and 3 are the queue (dashed, numbered) so the whole sequence can be planned.
+    arrows: [{ from: 'opp.c2', to: 'me.leader', cut: 40, label: '1', labelAt: 0.62 }, { from: 'opp.leader', to: 'me.leader', cut: 40, dashed: true, color: 'opp', bend: 190, label: '2', labelAt: 0.25 }, { from: 'opp.c3', to: 'me.leader', cut: 40, dashed: true, color: 'opp', bend: 40, label: '3', labelAt: 0.2 }],
+    decisionTall: true,
+    log: [SCN.th('Drill · Counter or take it (L10)'), '<li>From your game, turn 13</li>', '<li>3 attacks coming. Plan all three.</li>'],
+    coachStrip: { labels: { hint: 'Answer' }, hide: ['why', 'tempo'] },
   };
+  const q = (n, who, pw, need, cur) => `<li style="display:grid;grid-template-columns:18px 1fr auto;gap:6px;align-items:center;padding:2px 0;${cur ? 'font-weight:600' : 'color:var(--color-text-muted)'}"><span class="chip ${cur ? 'attack' : 'outline'}" style="height:18px;padding:0 5px;justify-content:center">${n}</span><span>${who} <span class="num">${pw}</span></span><span class="num" style="white-space:nowrap">${need}</span></li>`;
   s.decision = {
-    title: 'Defend your Leader · 1 Life',
-    body: SCN.battle({ att: { name: 'Ulti &amp; Page One', num: '6000', bd: '6000 base · 1 of 3 attackers' }, def: { name: 'Your Leader', num: '5000', bd: '5000 · 3 counters in hand, up to +5000' }, res: { cls: 'hit', text: 'Hit lands · Life 1 → 0', need: 'Need +2000' } }) + '<p class="subtle" style="margin:4px 0 0;font-size:12px">Plan all three attacks before you choose. Untimed.</p>',
-    foot: `<button class="btn" type="button" aria-disabled="true">Clear</button>${SCN.primary('Take the hit', 'Life 1 → 0 · +1 card', '')}`,
+    title: 'Defend · attack 1 of 3 · 1 Life',
+    body: `<p style="margin:0 0 6px">From your game, turn 13. They have 0 cards in hand and 0 active DON!!. Three attackers are active: plan all three before you choose.</p>
+      <ol style="list-style:none;margin:0 0 6px;padding:6px 8px;border:1px solid var(--color-line-strong);border-radius:6px;font-size:13px;line-height:18px" aria-label="Attack queue">
+        ${q(1, 'Ulti &amp; Page One', '6000', 'need +2000', true)}${q(2, 'Their Leader', '7000', 'need +3000')}${q(3, 'Kaido', '12000', 'need +8000')}</ol>`
+      + SCN.battle({ att: { name: 'Ulti &amp; Page One', num: '6000', bd: '6000 base · attack 1 of 3' }, def: { name: 'Your Leader', num: '5000', bd: '5000 base' }, res: { cls: 'hit', text: 'Hit lands · Life 1 → 0', need: 'Need +2000' } })
+      + `<div class="lane" style="border-bottom:0"><span class="ln">Counter</span><div class="opts"><button class="opt" type="button" aria-pressed="false">Rocks Pirates +2000</button><button class="opt" type="button" aria-pressed="false">No Authority +2000</button><button class="opt" type="button" aria-pressed="false">Buckin +1000</button></div></div>
+      <p class="muted" style="margin:4px 0 0;font-size:12px">Your hand: 3 counters, up to +5000 in total across all three attacks. Untimed.</p>`,
+    // Drill answers have equal weight and neither is focused (review UX-R7), so neither button is primary here.
+    foot: `<button class="btn big" type="button" aria-disabled="true" style="flex:1;min-width:0"><span class="lbl2">Counter</span><span class="sub">stage cards first</span></button><button class="btn big" type="button" style="flex:1;min-width:0;margin-left:0"><span class="lbl2">Take the hit</span><span class="sub">Life 1 → 0 · +1 card</span></button>`,
   };
   return s;
 }, STATES);

@@ -1,6 +1,6 @@
 # Visual system
 
-**As of:** 2026-10-28 (Phase 4, revision 1)
+**As of:** 2026-10-28 (Phase 4, revision 2: review-1 fixes)
 **Tokens:** `docs/design/tokens.css`. That file is the source of truth for every value below. M0 copies it to `app/src/styles/tokens.css`.
 **Contrast check:** `.cache/design/contrast.mjs` parses `tokens.css` and checks every declared pair. M0 moves it into the build, where any failing pair fails CI (PLAN, M0 done criteria).
 **Related:** `principles.md` (6: art is the hero), `board.md` (geometry, badges, pacing), `card-face-study.md`.
@@ -47,9 +47,20 @@ Four rules follow from that stance:
 | Meaning | Token (dark / light) | Paired non-colour cue |
 |---|---|---|
 | **You, and your legal options** | `--color-accent` `#6cc4ff` / `#0a69ae`; text `--color-accent-text` | Legal ring **plus** a corner glyph naming the action (▶ ⚔ ◆ ⌖ ⚡); "You" written in the tag |
-| **The opponent and their actions** | `--color-opponent` `#f5a35c` / `#b45309`; text `--color-opponent-text` | "Opponent" / "Opp" written in the tag; a word chip on the acting card ("playing", "attacking") |
+| **The opponent and their actions** | `--color-opponent` `#f5a35c` / `#b45309`; text `--color-opponent-text` | "Opponent" / "Opp" written in the tag; a word chip on the acting card ("playing", "attacking"). Orange is **only ever** the opponent: your own resolving or triggered card wears the accent ring and an accent "resolving" chip, never the orange ring (UX-R18) |
 | **Attack, hit lands, lethal, danger** | `--color-attack` `#ff6b7a` / `#c8283e`; text `--color-danger-text` | Arrow shape, ⌖ glyph, ✕ icon, the words "Hit lands" or "K.O." |
 | **Survives, attack fails** | `--color-success` `#5fd49a` / `#1c7a4c`; text `--color-success-text` | ✓ icon, the words "Attack fails" or "Survives" |
+
+**Battle results are styled from the player's side** (UX-R19). Success and danger mean "good for you" and "bad for you", not "the attack worked":
+
+| Result | Your attack | Their attack on you |
+|---|---|---|
+| Hit lands on the Leader | "✓ Hit lands · their Life 3 → 2", success | "✕ Hit lands · your Life 3 → 2", danger |
+| Character K.O.'d | "✓ K.O.s King", success | "✕ K.O. · Gloriosa", danger |
+| Attack stopped | "✕ Attack fails", danger text (no fill) | "✓ Attack fails", success |
+| Tie | "✓ Ties go to you", success | "✕ Ties go to the attacker", danger |
+
+The words are the same in both columns where the fact is the same, so the meaning never depends on the colour.
 | **Warning** (0 Life, low deck, effect not automated) | `--color-warning` `#f2c94c`; text `--color-warning-text` | ⚠ icon plus the words |
 | **DON!!** | `--color-don` `#b7a3ff` / `#6a4fd6`; rested `--color-don-rested` | ◆ glyph; rested tokens are rotated, in a separate row, labelled "⟳ Rested N" |
 | **Raised / lowered stat** | `--color-plate-buff` / `--color-plate-debuff` | ▲ / ▼ glyph beside the number |
@@ -67,11 +78,11 @@ Four rules follow from that stance:
 
 Every coloured meaning on screen has at least one non-colour cue, listed in §2.3. The specific checks:
 - **Active vs rested:** rotation plus the "⟳ Rested" chip (`board.md` §2.4). The DON!! rows add position and a label.
-- **Whose turn:** the words "Your turn" or "Opponent's turn" in the midline band.
+- **Whose turn:** the words "Your turn" or "Opponent's turn" in the midline band **and** as a chip in the rail header, plus a 4 px bar along the acting player's half of the mat's left edge (accent for you, opponent colour for them; UX-R12). The bar is a second, non-text cue; the words stay.
 - **Battle result:** an icon plus a phrase.
 - **Raised or lowered numbers:** ▲ or ▼.
 - **Card colour** (red, green, blue, purple, black, yellow) is a game attribute, not a UI meaning. Even so:
-  - the frame's colour band carries the colour initials at roomy density;
+  - the frame's colour band carries the colour initials at roomy density, at 12 px or larger (UX-R17);
   - every preview names the colours in words;
   - accessible names include them;
   - the deck builder filters by name.
@@ -126,6 +137,7 @@ Compact density is designed at 1280×720. Roomy density applies at viewports of 
 | `--text-3xl` | 32/40 | same | Fraunces 600 | Page titles, lesson titles |
 | `--text-4xl` | 40/48 | same | Fraunces 600 | Game result, tutorial chapter |
 | `--num-battle` | 28/32 | 36/40 | Inter 700, `tnum ss01` | Attacker and defender power in the battle panel |
+| `--num-don` | 20/24 | 28/32 | Inter 700, `tnum ss01` | The active DON!! count in each cost area's header ("2 active"). It is the largest DON!! number on each side; the rested count is `--text-md` 600 and the DON!! deck count is caption weight (`board.md` §3.4; UX-R4) |
 | `--num-hero` | 40 | same | Inter 700, `tnum` | Drill score, final Life totals |
 | `--badge-power-size` | 13–15 (`clamp`, 0.17 × card width) | 21 | Inter 700, `tnum ss01` | Live power plate |
 | `--badge-num-size` | 12–13 (0.15 × card width) | 19 | Inter 700, `tnum ss01` | Cost, DON!!, Counter, counts |
@@ -163,10 +175,20 @@ Prose (coach, guides, rules) is set at `--text-lg` with a 60–72 character meas
 - `--control-h` is 36 / 40 for compact and roomy buttons.
 - `--control-h-primary` is 48 / 56 for End turn, Confirm and Skip.
 
-**Rings:**
-- the focus ring is 2 px with a 2 px gap at 4 px offset;
-- the legal ring is 3 px at 3 px offset;
-- the selection ring is 3 px.
+**Rings** (review-1 C7). The focus ring keeps a 4 px offset, and on a card that is also legal or selected it stacks **outside** the legal ring, so the two never merge:
+
+| Ring | Width | Distance out from the card edge |
+|---|---|---|
+| Legal (`--legal-ring`, solid, `--color-accent`, plus the corner glyph) | 3 px | 3–6 px (3 px offset) |
+| Selection (`--select-ring`) | 3 px | 3–6 px, card raised 6 px |
+| Focus gap (`--color-focus-gap`), on a plain card | 2 px | 4–6 px |
+| Focus ring (`--color-focus`), on a plain card | 2 px | 6–8 px |
+| Focus gap, on a legal or selected card | 2 px | 6–8 px |
+| Focus ring, on a legal or selected card | 2 px | 8–10 px |
+
+- **Hand neighbours.** At compact density the hand's legal ring uses a **2 px offset** (2–5 px out), so two lit neighbours 8 px apart keep a visible gap between their rings instead of reading as one band (UX-R48). A focused hand card is raised, so its outer focus ring never collides with a neighbour's ring.
+- **Forced colours:** legal ring `ButtonText`, focus ring `Highlight`; both must stay distinguishable (`accessibility.md` §4.1).
+- The cost area's active row, when it is a legal DON!! source, shows the same ring **plus the ◆ glyph** like every other legal element (UX-R45).
 
 ## 5. Elevation
 
@@ -180,7 +202,7 @@ Dark surfaces show elevation mostly by surface step, with shadows as support. Li
 | `--elev-3` | Preview dock, dialogs |
 | `--elev-drag` | Card being dragged |
 
-The z-order tokens run `--z-board` < `--z-card-raised` < `--z-arrow` < `--z-popover` < `--z-dock` < `--z-drag` < `--z-dialog` < `--z-toast`. The attack arrow sits above cards and below popovers, so a popover on the target is never crossed by the arrow.
+The z-order tokens run `--z-board` < `--z-card-raised` < `--z-arrow` < `--z-plate` < `--z-popover` < `--z-dock` < `--z-drag` < `--z-dialog` < `--z-toast`. The attack arrow sits above card faces but **below the plates and chips** (power, cost, Life and deck counts, status chips), so the arrow never crosses the number a decision depends on, and it ends at the ⌖ marker below the defender's power plate (UX-R13). It stays below popovers, so a popover on the target is never crossed by the arrow.
 
 ## 6. Motion
 
@@ -193,7 +215,8 @@ The z-order tokens run `--z-board` < `--z-card-raised` < `--z-arrow` < `--z-popo
 | `--dur-slow` | 320 ms | Coach expand, dock open |
 | `--dur-highlight` | 120 ms | Pacing: a source lights up before it acts |
 | `--dur-move` | 240 ms | Pacing: a card or token travels between zones |
-| `--dur-dwell` | 240 ms | Pacing: the hold after a move so a person can read it |
+| `--dur-dwell` | 400 ms | Pacing: the hold after a play, give or activate so a person can read it (C12) |
+| `--dur-dwell-attack` | 600 ms | Pacing: the hold after an attack or battle result that needs no decision from you |
 | `--dur-damage` | 360 ms | Pacing: Life card flip and travel |
 
 | Easing | Curve | Use |
@@ -204,7 +227,7 @@ The z-order tokens run `--z-board` < `--z-card-raised` < `--z-arrow` < `--z-popo
 | `--ease-move` | `cubic-bezier(0.3, 0, 0.2, 1)` | Card travel: a short, decisive start and a soft landing |
 | `--ease-linear` | `linear` | Progress bars only |
 
-The pacing tokens are multiplied by 1/speed at runtime (0.5×, 1×, 2×, 4×; `board.md` §5.3). UI feedback durations never scale with game speed.
+The pacing tokens are multiplied by 1/speed at runtime (Step, 0.5×, 1×, 2×, 4×; `board.md` §5.3). UI feedback durations never scale with game speed.
 
 ### 6.2 Reduced motion
 
@@ -212,7 +235,7 @@ The pacing tokens are multiplied by 1/speed at runtime (0.5×, 1×, 2×, 4×; `b
 - there is no travel, rotation, scaling or parallax: `--dur-move`, `--dur-damage`, `--dur-base` and `--dur-slow` are 0;
 - cards appear in place with an opacity fade of up to `--dur-fast`;
 - the rest state changes instantly, with the "Rested" chip fading in;
-- **`--dur-dwell` doubles to 480 ms.** Without travel the eye has no motion to follow, so the board holds still longer instead. The opponent stays as easy to follow as it was (principle 10);
+- **The dwells double, to 800 ms (`--dur-dwell`) and 1,200 ms (`--dur-dwell-attack`).** Without travel the eye has no motion to follow, so the board holds still longer instead. The opponent stays as easy to follow as it was (principle 10);
 - the attack arrow appears whole, with no draw-on, and the thinking indicator becomes a static label;
 - no motion is ever the only carrier of information: every move is also logged and announced.
 
@@ -327,6 +350,8 @@ The pacing tokens are multiplied by 1/speed at runtime (0.5×, 1×, 2×, 4×; `b
 
 1. **Contrast:** `node .cache/design/contrast.mjs` exits 0 (after M0, `npm run build` does).
 2. **Colour-blind and greyscale:** screenshots in deuteranopia, protanopia and greyscale simulation keep every state distinguishable (§2.5).
-3. **Numbers:** every number on the board is tabular, at least 12 px, and on a plate or flat surface.
+3. **Numbers:** every number on the board is tabular, at least 12 px (colour-band initials included), and on a plate or flat surface. Numbers are never truncated: log lines and panel breakdowns wrap rather than ellipsise a numeral (UX-R20).
 4. **Brand:** no red-black-gold scheme, condensed italic display, pirate motif or printed DON!! or card-back imagery.
-5. **Motion:** with reduced motion on, nothing travels, rotates or scales, and dwell is at least 480 ms.
+5. **Motion:** with reduced motion on, nothing travels, rotates or scales, and dwell is at least 800 ms (1,200 ms on attacks and results).
+6. **Hierarchy:** on each side the active DON!! count is the largest DON!! number; the DON!! deck count is caption weight.
+7. **Perspective:** battle results are styled by whose side the player is on (§2.3), and orange appears only on the opponent's cards and tags.

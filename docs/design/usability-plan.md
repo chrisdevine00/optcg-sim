@@ -1,6 +1,6 @@
 # Usability plan
 
-**As of:** 2026-10-28 (Phase 4, revision 1)
+**As of:** 2026-10-28 (Phase 4, revision 2: review-1 fixes)
 **Answers:** `docs/plan-review-1.md` UX-2 (no testing with real people; partly accepted) and UX-8 (SeaKing never observed; partly accepted); `docs/PLAN.md` §3 and rows 6, 14, 18, 21.
 **Companions:** `docs/design/accessibility.md` (the screen-reader passes are there, not here), `flows.md`, `learning-ui.md`, `docs/content/curriculum.md`.
 
@@ -122,9 +122,10 @@ The wireframes are static HTML with click-through. Tasks only use paths the wire
 | 0.2 | "Play the Character that costs 3." | Board, your Main Phase | Reaches the played state via the action menu or drag, with no dead end |
 | 0.3 | "Give 2 DON!! to Zoro, then attack the opponent's Leader." | Board | Reaches the attack confirm and correctly reads its numbers aloud |
 | 0.4 | "You're being attacked. Decide what to do and do it." | Defend wireframe: Kaido 7000 attacks your Leader 5000; hand holds a +2000 and a +1000 counter; one Blocker at 4000 | Commits a defence the participant can justify; the choice itself is not graded |
-| 0.5 | "Do task 0.3 again using only the keyboard. You may open the shortcut sheet." | Board, focus at the page top | Reaches the attack confirm by keyboard; notes how the sheet was found |
+| 0.5 | "Do task 0.3 again using only the keyboard. You may open the shortcut sheet." | Board, focus at the page top. The wireframes implement the `accessibility.md` §3.1 tab order (one stop per zone, roving arrows, the "Skip to decision" link) and the keys `P`, `G`, `A`, `+`, `E` and `U` (`wireframes/wf.js`), so this task is runnable | Reaches the attack confirm by keyboard; notes how the sheet was found; the Tab count to End turn is recorded |
 | 0.6 | "Ask the app for a hint, then undo your last move." | Board after a move | Finds Hint and Rewind without an assist |
-| 0.7 | "This game is over. Find the turn where you could have won, and explain how." | Review wireframe, planted missed lethal | Opens the flag and restates the line in their own words |
+| 0.7 | "This game is over. Find the turn where you could have won, and explain how." | Review wireframe (Overview), planted missed lethal | Opens the flag, goes to Study, and restates the line in their own words |
+| 0.8 | **Keyword recognition** (UX-R16). Show `03-main` at 1280 for five seconds, then point at three keyword glyphs on the board (⛨, »C, ⊘) and ask what each means. Repeat at 1920, where the board shows short text chips ("Blocker", "Rush: C"). | Board screenshots at both sizes | Records how many of the three glyphs are named correctly at 1280 without the legend, and whether the participant finds the legend (shortcut sheet, Rules page). Fewer than 2 of 3 is a finding against the compact glyph set |
 
 **Teach-back:**
 - After 0.3: Q2 ("Why does Zoro show 7000 now, and what will it show on your opponent's turn?").
