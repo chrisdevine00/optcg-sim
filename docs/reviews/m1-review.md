@@ -102,3 +102,56 @@ Re-review needs `90-zoom-400-1280`, `95-forced-colors-card-focus`, the Tab count
 - **Service worker (listed under "Not assessed").** Confirmed broken: the built `sw.js` began with `import … from "./assets/sources-….js"`, so the classic-script registration failed and no page was ever controlled. Fixed by building `src/sw.ts` as a self-contained IIFE (`app/vite.config.ts`). Test `app/e2e/sw.spec.ts`: the worker controls the page, more than 10 image entries land in `optcg-images-v1`, and a reload sends fewer requests to the image host than there are cached images.
 - The Disposition column is the builder's; the reviewer's text is unchanged.
 
+
+## Re-review (2026-10-28, commit `d7746a8`)
+
+### Method
+
+- I rebuilt with `npm run build` and served the bundle with `npm run preview`. The preview server was stopped afterwards.
+- I drove the build with my own Playwright harness, `.cache/m1-review/r2.mjs`, plus three small probes (`insp320b.mjs`, `narrowkbd.mjs`, `dbg.mjs`). I did not use the builder's tests or screenshots.
+- Sizes: 1280×720, 1920×1080, 200% zoom (640×360 and 960×540 CSS px at DPR 2), and 320 CSS px wide (320×180 and 320×256 at DPR 4), plus forced-colours emulation.
+- I re-ran axe-core with the same tag set as before.
+- Screenshots are `.cache/m1-review/r2-*.png`, and the logs are `r2-log-*.json`.
+
+### Severity-3 findings
+
+| ID | Result | Measurement |
+|---|---|---|
+| M1-01 | **Verified** | Searching "Luffy" from the default view gives "123 cards in all sets" at both 1280 and 1920 (`r2-01-luffy-1280.png`). With OP-05 picked it gives "3 cards in OP-05 · 123 in all sets", and the second figure is a button (`r2-01b-luffy-setpicked-1280.png`). The default view says "119 cards in OP-17 (newest set)". |
+| M1-02 | **Verified** | From page load, 6 Tab presses reach the first card (Skip to results, logo, Home, Cards, search, card); before the fix it was 23. From search, Tab, ArrowDown and Enter each reach result 0 in **1 key**, and the first Tab plus Enter on "Skip to results" lands on result 0. Arrows, Enter, Escape and focus return still work. Measured at 1280 and 1920. |
+| M1-03 | **Verified** | In forced colours the focused card has `outline: solid 3px` in the system Highlight colour at a 4 px offset, and it is clearly visible (`r2-03-forced-focus-1280.png`, same at 1920). In normal mode the ring is a 2 px outline at a 4 px offset over a 4 px dark gap, and on the first tile it is not clipped (`r2-03-normal-focus-first-1280.png`). |
+| M1-04 | **Verified for the results page; not for the inspector** | At 320×180 the page's scrollWidth is 320 (0 px of overflow), the results are 320 px wide, the count sits below the header with no overlap, a focused card is fully in view, and axe reports 0 violations (`r2-04-320-full.png`). At 640×360 the results are 640 px wide and the inspector reads correctly. The inspector at 320 px fails, and is logged as new finding M1-30. |
+
+### Severity-2 spot checks
+
+| ID | Result | Evidence |
+|---|---|---|
+| M1-05 | Verified | At 640×360 the page scrolls with full-width results, 4 tiles in view after one scroll, and no horizontal scroll (`r2-04-200-1280-scrolled.png`). |
+| M1-06 | Verified | The active-filter chips are in the bar and "Clear all" works. The empty state reads "No cards match “zzqq” in all sets with 1 filter (Colour: Red)." and offers "Clear filters". |
+| M1-07 | Verified, with a nit (see M1-34) | Name matches now come before mentions in rules text. |
+| M1-09 | Verified | The inspector shows a neutral "Effect not automated" chip and one quiet line, and the yellow is gone. |
+| M1-10 | Verified, with a new problem (see M1-32) | "⛔ Banned" and "⟲ Rotated" chips appear on tiles and in their accessible names. |
+| M1-11 | Verified | When the image host is aborted: a notice in the results bar, "Couldn't load the card image (optcgapi.com didn't respond)" in the inspector, and after unblocking, "Retry images" restores all 49 tiles. |
+| M1-12 | Verified | A failed chunk shows the status "Couldn't load OP-17" with a plain message, Retry and Reload. After Retry, 119 cards load. |
+| M1-13 | Verified, with a new problem (see M1-31) | Filters persist across a reload (`?set=all&legality=banned`). `?card=OP05-119` opens the inspector, and Back closes it. |
+| M1-15 | Verified | PageDown in the inspector moves to the next result ("4 of 44"). |
+| M1-16 | Verified | axe reports 0 violations on the default view at 1280 and 1920, no results, the inspector, the fallback inspector, 200% and 320 px. |
+| M1-17 | Verified | The page title is "Cards · OPTCG Sim", and with the inspector open it is "Roronoa Zoro (OP01-001) · Cards · OPTCG Sim". |
+| Service worker | **Verified** | The worker controls the page on the first visit and after a reload. `optcg-images-v1` holds 49 entries. With the image host aborted after caching, all 49 tiles still render from cache (`r2-sw-hostdown-cached.png`). |
+| Scroll | Verified | With all 2,799 cards, frame times are p50, p99 and max 16.7–16.8 ms. Image requests during the fling: 0. |
+
+### New findings
+
+| ID | Sev | Principle / WCAG | Screen, state, screenshot | Problem | Recommended fix |
+|---|---|---|---|---|---|
+| M1-30 | **3** | WCAG 1.4.10 Reflow | Inspector at 320 CSS px: `r2-04-inspector-320x256-scrolled.png`, `r2-04-inspector-320x180-scrolled.png`; probe `insp320b.mjs` | At 320 px the inspector keeps its two-column grid (`240px 0px`). The info column (stats, legality and the **card text**) is **0 px wide** at x = 294, so its text wraps one letter per line at the dialog's edge, and the dialog overflows sideways (scrollWidth 414 against clientWidth 284). At 320×180 the sticky header (name, ID, Previous/Next, Close, Esc) fills all 160 px of the dialog's height, so **no card content is visible at all**. At 400% zoom, card text cannot be read anywhere in the product. | At 560 px and below, use one column (art scaled to width, then the info). Make the header non-sticky, or compact it to one row (name and Close, with Previous/Next moved to the footer). Add the inspector at 320×256 to the reflow e2e test and to axe. |
+| M1-31 | 2 | accessibility.md §4.3 ("Focus is never lost to `<body>`"); WCAG 2.4.3 | Inspector closed by browser Back, or opened from a `?card=` deep link and then closed | After Back (whether the inspector was opened by keyboard or by mouse), focus lands on `BODY`. Closing a deep-linked inspector with Escape also leaves focus on `BODY`. Both come from the M1-13 fix. | On a `popstate` close, focus the opener, or else the tile for that card if it is rendered, or else the results region. Do the same for a deep-linked close. |
+| M1-32 | 2 | P6 Art is the hero; card-face-study §1 (faces sit in the upper third) | Rotated filter: `r2-s2-rotated-chips.png`; all sets: `r2-01-luffy-1280.png` | The "⟲ Rotated" chip is centred in the upper art window, on top of the subject's face (Zoro, Law and Luffy in the first row). It appears on 597 of 2,799 cards. | Put the chip on the top edge of the footer plate, or in the art window's bottom-right corner opposite the Counter plate. Never centre it over the art. |
+| M1-33 | 2 | WCAG 3.3.2 Labels or instructions; 2.5.3 | Search, at every size: `r2-s2-default-1280.png` | The visible label "Search name, ID or text" was removed. The only visible cue is the placeholder "Name, number or text   /", which disappears once the user types. The accessible label is visually hidden. | Restore a short visible label ("Search"), or a search icon plus a persistent visible prefix. Keep the placeholder as the example only. |
+| M1-34 | 2 | WCAG 2.4.3 Focus order; 2.4.11 | Narrow layout (640×360), pressing Filters from the keyboard: `r2-narrow-filters-kbd.png`, probe `narrowkbd.mjs` | The panel opens above the results bar, which pushes the focused "Filters" button 587 px down and off screen (y = 735 in a 360 px viewport). The next Tab goes to result 0 and only then up into the filters, so the visual order and the focus order disagree. | Open the panel below the button (in DOM order after it), or move focus to the panel's first control on open. Keep the toggle in view. |
+| M1-35 | 1 | Search relevance | Search for "Zoro": log `02-search+Tab` | "Best match" ranks Zoro-Juurou (OP05-067, ST18-004) above Roronoa Zoro, because a name prefix outranks a whole word in the name. "Luffy" puts the "Luffy Is the Man…" Events above every Monkey.D.Luffy. | Score a whole-word match in the name as highly as a prefix match, then break ties by category (Leader and Character before Event) and by card number. |
+| M1-36 | 1 | card-face-study §1 | Tile macro: `r2-s2-tile-macro.png` | With the crop now starting at 6%, slivers of the printed power box still show above the power plate (M1-18 is only partly fixed). | Start the crop at about 8%, or extend the power plate up to the window's top edge. |
+
+**Counts for this re-review:** of the original severity-3 findings, all 4 are verified, and M1-04 is verified for the results page only. New findings: severity 3: 1 (M1-30) · severity 2: 4 · severity 1: 2. No new severity 4.
+
+M1 review: FAIL (open: M1-30, inspector unreadable at 320 CSS px)
