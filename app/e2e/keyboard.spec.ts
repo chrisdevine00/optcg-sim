@@ -68,7 +68,7 @@ async function keyboardTurn(page: Page) {
 }
 
 test('a whole game vs Rookie, keyboard only', async ({ page }) => {
-  test.setTimeout(300_000);
+  test.setTimeout(480_000);
   await startGame(page, 'seed=7&first=me&speed=4&skip=1');
   for (let i = 0; i < 600; i++) {
     const k = await nextDecision(page);

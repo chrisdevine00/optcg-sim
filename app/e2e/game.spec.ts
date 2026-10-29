@@ -3,7 +3,8 @@ import { nextDecision, playToEnd, startGame } from './game-support.ts';
 
 test.describe('M3 board: full games', () => {
   test('a full game vs Rookie plays to completion', async ({ page }) => {
-    test.setTimeout(240_000);
+    // Scripted effects (M4a) add decisions; CI runners are slower than local machines.
+    test.setTimeout(480_000);
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));
     await startGame(page, 'seed=101&first=me&speed=4&skip=1');
@@ -16,7 +17,8 @@ test.describe('M3 board: full games', () => {
   test('a full hotseat game plays to completion, with a handoff curtain at each turn', async ({
     page,
   }) => {
-    test.setTimeout(240_000);
+    // Scripted effects (M4a) add decisions; CI runners are slower than local machines.
+    test.setTimeout(480_000);
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));
     await startGame(page, 'opp=hotseat&seed=202&first=me&speed=4');
