@@ -15,6 +15,7 @@ export {
   queries,
   autoSkip,
   projectEvents,
+  actionFromView,
 } from './game.ts';
 export type { ProjectedView } from './project.ts';
 export {

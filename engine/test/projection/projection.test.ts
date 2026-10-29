@@ -1,13 +1,13 @@
 /** Projection (ARCHITECTURE §2.7, ADR 0005): CR 3-1-4, 3-2-2, 3-3-2, 3-4-3, 3-5-2, 3-10-2, 3-10-2-1. */
 import { describe, expect, it } from 'vitest';
 import {
+  actionFromView,
   project,
   projectEvents,
   reduce,
   type GameEvent,
   type ProjectedView,
 } from '../../src/index.ts';
-import { actionFromView } from '../../src/project.ts';
 import { internals } from '../../src/testing.ts';
 import { scenario } from '../fixtures/index.ts';
 import { KAIDO, LUFFY, newGame, op, PUR_1, RED_1, RED_5, startedGame } from '../support/game.ts';
@@ -73,7 +73,7 @@ describe('what each player sees', () => {
     const v = project(g.state, 'p1');
     expect(v.actions.length).toBe(g.legal().length);
     for (let i = 0; i < v.actions.length; i++) {
-      expect(actionFromView(internals(g.state), 'p1', v.actions[i]!)).toEqual(g.legal()[i]);
+      expect(actionFromView(g.state, 'p1', v.actions[i]!)).toEqual(g.legal()[i]);
     }
     expect(project(g.state, 'p2').actions).toEqual([]);
   });

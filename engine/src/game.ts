@@ -24,7 +24,11 @@ import { advance } from './flow.ts';
 import { summaryHash as hash } from './hash.ts';
 import { checkInvariants as invariants } from './invariants.ts';
 import { preview as previewWith } from './preview.ts';
-import { project as projectState, projectEvents as projectEventsFor } from './project.ts';
+import {
+  actionFromView as fromView,
+  project as projectState,
+  projectEvents as projectEventsFor,
+} from './project.ts';
 import { queries as q } from './queries.ts';
 import { replayWith } from './record.ts';
 import { createFromScenario as fromScenario, createGame as fromSetup } from './setup.ts';
@@ -100,3 +104,10 @@ export const autoSkip = (state: GameState): Action | null => {
 /** Events as one player may see them (ARCHITECTURE §2.7). */
 export const projectEvents = (events: readonly GameEvent[], player: PlayerId): GameEvent[] =>
   projectEventsFor(events, player);
+
+/**
+ * Map an action from a player's view (card handles) back to the engine action `reduce` takes. The
+ * session store calls this; the UI and AI only ever hold handles (ARCHITECTURE §2.7).
+ */
+export const actionFromView = (state: GameState, player: PlayerId, action: Action): Action =>
+  fromView(st(state), player, action);
