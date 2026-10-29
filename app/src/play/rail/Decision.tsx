@@ -953,7 +953,8 @@ function defenceContent(g: G): Content {
           target={targetH}
           breakdownDef={
             staged
-              ? `${num(tp - total)} + ${num(total)} staged (${s.counters.map((c) => g.nameOf(c.card)).join(', ')})`
+              ? // On tablet rails the staged names stay in the Counter lane only (one line fewer each).
+                `${num(tp - total)} + ${num(total)} staged${g.L.rail.w < 320 ? '' : ` (${s.counters.map((c) => g.nameOf(c.card)).join(', ')})`}`
               : s.blocker
                 ? `redirected from your Leader`
                 : undefined
@@ -1038,7 +1039,10 @@ function defenceContent(g: G): Content {
             </div>
           </div>
           <div className="lanehd">
-            <span className="subtle">Click lit hand cards to stage · ties go to the attacker</span>
+            <span className="subtle">
+              Click lit hand cards to stage
+              <span className="wide-only"> · ties go to the attacker</span>
+            </span>
             <button
               type="button"
               className="btn small"

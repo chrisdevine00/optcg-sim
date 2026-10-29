@@ -1702,3 +1702,22 @@
   justify-content: center;
   gap: 4px;
 }
+
+/* Tablet rails: the battle panel keeps a spare line on any platform's font metrics. The role word
+   moves above the name, so names and breakdowns use the full width. */
+.narrow-rail .battle .bn {
+  grid-template-columns: 1fr auto;
+}
+.narrow-rail .bn-role {
+  grid-column: 1 / -1;
+  line-height: 14px;
+}
+.narrow-rail .lane {
+  grid-template-columns: 52px 1fr;
+}
+.narrow-rail .wide-only {
+  display: none;
+}
+.narrow-rail .dec-body {
+  padding: 4px 10px;
+}

@@ -127,6 +127,9 @@ test('forced colours keep the legal ring and the focus ring distinct (accessibil
   expect(outline).not.toBe('none');
 });
 
+/** One 20 px line plus a little: the margin every tall body keeps at the adapted sizes. */
+const SLACK = 24;
+
 test.describe('adapted sizes', () => {
   for (const [w, h] of [
     [1280, 600],
@@ -157,13 +160,23 @@ test.describe('adapted sizes', () => {
           }).length;
           const primary =
             document.querySelector('.dec-foot .btn.primary')?.getBoundingClientRect().width ?? 999;
-          return { scroll: body.scrollHeight - body.clientHeight, over, primary };
+          // Slack: free height under the body's content. Fonts and wrapping differ across platforms
+          // (Linux CI wrapped one more line than macOS), so every tall body keeps a line spare.
+          const top = body.getBoundingClientRect().top;
+          const bottom = Math.max(
+            ...[...body.querySelectorAll('*')].map((el) => el.getBoundingClientRect().bottom),
+          );
+          const pad = parseFloat(getComputedStyle(body).paddingBottom);
+          const slack = body.clientHeight - (bottom - top + pad);
+          return { scroll: body.scrollHeight - body.clientHeight, slack, over, primary };
         });
       const ok = async (name: string) => {
         await page.waitForTimeout(300);
         await page.screenshot({ path: `.cache/m3/${w}x${h}-${name}.png` });
         const f = await fits();
+        console.log(`${w}x${h} ${name}: slack ${Math.round(f.slack)} px`);
         expect(f.scroll, `${name} body scrolls`).toBeLessThanOrEqual(0);
+        expect(f.slack, `${name} keeps a spare line`).toBeGreaterThanOrEqual(SLACK);
         expect(f.over, `${name} footer overflow`).toBe(0);
         expect(f.primary, `${name} primary width`).toBeGreaterThanOrEqual(136);
       };
