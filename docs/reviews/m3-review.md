@@ -389,3 +389,88 @@ On the unmutated worktree, the 11 tests in `review-rr1`, `touch-hotseat`, `hotse
 **Blocking:** M3-35. Fix it, add the hotseat effect-decision test, then re-review. M3-36 and M3-37 are small hardening steps and should go in the same change.
 
 Still owed: the manual screen-reader pass in PLAN's M3 exit criteria, and the carries already scheduled in DECISIONS (M3-18, M3-23).
+
+---
+
+## Re-review 3
+
+**Date:** 2026-10-29
+**Build reviewed:** `main` at `fb516fc` (fix `64ddfb5`; CI run 40822229184 green).
+- I served it from a clean detached worktree (`.cache/m3-rr3/head`, Vite on :5178).
+- Mutations and two scratch hotseat scenarios ran in a second worktree (`.cache/m3-rr3/mut`, :5179).
+  - `rocksA`: Player 1 has OP17-048 Shiki on the field and a Rocks Pirates card (OP17-054) in hand.
+  - `rocksB`: the same position, with no Rocks Pirates card in hand.
+- The main tree was not touched.
+
+**M3 re-review 3: FAIL.** One new severity-4 finding is open: **M3-39**. Under the veil, whether "Use" is available shows the attacker what is in the defender's hand. The fixes for M3-35 to M3-38 hold.
+
+### Method
+
+1. **Answer-availability probe** (`.cache/m3-review/rr3-answer.mjs`). Player 2 attacks in `rocksA` and in `rocksB`, so Shiki's `onOpponentAttack` optional reaches the veiled defender. Its cost is "trash 1 Rocks Pirates card from your hand". I diffed the veiled `#decision` DOM and the pixels between the two (`rr3/answer-A.html`, `rr3/answer-B.html`, `rr3/answer-rocksA.png`, `rr3/answer-rocksB.png`).
+2. **Code trace** of `veiledAnswerable()`, the veiled wrapper in `contentFor`, `publicView`'s neutral decision, and the engine's `noAccept` (`engine/src/actions.ts:452–455`: "use" is left out of the legal answers when its cost can't be paid).
+3. **Regression.**
+   - `leak.mjs`: all canaries clean.
+   - `rr3-sticky.mjs` and `rr3-rewind.mjs`.
+   - `rr3-hotseat.mjs`: a full hotseat game, seed 202, with scripted effects. It now presses "Show my hand" when a veiled decision needs it, and plays to game over with no leak line.
+   - `rr3g/ai-game.mjs`: a full game vs Rookie with M3-28's announcements.
+4. **Mutations:** remove each fix, then run its test.
+
+### Claims verified
+
+| ID | Verdict | Evidence |
+| --- | --- | --- |
+| M3-35 | **Fixed as specified.**<br>• The veiled seat sees "Player 1: your decision" and "Show my hand · R".<br>• The prompt is neutral ("Shiki: Give up to 1 of your opponent's Characters −3000 power", built from a public source).<br>• A decision whose answers name hidden cards shows "Show your hand to see this decision" and no buttons.<br>• The make-room note appears only for `characterLimit`.<br>The seed-202 game that stalled in round 2 now plays to the end through "Show my hand". However, the "answerable without revealing" rule reads the private legal answers (M3-39). | `rr3/hotseat-report.txt`; `hotseat-effects.spec.ts` |
+| M3-36 | **Fixed.**<br>• Conceding while the hand is revealed now ends on a veiled board with 0 private names (`rr3/s2-concede-game-over.png`).<br>• U with consent during a sticky reveal sends the curtain to Player 2, with 0 names under it and only Player 2's own hand after it.<br>• Shift+U also ends the reveal. | `rr3-sticky.mjs`, `rr3-rewind.mjs` output |
+| M3-37 | **Fixed.** `publicView` is built from an allow-list, with `looking: []` and `known: {}`; `resolving` and `attackLock` keep only public cards. | `session.ts`; mutation below |
+| M3-38 | **Fixed:** the commit now ends a touch reveal before a decision by the same seat. | mutation below |
+
+### Do the new tests catch the old bugs?
+
+| Mutation | Test | Result |
+| --- | --- | --- |
+| The veiled wrapper turned off (`contentFor` returns the inner panel) | `hotseat-effects.spec.ts` | **fails** (title) |
+| The public decision reverts to the other seat's prompt | `hotseat-effects.spec.ts` / `hidden.test.ts` | **both fail** ("Your opponent is choosing who goes first.") |
+| `looking: own.looking` in `publicView` | `hidden.test.ts` | **fails**: the seeded game really does look at cards (OP17-118, OP17-049), so the assertion is not vacuous |
+| The commit does not end the reveal | `touch-hotseat.spec` (the new M3-38 test) | **fails** |
+| `finish()` does not clear the reveal | `hotseat-effects.spec.ts` | **passes**: the concession goes through `restart()`, which also clears the reveal. Behaviour is safe; the line is untested on its own (M3-40). |
+| `restart()` does not clear the reveal on rewind | `hotseat-leaks`, `hotseat-effects`, `rewind` | **pass**: the post-rewind curtain sets `handVeil = 'none'`, which masks a stale flag. Safe, but untested (M3-40). |
+
+On the unmutated worktree, the 7 tests in `hotseat-effects`, `touch-hotseat`, `hotseat-leaks` and `review-rr1` pass, and so do both tests in `hidden.test.ts`.
+
+### Answer availability under the veil
+
+The engine keeps its side of the bargain: the optional decision is asked whether or not the cost can be paid, and only the decider gets the legal answers. The UI breaks it under the veil.
+
+| Position (Player 1 veiled, Player 2 looking) | Veiled panel |
+| --- | --- |
+| `rocksA`: a Rocks Pirates card in hand | "Player 1: your decision · You can answer without showing your hand… · Shiki: Give up to 1 of your opponent's Characters −3000 power · **Skip / Use**" |
+| `rocksB`: no Rocks Pirates card in hand | the same text, but **"Use" is disabled and its sub-label reads "can't pay the cost"** |
+
+The two DOMs differ only in that button (`<span>can't pay the cost</span>`), and the difference shows in the pixels. This is not a corner case. OP17-048 Shiki is in the Rocks list, its ability fires on every opponent attack, and the seed-202 hotseat game reached it (turn 8, "Shiki: Give up to 1…").
+
+The other channels I checked do not leak today:
+- **Timing:** a veiled decision has no AI beat, and both answers render at once.
+- **Neutral prompt:** it is built from the source card's public label.
+- **Done / count line:** only shown for picks among public cards.
+- **Trigger "Activate":** it reads "reveal first" whatever the card.
+
+One more channel is open in principle. The **"You can answer without showing your hand" versus "Show your hand to see this decision"** split is computed as `priv.length === pub.length`, which asks whether any *legal* answer names a hidden card. A choice whose legal answers may or may not include hand cards would switch between the two wordings depending on the hand. I found no scripted card that does this yet; it is the same root cause as M3-39.
+
+### New findings
+
+| ID | Sev | Area | Problem | Evidence | Fix |
+| --- | --- | --- | --- | --- | --- |
+| M3-39 | 4 | Hidden info: answer availability under the veil | **Under the veil, whether "Use" can be pressed reveals hand contents to the attacker.**<br>• `veiledAnswerable()` treats an optional decision as answerable without a reveal, because accept and decline name no card.<br>• `contentFor` then renders the inner footer from the seat's **private** legal answers. When the cost needs a hidden card the hand lacks, the engine drops "use" (`noAccept`), and the veiled footer shows "Use · can't pay the cost".<br>• With OP17-048 Shiki on the field, every opponent attack tells the attacker whether the defender holds a Rocks Pirates card. Other hand costs with a filter (EB04-032, OP17-042) leak the same way when they reach a veiled seat.<br>• More broadly, the answerable-or-not split itself is computed from private answers. | `rr3-answer.mjs` output ("DOM identical under the veil: false"); `rr3/answer-rocksA.png` against `rr3/answer-rocksB.png`; `rr3/answer-B.html`; `controller.ts` `veiledAnswerable()`; `Decision.tsx` `contentFor`; `engine/src/actions.ts:452–455` | **Nothing on a veiled panel may be computed from the private legal answers.**<br>• Decide whether a decision can be answered veiled from public facts only: the decision kind, and whether the ability's cost or condition reads a hidden zone (from the script, or a flag the engine sets on the decision). Any ability that reads a hidden zone always says "Show your hand to answer".<br>• For an optional answered while veiled, render "Use" and "Skip" both enabled. If "Use" turns out to be unpayable, say so only after the reveal.<br>• Add an e2e that renders the same veiled position with a payable and an unpayable hand (the `rocksA`/`rocksB` pair) and asserts that `#decision`'s HTML and the screenshot are identical.<br>• Add a unit property: the veiled panel's inputs (`veiledAnswerable`, the shown actions) are invariant under permuting the cards hidden from the other player. |
+| M3-40 | 1 | Test gaps | The reveal resets in `finish()` and `restart()` have no test of their own; each is masked by another path (the concession goes through `restart()`; the rewind curtain sets `handVeil = 'none'`). The behaviour is correct today. | mutation table | Add a unit test on `GameController`: reveal (sticky), then end the game by an effect or deck-out, and expect `revealed() === false`; reveal, rewind to a same-seat decision, and expect the veil back. |
+
+### Regression notes
+
+- `leak.mjs`: every step clean.
+- Full hotseat game (seed 202): no leak line, no page errors, game over on turn 9.
+- Full game vs Rookie: game over is announced (`A: Game over. You win on turn 11.`, then `P: Rematch, or New game.`), focus goes to "Game over", and Enter rematches.
+
+### Disposition
+
+**Blocking:** M3-39, the hotseat answer-availability leak. Fix the root cause rather than special-casing the "Use" button, add the payable/unpayable twin test, then re-review. M3-40 is optional hardening.
+
+Still owed: the manual screen-reader pass in PLAN's M3 exit criteria.
