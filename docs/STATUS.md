@@ -111,7 +111,19 @@ Notes:
 Since the builder's report:
 - **Orchestrator check** on clean main: 633 unit tests, 37 scripts, and a benchmark median of 3,949 per second with other agents running.
 - **Independent card tests:** merged to main (b05c19e). After the test author adapted the kit to the API additions (no expected outcome changed), 946 tests pass and 1 is an expected fail. B-1 (EB04-040's optional "you may rest 6" cost was auto-paid) was ruled for the test author under CR 8-3-1-4. It is fixed in 6d13ba9, and the full-game e2e timeouts went up in 354e2a8 (CI run 40820443987 green). All 314 independent card tests now pass. E-Q12 stays open: an Event playable when its optional cost can't be paid, and whether DON!! −X is optional.
-- **Independent M4a review**, `docs/reviews/m4a-review.md`: running.
+- **M4a review (`docs/reviews/m4a-review.md`, 70c6aa8): FAIL.** The engine core is sound: all 37 scripts match their cards, the engine leaks nothing, M2-17 to M2-23 hold, and the benchmark measured 5,106 per second.
+  - Severity 4: M4a-01, the M3-39 leak plus an OP07-077 case, added to M3 fix round 4. M4a-02 is already fixed by 64ddfb5.
+  - Severity 3:
+    - M4a-03: [Activate: Main] can't be used from the UI.
+    - M4a-04: OP17-118's [On Play] order is decided by instance id.
+    - M4a-05: the log records no effects, so screen-reader users hear nothing.
+  - Severity 2:
+    - M4a-06: the nightly leak property's false positive.
+    - M4a-07: validator traps for M4b.
+    - M4a-08: DON!! −X on Events is optional, which answers E-Q12 (attribution of the ST04-016 Q&A row to be checked by hand).
+    - M4a-09: prompts deviate from flows F6/F8.
+  - **The builder's phase A** (engine: M4a-04, 06, 07, 08, 11, 12) is running. **Phase B** (app: M4a-03, 05, 09, 15) starts after M3 fix round 4 lands, to avoid conflicts in `app/src/play/`. Then re-review.
+- **Verification caveat:** a worktree that symlinks the main tree's `node_modules` resolves `@optcg/*` to the main tree, so local "clean worktree" runs may test the wrong code. Use `npm ci` in the worktree; CI is the ground truth.
 
 If interrupted, check `git log` and the branch, and re-launch whichever of these stopped.
 
