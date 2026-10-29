@@ -31,6 +31,7 @@ import {
   RED,
   reachablePickSets,
   ROCKS,
+  settleNo,
   settleYes,
   side,
   sortedIds,
@@ -64,6 +65,7 @@ describe('OP17-118 Rocks.D.Xebec: +2000 Counter in hand while all your Character
   it('happy path: with only OP17-040 Newgate (no Counter) in play, it counters for +2000', () => {
     const g = defending([ROCKS.newgate]);
     attack(g, g.leader('p2'), g.leader('p1'));
+    settleNo(g, 'p1'); // decline OP17-040 Newgate's own offer: not part of this test
     passBlock(g);
     const xebec = g.find('p1', 'hand', ROCKS.xebec);
     expect(canCounterWith(g, xebec)).toBe(true);
@@ -76,6 +78,7 @@ describe('OP17-118 Rocks.D.Xebec: +2000 Counter in hand while all your Character
   it('condition fails: a Character with a Counter in play (OP02-060 Mohji, +1000) → no Counter', () => {
     const g = defending([VAN.mohji]);
     attack(g, g.leader('p2'), g.leader('p1'));
+    settleNo(g, 'p1'); // decline OP17-040 Newgate's own offer: not part of this test
     passBlock(g);
     expect(canCounterWith(g, g.find('p1', 'hand', ROCKS.xebec))).toBe(false);
   });
@@ -83,6 +86,7 @@ describe('OP17-118 Rocks.D.Xebec: +2000 Counter in hand while all your Character
   it('condition fails with a mix: Newgate plus OP08-051 Buckin (Counter +1000) → no Counter', () => {
     const g = defending([ROCKS.newgate, ROCKS.buckin]);
     attack(g, g.leader('p2'), g.leader('p1'));
+    settleNo(g, 'p1'); // decline OP17-040 Newgate's own offer: not part of this test
     passBlock(g);
     expect(canCounterWith(g, g.find('p1', 'hand', ROCKS.xebec))).toBe(false);
   });

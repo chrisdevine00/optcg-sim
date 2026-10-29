@@ -5,6 +5,24 @@ Each gap below says what the frozen API leaves open, how the tests work around i
 would make the test direct. None of these stops a test from being written. They make some tests
 assert on outcomes instead of on the decision itself.
 
+## Status after the M4a API additions (2026-10-29, DECISIONS.md)
+
+| Gap | Status | How the tests use it now |
+| --- | --- | --- |
+| 1. Mode names | Resolved: `Decision.options` and `{ option: id }` picks | Outcome enumeration still covers every mode; `optionChoices()` reads the ids |
+| 2. Event [Counter] target | Resolved: an Event [Counter] is `activate` in the Counter Step, and its target is chosen during resolution | `useCounter`, `canCounterWith` and `eventCounterTargets` use the `activate` shape |
+| 3. Effect source / purpose | Resolved: `Decision.source`, `Decision.purpose`, listed `order` options | Cost picks in `eventCounterTargets` use `purpose: 'cost'` |
+| 4. Adding DON!! from the DON!! deck | Resolved: as many as possible, with no decision (open question E-Q11) | No change needed (`settleYes` finds nothing to answer) |
+| 5. Looked-at cards | Resolved: `ProjectedView.looking` and `known` | `queries.card` works on looked-at cards |
+| 6. Card states | Resolved: `counter`, `cannotAttack` and `negated` on card views; `attackLock` and `delayed` on the view | Tests still check through legal actions, which is stricter |
+| 7. Granted keyword spelling | Resolved: printed strings | No change |
+
+One new note. Since M4a, a `PlayerView`'s `actions` name cards by view handle, not by instance id.
+The tests work in instance ids, so `kit.ts` reads the same actions from `legalActions`, which the
+view is projected from. `activate()` checks that the player's own view also offers an activation.
+
+The original entries follow, unchanged.
+
 ## 1. Modes of a "choose one" effect have no names
 
 `pick.choice` is `InstanceId | DonClass`. A mode ("Draw 2 cards" or "Your opponent trashes 2

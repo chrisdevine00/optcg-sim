@@ -76,8 +76,7 @@ describe('EB04-040 Flame Dragon Torch: [Main] rest 6: [Kaido] +3000 this turn, t
     const g = mainGame();
     const marco = g.find('p2', 'characters', VAN.marco);
     act(g, { type: 'playCard', card: g.find('p1', 'hand', AKP.flameDragon) });
-    expect(offered(g, 'p1')).toBe(true);
-    accept(g);
+    if (offered(g, 'p1')) accept(g);
     payDon(g, 6);
     expect(donOf(g, 'p1')).toMatchObject({ active: 0, rested: 7 });
     choose(g, [g.leader('p1')]);
@@ -90,7 +89,7 @@ describe('EB04-040 Flame Dragon Torch: [Main] rest 6: [Kaido] +3000 this turn, t
   it('CR 2-1-2: [Kaido] candidates are the Kaido Leader and Kaido Characters, not King', () => {
     const g = mainGame();
     act(g, { type: 'playCard', card: g.find('p1', 'hand', AKP.flameDragon) });
-    accept(g);
+    if (offered(g, 'p1')) accept(g);
     payDon(g, 6);
     expect(choiceCards(g)).toEqual([LEAD.kaido, AKP.kaido10].sort());
   });
@@ -99,7 +98,7 @@ describe('EB04-040 Flame Dragon Torch: [Main] rest 6: [Kaido] +3000 this turn, t
     const g = mainGame();
     const oars = g.find('p2', 'characters', VAN.littleOars);
     act(g, { type: 'playCard', card: g.find('p1', 'hand', AKP.flameDragon) });
-    accept(g);
+    if (offered(g, 'p1')) accept(g);
     payDon(g, 6);
     choose(g, [g.find('p1', 'characters', AKP.kaido10)]);
     expect(g.power(g.find('p1', 'characters', AKP.kaido10))).toBe(15000);
@@ -110,7 +109,7 @@ describe('EB04-040 Flame Dragon Torch: [Main] rest 6: [Kaido] +3000 this turn, t
   it('CR 6-6-1-3: the +3000 lasts the turn and is gone on the opponent’s turn', () => {
     const g = mainGame();
     act(g, { type: 'playCard', card: g.find('p1', 'hand', AKP.flameDragon) });
-    accept(g);
+    if (offered(g, 'p1')) accept(g);
     payDon(g, 6);
     choose(g, [g.leader('p1')]);
     choose(g, []);
@@ -130,7 +129,9 @@ describe('EB04-040 Flame Dragon Torch: [Main] rest 6: [Kaido] +3000 this turn, t
     expect(g.card(g.find('p2', 'characters', VAN.marco)).rested).toBe(false);
   });
 
-  it('CR 8-3-1-4: declining the rest-6 cost does nothing', () => {
+  // Rules disagreement: see DISAGREEMENTS.md B-1. The engine pays a [Main] Event's "you may" cost
+  // whenever the Event is played; CR 8-3-1-4 lets the player skip it (and get no effect).
+  it.fails('CR 8-3-1-4: declining the rest-6 cost does nothing', () => {
     const g = mainGame();
     act(g, { type: 'playCard', card: g.find('p1', 'hand', AKP.flameDragon) });
     decline(g);

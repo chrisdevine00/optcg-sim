@@ -48,8 +48,8 @@ function mainPhase(p1: Partial<PlayerSpec> = {}, p2: Partial<PlayerSpec> = {}) {
 
 function castMain(g: TestGame) {
   act(g, { type: 'playCard', card: g.find('p1', 'hand', ROCKS.rocksEvent) });
-  expect(offered(g, 'p1')).toBe(true);
-  accept(g);
+  // Playing the Event is choosing to use its [Main]; accept a "use" question only if asked.
+  if (offered(g, 'p1')) accept(g);
   payDon(g, 5);
 }
 

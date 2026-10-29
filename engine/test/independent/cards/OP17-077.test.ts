@@ -56,7 +56,9 @@ function playKundali(g: TestGame): boolean {
 }
 
 function payMainCost(g: TestGame): void {
-  accept(g);
+  // M4a: playing a [Main] Event is choosing to use it; "you may" costs are asked only if the
+  // engine asks (DECISIONS 2026-10-29).
+  if (offered(g, 'p1')) accept(g);
   payDon(g, 3, 'costActive');
   payWith(g, [g.find('p1', 'hand', VAN.gordon), g.find('p1', 'hand', VAN.sai)]);
   if (offered(g, 'p1')) accept(g); // "up to 3" asked as a yes/no
@@ -65,8 +67,7 @@ function payMainCost(g: TestGame): void {
 describe('OP17-077 Kundali Dragon Swarm: [Main] rest 3 DON!! and trash 2 → add up to 3 rested DON!!', () => {
   it('happy path (AKP Leader): pay card cost 1, rest 3, trash 2, then add 3 rested DON!!', () => {
     const g = mainGame({});
-    playKundali(g);
-    expect(offered(g, 'p1')).toBe(true);
+    expect(playKundali(g)).toBe(true);
     payMainCost(g);
     expect(donOf(g, 'p1')).toMatchObject({ active: 0, rested: 7, deck: 3 });
     expect(g.zone('p1', 'hand')).toHaveLength(0);

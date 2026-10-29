@@ -192,7 +192,17 @@ export function branch(g: TestGame): TestGame {
 export function viewActions(g: TestGame): Action[] {
   const d = queries.decision(g.state);
   if (!d) return [];
-  return [...project(g.state, d.player).actions];
+  // Since M4a a view's actions name cards by view handle, not instance id (api.ts, Decision.options).
+  // The tests work in instance ids, so they read the same actions from `legalActions`, which is
+  // what the view is projected from. `viewHasActivate` checks the view agrees.
+  return g.legal();
+}
+
+/** True if the deciding player's own view offers an `activate` action on some card. */
+export function viewHasActivate(g: TestGame): boolean {
+  const d = queries.decision(g.state);
+  if (!d) return false;
+  return project(g.state, d.player).actions.some((a) => a.type === 'activate');
 }
 
 /** Sorted card ids in a zone. */
@@ -233,8 +243,28 @@ export function decider(g: TestGame): PlayerId | null {
 
 /** True when `player` owes an `optional` decision now. */
 export function offered(g: TestGame, player: PlayerId): boolean {
+  skipUnusable(g, player);
   const d = decision(g);
-  return d?.kind === 'optional' && d.player === player;
+  return (
+    d?.kind === 'optional' &&
+    d.player === player &&
+    g.legal().some((a) => a.type === 'optional' && a.accept)
+  );
+}
+
+/**
+ * The engine asks an auto effect's `optional` even when its hidden-information cost cannot be paid,
+ * with "use" unavailable (DECISIONS 2026-10-29, "Auto with a cost asks first"). That question has
+ * one legal answer, so it is a forced pick (ARCHITECTURE §2.3 auto-skip): answer it and move on.
+ * Rules-wise the effect was not usable, which is what the tests assert.
+ */
+export function skipUnusable(g: TestGame, player: PlayerId): void {
+  for (let i = 0; i < 10; i++) {
+    const d = decision(g);
+    if (d?.kind !== 'optional' || d.player !== player) return;
+    if (g.legal().some((a) => a.type === 'optional' && a.accept)) return;
+    act(g, { type: 'optional', accept: false });
+  }
 }
 
 /** The attackers that may legally declare an attack now (any target). */
@@ -244,7 +274,20 @@ export function attackers(g: TestGame): InstanceId[] {
 
 /** True if `attacker` has at least one legal attack target now. */
 export function canAttackAny(g: TestGame, attacker: InstanceId): boolean {
+  expectKind(g, 'main');
   return g.legal().some((a) => a.type === 'attack' && a.attacker === attacker);
+}
+
+/**
+ * Guard for negative checks: "X is not offered" means something only at the decision where X would
+ * be offered. Throws if the game is waiting on a different decision (for example an unrelated
+ * `optional` still pending), so a negative check cannot pass by accident.
+ */
+export function expectKind(g: TestGame, ...kinds: string[]): void {
+  const k = kind(g);
+  if (!k || !kinds.includes(k)) {
+    throw new Error(`Expected a ${kinds.join('/')} decision, got ${k} (${decision(g)?.prompt})`);
+  }
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -261,6 +304,7 @@ export function abilities(g: TestGame, card: InstanceId): string[] {
 }
 
 export function canActivate(g: TestGame, card: InstanceId): boolean {
+  expectKind(g, 'main', 'counter');
   return abilities(g, card).length > 0;
 }
 
@@ -272,6 +316,7 @@ export function activate(g: TestGame, card: InstanceId): void {
   const [ability, ...more] = abilities(g, card);
   if (!ability) throw new Error(`No [Activate: Main] is offered on ${cardOf(g, card)} (${card}).`);
   if (more.length) throw new Error(`Several abilities offered on ${card}: ${[ability, ...more]}`);
+  if (!viewHasActivate(g)) throw new Error('legalActions offers an activation the view does not.');
   const player = g.decider;
   act(g, { type: 'activate', card, ability });
   if (offered(g, player)) accept(g);
@@ -314,7 +359,19 @@ export function donChoices(g: TestGame): DonClass[] {
   return g
     .legal()
     .flatMap((a) =>
-      a.type === 'pick' && typeof a.choice === 'object' && a.choice !== null ? [a.choice] : [],
+      a.type === 'pick' && typeof a.choice === 'object' && 'from' in a.choice ? [a.choice] : [],
+    );
+}
+
+/** Named options (`{ option: id }` picks) the current `choose` decision offers. */
+export function optionChoices(g: TestGame): string[] {
+  if (kind(g) !== 'choose') return [];
+  return g
+    .legal()
+    .flatMap((a) =>
+      a.type === 'pick' && typeof a.choice === 'object' && 'option' in a.choice
+        ? [a.choice.option]
+        : [],
     );
 }
 
@@ -326,7 +383,9 @@ export function canFinish(g: TestGame): boolean {
 export function choose(g: TestGame, targets: InstanceId[]): void {
   const player = g.decider;
   const max = decision(g)?.max;
-  const left = [...targets];
+  // Unordered picks must be made in canonical order (ARCHITECTURE §2.3): try them sorted by
+  // instance id, taking the first one the engine offers each time.
+  const left = [...targets].sort();
   while (left.length) {
     const legalNow = choices(g);
     const i = left.findIndex((t) => legalNow.includes(t));
@@ -357,8 +416,12 @@ export function chooseNone(g: TestGame): void {
  */
 export function payWith(g: TestGame, cards: InstanceId[]): void {
   const player = g.decider;
-  for (const c of cards) {
-    if (decider(g) === player && choices(g).includes(c)) act(g, { type: 'pick', choice: c });
+  const left = [...cards].sort();
+  while (left.length && decider(g) === player) {
+    const i = left.findIndex((c) => choices(g).includes(c));
+    if (i < 0) break;
+    act(g, { type: 'pick', choice: left[i]! });
+    left.splice(i, 1);
   }
   if (
     decider(g) === player &&
@@ -429,20 +492,34 @@ export function settleNo(g: TestGame, player: PlayerId, limit = 30): void {
 // Counter Step
 // ---------------------------------------------------------------------------------------------
 
-/** True if the defender may use `card` from hand in the current Counter Step (any target). */
+/**
+ * The Counter-Step actions that use `card` from hand: a Character Counter is `counter`; an Event
+ * [Counter] is `activate` on the card in hand (DECISIONS 2026-10-29), with costs paid at activation
+ * and targets chosen while it resolves.
+ */
+function counterActions(g: TestGame, card: InstanceId): Action[] {
+  expectKind(g, 'counter');
+  return g
+    .legal()
+    .filter((a) => (a.type === 'counter' || a.type === 'activate') && a.card === card);
+}
+
+/** True if the defender may use `card` from hand in the current Counter Step. */
 export function canCounterWith(g: TestGame, card: InstanceId): boolean {
-  return g.legal().some((a) => a.type === 'counter' && a.card === card);
+  return counterActions(g, card).length > 0;
 }
 
 /**
- * Use `card` in the Counter Step, preferring a `counter` action aimed at `target`. For an Event whose
- * target is chosen during resolution, the target is picked later with `choose`.
+ * Use `card` in the Counter Step. A Character Counter goes on `target`. An Event [Counter] is
+ * activated; any "you may" cost is accepted; its target is picked later with `chooseIfAsked`.
  */
 export function useCounter(g: TestGame, card: InstanceId, target: InstanceId): void {
-  const options = g.legal().filter((a) => a.type === 'counter' && a.card === card);
+  const options = counterActions(g, card);
   if (!options.length) throw new Error(`${cardOf(g, card)} cannot be used as a Counter now.`);
   const exact = options.find((a) => a.type === 'counter' && a.target === target);
+  const player = g.decider;
   g.act(exact ?? options[0]!);
+  if (offered(g, player)) accept(g);
 }
 
 /** If the engine asks for the target now, pick it; if the target was fixed already, do nothing. */
@@ -451,26 +528,26 @@ export function chooseIfAsked(g: TestGame, targets: InstanceId[]): void {
 }
 
 /**
- * Targets an Event [Counter] can boost: the targets of its `counter` actions if they differ, or
- * else the candidates of the `choose` that follows using it (explored on a copy).
+ * Targets an Event [Counter] can boost: the candidates of the target `choose` that follows
+ * activating it (explored on a copy, paying any cost on the way).
  */
 export function eventCounterTargets(g: TestGame, event: InstanceId): InstanceId[] {
-  const options = g.legal().filter((a) => a.type === 'counter' && a.card === event);
-  const targets = [
-    ...new Set(options.flatMap((a) => (a.type === 'counter' ? [a.target] : []))),
-  ].sort();
-  if (targets.length > 1) return targets;
+  const options = counterActions(g, event);
   if (!options.length) return [];
   const b = branch(g);
   b.act(options[0]!);
   const player = b.decider;
   for (let i = 0; i < 10; i++) {
     if (decider(b) !== player) break;
-    if (kind(b) === 'optional') act(b, { type: 'optional', accept: true });
-    else if (kind(b) === 'choose' && donChoices(b).length) payDon(b, 1);
-    else break;
+    const d = decision(b);
+    if (d?.kind === 'optional') act(b, { type: 'optional', accept: true });
+    else if (d?.kind === 'choose' && d.purpose === 'cost') {
+      const p = b.legal().find((a) => a.type === 'pick');
+      if (p) b.act(p);
+      else act(b, { type: 'done' });
+    } else break;
   }
-  return kind(b) === 'choose' ? [...choices(b)].sort() : targets;
+  return kind(b) === 'choose' ? [...choices(b)].sort() : [];
 }
 
 // ---------------------------------------------------------------------------------------------

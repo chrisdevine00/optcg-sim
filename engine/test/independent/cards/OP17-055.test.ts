@@ -37,6 +37,7 @@ import {
   theirTurn,
   useCounter,
   VAN,
+  settleNo,
 } from './kit.ts';
 import type { TestGame } from '../../fixtures/index.ts';
 
@@ -53,8 +54,8 @@ function mainPhase(p1: Partial<PlayerSpec> = {}) {
 
 function castMain(g: TestGame) {
   act(g, { type: 'playCard', card: g.find('p1', 'hand', ROCKS.noAuthority) });
-  expect(offered(g, 'p1')).toBe(true);
-  accept(g);
+  // Playing the Event is choosing to use its [Main]; accept a "use" question only if asked.
+  if (offered(g, 'p1')) accept(g);
   payDon(g, 1);
 }
 
@@ -70,12 +71,14 @@ describe('OP17-055: [Main] rest 1 DON!!: a [Rocks.D.Xebec] gains [Unblockable] d
     expect(g.card(g.leader('p1')).keywords).toContain('Unblockable');
     expect(sortedIds(g, 'p1', 'trash')).toEqual([ROCKS.noAuthority]);
     attack(g, g.leader('p1'), g.leader('p2'));
+    settleNo(g, 'p1'); // the Rocks Leader's own [When Attacking]: not part of this test
     expect(blockers(g)).toEqual([]);
   });
 
   it('control: without the Event, OP09-072 Franky can block the Leader', () => {
     const g = mainPhase();
     attack(g, g.leader('p1'), g.leader('p2'));
+    settleNo(g, 'p1'); // the Rocks Leader's own [When Attacking]: not part of this test
     expect(blockers(g)).toEqual([g.find('p2', 'characters', K.blockerFranky)]);
   });
 

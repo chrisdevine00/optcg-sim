@@ -31,6 +31,7 @@ import {
   sortedIds,
   theirTurn,
   VAN,
+  settleNo,
 } from './kit.ts';
 
 const THREE_ROCKS = [ROCKS.kyo, ROCKS.streusen, ROCKS.shiki];
@@ -110,6 +111,7 @@ describe('OP17-042 Kaido: [On Play] reveal 3 Rocks Pirates → −3000', () => {
     const marco = g.find('p2', 'characters', VAN.marco);
     choose(g, [marco]);
     attack(g, g.leader('p1'), g.leader('p2'));
+    settleNo(g, 'p1'); // the Rocks Leader's own [When Attacking]: not part of this test
     noDefence(g);
     expect(g.power(marco)).toBe(2000);
     endTurn(g);
