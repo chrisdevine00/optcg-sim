@@ -1,7 +1,7 @@
 # Status
 
 **Phase:** 5 Build, slice pass (ADR 0012), starting at M0. Phases 1–4 gated 2026-10-28.
-**Milestone:** M3 Playable board (built; in review). M0, M1 and M2 done 2026-10-28.
+**Milestone:** M3 Playable board (built; in review) and M4a Effects slice (built; independent tests to merge). M0, M1 and M2 done 2026-10-28.
 **Run the app:** `npm install && npm run dev` then open http://localhost:5173/optcg-sim/ and go to `/cards` for the card browser
 **Deployed:** https://chrisdevine00.github.io/optcg-sim/ (auto-deploys after green CI on `main`)
 
@@ -95,13 +95,18 @@ Builder decisions are logged in DECISIONS (2026-10-28, M3). Not done in M3, by t
 
 The screen-reader section of the review is a proxy. A real VoiceOver or NVDA pass is still owed: it goes with owner session S1, or to the owner sooner.
 
-**M4a has started in parallel** (engine and cards; it touches `app/` only at the end, after rebasing). The builder works on `main` in this order:
-1. the carried M2 findings (M2-17 to M2-23, M2-19 first);
-2. the DSL types and schema;
-3. the runtime;
-4. the Rocks and Kaido scripts, each with tests;
-5. the benchmark;
-6. app integration.
+**M4a is built** (builder's report; awaiting the independent-test merge and review). Commits on `main`:
+- 799dfcd carried M2 findings M2-17 to M2-23;
+- b260938 DSL types, script schema (`validateScript`) and registry;
+- 495e4b8 the DSL runtime in `engine/src/effects/`;
+- cf2e304 all 37 Rocks and Kaido scripts, 134 per-card tests, effects in the board, an e2e test that resolves Kaido's [When Attacking] through the UI;
+- then the benchmark and docs.
+
+Notes:
+- **Coverage:** Rocks (OP17-039) and Kaido (OP17-058) lists 100% scripted (37 cards, `cards/effects/`).
+- **Benchmark:** median 5,588 two-turn simulations per second in a `worker_threads` worker (target 1,000; ADR 0008 confirmed, no fallback). Method in `docs/benchmarks.md`; run `npm run bench:two-turn`.
+- **Tests:** 633 unit tests (164 todo), 79 e2e.
+- **API additions:** `Decision.purpose/source/options`, `{ option }` picks, `CardView`/`ViewCard` effect flags, `ProjectedView.looking/known/attackLock/delayed` (DECISIONS 2026-10-29, M4a).
 
 The independent card tests are done: branch `m4a-independent-tests` (334b676) holds 314 tests over all 37 cards, with 240 failing until the scripts land, plus `API-GAPS.md`. The API gaps went to the builder. Merge it after the builder reports, and send disagreements back to the builder. If interrupted, check `git log` and the branch, then re-launch either one from where it stopped.
 

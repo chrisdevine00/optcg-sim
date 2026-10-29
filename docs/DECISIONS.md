@@ -2,6 +2,25 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-10-29 — M4a effects slice: runtime and API decisions
+
+Context: M4a builds the effect DSL runtime and scripts the Rocks (OP17-039) and Kaido (OP17-058) lists, 37 cards. The independent card-test author reported API gaps (mode choices, Event [Counter] targets, decision sources, DON!! adds, looked-at cards, effect state in views, keyword strings). Each decision below lists what was rejected.
+
+- **Programs, not trees.** Each ability compiles to a flat program (costs, then the effect; if/else, may/ifDid, choose-one modes and delayed bodies become jumps); an effect frame holds an instruction pointer and its locals. Rejected: walking the step tree with a path stack (more state per frame, harder to hash).
+- **API additions (additive, frozen shapes unchanged):** `Decision.purpose` (`cost`, `target`, `mode`, `order`, `use`, `replacement`, `characterLimit`), `Decision.source` (card id, ability id, label; `instance` in queries, `handle` in views), `Decision.options` (named options with labels); `pick.choice` may be `{ option: id }` for modes and top/bottom; `order.first` is a listed option id (a card, or `<card>#<ability>` for pending effects); `CardView`/`ViewCard` gain `counter`, `cannotAttack`, `negated`; `ProjectedView` gains `looking`, `known` (now filled), `attackLock`, `delayed`; event types `CardsLooked`, `ModeChosen`, `EffectDeclined`. Granted keywords use the printed strings (`Rush`, `Unblockable`, `Blocker`). Rejected: a new decision kind for modes (breaks every consumer's switch); encoding modes in the prompt.
+- **Event [Counter] is `activate` in the Counter Step.** `{ type: 'activate', card, ability }` with the card in hand; costs are paid at activation and targets are chosen while it resolves (CR 8-4-4). `counter` stays for Character Counters only. Rejected: `counter` with a dummy target.
+- **Auto with a cost asks first.** If payability depends on the hand (a trash or reveal cost), the `optional` is asked even when the cost cannot be paid, with "use" unavailable and `secret` set, so the opponent learns nothing; a public cost that cannot be paid skips silently. Rejected: asking only when payable (leaks whether the hand holds a matching card).
+- **Hidden-zone choices are always asked** (even with no match) and flagged `secret`; `publicCount` marks a pick over a whole hand of public size. With another human watching, `autoSkip` skips a forced pick only when every candidate is visible or the count forces it (M2-19).
+- **DON!! by location with counts (E-D4).** A DON!! −X or return asks for classes with counts; it is not asked when one class can pay or every DON!! must go. "Add up to N DON!!" and "set up to N DON!! active" act on as many as possible without asking. Rejected: asking "how many" each time (adding fewer is never better in these decks; it would double the decisions for players and the AI). Logged as open question E-Q11.
+- **Pending effects batch per event; a player orders their own.** `order` asks the controller when two or more of their effects from one event wait (Rule Manual "Effect Activation Order"). Two Characters played by one effect (OP17-118) trigger in play order, as separate batches. Rejected: FIFO with no choice.
+- **Negation removes printed keywords too** (CR 10-1 calls them keyword effects; CR 8-2-1-1); granted keywords stay (CR 8-2-4). A negated card's [On K.O.] does not activate, and its replacements do not apply (E-Q1's best answer).
+- **"If X, A. Then, B" puts B inside the guard** (CR 4-10-1; effect-dsl §4.10): EB04-030, OP17-060, OP08-074, OP07-077.
+- **Blind picks are random.** "Trash 1 card from your opponent's hand" (OP17-075) is chosen face-down by its controller (QA-OP17); the engine picks uniformly with the seeded RNG. Rejected: a positional pick (the hand array order is draw order, so it would leak).
+- **Replacement order.** Applicable replacements are offered one at a time in CR 8-1-3-4-2 rank order; each is optional, so declining one and taking the next gives the same choice as ordering them.
+- **`derive` never memoizes a state that is being drafted.** A memo taken mid-`reduce` went stale and showed one viewer an old power; the leak property found it.
+- **Instance ids start with `$` (M2-22)** so the hash and the leak tests recognise them anywhere, including compound keys.
+- **Benchmark:** 5,588 two-turn simulations per second in a worker; ADR 0008 confirmed, no fallback (`docs/benchmarks.md`).
+
 ## 2026-10-29 — Target milestones for M3's carried items
 
 Context: M3 re-review 1 (M3-33) found that the items carried out of M3 had no target milestone, so they could drift.

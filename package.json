@@ -20,6 +20,7 @@
     "test:watch": "vitest",
     "test:nightly": "ENGINE_GAMES=10000 vitest run engine/test/property engine/test/golden --reporter=default --reporter=json --outputFile.json=test-results/nightly.json",
     "bench": "vitest bench --run",
+    "bench:two-turn": "tsx engine/bench/two-turn.ts",
     "test:e2e": "playwright test",
     "cards:update": "tsx cards/scripts/update.ts",
     "meta:update": "tsx scripts/meta-update.ts",

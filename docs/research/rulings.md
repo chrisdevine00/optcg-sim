@@ -846,3 +846,22 @@ Leader text below is the official card list's (`/cardlist/?series=…`, fetched 
   The three Usopp cases become golden tests (RL-32). The `order` decision for permanent effects is not needed for any current card.
 - **D-4. Protected Characters stay choosable.** `legalActions` should offer a "cannot be K.O.'d" Character as a K.O. target and as a "K.O. 1 of your Characters" cost pick. The pick then does nothing or the effect fizzles, as the Orlumbus and Hakuba Q&As describe (RL-16). The AI may prune these moves; the rules engine should not hide them. This is an exception to the completability lookahead in ARCHITECTURE §2.3, and it applies only when a Q&A says the choice is legal.
 - **D-5. Every RL entry becomes a test.** Put them at `engine/test/rulings/RL-xx.test.ts`, named by RL ID with the Q&A row in a comment, so a changed ruling points straight at its test.
+
+## Appendix: per-card Q&A rows used by the M4a scripts (2026-10-29)
+
+Paraphrased from the per-set Q&A files listed under "Sources and pages opened" (cached in `.cache/track-f/`). Each row has a test in `engine/test/cards/<CARD-ID>.test.ts`, except the parts marked *untested*.
+
+| Card | Q&A | Ruling (paraphrase) |
+| --- | --- | --- |
+| OP17-044 Captain John | QA-OP17 | With two such attack locks in play, the opponent may attack either locked card. |
+| OP17-045 Kyo | QA-OP17 | The "trash 2 cards instead" replacement cannot be used with 0 or 1 cards in hand. |
+| OP17-049 Charlotte Linlin | QA-OP17 (3 rows) | The controller draws for "Draw 2"; for "trashes 2" the opponent picks from their own hand; that mode may be chosen with 1 card (it is trashed) or 0 (nothing happens). |
+| OP17-050 Streusen | QA-OP17 | The 2 cards cannot be split between the top and the bottom. |
+| OP17-063 Kaido | QA-OP17 | With several Counter values, the highest applies. |
+| OP17-075 X.Drake | QA-OP17 | The player who activated it chooses the card face-down. |
+| OP17-118 Rocks.D.Xebec | QA-OP17 (2 rows) | With 0 Characters it has no Counter; the [On Play] may play just 1 card. |
+| EB04-040 Flame Dragon Torch | QA-OP14/EB04 | The [Main] can be used with no [Kaido] on the field. |
+| OP15-069 Nola | QA-OP15 (2 rows) | It can protect Nola itself; two Characters removed at once are both kept by one DON!! return (*untested*: no scripted effect removes two at once yet, and the engine offers the replacement per card). |
+| OP15-078 Mamaragan | QA-OP15 | The [Main] can be used with no Character to rest. |
+| OP08-074 Black Maria | QA-OP08 (2 rows) | The end-of-turn return still happens after Black Maria leaves; those returns count as DON!! returned for other effects (*untested* with OP17-062). |
+| ST34-004 Charlotte Linlin | QA-ST34 (2 rows) | The highest base-power setting applies; as the only card in hand, its costs cannot be paid and nothing resolves. |

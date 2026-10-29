@@ -1,6 +1,6 @@
 # ADR 0008: The AI plans per turn with determinized MCTS; budgets are iterations in CI and wall-clock in the app
 
-**Status:** Accepted, 2026-10-28 (revised after plan review 1); to be confirmed by the M4a benchmark on scripted decks
+**Status:** Accepted, 2026-10-28 (revised after plan review 1). Confirmed 2026-10-29 by the M4a benchmark on the scripted Rocks and Kaido decks: a median of 5,588 two-turn simulations per second in a worker (target 1,000), so the fallback is not triggered (`docs/benchmarks.md`).
 
 ## Context
 - **Strength targets:** Warlord must beat Rookie 95% of the time and Pirate 65%.

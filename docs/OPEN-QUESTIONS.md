@@ -62,15 +62,16 @@ Settled by Track F from official sources: R1 (reveal → pay → trash 1 → pla
 
 ## Effects (from Track E; full paragraphs with best answers in docs/research/effect-dsl.md §7)
 
-- E-Q1. Does a negated Character's [On K.O.] activate when it is then K.O.'d?
+- E-Q1. Does a negated Character's [On K.O.] activate when it is then K.O.'d? *M4a: implemented as the best answer (no); still no official ruling found. OP17-063 depends on it.*
 - E-Q2. Is OP12-061 Rosinante's "next time you play [Trafalgar Law] … from your hand" discount used up by a play from hand made by an effect?
 - E-Q3. What can OP15-035 Laboon's "rest 2 of your cards" rest?
-- E-Q4. Is OP17-118's "If you only have Characters without a Counter" true when you have no Characters?
-- E-Q5. Who picks the card in "trash … from your opponent's hand" (ST10-010, OP17-075)?
-- E-Q6. May a player choose a "choose one" mode that would do nothing?
+- E-Q4. Is OP17-118's "If you only have Characters without a Counter" true when you have no Characters? *Resolved by QA-OP17 OP17-118: no, with 0 Characters it has no Counter (the opposite of the Track E best answer). Scripted and tested that way.*
+- E-Q5. Who picks the card in "trash … from your opponent's hand" (ST10-010, OP17-075)? *Resolved for OP17-075 by QA-OP17: the player who activated it chooses face-down; the engine picks at random.*
+- E-Q6. May a player choose a "choose one" mode that would do nothing? *Resolved for OP17-049 by QA-OP17: yes (with 1 card they trash it; with 0 nothing happens).*
 - E-Q7. Which events does "removed from the field by your opponent's effect" cover, and how is it ordered against a K.O. replacement?
 - E-Q8. Are unsigned power and cost values on self-directed effects sign defects? Best answer: check each by hand in the M1 verification of the 182 meta cards.
 - E-Q9. Should printed keywords work on otherwise unscripted cards? Settled: yes, via verified overrides (E-D7).
+- E-Q11. "Add up to N DON!! cards" and "set up to N DON!! cards as active": may a player choose fewer? *M4a best answer: the engine adds or sets as many as possible without asking (DECISIONS 2026-10-29). A card where fewer is better would need a choice.*
 - E-Q10. Data defects found by Track E for M1 overrides: OP13-004 Sabo's sign defect is not caught by the repair rule; one Sakazuki's name is truncated to "Sakazuk"; OP12-018 has shifted columns; two meta cards have empty text (vanillas per Limitless).
 
 ## Engine (from the M2 review)
