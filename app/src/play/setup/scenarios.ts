@@ -216,7 +216,94 @@ export const SCENARIOS: Record<string, Spec> = {
       costArea: { active: 0, rested: 2 },
     },
   },
+  /**
+   * M4a-03: p1's King (EB04-031) can use its [Activate: Main]; Miss Buckingham Stussy's needs 3
+   * DON!! to rest and p1 has 2, so its menu explains why not.
+   */
+  activate: {
+    mode: 'ai',
+    seed: 5,
+    turn: 3,
+    activePlayer: 'p1',
+    firstPlayer: 'p1',
+    p1: {
+      leader: 'OP17-058',
+      life: ['ST05-007', 'ST05-007', 'ST05-007'],
+      hand: [],
+      characters: ['EB04-031', 'OP17-054'],
+      deck: filler('ST05-007', 10),
+      costArea: { active: 2, rested: 0 },
+    },
+    p2: {
+      leader: 'ST04-001',
+      life: ['OP01-010', 'OP01-012', 'OP01-010'],
+      hand: [],
+      characters: ['OP01-107'],
+      deck: filler('OP01-012', 10),
+      costArea: { active: 0, rested: 2 },
+    },
+  },
+  /**
+   * A late-game Rocks (p1) vs Kaido (p2) position, turn 7, 2 Life each, real cards in every zone:
+   * the per-push e2e plays it to the end against the AI (review M4a CI time). The full game from
+   * turn 1 runs nightly (E2E_FULL=1).
+   */
+  late: lateGame('ai'),
+  /** The same position in hotseat: Rocks defends with effect decisions under the veil. */
+  lateHotseat: lateGame('hotseat'),
 };
+
+function lateGame(mode: 'ai' | 'hotseat'): Spec {
+  return {
+    mode,
+    seed: 707,
+    turn: 7,
+    activePlayer: 'p1',
+    firstPlayer: 'p1',
+    p1: {
+      leader: 'OP17-039',
+      life: ['OP17-050', 'OP17-045'],
+      hand: ['OP17-045', 'OP17-055', 'OP17-056', 'OP17-050', 'OP17-049'],
+      characters: ['OP17-040', 'OP17-044'],
+      deck: [
+        'OP17-046',
+        'OP17-052',
+        'OP17-054',
+        'OP17-048',
+        'OP17-050',
+        'OP17-045',
+        'OP17-049',
+        'OP17-040',
+        'OP17-055',
+        'OP17-042',
+        'OP08-051',
+        'OP17-052',
+      ],
+      costArea: { active: 7, rested: 0 },
+    },
+    p2: {
+      leader: 'OP17-058',
+      life: ['OP17-074', 'OP17-073'],
+      hand: ['OP15-078', 'OP07-076', 'OP17-075', 'EB04-032'],
+      characters: ['EB04-031', 'OP17-074'],
+      deck: [
+        'OP17-073',
+        'OP17-074',
+        'EB04-032',
+        'OP09-077',
+        'OP07-077',
+        'OP17-060',
+        'OP15-069',
+        'OP17-061',
+        'OP17-075',
+        'OP17-076',
+        'OP17-063',
+        'OP08-074',
+      ],
+      costArea: { active: 0, rested: 7 },
+    },
+  };
+}
 
 export const scenarioCardIds = (s: Spec): string[] => {
   const ids: string[] = [];

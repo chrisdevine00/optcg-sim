@@ -16,10 +16,27 @@ import './play.css';
 
 /** A named scenario, or one described in the URL as `json:<base64url of the spec>`. */
 function scenarioFrom(name: string): (typeof SCENARIOS)[string] {
-  if (!name.startsWith('json:')) return SCENARIOS[name]!;
-  const b64 = name.slice(5).replace(/-/g, '+').replace(/_/g, '/');
-  const json = new TextDecoder().decode(Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)));
-  return JSON.parse(json) as (typeof SCENARIOS)[string];
+  if (!name.startsWith('json:')) {
+    const named = SCENARIOS[name];
+    if (!named) throw new Error(`There is no scenario named "${name}".`);
+    return named;
+  }
+  let sc: unknown;
+  try {
+    const b64 = name.slice(5).replace(/-/g, '+').replace(/_/g, '/');
+    const json = new TextDecoder().decode(Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)));
+    sc = JSON.parse(json);
+  } catch {
+    throw new Error('The scenario in the address could not be read.');
+  }
+  // Review M3-43: a spec without a valid mode used to hang on "Thinking"; refuse it up front.
+  const o = sc as Partial<(typeof SCENARIOS)[string]> | null;
+  if (!o || typeof o !== 'object') throw new Error('The scenario in the address is not an object.');
+  if (o.mode !== 'ai' && o.mode !== 'hotseat')
+    throw new Error('The scenario in the address needs "mode": "ai" or "hotseat".');
+  if (!o.p1?.leader || !o.p2?.leader)
+    throw new Error('The scenario in the address needs a Leader for each player.');
+  return o as (typeof SCENARIOS)[string];
 }
 
 function seedNow(): number {

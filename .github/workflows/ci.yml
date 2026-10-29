@@ -4,7 +4,7 @@ on:
     branches: [main]
   pull_request:
 jobs:
-  build-test:
+  checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,5 +16,20 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
+  # Playwright in 3 shards, side by side (review M4a: keep CI near 6 minutes). Turn-1 full games
+  # run nightly (E2E_FULL=1); per push the same flows play from a late-game position.
+  e2e:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
+      - run: npx playwright test --shard=${{ matrix.shard }}/3

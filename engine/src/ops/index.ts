@@ -238,10 +238,12 @@ export function lifeToHand(d: Draft, p: PlayerId, n: number): number {
 // ---------------------------------------------------------------------------------------------
 
 /** Rest a card. Resting a rested card is not performed (CR 1-3-2-1); returns whether it was. */
-export function rest(d: Draft, id: InstanceId): boolean {
+export function rest(d: Draft, id: InstanceId, reason?: 'effect' | 'cost'): boolean {
   if (d.card(id).rested) return false;
   d.wcard(id).rested = true;
-  d.emit({ type: 'Rested', instance: id, card: d.card(id).card });
+  const e: GameEvent = { type: 'Rested', instance: id, card: d.card(id).card };
+  if (reason) e.reason = reason;
+  d.emit(e);
   return true;
 }
 
@@ -327,8 +329,10 @@ export function addModifier(d: Draft, m: Omit<Modifier, 'id'>): Modifier {
     target: mod.target,
     amount: mod.amount,
     duration: mod.duration.kind,
+    card: d.card(mod.target).card,
   };
   if (mod.keyword) e.keyword = mod.keyword;
+  if (mod.source !== null) e.byEffect = true;
   d.emit(e);
   return mod;
 }

@@ -306,7 +306,13 @@ function runPlay(d: Draft, f: Extract<Frame, { f: 'play' }>): void {
   switch (f.step) {
     case 'pay':
       // Reveal, then pay the cost (CR 2-7-2..2-7-4, RL-04).
-      d.emit({ type: 'CardRevealed', instance: f.card, card: c.card, player: f.player });
+      d.emit({
+        type: 'CardRevealed',
+        instance: f.card,
+        card: c.card,
+        player: f.player,
+        reason: 'play',
+      });
       if (def.category === 'Event') {
         const cost = deriveLive(d.s, f.card).cost ?? 0;
         payCost(d, f.player, cost);
@@ -901,6 +907,19 @@ export function orderGroup(s: State): State['pending'] {
   return out;
 }
 
+/** Printed timing words for prompts (flows F8b: name the timing). */
+const TIMING_WORDS: Record<string, string> = {
+  onPlay: '[On Play]',
+  onKO: '[On K.O.]',
+  attack: "[When Attacking] / [On Your Opponent's Attack]",
+  endOfYourTurn: '[End of Your Turn]',
+  endOfOpponentsTurn: "[End of Your Opponent's Turn]",
+  endOfThisTurn: '(at the end of this turn)',
+  donReturned: '(DON!! returned)',
+  onBlock: '[On Block]',
+  startOfYourTurn: '(start of turn)',
+};
+
 export const pendingKey = (e: { card: InstanceId; ability: string }): string =>
   `${e.card}#${e.ability}`;
 
@@ -926,7 +945,11 @@ function drainPending(d: Draft): boolean {
       role: 'order',
       options: group.map((e) => ({
         id: pendingKey(e),
-        label: `${d.s.defs[e.cardId]?.name ?? e.cardId}: ${abilityOf(d.s, e.cardId, e.ability)?.label ?? e.timing}`,
+        label:
+          `${d.s.defs[e.cardId]?.name ?? e.cardId} ${TIMING_WORDS[e.timing] ?? ''}: ${abilityOf(d.s, e.cardId, e.ability)?.label ?? 'effect'}`.replace(
+            '  ',
+            ' ',
+          ),
       })),
     });
     return true;

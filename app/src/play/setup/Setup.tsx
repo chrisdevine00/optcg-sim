@@ -101,7 +101,8 @@ export function Setup({
       <ul className="lede automation" data-testid="automation">
         {[myDeck, theirDeck].map((id, i) => {
           const d = deckById(id);
-          return d ? <li key={i}>{automationLine(d)}</li> : null;
+          const seat = hot ? `${names[i]}’s deck` : i === 0 ? 'Your deck' : 'The AI’s deck';
+          return d ? <li key={i}>{automationLine(d, seat)}</li> : null;
         })}
       </ul>
       <form

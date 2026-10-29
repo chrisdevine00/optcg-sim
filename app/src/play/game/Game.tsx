@@ -12,6 +12,7 @@ import {
   type KeyboardEvent as RKeyboardEvent,
   type MouseEvent as RMouseEvent,
 } from 'react';
+import { SCRIPTS } from '@optcg/cards';
 import type { Action, PlayerId } from '@optcg/engine';
 import { Board, PhaseStepper, ZONE_ORDER, type CardDeco, type ZoneKey } from '../board/Board.tsx';
 import { computeLayout, placeDock, type Layout, type Rect } from '../board/layout.ts';
@@ -383,11 +384,19 @@ export function Game({
         }
         setUi({ kind: 'idle' });
       }
-      if (legal.attacks.has(h) && !viaKey) {
+      // A card with an [Activate: Main] opens its menu (Attack… and Activate), M4a-03.
+      if (legal.attacks.has(h) && !viaKey && activateAbilities(c.view.card).length === 0) {
         setUi({ kind: 'target', attacker: h });
         return;
       }
-      if (c.owner === me && (c.zone === 'hand' || legal.give.has(h) || legal.attacks.has(h))) {
+      if (
+        c.owner === me &&
+        (c.zone === 'hand' ||
+          legal.give.has(h) ||
+          legal.attacks.has(h) ||
+          legal.activate.has(h) ||
+          activateAbilities(c.view.card).length > 0)
+      ) {
         setUi({ kind: 'selected', handle: h });
         rememberFocus();
         setMenuFor(h);
@@ -1215,7 +1224,15 @@ function primaryEnterId(g: G): string | null {
   if (k === 'block' || k === 'counter')
     return document.getElementById('commit-defence') ? 'commit-defence' : null;
   if (k === 'trigger') return 'trigger-hand';
-  if (k === 'choose') return 'choose-done';
+  // Enter never commits "choose none" on a paid effect's target choice (M4a-09): with nothing
+  // picked and none required, the player must click it.
+  if (k === 'choose')
+    return g.picks.length === 0 && (g.view.decision?.min ?? 0) === 0 ? null : 'choose-done';
+  if (k === 'optional') {
+    const use = document.getElementById('use-btn');
+    return use && use.getAttribute('aria-disabled') !== 'true' ? 'use-btn' : null;
+  }
+  if (k === 'order') return document.getElementById('order-keep') ? 'order-keep' : 'order-0';
   if (k === 'main' && g.ui.kind === 'confirm') return 'confirm-attack';
   return null;
 }
@@ -1239,6 +1256,16 @@ function placeBeside(
   const left = right + w <= boardW ? right : Math.max(4, r.left - 12 - w);
   const top = Math.max(4, Math.min(r.top, window.innerHeight - h - 8));
   return { left, top };
+}
+
+/** A card's scripted [Activate: Main] abilities, in printed order. */
+function activateAbilities(cardId: string | null | undefined) {
+  if (!cardId) return [];
+  return (SCRIPTS[cardId]?.abilities ?? []).filter(
+    (a) =>
+      a.kind === 'activate' &&
+      (Array.isArray(a.when) ? a.when.includes('activateMain') : a.when === 'activateMain'),
+  );
 }
 
 function ActionMenu({
@@ -1290,6 +1317,27 @@ function ActionMenu({
     }
     if (g.legal.give.has(handle))
       items.push({ label: '◆ Give DON!!…', key: '+', run: () => onCount(handle) });
+    // [Activate: Main] abilities (review M4a-03): usable ones run, others say why not.
+    if (
+      c &&
+      c.owner === g.me &&
+      (c.zone === 'leader' || c.zone === 'characters' || c.zone === 'stage')
+    ) {
+      activateAbilities(c.card?.id).forEach((ab, i) => {
+        const a = g.legal.activate
+          .get(handle)
+          ?.find((x) => x.type === 'activate' && x.ability === ab.id);
+        const label = `✦ Activate: ${ab.label ?? 'effect'}`;
+        if (a) items.push({ label, key: i === 0 ? 'E' : undefined, run: () => g.act(a) });
+        else {
+          const r = g.ctl.session.whyNot(g.me, { type: 'activate', card: handle, ability: ab.id });
+          items.push({
+            label,
+            disabled: r ? `${r.text}${r.rule ? ` (${r.rule})` : ''}` : 'Not now',
+          });
+        }
+      });
+    }
   }
   if (c?.card) items.push({ label: 'Inspect', key: 'I', run: () => g.openInspector(handle) });
   const run = (i: (typeof items)[number]) => {

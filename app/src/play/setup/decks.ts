@@ -57,19 +57,24 @@ export const DECKS: DeckOption[] = ARCHETYPES.flatMap((a) =>
 
 export const deckById = (id: string) => DECKS.find((d) => d.id === id);
 
-/** How many of a deck's 51 cards (Leader included) have an effect script (M4a). */
+/** How many different card numbers in a deck (Leader included) have an effect script (M4a). */
 export function scriptedCount(d: DeckOption): { scripted: number; total: number } {
-  const ids = [d.spec.leader, ...d.spec.main];
-  return { scripted: ids.filter((id) => SCRIPTED.has(id)).length, total: ids.length };
+  const ids = new Set([d.spec.leader, ...d.spec.main]);
+  return { scripted: [...ids].filter((id) => SCRIPTED.has(id)).length, total: ids.size };
 }
 
-/** Plain-language automation status of a deck, for the setup screen. */
-export function automationLine(d: DeckOption): string {
+/**
+ * Plain-language automation status of one seat's deck (review M4a-15): counted by different card
+ * numbers, never claiming more than the scripts do. Cards without a script still play for their
+ * stats and verified keywords; some have no effect text at all.
+ */
+export function automationLine(d: DeckOption, seat: string): string {
   const { scripted, total } = scriptedCount(d);
-  if (scripted === total) return `${d.name}: every card's effect is automated.`;
+  if (scripted === total)
+    return `${seat} (${d.name}): all ${total} different cards are scripted; their effects happen in play.`;
   if (scripted === 0)
-    return `${d.name}: effects are not automated yet; its cards play for their power, cost, Counter and verified keywords.`;
-  return `${d.name}: ${scripted} of ${total} cards have automated effects; the rest play for their stats and verified keywords.`;
+    return `${seat} (${d.name}): no card effects are scripted yet; cards play for their power, cost, Counter and verified keywords only.`;
+  return `${seat} (${d.name}): ${scripted} of ${total} different cards are scripted; the others play for their power, cost, Counter and verified keywords only.`;
 }
 /** A deck by leader id (URL parameters accept `OP17-039`), the first list. */
 export const deckByLeader = (leader: string) => DECKS.find((d) => d.leader === leader);

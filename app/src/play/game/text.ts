@@ -3,7 +3,7 @@
  * §9.1, §9.3). Everything here reads projected events and views only, so nothing hidden can reach a
  * string (the announcer leak rule, accessibility §9.3).
  */
-import type { Card } from '@optcg/cards';
+import { SCRIPTS, type ActivateAbility, type Card, type Cost } from '@optcg/cards';
 import type { GameEvent, PlayerId, PlayerView, ViewCard } from '@optcg/engine';
 
 export const MINUS = '−';
@@ -99,6 +99,7 @@ export function describeMove(
   let drew = 0;
   let drewNames: string[] = [];
   let donPlaced = 0;
+  let effectDraws = 0;
   let turnPlayer: PlayerId | null = null;
   for (const e of events) {
     const p = e.player as PlayerId | undefined;
@@ -146,13 +147,102 @@ export function describeMove(
           lineActor = owner;
         } else if (to === 'life') {
           ctx.life[e.owner as PlayerId] += 1;
-        } else if (from === 'characters' && to === 'trash' && e.reason !== 'ko') {
-          // Trashed to make room (CR 3-7-6-1) or by a rule; K.O.s have their own line.
+          if (e.reason === 'effect')
+            bits.push(`Add a card to ${whose(ctx.names, e.owner as PlayerId)} Life`);
+        } else if ((from === 'characters' || from === 'stage') && e.cause) {
+          // Removed by an effect (bounce, bottom of deck, trash); K.O.s have their own line.
+          const c = e.cause as { kind: string };
+          if (c.kind === 'effect' && typeof e.card === 'string')
+            bits.push(
+              to === 'hand'
+                ? `${name(e.card)} returned to hand`
+                : to === 'deck'
+                  ? `${name(e.card)} placed at the bottom of the deck`
+                  : `${name(e.card)} trashed`,
+            );
+          else if (c.kind === 'cost' && typeof e.card === 'string')
+            bits.push(`Trash ${name(e.card)} (cost)`);
+        } else if (
+          from === 'hand' &&
+          to === 'trash' &&
+          (e.reason === 'cost' || e.reason === 'effect')
+        ) {
+          bits.push(
+            `${whose(ctx.names, e.owner as PlayerId, true)} hand: trash ${typeof e.card === 'string' ? name(e.card) : 'a card'}${e.reason === 'cost' ? ' (cost)' : ''}`,
+          );
+        } else if (from === 'trash' && to === 'hand' && typeof e.card === 'string') {
+          bits.push(`Add ${name(e.card)} from the trash to hand`);
+        } else if (from === 'deck' && to === 'hand' && e.reason === 'search') {
+          bits.push(`Add ${typeof e.card === 'string' ? name(e.card) : 'a card'} to hand`);
+        } else if (from === 'deck' && to === 'hand') {
+          if (e.reason === 'draw') effectDraws++;
         }
         break;
       }
       case 'DonPlaced':
-        donPlaced += Number(e.count);
+        // DON!! added by an effect get their own words; the DON!! Phase goes in the Refresh line.
+        if (e.by === 'effect')
+          bits.push(`Add ${String(e.count)} DON!!${e.rested ? ' (rested)' : ''}`);
+        else donPlaced += Number(e.count);
+        break;
+      // ---- Effects (M4a-05): one phrase per resolution step, from projected fields only ----
+      case 'EffectActivated': {
+        const label = abilityLabel(e.card, e.ability);
+        bits.push(`${name(e.card)}${label ? `: ${label}` : ' effect'}`);
+        break;
+      }
+      case 'EventActivated':
+        bits.push(`Event${e.timing === 'counter' ? ' [Counter]' : ''}: ${name(e.card)}`);
+        lineActor = p ?? lineActor;
+        break;
+      case 'EffectDeclined':
+        bits.push(`${name(e.card)}: effect not used`);
+        break;
+      case 'CardRevealed':
+        // A played card is named by its play line; other reveals are news to the opponent.
+        if (e.reason && e.reason !== 'play' && typeof e.card === 'string')
+          bits.push(`Reveal ${name(e.card)}${e.reason === 'cost' ? ' (cost)' : ''}`);
+        break;
+      case 'CardsLooked':
+        bits.push(
+          `Look at the top ${String(e.count)} of ${whose(ctx.names, e.owner as PlayerId)} deck`,
+        );
+        break;
+      case 'ModeChosen':
+        bits.push(
+          `${tag(ctx.names, p!)} chose: ${String(e.label ?? `mode ${Number(e.mode) + 1}`)}`,
+        );
+        break;
+      case 'DonReturned':
+        if (e.to === 'donDeck') bits.push(`Return ${String(e.count)} DON!! to the DON!! deck`);
+        break;
+      case 'ReplacementApplied':
+        bits.push(`${name(e.card)}: replaces the ${e.replaced === 'ko' ? 'K.O.' : 'removal'}`);
+        break;
+      case 'SetActive':
+        if (typeof e.don === 'number') bits.push(`Set ${String(e.don)} DON!! active`);
+        break;
+      case 'Rested':
+        if (e.reason === 'effect') bits.push(`Rest ${name(e.card)}`);
+        break;
+      case 'PowerModified':
+        if (e.byEffect && typeof e.card === 'string')
+          bits.push(`${name(e.card)} ${Number(e.amount) > 0 ? '+' : ''}${num(Number(e.amount))}`);
+        break;
+      case 'ModifierAdded':
+        if (e.byEffect && typeof e.card === 'string') {
+          const what =
+            e.kind === 'grant'
+              ? `gains [${String(e.keyword)}]`
+              : e.kind === 'negate'
+                ? 'effects negated'
+                : e.kind === 'cannotAttack'
+                  ? 'cannot attack'
+                  : e.kind === 'basePower'
+                    ? `base power ${num(Number(e.amount))}`
+                    : '';
+          if (what) bits.push(`${name(e.card)} ${what}`);
+        }
         break;
       case 'PhaseChanged':
         if (e.phase === 'main' && (drew || donPlaced)) {
@@ -237,12 +327,47 @@ export function describeMove(
         break;
     }
   }
+  if (effectDraws) bits.push(`Draw ${effectDraws}`);
   for (const [card, n] of donGiven) {
     linked.push(card);
     bits.unshift(`Give ${n} DON!! to ${cardName(ctx.cards, card)}`);
   }
   flush();
   return out;
+}
+
+/** A scripted Event's [Counter] ability, if it has one. */
+export function eventCounterAbility(cardId: string): ActivateAbility | undefined {
+  return SCRIPTS[cardId]?.abilities.find(
+    (a): a is ActivateAbility =>
+      a.kind === 'activate' &&
+      (Array.isArray(a.when) ? a.when.includes('counter') : a.when === 'counter'),
+  );
+}
+
+/** A script's activation cost in the card's words: "DON!! −1", "trash 1 card from your hand". */
+export function scriptCostText(costs: readonly Cost[] | undefined): string {
+  return (costs ?? [])
+    .map((k) => {
+      if ('donMinus' in k) return `DON!! ${MINUS}${k.donMinus}`;
+      if ('restDon' in k) return `rest ${String(k.restDon)} DON!!`;
+      if ('trash' in k || 'reveal' in k) {
+        const sel = 'trash' in k ? k.trash : k.reveal;
+        const n = sel.pick && 'exactly' in sel.pick ? sel.pick.exactly : 1;
+        return `${'trash' in k ? 'trash' : 'reveal'} ${n} from hand`;
+      }
+      if ('restSelf' in k) return 'rest this card';
+      if ('trashSelf' in k) return 'trash this card';
+      return '';
+    })
+    .filter(Boolean)
+    .join(' and ');
+}
+
+/** The script's short label for an ability (`cards/effects`), if any. */
+function abilityLabel(card: unknown, ability: unknown): string {
+  if (typeof card !== 'string' || typeof ability !== 'string') return '';
+  return SCRIPTS[card]?.abilities.find((a) => a.id === ability)?.label ?? '';
 }
 
 function targetWords(ctx: Ctx, e: GameEvent): string {

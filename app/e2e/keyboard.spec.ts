@@ -67,9 +67,8 @@ async function keyboardTurn(page: Page) {
   if ((await decisionKind(page)) === 'main') await page.keyboard.press('e');
 }
 
-test('a whole game vs Rookie, keyboard only', async ({ page }) => {
-  test.setTimeout(480_000);
-  await startGame(page, 'seed=7&first=me&speed=4&skip=1');
+async function keyboardGame(page: Page, query: string) {
+  await startGame(page, query);
   for (let i = 0; i < 600; i++) {
     const k = await nextDecision(page);
     if (k === 'over') break;
@@ -105,6 +104,17 @@ test('a whole game vs Rookie, keyboard only', async ({ page }) => {
     await page.waitForTimeout(30);
   }
   await expect(page.locator('#decision-title')).toHaveText('Game over');
+}
+
+test('a game vs Rookie from a late-game position, keyboard only', async ({ page }) => {
+  test.setTimeout(240_000);
+  await keyboardGame(page, 'scenario=late&speed=4&skip=1');
+});
+
+test('a whole game vs Rookie, keyboard only', async ({ page }) => {
+  test.skip(!process.env.E2E_FULL, 'turn-1 full games run nightly (E2E_FULL=1)');
+  test.setTimeout(480_000);
+  await keyboardGame(page, 'seed=7&first=me&speed=4&skip=1');
 });
 
 test('tab order: skip link, one stop per zone, then the decision panel', async ({ page }) => {

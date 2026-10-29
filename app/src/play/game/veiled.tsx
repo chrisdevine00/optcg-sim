@@ -14,6 +14,11 @@ export interface VeiledProps {
   /** Only what both players may see (session.publicView). */
   readonly view: PublicView;
   readonly seatName: string;
+  /**
+   * Whether Use will show the hand first (review M3-41): from the public log and the public
+   * script only, so it is the same for any hidden cards. Null when the public log cannot tell.
+   */
+  readonly usesHand: boolean | null;
   /** Show the hand (a sticky reveal); the full private decision follows. */
   readonly onShow: () => void;
   /** Optional decisions: answer yes. The controller checks payability after the press. */
@@ -65,6 +70,16 @@ export function veiledContent(p: VeiledProps): VeiledContent {
             : 'Show your hand to answer. Only you should look.'}
         </p>
         {d && <p className="dec-lead">{d.prompt}</p>}
+        {answerable && p.usesHand === true && (
+          <p className="subtle" data-testid="veiled-uses-hand">
+            This effect uses your hand, so Use shows your hand first.
+          </p>
+        )}
+        {answerable && p.usesHand === false && (
+          <p className="subtle" data-testid="veiled-uses-hand">
+            Use answers now; your hand stays hidden.
+          </p>
+        )}
         <button type="button" className="btn small" id="show-hand" onClick={p.onShow}>
           Show my hand <kbd>R</kbd>
         </button>

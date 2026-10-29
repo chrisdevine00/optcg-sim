@@ -3,7 +3,7 @@
  * worker, pacing, auto-skip, hotseat seats and the live region. Components read views from it and
  * send view actions to it; it never decides legality.
  */
-import type { Card } from '@optcg/cards';
+import { SCRIPTS, type Card } from '@optcg/cards';
 import type { AiTier } from '@optcg/ai';
 import type { Action, PlayerId, ProjectedView } from '@optcg/engine';
 import { GameSession, newIntentId, type Move, type Start } from '../../session/index.ts';
@@ -233,10 +233,41 @@ export class GameController {
     return {
       view: this.session.publicView(this.me),
       seatName: this.config.names[this.me],
+      usesHand: this.publicEffectReadsHand(),
       onShow: () => this.revealNow(),
       onUse: () => this.veiledUse(),
       onSkip: () => this.veiledSkip(),
     };
+  }
+
+  /**
+   * Does the effect being asked about read a hidden zone (review M3-41)? Judged only from the
+   * public log: the last effect or Event both seats saw activate, and its public script. Null when
+   * the public log names no such effect (a replacement, for instance).
+   */
+  private publicEffectReadsHand(): boolean | null {
+    if (this.session.view(this.me).decision?.kind !== 'optional') return null;
+    const events = this.session.publicLog(this.me).events.flat();
+    for (let i = events.length - 1; i >= 0; i--) {
+      const e = events[i]!;
+      if (
+        e.type === 'EffectActivated' &&
+        typeof e.card === 'string' &&
+        typeof e.ability === 'string'
+      )
+        return readsHiddenZone({ card: e.card, ability: e.ability });
+      if (e.type === 'EventActivated' && typeof e.card === 'string') {
+        const timing = e.timing === 'counter' ? 'counter' : 'main';
+        const ab = SCRIPTS[e.card]?.abilities.find(
+          (a) =>
+            a.kind === 'activate' &&
+            (Array.isArray(a.when) ? a.when.includes(timing) : a.when === timing),
+        );
+        return ab ? readsHiddenZone({ card: e.card, ability: ab.id }) : null;
+      }
+      if (e.type === 'TurnStarted' || e.type === 'AttackDeclared') return null;
+    }
+    return null;
   }
 
   /**

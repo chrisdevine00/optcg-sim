@@ -1,8 +1,37 @@
 import { expect, test } from '@playwright/test';
 import { nextDecision, playToEnd, startGame } from './game-support.ts';
 
+/** Turn-1 full games are long on CI runners: they run nightly (E2E_FULL=1); per push, the same
+ * flows play to completion from a late-game position with every card scripted (review M4a). */
+const full = () => test.skip(!process.env.E2E_FULL, 'turn-1 full games run nightly (E2E_FULL=1)');
+
 test.describe('M3 board: full games', () => {
+  test('a game vs Rookie plays to completion from a late-game position', async ({ page }) => {
+    test.setTimeout(240_000);
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    await startGame(page, 'scenario=late&speed=4&skip=1');
+    await playToEnd(page);
+    await expect(page.locator('#decision-title')).toHaveText('Game over');
+    expect(errors).toEqual([]);
+  });
+
+  test('a hotseat game plays to completion from a late-game position, effects under the veil', async ({
+    page,
+  }) => {
+    test.setTimeout(240_000);
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    await startGame(page, 'scenario=lateHotseat&speed=4');
+    const stats = await playToEnd(page);
+    expect(stats.veiledOwnDecisions).toBeGreaterThan(0);
+    await expect(page.locator('#decision-title')).toHaveText('Game over');
+    await expect(page.locator('.banner')).toContainText(/Player [12] wins/);
+    expect(errors).toEqual([]);
+  });
+
   test('a full game vs Rookie plays to completion', async ({ page }) => {
+    full();
     // Scripted effects (M4a) add decisions; CI runners are slower than local machines.
     test.setTimeout(480_000);
     const errors: string[] = [];
@@ -17,6 +46,7 @@ test.describe('M3 board: full games', () => {
   test('a full hotseat game plays to completion, with a handoff curtain at each turn', async ({
     page,
   }) => {
+    full();
     // Scripted effects (M4a) add decisions; CI runners are slower than local machines.
     test.setTimeout(480_000);
     const errors: string[] = [];

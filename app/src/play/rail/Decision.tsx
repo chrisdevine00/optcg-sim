@@ -10,7 +10,14 @@ import { CardFace } from '../../art/index.ts';
 import { veiledContent } from '../game/veiled.tsx';
 import { SPEEDS, speedLabel } from '../game/controller.ts';
 import { newIntentId, type Simulation } from '../../session/index.ts';
-import { num, other, resultReason, winnerWords } from '../game/text.ts';
+import {
+  eventCounterAbility,
+  num,
+  other,
+  resultReason,
+  scriptCostText,
+  winnerWords,
+} from '../game/text.ts';
 import type { G, Staging } from '../game/ui.ts';
 
 export function isTall(g: G): boolean {
@@ -314,40 +321,76 @@ function contentInner(g: G): Content {
         body: <p className="dec-lead">{view.decision?.prompt}</p>,
         foot: {
           equal: true,
-          secondary: { label: 'Skip', onClick: () => no && g.act(no), id: 'skip-btn' },
+          secondary: {
+            label: view.decision?.purpose === 'replacement' ? 'Let it happen' : 'Skip',
+            onClick: () => no && g.act(no),
+            id: 'skip-btn',
+            autoFocus: !yes,
+          },
           primary: {
-            label: 'Use',
+            label: view.decision?.purpose === 'replacement' ? 'Use instead' : 'Use',
+            key: 'Enter',
             onClick: () => yes && g.act(yes),
             id: 'use-btn',
             disabled: !yes,
             reason: "can't pay the cost",
+            // flows F8d: focus starts on Use.
+            autoFocus: !!yes,
           },
         },
       };
     }
-    case 'order':
+    case 'order': {
+      // Pending effects (ids "<handle>#<ability>") or cards to place (plain handles), flows F8b/F8c.
+      const cardsToPlace = legal.order.every((a) => a.type === 'order' && !a.first.includes('#'));
+      const labelOf = (first: string) =>
+        view.decision?.options?.find((o) => o.id === first)?.label ?? g.nameOf(first);
+      const keep = () =>
+        g.ctl.actSequence(legal.order.slice(0, -1).map((a) => ({ ...a }) as Action));
       return {
-        title: 'Resolve in this order',
+        title: cardsToPlace ? 'Order the cards' : 'Choose what resolves first',
         tall,
         body: (
           <div>
             <p className="dec-lead">{view.decision?.prompt}</p>
-            <ol className="dec-list">
-              {legal.order.map((a) => (
-                <li key={a.type === 'order' ? a.first : ''}>
-                  <button type="button" className="opt" onClick={() => g.act(a)}>
-                    {a.type === 'order'
-                      ? (view.decision?.options?.find((o) => o.id === a.first)?.label ??
-                        g.nameOf(a.first))
-                      : ''}
+            <p className="subtle">
+              {cardsToPlace
+                ? 'Pick the next card, or keep the order shown.'
+                : 'Your effects triggered together (CR 8-6-1). Pick the one to resolve first.'}
+            </p>
+            <ul className="opts col" role="group" aria-label="Order">
+              {legal.order.map((a, i) => (
+                <li key={a.type === 'order' ? a.first : i}>
+                  <button
+                    type="button"
+                    className="opt"
+                    id={`order-${i}`}
+                    data-autofocus={i === 0 ? '' : undefined}
+                    onClick={() => g.act(a)}
+                  >
+                    {cardsToPlace ? 'Next: ' : 'First: '}
+                    {a.type === 'order' ? labelOf(a.first) : ''}
                   </button>
                 </li>
               ))}
-            </ol>
+            </ul>
           </div>
         ),
-        foot: {},
+        foot: cardsToPlace
+          ? {
+              primary: {
+                label: 'Keep this order',
+                key: 'Enter',
+                sub: legal.order
+                  .map((a) => (a.type === 'order' ? labelOf(a.first) : ''))
+                  .join(' → '),
+                onClick: keep,
+                id: 'order-keep',
+              },
+            }
+          : {},
       };
+    }
     default:
       return { title: view.decision?.prompt ?? '', tall, body: null, foot: {} };
   }
@@ -759,9 +802,12 @@ function BattleNumbers({
           {label(tgt, t)}
           <span className="bn-bd">
             {breakdownDef ??
-              (t?.card?.power !== undefined && t?.card?.power !== null && t.card.power !== tp
-                ? `${num(t.card.power)} + ${num(tp - t.card.power)}`
-                : 'no change')}
+              (() => {
+                // The printed card, even when the simulation's card has no data (M4a-09).
+                const base = (t?.card ?? g.cardOf(tgt)?.card)?.power;
+                if (base === undefined || base === null || base === tp) return 'no change';
+                return `${num(base)} ${tp > base ? '+' : MINUS} ${num(Math.abs(tp - base))}`;
+              })()}
           </span>
         </span>
         <span className="bn-num num" data-testid="defender-power">
@@ -1037,7 +1083,10 @@ function defenceContent(g: G): Content {
         reason: hidden ? 'reveal your hand first' : 'Stage a lit hand card',
         onClick: commit,
       },
-      primary: takeBtn,
+      // After an Event [Counter] the attack may already fail: say so (M4a-09).
+      primary: hits
+        ? takeBtn
+        : { ...takeBtn, label: 'Done · the attack fails', sub: 'no more Counters' },
     };
   } else if (hits) {
     foot = {
@@ -1064,27 +1113,51 @@ function defenceContent(g: G): Content {
   }
   const hand = view.zones[me].hand;
   const counterCards = hand.filter((c) => options.has(c.handle));
+  // Event [Counter]s in hand, with their cost and effect (flows F6.2 lane 3, M4a-09). They are
+  // activated one at a time in the Counter Step, after the block decision.
+  const eventCounters = hand.flatMap((c) => {
+    const ab = c.card ? eventCounterAbility(c.card) : undefined;
+    if (!ab || !c.card) return [];
+    const action = g.legal.activate.get(c.handle)?.[0] ?? null;
+    const extra = scriptCostText(ab.cost);
+    const r = action
+      ? null
+      : inBlock
+        ? { text: 'available in the Counter Step, after the block decision' }
+        : g.ctl.session.whyNot(me, { type: 'activate', card: c.handle, ability: ab.id });
+    return [
+      {
+        handle: c.handle,
+        action,
+        cost: `cost ${c.cost ?? 0}${extra ? ` + ${extra} (optional)` : ''}`,
+        effect: ab.label ?? '',
+        why: r?.text ?? 'not now',
+      },
+    ];
+  });
   const base = g.cardOf(targetH)?.power ?? 0;
   return {
     title: `Defend ${targetWord} · ${g.nameOf(b.attacker)} attacks`,
     tall: true,
     body: (
       <div className="defend">
-        {view.decision?.kind === 'counter' && !hidden && g.legal.activate.size > 0 && (
+        {!hidden && eventCounters.length > 0 && (
           <div className="opts col" role="group" aria-label="Event Counters">
-            {[...g.legal.activate.entries()].flatMap(([h, list]) =>
-              list.map((a) => (
-                <button
-                  key={`${h}-${a.type === 'activate' ? a.ability : ''}`}
-                  type="button"
-                  className="opt"
-                  data-event-counter=""
-                  onClick={() => g.act(a)}
-                >
-                  Activate [Counter]: {g.nameOf(h)}
-                </button>
-              )),
-            )}
+            {eventCounters.map((ec) => (
+              <button
+                key={ec.handle}
+                type="button"
+                className="opt"
+                data-event-counter=""
+                aria-disabled={ec.action ? undefined : true}
+                onClick={() => ec.action && g.act(ec.action)}
+              >
+                <span>
+                  Activate [Counter]: {g.nameOf(ec.handle)} · {ec.cost}
+                </span>
+                <span className="sub">{ec.action ? ec.effect : ec.why}</span>
+              </button>
+            ))}
           </div>
         )}
         <BattleNumbers
@@ -1358,9 +1431,17 @@ function optionChoice(g: G): Content | null {
     const c = a.choice;
     if (typeof c === 'string') return g.nameOf(c);
     if ('option' in c) return d.options?.find((o) => o.id === c.option)?.label ?? c.option;
-    if (c.from === 'costActive') return 'An active DON!! in your cost area';
-    if (c.from === 'costRested') return 'A rested DON!! in your cost area';
-    return `A DON!! given to ${g.nameOf(c.card)}`;
+    const don = g.view.don[g.me];
+    if (c.from === 'costActive') return `Active DON!! in your cost area (${don.active})`;
+    if (c.from === 'costRested') return `Rested DON!! in your cost area (${don.rested})`;
+    const holder = g.cardOf(c.card);
+    const given = findCard(g, c.card)?.don ?? 0;
+    const who = holder?.zone === 'leader' ? 'your Leader' : `your ${g.nameOf(c.card)}`;
+    const warn =
+      g.view.battle && (g.view.battle.attacker === c.card || g.view.battle.target === c.card)
+        ? ` · lowers its power in this battle${g.view.turn.activePlayer === g.me ? '' : ' next turn'}`
+        : '';
+    return `DON!! given to ${who} (${given})${warn}`;
   };
   return {
     title: d.purpose === 'mode' ? 'Choose one' : 'Choose',
@@ -1450,7 +1531,11 @@ function chooseContent(g: G): Content {
                   )
                 }
               >
-                ⌖ {g.nameOf(h)} · {num(g.cardOf(h)?.power)}
+                {d.purpose === 'cost' ? '' : '⌖ '}
+                {g.nameOf(h)}
+                {g.cardOf(h)?.power !== null && g.cardOf(h)?.power !== undefined
+                  ? ` · ${num(g.cardOf(h)?.power)}`
+                  : ''}
                 {on ? ` ✓ ${chosen.indexOf(h) + 1}` : ''}
               </button>
             );

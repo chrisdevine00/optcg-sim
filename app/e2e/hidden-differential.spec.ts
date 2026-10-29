@@ -104,6 +104,25 @@ async function snapshot(page: Page): Promise<string> {
   return [html, aria, live].join('\n----\n');
 }
 
+/**
+ * What the other seat can observe after an answer, without the seat's own revealed hand: the
+ * decision panel's kind and title, whether the veil is up, the log and the live regions.
+ */
+async function publicSignature(page: Page): Promise<string> {
+  await page.waitForTimeout(250);
+  return page.evaluate(() => {
+    const d = document.getElementById('decision');
+    return [
+      d?.getAttribute('data-kind') ?? '',
+      document.getElementById('decision-title')?.textContent ?? '',
+      document.querySelector('.hand-veil') ? 'veiled' : 'shown',
+      [...document.querySelectorAll('.log-row')].map((r) => r.textContent).join('|'),
+      document.getElementById('announce-polite')?.textContent ?? '',
+      document.getElementById('announce-assertive')?.textContent ?? '',
+    ].join('\n');
+  });
+}
+
 /** Drive one position to each veiled state; returns the snapshots in order. */
 async function veiledStates(page: Page, spec: unknown): Promise<string[]> {
   await serveArt(page);
@@ -201,6 +220,87 @@ test.describe('veiled screens depend on public information only', () => {
     const a = await takeStep(base(true));
     const b = await takeStep(base(false));
     expect(b, 'OP07-077 take step differs').toBe(a);
+  });
+
+  // M3-42: pressing Use under the veil must behave the same whatever the hand holds. Shiki's cost
+  // reads the hand, so Use shows the hand first in both positions; the public result (decision,
+  // veil, log, live regions) must match. M3-41: the panel says so, from public facts only.
+  test('Use under the veil: payable and unpayable Shiki behave alike (M3-42, M3-41)', async ({
+    page,
+  }) => {
+    const afterUse = async (spec: unknown) => {
+      await serveArt(page);
+      await page.goto(url(spec));
+      expect(await nextDecision(page)).toBe('main');
+      await page.locator('[data-zone="my-chars"][data-glyph="attack"]').click();
+      await page.locator('[data-zone="opp-row"].bc-leader').click();
+      await page.locator('#confirm-attack').click();
+      expect(await nextDecision(page)).toBe('optional');
+      await expect(page.locator('.hand-veil')).toBeVisible();
+      await expect(page.getByTestId('veiled-uses-hand')).toContainText('shows your hand first');
+      const before = await snapshot(page);
+      await page.locator('#use-btn').click();
+      await page.waitForTimeout(300);
+      return [before, await publicSignature(page)];
+    };
+    const r1 = rng(1);
+    const a = position(r1, true);
+    const b = { ...a, p1: { ...a.p1, hand: hand(rng(2), false) } };
+    const [ba, sa] = await afterUse(a);
+    const [bb, sb] = await afterUse(b);
+    expect(bb, 'veiled Shiki optional differs').toBe(ba);
+    expect(sb, 'the result of Use under the veil differs').toBe(sa);
+  });
+
+  test("Use under the veil answers Kaido's public DON!! −1 at once, identically (M3-42)", async ({
+    page,
+  }) => {
+    const kaido = (seed: number) => {
+      const r = rng(seed);
+      return {
+        mode: 'hotseat',
+        seed: 31,
+        turn: 4,
+        activePlayer: 'p2',
+        firstPlayer: 'p1',
+        p1: {
+          leader: 'OP17-058',
+          life: pickN(r, PLAIN, 3),
+          hand: pickN(r, [...PLAIN, ...ROCKS], 4),
+          deck: pickN(r, PLAIN, 10),
+          costArea: { active: 2, rested: 0 },
+        },
+        p2: {
+          leader: 'ST01-001',
+          characters: ['OP01-023'],
+          life: pickN(r, PLAIN, 2),
+          hand: pickN(r, PLAIN, 2),
+          deck: pickN(r, PLAIN, 10),
+          costArea: { active: 0, rested: 2 },
+        },
+      };
+    };
+    const afterUse = async (spec: unknown) => {
+      await serveArt(page);
+      await page.goto(url(spec));
+      expect(await nextDecision(page)).toBe('main');
+      await page.locator('[data-zone="my-chars"][data-glyph="attack"]').click();
+      await page.locator('[data-zone="opp-row"].bc-leader').click();
+      await page.locator('#confirm-attack').click();
+      expect(await nextDecision(page)).toBe('optional');
+      await expect(page.locator('.hand-veil')).toBeVisible();
+      await expect(page.getByTestId('veiled-uses-hand')).toContainText('hand stays hidden');
+      const before = await snapshot(page);
+      await page.locator('#use-btn').click();
+      // Applied under the veil: the target choice follows, still veiled.
+      expect(await nextDecision(page)).toBe('choose');
+      await expect(page.locator('.hand-veil')).toBeVisible();
+      return [before, await snapshot(page)];
+    };
+    const [ba, sa] = await afterUse(kaido(41));
+    const [bb, sb] = await afterUse(kaido(42));
+    expect(bb, 'veiled Kaido optional differs').toBe(ba);
+    expect(sb, 'the veiled state after Use differs').toBe(sa);
   });
 
   // 50 generated pairs in 10 batches, so the batches run in parallel.

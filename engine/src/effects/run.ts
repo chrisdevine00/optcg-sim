@@ -144,6 +144,31 @@ export function runEffect(d: Draft, f: EffectFrame): void {
   }
 }
 
+/** A cost in the card's words, for prompts (flows F8d): "DON!! −1", "trash 1 card from your hand". */
+export function costText(costs: readonly Cost[] | undefined): string {
+  const words = (costs ?? []).map((k) => {
+    if ('donMinus' in k) return `DON!! −${k.donMinus}`;
+    if ('returnDon' in k) return `return ${k.returnDon} DON!!`;
+    if ('restDon' in k) return `rest ${String(k.restDon)} DON!!`;
+    if ('trash' in k || 'reveal' in k) {
+      const sel = 'trash' in k ? k.trash : k.reveal;
+      const n = sel.pick && 'exactly' in sel.pick ? sel.pick.exactly : 1;
+      const f = sel.filter;
+      const what =
+        f && 'typeIncludes' in f
+          ? ` with a type including "${f.typeIncludes}"`
+          : f && 'type' in f
+            ? ` {${f.type}}`
+            : '';
+      return `${'trash' in k ? 'trash' : 'reveal'} ${n} card${n === 1 ? '' : 's'}${what} from your hand`;
+    }
+    if ('restSelf' in k) return 'rest this card';
+    if ('trashSelf' in k) return 'trash this card';
+    return '';
+  });
+  return words.filter(Boolean).join(' and ');
+}
+
 /** An optional auto, or an auto with a cost (CR 8-1-2, 8-3-1-4): ask before anything else. */
 function askUse(d: Draft, f: EffectFrame, ab: Ability): void {
   const g = take(f);
@@ -170,7 +195,7 @@ function askUse(d: Draft, f: EffectFrame, ab: Ability): void {
   const dec: Omit<DecisionState, 'purpose' | 'source'> = {
     kind: 'optional',
     player: f.controller,
-    prompt: `${nameOf(d, f)}: use this effect${ab.label ? ` (${ab.label})` : ''}?${ok ? '' : " You can't pay its cost."}`,
+    prompt: `${nameOf(d, f)}: ${costText(costs) ? `pay ${costText(costs)} to ` : ''}use this effect${ab.label ? ` (${ab.label})` : ''}?${ok ? '' : " You can't pay its cost."}`,
     role: 'use',
   };
   if (!ok) dec.noAccept = true;
@@ -395,12 +420,18 @@ function payCost(d: Draft, f: EffectFrame, k: Cost, reserve: number): Out {
     const ids = select(d, f, k.reveal, { role: 'cost', verb: 'reveal' });
     if (ids === WAIT) return WAIT;
     for (const id of ids)
-      d.emit({ type: 'CardRevealed', instance: id, card: d.card(id).card, player: f.controller });
+      d.emit({
+        type: 'CardRevealed',
+        instance: id,
+        card: d.card(id).card,
+        player: f.controller,
+        reason: 'cost',
+      });
     return 'next';
   }
   if ('restSelf' in k) {
     if (!d.s.cards[f.card]) return anomaly(d, f, 'restSelf');
-    rest(d, f.card);
+    rest(d, f.card, 'cost');
     return 'next';
   }
   if ('trashSelf' in k) {
@@ -533,6 +564,7 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
       card: d.card(top).card,
       player: you,
       from: 'deck',
+      reason: 'effect',
     });
     markKnown(d, top, ['p1', 'p2']);
     f.b = { ...f.b, [a.reveal.bind]: [top] };
@@ -570,7 +602,7 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
   if ('rest' in a) {
     const ids = select(d, f, a.rest, { role: 'target', verb: 'rest' });
     if (ids === WAIT) return WAIT;
-    for (const id of ids) if (FIELD.has(d.card(id).zone)) rest(d, id);
+    for (const id of ids) if (FIELD.has(d.card(id).zone)) rest(d, id, 'effect');
     return 'next';
   }
   if ('setActive' in a) {
@@ -777,6 +809,7 @@ function lookAtTop(
             instance: id,
             card: d.card(id).card,
             player: f.controller,
+            reason: 'search',
           });
         moveCard(d, id, 'hand', { revealed: tk.reveal === true, extra: { reason: 'search' } });
       }

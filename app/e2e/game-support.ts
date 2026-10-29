@@ -68,6 +68,9 @@ export async function playMainPhase(page: Page) {
     const attacker = page.locator('[data-glyph="attack"]').first();
     if (!(await attacker.count())) break;
     await attacker.click();
+    // A card with an [Activate: Main] opens its menu first (M4a-03): choose Attack… there.
+    const attackItem = page.getByRole('menuitem', { name: /Attack…/ });
+    if (await attackItem.isVisible().catch(() => false)) await attackItem.click();
     // The Leader if it can be attacked, else a rested Character ([Rush: Character] cannot hit Leaders).
     const leader = page.locator('[data-zone="opp-row"].bc-leader[data-glyph="target"]');
     const target = (await leader.count())
@@ -150,7 +153,7 @@ export async function playToEnd(page: Page, maxDecisions = 2000): Promise<GameSt
         await page.locator('#skip-btn').click();
         break;
       case 'order':
-        await page.locator('#decision .dec-list .opt').first().click();
+        await page.locator('#order-0').click();
         break;
       default:
         throw new Error(`Unexpected decision ${k}`);

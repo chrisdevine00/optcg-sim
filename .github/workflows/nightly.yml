@@ -17,6 +17,13 @@ jobs:
       # 10,000 random legal games with meta decks, plus golden records (PLAN §5, §8).
       # Each run draws a new PROPERTY_SEED and logs it; rerun with PROPERTY_SEED=<seed> to reproduce.
       - run: npm run test:nightly
+      # Full games from turn 1 through the UI (vs Rookie, hotseat, keyboard only): too slow per push.
+      - run: npx playwright install --with-deps chromium
+        if: always()
+      - run: npx playwright test app/e2e/game.spec.ts app/e2e/keyboard.spec.ts
+        if: always()
+        env:
+          E2E_FULL: '1'
       - run: npm run bench -- --outputJson test-results/bench.json
         if: always()
       - uses: actions/upload-artifact@v4

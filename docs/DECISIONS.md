@@ -2,6 +2,15 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-10-29 — M4a fix round 1, Phase B (app) and CI time
+
+- **[Activate: Main] in the UI (M4a-03).** A card with a scripted [Activate: Main] opens its action menu on click or Enter (with "⚔ Attack…" when it can also attack); each ability is an item ("✦ Activate: <label>", key E for the first), or disabled with `whyNot`'s reason. Rejected: a separate ability bar (more chrome; the menu is already the keyboard path).
+- **Effect log lines (M4a-05)** come from projected events only, so a hidden card is never named: activations with the script's label, Events, declines, reveals (the engine now tags `CardRevealed.reason`: play, cost, effect, search), looks, modes (the `neutral` label), DON!! returns and adds, replacements, effect rests (`Rested.reason`), power and keyword changes (`PowerModified`/`ModifierAdded` carry `card` and `byEffect`), bounce, bottom-deck and trash. Hotseat keeps using the public log. Draws by an effect are a count.
+- **Prompts (M4a-09).** The `use` prompt names its cost ("pay DON!! −1 to use this effect"); focus starts on Use and Enter uses it (flows F8d). Enter never commits "choose none" on a paid effect's target choice. DON!! choices show counts per location and warn when the DON!! sits on a card in the battle. The order panel names the timing ("Kaido [On Play]: …"), and card ordering has "Keep this order". Event [Counter]s list their cost (with the optional activation cost) and effect, and show in the Block Step as "available in the Counter Step". When the attack already fails, the defence footer says "Done · the attack fails". Rejected for now: staging Event [Counter]s with Character Counters (their costs and targets need decisions, which the one-commit sequence cannot carry).
+- **Setup copy (M4a-15)** is per seat and per deck, counted by different card numbers, and claims only that scripted cards' effects happen.
+- **Veiled hotseat (M3-41, M3-42, M3-43).** The veiled panel says whether Use will show the hand, judged from the last effect both seats saw activate in the public log and its public script, so it cannot vary with hidden cards. A differential e2e test presses Use under the veil for a payable and an unpayable Shiki cost and for Kaido's public DON!! −1; removing the `readsHiddenZone` check fails it. A `scenario=json:` spec without a valid mode returns to setup with a message.
+- **CI time.** Playwright runs in 3 parallel shards, separate from lint, typecheck and unit tests. Per push, the full-game flows (vs Rookie, hotseat, keyboard) play to completion from a late-game Rocks-vs-Kaido position with every card scripted; the turn-1 full games run nightly (`E2E_FULL=1`). `E2E_PORT` lets several working copies run e2e on one machine without reusing another copy's preview server. Rejected: dropping the full games (coverage) or a single longer timeout (still flaky).
+
 ## 2026-10-29 — M4a fix round 1 (engine and cards)
 
 Context: the M4a review (`docs/reviews/m4a-review.md`) failed the milestone. Phase A covers the engine and card findings.
