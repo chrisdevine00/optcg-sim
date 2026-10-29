@@ -91,7 +91,7 @@ Builder decisions are logged in DECISIONS (2026-10-28, M3). Not done in M3, by t
 - every severity-3 finding and most severity-2 findings are fixed;
 - carried: M3-18 (tablet lane chip size), M3-23 (the not-built list) and some severity-1 nits.
 
-The same reviewer is now on re-review 1. If interrupted, re-launch it. When it passes, mark M3 done.
+**Re-review 1 (dc494e8): FAIL.** The leaks are confirmed fixed, and each new test catches its bug. Three new severity-3 findings are open: M3-27 (the inspector pinned after R is released kills the shortcuts), M3-28 (game over is silent after a defence) and M3-32 (touch can't stage a Counter while revealing). The builder is on fix round 2, then re-review 2. Carried items have target milestones (DECISIONS, 2026-10-29).
 
 The screen-reader section of the review is a proxy. A real VoiceOver or NVDA pass is still owed: it goes with owner session S1, or to the owner sooner.
 

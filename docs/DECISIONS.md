@@ -2,6 +2,18 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-10-29 — Target milestones for M3's carried items
+
+Context: M3 re-review 1 (M3-33) found that the items carried out of M3 had no target milestone, so they could drift.
+
+Decision:
+- the "Why?" chip on AI log lines goes to **M5a**, with the `Explanation` builder;
+- the hotseat "you look away" line goes to **M7**, with the coach copy;
+- saving and resuming a game goes to **M8**, with local save;
+- drag as a shortcut for click, and 44 px lane chips on tablets (M3-18, the product's own rule in board.md §6.2; the chips already meet WCAG 2.5.8 at 24 px), go to **M10** polish.
+
+Rejected: building them in M3. None is in PLAN's M3 exit criteria, and each depends on later work (Explanations, the coach, local save) or competes with the tablet height margin that fixed the Linux scroll.
+
 ## 2026-10-29 — Hotseat renders a public view while veiled
 
 Context: M3 review 1 found four severity-4 leaks in hotseat (M3-01 to M3-04). Behind the handoff curtain and during a veiled defence, the board, log, live regions, staged-Counter breakdown and rewind list all rendered from the private view of the incoming or defending seat.
