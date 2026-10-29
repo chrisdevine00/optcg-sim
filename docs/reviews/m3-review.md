@@ -177,3 +177,119 @@ Any severity 3 or 4 finding fails the milestone.
 - M3-08 (battle maths announcements).
 
 The rest (severity 2 and 1) should be fixed or deferred with a DECISIONS entry. The manual screen-reader pass is still required by PLAN's M3 exit criteria.
+
+---
+
+## Re-review 1
+
+**Date:** 2026-10-29
+**Build reviewed:** `main` at `f1cebdc` (fixes `405751b` and `c379298`; CI run 40815495263 green).
+- I served it from a clean detached worktree (`.cache/m3-rr1/head`, Vite on :5174), so the M4a builder's uncommitted `engine/` work played no part.
+- Mutation runs used a second scratch worktree (`.cache/m3-rr1/mut`, Vite on :5175). Every mutation was reverted with `git checkout`, and the worktree ended clean.
+- I changed nothing in the main tree.
+
+**M3 re-review 1: FAIL.**
+- No severity-4 finding remains open. All four hotseat leaks are fixed, and I could not break the public view.
+- Three new severity-3 findings block the milestone:
+  - M3-27: a keyboard dead end after inspecting a card during a reveal;
+  - M3-28: game over is silent after any defence, a regression from the M3-08 fix;
+  - M3-32: on touch, the defender can see their hand but cannot stage a Counter.
+
+### Method
+
+1. **Re-ran my round-1 probes against :5174.** All transcripts and screenshots are in `.cache/m3-review/` (the round-1 names) and `.cache/m3-review/rr1/`.
+   - `leak.mjs`: the curtain, the veiled defence, R held, R released, then Blocker plus a short Counter.
+   - `hotseat.mjs`: a full hotseat game, seed 202.
+   - `ai-game.mjs`: a full game vs Rookie with Skip, a mid-battle rewind, resizing, game over and rematch.
+   - `keyboard.mjs` and `insp.mjs`.
+2. **New probes, written to break the public view:**
+   - `rr-curtain.mjs`: curtain focus and the accessibility tree;
+   - `rr-break.mjs`: the inspector pinned during a reveal, window `blur` while R is held, U / Shift+U / Ctrl+Z and the menu while veiled, the damage decision veiled and then revealed, the live regions after a reveal ends, and the attacker's resumed seat;
+   - `rr-k.mjs`: recovery from M3-27;
+   - `rr-m305.mjs`: staging Counters before and after a Blocker, unblocking, and Enter;
+   - `rr-touch.mjs` and `rr-touch2.mjs`: CDP multi-touch on a 1024×690 touch context;
+   - `rr-target.mjs`: target sizes and the WCAG 2.5.8 spacing test at the three adapted sizes.
+3. **Read the code:**
+   - the diffs of `session.ts` (`publicView`, `publicLog`, `pendingLifeCard`) and `controller.ts` (`revealed`, `actions`, `spoken`, `alert`, `finish`);
+   - the veil and press-and-hold code in `Board.tsx` and `Game.tsx`, and the `Dock` change;
+   - the engine's `ProjectedView` and `Decision` types, to check that nothing else passes through `{ ...own }`.
+4. **Looked at the builder's regenerated screenshots in `.cache/m3/`** (taken at 00:12, after the fixes) for every severity-2 claim that only pixels can show.
+5. **Mutation-tested the new tests** (step 2 of the brief).
+
+### Do the new tests catch the old bugs?
+
+Each mutation re-introduces one fix's bug in the scratch worktree; each was reverted before the next.
+
+| Mutation | Test | Result |
+| --- | --- | --- |
+| `revealed()` always `true`, which undoes the public view (M3-01..03) | `hotseat-leaks.spec.ts` | **fails** at the first curtain: "Urashima" is exposed |
+| The hotseat log uses `session.log`, not `publicLog` (M3-02) | `hotseat-leaks.spec.ts` | **fails** after the defence: "Vergo" is exposed |
+| `publicView` returns the seat's own view | `hidden.test.ts` | **fails** (actions not empty) |
+| `publicLog` returns the seat's own log | `hidden.test.ts` | **fails** |
+| `aiInitCards` sends every card (M3-09) | `hidden.test.ts` | **fails** |
+| Staged Counters keep the target they were staged with (M3-05) | `defence.spec` "Counters staged before a Blocker…" | **fails** (defender power) |
+| No `onRevealStart` on the veil (M3-06) | `defence.spec` "press and hold…" | **fails** |
+| No staging announcement (M3-08) | `defence.spec` "the attack and each staging change…" | **fails** (the polite region kept the attack line) |
+
+The unmutated worktree passes the same specs. On the dev server the whole 720p suite gives 38 passed and 2 failed. The two failures, `sw.spec` and the "set fails to load" test in `cards.spec`, need the production build and are unrelated to M3. CI, which builds first, is green.
+
+The tests are real: each one fails when its fix is removed. They do not cover the three new severity-3 findings below. M3-06's test uses a mouse, so it cannot see M3-32.
+
+### Round-1 findings
+
+| ID | Claim | Verdict | Evidence |
+| --- | --- | --- | --- |
+| M3-01 | Public view behind the curtain, which is `inert` | **Fixed** | `leak-01-curtain-p2.txt`: no hand names in any text, attribute or tree node. `rr-curtain.mjs`: the only `inert` wrapper is `.stage-wrap`, and the live regions stay outside it. |
+| M3-02 | Public log and live regions in hotseat | **Fixed** | `hotseat-report.txt`: no "LEAK?" line in a full game. After "Add to hand" the polite line reads "Player 1: Life card to hand · Player 1's Life 3 → 2." with no name. Both regions are emptied when R is released (`rr-break.mjs`). On the attacker's resumed, click-veiled seat, the defender's hand is not in the DOM. The cost is that your own draws are no longer named in the hotseat log; it is recorded in DECISIONS and acceptable. |
+| M3-03 | Staged Counters shown as a count | **Fixed** at every width: "Your Leader 5000 · 1 staged (hidden)", and the Counter lane reads "1 staged. Player 1: hold R, or press and hold your hand area…". While veiled, the numbers leave out the hidden Counters, so their values don't leak either. |
+| M3-04 | Rewind off while veiled | **Fixed.** The menu shows Rewind list, Back to my last decision and Forward as disabled. The log's ⟲ buttons are gone (0), and U, Shift+U and Ctrl+Z do nothing (`rr-break.mjs`). |
+| M3-05 | Counters follow the Blocker; Enter never wastes them | **Fixed** (`rr-m305.mjs`):<br>• 1 staged, then Franky: "Franky 5000 + 1000 staged (Marco) · 6000 · Need +2000". Enter is "Block with Franky · Franky K.O.'d · Life stays 3 · Counters kept", and the log reads "Block: Franky · Hit", with no Counter played. "Play anyway · Franky still K.O.'d" is a separate button.<br>• 3 staged, then Franky: "8000 · Attack fails"; Enter commits block plus three Counters on Franky.<br>• Unblocking re-aims all three at the Leader.<br>While veiled, the commit is "Commit defence · 1 staged · hidden", which has no Enter key. |
+| M3-06 | Press and hold reveals the hand | **Partly.** A mouse or a single finger reveals it and releasing hides it. **A touch user cannot stage while holding** (M3-32). |
+| M3-07 | The curtain traps focus | **Fixed.** Tab and Shift+Tab move only between the curtain button and `<body>`; nothing behind the curtain takes focus. |
+| M3-08 | Attack and staging announced | **Fixed.**<br>• Assertive: "Kaido attacks your Leader. Kaido 7000, your Leader 5000. You need 3000 to stop it. Plan your defence." In hotseat it does not count the defender's Counters, which is right.<br>• Polite after each Space: "Staged Komachiyo, plus 1000. Your Leader 6000 against 7000: still hits. Need 2000 more."<br>It also introduced a regression (M3-28). |
+| M3-09 | AI `init` carries only its own deck | **Fixed** (`aiInitCards`, and the unit test fails under mutation). |
+| M3-10 | Attribution and jargon | **Partly** (M3-31). |
+| M3-11 | Recap where Skip stopped | **Fixed.** It reads "Stopped here. While you skipped: Kaido: End of turn. You: Refresh · Draw: …", and it is cleared on the next action and on rewind. |
+| M3-12 | The damage decision is never auto-skipped, and shows the card | **Fixed.** Against the AI the decision waits for the player, and the revealed panel renders the card face and "Life card: Komachiyo". |
+| M3-13 | Reveal cleared on blur | **Fixed.** A `blur` event re-veils the hand. A later keydown from R still being held reveals it again, which is right. |
+| M3-14 | Card aspect ratio | **Partly.** The mulligan fan is now about 97×135 and the art keeps 63:88 where it shows, but the docks drop the art (M3-29). |
+| M3-15 | The dock avoids the plates | **Fixed** in `720p-` and `1080p-defend-preview.png`: the dock sits over empty opponent Character slots, and every count stays visible. |
+| M3-16 | The arrow runs under the plates | **Fixed.** Franky's "5000" and the chips draw above the arrow, and the ⌖ is on top. |
+| M3-17 | Forced colours | **Fixed** (`1080p-forced-colours.png`): a focused legal card shows two rings, and the cards and tokens have borders. |
+| M3-19 | Step pace | **Fixed.** The primary is "Next move ." (with the sub-label "the AI is moving" while the AI is acting), and the secondary is Skip. |
+| M3-20 | 1280×600 rise | **Partly.** The ⌖ now stays visible, but a staged card still covers most of the Leader's name (`1280x600-defend-tie.png`). This is severity 1 now. |
+| M3-21 | Scrim and turn bar | **Fixed.** The notice stays readable over the trash scrim, and the game-over board has no turn bar. |
+| M3-22 | Make-room context | **Fixed:** the panel reads "Make room for Sai", "Cancel the play" is offered, the order matches the board, and each candidate carries a "Trash · not a K.O." chip. |
+| M3-24 | Hotseat rewind | **Fixed:** "Rewind for both players?" asks for consent, and rewind is off while veiled. |
+| M3-25 | Dialog focus return | **Fixed.** `?` then Escape returns focus to the card. |
+| M3-26 | Nits | Mostly fixed ("1 card", "can block"). See M3-31 and the nits below for what remains. |
+
+### The carries
+
+- **M3-18 (44 px lane chips on tablets): accepted as severity 2, but the stated reason is inaccurate.** `rr-target.mjs` measures the lane chips at exactly 24 px tall at 1024×690, 1180×740 and 1280×600. They meet WCAG 2.5.8's 24 × 24 minimum outright, not "through the spacing exception". The only two targets under 24 px pass the spacing test. So AA passes. The 44 px rule is the product's own (board.md §6.2, and WCAG 2.5.5 at AAA), and 24 px chips on a touch tablet are a real friction, made worse by M3-32. Keep it open with a target milestone, M10 at the latest, and fix the DECISIONS wording.
+- **M3-23 (drag, save and resume, the "Why?" chip, the "you look away" line): acceptable to carry.** None of these is in PLAN's M3 exit criteria. Hotseat rewind consent and the forced-colours ring are now built. DECISIONS, however, records only M3-18; the rest have no target milestone (M3-33).
+
+### New findings
+
+| ID | Sev | Area | Problem | Evidence | Fix |
+| --- | --- | --- | --- | --- | --- |
+| M3-27 | 3 | Hotseat keyboard dead end | **If the defender inspects a card while holding R, then releases R, the keyboard goes dead.** The card's handle leaves the rendered (public) view, so `CardDock` renders nothing, but `dock.pinned` stays true. `onKey` returns early on `dock.pinned`, so R no longer reveals, and Escape, U, Q and every other shortcut do nothing. The log stays `inert` and focus falls to `<body>`. Tab still moves focus, but no key brings the hand back, so a keyboard-only defender cannot see or stage Counters for the rest of that defence. Only a pointer press-and-hold recovers, by re-showing the invisible inspector. Inspecting a Counter before playing it is exactly what a learner does. | `rr-break.mjs` (k): "after release: dock count 0 · focus BODY", "R again reveals? false", "keys after: polite=''". `rr-k.mjs`: after 4 Tabs R still doesn't reveal, "log inert? true", and the pointer reveal brings `.dock` back. `Game.tsx` `onKey` (`if (dialog \|\| dock.pinned) return`), `Dock.tsx` (`if (!c?.card) return null`). | When `dock.handle` is not in the current view, reset the dock state to closed (an effect keyed on `view`), and return focus to the hand veil. Better: key the early return on the dock being rendered, not on `dock.pinned`. Add an e2e: R down, I on a hand card, R up, R down again → the hand is visible. |
+| M3-28 | 3 | Game over is silent (regression from M3-08) | `finish()` announces game over only when `this.assertive.text === ''`. The new defence alert (`ctl.alert`) sets that text, and nothing clears it against the AI. In any game where the human defended once, the game ends with **no "Game over. You win on turn N."**, no polite "Rematch, or New game.", no `focusDecision` (focus stays on `<body>` after the Confirm button unmounts), and no `stopSkipping('end')`. Round 1 got `A: Game over. You win on turn 11.` and focus on "Game over". Round 2, on the same seed and path, got neither. | `rr1/ai-announcements.txt` (six defence alerts, no game-over line) against `ai-announcements.txt` from round 1; `rr1/ai-notes.txt` ("focus at game over: <main>"); `rr1/ai-focus.txt`; `controller.ts:510–524` | Track "game over announced" with its own boolean instead of testing the region's text. Add an e2e that defends once, wins, and checks `#announce-assertive` and the focused element. |
+| M3-29 | 2 | Docks lost their art; the 720 inspector clips its text | To fix M3-14, docks narrower than 300 px now drop the card art. That covers the 1080 hover preview (240 px) and every 720 dock, so the hover preview no longer shows "the card bigger" (board.md §3.12: preview art 168×235 / 240×335). At 720 the pinned inspector is about 200×190: Miss Buckingham Stussy's effect text and Kaido's "[Activate: Main] [Once…" are cut off with no scroll cue. The inspector must never be smaller than the preview and must show the full text (§3.12, C19). | `.cache/m3/1080p-defend-preview.png`, `720p-defend-preview.png`, `720p-inspector.png`, `720p-game-over.png`; `Dock.tsx` (`rect.w >= 300`) | Size the dock to the spec so it can hold the 63:88 art (at 720, dock over the log as the reveal tray does, if the board has no room). Give the pinned inspector the full text, with scrolling and a visible cue. |
+| M3-30 | 2 | Focus lands in `aria-hidden` content | The unpinned hover dock (`aria-hidden="true"`) is a Tab stop: Chrome makes its scrollable text box keyboard-focusable. In round 2's Tab walk, focus went from the disclaimer to `div "Komachiyo OP01-010 · Character…" (IN aria-hidden)`, so a screen-reader user lands on silence. The preview appears whenever a card holds keyboard focus for 400 ms. | `rr-keyboard.mjs` output (`rr1/keyboard.txt`), Tab 16 | Give the unpinned dock `inert` (not only `aria-hidden`), or `tabIndex={-1}` with `overflow: hidden` on its text when unpinned. |
+| M3-31 | 2 | M3-10 residue: attribution and jargon | • The Hit line belongs to the defender's move, so it is credited to the defender: your own attack landing is announced "Kaido: Hit · 8000 vs 7000." and logged with an "Opp" chip (`720p-game-over.png`: "Opp · Hit · 5000 vs 5000").<br>• "Opp" is still spoken at the rematch: "Kaido: Opp chose to go second."<br>• Other rough lines: "You: You chose to go first.", "Skipped 2 moves. Kaido: End of turn.. You: …" (a doubled full stop), and "You have 0 counter cards worth 0." | `rr1/ai-announcements.txt`; `text.ts` (`FirstPlayerChosen` uses `tag()`, and the actor of `DamageStep`) | Credit the battle-result line to the attacker ("You: Hit · 8000 vs 7000"). Use the `whose()`/name wording for `FirstPlayerChosen`. Strip a trailing full stop before joining. Say "You have no Counter cards" for 0. |
+| M3-32 | 3 | Touch hotseat: the defender can look but not counter | Press-and-hold now reveals the hand, but a tap from a second finger while the first holds produces **no `click`**: browsers synthesize click only for the primary pointer. Staging a hand card or a Counter-lane button therefore does nothing while the hand is revealed. Lifting the holding finger re-veils the hand, which hides the Counter lane. On a tablet in hotseat the defender still cannot play a single Counter, which is what M3-06 was raised for. The M3-06 e2e uses a mouse, so it cannot see this. (Found in Chromium's touch emulation through CDP; iOS Safari also fires click only for single-finger taps.) | `rr-touch.mjs`: "finger 1 down → revealed: true", second-finger tap → "staged? false", "still revealed: true". `rr-touch2.mjs`: a single CDP tap on Franky stages it (the harness works), but a second-finger tap on the Counter lane's "Marco" → `aria-pressed=false`, and on a hand card → 0 clicks. | On touch, make the reveal a toggle: a tap shows the hand with a visible "Hide my hand" button, and the hand re-veils on hide, on commit, and on any seat change. Or make the lane buttons and hand cards act on `pointerup` for non-primary touch pointers. Add a touch e2e that uses CDP touch events (as in `rr-touch2.mjs`). |
+| M3-33 | 2 | Carries not scheduled | DECISIONS gives a reason and a home only for M3-18. Drag (in the PROMPT M3 row), save and resume (F13b.6), the "Why?" chip and the "you look away" line (F13b.3) have no target milestone, so they can quietly drop out. The DECISIONS line for M3-18 also has the wrong reason (see the carries above). | `docs/DECISIONS.md` 2026-10-29 | Add one line per deferral with its target milestone, and correct the M3-18 wording. |
+| M3-34 | 1 | Nits | • While the hand is veiled, or once a Blocker is chosen, the panel title stays "Defend your Leader · Kaido attacks" while the Defender row says Franky.<br>• M3-20's residue: at 1280×600 a staged card still covers the Leader's name.<br>• The rail-header icons are 32 px, under board.md §6.2's 44 px on tablets. | `rr-m305.mjs` output; `.cache/m3/1280x600-defend-tie.png`; `rr-target.mjs` | Fix in passing. |
+
+### Hidden information: summary of this pass
+
+- **Hotseat.** I found nothing hidden on the surfaces checked. That covers every text node, every attribute (aria names, titles, `alt`, `aria-valuetext`), both live regions, the aria snapshot, the menu, the rewind list, the trash viewer and the hover preview. It holds under the curtain, in a veiled defence, in the damage decision, after a reveal ends, after a blur, on the attacker's resumed seat, and at game over. (I did not re-probe the rewind-consent path myself; `hotseat-leaks.spec.ts` covers it.)
+- **`publicView` and `publicLog`.** They intersect the two projections by position. `hidden.test.ts` checks that over 250 Rookie actions. `ProjectedView`'s other fields are public (`battle`, `resolving`, `don`, `turn`) or emptied (`actions`, `known`). `Decision` carries only `kind`, `player`, `prompt`, `min` and `max`, and the prompt is replaced by the other seat's wording.
+- **The AI.** The worker receives its own deck's cards and `PlayerView`s only.
+
+### Disposition
+
+**Blocking:** M3-27, M3-28 and M3-32. Fix them, add the three tests described, then re-review.
+
+Severity 2 (M3-29 to M3-31 and M3-33, plus M3-18 carried) can be fixed or scheduled in DECISIONS. The manual screen-reader pass in PLAN's M3 exit criteria is still owed; this review's screen-reader work is a proxy, not that pass.
