@@ -110,7 +110,7 @@ Notes:
 
 Since the builder's report:
 - **Orchestrator check** on clean main: 633 unit tests, 37 scripts, and a benchmark median of 3,949 per second with other agents running.
-- **Independent card tests:** merged to main (b05c19e). After the test author adapted the kit to the API additions (no expected outcome changed), 946 tests pass and 1 is an expected fail. That one, B-1 (EB04-040's optional "you may rest 6" cost is auto-paid), was ruled for the test author under CR 8-3-1-4 and is with the builder, along with allowing an Event to be played when its optional cost can't be paid.
+- **Independent card tests:** merged to main (b05c19e). After the test author adapted the kit to the API additions (no expected outcome changed), 946 tests pass and 1 is an expected fail. B-1 (EB04-040's optional "you may rest 6" cost was auto-paid) was ruled for the test author under CR 8-3-1-4. It is fixed in 6d13ba9, and the full-game e2e timeouts went up in 354e2a8 (CI run 40820443987 green). All 314 independent card tests now pass. E-Q12 stays open: an Event playable when its optional cost can't be paid, and whether DON!! −X is optional.
 - **Independent M4a review**, `docs/reviews/m4a-review.md`: running.
 
 If interrupted, check `git log` and the branch, and re-launch whichever of these stopped.
