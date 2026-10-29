@@ -167,3 +167,90 @@ So E-Q12 should close as "optional", and M4a-08 is the engine change.
 - **Veiled optional decisions:** they render only through `veiledContent(PublicView)`. "Use" and "Skip" are always both enabled, and "Use" on a script that reads a hidden zone reveals the hand first. The payable and unpayable Shiki positions now render identical veiled HTML, aria and live-region text.
 - **OP07-077's take step:** the public decision no longer carries `max`, and a veiled choose is never answerable. The match and no-match positions render identically.
 - **Tests:** mutations that restore either shape make `hidden-differential.spec.ts` fail. Details and the remaining test gap (M3-42: no test presses "Use" under the veil) are in `docs/reviews/m3-review.md`, Re-review 4.
+
+## Re-review 1
+
+**Date:** 2026-10-29. **Builds:**
+- Phase A: `292f730` (CI 40826294923);
+- Phase B: `d3ed657` (CI 40846908098, green: 979 unit tests, e2e 113 passed and 25 skipped across 3 shards);
+- `main` was at `d64a06c` when this was written; only STATUS changed after `d3ed657`.
+
+**Reviewer:** the same reviewer. I changed no repository code.
+
+**M4a re-review 1: PASS.** No severity 3 or 4 finding is open. Every severity 3 and 4 finding is fixed, and each has a test that fails when its fix is reverted. M4a-01 was already confirmed fixed by M3 re-review 4. The new findings are severity 2 and 1 (M4a-16 to M4a-20).
+
+### Method
+
+1. **Clean worktree.** `.cache/m4a-rr1/wt` at `d3ed657`, with `@optcg/*` relinked to the worktree's own packages, and `E2E_PORT` 4391–4393 for every Playwright run.
+2. **Suite, types and lint.**
+   - `npx vitest run`: 979 passed, 164 todo.
+   - `tsc` and `eslint .`: clean.
+3. **Leak properties.**
+   - `ENGINE_GAMES=10000` on `leaks.test.ts` with a fresh seed (116558321) and with the two seeds that used to fail (100620542, 102403076): all pass.
+   - A new probe (`event-cards.test.ts`) checks **every** projected event that names a card, including events after a reveal, which the property stops comparing at. The named card must be visible to the viewer before or after the action, or the event must be a reveal (`CardRevealed`, `TriggerRevealed`, `CounterPlayed`, `EventActivated`, `CardPlayed`, or a `revealed` move). Over 1,500 leak games: **520,544 card-naming events, 0 violations.** This covers `Rested.reason`, `CardRevealed.reason`, `PowerModified`/`ModifierAdded` `card` and `byEffect`, `ModeChosen`, `ReplacementApplied`, `EffectActivated` and `EffectDeclined`.
+4. **Mutation pass.** Each fix's key line was reverted and the tests that claim it were run. The harness is `scratchpad/mutate.py` plus an e2e script that rebuilds on its own port per mutation. Table below.
+5. **Hotseat probe of the M3-41 hint.** `GameController` in hotseat: Shiki's [When Attacking] (a cost paid from hand), then the defender's EB04-030 K.O. shield.
+6. **CI.**
+   - Read `ci.yml`, `nightly.yml` and `playwright.config.ts`.
+   - `gh run list -w Nightly`.
+   - Ran the nightly e2e locally: `E2E_FULL=1 npx playwright test app/e2e/game.spec.ts app/e2e/keyboard.spec.ts --project=720p`.
+
+### Fix verification
+
+| Finding | Status | Test that fails on revert |
+| --- | --- | --- |
+| M4a-01 (4) | **Fixed** (97f5f4f; confirmed by M3 re-review 4) | `hidden-differential.spec.ts` (per M3 re-review 4) |
+| M4a-02 (4) | Fixed earlier (64ddfb5) | `hidden.test.ts` allow-list (per M3 re-review 2) |
+| M4a-03 (3) | **Fixed.** Activate items appear in the action menu, an unusable one is disabled with its `whyNot`, and key E works. | Removing the menu items fails both M4a-03 tests in `effects.spec.ts` (mouse and keyboard). |
+| M4a-04 (3) | **Fixed.** Cards placed by one `play` share a pending batch, so the player orders their [On Play]s. | Removing `pf.batch` fails `OP17-118.test.ts` (both orders). |
+| M4a-05 (3) | **Fixed.** Effect lines are in the log and the polite region, built from projected events only; hotseat uses the public log. No line can name a hidden card (point 3 of the method). | Disabling the `PowerModified` case fails `effects-log.test.ts`. |
+| M4a-06 (2) | **Fixed.** The property passes the two formerly failing seeds and a fresh one at 10,000 games, and it still has teeth. | Removing the M2-19 guard fails `leaks.test.ts`. |
+| M4a-07 (2) | **Fixed.** The validator rejects each mishandled shape; the runtime honours deck positions; fall-throughs emit an `Anomaly`. | Reverting the validator fails 14 tests in `dsl.test.ts`; dropping the deck position fails `runtime-shapes.test.ts`. The runtime's deck-top guard has no test (M4a-19). |
+| M4a-08 (2) | **Fixed.** `optionalCost`: a `costOptional` flag, or DON!! −X on an Event [Main] or [Counter] (RL-52). | Removing the DON!! −X clause fails 11 tests (5 per-card files and the independent suite). |
+| M4a-09 (2) | **Fixed in part, as specified:**<br>• the Use prompt names its cost;<br>• focus starts on Use, and Enter uses it;<br>• Enter never commits "choose none" after a paid cost;<br>• DON!! choices show counts;<br>• order panels name the timing;<br>• Event [Counter]s list their cost and effect.<br>Event [Counter]s are still not staged with Character Counters (DECISIONS). | Removing the Enter guard fails the F8d test in `effects.spec.ts`. |
+| M4a-10 (2) | Recorded for M4b entry in STATUS. | — |
+| M4a-11 (1) | **Fixed.** Neutral labels on OP17-049. | **None** (M4a-19). |
+| M4a-12 (1) | **Fixed.** Keys and batch counters are out of the hash; batch grouping is kept by queue position; `known` is in, by position. | **None** in records, rules or legality; only the golden values would move (M4a-19). |
+| M4a-13, M4a-14 (1) | Wording updated. | — |
+| M4a-15 (1) | **Fixed.** Copy per seat, counted by different card numbers. | **None** (M4a-19). |
+
+### The questions asked
+
+1. **Do effect log lines name hidden cards?** No, in vs-AI or hotseat.
+   - `describeMove` reads only projected events. Against the AI it uses the player's own projection; in hotseat it uses `publicLog`, which keeps only fields both projections hold.
+   - Looks print a count ("Look at the top 5 of …").
+   - Draws by effect print a count. The turn player's own Refresh draw is named only in their own projection.
+   - A trash from hand is named only when it is `revealed`, which the rules make public: costs, and X.Drake's face-down pick.
+   - A deck-top card added to Life is unnamed.
+   - The new `reason`, `card` and `byEffect` fields are attached only to cards on the field or legitimately revealed. `ModifierExpired` carries no card.
+   - The 520,544-event probe above found no exception.
+2. **The M3-41 veiled hint.**
+   - It cannot vary with hidden cards: its inputs are the private decision's kind (public), the public log and static scripts.
+   - Rewind truncates the event history (`session.ts:582`), so the hint follows the rewound log.
+   - Two effects in a row: each drained effect emits `EffectActivated` just before its own prompt, so each hint matches its own effect.
+   - A trigger during a defence asks no optional decision in these decks.
+   - It **can be wrong**, though; see M4a-16.
+3. **CI coverage.**
+   - Per push, full games now start from a fixed late-game Rocks-vs-Kaido position (seed 707), vs Rookie and hotseat. That gains effect coverage per push, since every card is scripted. It loses, per push, the UI path through choose-first, mulligan and the first-turn rules in a full game, and the keyboard-only setup.
+   - `board-states.spec.ts` still steps through choose-first and mulligan per push. The rest is nightly-only.
+   - **The Nightly workflow has never run**: `gh run list -w Nightly` lists nothing. So the turn-1 full games, the PLAN M3 exit criterion, have not run in CI since d3ed657. Locally, all 8 tests in `game.spec.ts` and `keyboard.spec.ts` pass at 720p with `E2E_FULL=1`, in 42.7 s (turn-1 full games take 11–14 s each).
+   - The nightly e2e step is `if: always()`, so it runs even when the property step fails. See M4a-20.
+4. **E-Q12 and B-1 consistency.** They now match across every Event cost in the 37 scripts:
+   - `optionalCost` covers the five `costOptional` abilities (EB04-040, OP17-055, OP17-056 and OP17-077 [Main]; OP17-076 [Counter]) and every Event DON!! −X (OP09-077, OP15-078, OP07-076, EB04-040 [Counter], OP17-077 [Counter]);
+   - such an Event is playable on its printed cost alone, and the cost is then always asked, with "use" unavailable when it can't be paid;
+   - [Activate: Main] and auto costs are voluntary by construction;
+   - the [Trigger] cost (OP17-076) is gated by `triggerPayable`, which is consistent (declining it only trades the card for nothing).
+
+   **Remaining risk for M4b:** `costOptional` is a per-script flag that the author must remember for "you may" costs other than DON!! −X; nothing checks it against the card text. Suggestion: have `validateScript` require it when an Event's verified text has "You may" before the colon.
+
+### New findings
+
+| ID | Sev | Area | Problem | Evidence | Fix |
+| --- | --- | --- | --- | --- | --- |
+| M4a-16 | 2 | Hotseat: M3-41 hint | **The veiled hint can describe the wrong effect.** `publicEffectReadsHand()` reads the last `EffectActivated`/`EventActivated` in the public log, but a replacement emits no activation, and that last activation may belong to the **other** player. Example: P2's Shiki pays its [When Attacking] from hand, then wins its battle against P1's EB04-030. At P1's veiled K.O.-shield decision, the panel says "This effect uses your hand, so Use shows your hand first". `veiledUse()` instead decides from the decision's own source (the shield returns a DON!!) and applies it without showing the hand. No hidden card affects either, so nothing leaks. But the other direction, "your hand stays hidden" and then Use reveals it, becomes possible once M4b scripts replacements that pay from hand during the opponent's battle. | `app/test/review/hint.test.ts` (worktree): `usesHand = true` with the public log ending `[AttackDeclared OP17-048, EffectActivated OP17-048 shrink]`, at decision `EB04-030/ko-shield`; `controller.ts:248-271` vs `:279-288` | Compute the hint from the same input as `veiledUse` (the decision's source), and give replacements and other source-less optionals a public source. |
+| M4a-17 | 2 | Hotseat: Use under the veil | **The veiled Use's safety rests on a regex over script JSON**, not on the engine's own `secret` flag. `readsHiddenZone` (`veiled.tsx:43`) misses selectors whose `from` is an array including `"hand"`, and zones such as `lifeTop`. (Numeric hand reads like `{hand:'you'}` are public counts, so those are fine.) No such shape is in the 37 scripts, so there is no reachable leak today. An M4b hand cost written as `from: ['hand', …]` would let Use act, or not, on private payability. | `node` check: `{"trash":{"from":["hand","characters"]}}` → false; `{"from":"lifeTop"}` → false | `secret` is computed from script shape only (`costIsSecret`, `hiddenPool`), so it is public by construction. Put it on the public `Decision`, and use it for both the hint and Use. |
+| M4a-18 | 2 | App: optional Event costs | **An Event whose optional cost can't be paid looks fully usable.** With Wo Ro (OP17-076) as the only card in hand, the defence panel shows "Activate [Counter]: Wo Ro … · cost 0 + trash 1 from hand (optional)" with its "+3000" effect, enabled. One click trashes it, and the follow-up says "You can't pay its cost". The engine is right (B-1, RL-52); the button should say so first. Event [Counter]s are not staged, so there is no take-back short of Rewind, and Strict mode has none. | `engine/test/review/woro.test.ts` (worktree): `activate` is listed, then `optional` with "You can't pay its cost"; `Decision.tsx:1116-1160` | While revealed (the hand is the player's own), mark such buttons "can't pay now · plays for no effect", and confirm before activating. Do the same for a [Main] Event in the action menu. |
+| M4a-19 | 1 | Tests | **Fixes with no test that fails on revert:**<br>• the runtime deck-top guard (M4a-07; the validator in front of it is tested);<br>• the neutral `ModeChosen` label (M4a-11);<br>• the hash's exclusion of keys and batch counters, and `known` in the hash (M4a-12);<br>• the M4a-15 setup copy. | mutation pass: each passes the whole engine, cards and app unit suites | Add a `ModeChosen.label` assertion to `OP17-049.test.ts`; a `records.test.ts` case where two paths to the same position differ only in keys or batch numbers and hash equal, and two differing only in `known` hash differently; a `withAbilities` probe expecting an `Anomaly` for a deck-top-to-trash move; and a unit test of `automationLine`. |
+| M4a-20 | 1 | CI | **The nightly that now carries the turn-1 full games has never run.** Dispatch it once (`gh workflow run Nightly`) and record the run, so the M3 exit criterion is shown in CI and the 60-minute job budget is checked. The job holds the 10,000-game property run plus 3 turn-1 tests × 2 projects, each with a 480 s budget. | `gh run list -w Nightly` → empty; local run: 8 passed, 42.7 s | — |
+
+**Counts (re-review 1):** severity 4: 0 open; severity 3: 0 open; new severity 2: 3 (M4a-16, M4a-17, M4a-18); new severity 1: 2 (M4a-19, M4a-20).
