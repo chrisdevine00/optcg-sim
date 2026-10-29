@@ -1,0 +1,74 @@
+# Scripted NVDA screen-reader pass (docs/design/accessibility.md §11.2, step 1 of "Who runs them").
+# Manual only: Guidepup drives NVDA on a Windows runner through the §11.3 script, once with Chrome
+# and once with Firefox, and uploads the spoken-phrase logs. Never runs on push.
+name: a11y NVDA pass
+on:
+  workflow_dispatch:
+    inputs:
+      browsers:
+        description: Which browsers to run
+        type: choice
+        options: [both, chrome, firefox]
+        default: both
+jobs:
+  nvda:
+    runs-on: windows-2025
+    timeout-minutes: 120
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      # The app: built and served locally, so the pass tests exactly this commit.
+      - run: npm ci
+      - run: npm run build -w @optcg/app
+      - name: Serve the build (vite preview, port 4173)
+        run: |
+          Start-Process -FilePath "cmd.exe" -ArgumentList "/c", "npx vite preview --port 4173 --strictPort > ..\preview.log 2>&1" -WorkingDirectory app -WindowStyle Hidden
+          for ($i = 0; $i -lt 60; $i++) {
+            try { Invoke-WebRequest -UseBasicParsing http://localhost:4173/optcg-sim/ | Out-Null; Write-Host "Preview is up"; exit 0 } catch { Start-Sleep -Seconds 2 }
+          }
+          Get-Content preview.log; exit 1
+      # The harness and its own dependencies (app/a11y is not a workspace: CI never installs them).
+      - name: Install the harness, NVDA and browsers
+        working-directory: app/a11y
+        run: |
+          npm ci
+          npx @guidepup/setup setup --ci
+          npx @guidepup/setup install nvda
+          npx playwright install firefox
+      - name: Record versions
+        working-directory: app/a11y
+        run: |
+          Get-ItemProperty -Path "HKCU:\Software\Guidepup\Nvda" -ErrorAction SilentlyContinue | Format-List | Out-String | Write-Host
+          $exe = Get-ChildItem -Recurse -Filter nvda.exe -Path "$env:LOCALAPPDATA\guidepup", "$env:USERPROFILE\AppData\Local\guidepup" -ErrorAction SilentlyContinue | Select-Object -First 1
+          $nvdaVer = if ($exe) { $exe.VersionInfo.ProductVersion } else { "unknown" }
+          $chrome = (Get-Item "C:\Program Files\Google\Chrome\Application\chrome.exe").VersionInfo.ProductVersion
+          $guidepup = (Get-Content node_modules/@guidepup/guidepup/package.json | ConvertFrom-Json).version
+          "NVDA_VERSION=$nvdaVer" >> $env:GITHUB_ENV
+          "GUIDEPUP_VERSION=guidepup $guidepup, @guidepup/playwright $((Get-Content node_modules/@guidepup/playwright/package.json | ConvertFrom-Json).version)" >> $env:GITHUB_ENV
+          "IMAGE_VERSION=$env:ImageOS $env:ImageVersion" >> $env:GITHUB_ENV
+          Write-Host "NVDA $nvdaVer; Chrome $chrome; Guidepup $guidepup; image $env:ImageOS $env:ImageVersion"
+      - name: NVDA + Chrome
+        if: inputs.browsers != 'firefox'
+        continue-on-error: true
+        working-directory: app/a11y
+        run: npx playwright test --project=nvda-chrome
+      - name: NVDA + Firefox
+        if: inputs.browsers != 'chrome'
+        continue-on-error: true
+        working-directory: app/a11y
+        run: npx playwright test --project=nvda-firefox
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: a11y-nvda-${{ github.run_id }}
+          path: |
+            app/a11y/results/
+            app/a11y/test-results/
+            preview.log
+          if-no-files-found: warn

@@ -13,3 +13,6 @@ docs/design/wireframes/shots/
 
 # Claude Code agent worktrees and local settings
 .claude/worktrees/
+
+# Scripted screen-reader pass output (uploaded by the a11y-nvda workflow, never committed)
+app/a11y/results/

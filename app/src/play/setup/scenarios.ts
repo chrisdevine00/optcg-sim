@@ -3,12 +3,14 @@
  * Each is a described position; the engine validates it with its invariants.
  */
 import type { ScenarioSpec } from '@optcg/engine';
+import { A11Y_SCENARIOS } from './a11y-scenarios.ts';
 
 type Spec = Omit<ScenarioSpec, 'cards'> & { mode: 'ai' | 'hotseat' };
 
 const filler = (id: string, n: number) => Array.from({ length: n }, () => id);
 
 export const SCENARIOS: Record<string, Spec> = {
+  ...A11Y_SCENARIOS,
   /**
    * Review M3-35: Player 2's Character attacks; Player 1's Kaido Leader (OP17-058) offers its
    * [On Your Opponent's Attack] DON!! −1 while Player 1's hand is veiled. Private cards have

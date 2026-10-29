@@ -1,0 +1,19 @@
+{
+  "name": "optcg-a11y",
+  "private": true,
+  "description": "Scripted screen-reader passes (accessibility.md \u00a711.2). Not a workspace: its dependencies install only in the a11y workflow.",
+  "type": "module",
+  "scripts": {
+    "nvda": "playwright test --project=nvda-chrome --project=nvda-firefox",
+    "dry": "playwright test --project=dry",
+    "typecheck": "tsc -p tsconfig.json",
+    "voiceover": "playwright test --project=voiceover-webkit"
+  },
+  "devDependencies": {
+    "@guidepup/guidepup": "0.38.0",
+    "@guidepup/playwright": "0.21.0",
+    "@guidepup/setup": "0.29.3",
+    "@playwright/test": "1.64.1",
+    "@types/node": "24.19.2"
+  }
+}
