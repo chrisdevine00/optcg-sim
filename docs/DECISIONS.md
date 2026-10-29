@@ -2,6 +2,18 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-10-28 — Frozen engine API amended after the independent test author's report
+
+Context: the independent test author (branch `m2-independent-tests`: 132 tests and 183 todos, written without seeing engine source) found three gaps in the API frozen earlier today. First, `Omit<Action, …>` does not distribute over the `Action` union, so the fixtures' documented `g.act({ type: 'attack', … })` did not typecheck. Second, `PlayerView` exposed only the decision and actions, so visibility rules (CR 3-1-4 public zone counts, CR 3-3-2 DON!! deck) could not be tested. Third, event names were not frozen. It also found a data gap: OP05-022, a Leader with printed [Blocker], had no keywords, because only meta cards had verified overrides.
+
+Decision:
+- **Types.** Add `DistributiveOmit` and use it for `Intent` and in the fixtures.
+- **PlayerView.** Add `turn`, `result`, `zones` (both players, `ViewCard` with `card: null` when hidden and handles re-keyed per ARCHITECTURE §2.7) and `don` counts.
+- **Events.** Export a frozen `GameEventType` union. A trash that is not a K.O. never emits `KO`.
+- **Data.** Add a verified override for OP05-022 (Limitless cross-check). Non-meta cards get keyword overrides when a test or a script needs them.
+
+The engine author applies the API changes in its next commit. Alternatives rejected: leaving the bug and making the tests work around it; letting the tests read internal state.
+
 ## 2026-10-28 — Engine public API and test fixtures frozen for M2
 
 Context: PLAN §5 requires the fixture API to be frozen before M2. The engine author and an independent test author can then work in parallel, and the tests encode the rules rather than the implementation. Decision:

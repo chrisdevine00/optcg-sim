@@ -1375,9 +1375,17 @@
    "block": 2,
    "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.) [End of Your Turn] If you have 6 or less cards in your hand, set this Leader as active.",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Blocker"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/OP05-022",
+     "date": "2026-10-28",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
