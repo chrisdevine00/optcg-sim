@@ -17,7 +17,9 @@ export {
   projectEvents,
   actionFromView,
   previewFromView,
+  projectForSearch,
 } from './game.ts';
+export { determinize, CannotDeterminize, type SearchView, type Skeleton } from './determinize.ts';
 export type { ProjectedView } from './project.ts';
 export type { AutoSkipOptions } from './game.ts';
 export {

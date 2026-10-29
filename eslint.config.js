@@ -33,6 +33,8 @@ const fullState = {
     'projectEvents',
     'actionFromView',
     'previewFromView',
+    'projectForSearch',
+    'determinize',
     'checkInvariants',
     'summaryHash',
     'cardsVersionOf',

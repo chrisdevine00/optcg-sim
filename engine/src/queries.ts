@@ -70,6 +70,7 @@ export function cardView(s: State, id: InstanceId): CardView {
     cost: dv.cost,
     keywords: dv.keywords,
     ...extras(s, id),
+    played: c.played,
   };
 }
 
@@ -125,4 +126,13 @@ export const queries: Queries = {
     for (const id of [ps.leader, ...ps.characters]) given += s.cards[id]!.don;
     return { deck: ps.donDeck, active: ps.donActive, rested: ps.donRested, given };
   },
+  battle: (g) => {
+    const b = st(g).battle;
+    return b && { attacker: b.attacker, target: b.target, blocker: b.blocker };
+  },
+  usedThisTurn: (g) =>
+    st(g).oncePerTurn.map((k) => {
+      const i = k.indexOf('/');
+      return { card: k.slice(0, i), ability: k.slice(i + 1) };
+    }),
 };

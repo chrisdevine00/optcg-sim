@@ -36,6 +36,7 @@ import { queries as q } from './queries.ts';
 import { replayWith } from './record.ts';
 import { createFromScenario as fromScenario, createGame as fromSetup } from './setup.ts';
 import { other, type State } from './state.ts';
+import { projectForSearch as projectForSearchState, type SearchView } from './determinize.ts';
 
 const st = (g: GameState): State => g as unknown as State;
 const gs = (s: State): GameState => s as unknown as GameState;
@@ -171,3 +172,11 @@ export const previewFromView = (
     gameOver: p.gameOver,
   };
 };
+
+/**
+ * M5a, for AI search (ADR 0005, ARCHITECTURE §4.3): the player's view plus a skeleton of the state
+ * from which every card hidden from that player has been stripped. Only the session store calls
+ * this; the AI worker turns the skeleton back into full states with `determinize`.
+ */
+export const projectForSearch = (state: GameState, player: PlayerId): SearchView =>
+  projectForSearchState(st(state), player);

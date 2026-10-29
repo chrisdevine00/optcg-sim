@@ -194,6 +194,11 @@ export interface CardView {
   cannotAttack?: boolean;
   /** Added in M4a. Set while its effects are negated (CR 8-2). */
   negated?: boolean;
+  /**
+   * Added in M5a. The turn it was played into the Character or Stage area (summoning sickness,
+   * CR 3-7-4), or -1. Public: both players saw it played.
+   */
+  played?: number;
 }
 
 /** Opaque game state (ARCHITECTURE §2.2). Plain JSON; never mutate it. */
@@ -340,6 +345,12 @@ export interface Queries {
     state: GameState,
     player: PlayerId,
   ): { deck: number; active: number; rested: number; given: number };
+  /** Added in M5a: the battle in progress (attacker, current target, Blocker), or null. */
+  battle(
+    state: GameState,
+  ): { attacker: InstanceId; target: InstanceId; blocker: InstanceId | null } | null;
+  /** Added in M5a: Once Per Turn abilities already used this turn, as `{ card, ability }`. */
+  usedThisTurn(state: GameState): { card: InstanceId; ability: string }[];
 }
 
 export class IllegalAction extends Error {

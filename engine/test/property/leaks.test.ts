@@ -4,7 +4,8 @@
  * ids and some Life cards face up, so damage decisions and visible-to-hidden-to-visible moves occur.
  *
  * 1. Indistinguishability: permuting the cards hidden from a viewer, including a Life card waiting
- *    on a damage decision, changes neither that viewer's view nor `autoSkip` for an observing human.
+ *    on a damage decision, changes neither that viewer's view, nor its search skeleton (M5a), nor
+ *    `autoSkip` for an observing human.
  * 2. Events: the same action from both states projects to the same events for that viewer (card
  *    ids aside, which legitimate reveals may show).
  * 3. Linkage: a card that passed through a zone hidden from a viewer never shows that viewer a
@@ -20,6 +21,7 @@ import {
   cardsVersionOf,
   project,
   projectEvents,
+  projectForSearch,
   reduce,
   SCRIPTS_VERSION,
   nextInt,
@@ -166,6 +168,10 @@ describe('hidden-information leak properties', () => {
               const other = permuted(s, viewer, order) as unknown as GameState;
               expect(JSON.stringify(project(other, viewer))).toBe(
                 JSON.stringify(project(g, viewer)),
+              );
+              // M5a: the AI's search skeleton is as blind as the view (ADR 0005).
+              expect(JSON.stringify(projectForSearch(other, viewer).skeleton)).toBe(
+                JSON.stringify(projectForSearch(g, viewer).skeleton),
               );
               if (s.decision && s.decision.player !== viewer)
                 expect(autoSkip(other, { observedByOtherHuman: true })).toEqual(
