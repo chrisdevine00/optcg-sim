@@ -1,7 +1,11 @@
 {
-  "note": "Random legal game, seed 1001, random policy. Engine 0.3.1.",
+  "note": "Random legal game, seed 1001, random policy. Engine 0.4.0.",
   "record": {
-    "versions": { "engine": "0.3.1", "cards": "cards-19fa9b406a61bb1e", "scripts": "none" },
+    "versions": {
+      "engine": "0.4.0",
+      "cards": "cards-19fa9b406a61bb1e",
+      "scripts": "scripts-1bc27f5a56d1e715"
+    },
     "start": {
       "setup": {
         "seed": 1001,
@@ -251,25 +255,25 @@
     ]
   },
   "expected": {
-    "hash": "1ec1d7d9671f5b000ac11b5e9c79",
+    "hash": "064c641542bfe502859032e756b1",
     "actions": 128,
     "turn": 12,
     "result": { "winner": "p2", "reason": "damage at 0 Life" },
     "turnHashes": [
-      "017aa6f1380b0c0a49d78eddf9d3",
-      "18d6cca965294411d0d39b5249f8",
-      "088ab6bce0271409749c16ae6318",
-      "1c9f9fc207cbe700a59a772fe993",
-      "1a9b6201871c3c0f52ead7d5bcae",
-      "0d824e8d10c2bc1954d6bcf04563",
-      "10ecc6801eb0481105bd58154092",
-      "122cbd361b03a702fd7d007304da",
-      "155b8d61decde008b97922a40e15",
-      "16abe857ab12360f412109093767",
-      "0d910255a9271109f45c29fa8dfb",
-      "0a0e26b76f489509a3dcf5580130",
-      "0be75b2230ffa60ad316e9ad2004",
-      "1ec1d7d9671f5b000ac11b5e9c79"
+      "1341c836ed779c13650f6ee28de7",
+      "0c5dd2cbb07d990d4290b998919f",
+      "0f257400a50715065b721d3fa15c",
+      "0cf60ba0fcfc1f0051fb09bab3f9",
+      "1de9695f6fad9f0bfb49d3793d40",
+      "02685db1c8621f10d810c4aea1a4",
+      "0095c8a566f73207b9f7d5292d67",
+      "1342ae9f55b8e7163a21b55005cf",
+      "110a0abafb776812075a6de021ec",
+      "10d512ba0a33410b266c72a427b3",
+      "08aa1f0bda058d1b26031369f17e",
+      "1a9a85bde430c51c602fa5e9ef2e",
+      "1f30faecb0c6a1079f3454197785",
+      "064c641542bfe502859032e756b1"
     ],
     "eventTypes": "0c0f231fe5f9031b75deb191a1d4"
   }

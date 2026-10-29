@@ -7,6 +7,7 @@ import type {
   BattleStep,
   CardId,
   DecisionKind,
+  DecisionPurpose,
   DonClass,
   GameResult,
   InstanceId,
@@ -35,7 +36,7 @@ export interface Def {
   keywords: string[];
   hasTrigger: boolean;
   /**
-   * Abilities the engine can run. Until M4 this is empty for every real card; tests inject
+   * Abilities the engine can run: the card's script (`cards/effects`), or none. Tests may inject
    * abilities through `engine/src/testing.ts` to exercise the hooks (ADR 0013).
    */
   abilities: Ability[];
@@ -97,7 +98,16 @@ export type Duration =
   | { kind: 'untilEndOfOpponentsNextEndPhase'; player: PlayerId; after: number }
   | { kind: 'whileSource'; source: InstanceId };
 
-export type ModKind = 'power' | 'cost' | 'basePower' | 'grant' | 'cannotBeKOd';
+export type ModKind =
+  | 'power'
+  | 'cost'
+  | 'basePower'
+  | 'grant'
+  | 'cannotBeKOd'
+  /** "cannot attack" (OP17-054, OP17-065). */
+  | 'cannotAttack'
+  /** "negate the effect of" (CR 8-2): the card's abilities and keyword effects do nothing. */
+  | 'negate';
 
 export interface Modifier {
   id: number;
@@ -145,7 +155,16 @@ export type Frame =
         | 'endThisTurn'
         | 'endPass';
     }
-  | { f: 'play'; card: InstanceId; player: PlayerId; step: 'pay' | 'make-room' | 'place' | 'done' }
+  | {
+      f: 'play';
+      card: InstanceId;
+      player: PlayerId;
+      step: 'pay' | 'make-room' | 'place' | 'done';
+      /** Played by an effect: no cost is paid (CR 2-7 applies to plays from hand by the player). */
+      free?: true;
+      /** An Event activated in the Counter Step for its [Counter] (CR 7-1-3-1-2). */
+      counter?: true;
+    }
   | { f: 'battle' }
   | {
       f: 'damage';
@@ -166,17 +185,62 @@ export type Frame =
       /** Printed card id, to find the ability after the source has moved. */
       cardId: CardId;
       ability: string;
-      /** Which list to run: the ability's effect, or a replacement's `instead`. */
+      /** Which program to run: the ability's costs and effect, or a replacement's `instead`. */
       part: 'effect' | 'instead';
       controller: PlayerId;
+      /** Instruction pointer into the compiled program (`effects/compile.ts`). */
       ip: number;
-      /** An optional auto ability asks first; false once accepted (or for mandatory ones). */
-      ask: boolean;
+      /** `ask`: an optional auto (or one with a cost) still asks whether to use it. */
+      stage: 'ask' | 'run';
+      /** A delayed body (`delayed`) runs from `ip` to its own `end` instruction. */
+      delayed?: true;
+      /** Bound selections (`bind`), by name. */
+      b?: Record<string, InstanceId[]>;
+      /** Labels of `may` steps that were accepted. */
+      did?: string[];
+      /** The answer to the decision this frame is waiting on. */
+      got?: Got;
+      /** Progress inside a multi-decision instruction, and its scratch data. */
+      ph?: number;
+      tmp?: Scratch;
+      /** Cards the controller is looking at (`lookAtTop`): visible to them only (CR 11-3-1). */
+      look?: InstanceId[];
+    }
+  | {
+      f: 'remove';
+      /** A card leaving the field by an effect other than K.O. (E-D3): replacements first. */
+      card: InstanceId;
+      dest: 'hand' | 'deck' | 'trash';
+      position?: 'top' | 'bottom';
+      cause: Cause;
+      considered: string[];
     }
   | { f: 'loop' };
 
+/** One candidate of a `choose` (or `order`) decision. */
+export type Choice = InstanceId | DonClass | { option: string };
+
+/** What an effect frame's pending decision returned. */
+export type Got = (InstanceId | DonClass | { option: string })[] | boolean | string;
+
+/** Per-instruction scratch data of an effect frame (plain JSON). */
+export interface Scratch {
+  /** Results of earlier selections in this instruction. */
+  sel?: InstanceId[];
+  /** `lookAtTop`: which `take` is next, and cards ordered so far. */
+  take?: number;
+  order?: InstanceId[];
+  top?: boolean;
+}
+
 /** An auto effect that has activated and waits to resolve (CR 8-6). */
 export interface PendingEffect {
+  /** Effects triggered by one event share a batch; a player orders their own within it. */
+  batch: number;
+  /** The controller already chose this one to resolve next (`order` decision). */
+  chosen?: true;
+  /** A delayed effect's body starts at this instruction. */
+  start?: number;
   card: InstanceId;
   /** The source's projection key when it triggered, for `EffectActivated` (M2-17). */
   key: string;
@@ -194,10 +258,22 @@ export interface DecisionState {
   min?: number;
   max?: number;
   /** `choose`: candidates in canonical order, and the picks made so far. */
-  candidates?: (InstanceId | DonClass)[];
-  picked?: (InstanceId | DonClass)[];
+  candidates?: Choice[];
+  picked?: Choice[];
   /** `optional`: the replacement on offer, if this is a replacement decision. */
   replacement?: ReplacementRef;
+  /** `choose` over DON!! classes: how many DON!! each candidate class still holds (E-D4). */
+  counts?: number[];
+  /** `choose` constraints across picks (OP17-118): a total-cost budget and distinct names. */
+  limits?: { total?: number; costs: number[]; names?: string[] };
+  /** `optional`: accepting is not possible (a cost that cannot be paid; the ask is still shown). */
+  noAccept?: true;
+  /** What the decision is for (public `Decision.purpose`). */
+  role?: DecisionPurpose;
+  /** The effect it belongs to (public `Decision.source`). */
+  source?: { card: InstanceId; cardId: CardId; ability: string; label?: string };
+  /** Named options: modes, top or bottom, the effects or cards to order. */
+  options?: { id: string; label: string }[];
   /**
    * The decision's options depend on cards hidden from the other player (a search of a secret
    * area, a cost paid from hand). An observing human must not learn anything from whether it
@@ -207,7 +283,7 @@ export interface DecisionState {
   /** The candidates are a whole zone whose size is public, so the count alone can force a pick. */
   publicCount?: boolean;
   /** Which frame or rule the decision serves, for prompts and `whyNot`. */
-  purpose?: 'characterLimit' | 'replacement' | 'ability';
+  purpose?: 'characterLimit' | 'replacement' | 'ability' | 'effect' | 'pending';
 }
 
 export interface Battle {
@@ -276,6 +352,24 @@ export interface State {
   setup: SetupFacts;
   /** Old id → new id for cards that became new objects in the last step (CR 3-1-6, ADR 0013). */
   renames: [InstanceId, InstanceId][];
+  /**
+   * Hidden cards each player knows (ARCHITECTURE §2.7 `known`): a revealed deck top, cards placed
+   * back after a look. Cleared for a card when it moves, and for a deck when it is shuffled.
+   */
+  known: Record<PlayerId, InstanceId[]>;
+  /** Delayed effects ("at the end of this turn, …", OP08-074). */
+  delayed: Delayed[];
+}
+
+export interface Delayed {
+  turn: number;
+  card: InstanceId;
+  key: string;
+  cardId: CardId;
+  ability: string;
+  controller: PlayerId;
+  /** First instruction of the delayed body in the ability's program. */
+  start: number;
 }
 
 export const other = (p: PlayerId): PlayerId => (p === 'p1' ? 'p2' : 'p1');

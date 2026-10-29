@@ -128,7 +128,7 @@ export function applyOp(state: GameState, op: TestOp): Step {
   }
   ruleProcessing(d);
   advance(d);
-  return { state: gs(d.s), events: d.events };
+  return { state: gs(d.finish()), events: d.events };
 }
 
 /** Internal state, for tests that check bookkeeping no public query exposes. */

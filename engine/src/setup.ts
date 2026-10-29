@@ -84,6 +84,8 @@ function baseState(seed: number, defs: DefTable): State {
       mulliganed: { p1: false, p2: false },
     },
     renames: [],
+    known: { p1: [], p2: [] },
+    delayed: [],
   };
 }
 
@@ -186,7 +188,7 @@ export function createGame(setup: GameSetup): Step {
   d.emit({ type: 'GameStarted', chooser });
   d.stack().push({ f: 'setup', step: 'chooseFirst' });
   advance(d);
-  return { state: d.s as never, events: d.events };
+  return { state: d.finish() as never, events: d.events };
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -332,5 +334,5 @@ export function createFromScenario(spec: ScenarioSpec): Step {
   advance(d);
   const errors = checkInvariants(d.s);
   if (errors.length) fail(errors.join('; '));
-  return { state: d.s as never, events: d.events };
+  return { state: d.finish() as never, events: d.events };
 }

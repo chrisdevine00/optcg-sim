@@ -1,26 +1,24 @@
 /**
- * The engine's hook-facing ability shape. It follows the field names of the DSL sketch
- * (effect-dsl.md §4.14: `kind`, `when`, `oncePerTurn`, `optional`, `replaces`, `instead`) so the M4
- * interpreter can slot in behind the same hooks. The DSL itself is **not** implemented here: until
- * M4, an ability's effect is a list of internal steps that call atomic operations directly, and
- * only tests create abilities (`engine/src/testing.ts`).
+ * The engine's ability shape: the DSL's (`@optcg/cards`, effect-dsl.md §4.14), widened in two ways
+ * that never appear in a card script:
+ * - two engine-only timing points (`startOfMainPhase`, `endOfBattle`) used by rule tests;
+ * - `InternalStep`, a test-only step that calls one atomic operation directly. M2 tests inject
+ *   these through `engine/src/testing.ts` to exercise the hooks without a script.
  */
+import type {
+  ActivateTiming,
+  AutoTiming as DslAutoTiming,
+  Condition,
+  Continuous,
+  Cost,
+  ReplaceEvent,
+  Step,
+} from '@optcg/cards';
 import type { InstanceId } from './api.ts';
 
-export type AutoTiming =
-  | 'startOfGame'
-  | 'startOfYourTurn'
-  | 'startOfMainPhase'
-  | 'onPlay'
-  | 'whenAttacking'
-  | 'onOpponentAttack'
-  | 'onBlock'
-  | 'endOfBattle'
-  | 'onKO'
-  | 'endOfYourTurn'
-  | 'endOfOpponentsTurn';
+export type AutoTiming = DslAutoTiming | 'startOfMainPhase' | 'endOfBattle';
 
-/** Internal effect steps (not the DSL). Each one calls an atomic operation. */
+/** Test-only steps (not the DSL). Each one calls an atomic operation. */
 export type InternalStep =
   | { op: 'emit'; label: string }
   | { op: 'draw'; n: number }
@@ -29,27 +27,38 @@ export type InternalStep =
   | { op: 'ko'; target: InstanceId }
   | { op: 'setActive'; target: 'self' };
 
-/** Which K.O. a replacement watches: a card of `owner` (relative to the ability's controller). */
-export interface KoMatch {
-  owner: 'you' | 'opponent' | 'any';
-  /** Exact card name (CR 2-1-2). */
-  name?: string;
-  /** Only this ability's own card. */
-  self?: boolean;
-}
+/** A step of an ability's effect: a DSL step, or (tests only) an internal step. */
+export type EStep = Step | InternalStep;
 
 interface Base {
   id: string;
+  label?: string;
   oncePerTurn?: true;
+  conditions?: Condition[];
 }
 
 export type Ability =
-  | (Base & { kind: 'auto'; when: AutoTiming[]; optional?: true; effect: InternalStep[] })
-  | (Base & { kind: 'activate'; when: 'activateMain' | 'main'; effect: InternalStep[] })
-  | (Base & { kind: 'trigger'; effect: InternalStep[] })
+  | (Base & { kind: 'auto'; when: AutoTiming[]; optional?: true; cost?: Cost[]; effect: EStep[] })
+  | (Base & {
+      kind: 'activate';
+      when: ActivateTiming | ActivateTiming[];
+      cost?: Cost[];
+      effect: EStep[];
+    })
+  | (Base & { kind: 'trigger'; cost?: Cost[]; effect: EStep[] })
+  | (Base & { kind: 'permanent'; zone?: 'field' | 'hand'; apply: Continuous[] })
   | (Base & {
       kind: 'replacement';
-      replaces: { ko: KoMatch };
+      replaces: ReplaceEvent;
       optional: boolean;
-      instead: InternalStep[];
+      instead: Cost[] | EStep[];
     });
+
+export const isInternal = (s: unknown): s is InternalStep =>
+  !!s && typeof s === 'object' && 'op' in s;
+
+/** Does an activate ability have this timing ([Main], [Counter], [Activate: Main])? */
+export function hasTiming(ab: Ability, t: ActivateTiming): boolean {
+  if (ab.kind !== 'activate') return false;
+  return Array.isArray(ab.when) ? ab.when.includes(t) : ab.when === t;
+}

@@ -3,9 +3,14 @@
  * the stack until some player owes a decision or the game is over. Every frame is plain data, so a
  * suspended choice is just a frame waiting for its next action.
  */
+import type { Cost, Selector } from '@optcg/cards';
+import { isEffect } from '@optcg/cards';
 import type { InstanceId, PlayerId } from './api.ts';
 import type { Ability, AutoTiming, InternalStep } from './abilities.ts';
+import { hasTiming, isInternal } from './abilities.ts';
 import { deriveLive } from './derive.ts';
+import { allHold, payable, pool, type Ctx } from './effects/eval.ts';
+import { answerEffect, pushEffect, runEffect } from './effects/run.ts';
 import type { Draft } from './draft.ts';
 import { OPENING_HAND } from './defs.ts';
 import { summaryHash } from './hash.ts';
@@ -14,17 +19,16 @@ import {
   endGame,
   expireModifiers,
   leaveField,
-  lifeToHand,
   markDamagedAtZero,
   moveCard,
   placeDon,
   returnGivenDon,
   ruleProcessing,
-  setActive,
   untapAll,
 } from './ops/index.ts';
 import {
   other,
+  type Cause,
   type DecisionState,
   type Frame,
   type Modifier,
@@ -111,6 +115,8 @@ function runFrame(d: Draft, f: Frame): void {
       return runTrigger(d, f);
     case 'effect':
       return runEffect(d, f);
+    case 'remove':
+      return runRemove(d, f);
     case 'loop':
       // Test-only mandatory loop: does nothing and stays on the stack forever.
       d.ops++;
@@ -243,6 +249,8 @@ function runTurn(d: Draft, f: Extract<Frame, { f: 'turn' }>): void {
       // 6-6-1-1: [End of Your Turn] (turn player) then [End of Your Opponent's Turn] (non-turn).
       f.step = 'endExpire';
       fireFor(d, [p], 'endOfYourTurn', (q) => fieldCards(d, q));
+      // "At the end of this turn, …" effects registered earlier (OP08-074).
+      fireDelayed(d);
       fireFor(d, [other(p)], 'endOfOpponentsTurn', (q) => fieldCards(d, q));
       return;
     case 'endExpire':
@@ -302,15 +310,18 @@ function runPlay(d: Draft, f: Extract<Frame, { f: 'play' }>): void {
       if (def.category === 'Event') {
         const cost = deriveLive(d.s, f.card).cost ?? 0;
         payCost(d, f.player, cost);
-        // CR 8-4-2: trash the Event, then carry out its effect.
+        // CR 8-4-2: trash the Event, then carry out its effect: [Main] in the Main Phase, [Counter]
+        // in the Counter Step (CR 7-1-3-1-2). Its activation costs are paid by the effect frame.
         const nid = moveCard(d, f.card, 'trash', { revealed: true, extra: { reason: 'event' } });
-        d.emit({ type: 'EventActivated', instance: nid, card: c.card, player: f.player });
+        const timing = f.counter ? 'counter' : 'main';
+        d.emit({ type: 'EventActivated', instance: nid, card: c.card, player: f.player, timing });
         pop(d);
-        const main = def.abilities.find((a) => a.kind === 'activate' && a.when === 'main');
-        if (main) pushEffect(d, nid, c.card, main, f.player, 'effect');
+        const ab = def.abilities.find((a) => hasTiming(a, timing));
+        if (ab) pushEffect(d, nid, c.card, ab, f.player, 'effect');
         return;
       }
-      payCost(d, f.player, deriveLive(d.s, f.card).cost ?? 0);
+      // A card played by an effect is played without paying its cost.
+      if (!f.free) payCost(d, f.player, deriveLive(d.s, f.card).cost ?? 0);
       if (def.category === 'Character' && ps.characters.length >= MAX_CHARACTERS) {
         // CR 3-7-6-1: trash 1 of your Characters, then play (rule processing, not a K.O.).
         f.step = 'make-room';
@@ -387,10 +398,20 @@ function runBattle(d: Draft): void {
   const defender = other(b.attackerOwner);
   switch (b.step) {
     case 'attack':
-      // CR 7-1-1-3, 10-2-16-1: [When Attacking] first, then [On Your Opponent's Attack].
+      // CR 7-1-1-3, 10-2-16-1: [When Attacking] and "when … attacks" first, then [On Your
+      // Opponent's Attack] and "when … is attacked" (QA-OP17 OP17-040: same timing).
       b.step = 'attackEnd';
-      fireFor(d, [b.attackerOwner], 'whenAttacking', () => [b.attacker]);
-      fireFor(d, [defender], 'onOpponentAttack', (q) => fieldCards(d, q));
+      fire(
+        d,
+        [b.attackerOwner, defender],
+        (q) => fieldCards(d, q),
+        (w, card, p) =>
+          p === b.attackerOwner
+            ? (w === 'whenAttacking' && card === b.attacker) ||
+              attackMatch(s, w, card, p, 'attacker')
+            : w === 'onOpponentAttack' || attackMatch(s, w, card, p, 'target'),
+        'attack',
+      );
       return;
     case 'attackEnd':
       // CR 7-1-1-4.
@@ -555,6 +576,7 @@ function runTrigger(d: Draft, f: Extract<Frame, { f: 'trigger' }>): void {
     // Run the [Trigger] effect; the printed cost is never paid (RL-25).
     f.step = 'finish';
     const ab = c && d.s.defs[c.card]!.abilities.find((a) => a.kind === 'trigger');
+    // Its own activation cost, if any, is paid by the effect frame (OP17-076).
     if (c && ab) pushEffect(d, f.card, c.card, ab, f.player, 'effect');
     return;
   }
@@ -564,7 +586,7 @@ function runTrigger(d: Draft, f: Extract<Frame, { f: 'trigger' }>): void {
 }
 
 // ---------------------------------------------------------------------------------------------
-// K.O. with replacement hooks (CR 8-1-3-4, 10-2-1; ADR 0013)
+// K.O. and removal with replacement hooks (CR 8-1-3-4, 10-2-1; ADR 0013; E-D3)
 // ---------------------------------------------------------------------------------------------
 
 /** Push a K.O. of a Character by battle or effect. */
@@ -576,92 +598,154 @@ export function pushKo(
   push(d, { f: 'ko', card, cause, considered: [] });
 }
 
+/** Push a removal from the field by an effect: to hand, to deck, or trashed (not a K.O.). */
+export function pushRemove(
+  d: Draft,
+  card: InstanceId,
+  dest: 'hand' | 'deck' | 'trash',
+  cause: Cause,
+  position?: 'top' | 'bottom',
+): void {
+  const f: Frame = { f: 'remove', card, dest, cause, considered: [] };
+  if (position) f.position = position;
+  push(d, f);
+}
+
+/** Offer the next applicable replacement for the event on top of the stack, if any. */
+function offerReplacement(
+  d: Draft,
+  f: Extract<Frame, { f: 'ko' | 'remove' }>,
+  event: 'ko' | 'remove',
+): boolean {
+  const reps = collectReplacements(d.s, f.card, event, f.cause, f.considered);
+  const r = reps[0];
+  if (!r) return false;
+  f.considered = [...f.considered, `${r.card}/${r.ability}`];
+  const ab = abilityOf(d.s, d.card(r.card).card, r.ability);
+  if (ab?.kind === 'replacement' && ab.optional) {
+    const target = d.s.defs[d.card(f.card).card]!.name;
+    ask(d, {
+      kind: 'optional',
+      player: r.controller,
+      prompt: `Use ${d.s.defs[d.card(r.card).card]!.name}'s effect instead of ${event === 'ko' ? 'the K.O. of' : 'removing'} ${target}?`,
+      replacement: r,
+      purpose: 'replacement',
+      role: 'replacement',
+      source: sourceInfo(d.s, r.card, d.card(r.card).card, r.ability, ab.label),
+    });
+    return true;
+  }
+  applyReplacement(d, r);
+  return true;
+}
+
 function runKo(d: Draft, f: Extract<Frame, { f: 'ko' }>): void {
   const c = d.s.cards[f.card];
   if (!c || c.zone !== 'characters') {
     pop(d); // it already left; nothing to K.O.
     return;
   }
-  if (deriveLive(d.s, f.card).cannotBeKOd) {
+  const dv = deriveLive(d.s, f.card);
+  if (dv.cannotBeKOd) {
     d.emit({ type: 'KOPrevented', instance: f.card, card: c.card });
     pop(d);
     return;
   }
-  const reps = collectKoReplacements(d.s, f.card, f.considered);
-  const r = reps[0];
-  if (r) {
-    f.considered = [...f.considered, `${r.card}/${r.ability}`];
-    const ab = abilityOf(d.s, d.card(r.card).card, r.ability);
-    if (ab?.kind === 'replacement' && ab.optional) {
-      ask(d, {
-        kind: 'optional',
-        player: r.controller,
-        prompt: `Use ${d.s.defs[d.card(r.card).card]!.name}'s effect instead of the K.O. of ${d.s.defs[c.card]!.name}?`,
-        replacement: r,
-        purpose: 'replacement',
-      });
-      return;
-    }
-    applyReplacement(d, r);
-    return;
-  }
+  if (offerReplacement(d, f, 'ko')) return;
   // No replacement: the K.O. happens (to its owner's trash, CR 10-2-1-2).
   const owner = c.owner;
   d.emit({ type: 'KO', instance: f.card, card: c.card, owner, cause: f.cause });
   const nid = leaveField(d, f.card, 'trash', f.cause);
   pop(d);
-  // [On K.O.] resolves from the trash, following the rename (CR 10-2-17-2).
-  fireFor(d, [owner], 'onKO', () => [nid]);
+  // [On K.O.] activates on the field and resolves from the trash, following the rename
+  // (CR 10-2-17-1/-2). A negated card's [On K.O.] does not activate (CR 8-2-1-1; E-Q1).
+  if (!dv.negated)
+    fire(
+      d,
+      [owner],
+      () => [nid],
+      (w) => w === 'onKO',
+      'onKO',
+    );
+}
+
+function runRemove(d: Draft, f: Extract<Frame, { f: 'remove' }>): void {
+  const c = d.s.cards[f.card];
+  if (!c || (c.zone !== 'characters' && c.zone !== 'stage')) {
+    pop(d);
+    return;
+  }
+  if (offerReplacement(d, f, 'remove')) return;
+  leaveField(d, f.card, f.dest, f.cause, f.position ? { position: f.position } : {});
+  pop(d);
 }
 
 /**
- * Replacements that apply to the K.O. of `card`, in CR 8-1-3-4-2 order: the K.O.'d card's own
- * first, then the turn player's, then the non-turn player's. Skips spent Once Per Turn, ones already
- * applied to this event (CR 8-1-3-4-3) and impossible ones (CR 8-1-3-4-5).
+ * Replacements that apply to the K.O. (`ko`) or other removal (`remove`) of `card`, in
+ * CR 8-1-3-4-2 order: the card's own first, then the turn player's, then the non-turn player's.
+ * Skips negated sources, spent Once Per Turn, ones already applied to this event (CR 8-1-3-4-3)
+ * and impossible ones (CR 8-1-3-4-5). A `leaveField` replacement watches removal by the opponent's
+ * effect, which includes a K.O. by an opponent's effect but never a battle K.O. (E-D3, E-Q7).
  */
-export function collectKoReplacements(
+export function collectReplacements(
   s: State,
   card: InstanceId,
+  event: 'ko' | 'remove',
+  cause: Cause,
   considered: string[],
 ): ReplacementRef[] {
   const target = s.cards[card]!;
-  const tdef = s.defs[target.card]!;
   const out: (ReplacementRef & { rank: number })[] = [];
   for (const p of [s.active, other(s.active)]) {
     const ps = s.players[p];
     for (const id of [ps.leader, ...ps.characters, ...ps.stage]) {
       const def = s.defs[s.cards[id]!.card]!;
+      if (!def.abilities.some((a) => a.kind === 'replacement')) continue;
+      if (deriveLive(s, id).negated) continue;
+      const c: Ctx = { s, you: p, self: id, live: true };
       for (const ab of def.abilities) {
         if (ab.kind !== 'replacement') continue;
         const key = `${id}/${ab.id}`;
         if (considered.includes(key)) continue;
         if (ab.oncePerTurn && s.oncePerTurn.includes(key)) continue;
-        const m = ab.replaces.ko;
-        if (m.self && id !== card) continue;
-        if (m.owner === 'you' && target.owner !== p) continue;
-        if (m.owner === 'opponent' && target.owner === p) continue;
-        if (m.name !== undefined && tdef.name !== m.name) continue;
-        if (!possible(s, p, ab.instead)) continue;
+        const rp = ab.replaces;
+        let sel: Selector;
+        if ('ko' in rp) {
+          if (event !== 'ko') continue;
+          sel = rp.ko;
+        } else {
+          // "removed from the field by your opponent's effect".
+          if (cause.kind !== 'effect' || cause.by === p) continue;
+          sel = rp.leaveField;
+        }
+        if (!pool(c, sel).includes(card)) continue;
+        if (!allHold(c, ab.conditions)) continue;
+        if (!possible(c, ab.instead)) continue;
         const rank = id === card ? 0 : p === s.active ? 1 : 2;
         out.push({ card: id, ability: ab.id, controller: p, rank });
       }
     }
   }
+  void target;
   out.sort((a, b) => a.rank - b.rank);
   return out.map(({ rank: _r, ...r }) => r);
 }
 
-/** An impossible replacement cannot be applied (CR 8-1-3-4-5), e.g. Life to hand at 0 Life. */
-function possible(s: State, p: PlayerId, steps: InternalStep[]): boolean {
-  for (const st of steps) {
-    if (st.op === 'lifeToHand' && s.players[p].life.length < st.n) return false;
+/** An impossible replacement cannot be applied (CR 8-1-3-4-5): its payload must be payable. */
+function possible(c: Ctx, instead: readonly unknown[]): boolean {
+  if (instead.some(isInternal)) {
+    for (const st of instead as InternalStep[]) {
+      if (st.op === 'lifeToHand' && c.s.players[c.you].life.length < st.n) return false;
+    }
+    return true;
   }
-  return true;
+  if (isEffect(instead)) return true;
+  return payable(c, instead as Cost[]);
 }
 
 export function applyReplacement(d: Draft, r: ReplacementRef): void {
   const f = top(d);
-  if (!f || f.f !== 'ko') throw new Error('No K.O. to replace');
+  if (!f || (f.f !== 'ko' && f.f !== 'remove')) throw new Error('No K.O. or removal to replace');
   const c = d.card(r.card);
   const ab = abilityOf(d.s, c.card, r.ability)!;
   if (ab.oncePerTurn) d.opt().push(`${r.card}/${r.ability}`);
@@ -670,16 +754,16 @@ export function applyReplacement(d: Draft, r: ReplacementRef): void {
     instance: r.card,
     card: c.card,
     ability: r.ability,
-    replaced: 'ko',
+    replaced: f.f === 'ko' ? 'ko' : 'remove',
     target: f.card,
     controller: r.controller,
   });
-  pop(d); // the K.O. does not happen
+  pop(d); // the K.O. or removal does not happen
   pushEffect(d, r.card, c.card, ab, r.controller, 'instead');
 }
 
 // ---------------------------------------------------------------------------------------------
-// Ability hooks (placeholder runner until the M4 DSL interpreter)
+// Auto effects: activation and the pending queue (CR 8-1-3-1, 8-6)
 // ---------------------------------------------------------------------------------------------
 
 export function fieldCards(d: Draft, p: PlayerId): InstanceId[] {
@@ -687,31 +771,43 @@ export function fieldCards(d: Draft, p: PlayerId): InstanceId[] {
   return [ps.leader, ...ps.characters, ...ps.stage];
 }
 
+type TimingMatch = (when: AutoTiming, card: InstanceId, controller: PlayerId) => boolean;
+
 /**
- * Activate every auto ability with `timing` on the given cards: they join the pending queue in
- * `order` (players listed in resolution order; pass the turn player first, CR 8-6-1).
+ * Activate every auto ability on the given cards whose timing matches: they join the pending queue
+ * as one batch, players in `order` (pass the turn player first, CR 8-6-1). An ability whose
+ * conditions fail at the event does not activate (CR 8-3-2-3), nor one on a negated card (8-2-1-1),
+ * nor a spent [Once Per Turn] (CR 10-2-13-3).
  */
-export function fireFor(
+export function fire(
   d: Draft,
   order: PlayerId[],
-  timing: AutoTiming,
   cardsOf: (p: PlayerId) => InstanceId[],
+  match: TimingMatch,
+  label: string,
 ): void {
   let added: State['pending'] | null = null;
+  let batch = -1;
   for (const p of order) {
     for (const id of cardsOf(p)) {
       const c = d.s.cards[id];
       if (!c) continue;
-      for (const ab of d.s.defs[c.card]!.abilities) {
-        if (ab.kind !== 'auto' || !ab.when.includes(timing)) continue;
+      const abilities = d.s.defs[c.card]!.abilities;
+      if (!abilities.some((a) => a.kind === 'auto')) continue;
+      if (c.zone !== 'trash' && deriveLive(d.s, id).negated) continue;
+      for (const ab of abilities) {
+        if (ab.kind !== 'auto' || !ab.when.some((w) => match(w, id, p))) continue;
         if (ab.oncePerTurn && d.s.oncePerTurn.includes(`${id}/${ab.id}`)) continue;
+        if (!allHold({ s: d.s, you: p, self: id, live: true }, ab.conditions)) continue;
+        if (batch < 0) batch = d.s.nextMod++;
         (added ??= []).push({
+          batch,
           card: id,
           key: c.key,
           cardId: c.card,
           ability: ab.id,
           controller: p,
-          timing,
+          timing: label,
         });
       }
     }
@@ -719,18 +815,127 @@ export function fireFor(
   if (added) d.s.pending = [...d.s.pending, ...added];
 }
 
+/** Named-timing shorthand (CR 10-2). */
+export function fireFor(
+  d: Draft,
+  order: PlayerId[],
+  timing: AutoTiming,
+  cardsOf: (p: PlayerId) => InstanceId[],
+): void {
+  fire(d, order, cardsOf, (w) => w === timing, typeof timing === 'string' ? timing : 'event');
+}
+
+/** An event-triggered auto on `p`'s field ("When a DON!! card on your field is returned …"). */
+export function fireEvent(
+  d: Draft,
+  p: PlayerId,
+  match: (w: AutoTiming) => boolean,
+  label: string,
+): void {
+  fire(
+    d,
+    [p],
+    (q) => fieldCards(d, q),
+    (w) => match(w),
+    label,
+  );
+}
+
+/** Does the battle's attacker (or target) match an `attack` event's selector for `p`? */
+export function attackMatch(
+  s: State,
+  w: AutoTiming,
+  card: InstanceId,
+  p: PlayerId,
+  side: 'attacker' | 'target',
+): boolean {
+  if (typeof w !== 'object' || w.event !== 'attack' || !s.battle) return false;
+  const sel = side === 'attacker' ? w.attacker : w.target;
+  if (!sel) return false;
+  const subject = side === 'attacker' ? s.battle.attacker : s.battle.target;
+  return pool({ s, you: p, self: card, live: true }, sel).includes(subject);
+}
+
+/** A delayed effect's registration point: "at the end of this turn" (CR 6-6-1-1). */
+function fireDelayed(d: Draft): void {
+  const now = d.s.delayed.filter((x) => x.turn === d.s.turn);
+  if (now.length === 0) return;
+  d.s.delayed = d.s.delayed.filter((x) => x.turn !== d.s.turn);
+  const batch = d.s.nextMod++;
+  const ordered = [
+    ...now.filter((x) => x.controller === d.s.active),
+    ...now.filter((x) => x.controller !== d.s.active),
+  ];
+  d.s.pending = [
+    ...d.s.pending,
+    ...ordered.map((x) => ({
+      batch,
+      card: x.card,
+      key: x.key,
+      cardId: x.cardId,
+      ability: x.ability,
+      controller: x.controller,
+      timing: 'endOfThisTurn',
+      start: x.start,
+    })),
+  ];
+}
+
+/** The pending effects a player must order now: the head batch's run for one controller. */
+export function orderGroup(s: State): State['pending'] {
+  const h = s.pending[0];
+  if (!h) return [];
+  const out: State['pending'] = [];
+  for (const e of s.pending) {
+    if (e.batch !== h.batch || e.controller !== h.controller) break;
+    out.push(e);
+  }
+  return out;
+}
+
+export const pendingKey = (e: { card: InstanceId; ability: string }): string =>
+  `${e.card}#${e.ability}`;
+
 /**
  * Resolve the next pending auto effect, if the game is at a point where effects may resolve:
- * no activation, damage processing, K.O. or play is in progress (CR 8.6.3, 8-6-2).
+ * no activation, damage processing, K.O. or play is in progress (CR 8.6.3, 8-6-2). When a player
+ * has two or more effects from one event waiting, they choose which resolves first (an `order`
+ * decision; Rule Manual "Effect Activation Order", CR 8-6-1-1).
  */
 function drainPending(d: Draft): boolean {
   if (d.s.pending.length === 0) return false;
   const f = top(d);
   if (!f || (f.f !== 'turn' && f.f !== 'battle' && f.f !== 'setup')) return false;
+  const group = orderGroup(d.s);
+  if (group.length >= 2 && !group[0]!.chosen) {
+    const p = group[0]!.controller;
+    ask(d, {
+      kind: 'order',
+      player: p,
+      prompt: 'Several of your effects activated at once. Choose the one to resolve first.',
+      candidates: group.map(pendingKey),
+      purpose: 'pending',
+      role: 'order',
+      options: group.map((e) => ({
+        id: pendingKey(e),
+        label: `${d.s.defs[e.cardId]?.name ?? e.cardId}: ${abilityOf(d.s, e.cardId, e.ability)?.label ?? e.timing}`,
+      })),
+    });
+    return true;
+  }
   const [next, ...rest] = d.s.pending;
   d.s.pending = rest;
   const ab = abilityOf(d.s, next!.cardId, next!.ability);
   if (!ab) return true;
+  // An effect whose source is negated before it resolves does nothing (CR 8-2-1-1).
+  const src = d.s.cards[next!.card];
+  if (
+    src &&
+    src.zone !== 'trash' &&
+    src.zone !== 'resolving' &&
+    deriveLive(d.s, next!.card).negated
+  )
+    return true;
   d.emit({
     type: 'EffectActivated',
     instance: next!.card,
@@ -739,103 +944,41 @@ function drainPending(d: Draft): boolean {
     timing: next!.timing,
     keys: { instance: next!.key },
   });
-  pushEffect(d, next!.card, next!.cardId, ab, next!.controller, 'effect');
+  const opts: { start?: number; delayed?: boolean } = {};
+  if (next!.start !== undefined) {
+    opts.start = next!.start;
+    opts.delayed = true;
+  }
+  pushEffect(d, next!.card, next!.cardId, ab, next!.controller, 'effect', opts);
   return true;
 }
 
-export function pushEffect(
-  d: Draft,
+/** The `order` answer for pending effects: that one resolves next. */
+export function choosePending(d: Draft, first: string): void {
+  const i = d.s.pending.findIndex((e) => pendingKey(e) === first);
+  if (i < 0) throw new Error('No such pending effect');
+  const e = { ...d.s.pending[i]!, chosen: true as const };
+  d.s.pending = [e, ...d.s.pending.filter((_, j) => j !== i)];
+}
+
+/** Who and what a decision belongs to (public `Decision.source`). */
+export function sourceInfo(
+  s: State,
   card: InstanceId,
   cardId: string,
-  ab: Ability,
-  controller: PlayerId,
-  part: 'effect' | 'instead',
-): void {
-  push(d, {
-    f: 'effect',
-    card,
-    cardId,
-    ability: ab.id,
-    part,
-    controller,
-    ip: 0,
-    ask: ab.kind === 'auto' && ab.optional === true,
-  });
+  ability: string,
+  label?: string,
+): NonNullable<DecisionState['source']> {
+  const out: NonNullable<DecisionState['source']> = { card, cardId, ability };
+  if (label) out.label = label;
+  return out;
 }
 
-function runEffect(d: Draft, f: Extract<Frame, { f: 'effect' }>): void {
-  const ab = abilityOf(d.s, f.cardId, f.ability);
-  if (!ab) {
-    pop(d);
-    return;
-  }
-  if (f.ask) {
-    ask(d, {
-      kind: 'optional',
-      player: f.controller,
-      prompt: `Use the effect of ${d.s.defs[f.cardId]!.name}?`,
-      purpose: 'ability',
-    });
-    return;
-  }
-  const steps: InternalStep[] =
-    f.part === 'instead' && ab.kind === 'replacement'
-      ? ab.instead
-      : ab.kind !== 'replacement'
-        ? ab.effect
-        : [];
-  if (f.ip === 0 && ab.oncePerTurn && ab.kind !== 'replacement') {
-    const key = `${f.card}/${ab.id}`;
-    if (!d.s.oncePerTurn.includes(key)) d.opt().push(key);
-  }
-  const st = steps[f.ip];
-  if (!st) {
-    pop(d);
-    return;
-  }
-  f.ip += 1;
-  runStep(d, f.card, f.controller, st);
-}
+export { runEffect, runRemove };
 
-function runStep(d: Draft, self: InstanceId, you: PlayerId, st: InternalStep): void {
-  d.ops++;
-  switch (st.op) {
-    case 'emit':
-      d.emit({ type: 'EffectResolved', label: st.label, instance: self, player: you });
-      return;
-    case 'draw':
-      draw(d, you, st.n);
-      return;
-    case 'lifeToHand':
-      lifeToHand(d, you, st.n);
-      return;
-    case 'damage': {
-      const p = st.player === 'you' ? you : other(you);
-      d.emit({ type: 'DamageDealt', player: p, amount: st.n, by: you, effect: true });
-      push(d, {
-        f: 'damage',
-        player: p,
-        remaining: st.n,
-        banish: false,
-        battle: false,
-        by: you,
-        pending: null,
-      });
-      return;
-    }
-    case 'ko':
-      pushKo(d, st.target, { kind: 'effect', by: you });
-      return;
-    case 'setActive':
-      if (d.s.cards[self]) setActive(d, self);
-      return;
-  }
-}
-
-/** Answer to an `optional` decision for an optional auto ability. */
+/** Answer to an `optional` decision for an optional auto ability (legacy path). */
 export function answerAbilityOptional(d: Draft, accept: boolean): void {
-  const f = top(d);
-  if (!f || f.f !== 'effect' || !f.ask) throw new Error('No optional ability is pending');
-  if (accept) f.ask = false;
-  else pop(d);
+  answerEffect(d, accept);
 }
+
+export { fireDelayed };

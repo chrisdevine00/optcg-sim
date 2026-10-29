@@ -6,6 +6,7 @@ import {
   checkInvariants,
   createFromScenario,
   ENGINE_VERSION,
+  SCRIPTS_VERSION,
   legalActions,
   reduce,
   replay,
@@ -64,7 +65,7 @@ describe('replay', () => {
     };
     let state = createFromScenario({ ...spec, cards: cards() }).state;
     const record: GameRecord = {
-      versions: { engine: ENGINE_VERSION, cards: cardsVersionOf(state), scripts: 'none' },
+      versions: { engine: ENGINE_VERSION, cards: cardsVersionOf(state), scripts: SCRIPTS_VERSION },
       start: { scenario: spec },
       actions: [],
     };

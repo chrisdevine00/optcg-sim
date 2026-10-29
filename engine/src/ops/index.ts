@@ -108,6 +108,7 @@ export function moveCard(d: Draft, id: InstanceId, to: Zone, opts: MoveOptions =
   }
 
   const oldKey = c.key;
+  forget(d, id);
   const nid = leavesField ? d.rekey(id) : id;
 
   const w = d.wcard(nid);
@@ -148,6 +149,21 @@ export function moveCard(d: Draft, id: InstanceId, to: Zone, opts: MoveOptions =
   d.emit(e);
   if (from === 'deck') touchDeck(d, owner);
   return nid;
+}
+
+/** A moved card is no longer known to anyone in its new place (ARCHITECTURE §2.7). */
+function forget(d: Draft, id: InstanceId): void {
+  const k = d.s.known;
+  if (!k.p1.includes(id) && !k.p2.includes(id)) return;
+  d.s.known = { p1: k.p1.filter((x) => x !== id), p2: k.p2.filter((x) => x !== id) };
+}
+
+/** These players now know these hidden cards where they are (a reveal, a look put back). */
+export function markKnown(d: Draft, ids: InstanceId | InstanceId[], players: PlayerId[]): void {
+  const list = Array.isArray(ids) ? ids : [ids];
+  const k = { ...d.s.known };
+  for (const p of players) k[p] = [...k[p].filter((x) => !list.includes(x)), ...list];
+  d.s.known = k;
 }
 
 /** Every way a card leaves the field goes through here (E-D3), with its cause. */
@@ -195,6 +211,13 @@ export function shuffleDeck(d: Draft, p: PlayerId): void {
   d.setRng(rng);
   ps.deck = order;
   for (const id of order) d.wcard(id).key = d.newKey();
+  // Shuffling ends every player's knowledge of that deck (ARCHITECTURE §2.7).
+  const k = d.s.known;
+  if (k.p1.length || k.p2.length)
+    d.s.known = {
+      p1: k.p1.filter((x) => !order.includes(x)),
+      p2: k.p2.filter((x) => !order.includes(x)),
+    };
   d.emit({ type: 'Shuffled', player: p, zone: 'deck' });
 }
 

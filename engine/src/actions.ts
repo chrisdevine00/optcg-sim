@@ -5,8 +5,11 @@
  * enumeration in `legalActions` produces exactly the intents `check` accepts; a property test holds
  * the two together. `reduce` validates with `check`, so it never has to enumerate.
  */
-import type { Action, DonClass, InstanceId, Intent, PlayerId, Reason } from './api.ts';
+import type { Action, InstanceId, Intent, OptionChoice, PlayerId, Reason } from './api.ts';
+import { hasTiming, type Ability } from './abilities.ts';
 import { derive } from './derive.ts';
+import { attackLock, counterOf, payable, type Ctx } from './effects/eval.ts';
+import { answerEffect, pushEffect } from './effects/run.ts';
 import type { Draft } from './draft.ts';
 import { OPENING_HAND } from './defs.ts';
 import {
@@ -17,14 +20,14 @@ import {
   beginEndPhase,
   fireFor,
   hasScriptedTrigger,
+  choosePending,
   makeRoom,
   pendingLife,
   push,
-  pushEffect,
   top,
 } from './flow.ts';
 import { addModifier, draw, endGame, giveDon, moveCard, rest, shuffleDeck } from './ops/index.ts';
-import { other, type State } from './state.ts';
+import { other, type Choice, type State } from './state.ts';
 
 const r = (text: string, rule?: string): Reason => (rule ? { text, rule } : { text });
 
@@ -42,8 +45,17 @@ function firstTurnOf(s: State): boolean {
   return s.turn <= 2;
 }
 
-function eventMain(s: State, cardId: string) {
-  return s.defs[cardId]!.abilities.find((a) => a.kind === 'activate' && a.when === 'main');
+function eventAbility(s: State, cardId: string, t: 'main' | 'counter'): Ability | undefined {
+  return s.defs[cardId]!.abilities.find((a) => hasTiming(a, t));
+}
+
+const ctx = (s: State, p: PlayerId, self: InstanceId): Ctx => ({ s, you: p, self });
+
+/** Can `p` activate this Event's [Main] or [Counter] from hand: its cost plus its activation costs? */
+function eventPayable(s: State, p: PlayerId, card: InstanceId, ab: Ability): boolean {
+  const cost = derive(s, card).cost ?? 0;
+  const costs = ab.kind === 'activate' ? ab.cost : undefined;
+  return payable(ctx(s, p, card), costs, { playCost: cost, exclude: card });
 }
 
 function sick(s: State, id: InstanceId): boolean {
@@ -114,7 +126,8 @@ export function check(s: State, player: PlayerId, a: Intent | null): Reason | nu
     order: 'order',
     concede: '',
   };
-  if (kindOf[a.type] !== dec.kind) return wrongWindow(a.type);
+  if (kindOf[a.type] !== dec.kind && !(a.type === 'activate' && dec.kind === 'counter'))
+    return wrongWindow(a.type);
   const ps = s.players[player];
   switch (a.type) {
     case 'chooseFirst':
@@ -128,13 +141,16 @@ export function check(s: State, player: PlayerId, a: Intent | null): Reason | nu
       if (!c || c.owner !== player || c.zone !== 'hand')
         return r('You can only play cards from your hand.', 'CR 6-5-3-1');
       const def = s.defs[c.card]!;
-      if (def.category === 'Event' && !eventMain(s, c.card))
+      const main = def.category === 'Event' ? eventAbility(s, c.card, 'main') : undefined;
+      if (def.category === 'Event' && !main)
         return r(
           def.abilities.length === 0
             ? "This card's effect is not automated yet."
             : 'This Event has no [Main] effect to activate in your Main Phase.',
           def.abilities.length === 0 ? 'effect-dsl E-D8' : 'CR 6-5-3-1',
         );
+      if (main && !eventPayable(s, player, a.card, main))
+        return r("You can't pay this Event's cost and activation cost together.", 'CR 8-3-1-3');
       const cost = derive(s, a.card).cost ?? 0;
       if (cost > ps.donActive)
         return r(
@@ -151,13 +167,28 @@ export function check(s: State, player: PlayerId, a: Intent | null): Reason | nu
       return null;
     case 'activate': {
       const c = s.cards[a.card];
+      if (dec.kind === 'counter') {
+        // An Event's [Counter] in the Counter Step (CR 7-1-3-1-2): costs are paid at activation;
+        // its targets are chosen while it resolves (CR 8-4-4).
+        if (!c || c.owner !== player || c.zone !== 'hand')
+          return r('Counters are used from your hand.', 'CR 7-1-3-1-1');
+        const ab = s.defs[c.card]!.abilities.find((x) => x.id === a.ability);
+        if (!ab || !hasTiming(ab, 'counter'))
+          return r("This card's [Counter] effect is not automated yet.", 'effect-dsl E-D8');
+        if (!eventPayable(s, player, a.card, ab))
+          return r("You can't pay this Event's cost and activation cost together.", 'CR 8-3-1-3');
+        return null;
+      }
       if (!c || c.owner !== player || !['leader', 'characters', 'stage'].includes(c.zone))
         return r('Only cards on your field have [Activate: Main] effects.', 'CR 10-2-2-1');
       const ab = s.defs[c.card]!.abilities.find((x) => x.id === a.ability);
-      if (!ab || ab.kind !== 'activate' || ab.when !== 'activateMain')
+      if (!ab || !hasTiming(ab, 'activateMain'))
         return r("This card's effect is not automated yet.", 'effect-dsl E-D8');
+      if (derive(s, a.card).negated) return r("This card's effects are negated.", 'CR 8-2-1-1');
       if (ab.oncePerTurn && s.oncePerTurn.includes(`${a.card}/${ab.id}`))
         return r('[Once Per Turn]: already used this turn.', 'CR 10-2-13-1');
+      if (ab.kind === 'activate' && !payable(ctx(s, player, a.card), ab.cost))
+        return r("You can't pay this effect's cost.", 'CR 8-3-1-3');
       return null;
     }
     case 'attack':
@@ -184,10 +215,12 @@ export function check(s: State, player: PlayerId, a: Intent | null): Reason | nu
       const def = s.defs[c.card]!;
       if (def.category === 'Event')
         return r(
-          "This card's [Counter] effect is not automated yet.",
+          eventAbility(s, c.card, 'counter')
+            ? "Activate this Event's [Counter] effect instead; it chooses its targets as it resolves."
+            : "This card's [Counter] effect is not automated yet.",
           'CR 7-1-3-1-2, effect-dsl E-D8',
         );
-      if (def.category !== 'Character' || !def.counter)
+      if (def.category !== 'Character' || !counterOf(s, a.card))
         return r('This card has no Counter value.', 'CR 7-1-3-1-1');
       if (!isOwnLeaderOrCharacter(s, player, a.target))
         return r('A Counter gives power to your Leader or one of your Characters.', 'CR 7-1-3-1-1');
@@ -205,10 +238,13 @@ export function check(s: State, player: PlayerId, a: Intent | null): Reason | nu
             : 'This card has no [Trigger].',
           'CR 10-1-5-1',
         );
+      if (a.activate && card !== null && !triggerPayable(s, player, card))
+        return r("You can't pay this [Trigger]'s cost.", 'CR 8-3-1-3');
       return null;
     }
     case 'optional':
-      return typeof a.accept === 'boolean' ? null : r('Yes or no.');
+      if (a.accept && dec.noAccept) return r("You can't pay this effect's cost now.", 'CR 8-3-1-3');
+      return null;
     case 'pick':
       return checkPick(s, a.choice);
     case 'done': {
@@ -218,7 +254,9 @@ export function check(s: State, player: PlayerId, a: Intent | null): Reason | nu
       return null;
     }
     case 'order':
-      return r('There is nothing to order.');
+      return (dec.candidates ?? []).includes(a.first)
+        ? null
+        : r('That is not one of the things to order.');
   }
 }
 
@@ -251,7 +289,9 @@ function checkAttack(
   if (!a || !isOwnLeaderOrCharacter(s, p, attacker))
     return r('Only your Leader or one of your Characters can attack.', 'CR 7-1-1-1');
   if (a.rested) return r('Rested cards cannot attack.', 'CR 7-1-1-1');
-  const kw = derive(s, attacker).keywords;
+  const dv = derive(s, attacker);
+  if (dv.cannotAttack) return r('An effect says this card cannot attack.', 'CR 1-3-3');
+  const kw = dv.keywords;
   const isSick = sick(s, attacker);
   if (isSick && !kw.includes('Rush') && !kw.includes('Rush: Character'))
     return r("A Character can't attack on the turn it is played.", 'CR 3-7-4');
@@ -265,32 +305,64 @@ function checkAttack(
       '[Rush: Character] can attack only Characters on the turn it is played.',
       'CR 10-1-6-1',
     );
+  const lock = attackLock(s, p);
+  if (lock && !lock.includes(target))
+    return r(
+      `An effect lets you attack only ${[...new Set(lock.map((id) => s.defs[s.cards[id]!.card]!.name))].join(' or ') || 'nothing'} right now.`,
+      'OP17-044',
+    );
   return null;
 }
 
-function donKey(x: InstanceId | DonClass): string {
-  return typeof x === 'string' ? x : x.from === 'given' ? `given:${x.card}` : x.from;
+function triggerPayable(s: State, p: PlayerId, card: InstanceId): boolean {
+  const ab = s.defs[s.cards[card]!.card]!.abilities.find((x) => x.kind === 'trigger');
+  return !!ab && ab.kind === 'trigger' && payable(ctx(s, p, card), ab.cost);
 }
 
-function checkPick(s: State, choice: InstanceId | DonClass): Reason | null {
+function choiceKey(x: Choice): string {
+  if (typeof x === 'string') return x;
+  if ('option' in x) return `option:${x.option}`;
+  return x.from === 'given' ? `given:${x.card}` : x.from;
+}
+
+function checkPick(s: State, choice: Choice): Reason | null {
   const dec = s.decision!;
-  if (
-    typeof choice !== 'string' &&
-    (choice === null || typeof choice !== 'object' || !('from' in choice))
-  )
-    return r('That card cannot be chosen here.');
+  const okShape =
+    typeof choice === 'string' ||
+    (choice !== null &&
+      typeof choice === 'object' &&
+      (('from' in choice && typeof choice.from === 'string') ||
+        ('option' in choice && typeof (choice as OptionChoice).option === 'string')));
+  if (!okShape) return r('That card cannot be chosen here.');
   const cands = dec.candidates ?? [];
   const picked = dec.picked ?? [];
-  const key = donKey(choice);
-  const i = cands.findIndex((c) => donKey(c) === key);
+  const keys = cands.map(choiceKey);
+  const key = choiceKey(choice);
+  const i = keys.indexOf(key);
   if (i < 0) return r('That card cannot be chosen here.');
-  // Canonical order: picks of an unordered set go in candidate order (ADR 0003).
-  const last = picked.length ? cands.findIndex((c) => donKey(c) === donKey(picked.at(-1)!)) : -1;
-  if (i <= last) return r('Choose cards in the listed order (they are an unordered set).');
+  const idx = picked.map((x) => keys.indexOf(choiceKey(x)));
+  const pickedOf = (j: number): number => idx.filter((x) => x === j).length;
+  const counts = dec.counts;
+  // Canonical order: picks of an unordered set go in candidate order (ADR 0003). A DON!! class
+  // may be picked again while it still holds DON!! (E-D4).
+  const last = idx.length ? idx[idx.length - 1]! : -1;
+  if (i < last || (i === last && (!counts || pickedOf(i) >= counts[i]!)))
+    return r('Choose cards in the listed order (they are an unordered set).');
   if (picked.length >= (dec.max ?? 1)) return r('You have already chosen as many as allowed.');
+  const lim = dec.limits;
+  if (lim) {
+    if (lim.names && idx.some((j) => lim.names![j] === lim.names![i]))
+      return r('The cards must have different card names.', 'OP17-118');
+    if (lim.total !== undefined) {
+      const total = idx.reduce((a, j) => a + (lim.costs[j] ?? 0), 0) + (lim.costs[i] ?? 0);
+      if (total > lim.total) return r(`Their total cost must be ${lim.total} or less.`);
+    }
+  }
   // Completability lookahead: enough candidates must remain to reach the minimum.
   const need = (dec.min ?? 0) - picked.length - 1;
-  if (cands.length - 1 - i < need) return r('That choice could not be completed.');
+  let room = counts ? counts[i]! - pickedOf(i) - 1 : 0;
+  for (let j = i + 1; j < cands.length; j++) room += counts ? counts[j]! : 1;
+  if (room < need) return r('That choice could not be completed.');
   return null;
 }
 
@@ -325,7 +397,7 @@ export function legalActions(s: State): Action[] {
         }
         for (const id of [ps.leader, ...ps.characters, ...ps.stage]) {
           for (const ab of s.defs[s.cards[id]!.card]!.abilities) {
-            if (ab.kind === 'activate' && ab.when === 'activateMain') {
+            if (hasTiming(ab, 'activateMain')) {
               if (check(s, p, { type: 'activate', card: id, ability: ab.id }) === null)
                 out.push({ type: 'activate', card: id, ability: ab.id, player: p });
             }
@@ -356,7 +428,13 @@ export function legalActions(s: State): Action[] {
         const targets = [ps.leader, ...ps.characters];
         for (const id of ps.hand) {
           const def = s.defs[s.cards[id]!.card]!;
-          if (def.category !== 'Character' || !def.counter) continue;
+          if (def.category === 'Event') {
+            const ab = eventAbility(s, def.id, 'counter');
+            if (ab && check(s, p, { type: 'activate', card: id, ability: ab.id }) === null)
+              out.push({ type: 'activate', card: id, ability: ab.id, player: p });
+            continue;
+          }
+          if (def.category !== 'Character' || !counterOf(s, id)) continue;
           for (const t of targets) out.push({ type: 'counter', card: id, target: t, player: p });
         }
         out.push({ type: 'endCounter', player: p });
@@ -364,13 +442,13 @@ export function legalActions(s: State): Action[] {
       }
       case 'trigger': {
         const card = pendingLife(s);
-        if (card !== null && hasScriptedTrigger(s, card))
+        if (card !== null && hasScriptedTrigger(s, card) && triggerPayable(s, p, card))
           out.push({ type: 'trigger', activate: true, player: p });
         out.push({ type: 'trigger', activate: false, player: p });
         break;
       }
       case 'optional':
-        out.push({ type: 'optional', accept: true, player: p });
+        if (!dec.noAccept) out.push({ type: 'optional', accept: true, player: p });
         out.push({ type: 'optional', accept: false, player: p });
         break;
       case 'choose':
@@ -380,6 +458,8 @@ export function legalActions(s: State): Action[] {
         if ((dec.picked?.length ?? 0) >= (dec.min ?? 0)) out.push({ type: 'done', player: p });
         break;
       case 'order':
+        for (const c of dec.candidates ?? [])
+          if (typeof c === 'string') out.push({ type: 'order', first: c, player: p });
         break;
     }
   }
@@ -431,6 +511,12 @@ export function apply(d: Draft, a: Action): void {
       giveDon(d, p, a.target);
       break;
     case 'activate': {
+      if (dec.kind === 'counter') {
+        // An Event [Counter]: reveal, pay, trash, then resolve (CR 7-1-3-1-2, 8-4-2); afterwards
+        // the Counter Step asks again.
+        push(d, { f: 'play', card: a.card, player: p, step: 'pay', counter: true });
+        break;
+      }
       const c = d.card(a.card);
       const ab = s.defs[c.card]!.abilities.find((x) => x.id === a.ability)!;
       d.emit({ type: 'EffectActivated', instance: a.card, card: c.card, ability: ab.id });
@@ -487,7 +573,7 @@ export function apply(d: Draft, a: Action): void {
     }
     case 'counter': {
       const c = d.card(a.card);
-      const amount = s.defs[c.card]!.counter ?? 0;
+      const amount = counterOf(s, a.card, true) ?? 0;
       moveCard(d, a.card, 'trash', { revealed: true, extra: { reason: 'counter' } });
       addModifier(d, {
         kind: 'power',
@@ -510,6 +596,8 @@ export function apply(d: Draft, a: Action): void {
       if (dec.purpose === 'replacement') {
         if (a.accept) applyReplacement(d, dec.replacement!);
         else d.emit({ type: 'ReplacementDeclined', ability: dec.replacement!.ability, player: p });
+      } else if (dec.purpose === 'effect') {
+        answerEffect(d, a.accept);
       } else {
         answerAbilityOptional(d, a.accept);
       }
@@ -524,17 +612,23 @@ export function apply(d: Draft, a: Action): void {
       completeChoice(d, dec.purpose, dec.picked ?? []);
       break;
     case 'order':
-      throw new Error('order decisions are not used before M4');
+      if (dec.purpose === 'pending') choosePending(d, a.first);
+      else answerEffect(d, a.first);
+      break;
   }
 }
 
 function completeChoice(
   d: Draft,
   purpose: NonNullable<State['decision']>['purpose'],
-  picked: (InstanceId | DonClass)[],
+  picked: Choice[],
 ): void {
   if (purpose === 'characterLimit') {
     makeRoom(d, picked[0] as InstanceId);
+    return;
+  }
+  if (purpose === 'effect') {
+    answerEffect(d, picked);
     return;
   }
   throw new Error(`No handler for choice ${String(purpose)}`);

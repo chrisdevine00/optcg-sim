@@ -234,6 +234,7 @@ function payFromActive(g: TestGame, player: PlayerId): void {
         a.type === 'pick' &&
         typeof a.choice === 'object' &&
         a.choice !== null &&
+        'from' in a.choice &&
         a.choice.from === 'costActive',
     );
     if (pay) {

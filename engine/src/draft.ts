@@ -6,6 +6,7 @@
 import type { GameEvent, InstanceId, PlayerId } from './api.ts';
 import { nextInt, type RngState } from './rng.ts';
 import type { CardInst, PlayerState, State } from './state.ts';
+import { drafting } from './derive.ts';
 
 const ID_CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789';
 /**
@@ -43,7 +44,14 @@ export class Draft {
 
   constructor(base: State, intentId?: string) {
     this.s = { ...base, renames: [] };
+    drafting.add(this.s);
     this.intentId = intentId;
+  }
+
+  /** The step is complete: the state is now immutable and `derive` may memoize it. */
+  finish(): State {
+    drafting.delete(this.s);
+    return this.s;
   }
 
   card(id: InstanceId): CardInst {

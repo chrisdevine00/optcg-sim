@@ -2,7 +2,8 @@
  * Card definitions copied into state, so `reduce(state, action)` needs no lookup (ARCHITECTURE §2.1:
  * card data is injected at game start and the state stays self-contained plain JSON).
  */
-import type { Card } from '@optcg/cards';
+import { SCRIPTS, type Card } from '@optcg/cards';
+import type { Ability } from './abilities.ts';
 import type { CardId, CardLookup } from './api.ts';
 import type { Def } from './state.ts';
 
@@ -38,7 +39,8 @@ export function toDef(card: Card): Def {
     attributes: card.attributes.slice(),
     keywords: card.keywords.slice(),
     hasTrigger: card.triggerText !== null && card.triggerText !== '',
-    abilities: [],
+    // Effect scripts (cards/effects, E-D1); an unscripted card plays for its stats (E-D7, E-D8).
+    abilities: (SCRIPTS[card.id]?.abilities ?? []) as Ability[],
   };
 }
 

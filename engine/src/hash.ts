@@ -67,6 +67,7 @@ export function summary(s: State): unknown {
     // Pending obligations: remaining damage, play steps, queued auto effects (M2-08).
     stack: canon(s.stack),
     pending: canon(s.pending),
+    delayed: canon(s.delayed ?? []),
     mods,
     oncePerTurn: s.oncePerTurn.map(canon),
     result: s.result,

@@ -56,7 +56,7 @@ export const reduce = (state: GameState, action: Action): Step => {
   advance(d);
   if (d.deckTouched.size || d.damagedAtZero.size)
     throw new Error('Rule processing left a defeat flag unchecked (M2-14)');
-  return { state: gs(d.s), events: d.events };
+  return { state: gs(d.finish()), events: d.events };
 };
 
 export const legalActions = (state: GameState): Action[] => enumerate(st(state));

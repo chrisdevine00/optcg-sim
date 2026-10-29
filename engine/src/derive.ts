@@ -16,6 +16,10 @@ export interface Derived {
   cost: number | null;
   keywords: string[];
   cannotBeKOd: boolean;
+  /** An effect says it cannot attack (OP17-054, OP17-065). */
+  cannotAttack: boolean;
+  /** Its effects are negated (CR 8-2): abilities and printed keyword effects do nothing. */
+  negated: boolean;
 }
 
 const cache = new WeakMap<State, Map<InstanceId, Derived>>();
@@ -47,8 +51,15 @@ function active(s: State, m: Modifier): boolean {
   return src !== undefined && ON_FIELD.has(src.zone);
 }
 
-/** Memoized: only for finished (immutable) states. */
+/**
+ * States still being written by a `Draft`. `derive` never memoizes these: a value cached mid-step
+ * would go stale when a later operation in the same step changes the card.
+ */
+export const drafting = new WeakSet<object>();
+
+/** Memoized for finished (immutable) states; live for a state that is still being written. */
 export function derive(s: State, id: InstanceId): Derived {
+  if (drafting.has(s)) return deriveLive(s, id);
   let per = cache.get(s);
   if (!per) {
     per = new Map();
@@ -80,6 +91,8 @@ function compute(s: State, id: InstanceId, mods: Modifier[] | undefined): Derive
   let cost = def.cost;
   let keywords = def.keywords;
   let cannotBeKOd = false;
+  let cannotAttack = false;
+  let negated = false;
   if (mods && mods.length > 0) {
     let extra = 0;
     let costDelta = 0;
@@ -98,26 +111,37 @@ function compute(s: State, id: InstanceId, mods: Modifier[] | undefined): Derive
           costDelta += m.amount;
           break;
         case 'grant':
-          if (m.keyword && !keywords.includes(m.keyword) && !grants?.includes(m.keyword))
-            (grants ??= []).push(m.keyword);
+          if (m.keyword && !grants?.includes(m.keyword)) (grants ??= []).push(m.keyword);
           break;
         case 'cannotBeKOd':
           cannotBeKOd = true;
           break;
+        case 'cannotAttack':
+          cannotAttack = true;
+          break;
+        case 'negate':
+          negated = true;
+          break;
       }
     }
+    // Negation removes printed keyword effects (CR 10-1 keyword effects, 8-2-1-1); keywords
+    // granted by effects stay (CR 8-2-4).
+    if (negated) keywords = [];
     if (basePower !== null && setBase !== null) basePower = setBase;
     if (basePower !== null) power = basePower + extra;
     // Negative intermediate costs carry through the calculation; the result floors at 0 (CR 1-3-6-2).
     if (cost !== null) cost = Math.max(0, cost + costDelta);
-    if (grants) keywords = [...keywords, ...grants];
+    if (grants) {
+      const printed = keywords;
+      keywords = [...printed, ...grants.filter((k) => !printed.includes(k))];
+    }
   } else {
     power = basePower;
   }
   if (power !== null && c.don > 0 && c.owner === s.active && ON_FIELD.has(c.zone)) {
     power += 1000 * c.don;
   }
-  return { power, basePower, cost, keywords, cannotBeKOd };
+  return { power, basePower, cost, keywords, cannotBeKOd, cannotAttack, negated };
 }
 
 export const powerOf = (s: State, id: InstanceId): number | null => derive(s, id).power;

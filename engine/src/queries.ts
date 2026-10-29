@@ -13,6 +13,7 @@ import type {
   ZoneName,
 } from './api.ts';
 import { derive } from './derive.ts';
+import { counterOf } from './effects/eval.ts';
 import type { State } from './state.ts';
 
 const st = (g: GameState): State => g as unknown as State;
@@ -23,6 +24,13 @@ export function publicDecision(s: State): Decision | null {
   const out: Decision = { kind: d.kind, player: d.player, prompt: d.prompt };
   if (d.min !== undefined) out.min = Math.max(0, d.min - (d.picked?.length ?? 0));
   if (d.max !== undefined) out.max = Math.max(0, d.max - (d.picked?.length ?? 0));
+  const purpose = d.role ?? (d.purpose === 'characterLimit' ? 'characterLimit' : undefined);
+  if (purpose) out.purpose = purpose;
+  if (d.source) {
+    out.source = { card: d.source.cardId, ability: d.source.ability, instance: d.source.card };
+    if (d.source.label) out.source.label = d.source.label;
+  }
+  if (d.options) out.options = d.options.map((o) => ({ ...o }));
   return out;
 }
 
@@ -61,7 +69,22 @@ export function cardView(s: State, id: InstanceId): CardView {
     power: dv.power,
     cost: dv.cost,
     keywords: dv.keywords,
+    ...extras(s, id),
   };
+}
+
+/** M4a additions to a card's view: Counter value and effect flags. */
+export function extras(
+  s: State,
+  id: InstanceId,
+): { counter: number | null; cannotAttack?: true; negated?: true } {
+  const dv = derive(s, id);
+  const out: { counter: number | null; cannotAttack?: true; negated?: true } = {
+    counter: counterOf(s, id),
+  };
+  if (dv.cannotAttack) out.cannotAttack = true;
+  if (dv.negated) out.negated = true;
+  return out;
 }
 
 export function zoneIds(s: State, p: PlayerId, zone: ZoneName): InstanceId[] {

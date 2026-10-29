@@ -1,7 +1,11 @@
 {
-  "note": "Random legal game, seed 2024, random policy. Engine 0.3.1.",
+  "note": "Random legal game, seed 2024, random policy. Engine 0.4.0.",
   "record": {
-    "versions": { "engine": "0.3.1", "cards": "cards-18b71006dd93f400", "scripts": "none" },
+    "versions": {
+      "engine": "0.4.0",
+      "cards": "cards-18b71006dd93f400",
+      "scripts": "scripts-1bc27f5a56d1e715"
+    },
     "start": {
       "setup": {
         "seed": 2024,
@@ -316,32 +320,32 @@
     ]
   },
   "expected": {
-    "hash": "17c3f4fabcb2560286120c5a9d4b",
+    "hash": "137048880fcd92049b345c04b589",
     "actions": 193,
     "turn": 19,
     "result": { "winner": "p1", "reason": "damage at 0 Life" },
     "turnHashes": [
-      "0be23b067d84ee01f5307720bec3",
-      "1abe7e3a54e34f0a0cc0006a37d0",
-      "071c934212eb041ebb3b9444a740",
-      "1a3224ae25ef470cb48f6b5ab878",
-      "0bc8feff7bd2a3190527d2a0e36d",
-      "1ce1692030805518a4b01543e493",
-      "0bfd9452e4f75d1d89017a6f88ae",
-      "116e8410f2966e1d3aba98c37e39",
-      "0496bde7d8c62706bd249f175bff",
-      "1c52417c6655810d7f956d370780",
-      "1a5cefe89f7abf1c5ea3e7ae0acb",
-      "0279d3727cb7fa1fd604c65cdc4c",
-      "125bbac4ba651812567f31f9e3c7",
-      "1425830bc2179d172cde14b1eaae",
-      "1bd9e49017799812682c00f6d28e",
-      "054dd8ae4dce1c1bc4565be4f89b",
-      "1bfd5ae0e9a59e0d251f4df71ee1",
-      "0b13cadf0a7f5708533b79c4b77d",
-      "104fb55827c77a00f714578332c9",
-      "13701b36d3e55c08ba1591f3e1e0",
-      "17c3f4fabcb2560286120c5a9d4b"
+      "1c9a9541a9a33c0224d8262f25ba",
+      "0f8b0a34ba000c093e0ccb630c40",
+      "02ea98058c20f0163ae9a2cb38af",
+      "135cdb845fde1e1674e1fcd35552",
+      "12d81ca104aa221159eb00ddad8a",
+      "1f938ce75624ae1aef61230bf3da",
+      "151b6b2ee50f3d1e2fa917be039a",
+      "177ee1be2c8cf31d4b55bb9cf1a3",
+      "1d79ce22a9a983190b2d4b15f43e",
+      "0d79e12bae9d0614b8032dd73617",
+      "09132856a0f2c9125549f67017a1",
+      "19eaf2620302b5096b4a7aaa1ae3",
+      "0a923fcad3691103007df672e059",
+      "08e4f07c4a7ec8008067dc5048ff",
+      "1bf44cac11d3a1078568c9e6cb0a",
+      "0b48e7d6d5dd230985c738103fde",
+      "0452544d49770c172a92003b0678",
+      "1e1567506f48ae1289766d9aab41",
+      "07021306e972a813889e43e294b0",
+      "03678490a03918152498db706a3f",
+      "137048880fcd92049b345c04b589"
     ],
     "eventTypes": "0ac71885da3ae01295f8f42ace34"
   }

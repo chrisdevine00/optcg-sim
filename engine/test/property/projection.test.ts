@@ -5,6 +5,7 @@
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 import { project, type GameState, type PlayerId } from '../../src/index.ts';
+import { canSee } from '../../src/project.ts';
 import { internals } from '../../src/testing.ts';
 import type { State } from '../../src/state.ts';
 import { playRandomGame } from '../support/random-game.ts';
@@ -22,7 +23,8 @@ function hiddenFrom(s: State, viewer: PlayerId): string[] {
     const pending = s.decision?.kind === 'trigger' ? ps.life[0] : undefined;
     out.push(...ps.life.filter((id) => !s.cards[id]!.faceUp && id !== pending));
   }
-  return out;
+  // Cards the viewer is looking at, or knows (a revealed deck top), are not hidden from them.
+  return out.filter((id) => !canSee(s, id, viewer));
 }
 
 /** Permute the printed card ids among the hidden instances (positions, ids and keys stay). */

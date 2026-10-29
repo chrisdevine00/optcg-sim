@@ -95,6 +95,18 @@ export type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omi
 export type DonClass =
   { from: 'costActive' } | { from: 'costRested' } | { from: 'given'; card: InstanceId };
 
+/**
+ * A named option in a `choose` decision (added in M4a): a mode of "choose one" (OP17-049), or
+ * "top" / "bottom" of the deck (OP17-050). `Decision.options` lists the ids with labels.
+ */
+export interface OptionChoice {
+  option: string;
+}
+
+/** What a decision is for (added in M4a; `Decision.purpose`). */
+export type DecisionPurpose =
+  'cost' | 'target' | 'mode' | 'order' | 'use' | 'replacement' | 'characterLimit';
+
 export type Action = (
   | { type: 'chooseFirst'; goFirst: boolean }
   | { type: 'mulligan'; redraw: boolean }
@@ -108,7 +120,7 @@ export type Action = (
   | { type: 'endCounter' }
   | { type: 'trigger'; activate: boolean }
   | { type: 'optional'; accept: boolean }
-  | { type: 'pick'; choice: InstanceId | DonClass }
+  | { type: 'pick'; choice: InstanceId | DonClass | OptionChoice }
   | { type: 'done' }
   | { type: 'order'; first: string }
   | { type: 'concede' }
@@ -133,6 +145,28 @@ export interface Decision {
   /** For `choose`: how many picks are still allowed and required. */
   min?: number;
   max?: number;
+  /**
+   * Added in M4a. What the decision is for: paying a cost, choosing targets, a mode, an order,
+   * whether to use an optional effect, whether to apply a replacement.
+   */
+  purpose?: DecisionPurpose;
+  /**
+   * Added in M4a. The effect the decision belongs to: the source card (`instance` in full-state
+   * queries, `handle` in a view), its card id, the ability id and a short label.
+   */
+  source?: {
+    card: CardId;
+    ability: string;
+    label?: string;
+    instance?: InstanceId;
+    handle?: string;
+  };
+  /**
+   * Added in M4a. Named options: for `choose` over modes or deck positions (picked with
+   * `{ option: id }`), and for `order` (answered with `{ type: 'order', first: id }`). In a view the
+   * ids of cards are handles; an effect's id is `<handle>#<ability>`.
+   */
+  options?: { id: string; label: string }[];
 }
 
 export type GameResult = { winner: PlayerId; reason: string } | { draw: 'bothLost' | 'loop' };
@@ -154,6 +188,12 @@ export interface CardView {
   power: number | null;
   cost: number | null;
   keywords: string[];
+  /** Added in M4a. Current Counter value (hand cards include permanent grants, CR 2-10-4). */
+  counter?: number | null;
+  /** Added in M4a. Set while an effect says it cannot attack. */
+  cannotAttack?: boolean;
+  /** Added in M4a. Set while its effects are negated (CR 8-2). */
+  negated?: boolean;
 }
 
 /** Opaque game state (ARCHITECTURE §2.2). Plain JSON; never mutate it. */
@@ -204,7 +244,11 @@ export type GameEventType =
   | 'Conceded'
   | 'LoopDetected'
   | 'GameEnded'
-  | 'Anomaly';
+  | 'Anomaly'
+  // Added in M4a.
+  | 'CardsLooked'
+  | 'ModeChosen'
+  | 'EffectDeclined';
 
 export interface GameEvent {
   type: GameEventType;
@@ -222,6 +266,10 @@ export interface ViewCard {
   power: number | null;
   cost: number | null;
   keywords: string[];
+  /** Added in M4a: see `CardView`. Present only for cards the viewer can see. */
+  counter?: number | null;
+  cannotAttack?: boolean;
+  negated?: boolean;
 }
 
 /** What one player may see (ARCHITECTURE §2.7). Hidden cards carry no card id. */

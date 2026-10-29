@@ -28,7 +28,7 @@ const ROSINANTE_REPLACEMENT: Ability = {
   kind: 'replacement',
   oncePerTurn: true,
   optional: true,
-  replaces: { ko: { owner: 'you', name: 'Trafalgar Law' } },
+  replaces: { ko: { from: 'characters', owner: 'you', filter: { name: 'Trafalgar Law' } } },
   instead: [{ op: 'lifeToHand', n: 1 }],
 };
 
@@ -148,7 +148,7 @@ describe('replacement hook: K.O. replaced (RL-41, CR 8-1-3-4)', () => {
       id: 'self',
       kind: 'replacement',
       optional: true,
-      replaces: { ko: { owner: 'you', self: true } },
+      replaces: { ko: { from: 'characters', owner: 'you', filter: { isSelf: true } } },
       instead: [],
     };
     give(g, LAW, [selfSave]);
@@ -168,7 +168,7 @@ describe('replacement hook: K.O. replaced (RL-41, CR 8-1-3-4)', () => {
         id: 'thatch',
         kind: 'replacement',
         optional: false,
-        replaces: { ko: { owner: 'you', self: true } },
+        replaces: { ko: { from: 'characters', owner: 'you', filter: { isSelf: true } } },
         instead: [{ op: 'emit', label: 'instead' }],
       },
     ]);

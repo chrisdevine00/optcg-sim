@@ -28,15 +28,26 @@ import { hashString } from './hash.ts';
 import { PLAYERS, type State, type Zone } from './state.ts';
 import type { Action } from './api.ts';
 import { CARD_FIELDS, INSTANCE_ID } from './draft.ts';
-import { battleStepOf, publicDecision, zoneIds } from './queries.ts';
+import { battleStepOf, extras, publicDecision, zoneIds } from './queries.ts';
+import { attackLock } from './effects/eval.ts';
 
 /** Extra runtime fields beyond the frozen `PlayerView`: the open battle and the no-area slot. */
 export interface ProjectedView extends PlayerView {
   readonly battle: { attacker: string; target: string; blocker: string | null } | null;
   /** A [Trigger] card being resolved (CR 10-1-5-3). */
   readonly resolving: ViewCard[];
-  /** What this player legitimately knows about hidden cards (looked-at deck tops; M4). */
+  /**
+   * What this player legitimately knows about hidden cards, by positional handle
+   * (`p1.deck.0` → card id): a revealed deck top, cards put back after a look. Cleared when the
+   * card moves or its deck is shuffled.
+   */
   readonly known: Record<string, CardId>;
+  /** M4a: cards this player is looking at right now (`lookAtTop`, CR 11-3-1); theirs alone. */
+  readonly looking: ViewCard[];
+  /** M4a: when an effect limits what this player may attack (OP17-044), the handles allowed. */
+  readonly attackLock: string[] | null;
+  /** M4a: delayed effects waiting ("at the end of this turn, …"), public. */
+  readonly delayed: { player: PlayerId; card: CardId; turn: number }[];
 }
 
 const ZONE_NAMES: readonly ZoneName[] = [
@@ -68,7 +79,26 @@ function viewCard(s: State, id: InstanceId, viewer: PlayerId): ViewCard {
     power: dv.power,
     cost: dv.cost,
     keywords: dv.keywords,
+    ...extras(s, id),
   };
+}
+
+/** Cards `viewer` is looking at through an effect in progress (CR 11-3-1). */
+export function lookingAt(s: State, viewer: PlayerId): InstanceId[] {
+  const out: InstanceId[] = [];
+  for (const f of s.stack)
+    if (f.f === 'effect' && f.controller === viewer && f.look) out.push(...f.look);
+  return out;
+}
+
+/**
+ * Can `viewer` identify this card now: it is in an open area, they are looking at it, or they
+ * legitimately know it (`known`). Handles of such cards map back in `actionFromView`.
+ */
+export function canSee(s: State, id: InstanceId, viewer: PlayerId): boolean {
+  return (
+    visibleTo(s, id, viewer) || lookingAt(s, viewer).includes(id) || s.known[viewer].includes(id)
+  );
 }
 
 /** A face-down card: positional handle, no id, no card. */
@@ -150,7 +180,15 @@ const GENERIC_PROMPT: Record<Decision['kind'], string> = {
   order: 'Your opponent is ordering effects.',
 };
 
-const ACTION_CARD_FIELDS = ['card', 'target', 'attacker', 'blocker', 'choice'] as const;
+const ACTION_CARD_FIELDS = ['card', 'target', 'attacker', 'blocker', 'choice', 'first'] as const;
+
+/** An id that names a card, alone or as `<id>#<ability>` (a pending effect, `order.first`). */
+function mapRef(v: string, f: (id: string) => string | undefined): string | undefined {
+  const h = v.indexOf('#');
+  const head = h < 0 ? v : v.slice(0, h);
+  const m = f(head);
+  return m === undefined ? undefined : m + (h < 0 ? '' : v.slice(h));
+}
 
 /** Re-express an engine action in `viewer`'s handles. */
 function actionToView(s: State, viewer: PlayerId, a: Action): Action {
@@ -160,8 +198,11 @@ function actionToView(s: State, viewer: PlayerId, a: Action): Action {
     if (f === 'choice' && v && typeof v === 'object' && 'card' in v) {
       const dc = v as { from: 'given'; card: InstanceId };
       (out ??= { ...a })[f] = { ...dc, card: handleFor(viewer, dc.card, s.cards[dc.card]!.key) };
-    } else if (typeof v === 'string' && s.cards[v]) {
-      (out ??= { ...a })[f] = handleFor(viewer, v, s.cards[v]!.key);
+    } else if (typeof v === 'string') {
+      const m = mapRef(v, (id) =>
+        s.cards[id] ? handleFor(viewer, id, s.cards[id]!.key) : undefined,
+      );
+      if (m !== undefined) (out ??= { ...a })[f] = m;
     }
   }
   return (out ?? a) as Action;
@@ -174,7 +215,7 @@ function actionToView(s: State, viewer: PlayerId, a: Action): Action {
 export function actionFromView(s: State, player: PlayerId, a: Action): Action {
   const byHandle = new Map<string, InstanceId>();
   for (const id of Object.keys(s.cards)) {
-    if (visibleTo(s, id, player)) byHandle.set(handleFor(player, id, s.cards[id]!.key), id);
+    if (canSee(s, id, player)) byHandle.set(handleFor(player, id, s.cards[id]!.key), id);
   }
   let out: Record<string, unknown> | null = null;
   for (const f of ACTION_CARD_FIELDS) {
@@ -183,7 +224,7 @@ export function actionFromView(s: State, player: PlayerId, a: Action): Action {
       const dc = v as { from: 'given'; card: string };
       (out ??= { ...a })[f] = { ...dc, card: byHandle.get(dc.card) ?? dc.card };
     } else if (typeof v === 'string') {
-      (out ??= { ...a })[f] = byHandle.get(v) ?? v;
+      (out ??= { ...a })[f] = mapRef(v, (h) => byHandle.get(h)) ?? v;
     }
   }
   return (out ?? a) as Action;
@@ -197,8 +238,16 @@ export function project(s: State, player: PlayerId): ProjectedView {
     dec === null
       ? null
       : mine
-        ? dec
+        ? viewDecision(s, dec, player)
         : { kind: dec.kind, player: dec.player, prompt: GENERIC_PROMPT[dec.kind] };
+  const lock =
+    s.decision?.kind === 'main' && s.decision.player === player ? attackLock(s, player) : null;
+  const knownMap: Record<string, CardId> = {};
+  for (const p of PLAYERS) {
+    s.players[p].deck.forEach((id, i) => {
+      if (s.known[player].includes(id)) knownMap[`${p}.deck.${i}`] = s.cards[id]!.card;
+    });
+  }
   return {
     player,
     decision,
@@ -218,9 +267,27 @@ export function project(s: State, player: PlayerId): ProjectedView {
       blocker: s.battle.blocker && h(s.battle.blocker),
     },
     resolving: s.resolving.map((id) => viewCard(s, id, player)),
-    known: {},
+    known: knownMap,
+    looking: lookingAt(s, player).map((id) => viewCard(s, id, player)),
+    attackLock: lock && lock.map(h),
+    delayed: s.delayed.map((x) => ({ player: x.controller, card: x.cardId, turn: x.turn })),
     __brand: 'PlayerView',
   };
+}
+
+/** The decider's own decision, with ids re-expressed as their handles. */
+function viewDecision(s: State, dec: Decision, viewer: PlayerId): Decision {
+  const toHandle = (id: string): string | undefined =>
+    s.cards[id] ? handleFor(viewer, id, s.cards[id]!.key) : undefined;
+  const out: Decision = { ...dec };
+  if (dec.source) {
+    const { instance, ...rest } = dec.source;
+    out.source = { ...rest };
+    if (instance && toHandle(instance)) out.source.handle = toHandle(instance)!;
+  }
+  if (dec.options)
+    out.options = dec.options.map((o) => ({ id: mapRef(o.id, toHandle) ?? o.id, label: o.label }));
+  return out;
 }
 
 /**

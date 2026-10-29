@@ -3,7 +3,7 @@
  * Each effect emits a labelled `EffectResolved` event, so the label sequence is the resolution order.
  */
 import { describe, expect, it } from 'vitest';
-import { reduce } from '../../src/index.ts';
+import { queries, reduce } from '../../src/index.ts';
 import type { Ability } from '../../src/testing.ts';
 import { scenario, type TestGame } from '../fixtures/index.ts';
 import {
@@ -82,6 +82,10 @@ describe('CR 8-6: pending auto effects', () => {
     give(g, RED_1, [{ id: 'C', kind: 'auto', when: ['onKO'], effect: [emit('C')] }]);
     g.act({ type: 'attack', attacker: g.leader('p1'), target: g.leader('p2') });
     noDefence(g);
+    // A and B triggered together for one player: they choose the order (Rule Manual p.14).
+    expect(queries.decision(g.state)!.kind).toBe('order');
+    const first = g.legal().find((a) => a.type === 'order' && a.first.endsWith('#A'))!;
+    g.act(first);
     expect(labels(g)).toEqual(['A', 'B', 'C']);
   });
 
