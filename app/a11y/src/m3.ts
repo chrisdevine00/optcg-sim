@@ -539,8 +539,12 @@ export async function runM3(p: Pass) {
       let h = g;
       for (let i = 0; i < 2; i++) h = await p.press('ArrowDown');
       if (h.aria === g.aria) p.note('ArrowDown did not move focus in the rewind list.');
-      // Choose the newest move (the first item), then confirm.
-      await p.until('Shift+Tab', (x) => x.aria === g.aria, 8);
+      // Choose a move by Tab (Tab moves focus, and NVDA's browse cursor with it; its arrows move
+      // only the browse cursor, and Enter then acts there), then confirm.
+      h = await p.press('Tab');
+      if (!h.inDialog || /^(Cancel|Rewind to before it|Close)/.test(h.name))
+        h = (await p.until('Shift+Tab', (x) => x.aria === g.aria, 8)) ?? h;
+      p.note(`Chose: ${h.aria}`);
       h = await p.press('Enter');
       if (h.inDialog && !/^Rewind to before it/.test(h.name))
         h = (await p.until('Tab', named(/^Rewind to before it/), 30)) ?? h;
