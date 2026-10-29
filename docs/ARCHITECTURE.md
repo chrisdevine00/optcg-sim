@@ -181,8 +181,8 @@ Events drive animation, the game log, the screen-reader live region and the revi
 ### 4.1 Protocol and budgets
 
 The AI runs in a dedicated Web Worker with a typed protocol:
-- `planTurn({ view, tier, playbookId, budget })` → `TurnPlan`
-- `decide({ view, plan?, budget })` → `Decision`
+- `planTurn({ view, tier, playbookId, budget })` → `TurnPlan` (M5a: the worker keeps the plan and answers with its length; the game's tier, the AI's own list and both Leaders come with `init`)
+- `decide({ view, plan?, budget })` → `Decision` (M5a: follows the kept plan while the view's fingerprint matches it)
 - `lethal({ view, mode, capMs })`
 - `analyze({ record, budget })`, which streams progress
 - `cancel(id)`
@@ -208,6 +208,7 @@ The AI never samples from the human's actual decklist.
 - **Opponent's unknown cards:** sampled from an archetype prior, built from the three sourced lists for the opponent's leader, weighted by recency. For a leader with no sourced lists, the prior is legal cards of the leader's colors weighted by meta frequency. Cards already seen are removed.
 - **AI's own hidden zones:** its deck order and its Life cards are also secret from it (CR 3-2, 3-10), so they are sampled too.
 - **Knowledge:** a deck top the AI has looked at stays fixed in every sample until a shuffle.
+- **Mechanism (M5a):** the store sends the AI seat's `SearchView`, `projectForSearch(state, p)`: the view plus a skeleton of the state with every card hidden from `p` stripped and ids made canonical from public structure. `determinize(view, fill, cards, seed)` in `ai/src/search/` names the hidden cards and rebuilds a full state; a skeleton whose public parts point at a hidden card is `opaque` and is refused. The leak property covers the skeleton (DECISIONS, 2026-10-29).
 
 ### 4.4 Lethal search
 
