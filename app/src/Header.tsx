@@ -2,6 +2,7 @@ import { Link, usePath } from './router.tsx';
 
 const NAV = [
   { to: '/', label: 'Home' },
+  { to: '/play', label: 'Play' },
   { to: '/cards', label: 'Cards' },
 ];
 

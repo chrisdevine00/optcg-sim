@@ -6,11 +6,14 @@ export function Home() {
     <main className="page" id="main">
       <h1>OPTCG Sim</h1>
       <p className="lede">
-        A One Piece Card Game practice simulator and strategy teacher. The game board arrives in
-        later milestones; for now you can browse every English card.
+        A One Piece Card Game practice simulator and strategy teacher. Play a full game against the
+        Rookie AI or a friend at the same device, or browse every English card.
       </p>
-      <p>
-        <Link to="/cards" className="btn primary">
+      <p className="home-actions">
+        <Link to="/play" className="btn primary">
+          Play a game
+        </Link>{' '}
+        <Link to="/cards" className="btn">
           Browse {manifest.cardCount.toLocaleString('en-US')} cards
         </Link>
       </p>

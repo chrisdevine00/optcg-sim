@@ -5,9 +5,17 @@ import { usePath } from './router.tsx';
 import { Home } from './routes/Home.tsx';
 
 const CardBrowser = lazy(() => import('./cards/CardBrowser.tsx'));
+const PlayRoute = lazy(() => import('./play/PlayRoute.tsx'));
 
 export function App() {
   const path = usePath();
+  if (path === '/play')
+    // The board is full-screen: its rail notice is the footer equivalent (board.md §3.1, C15).
+    return (
+      <Suspense fallback={<main className="page" id="main" aria-busy="true" />}>
+        <PlayRoute />
+      </Suspense>
+    );
   return (
     <div className="shell">
       {path === '/cards' ? (
