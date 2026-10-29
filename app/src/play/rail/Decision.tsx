@@ -952,7 +952,8 @@ function defenceContent(g: G): Content {
   const commit = () => commitDefence(g, s);
   const blockOnly = () => commitDefence(g, { blocker: s.blocker, counters: [] });
   const blockers = [...g.legal.blocks.keys()];
-  const targetWord = g.cardOf(b.target)?.zone === 'leader' ? 'your Leader' : g.nameOf(b.target);
+  // The title names whoever defends now: the Blocker once one is chosen (M3-34).
+  const targetWord = leaderTarget ? 'your Leader' : g.nameOf(targetH);
   const result = hits
     ? leaderTarget
       ? `✕ Hit lands · your Life ${lifeNow} → ${sim.lifeAfter[me]}${sim.gameOver ? ' · you lose' : ''}`
@@ -1161,6 +1162,16 @@ function defenceContent(g: G): Content {
               Select lit hand cards to stage
               <span className="wide-only"> · ties go to the attacker</span>
             </span>
+            {g.ctl.revealSticky && (
+              <button
+                type="button"
+                className="btn small"
+                id="hide-hand"
+                onClick={() => g.ctl.endReveal()}
+              >
+                Hide my hand
+              </button>
+            )}
             <button
               type="button"
               className="btn small"
@@ -1261,6 +1272,16 @@ function triggerContent(g: G): Content {
             <p className="subtle">
               Only you see this. Life {life} → {life - 1}.
             </p>
+            {g.ctl.revealSticky && (
+              <button
+                type="button"
+                className="btn small"
+                id="hide-hand"
+                onClick={() => g.ctl.endReveal()}
+              >
+                Hide my hand
+              </button>
+            )}
             {card.triggerText && (
               <p>
                 <b>[Trigger]</b> {card.triggerText}

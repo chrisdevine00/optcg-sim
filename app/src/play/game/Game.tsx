@@ -62,6 +62,15 @@ function markAnnounced(key: string) {
 
 /** Where focus returns when a dialog, menu or the inspector closes (accessibility §4.3). */
 const focusMemory: { el: HTMLElement | null } = { el: null };
+const veilFocus = { pending: false };
+function markVeilFocus() {
+  veilFocus.pending = true;
+}
+function takeVeilFocus(): boolean {
+  const p = veilFocus.pending;
+  veilFocus.pending = false;
+  return p;
+}
 function rememberFocus(el: Element | null = document.activeElement) {
   focusMemory.el = el as HTMLElement | null;
 }
@@ -187,6 +196,17 @@ export function Game({
   };
 
   const tall = isTall(g);
+
+  // A pinned inspector whose card left the rendered view (a reveal ended) closes, and focus
+  // returns to the hand veil, so the keyboard never dead-ends (review M3-27).
+  const dockOpen = dock.handle !== null && !!index.get(dock.handle)?.view.card;
+  if (dock.handle !== null && !dockOpen) {
+    if (dock.pinned) markVeilFocus();
+    setDock({ handle: null, pinned: false, how: 'hover' });
+  }
+  useEffect(() => {
+    if (takeVeilFocus()) document.querySelector<HTMLElement>('.hand-veil')?.focus();
+  });
 
   /**
    * Rewind is off while a hotseat hand is veiled or curtained (review M3-04, M3-24), and in
@@ -444,7 +464,7 @@ export function Game({
   const onKey = (e: KeyboardEvent) => {
     const t = e.target as HTMLElement | null;
     if (isTyping(t)) return;
-    if (dialog || dock.pinned) return; // dialogs handle their own keys
+    if (dialog || (dock.pinned && dockOpen)) return; // dialogs handle their own keys
     if (ctl.curtainFor) {
       if (e.key === ' ' || e.key === 'Enter') {
         e.preventDefault();
@@ -742,7 +762,7 @@ export function Game({
       if (e.key === 'r' || e.key === 'R') ctl.setReveal(false);
     };
     // A reveal never sticks: losing the window ends it (review M3-13).
-    const hide = () => ctl.setReveal(false);
+    const hide = () => ctl.endReveal();
     const vis = () => document.visibilityState !== 'visible' && hide();
     window.addEventListener('keydown', down);
     window.addEventListener('keyup', up);
@@ -773,7 +793,9 @@ export function Game({
     const opts = ctl.revealed() ? counterOptions(g, NO_STAGING) : new Map();
     const worth = [...opts.keys()].reduce((t, h) => t + (cardOf(h)?.card?.counter ?? 0), 0);
     const hand = ctl.revealed()
-      ? ` You have ${opts.size} counter ${opts.size === 1 ? 'card' : 'cards'} worth ${worth}.`
+      ? opts.size === 0
+        ? ' You have no Counter cards.'
+        : ` You have ${opts.size} Counter ${opts.size === 1 ? 'card' : 'cards'} worth ${worth}.`
       : '';
     ctl.alert(
       `${nameOf(b.attacker)} attacks ${target}. ${nameOf(b.attacker)} ${n.ap}, ${target} ${n.tp}. ${n.hits ? `You need ${n.need} to stop it.` : 'It fails as things stand.'}${hand} Plan your defence.`,
@@ -976,6 +998,7 @@ export function Game({
               donMode={ui.kind === 'don'}
               handHidden={ctl.hotseat ? (ctl.handHidden() ? ctl.handVeil : 'none') : 'none'}
               onShowHand={() => ctl.showHand()}
+              onRevealSticky={() => ctl.setReveal(true, true)}
               onRevealStart={(id) => {
                 ctl.setReveal(true);
                 const end = (e: PointerEvent) => {
@@ -1017,7 +1040,7 @@ export function Game({
                   )}
                 </p>
               )}
-              <div inert={dialog?.kind === 'trash' || dock.pinned ? true : undefined}>
+              <div inert={dialog?.kind === 'trash' || (dock.pinned && dockOpen) ? true : undefined}>
                 <GameLog
                   top={logTop}
                   height={logH}

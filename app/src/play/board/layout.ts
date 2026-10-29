@@ -311,7 +311,8 @@ const hits = (a: Rect, b: Rect) =>
  */
 export function placeDock(L: Layout, avoid: Rect[], tall: boolean, pinned = false): Rect | null {
   if (!tall && !avoid.some((a) => hits(a, L.dock))) return L.dock;
-  const sizes = [1, 0.8, 0.65, 0.5].map((k) => ({
+  // Never smaller than 80%, so the 63:88 art and the text keep their size (review M3-29).
+  const sizes = [1, 0.9, 0.8].map((k) => ({
     w: Math.round(L.dock.w * k),
     h: Math.round(L.dock.h * k),
   }));
@@ -323,10 +324,9 @@ export function placeDock(L: Layout, avoid: Rect[], tall: boolean, pinned = fals
       }
     }
   }
-  // Nothing is clear. A hover preview then stays closed (the card's own name carries the same
-  // information); the pinned inspector, which the player asked for, takes the log's place when it
-  // can, else the board's top-left at the smallest size.
-  if (!pinned) return null;
+  // Nothing on the board is clear. Outside a tall decision the dock goes over the log, its
+  // default home. During one, a hover preview stays closed (the card's name carries the same
+  // information) and the inspector the player asked for takes the board's top-left.
   if (!tall) return L.dock;
-  return { ...L.dockAlt, w: sizes[2]!.w, h: sizes[2]!.h };
+  return pinned ? L.dockAlt : null;
 }

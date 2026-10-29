@@ -1780,3 +1780,28 @@
   background: var(--color-warning);
   color: var(--color-on-warning);
 }
+
+/* The pinned inspector: the text scrolls inside, with shadows that show there is more (M3-29). */
+.dock.pinned {
+  overflow: hidden;
+}
+.dock.pinned .dock-text {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  background:
+    linear-gradient(var(--color-surface-2) 30%, transparent) center top / 100% 32px no-repeat local,
+    linear-gradient(transparent, var(--color-surface-2) 70%) center bottom / 100% 32px no-repeat
+      local,
+    radial-gradient(farthest-side at 50% 0, rgb(0 0 0 / 0.55), transparent) center top / 100% 12px
+      no-repeat scroll,
+    radial-gradient(farthest-side at 50% 100%, rgb(0 0 0 / 0.55), transparent) center bottom / 100%
+      12px no-repeat scroll;
+}
+.dock-body {
+  flex: none;
+}
+.btn.hide-hand,
+#hide-hand {
+  margin-right: auto;
+}

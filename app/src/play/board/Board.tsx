@@ -59,6 +59,9 @@ export interface BoardProps {
   onShowHand: () => void;
   /** Hotseat defence: a press and hold on the veil reveals the hand until released (M3-06). */
   onRevealStart: (pointerId: number) => void;
+  /** Touch, pen or keyboard on the veil: a reveal that stays until hidden. */
+  onRevealSticky: () => void;
+
   mulligan: boolean;
   midline: ReactNode;
   oppActivity: string;
@@ -529,10 +532,22 @@ export function Board(b: BoardProps) {
             type="button"
             className="hand-veil"
             style={rect(H)}
-            onClick={b.handHidden === 'click' ? b.onShowHand : undefined}
+            onClick={
+              b.handHidden === 'click'
+                ? b.onShowHand
+                : b.handHidden === 'hold'
+                  ? (e) => {
+                      // Touch and pen: a tap shows the hand until "Hide my hand" (M3-32); a
+                      // mouse holds instead (pointerdown below). Keyboard: Enter or Space.
+                      const t = (e.nativeEvent as PointerEvent).pointerType;
+                      if (t !== 'mouse') b.onRevealSticky();
+                    }
+                  : undefined
+            }
             onPointerDown={
               b.handHidden === 'hold'
                 ? (e) => {
+                    if (e.pointerType !== 'mouse') return;
                     e.preventDefault();
                     b.onRevealStart(e.pointerId);
                   }
@@ -542,7 +557,7 @@ export function Board(b: BoardProps) {
             {...item('hand', 0)}
           >
             {b.handHidden === 'hold'
-              ? `${b.names.player[me]}’s hand is hidden. ${b.names.player[me]}: press and hold here, or hold R, to see it.`
+              ? `${b.names.player[me]}’s hand is hidden. ${b.names.player[me]}: tap here, press and hold, or hold R, to see it.`
               : `${b.names.player[me]}’s hand is hidden. ${b.names.player[me]}: press Space or click to show it.`}
           </button>
         ) : b.mulligan ? (

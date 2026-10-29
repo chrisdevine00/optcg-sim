@@ -47,9 +47,11 @@ test.describe('defence planner (flows F6, board.md §3.9)', () => {
     await page.keyboard.press('Enter');
     await page.keyboard.up('r');
     // One commit: block step, three Counters and the end of the Counter step, as one move.
-    const line = page.locator('.log-row').filter({ hasText: 'Attack fails' });
+    // One commit, one move: the three Counters on one line; the result is the attacker's line.
+    const line = page.locator('.log-row').filter({ hasText: 'Counter:' });
     await expect(line).toHaveCount(1);
     await expect(line).toContainText(/Counter: .*Counter: .*Counter: /);
+    await expect(page.locator('.log-row').filter({ hasText: 'Attack fails' })).toHaveCount(1);
     await expect(
       page.getByRole('button', { name: 'Player 1’s Life, 3 cards, face down' }),
     ).toHaveCount(1);
@@ -99,7 +101,7 @@ test.describe('defence planner (flows F6, board.md §3.9)', () => {
   test('press and hold on the veiled hand reveals it, for touch (M3-06)', async ({ page }) => {
     await attackLeader(page);
     const veil = page.locator('.hand-veil');
-    await expect(veil).toContainText('press and hold here');
+    await expect(veil).toContainText('press and hold');
     await veil.hover();
     await page.mouse.down();
     await expect(page.locator('[data-zone="hand"][data-glyph="play"]')).toHaveCount(4);

@@ -9,6 +9,31 @@ type Spec = Omit<ScenarioSpec, 'cards'> & { mode: 'ai' | 'hotseat' };
 const filler = (id: string, n: number) => Array.from({ length: n }, () => id);
 
 export const SCENARIOS: Record<string, Spec> = {
+  /**
+   * Review M3-28: Player 2 attacks (Player 1 defends), then Player 1 wins on their own turn by
+   * hitting a Leader at 0 Life. The game ends after a defence alert was spoken.
+   */
+  last: {
+    mode: 'hotseat',
+    seed: 5,
+    turn: 4,
+    activePlayer: 'p2',
+    firstPlayer: 'p1',
+    p1: {
+      leader: 'ST01-001',
+      life: ['OP01-010', 'OP01-012', 'ST01-003'],
+      hand: ['OP01-010'],
+      deck: filler('OP01-010', 10),
+      costArea: { active: 3, rested: 0 },
+    },
+    p2: {
+      leader: { card: 'ST04-001', don: 2 },
+      life: [],
+      hand: [],
+      deck: filler('OP01-012', 10),
+      costArea: { active: 0, rested: 2 },
+    },
+  },
   /** p2 (hotseat) is about to attack p1's Leader. p1 holds three +1000 Counters and a Blocker. */
   defend: {
     mode: 'hotseat',

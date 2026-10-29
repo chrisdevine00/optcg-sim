@@ -104,9 +104,7 @@ export function describeMove(
     const p = e.player as PlayerId | undefined;
     switch (e.type) {
       case 'FirstPlayerChosen':
-        bits.push(
-          `${tag(ctx.names, e.chooser as PlayerId)} chose to go ${e.first === e.chooser ? 'first' : 'second'}`,
-        );
+        bits.push(`Chose to go ${e.first === e.chooser ? 'first' : 'second'}`);
         lineActor = e.chooser as PlayerId;
         break;
       case 'Mulligan':
@@ -200,6 +198,9 @@ export function describeMove(
         lineActor = p ?? lineActor;
         break;
       case 'DamageStep': {
+        // The battle result belongs to the attacker, not to the defender's move (M3-31).
+        flush();
+        lineActor = other(actor);
         const ap = num(Number(e.attackerPower));
         const tp = num(Number(e.targetPower));
         if (!e.attackerWins) bits.push(`Attack fails · ${ap} vs ${tp}`);

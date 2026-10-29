@@ -96,6 +96,9 @@ export class GameController {
   curtainFor: PlayerId | null = null;
   handVeil: 'none' | 'hold' | 'click' = 'none';
   revealHeld = false;
+  /** Touch: the reveal stays until "Hide my hand", a commit or a seat change (M3-32). */
+  revealSticky = false;
+  private gameOverAnnounced = false;
   private curtainSeen: Record<PlayerId, string> = { p1: '', p2: '' };
 
   // Feedback.
@@ -475,7 +478,7 @@ export class GameController {
         ? `${this.config.names[l.actor]}’s turn ${n}.`
         : `Your turn ${n}.`;
     }
-    return `${l.actor ? `${name(l.actor)}: ` : ''}${l.text}.`;
+    return `${l.actor ? `${name(l.actor)}: ` : ''}${l.text.replace(/\.+$/, '')}.`;
   }
 
   private linesSince(index: number): LogLine[] {
@@ -509,7 +512,9 @@ export class GameController {
 
   private finish(): void {
     const r = this.session.view('p1').result;
-    if (r && this.assertive.text === '') {
+    // Its own flag: the region may still hold a defence alert (review M3-28).
+    if (r && !this.gameOverAnnounced) {
+      this.gameOverAnnounced = true;
       const text =
         'winner' in r
           ? `Game over. ${r.winner === this.me && !this.hotseat ? 'You win' : `${this.config.names[r.winner]} wins`} on turn ${this.session.view('p1').turn.number}.`
@@ -535,6 +540,7 @@ export class GameController {
     this.seat = d;
     if (this.revealHeld) this.clearAnnouncements();
     this.revealHeld = false;
+    this.revealSticky = false;
     this.recap = null;
     if (defending) this.handVeil = 'hold';
     else if (this.curtainSeen[d] === key) this.handVeil = 'click';
@@ -551,11 +557,28 @@ export class GameController {
     this.bump();
   }
 
-  setReveal(held: boolean): void {
-    if (this.handVeil === 'none' || this.revealHeld === held) return;
+  setReveal(held: boolean, sticky = false): void {
+    if (this.handVeil === 'none') return;
+    // A sticky (touch) reveal ignores a key or pointer release; only Hide, a commit, blur or a
+    // seat change end it.
+    if (!held && this.revealSticky) return;
+    this.revealSticky = held && sticky;
+    if (this.revealHeld === held) {
+      this.bump();
+      return;
+    }
     this.revealHeld = held;
     // What was said while revealed (staging sentences) leaves the live regions with the reveal.
     if (!held) this.clearAnnouncements();
+    this.bump();
+  }
+
+  /** End any reveal now, sticky included (Hide, blur, commit). */
+  endReveal(): void {
+    if (!this.revealHeld && !this.revealSticky) return;
+    this.revealSticky = false;
+    this.revealHeld = false;
+    this.clearAnnouncements();
     this.bump();
   }
 
@@ -613,6 +636,8 @@ export class GameController {
     actions: Action[],
     intentId = newIntentId(),
   ): { sent: number; paused: string | null } {
+    // A defence commit ends any reveal, sticky or held, before the next decision draws (M3-32).
+    if (this.revealHeld) this.endReveal();
     const me = this.me;
     let sent = 0;
     const before = this.session.actionCount;
@@ -689,7 +714,7 @@ export class GameController {
     this.stepWaiting = false;
     if (lines.length) {
       this.recap = lines.slice(-6);
-      this.say(`Skipped ${lines.length} moves. ${lines.slice(-3).join('. ')}`);
+      this.say(`Skipped ${lines.length} moves. ${lines.slice(-3).join(' ')}`);
     } else this.recap = why === 'decision' ? null : this.recap;
   }
 
