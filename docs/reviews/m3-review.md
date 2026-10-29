@@ -474,3 +474,129 @@ One more channel is open in principle. The **"You can answer without showing you
 **Blocking:** M3-39, the hotseat answer-availability leak. Fix the root cause rather than special-casing the "Use" button, add the payable/unpayable twin test, then re-review. M3-40 is optional hardening.
 
 Still owed: the manual screen-reader pass in PLAN's M3 exit criteria.
+
+---
+
+## Re-review 4
+
+**Date:** 2026-10-29
+**Build reviewed:** `main` at `3e9db4f` (fixes `97f5f4f` and `61dc040`; CI run 40827636985 green).
+- I served it from a clean detached worktree (`.cache/m3-rr4/head`, Vite on :5180). That worktree ran its own `npm ci`, and I confirmed that `node_modules/@optcg/*` link to its own `engine`, `cards`, `ai` and `app`.
+- Mutations ran in a second worktree with its own `npm ci` (`.cache/m3-rr4/mut`, :5181).
+- The main tree was not touched.
+
+**M3 re-review 4: PASS.**
+- No severity 3 or 4 finding is open. M3-39 (and M4a-01) is fixed at the root.
+- Three new findings, at severity 2, 2 and 1, are below.
+- The milestone still needs the manual screen-reader pass in PLAN's M3 exit criteria, which this review cannot provide.
+
+### Method
+
+1. **Read the boundary and grepped every path from private data to the screen.**
+   - `veiled.tsx`, `controller.actions()` and `veiledProps()`, `veiledUse()`/`veiledSkip()`, and the new `PublicView` brand.
+   - Every `session.view(`, `.simulate(`, `counterOptions(`, `preview`, `whyNot` and `pendingLifeCard` call in `Game.tsx`, `Decision.tsx`, `Dock.tsx`, `Board.tsx`, `Dialogs.tsx` and `Rail.tsx`.
+2. **Ran my own differential pairs** (`.cache/m3-review/rr4-diff.mjs`) for what the builder's pairs never vary. Each pair was driven to the defender's veiled optional, then the Counter step, the damage decision and the attacker's resumed seat, comparing HTML, the aria snapshot and both live regions:
+   - an Event [Counter] in hand (OP17-076) against none;
+   - two Event [Counter] cards against none;
+   - a hand with no Counter values (EB01 vanilla-less Characters) against a hand of +1000 cards;
+   - a hand of Stages only against Characters.
+3. **Pressed "Use" under the veil** in a payable and an unpayable Shiki position (`rr4-use.mjs`).
+4. **Fed the `scenario=json:` option** malformed, mode-less and markup-bearing input.
+5. **Mutation tests** of the differential suite, the M4a-01 shape and M3-40.
+6. **Regression:** `leak.mjs`, `rr4-sticky.mjs`, a full hotseat game (`rr4-hotseat.mjs`, seed 202) and a full game vs Rookie (`rr4g/ai-game.mjs`).
+
+### 1. Does anything reach a veiled screen from private data outside `veiledContent`?
+
+**No.** Path by path:
+
+| Surface | What it reads while veiled | Verdict |
+| --- | --- | --- |
+| Effect decisions (optional, choose, order) | `veiledContent(ctl.veiledProps())`: the `PublicView`, the seat's name and callbacks. `actions()` returns `[]` for these kinds, so `legal` is empty. | Public only |
+| Board lighting (`deco`) | `legal` (empty for effect decisions; for block and counter, only actions naming visible cards). Counter staging and lighting are guarded by `handHidden()`. `stagedPowers` is guarded by `revealed()`. | Public only |
+| Footer and Enter | The veiled footer is the constant Use/Skip, or nothing. `primaryEnterId` finds no `#choose-done` or `#commit-defence` under the veil. Its "commit-hidden" button has no key. | Public only |
+| Key handlers | They act on `legal`/`kind` (public), or reveal (R) or show (Space or R on the click veil). | Public only |
+| Live regions | The hotseat log is public. The defence alert counts Counters only when `revealed()`. Staging sentences are cleared on release. Game-over text is public. | Public only |
+| Hover and inspector | `index` is built from `ctl.view()` (the public view); the dock closes when its card leaves. | Public only |
+| Defence panel | `counterOptions()` and `simulate()` read private actions, but every use is behind `hidden`: the Counter lane, the Event [Counter] buttons, `counterCards` and "No Counter cards". The `none` and per-Blocker simulations take default answers and yield public facts: Life counts, K.O., attacker and target power. | Public only |
+| Damage panel | `pendingLifeCard()` is null unless revealed. Activate reads "reveal first", and `whyNot` is skipped when hidden. | Public only |
+| Timing | In hotseat, auto-skip runs only on windows that follow from public information (engine M2-02 and M2-19). With `61dc040`, a decision is offered only once the loop settles. A veiled "Use" either reveals, or applies only when `readsHiddenZone` is false, so its timing follows from the public script. | Public only |
+
+My four extra pairs are **identical** in every state:
+- the event-counter pair;
+- the two-events pair;
+- the no-Counter hand pair;
+- the Stage-only hand pair.
+
+They pass through optional, counter and trigger, then the attacker's main.
+
+Pressing "Use" under the veil behaves identically in the payable and unpayable Shiki positions. Before the press, both panels read the same, with Use enabled. After it, both reveal the hand. The unpayable side then says "You can't pay its cost" only once the hand is shown (`rr4/use-payable.png`, `rr4/use-unpayable.png`).
+
+### 2. Do the differential pairs differ in what matters?
+
+**Mostly yes.**
+- **The fixed pair** differs exactly in Shiki's payability.
+- **The 50 generated pairs** differ in every hidden zone of both seats (hands, Life and decks) at equal sizes, with the field and the seed fixed. Every other pair flips payability.
+- **The OP07-077 pair** differs only in whether the deck's top 5 hold a match.
+
+They reach optional, counter, trigger and choose. They never reach `order`. That kind is safe by construction: `actions()` returns `[]`, and `veiledContent` always says "Show your hand to answer".
+
+The PLAIN pool has a Counter on every card, so no generated hand lacks Counters or holds an Event. My extra pairs cover that.
+
+They never press "Use", which is a real test gap (M3-42).
+
+**Mutation results:**
+
+| Mutation | Result |
+| --- | --- |
+| The veiled optional renders the private footer again (the M3-39 shape) | **fails**: the fixed pair, pair 1, pair 6 and others |
+| The public decision carries `max`, and `veiledContent` treats a `max: 0` choose as answerable (the M4a-01 shape) | **fails**: "OP07-077 take step differs" (plus `hidden.test.ts`) |
+| `finish()` does not clear the reveal (M3-40) | `controller.test.ts` **fails** |
+| `restart()` does not clear the reveal (M3-40) | `controller.test.ts` **fails** |
+| `veiledUse()` skips the `readsHiddenZone` check | **all tests pass** (M3-42) |
+
+The builder reports that 11 of the 12 differential tests fail against `64ddfb5`. That code has no `scenario=json:` route, so some of those failures may come from the missing route rather than from the leak. The mutations above are the stronger evidence, and they show the suite catches the leak on current code.
+
+### 3. OP07-077's `max`
+
+**Out of the DOM, and out of the data.** `publicView`'s decision carries only `kind`, `player` and a constant prompt. A veiled choose is never answerable, so it shows "Show your hand to answer" whether or not the top 5 held a match. The OP07-077 pair is identical, and re-adding `max` with a `max`-based answerable rule makes it fail.
+
+### 4. The `scenario=json:` URL option
+
+**Harmless.**
+- Card ids resolve through the static `import.meta.glob` set map (`loadSet`), so a crafted id cannot fetch arbitrary paths.
+- Every string renders through React as text. A hand entry `<img src=x onerror=alert(1)>` simply fails to load as a card and falls back to the setup page.
+- Malformed base64 and incomplete specs also fall back to setup, without an error message.
+- One rough edge is M3-43.
+
+### Regression
+
+| Probe | Result |
+| --- | --- |
+| `leak.mjs` | All 7 canary steps clean. |
+| `rr4-sticky.mjs` | Every sticky-reveal path (commit, damage, Add to hand, concede, blur, Hide, inspector) shows no private names. The `s3-after-rewind` line is my script's no-op rewind (the button filter missed), and only the revealed seat's own hand is shown. |
+| Full hotseat game, seed 202 | Plays to game over on turn 9. Five hidden-dependent decisions went through "Show my hand", with no leak lines and no page errors. |
+| Full game vs Rookie | Game over is announced and takes focus; no page errors. |
+
+### Claims verified
+
+| Claim | Verdict |
+| --- | --- |
+| Type boundary (`veiledContent(VeiledProps)`, branded `PublicView`) | **Verified** (code; mutation A). |
+| Public decision without `min`, `max`, `purpose`, `source` or options | **Verified** (`session.ts`; mutation B). |
+| `actions()` returns nothing for veiled optional, choose and order | **Verified.** |
+| Use and Skip always enabled; Use reveals on a hidden-reading script; choose and order always ask for the reveal | **Verified** (`rr4-use.mjs`). |
+| The differential test | **Verified with gaps:** it catches the M3-39 and M4a-01 shapes, but never presses Use (M3-42). |
+| M3-40 covered by `controller.test.ts` | **Verified** (both mutations fail). |
+| `61dc040` (decision offered only once settled) | No regressions in either full game. |
+
+### New findings
+
+| ID | Sev | Area | Problem | Evidence | Fix |
+| --- | --- | --- | --- | --- | --- |
+| M3-41 | 2 | Veiled "Use" opens the hand unannounced | On an ability whose script reads a hidden zone, pressing "Use" under the veil shows the hand at once. This is correct for secrecy: it happens in both the payable and unpayable cases. But the panel says "Use or Skip, or show your hand first. Only you should look.", so a defender who presses Use is not told that it will show their hand to whoever is looking. | `rr4-use.mjs` output; `controller.ts` `veiledUse()` | Word the veiled Use as "Use (shows your hand)". Or have the first press turn the button into "Show my hand to use" without revealing. Either way the wording is the same for every ability, so it stays public. |
+| M3-42 | 2 | Test gap: Use under the veil | No test presses "Use" under the veil. If the `readsHiddenZone` check is removed from `veiledUse()`, a payable Shiki goes on to its veiled cost choice while an unpayable one opens the hand with "can't pay": a behavioural replay of M3-39. All 13 hotseat e2e tests and all 30 unit tests still pass. | mutation C above | In `hidden-differential.spec.ts`, after the veiled optional snapshot, press `#use-btn` and compare the next veiled state (or assert the hand is revealed on both sides). Add a unit test that `veiledUse` reveals for a hidden-reading script whether or not "use" is legal. |
+| M3-43 | 1 | `scenario=json:` input | `mode` is not validated. A spec without `mode` starts a game whose seats are human and AI but with no AI client, and it shows "Rookie AI · Thinking" forever. Malformed input falls back to the setup page with no message. Test-only surface. | `rr4-use.mjs` json cases; `PlayRoute.tsx` `scenarioFrom` | Accept only `mode` `'ai'` or `'hotseat'`, and show the setup error line when the spec fails to parse or validate. |
+
+### Disposition
+
+M3 review: **PASS** on code, with no severity 3 or 4 finding open. M3-41 and M3-42 should be fixed soon; M3-42 matters most, because it guards the M3-39 class. The carries remain as scheduled (M3-18, M3-23). The milestone's exit still needs the manual screen-reader pass.

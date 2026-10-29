@@ -160,3 +160,10 @@ So E-Q12 should close as "optional", and M4a-08 is the engine change.
 | 354e2a8 | Test timeouts only; no behaviour change. |
 
 **Not done:** a real screen-reader pass (same as M3); the 1920×1080 effect screenshots; a screenshot of M4a-02's render (traced in code and through `GameSession`).
+
+## Status update: M4a-01 (from M3 re-review 4, 2026-10-29)
+
+**M4a-01 is fixed** at `3e9db4f` (fix `97f5f4f`), re-checked in a clean worktree with its own `npm ci`.
+- **Veiled optional decisions:** they render only through `veiledContent(PublicView)`. "Use" and "Skip" are always both enabled, and "Use" on a script that reads a hidden zone reveals the hand first. The payable and unpayable Shiki positions now render identical veiled HTML, aria and live-region text.
+- **OP07-077's take step:** the public decision no longer carries `max`, and a veiled choose is never answerable. The match and no-match positions render identically.
+- **Tests:** mutations that restore either shape make `hidden-differential.spec.ts` fail. Details and the remaining test gap (M3-42: no test presses "Use" under the veil) are in `docs/reviews/m3-review.md`, Re-review 4.
