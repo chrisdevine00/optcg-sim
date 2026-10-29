@@ -25,6 +25,8 @@ export interface GameConfig {
   /** "Always skip to my decisions" (board.md §5.3). */
   alwaysSkip: boolean;
   speed: Speed;
+  /** Start with AI playback paused (K), e.g. to read the board first. */
+  startPaused?: boolean;
 }
 
 export interface Announcement {
@@ -113,6 +115,7 @@ export class GameController {
       this.curtainSeen[this.seat] = this.turnKey();
     }
     if (config.alwaysSkip) this.skipping = true;
+    if (config.startPaused) this.paused = true;
   }
 
   // -------------------------------------------------------------------------------------------

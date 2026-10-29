@@ -33,6 +33,7 @@ async function startGame(choice: SetupChoice): Promise<GameController> {
     autoSkip: choice.autoSkip,
     alwaysSkip: choice.alwaysSkip,
     speed: choice.speed,
+    startPaused: choice.paused ?? false,
   };
   if (choice.scenario) {
     const sc = SCENARIOS[choice.scenario]!;

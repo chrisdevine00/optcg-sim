@@ -5,7 +5,8 @@
 .play {
   position: fixed;
   inset: 0;
-  overflow: hidden;
+  /* clip, not hidden: focus must never scroll the board (the peeking hand reaches below the window) */
+  overflow: clip;
   background: var(--color-bg);
   color: var(--color-text);
 }
@@ -349,9 +350,12 @@
   z-index: var(--z-card-raised);
 }
 .hand.peek .bc-hand:focus-visible,
-.hand.peek .bc-hand:hover,
-.hand.peek .bc-hand.raised {
+.hand.peek .bc-hand:hover {
   transform: translateY(-42%);
+}
+/* A staged card rises only a little in peek mode, so it never covers your Leader row. */
+.hand.peek .bc-hand.raised:not(:hover):not(:focus-visible) {
+  transform: translateY(-12px);
 }
 
 /* Card back: our own geometric design, never the printed back */
@@ -722,6 +726,7 @@
 .rail {
   position: absolute;
   top: 0;
+  overflow: clip;
   background: var(--color-bg);
   border-left: 1px solid var(--color-line);
 }
@@ -1679,4 +1684,21 @@
   list-style: none;
   margin: 0;
   padding: 0;
+}
+
+/* Tablet rails (264-280 px): tighter footer buttons that wrap within an 80 px footer (UX-V12). */
+.narrow-rail .dec-foot {
+  gap: 6px;
+  padding: 0 8px;
+}
+.narrow-rail .btn.big {
+  min-height: 64px;
+  padding: 2px 6px;
+  font-size: 13px;
+  line-height: 16px;
+}
+.narrow-rail .btn.big .lbl2 {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
 }

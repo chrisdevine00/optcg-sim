@@ -241,10 +241,11 @@ export function computeLayout(W: number, H: number): Layout {
   // Rail (§3.1, §3.9, §6.2, §6.3).
   const railHead = p.roomy ? 56 : 44;
   const notice = f.rail >= 320 ? 32 : 46;
+  // Tablet rails get an 80 px footer, so two-line labels and their sub-labels fit (UX-V12).
   const parts: [number, number, number] = p.roomy
     ? [44, 220, 72]
     : f.rail < 320
-      ? [36, 164, 64]
+      ? [36, 148, 80]
       : [36, 148, 64];
   const decH = parts[0] + parts[1] + parts[2];
   const narrowOrShort = f.rail < 320 || p.peek;

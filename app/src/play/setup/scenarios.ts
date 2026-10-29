@@ -55,6 +55,28 @@ export const SCENARIOS: Record<string, Spec> = {
       costArea: { active: 0, rested: 4 },
     },
   },
+  /** Rookie's turn; with this seed its first move attacks your Leader while you hold Counters. */
+  skip: {
+    mode: 'ai',
+    seed: 3,
+    turn: 4,
+    activePlayer: 'p2',
+    firstPlayer: 'p1',
+    p1: {
+      leader: 'ST01-001',
+      life: ['OP01-010', 'OP01-012'],
+      hand: ['OP01-010', 'OP01-012'],
+      deck: filler('OP01-010', 10),
+      costArea: { active: 0, rested: 4 },
+    },
+    p2: {
+      leader: { card: 'ST04-001', don: 2 },
+      life: ['OP01-010', 'OP01-012'],
+      hand: [],
+      deck: filler('OP01-012', 10),
+      costArea: { active: 0, rested: 2 },
+    },
+  },
   /** The AI is at 0 Life on p1's turn: one hit wins (a short game to completion). */
   lethal: {
     mode: 'ai',

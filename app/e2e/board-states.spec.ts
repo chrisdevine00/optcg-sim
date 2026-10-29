@@ -112,6 +112,21 @@ test.describe('board states', () => {
   });
 });
 
+test('forced colours keep the legal ring and the focus ring distinct (accessibility §4.1)', async ({
+  page,
+}, info) => {
+  await page.emulateMedia({ forcedColors: 'active', reducedMotion: 'reduce' });
+  await startGame(page, 'scenario=lethal&speed=4');
+  await nextDecision(page);
+  await page.locator('[data-zone="my-row"].bc-leader').focus();
+  await page.waitForTimeout(300);
+  await page.screenshot({ path: `.cache/m3/${info.project.name}-forced-colours.png` });
+  const outline = await page
+    .locator('[data-zone="my-row"].bc-leader')
+    .evaluate((el) => getComputedStyle(el).outlineStyle);
+  expect(outline).not.toBe('none');
+});
+
 test.describe('adapted sizes', () => {
   for (const [w, h] of [
     [1280, 600],
@@ -128,9 +143,18 @@ test.describe('adapted sizes', () => {
       const fits = () =>
         page.evaluate(() => {
           const body = document.querySelector('.dec-body')!;
-          const over = [...document.querySelectorAll('.dec-foot .btn')].filter(
-            (b) => b.scrollWidth > b.clientWidth + 1 || b.scrollHeight > b.clientHeight + 1,
-          ).length;
+          // No label spills out of its button, and no button out of the window.
+          const over = [...document.querySelectorAll('.dec-foot .btn')].filter((b) => {
+            const r = b.getBoundingClientRect();
+            const kids = [...b.querySelectorAll('*')].map((k) => k.getBoundingClientRect());
+            return (
+              r.bottom > window.innerHeight + 0.5 ||
+              kids.some(
+                (k) =>
+                  k.bottom > r.bottom + 0.5 || k.right > r.right + 0.5 || k.left < r.left - 0.5,
+              )
+            );
+          }).length;
           const primary =
             document.querySelector('.dec-foot .btn.primary')?.getBoundingClientRect().width ?? 999;
           return { scroll: body.scrollHeight - body.clientHeight, over, primary };

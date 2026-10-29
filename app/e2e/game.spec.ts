@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { playToEnd, startGame } from './game-support.ts';
+import { nextDecision, playToEnd, startGame } from './game-support.ts';
 
 test.describe('M3 board: full games', () => {
   test('a full game vs Rookie plays to completion', async ({ page }) => {
@@ -39,5 +39,20 @@ test.describe('M3 board: full games', () => {
     await expect(page.locator('#decision-title')).toHaveText('Game over');
     await expect(page.locator('.banner')).toContainText(/Player [12] wins/);
     expect(errors).toEqual([]);
+  });
+
+  test('Skip to my decision stops at the defence when a Counter is in hand (flows F21)', async ({
+    page,
+  }) => {
+    // Paused first, so nothing has happened yet when Skip is pressed.
+    await startGame(page, 'scenario=skip&paused=1');
+    await expect(page.locator('#decision')).toHaveAttribute('data-kind', 'waiting');
+    await page.locator('#skip-btn').click();
+    expect(await nextDecision(page)).toBe('counter');
+    await expect(page.locator('#take-hit')).toBeVisible();
+    await expect(page.locator('.log-row').filter({ hasText: /Hit|No counter/ })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Your Life, 2 cards, face down' })).toHaveCount(
+      1,
+    );
   });
 });

@@ -20,6 +20,7 @@ export interface SetupChoice {
   speed: Speed;
   seed: number | undefined;
   scenario?: string;
+  paused?: boolean;
 }
 
 function fromUrl(): Partial<SetupChoice> & { start?: boolean } {
@@ -40,6 +41,7 @@ function fromUrl(): Partial<SetupChoice> & { start?: boolean } {
   else if (speed && ['0.5', '1', '2', '4'].includes(speed)) out.speed = Number(speed) as Speed;
   if (q.get('skip') === '1') out.alwaysSkip = true;
   if (q.get('ask') === '1') out.autoSkip = false;
+  if (q.get('paused') === '1') out.paused = true;
   const sc = q.get('scenario');
   if (sc && SCENARIOS[sc]) out.scenario = sc;
   if (q.get('start') === '1') out.start = true;
@@ -81,6 +83,7 @@ export function Setup({
     speed,
     seed: /^\d+$/.test(seed) ? Number(seed) : undefined,
     ...(url.scenario ? { scenario: url.scenario } : {}),
+    ...(url.paused ? { paused: true } : {}),
   });
 
   useEffect(() => {

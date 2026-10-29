@@ -211,7 +211,8 @@ export function Game({
     const owner = c.owner;
     if (ctl.highlight?.handle === h) out.acting = ctl.highlight.word;
     if (battle && (battle.attacker === h || battle.target === h)) out.battle = true;
-    if (battle?.attacker === h) out.chips!.push({ text: '⚔ attacking', tone: 'attack' });
+    if (battle?.attacker === h && !view.result)
+      out.chips!.push({ text: '⚔ attacking', tone: 'attack' });
     const isSick =
       c.zone === 'characters' &&
       owner === me &&
@@ -791,7 +792,7 @@ export function Game({
   // ---------------- Arrow ----------------
   let arrow: { from: string; to: string; dashed: boolean; label?: string } | null = null;
   if (ui.kind === 'confirm') arrow = { from: ui.attacker, to: ui.target, dashed: true };
-  else if (view.battle) {
+  else if (view.battle && !view.result) {
     const target =
       mine && kind === 'block' && staging.blocker ? staging.blocker : view.battle.target;
     arrow = { from: view.battle.attacker, to: target, dashed: false };
@@ -849,7 +850,11 @@ export function Game({
   const countTarget = ui.kind === 'count' ? ui.target : null;
 
   return (
-    <main className={`play ${L.density}`} style={style} data-me={me}>
+    <main
+      className={`play ${L.density} ${L.rail.w < 320 ? 'narrow-rail' : ''}`}
+      style={style}
+      data-me={me}
+    >
       {!L.supported ? (
         <SmallScreen onHome={onHome} />
       ) : (

@@ -74,6 +74,7 @@ describe('board layout (board.md §3.1, §3.2, §6)', () => {
     expect(xywh(b.me.trash)).toEqual([668, 508, 80, 52]);
     expect(xywh(b.hand)).toEqual([12, 570, 736, 112]);
     expect(b.rail.decision.top).toBe(426);
+    expect(b.rail.decision.parts).toEqual([36, 148, 80]);
     const c = computeLayout(1280, 600);
     expect(c.card).toEqual({ w: 77, h: 108 });
     expect(c.peek).toBe(true);
