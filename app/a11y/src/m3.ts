@@ -265,7 +265,6 @@ export async function runM3(p: Pass) {
   );
 
   // 9 ---------------------------------------------------------------------------------------
-  let stepTen = false;
   await p.step(
     '9',
     'Attacked: the defence planner',
@@ -287,7 +286,6 @@ export async function runM3(p: Pass) {
       }
       const text = await p.decisionText();
       p.note(`Planner text: ${text.slice(0, 400)}`);
-      stepTen = /Need \+3000/.test(text);
       // Enter alone must not commit "Take the hit" (from the heading, where focus should be).
       const f = await p.focus();
       if (f.id !== 'decision-title') p.note('Focus was not on the planner heading.');
@@ -300,67 +298,97 @@ export async function runM3(p: Pass) {
     },
   );
 
-  // 10 --------------------------------------------------------------------------------------
-  await p.step(
-    '10',
-    'Stage Counters',
-    'Choose "No block"; stage one counter that ties; check the footer; stage a second; change one counter\'s target; Enter',
-    'After the first Space: the tie wording and a footer of "Take the hit" (primary) and "Play anyway · still hits"; after the second: "Counter plus 3000, survive" as the primary; Enter plays the counters; then the result',
-    async () => {
-      if (!stepTen) {
-        p.note('The first attack was not the 7000-against-5000 one this step needs.');
-        return 'not reached';
-      }
-      const k = await p.kind();
-      if (k !== 'block' && k !== 'counter') return 'not reached';
-      await decide(p, named(/^No block/), 'No block', '#decision [aria-pressed]', ' ');
-      await decide(
-        p,
-        named(/Drake \+2000/),
-        'X.Drake +2000',
-        '#decision [aria-label*="Drake"]',
-        ' ',
-      );
-      // The footer, in Tab order.
-      await p.until('Tab', (f) => f.id === 'take-hit', 8);
-      await p.until('Shift+Tab', named(/^Yamato \+1000/), 8);
-      await p.press(' ');
-      p.note(
-        'No control changes one staged Counter\'s target: staged Counters all go to the defender (the Leader, or the staged Blocker). "Change one counter\'s target" is not built.',
-      );
-      await p.until('Tab', named(/^Counter \+3000/), 8);
-      const f = await p.focus();
-      if (!/^Counter \+3000/.test(f.name))
-        await p.assist(
-          'Tab did not reach the Counter primary',
-          '#decision .dec-foot button:last-child',
-        );
-      await p.press('Enter');
-    },
-  );
-
-  // 11 --------------------------------------------------------------------------------------
-  await p.step(
-    '11',
-    'A hit reveals a [Trigger]',
-    'Take a hit that reveals a [Trigger]',
-    'The Trigger prompt with two buttons; the result is announced',
-    async () => {
-      let sawTrigger = false;
-      for (let i = 0; i < 20; i++) {
-        const k = await untilMine(p);
-        if (k === 'main' || k === 'over') break;
-        const f = await p.focus();
-        p.note(`Decision "${k}"; focus: ${f.aria}`);
-        if (k === 'trigger') {
-          sawTrigger = true;
-          p.note(`Trigger prompt: ${await p.decisionText()}`);
+  // 10 and 11 ------------------------------------------------------------------------------
+  // Rookie's attacks come in an order fixed by the seed and the script's moves, but that order
+  // has differed between the dry run and NVDA (the hit with a [Trigger] can come first). So the
+  // step that matches the open attack runs first, and the other waits for its attack.
+  const isTen = async () => /Need \+3000/.test(await p.decisionText());
+  let finished = false;
+  const finishTurn = async () => {
+    for (let i = 0; i < 20; i++) {
+      const k = await untilMine(p);
+      if (k === 'main' || k === 'over') break;
+      p.note(`Then "${k}"; focus: ${(await p.focus()).aria}`);
+      await answerPlainly(p, k);
+    }
+    finished = true;
+  };
+  const ten = () =>
+    p.step(
+      '10',
+      'Stage Counters',
+      'Choose "No block"; stage one counter that ties; check the footer; stage a second; change one counter\'s target; Enter',
+      'After the first Space: the tie wording and a footer of "Take the hit" (primary) and "Play anyway · still hits"; after the second: "Counter plus 3000, survive" as the primary; Enter plays the counters; then the result',
+      async () => {
+        // Wait for the 7000-against-5000 attack, answering anything else plainly.
+        for (let i = 0; i < 20; i++) {
+          const k = await untilMine(p);
+          if (k === 'main' || k === 'over') return 'not reached';
+          if ((k === 'block' || k === 'counter') && (await isTen())) break;
+          p.note(`Before the 7000 attack: "${k}"; focus: ${(await p.focus()).aria}`);
+          await answerPlainly(p, k);
         }
-        await answerPlainly(p, k);
-      }
-      if (!sawTrigger) return 'not reached';
-    },
-  );
+        p.note(`Planner: ${(await p.decisionText()).slice(0, 300)}`);
+        await decide(p, named(/^No block/), 'No block', '#decision [aria-pressed]', ' ');
+        await decide(
+          p,
+          named(/Drake \+2000/),
+          'X.Drake +2000',
+          '#decision [aria-label*="Drake"]',
+          ' ',
+        );
+        // The footer, in Tab order.
+        await p.until('Tab', (f) => f.id === 'take-hit', 8);
+        await p.until('Shift+Tab', named(/^Yamato \+1000/), 8);
+        await p.press(' ');
+        p.note(
+          'No control changes one staged Counter\'s target: staged Counters all go to the defender (the Leader, or the staged Blocker). "Change one counter\'s target" is not built.',
+        );
+        await p.until('Tab', named(/^Counter \+3000/), 8);
+        const f = await p.focus();
+        if (!/^Counter \+3000/.test(f.name))
+          await p.assist(
+            'Tab did not reach the Counter primary',
+            '#decision .dec-foot button:last-child',
+          );
+        await p.press('Enter');
+        if (sawTrigger) await finishTurn();
+      },
+    );
+  let sawTrigger = false;
+  const eleven = () =>
+    p.step(
+      '11',
+      'A hit reveals a [Trigger]',
+      'Take a hit that reveals a [Trigger]',
+      'The Trigger prompt with two buttons; the result is announced',
+      async () => {
+        for (let i = 0; i < 20 && !sawTrigger; i++) {
+          const k = await untilMine(p);
+          if (k === 'main' || k === 'over') break;
+          const f = await p.focus();
+          p.note(`Decision "${k}"; focus: ${f.aria}`);
+          if (k === 'trigger') {
+            sawTrigger = true;
+            p.note(`Trigger prompt: ${await p.decisionText()}`);
+          }
+          await answerPlainly(p, k);
+        }
+        // Hear the result of the [Trigger] before moving on.
+        await p.page.waitForTimeout(1500);
+        if (!sawTrigger) return 'not reached';
+        if (!finished && tenFirst) await finishTurn();
+      },
+    );
+  const tenFirst = await isTen();
+  if (tenFirst) {
+    await ten();
+    await eleven();
+  } else {
+    await eleven();
+    await ten();
+  }
+  if (!finished) await finishTurn();
 
   // 12 --------------------------------------------------------------------------------------
   let orderSeen = false;
