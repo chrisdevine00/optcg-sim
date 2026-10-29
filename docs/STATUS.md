@@ -1,7 +1,7 @@
 # Status
 
 **Phase:** 5 Build, slice pass (ADR 0012), starting at M0. Phases 1–4 gated 2026-10-28.
-**Milestone:** M3 Playable board (next). M0, M1 and M2 done 2026-10-28.
+**Milestone:** M3 Playable board (in progress). M0, M1 and M2 done 2026-10-28.
 **Milestone:** M0 scaffold started (allowed before the Phase 4 gate)
 **Run the app:** `npm install && npm run dev` then open http://localhost:5173/optcg-sim/ and go to `/cards` for the card browser
 **Deployed:** https://chrisdevine00.github.io/optcg-sim/ (auto-deploys after green CI on `main`)
@@ -73,7 +73,15 @@
 
 ## In progress
 
-Nothing running.
+The M3 builder subagent is on `main`, in `app/` and `ai/`. It is building:
+- the session store;
+- Rookie in a Web Worker;
+- the setup screen with the 12 archetypes' lists;
+- the board per `board.md`, with every decision type;
+- hotseat, AI pacing, the inspector, the live region and keyboard play;
+- the carried fixes.
+
+It commits each green step. If interrupted, check `git log`, then re-launch with the M3 brief (PLAN M3 row, `board.md`, `flows.md`, `accessibility.md`), continuing from the last commit. After the builder finishes come a screenshot review (`docs/reviews/m3-review.md`) and a manual screen-reader pass.
 
 ## Next (slice pass, PLAN.md §1)
 
