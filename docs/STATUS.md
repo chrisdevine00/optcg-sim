@@ -70,7 +70,13 @@
   - Tests: 361 unit tests pass, 0 fail, plus 183 todos that wait for M4 effects. The independent suite (132 tests written blind) passes in full.
   - Benchmark: median `reduce` about 4 µs (target under 20 µs), `legalActions` about 1.4 µs.
   - Nightly property run: 10,000 random games in 39 s, with 0 invariant failures, 0 replay-hash mismatches and 0 projection leaks.
-- **Running:** a skeptical-engineer review (`docs/reviews/m2-review.md`) that tries to break rules, hidden information and determinism with probe tests. M2 is done on PASS. If interrupted, re-launch the review with the same brief.
+- **M2 review** (`docs/reviews/m2-review.md`): FAIL. The base rules held under every probe, but there are three severity-4 hidden-information leaks:
+  - M2-01: the Trigger decision reveals that a face-down Life card has a [Trigger];
+  - M2-02: `autoSkip` on an empty Counter window reveals the hand in hotseat;
+  - M2-03: event handles track a card through the opponent's hand.
+
+  There are also 8 severity-2 findings, among them the CR 8-6 pending-trigger queue that M4a needs. The probe tests are in `.cache/m2-review/probes/`.
+- **Running:** the engine author is fixing these with tests that fail before the fix. The reviewer then re-checks. If interrupted, re-launch the engine author with "fix the findings in docs/reviews/m2-review.md".
 
 ## Next (slice pass, PLAN.md §1)
 
