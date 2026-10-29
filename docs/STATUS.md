@@ -108,7 +108,12 @@ Notes:
 - **Tests:** 633 unit tests (164 todo), 79 e2e.
 - **API additions:** `Decision.purpose/source/options`, `{ option }` picks, `CardView`/`ViewCard` effect flags, `ProjectedView.looking/known/attackLock/delayed` (DECISIONS 2026-10-29, M4a).
 
-The independent card tests are done: branch `m4a-independent-tests` (334b676) holds 314 tests over all 37 cards, with 240 failing until the scripts land, plus `API-GAPS.md`. The API gaps went to the builder. Merge it after the builder reports, and send disagreements back to the builder. If interrupted, check `git log` and the branch, then re-launch either one from where it stopped.
+Since the builder's report:
+- **Orchestrator check** on clean main: 633 unit tests, 37 scripts, and a benchmark median of 3,949 per second with other agents running.
+- **Independent card tests**, branch `m4a-independent-tests`: merged with main in a scratch worktree, 91 of 314 fail. Most failures are decision-shape mismatches with the new API additions. The test author is adapting the kit (not the expected outcomes) and classifying the rest as test bug, rules disagreement or API gap in `DISAGREEMENTS.md`. Then the orchestrator adjudicates each disagreement against the card text and the CR, the builder fixes engine bugs, and the branch is merged.
+- **Independent M4a review**, `docs/reviews/m4a-review.md`: running.
+
+If interrupted, check `git log` and the branch, and re-launch whichever of these stopped.
 
 ## Next (slice pass, PLAN.md §1)
 
