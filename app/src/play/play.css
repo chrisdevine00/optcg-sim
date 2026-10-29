@@ -1775,3 +1775,8 @@
     pointer-events: none;
   }
 }
+
+.cchip.warn {
+  background: var(--color-warning);
+  color: var(--color-on-warning);
+}

@@ -302,6 +302,10 @@ export function Game({
       if (k >= 0) {
         out.selected = true;
         out.chips!.push({ text: `✓ ${k + 1}`, tone: 'you' });
+      } else if (view.decision?.prompt.includes('Character area is full')) {
+        // board.md §3.7: the candidates say what happens to them (M3-22).
+        out.chips!.push({ text: 'Trash · not a K.O.', tone: 'warn' });
+        out.extraName = ['trash to make room, not a K.O.'];
       }
     }
     if (
