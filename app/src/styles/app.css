@@ -376,6 +376,14 @@ kbd {
   color: var(--color-plate-text);
   box-shadow: 0 0 0 1px rgb(255 255 255 / 0.2);
 }
+/* Compact tiles show the chip's icon only, so it never reaches the Counter plate (M1-37); the word stays in
+   the tile's accessible name and the chip's title. Roomy tiles have room for the word. */
+.face-chip-word {
+  margin-left: 3px;
+}
+.face-tile .face-chip-word {
+  display: none;
+}
 .face-chip-banned {
   background: var(--color-attack);
   color: var(--color-on-attack);
@@ -724,6 +732,11 @@ kbd {
   color: var(--color-text);
   box-shadow: var(--elev-3);
 }
+/* The sticky header and footer never hide content scrolled into view (M1-38, WCAG 2.4.11). */
+.inspector {
+  scroll-padding-top: 96px;
+  scroll-padding-bottom: 64px;
+}
 .inspector::backdrop {
   background: var(--color-scrim);
 }
@@ -867,6 +880,7 @@ kbd {
    dialog scrolls, so the card text is always reachable and never squeezed. */
 @media (max-width: 560px) {
   .inspector {
+    scroll-padding: 0;
     width: calc(100vw - 16px);
     max-width: none;
     max-height: calc(100vh - 16px);
@@ -915,6 +929,9 @@ kbd {
   }
   .face-text-body {
     -webkit-line-clamp: 3;
+  }
+  .face-tile .face-chip-word {
+    display: inline;
   }
   .inspector {
     width: min(1040px, 92vw);

@@ -311,13 +311,30 @@ test.describe('card browser', () => {
     await expectFocusAt(page, '0');
   });
 
-  test('shows banned and rotated status on tiles', async ({ page }) => {
+  test('shows banned and rotated status on tiles', async ({ page }, info) => {
     await serveArt(page);
+    const roomy = info.project.name === '1080p';
     await page.goto('./cards?q=OP14-020');
-    await expect(tile(page, 'OP14-020')).toContainText('⛔ Banned');
+    // Compact tiles show the icon only (M1-37); the word is in the name and the title.
+    await expect(tile(page, 'OP14-020')).toContainText(roomy ? '⛔Banned' : '⛔');
+    await expect(tile(page, 'OP14-020').locator('.face-chip')).toHaveAttribute('title', 'Banned');
     await expect(tile(page, 'OP14-020')).toHaveAccessibleName(/banned in Standard/);
     await page.goto('./cards?set=OP-01');
-    await expect(tile(page, 'OP01-001')).toContainText('⟲ Rotated');
+    await expect(tile(page, 'OP01-001')).toContainText('⟲');
+    // M1-37: no status chip intersects any plate on any visible tile.
+    const overlaps = await page.evaluate(() => {
+      const out: string[] = [];
+      for (const chip of document.querySelectorAll('.face-chip')) {
+        const c = chip.getBoundingClientRect();
+        for (const plate of chip.parentElement!.querySelectorAll('.plate')) {
+          const p = plate.getBoundingClientRect();
+          if (c.left < p.right && p.left < c.right && c.top < p.bottom && p.top < c.bottom)
+            out.push(plate.textContent ?? '');
+        }
+      }
+      return out;
+    });
+    expect(overlaps).toEqual([]);
   });
 
   test('falls back to the text card face when images are blocked, and says so honestly', async ({

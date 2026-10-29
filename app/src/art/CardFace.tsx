@@ -44,7 +44,10 @@ export function useArt(artwork: Artwork | undefined, load = true) {
   };
 }
 
-const LEGAL_CHIP: Record<string, string> = { banned: '⛔ Banned', rotated: '⟲ Rotated' };
+const LEGAL_CHIP: Record<string, [string, string]> = {
+  banned: ['⛔', 'Banned'],
+  rotated: ['⟲', 'Rotated'],
+};
 const LEGAL_WORDS: Record<string, string> = {
   banned: 'banned in Standard',
   rotated: 'rotated out of Standard',
@@ -61,11 +64,14 @@ export function CardFace({
   artwork = card.artworks[0],
   load = true,
   tile = false,
+  plates = true,
 }: {
   card: Card;
   artwork?: Artwork | undefined;
   load?: boolean;
   tile?: boolean;
+  /** False on the board, which draws live values on its own plates (board.md §2.3). */
+  plates?: boolean;
 }) {
   const art = useArt(artwork, load);
   const focus = card.artFocus;
@@ -115,17 +121,24 @@ export function CardFace({
           </span>
         )}
       </span>
-      {card.cost !== null && <span className="plate plate-cost">{num(card.cost)}</span>}
-      {card.category === 'Leader' && card.life !== null && (
+      {plates && card.cost !== null && <span className="plate plate-cost">{num(card.cost)}</span>}
+      {plates && card.category === 'Leader' && card.life !== null && (
         <span className="plate plate-life">
           {card.life}
           <span className="plate-unit">Life</span>
         </span>
       )}
-      {card.power !== null && <span className="plate plate-power">{num(card.power)}</span>}
-      {card.counter !== null && <span className="plate plate-counter">+{card.counter}</span>}
+      {plates && card.power !== null && (
+        <span className="plate plate-power">{num(card.power)}</span>
+      )}
+      {plates && card.counter !== null && (
+        <span className="plate plate-counter">+{card.counter}</span>
+      )}
       {legal && (
-        <span className={`face-chip face-chip-${card.legality.standard.status}`}>{legal}</span>
+        <span className={`face-chip face-chip-${card.legality.standard.status}`} title={legal[1]}>
+          {legal[0]}
+          <span className="face-chip-word">{legal[1]}</span>
+        </span>
       )}
       <span className="face-foot">
         <span className="face-name">{card.name.replace(/\.(?=\S)/g, '.\u200b')}</span>
