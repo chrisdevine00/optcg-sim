@@ -168,7 +168,7 @@ function donFor(s: State): PlayerView['don'] {
   return out;
 }
 
-const GENERIC_PROMPT: Record<Decision['kind'], string> = {
+export const GENERIC_PROMPT: Record<Decision['kind'], string> = {
   chooseFirst: 'Your opponent is choosing who goes first.',
   mulligan: 'Your opponent is deciding whether to redraw.',
   main: "It is your opponent's Main Phase.",

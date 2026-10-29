@@ -22,7 +22,7 @@
 import type { CardId, CardLookup, GameState, InstanceId, PlayerId } from './api.ts';
 import { DefTable } from './defs.ts';
 import { INSTANCE_ID } from './draft.ts';
-import { canSee, handleFor, project, type ProjectedView } from './project.ts';
+import { canSee, GENERIC_PROMPT, handleFor, project, type ProjectedView } from './project.ts';
 import { seedRng } from './rng.ts';
 import { other, PLAYERS, type State } from './state.ts';
 
@@ -110,16 +110,40 @@ export function skeletonOf(s: State, viewer: PlayerId): Skeleton {
       }
       return st;
     });
+  /** Does this raw value name a card the viewer cannot see? */
+  const namesHidden = (v: unknown): boolean =>
+    typeof v === 'string' && [...v.matchAll(ANY_ID)].some((m) => ids.has(m[0]) && !seen.has(m[0]));
   const walk = (v: unknown): unknown => {
     if (typeof v === 'string') return rename(v);
     if (Array.isArray(v)) return v.map(walk);
     if (v && typeof v === 'object') {
+      const o = v as Record<string, unknown>;
       const out: Record<string, unknown> = {};
-      for (const [k, x] of Object.entries(v)) out[rename(k)] = walk(x);
+      for (const [k, x] of Object.entries(o)) out[rename(k)] = walk(x);
+      // A record about a hidden card also carries its printed id (`cardId`) or a label derived
+      // from it: blank them too (review M5a-02).
+      if (namesHidden(o.card)) {
+        if ('cardId' in out) out.cardId = '';
+        if ('label' in out) out.label = '';
+      }
       return out;
     }
     return v;
   };
+  // A decision another player owes was built from their private information (a face-down Life
+  // card's name in a damage prompt, looked-at cards in order labels, how many hidden cards
+  // qualify). The viewer gets only its public shape, as `project` gives it, and the skeleton is
+  // opaque: nothing can be searched from it (review M5a-02).
+  const owed = s.decision;
+  const foreign = owed !== null && owed.player !== viewer;
+  if (foreign) opaque = true;
+  const decision = foreign
+    ? ({
+        kind: owed.kind,
+        player: owed.player,
+        prompt: GENERIC_PROMPT[owed.kind],
+      } as State['decision'])
+    : s.decision;
 
   const cards: State['cards'] = {};
   for (const [id, cid] of ids) {
@@ -165,7 +189,7 @@ export function skeletonOf(s: State, viewer: PlayerId): Skeleton {
     ...(walk({
       battle: s.battle && { ...s.battle, keys: { attacker: '', target: '' } },
       stack: s.stack,
-      decision: s.decision,
+      decision,
       mods: s.mods,
       pending: s.pending.map(blankKeys),
       oncePerTurn: s.oncePerTurn,
