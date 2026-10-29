@@ -140,7 +140,7 @@ export function isLegal(g: TestGame, move: Move): boolean {
   const decision = queries.decision(g.state);
   const player = move.player ?? decision?.player;
   if (!player) return false;
-  const full = { ...move, player } as Omit<Action, 'intentId'>;
+  const full = { ...move, player } as DistributiveOmit<Action, 'intentId'>;
   return g.isLegal(full);
 }
 
