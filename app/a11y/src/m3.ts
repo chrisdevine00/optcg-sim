@@ -93,15 +93,32 @@ async function untilMine(p: Pass, max = 40): Promise<string> {
     const k = await p.kind();
     if (HUMAN.has(k) || k === 'over') return k;
     const f = await p.focus();
-    if (!f.inBoard && !f.inDecision) {
+    const before = `${k}|${(await p.live()).length}|${p.reader.heardSince(0).length}`;
+    if (f.inBoard) await p.press('.');
+    else if (!deadDot && f.inDecision) {
+      // The panel prints "." on its Next move button; try the key where focus is first.
+      await p.press('.');
+      const after = `${await p.kind()}|${(await p.live()).length}|${p.reader.heardSince(0).length}`;
+      if (after === before && (await p.kind()) === 'waiting') {
+        deadDot = true;
+        p.note(
+          `"." did nothing with focus on ${f.aria} (in the decision panel, outside the board's application region). From here the script presses Enter on that button, as a user would.`,
+        );
+      }
+    } else if (/^Next move|^Skip to my decision/.test(f.name)) {
+      await p.press('Enter');
+    } else {
       // `.` is a board key; a user would come back to the board first.
       await toZone(p, 'hand');
+      await p.press('.');
     }
-    await p.press('.');
     await p.page.waitForTimeout(150);
   }
   return await p.kind();
 }
+
+/** Set once "." has been seen to do nothing in the decision panel (the reader took the key). */
+let deadDot = false;
 
 const gameOver = async (p: Pass) =>
   (await p.live()).some((l) => /game over|you win|you lose/i.test(l.text)) ||
@@ -478,17 +495,20 @@ export async function runM3(p: Pass) {
         p.note(`R did not open the rewind list; focus: ${g.aria}`);
         return;
       }
-      // The list: arrows first (as the spec says), then Tab if arrows do not move.
+      // The list: arrows first (as the spec says), then Tab if arrows do not move focus.
       let h = g;
       for (let i = 0; i < 2; i++) h = await p.press('ArrowDown');
-      if (h.aria === g.aria) {
-        p.note('ArrowDown did not move in the rewind list; Tab does.');
-        for (let i = 0; i < 2; i++) await p.press('Tab');
-      }
+      if (h.aria === g.aria) p.note('ArrowDown did not move focus in the rewind list.');
+      // Choose the newest move (the first item), then confirm.
+      await p.until('Shift+Tab', (x) => x.aria === g.aria, 8);
       h = await p.press('Enter');
-      if (h.inDialog) {
+      if (h.inDialog && !/^Rewind to before it/.test(h.name))
         h = (await p.until('Tab', named(/^Rewind to before it/), 30)) ?? h;
-        if (/^Rewind to before it/.test(h.name)) h = await p.press('Enter');
+      if (/^Rewind to before it/.test(h.name) && !h.aria.includes('[disabled]'))
+        h = await p.press('Enter');
+      if (h.inDialog) {
+        p.note(`The rewind did not happen; focus: ${h.aria}. Closing the list with Escape.`);
+        h = await p.press('Escape');
       }
       p.note(`After the rewind: decision "${await p.kind()}"; focus: ${h.aria}`);
     },
@@ -501,6 +521,7 @@ export async function runM3(p: Pass) {
     '?, then Escape',
     'Sheet dialog read; focus returns',
     async () => {
+      if ((await p.focus()).inDialog) await p.press('Escape');
       await toZone(p, 'hand');
       await p.press('?');
       await p.press('Escape');
