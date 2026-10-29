@@ -103,7 +103,7 @@ The screen-reader section of the review is a proxy built from aria snapshots and
 5. the benchmark;
 6. app integration.
 
-An independent test author is writing black-box card tests on branch `m4a-independent-tests` without seeing the scripts. Merge it after the builder reports, and send disagreements back to the builder. If interrupted, check `git log` and the branch, then re-launch either one from where it stopped.
+The independent card tests are done: branch `m4a-independent-tests` (334b676) holds 314 tests over all 37 cards, with 240 failing until the scripts land, plus `API-GAPS.md`. The API gaps went to the builder. Merge it after the builder reports, and send disagreements back to the builder. If interrupted, check `git log` and the branch, then re-launch either one from where it stopped.
 
 ## Next (slice pass, PLAN.md §1)
 
