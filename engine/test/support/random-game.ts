@@ -36,15 +36,36 @@ export interface RandomGameOptions {
   decks?: [number, number];
   /** Check invariants after every action (default true). */
   invariants?: boolean;
+  policy?: Policy;
   /** Keep every intermediate state (default false). */
   keepStates?: boolean;
   onStep?: (before: GameState, action: Action, after: GameState, legal: Action[]) => void;
 }
 
-export function pickAction(legal: Action[], rng: number): [Action, number] {
+/** `passive` rarely attacks and always ends the turn quickly, so games reach deck-out. */
+export type Policy = 'random' | 'passive';
+
+export function pickAction(
+  legal: Action[],
+  rng: number,
+  policy: Policy = 'random',
+): [Action, number] {
   const options = legal.filter((a) => a.type !== 'concede');
-  const weights = options.map((a) => (a.type === 'endTurn' ? 1 : a.type === 'giveDon' ? 2 : 4));
+  const weights = options.map((a): number =>
+    policy === 'passive'
+      ? a.type === 'endTurn'
+        ? 20
+        : a.type === 'attack'
+          ? 0
+          : 4
+      : a.type === 'endTurn'
+        ? 1
+        : a.type === 'giveDon'
+          ? 2
+          : 4,
+  );
   const total = weights.reduce((x, y) => x + y, 0);
+  if (total === 0) return [options[0]!, rng];
   let v: number;
   [v, rng] = nextInt(rng, total);
   for (let i = 0; i < options.length; i++) {
@@ -92,7 +113,7 @@ export function playRandomGame(opts: RandomGameOptions): RandomGame {
       break;
     }
     let action: Action;
-    [action, rng] = pickAction(legal, rng);
+    [action, rng] = pickAction(legal, rng, opts.policy);
     const next = reduce(state, action).state;
     opts.onStep?.(state, action, next, legal);
     record.actions.push(action);

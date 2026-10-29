@@ -36,6 +36,8 @@ export function battleStepOf(s: State): BattleStep | null {
       return 'block';
     case 'counterEnd':
       return 'counter';
+    case 'damageEnd':
+      return 'damage';
     case 'endExpire':
       return 'end';
     default:

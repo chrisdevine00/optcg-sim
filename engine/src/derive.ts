@@ -29,14 +29,15 @@ function modsFor(s: State, id: InstanceId): Modifier[] | undefined {
   if (!idx) {
     idx = new Map();
     for (const m of s.mods) {
-      if (!active(s, m)) continue;
       const list = idx.get(m.target);
       if (list) list.push(m);
       else idx.set(m.target, [m]);
     }
     modIndex.set(s.mods, idx);
   }
-  return idx.get(id);
+  // The index is shared by states with the same modifier list; whether a modifier is active
+  // depends on the state, so filter here.
+  return idx.get(id)?.filter((m) => active(s, m));
 }
 
 /** A `whileSource` modifier lasts only while its source stays on the field. */

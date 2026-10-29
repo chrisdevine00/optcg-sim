@@ -417,8 +417,9 @@ function runBattle(d: Draft): void {
       b.step = moved(d) ? 'end' : 'damage';
       return;
     case 'damage': {
-      // CR 7-1-4: compare once; the attacker wins ties.
-      b.step = 'end';
+      // CR 7-1-4: compare once; the attacker wins ties. Damage processing and the K.O. run in
+      // frames pushed above this one, still inside the Damage Step.
+      b.step = 'damageEnd';
       const ap = deriveLive(s, b.attacker).power ?? 0;
       const tp = deriveLive(s, b.target).power ?? 0;
       const target = d.card(b.target);
@@ -462,6 +463,9 @@ function runBattle(d: Draft): void {
       }
       return;
     }
+    case 'damageEnd':
+      b.step = 'end';
+      return;
     case 'end':
       // CR 7-1-5-1, 7-1-5-2: the battle ends; end-of-battle effects activate.
       b.step = 'endExpire';

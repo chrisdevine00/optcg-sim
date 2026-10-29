@@ -162,9 +162,12 @@ export function leaveField(
   return moveCard(d, id, dest, { ...opts, cause });
 }
 
+/** Modifiers on a card that left fall away (CR 3-1-6), and so do those lasting while it stays. */
 function dropModifiers(d: Draft, id: InstanceId): void {
-  if (!d.s.mods.some((m) => m.target === id)) return;
-  d.s.mods = d.s.mods.filter((m) => m.target !== id);
+  const gone = (m: Modifier): boolean =>
+    m.target === id || (m.duration.kind === 'whileSource' && m.duration.source === id);
+  if (!d.s.mods.some(gone)) return;
+  d.s.mods = d.s.mods.filter((m) => !gone(m));
 }
 
 // ---------------------------------------------------------------------------------------------

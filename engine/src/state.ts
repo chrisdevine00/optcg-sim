@@ -197,7 +197,7 @@ export interface Battle {
   /** Current target (a Blocker replaces it). */
   target: InstanceId;
   /** Area of the attacker and target at declaration, for the moved-area checks (CR 7-1-1-4). */
-  step: BattleStep | 'attackEnd' | 'blockEnd' | 'counterEnd' | 'endExpire';
+  step: BattleStep | 'attackEnd' | 'blockEnd' | 'counterEnd' | 'damageEnd' | 'endExpire';
   blocker: InstanceId | null;
   /** Did the attacker win the Damage Step (for "if this battles" checks later). */
   attackerWon: boolean | null;
