@@ -86,7 +86,14 @@ Builder decisions are logged in DECISIONS (2026-10-28, M3). Not done in M3, by t
 - the "you look away" line;
 - the forced-colours double ring.
 
-An independent reviewer is writing `docs/reviews/m3-review.md`: screenshots, driving the real app, hidden information, and an accessibility-tree proxy for the screen-reader pass. If interrupted, re-launch that review. Then fix severity 3 and 4 findings through the builder, and mark M3 done.
+**Review 1 (`docs/reviews/m3-review.md`, commit 0cfa8cc): FAIL.** 26 findings:
+- 4 at severity 4, all hotseat hidden-information leaks while the screen is veiled (M3-01 to M3-04);
+- 4 at severity 3: Counters staged before choosing a Blocker (M3-05), no touch reveal (M3-06), the curtain's focus trap (M3-07), battle maths not announced (M3-08);
+- 17 at severity 2 and one combined severity-1 row.
+
+Against the AI, the reviewer found no leak. The tablet defence change (`d4701b7`, CI green) was re-checked and is fine. The builder is on fix round 1. Then the same reviewer re-reviews, and M3 is marked done.
+
+The screen-reader section of the review is a proxy built from aria snapshots and live-region transcripts. A real VoiceOver or NVDA pass is still owed: it goes with owner session S1, or to the owner sooner if possible.
 
 **M4a has started in parallel** (engine and cards; it touches `app/` only at the end, after rebasing). The builder works on `main` in this order:
 1. the carried M2 findings (M2-17 to M2-23, M2-19 first);
