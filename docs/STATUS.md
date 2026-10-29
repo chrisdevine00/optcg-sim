@@ -88,6 +88,16 @@ Builder decisions are logged in DECISIONS (2026-10-28, M3). Not done in M3, by t
 
 An independent reviewer is writing `docs/reviews/m3-review.md`: screenshots, driving the real app, hidden information, and an accessibility-tree proxy for the screen-reader pass. If interrupted, re-launch that review. Then fix severity 3 and 4 findings through the builder, and mark M3 done.
 
+**M4a has started in parallel** (engine and cards; it touches `app/` only at the end, after rebasing). The builder works on `main` in this order:
+1. the carried M2 findings (M2-17 to M2-23, M2-19 first);
+2. the DSL types and schema;
+3. the runtime;
+4. the Rocks and Kaido scripts, each with tests;
+5. the benchmark;
+6. app integration.
+
+An independent test author is writing black-box card tests on branch `m4a-independent-tests` without seeing the scripts. Merge it after the builder reports, and send disagreements back to the builder. If interrupted, check `git log` and the branch, then re-launch either one from where it stopped.
+
 ## Next (slice pass, PLAN.md §1)
 
 1. **M3 Playable board** (estimate 50 h):
