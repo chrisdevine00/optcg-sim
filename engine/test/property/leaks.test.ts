@@ -169,7 +169,9 @@ describe('hidden-information leak properties', () => {
               expect(JSON.stringify(project(other, viewer))).toBe(
                 JSON.stringify(project(g, viewer)),
               );
-              // M5a: the AI's search skeleton is as blind as the view (ADR 0005).
+              // M5a: the AI's search skeleton is as blind as the view (ADR 0005). Permuting card
+              // ids after the fact cannot reach text the engine derived from them (a prompt naming
+              // a Life card): skeleton-diff.test.ts compares reachable pairs for that (M5a-02).
               expect(JSON.stringify(projectForSearch(other, viewer).skeleton)).toBe(
                 JSON.stringify(projectForSearch(g, viewer).skeleton),
               );
