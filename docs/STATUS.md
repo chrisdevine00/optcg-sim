@@ -1,7 +1,7 @@
 # Status
 
 **Phase:** 5 Build, slice pass (ADR 0012), starting at M0. Phases 1–4 gated 2026-10-28.
-**Milestone:** M2 Engine core (in progress). M0 and M1 done 2026-10-28.
+**Milestone:** M3 Playable board (next). M0, M1 and M2 done 2026-10-28.
 **Milestone:** M0 scaffold started (allowed before the Phase 4 gate)
 **Run the app:** `npm install && npm run dev` then open http://localhost:5173/optcg-sim/ and go to `/cards` for the card browser
 **Deployed:** https://chrisdevine00.github.io/optcg-sim/ (auto-deploys after green CI on `main`)
@@ -64,25 +64,28 @@
   Review `docs/reviews/m1-review.md`: PASS after two fix rounds (4 + 1 severity-3 fixed). Tests: 69 unit, 36 e2e runs (720p and 1080p).
   Carried to M3: M1-37 (the Banned/Rotated chip clips the counter value at 1280) and M1-38 (the inspector header can cover the first text line at 561–640 px).
 
+- **M2 Engine core** (done 2026-10-28): the frozen public API is implemented. It covers every non-effect rule, scenarios, replacement hooks, last-known information, the CR 8-6 pending queue, leak-proof projection (handles re-keyed in hidden zones, damage decisions that reveal nothing), versioned records with per-turn snapshots, and a semantic hash.
+  - Tests: 310 engine tests, including 132 independent tests written blind; 183 todos wait for M4 effects.
+  - Benchmark: median `reduce` about 4 µs.
+  - Nightly property run: 10,000 games with varying seeds.
+  - Review `docs/reviews/m2-review.md`: PASS after one fix round (3 severity-4 hidden-information leaks fixed, each with a test that fails against the old code).
+  - Carried: M2-19 (`autoSkip` must not skip forced picks among hidden cards) must be fixed before M4a; M2-17 and the severity-1 nits go with it.
+
 ## In progress
 
-- **M2 Engine core:** built on `main` (commits c1e0d2c, 13e358a, 0402711, 41c955d) and merged with the independent suite (c6d8661).
-  - Tests: 361 unit tests pass, 0 fail, plus 183 todos that wait for M4 effects. The independent suite (132 tests written blind) passes in full.
-  - Benchmark: median `reduce` about 4 µs (target under 20 µs), `legalActions` about 1.4 µs.
-  - Nightly property run: 10,000 random games in 39 s, with 0 invariant failures, 0 replay-hash mismatches and 0 projection leaks.
-- **M2 review** (`docs/reviews/m2-review.md`): FAIL. The base rules held under every probe, but there are three severity-4 hidden-information leaks:
-  - M2-01: the Trigger decision reveals that a face-down Life card has a [Trigger];
-  - M2-02: `autoSkip` on an empty Counter window reveals the hand in hotseat;
-  - M2-03: event handles track a card through the opponent's hand.
-
-  There are also 8 severity-2 findings, among them the CR 8-6 pending-trigger queue that M4a needs. The probe tests are in `.cache/m2-review/probes/`.
-- **Running:** the engine author is fixing these with tests that fail before the fix. The reviewer then re-checks. If interrupted, re-launch the engine author with "fix the findings in docs/reviews/m2-review.md".
+Nothing running.
 
 ## Next (slice pass, PLAN.md §1)
 
-1. **M2 review** (running), then fix any severity-3 or severity-4 findings.
-2. **M3 Playable board:** the board from `docs/design/board.md`, hotseat, play vs Rookie, every decision type, rewind by move, the keyboard path, and the live region. It also fixes the carried items: the two Phase 4 severity-2 findings and M1-37/38.
-3. **M4a:** the DSL runtime, then the Rocks and Kaido archetypes and a throughput benchmark. Then M5a (Pirate), the learning slice L, and owner usability session S1.
+1. **M3 Playable board** (estimate 50 h):
+   - the board per `docs/design/board.md` at 1280×720 and 1920×1080, plus the adapted sizes;
+   - hotseat, and play vs Rookie (random legal moves, always blocks or counters lethal, in a Web Worker);
+   - every decision type from `flows.md`: the defence panel, multi-select, Trigger, order;
+   - rewind by move, the inspector, the live region, and the keyboard path from `accessibility.md`.
+
+   It also fixes the carried items: the Phase 4 severity-2 findings and M1-37/38.
+2. **M4a:** fix M2-19 first; then the DSL runtime, the Rocks and Kaido archetypes, and a throughput benchmark.
+3. **M5a** (Pirate), the learning slice L, and owner usability session S1.
 
 ## Blockers
 

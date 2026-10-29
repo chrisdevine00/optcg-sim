@@ -92,3 +92,94 @@ M2 review: FAIL (open: M2-01, M2-02, M2-03)
 
 - **M2-01 to M2-03 are rated 4 even though no real card triggers them in a seeded game today.** Each one is in M2's own deliverable (projection hardening and the `autoSkip` API). Each is reachable now: M2-02 with real Counter cards, M2-01 and M2-03 through the hooks and scenarios. M3 hotseat and M4 scripts will expose all three.
 - **M2-05 is rated 2, not 3, because PLAN moves CR 8-x to M4.** Still, the missing `pendingTriggers` changes `State`, and with it hashes and records. It is cheaper to fix before M4a and before any user records exist.
+
+## Re-review
+
+**Date:** 2026-10-28. **Build:** `main` at `f267c16` (fix commit `1f42e29`, plus the docs commit for M2-16). **Same reviewer.** I changed no repository code.
+
+### Method
+
+1. **Suite, lint and types.**
+   - `npx vitest run engine`: 310 passed, 183 todo.
+   - `eslint .` and `tsc`: clean.
+   - Nightly configuration (`ENGINE_GAMES=10000`, property and golden suites, fresh `PROPERTY_SEED=86954752`): 12 of 12 passed in 35.6 s.
+2. **Original probes.** I re-ran them. 13 of them now fail, which is expected: each asserted the old, buggy behaviour, so a failure means the finding no longer reproduces. The 8 confirmation probes still pass:
+   - frozen inputs;
+   - a JSON round trip of the state;
+   - Double Attack at 1 and at 0 Life;
+   - DON!! on the opponent's turn;
+   - deck-out;
+   - the 5-Character procedure and Stage replacement;
+   - the self-Blocker check.
+3. **New probes.** `.cache/m2-review/probes/recheck.test.ts` (13 tests, all pass) keeps the original intent, adapted to the damage decision now asked for every Life card. `rawids.test.ts` scans projected events for raw ids.
+4. **Mutation check.** I copied `HEAD` to a scratch directory with its own `@optcg/engine` link, re-introduced each old bug, and ran the whole engine suite against each one. The harness is `scratchpad/m2mut/mutate.py`. I also ran the M2-03 mutant under 5 different `PROPERTY_SEED` values.
+5. **New-leak hunt.** I read the whole fix diff and probed:
+   - lint bypasses, with `eslint --stdin`;
+   - raw ids in projected events, over 60 leak games;
+   - how the queue drains;
+   - `autoSkip` paths that the observed guard does not cover.
+
+### The severity-4 findings are closed (independently confirmed)
+
+- **M2-01.** Two positions that differ only in whether p2's face-down top Life card has a scripted [Trigger] now look the same to p1. p1's views after the attack, `block null`, `endCounter` and a declined damage decision are byte-identical in both, and so are the projected events. p1 sees `{kind:'trigger', prompt:'Your opponent is taking damage.'}` in both. Only the owner's action list differs, by the extra "activate".
+- **M2-02.** With `observedByOtherHuman: true`, `autoSkip` returns `null` in the Counter window for any non-empty hand, whether it holds a Counter card or a Stage. It skips only an empty hand, whose size is public. The damage decision never skips when observed.
+- **M2-03.** The life→hand event now shows p1 the handle it already saw for the face-up Life card, and `newInstance` is hidden. Whichever copy p2 later plays, its field handle differs from that event handle. Across 25 leak games, no projected event carries a live instance id.
+
+### The new tests have teeth
+
+Each old bug, re-introduced in the scratch copy, fails the tests below:
+
+| Re-introduced bug | Tests that fail |
+| --- | --- |
+| M2-01: damage decision only for scripted [Trigger] | `leaks` permutation property, `legality` M2-01, `records` M2-08, 2 goldens |
+| M2-02: `observedByOtherHuman` ignored | `leaks` permutation property (the observed-`autoSkip` check), `legality` M2-01 and M2-02 |
+| M2-03: old id-keyed event keys | `leaks` linkage property, under all 5 seeds tried |
+| M2-05: drain at any frame | all 4 `effect-order` tests, plus Attack Step order, start-of-game order and End Phase order |
+| M2-06: player check removed | `numbers-and-scenarios` "malformed actions (M2-06)" |
+| M2-08: stack dropped from the hash | `records` M2-08 and all 3 goldens |
+
+### The severity-2 fixes are verified
+
+- **CR 8-6 queue (M2-05).**
+  - [On K.O.] now resolves after the rest of the activation that caused it (CR 8.6.3).
+  - An [On K.O.] caused by a [Trigger] waits until the second Double Attack point is dealt (CR 8-6-2).
+  - The order changes for the Attack Step, the End Phase and start-of-game in the same commit are CR-correct, now that resolution order is FIFO.
+- **Concede and shape validation (M2-06).** A concede from `p3`, or from no player, throws `IllegalAction`. So does `pick null`, for which `whyNot` returns a reason.
+- **Replay pins the card data (M2-07).** A record with a different `versions.cards`, or a lookup with one card's power changed, throws `RecordVersionMismatch`. The goldens require their engine version to equal `ENGINE_VERSION`, now `0.3.0`, and they pin the per-turn and event hashes.
+- **Hash coverage (M2-08).** A Double Attack position with one point still to deal no longer hashes like a single hit, and the `whileSource` id is mapped to a board position.
+- **Nightly seeds (M2-11).** Each nightly run draws a different seed (I saw 86947324, 86947996 and 86954752), while every push uses `24301`.
+- **Lint (M2-12).** Named and namespace imports of `queries` and the other full-state functions are errors in `app/src` and `ai/src`, and allowed in `app/src/session/`.
+- **`previewFromView` (M2-04).** It is keyed by the viewer's handles, holds no raw ids, and refuses another player's action.
+- **Other closed items.**
+  - M2-09: a scenario's DON!! total must equal the Leader's DON!! deck size.
+  - M2-14: the defeat flags live on the `Draft`.
+  - M2-15: goldens pin per-turn and event hashes.
+  - M2-16: deferred, and logged in OPEN-QUESTIONS (`f267c16`).
+- **Performance after the fixes:**
+  - `reduce` p50: 2.9 µs warm, 3.5 µs cold;
+  - Main Phase `legalActions`: 1.4 µs warm, 3.0 µs cold;
+  - `project`: 26 µs.
+
+### The independent-test edits weaken nothing
+
+There are three `takeDamage(g)` lines: `battle.test.ts`, `durations.test.ts` and RL-08. In each, the old assertion would now run in the middle of damage processing, so the call is needed and nothing is skipped.
+
+The commit also changed the shared `passCounter` and `noDefence` helpers to call `takeDamage`. That is broader than "three one-line additions". `takeDamage` stops at any decision that offers "activate", so tests that expect a scripted [Trigger] still see it. A bug that wrongly offered "activate" would leave the decision pending and fail the `kind: 'main'` checks.
+
+The one claim no longer asserted directly is the comment "No `trigger` decision" in RL-21 (Banish). Its hand and trash assertions would still catch any regression that sent the Life card to hand. Logged as M2-23.
+
+### New findings from the re-review
+
+| ID | Sev | Area | Problem | Reproduction | Fix |
+| --- | --- | --- | --- | --- | --- |
+| M2-17 | 2 | Projection: raw ids | `projectEvents` leaves a raw instance id in `BattleEnded.target` whenever the target left the field during the battle: 514 occurrences in 60 leak games. `BattleEnded` is emitted after the K.O. renamed the card, so the event has no key for it. The same can happen to a drained `EffectActivated.instance` if its card moves before the queue drains. The id is dead, so it links to nothing: this is not a hidden-information leak. It does break "the view never shows instance ids", and the UI cannot map the value to a handle. | `.cache/m2-review/probes/rawids.test.ts`; output in `.cache/m2-review/rawids.json` | Capture the handles' keys at declaration (`Battle` keeps the keys), or map through `renames`. Add a "no raw id in any projected event" assertion to `leaks.test.ts`. |
+| M2-18 | 1 | Legality | `reduce(state, null)` throws `TypeError`, because it reads `action.player` before `check` runs. | `recheck.test.ts` M2-06 | Guard the action's shape in `reduce` and `whyNot` before reading `player`. |
+| M2-19 | 2 | Hidden info: `autoSkip` (latent until M4) | The observed guard covers only the damage decision and the Counter window. A forced `pick` or `done` still skips whatever its candidates are. Today the only `choose` is the public Character-limit choice, so nothing leaks. M4 choices among hidden cards would leak, for example "reveal 1 {X} from your hand" with exactly one match, or a search with no match. | Read `game.ts` `autoSkip` | When observed, skip a `pick` or `done` only if every candidate is visible to the other player, or if the count alone forces the answer. Add `choose` decisions over hidden zones to the leak property in M4a. |
+| M2-20 | 1 | Boundaries | The lint rule does not catch dynamic `import('@optcg/engine')`. `project(state, opponent)` and the other functions that take a `GameState` remain allowed anywhere in `app/src`. The session store is therefore still a trust boundary held by convention. | `eslint --stdin` with `import('@optcg/engine').then((m) => m.queries)` in `app/src/x.ts`: 0 errors | Ban dynamic imports of the engine outside the store, and keep `GameState` values inside `app/src/session/` (for example with a lint rule on the type import). |
+| M2-21 | 1 | Tests: seed logging | Under the default reporter that `test:nightly` uses, vitest 4 hides console output from passing tests. The `PROPERTY_SEED` line therefore appears only with `--reporter=verbose` or when a test fails. A passing nightly run does not record which games it covered. | `ENGINE_GAMES=40 npx vitest run engine/test/property/games-1.test.ts` prints no seed | Write the seed into `test-results/` or a test name, or add the verbose reporter to `test:nightly`. |
+| M2-22 | 1 | Hash | `canon` treats any string matching `/^c[a-z0-9]{7}$/` as an instance id. A future ability id or label of that shape would be rewritten to a position or to `'gone'`. | Read `hash.ts` | Map ids only in the fields known to hold them, or prefix instance ids with a character that card and ability ids never use. |
+| M2-23 | 1 | Tests | RL-21 no longer asserts directly that Banish asks no damage decision. | `RL-21.test.ts` with `noDefence` | Assert `decision.kind` after `endCounter`, before calling the helper. |
+
+**Open after the re-review:** severity 4: 0; severity 3: 0; severity 2: 2 (M2-17, M2-19, the latter latent until M4); severity 1: 5 (M2-18, M2-20 to M2-23).
+
+M2 review: PASS
