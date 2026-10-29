@@ -763,9 +763,11 @@ export function Game({
       case 'w':
       case 'W': {
         // "Why?" for the AI's last move with a choice (flows F10).
-        const i = ctl.hotseat ? null : ctl.lastWhy();
-        if (i !== null) {
-          e.preventDefault();
+        if (ctl.hotseat) return;
+        e.preventDefault();
+        const i = ctl.lastWhy();
+        if (i === null) ctl.announce('No AI move to explain yet.');
+        else {
           rememberFocus(t);
           setDialog({ kind: 'why', index: i });
         }
@@ -1071,7 +1073,13 @@ export function Game({
                   )}
                 </p>
               )}
-              <div inert={dialog?.kind === 'trash' || (dock.pinned && dockOpen) ? true : undefined}>
+              <div
+                inert={
+                  dialog?.kind === 'trash' || dialog?.kind === 'why' || (dock.pinned && dockOpen)
+                    ? true
+                    : undefined
+                }
+              >
                 <GameLog
                   top={logTop}
                   height={logH}

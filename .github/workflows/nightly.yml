@@ -17,9 +17,10 @@ jobs:
       # 10,000 random legal games with meta decks, plus golden records (PLAN §5, §8).
       # Each run draws a new PROPERTY_SEED and logs it; rerun with PROPERTY_SEED=<seed> to reproduce.
       - run: npm run test:nightly
-      # M5a strength (ADR 0008): Pirate vs Rookie over 200 iteration-budgeted games (Rocks and Kaido,
-      # swapped seats, fixed seeds; at least 75%), and the game-plan assertions statistically over
-      # 40 Pirate-vs-Pirate games. Reports: test-results/strength-200.json, game-plan-40.json.
+      # M5a strength (ADR 0008; review M5a-10): Pirate vs Rookie over 200 iteration-budgeted games
+      # (at least 95%), vs a shallow Pirate over 100 (at least 60%), a non-prior-list row, the
+      # shallow control and A/B runs, and the game-plan assertions over 40 Pirate-vs-Pirate games
+      # with and without the biases. Reports: test-results/strength-*.json, game-plan-40.json.
       - run: npm run test:strength
         if: always()
       # Full games from turn 1 through the UI (vs Rookie, hotseat, keyboard only, and AI turn pacing

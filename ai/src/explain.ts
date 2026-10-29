@@ -10,7 +10,6 @@
  */
 import type { Explanation, Evidence, Move } from './explanation.ts';
 import type { LeaderTrickCopy } from './playbook.ts';
-import type { WeightKey } from './playbook.ts';
 
 export const MINUS = '−';
 const signed = (n: number): string => (n < 0 ? `${MINUS}${-n}` : `+${n}`);
@@ -76,6 +75,9 @@ function stopText(attack: number, defence: number): string {
 /** "your Leader", or the Character's name. */
 const attackerRef = (a: CardFact): string => (a.isLeader ? 'your Leader' : a.name);
 
+/** The real minus sign before a number, in every line (explanations.md copy rules). */
+const minus = (t: string): string => t.replace(/(^|[\s(])-(\d)/g, `$1${MINUS}$2`);
+
 function base(
   conceptId: string,
   claim: string,
@@ -88,10 +90,10 @@ function base(
 ): Explanation {
   return {
     conceptId,
-    claim,
-    evidence,
-    line,
-    outcome,
+    claim: minus(claim),
+    evidence: evidence.map((e) => ({ ...e, text: minus(e.text) })),
+    line: line && line.map((m) => ({ ...m, text: minus(m.text) })),
+    outcome: minus(outcome),
     certainty: 'any-hand',
     nextTime,
     lessonId,
@@ -163,7 +165,7 @@ export function explainCounter(
     });
   else
     evidence.push({
-      text: `${f.aiName} was at ${life} Life with ${f.aiHand} cards in hand.`,
+      text: `${f.aiName} was at ${life} Life with ${f.aiHand} ${f.aiHand === 1 ? 'card' : 'cards'} in hand.`,
       figures: { aiLife: life, aiHandSize: f.aiHand },
     });
   const others = f.readyOthers;
@@ -186,30 +188,37 @@ export function explainCounter(
       figures,
     });
   }
+  // A defence of several cards is explained card by card, as each is played: this card's line
+  // never previews a card still in hand (review M5a-05, flows F10.2).
+  const stops = after > f.attacker.power;
+  const made = counter.event
+    ? `${counter.name} costs ${counter.cost} and made its ${f.target.isLeader ? 'Leader' : f.target.name} ${after}`
+    : `${counter.name}'s +${counter.value} Counter made its ${f.target.isLeader ? 'Leader' : f.target.name} ${after}`;
   evidence.push({
-    text: counter.event
-      ? `${counter.name} costs ${counter.cost} and made its Leader ${after} against your ${f.attacker.power}.`
-      : `${counter.name}'s +${counter.value} Counter made its ${f.target.isLeader ? 'Leader' : f.target.name} ${after} against your ${f.attacker.power}.`,
+    text: stops
+      ? `${made} against your ${f.attacker.power}.`
+      : `${made}; your attack is still at ${f.attacker.power}.`,
     figures: {
       [f.target.isLeader ? 'leaderAfter' : 'defenceAfter']: after,
       attackPower: f.attacker.power,
     },
   });
-  if (life === 1 && others.length > 0)
+  if (stops && life === 1 && others.length > 0)
     evidence.push({
       text: `Taking this hit would mean stopping ${others.length === 2 ? 'both' : `all ${word(others.length)}`} of your next attacks. Countering now leaves it a Life card to spend on one of them.`,
       figures: {},
     });
   const claim =
     life === 1
-      ? 'It countered because at 1 Life it can take only one more hit.'
+      ? 'It countered: at 1 Life it can take only one more hit.'
       : life === 0
-        ? 'It countered because at 0 Life this hit would lose.'
+        ? 'It countered: at 0 Life this hit would lose.'
         : f.target.isLeader
           ? `It countered to stay at ${life} Life.`
           : `It countered to keep ${f.target.name} on the board.`;
-  const outcome =
-    life === 1 && others.length > 0
+  const outcome = !stops
+    ? `Your attack still needs stopping: ${f.attacker.power} against ${after}.`
+    : life === 1 && others.length > 0
       ? `Stays at 1 Life, with one hit to spare against your last ${others.length === 1 ? 'attack' : `${word(others.length)} attacks`}.`
       : f.target.isLeader
         ? `Stays at ${life} Life.`
@@ -235,26 +244,32 @@ export function explainCounter(
   );
 }
 
-/** Took a hit it could have stopped, or had nothing to stop it with (no card is named). */
+/**
+ * The defender lets the attack through, or it already fails. Every word is true whatever the AI
+ * holds: it never says whether a Counter was available (review M5a-01).
+ */
 export function explainTake(f: BattleFacts): Explanation {
+  const cards = (n: number) => `${n} ${n === 1 ? 'card' : 'cards'}`;
   const evidence: Evidence[] = [
     {
-      text: `${f.aiName} was at ${f.aiLife} Life with ${f.aiHand} cards in hand.`,
+      text: `${f.aiName} was at ${f.aiLife} Life with ${cards(f.aiHand)} in hand.`,
       figures: { aiLife: f.aiLife, aiHandSize: f.aiHand },
     },
   ];
   if (f.need <= 0) {
+    // True whether or not it played Counters first: their cards are in the log either way.
+    const what = f.target.isLeader ? 'Its Leader' : f.target.name;
     evidence.push({
-      text: `${cap(attackerRef(f.attacker))} attacked at ${f.attacker.power} into ${f.target.power}: the attack already fails.`,
+      text: `${cap(attackerRef(f.attacker))} attacked at ${f.attacker.power}; its ${f.target.isLeader ? 'Leader' : f.target.name} is at ${f.target.power}.`,
       figures: { attackPower: f.attacker.power, defencePower: f.target.power },
     });
     return base(
       'counters-and-blockers',
-      'It played no counter: the attack already failed.',
+      `${what} already holds: ${f.target.power} against your ${f.attacker.power}.`,
       evidence,
       null,
-      'Kept every card.',
-      'An attack that does not reach their power needs no answer. Give DON!! before you attack, not after.',
+      `Your attack fails at ${f.attacker.power} against ${f.target.power}.`,
+      'A counter has to put them above your power, not level with it. Size your attacks to what their hand can stop.',
       ['CR 7-1-4-1'],
     );
   }
@@ -262,24 +277,49 @@ export function explainTake(f: BattleFacts): Explanation {
     text: `Stopping ${attackerRef(f.attacker)} took ${stopText(f.attacker.power, f.target.power)}.`,
     figures: { stopNeeded: f.need },
   });
-  if (f.target.isLeader)
+  if (!f.target.isLeader)
     return base(
       'counter-or-take',
-      `It took the hit: at ${f.aiLife} Life a hit is also a card.`,
+      `It let your attack on ${f.target.name} through.`,
+      evidence,
+      [{ kind: 'take', text: `${f.target.name} is K.O.'d.` }],
+      `${f.target.name} is K.O.'d.`,
+      'Countering to save a Character pays only if it will matter next turn.',
+      ['CR 7-1-4-1', 'SH-CTR'],
+    );
+  if (f.aiLife === 0)
+    return base(
+      'lethal-math',
+      'It let the hit through at 0 Life: the game ends.',
+      evidence,
+      [{ kind: 'take', text: 'Take the hit at 0 Life.' }],
+      'You win the game.',
+      'At 0 Life they must stop every attack. Count their hand, and send the attack they can least stop.',
+      ['CR 1-2-1-1-1', 'CR 7-1-4-1-1-1'],
+    );
+  if (f.aiLife <= 2) {
+    evidence.push({
+      text: `At ${f.aiLife} Life it can take ${f.aiLife} more ${f.aiLife === 1 ? 'hit' : 'hits'}; the one after that wins for you.`,
+      figures: { aiLife: f.aiLife },
+    });
+    return base(
+      'counter-or-take',
+      `It let the hit through at ${f.aiLife} Life.`,
       evidence,
       [{ kind: 'take', text: 'Take the hit.' }],
-      'Lost 1 Life, and the Life card went to its hand.',
-      'At high Life, let a lone hit through. Keep counters for hits that would cost you the game or a Character you need.',
-      ['CR 7-1-4-1-1-2', 'SH-CTR', 'SH-MIS'],
+      `It drops to ${f.aiLife - 1} Life, and the Life card goes to its hand.`,
+      'When they let a hit through at low Life, count their hand: they may be saving counters for a bigger attack, or have none.',
+      ['CR 7-1-4-1-1-1', 'CR 7-1-4-1-1-2', 'SH-CTR'],
     );
+  }
   return base(
     'counter-or-take',
-    `It let ${f.target.name} go rather than spend cards.`,
+    `It took the hit: at ${f.aiLife} Life, a hit is a card.`,
     evidence,
-    [{ kind: 'take', text: `Let ${f.target.name} be K.O.'d.` }],
-    `Kept its cards; ${f.target.name} is K.O.'d.`,
-    'Countering to save a Character pays only if it will matter next turn.',
-    ['CR 7-1-4-1', 'SH-CTR'],
+    [{ kind: 'take', text: 'Take the hit.' }],
+    'Lost 1 Life, and the Life card went to its hand.',
+    'At high Life, let a lone hit through. Keep counters for hits that would cost you the game or a Character you need.',
+    ['CR 7-1-4-1-1-2', 'SH-CTR', 'SH-MIS'],
   );
 }
 
@@ -343,21 +383,6 @@ export function explainLeaderTrick(
   );
 }
 
-/** What a heuristic term means in a sentence (the term the chosen move changed most). */
-export const TERM_TEXT: Record<WeightKey | 'deck' | 'result', { concept: string; text: string }> = {
-  life: { concept: 'board-vs-face', text: 'It expects this to bring your Life down sooner.' },
-  hand: { concept: 'card-advantage', text: 'It expects to come out ahead on cards.' },
-  counter: { concept: 'hand-management', text: 'It keeps more counters in hand for your turn.' },
-  board: { concept: 'tempo', text: 'It expects this to leave it the stronger board.' },
-  don: { concept: 'don-efficiency', text: 'It expects to have more DON!! next turn.' },
-  threat: {
-    concept: 'lethal-math',
-    text: 'It expects this to change who threatens lethal next turn.',
-  },
-  deck: { concept: 'card-advantage', text: 'It is protecting its deck from running out.' },
-  result: { concept: 'lethal-math', text: 'It expects this to decide the game.' },
-};
-
 const NEXT_TIME: Record<string, string> = {
   'board-vs-face':
     'Count what each attack costs you to stop before you counter. At high Life, a lone hit is often worth taking.',
@@ -369,31 +394,54 @@ const NEXT_TIME: Record<string, string> = {
   'lethal-math': 'Count Life + 1 hits each turn, for both sides.',
   'leader-identity': 'Learn what the Leader does on each turn: it shapes every attack.',
   'removal-timing': 'Expect removal on the Character that matters most to your next turn.',
+  'life-as-resource': 'A Life card is a card in hand with a countdown: count both.',
+  mulligan:
+    'Ask three questions of an opening hand: can it act early, does it hold a piece of the plan, can it defend?',
+  'turn-order':
+    'Going second gives a card and a DON!! more each turn until 10; going first gives the first attack.',
 };
 
-/** A main-phase move (or an own-turn choice), from the public view and the term it moved most. */
+/**
+ * A move's explanation (review M5a-01, M5a-04). Every input is public: the position as the player
+ * sees it, the AI's move (public once made) and its playbook. It never cites the heuristic term a
+ * move gained on, because the search that ranked the moves used the AI's hidden hand; instead it
+ * cites the guide's line when the move follows one (`cite`), and otherwise says plainly that the
+ * search ranked it first (`ranked`).
+ */
 export function explainMove(input: {
   claim: string;
   evidence: Evidence[];
   line: Move[] | null;
   outcome: string;
-  term: WeightKey | 'deck' | 'result' | null;
-  concept?: string;
+  concept: string;
   sources?: string[];
+  /** The playbook line this move follows, with its guide source. */
+  cite?: { text: string; source: string } | null;
+  /** Add "its search ranked this move first" (only where other moves were publicly possible). */
+  ranked?: boolean;
+  certainty?: Explanation['certainty'];
 }): Explanation {
   const evidence = input.evidence.slice();
-  const t = input.term ? TERM_TEXT[input.term] : null;
-  if (t) evidence.push({ text: t.text, figures: {} });
-  const concept = input.concept ?? t?.concept ?? 'tempo';
-  return base(
-    concept,
+  const sources = (input.sources ?? []).slice();
+  if (input.cite) {
+    evidence.push({ text: input.cite.text, figures: {} });
+    if (!sources.includes(input.cite.source)) sources.push(input.cite.source);
+  } else if (input.ranked)
+    evidence.push({
+      text: 'Its search ranked this move first, playing out guesses at your hidden hand.',
+      figures: {},
+    });
+  const e = base(
+    input.concept,
     input.claim,
     evidence,
     input.line,
     input.outcome,
-    NEXT_TIME[concept] ?? NEXT_TIME.tempo!,
-    input.sources ?? ['SH-MIS'],
+    NEXT_TIME[input.concept] ?? NEXT_TIME.tempo!,
+    sources.length ? sources : ['SH-MIS'],
   );
+  if (input.certainty) e.certainty = input.certainty;
+  return e;
 }
 
 export { stopText, attackerRef, cap };

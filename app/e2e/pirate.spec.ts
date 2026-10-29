@@ -94,25 +94,49 @@ test.describe('M5a: the Pirate AI', () => {
     return out;
   }
 
-  const median = (xs: number[]) =>
-    xs.slice().sort((a, b) => a - b)[Math.floor((xs.length - 1) / 2)]!;
+  /**
+   * Each turn on its own (review M5a-12): its total within 8 s, the board's own pacing (the turn
+   * minus the time it waited on the worker) within 8 s, and the worker's visible time within 1 s.
+   * Iteration budgets make the AI choose the same line on every machine.
+   */
+  function checkTurns(turns: Awaited<ReturnType<typeof aiTurns>>) {
+    for (const t of turns) {
+      expect(t.ms - t.thinkMs, `turn ${t.turn}: animation and holds`).toBeLessThanOrEqual(8000);
+      expect(t.thinkMs, `turn ${t.turn}: waiting on the worker`).toBeLessThanOrEqual(1000);
+      expect(t.ms, `turn ${t.turn}: the whole turn`).toBeLessThanOrEqual(8000);
+    }
+  }
 
-  test('an AI turn at 1× takes 8 s or less (flows F21)', async ({ page }) => {
-    once();
-    test.setTimeout(240_000);
-    // The late-game position: the player ends each turn at once and takes every hit, so each AI
-    // turn is measured as the player sees it (the player's own decisions excluded).
-    const turns = await measure(page, 'scenario=late&opp=pirate&speed=1', 3);
-    expect(turns.length).toBeGreaterThan(0);
-    expect(median(turns.map((t) => t.ms))).toBeLessThanOrEqual(8000);
-  });
+  test.describe(() => {
+    // A pacing failure must not be hidden by CI's retry.
+    test.describe.configure({ retries: 0 });
 
-  test('AI turns at 1× over a game from turn 1 (nightly)', async ({ page }) => {
-    once();
-    test.skip(!process.env.E2E_FULL, 'a turn-1 game at 1× runs nightly (E2E_FULL=1)');
-    test.setTimeout(600_000);
-    const turns = await measure(page, 'seed=31&first=me&opp=pirate&speed=1', 8);
-    expect(turns.length).toBeGreaterThanOrEqual(3);
-    expect(median(turns.map((t) => t.ms))).toBeLessThanOrEqual(8000);
+    test('every AI turn at 1× takes 8 s or less (flows F21)', async ({ page }) => {
+      once();
+      test.setTimeout(300_000);
+      // A late-game turn (15 moves), then the first turns of a game from turn 1. The player ends
+      // each turn at once and takes every hit; the player's own decisions are excluded.
+      const late = await measure(page, 'scenario=late&opp=pirate&speed=1&aibudget=iterations', 1);
+      const early = await measure(
+        page,
+        'seed=31&first=me&opp=pirate&speed=1&aibudget=iterations',
+        3,
+      );
+      expect(late.length + early.length).toBeGreaterThanOrEqual(3);
+      checkTurns([...late, ...early]);
+    });
+
+    test('AI turns at 1× over a whole game from turn 1 (nightly)', async ({ page }) => {
+      once();
+      test.skip(!process.env.E2E_FULL, 'a whole game at 1× runs nightly (E2E_FULL=1)');
+      test.setTimeout(600_000);
+      const turns = await measure(
+        page,
+        'seed=31&first=me&opp=pirate&speed=1&aibudget=iterations',
+        8,
+      );
+      expect(turns.length).toBeGreaterThanOrEqual(3);
+      checkTurns(turns);
+    });
   });
 });

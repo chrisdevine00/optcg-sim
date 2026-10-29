@@ -30,21 +30,13 @@ import {
   type ProjectedView,
   type SearchView,
 } from '@optcg/engine';
-import type { Explanation, Move } from '../explanation.ts';
-import {
-  explainBlock,
-  explainCounter,
-  explainLeaderTrick,
-  explainMove,
-  explainTake,
-  stopText,
-  type BattleFacts,
-  type CardFact,
-} from '../explain.ts';
-import { biggestCounter, counterValueOf, eventCounterOf, type Prior } from '../knowledge.ts';
-import { ownTurn, type Playbook, type WeightKey } from '../playbook.ts';
-import type { Breakdown } from './heuristic.ts';
+import type { Explanation } from '../explanation.ts';
+import { explainMove } from '../explain.ts';
+import { counterValueOf, type Prior } from '../knowledge.ts';
+import { ownTurn, type Playbook } from '../playbook.ts';
+import { evaluate, total, type Breakdown, type Weights } from './heuristic.ts';
 import { determinizations } from './sample.ts';
+import { explainAction, type WhyContext } from './why.ts';
 import { apply, battleNumbers, quickAction, rolloutValue, settle, type SimContext } from './sim.ts';
 
 export type Budget = { iterations: number } | { ms: number };
@@ -57,6 +49,12 @@ export interface PirateSetup {
   oppAvgCounter: number;
   /** Determinized states per decision. */
   k: number;
+  /** Tests and A/B runs only: replace some heuristic weights. */
+  weights?: Partial<Weights>;
+  /** Tests only: no search at all, the rollout's quick policy decides (a baseline; M5a-10). */
+  searchless?: boolean;
+  /** Tests only: score moves by the position right after them, with no rollout (a baseline). */
+  shallow?: boolean;
   /** A clock for wall-clock budgets (the worker passes `performance.now`). */
   now: () => number;
   /** Tests only: sees each ranking. */
@@ -85,7 +83,8 @@ export interface TurnPlan {
 /** What the worker keeps between decisions of one game. */
 export interface PirateMemory {
   plan: TurnPlan | null;
-  defence: { key: string; actions: Action[]; explanation: Explanation } | null;
+  /** The rest of a whole defence chosen for the battle `key` (review M5a-11). */
+  defence: { key: string; actions: Action[] } | null;
 }
 
 export interface PirateDecision {
@@ -203,6 +202,7 @@ function simContext(view: PlayerView, setup: PirateSetup): SimContext {
       playbook: setup.playbook,
       cards: setup.cards,
       oppAvgCounter: setup.oppAvgCounter,
+      ...(setup.weights ? { weights: setup.weights } : {}),
     },
     stats: { rollouts: 0, actions: 0 },
   };
@@ -247,6 +247,12 @@ function settleToMine(s0: GameState, me: PlayerId, ctx: SimContext): GameState {
   return s;
 }
 
+/**
+ * Score every candidate in each sampled state, one state at a time (round-robin), and compare them
+ * over complete rounds only: once started, the first round runs in full (at most one round past
+ * the budget per plan), so no candidate goes unscored; a round the budget cuts short is dropped, so every candidate is judged
+ * on the same samples (review M5a-15).
+ */
 function score(
   states: GameState[],
   cands: Candidate[],
@@ -255,51 +261,55 @@ function score(
   clock: Clock,
   main: boolean,
   bias: (c: Candidate) => number,
+  shallowRun = false,
 ): Scored[] {
-  const out: Scored[] = cands.map((c) => ({
-    c,
-    n: 0,
-    sum: 0,
-    breakdown: { ...ZERO },
-    bias: bias(c),
-    mean: -Infinity,
-  }));
-  outer: for (const s of states) {
+  // No budget left at all: the caller plays its quick policy instead.
+  if (!clock.left()) return [];
+  const runs: { value: number; breakdown: Breakdown }[][] = cands.map(() => []);
+  let rounds = 0;
+  for (const [round, s] of states.entries()) {
     const fromTurn = queries.turn(s).number;
-    for (const sc of out) {
-      if (!clock.left()) break outer;
-      const after = play(s, sc.c, me, ctx, main);
+    let complete = true;
+    for (const [i, c] of cands.entries()) {
+      if (round > 0 && !clock.left()) {
+        complete = false;
+        break;
+      }
+      const after = play(s, c, me, ctx, main);
       if (!after) {
         ctx.stats.rollouts++;
+        runs[i]!.push({ value: -Infinity, breakdown: { ...ZERO } });
         continue;
       }
-      const r = rolloutValue(after, fromTurn, ctx);
-      sc.n++;
-      sc.sum += r.value;
-      for (const k of Object.keys(ZERO) as (keyof Breakdown)[]) sc.breakdown[k] += r.breakdown[k];
+      if (shallowRun) {
+        ctx.stats.rollouts++;
+        const b = evaluate(after, ctx.evalCtx);
+        runs[i]!.push({ value: total(b), breakdown: b });
+      } else runs[i]!.push(rolloutValue(after, fromTurn, ctx));
     }
+    if (!complete) break;
+    rounds++;
   }
-  for (const sc of out) {
-    if (sc.n === 0) continue;
-    sc.mean = sc.sum / sc.n + sc.bias;
-    for (const k of Object.keys(ZERO) as (keyof Breakdown)[]) sc.breakdown[k] /= sc.n;
-  }
+  if (rounds < states.length) clock.cut = true;
+  const out: Scored[] = cands.map((c, i) => {
+    const r = runs[i]!.slice(0, Math.max(1, rounds));
+    const legal = r.filter((x) => x.value !== -Infinity);
+    const breakdown = { ...ZERO };
+    for (const x of legal)
+      for (const k of Object.keys(ZERO) as (keyof Breakdown)[])
+        breakdown[k] += x.breakdown[k] / legal.length;
+    const sum = legal.reduce((t, x) => t + x.value, 0);
+    const b = bias(c);
+    return {
+      c,
+      n: legal.length,
+      sum,
+      breakdown,
+      bias: b,
+      mean: legal.length ? sum / legal.length + b : -Infinity,
+    };
+  });
   return out.filter((x) => x.n > 0).sort((x, y) => y.mean - x.mean);
-}
-
-/** The heuristic term the chosen move gained most on, against the runner-up. */
-function topTerm(best: Scored, alt: Scored | undefined): WeightKey | 'deck' | 'result' | null {
-  if (!alt) return null;
-  let key: keyof Breakdown | null = null;
-  let gain = 0.05;
-  for (const k of Object.keys(ZERO) as (keyof Breakdown)[]) {
-    const d = best.breakdown[k] - alt.breakdown[k];
-    if (d > gain) {
-      gain = d;
-      key = k;
-    }
-  }
-  return key;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -560,406 +570,6 @@ function counterCandidates(s: GameState, me: PlayerId, setup: PirateSetup): Cand
 }
 
 // ------------------------------------------------------------------------------------------------
-// Public facts for explanations (flows D9: public information only)
-// ------------------------------------------------------------------------------------------------
-
-function cardFact(s: GameState, id: string, setup: PirateSetup): CardFact {
-  const c = queries.card(s, id);
-  return {
-    card: c.card,
-    name: setup.cards.get(c.card)?.name ?? c.card,
-    power: c.power ?? 0,
-    isLeader: c.zone === 'leader',
-  };
-}
-
-function battleFacts(s: GameState, me: PlayerId, setup: PirateSetup): BattleFacts | null {
-  const n = battleNumbers(s);
-  if (!n) return null;
-  const foe = n.attacker.owner;
-  const turn = queries.turn(s).number;
-  const ready = [...queries.zone(s, foe, 'leader'), ...queries.zone(s, foe, 'characters')].filter(
-    (c) =>
-      c.instance !== n.b.attacker &&
-      !c.rested &&
-      !c.cannotAttack &&
-      (c.zone === 'leader' || (c.played ?? -1) < turn || c.keywords.includes('Rush')),
-  );
-  const pb = setup.playbook;
-  const myLeader = queries.zone(s, me, 'leader')[0]!;
-  const trick = pb?.leaderTrick;
-  return {
-    aiName: pb?.aiName ?? setup.cards.get(myLeader.card)?.name ?? 'The AI',
-    aiLife: queries.zone(s, me, 'life').length,
-    aiHand: queries.zone(s, me, 'hand').length,
-    attacker: cardFact(s, n.b.attacker, setup),
-    target: cardFact(s, n.b.target, setup),
-    need: n.need,
-    readyOthers: ready.map((c) => cardFact(s, c.instance, setup)),
-    biggestCounter: biggestCounter(myLeader.card, setup.cards),
-    ...(trick
-      ? {
-          leaderTrick: {
-            name: trick.name,
-            used: queries
-              .usedThisTurn(s)
-              .some((u) => u.card === myLeader.instance && u.ability === trick.ability),
-          },
-        }
-      : {}),
-  };
-}
-
-const hasOnPlay = (cardId: string): boolean =>
-  (SCRIPTS[cardId]?.abilities ?? []).some((a) => {
-    const when = (a as { when?: unknown }).when;
-    return Array.isArray(when) ? when.includes('onPlay') : when === 'onPlay';
-  });
-
-/** A script ability's power amount and DON!! −X cost (the Leader's trick, for copy). */
-function abilityNumbers(cardId: string, ability: string): { amount: number; donCost: number } {
-  const a = SCRIPTS[cardId]?.abilities.find((x) => x.id === ability) as
-    { cost?: { donMinus?: number }[]; effect?: unknown } | undefined;
-  let amount = 0;
-  const walk = (v: unknown): void => {
-    if (Array.isArray(v)) v.forEach(walk);
-    else if (v && typeof v === 'object') {
-      const o = v as Record<string, unknown>;
-      const p = o.power as { amount?: number } | undefined;
-      if (p && typeof p.amount === 'number' && amount === 0) amount = p.amount;
-      Object.values(o).forEach(walk);
-    }
-  };
-  walk(a?.effect);
-  const donCost = (a?.cost ?? []).reduce((t, c) => t + (c.donMinus ?? 0), 0);
-  return { amount, donCost };
-}
-
-// ------------------------------------------------------------------------------------------------
-// Explanations of moves
-// ------------------------------------------------------------------------------------------------
-
-function explainMainAction(
-  s: GameState,
-  a: Action,
-  me: PlayerId,
-  setup: PirateSetup,
-  term: WeightKey | 'deck' | 'result' | null,
-  macroDon: number,
-): Explanation {
-  const name = (id: string) => cardFact(s, id, setup).name;
-  const opp = other(me);
-  const yourLife = queries.zone(s, opp, 'life').length;
-  const yourHand = queries.zone(s, opp, 'hand').length;
-  switch (a.type) {
-    case 'playCard': {
-      const c = queries.card(s, a.card);
-      const cost = c.cost ?? 0;
-      const don = queries.don(s, me).active;
-      const kw = c.keywords.length ? `, ${c.keywords.map((k) => `[${k}]`).join(' ')}` : '';
-      if (setup.cards.get(c.card)?.category === 'Event') {
-        const main = SCRIPTS[c.card]?.abilities.find(
-          (x) => (x as { when?: unknown }).when === 'main',
-        ) as { label?: string } | undefined;
-        return explainMove({
-          claim: `It played ${name(a.card)}.`,
-          evidence: [
-            {
-              text: `${main?.label ?? 'Its [Main] effect'}. It cost ${cost} DON!!; ${Math.max(0, don - cost)} stayed active.`,
-              figures: { cost, donAfter: Math.max(0, don - cost) },
-            },
-          ],
-          line: [{ kind: 'play', text: `Play ${name(a.card)}.`, card: c.card }],
-          outcome: `${main?.label ?? 'Its effect'}.`,
-          term,
-        });
-      }
-      return explainMove({
-        claim: `It played ${name(a.card)} for ${cost} DON!!.`,
-        evidence: [
-          {
-            text: `${name(a.card)} has ${c.power ?? 0} power${kw}.`,
-            figures: { power: c.power ?? 0 },
-          },
-          {
-            text: `It had ${don} active DON!! and kept ${Math.max(0, don - cost)}.`,
-            figures: { donBefore: don, donAfter: Math.max(0, don - cost) },
-          },
-        ],
-        line: [{ kind: 'play', text: `Play ${name(a.card)}.`, card: c.card }],
-        outcome: `${name(a.card)} is on its board.`,
-        term,
-      });
-    }
-    case 'attack': {
-      const at = cardFact(s, a.attacker, setup);
-      const tg = cardFact(s, a.target, setup);
-      const power = at.power;
-      const need = power - tg.power + 1000;
-      const by = at.isLeader ? 'its Leader' : at.name;
-      const line: Move[] = [];
-      if (macroDon > 0)
-        line.push({
-          kind: 'giveDon',
-          text: `Give ${macroDon} DON!! to ${by} (${power}).`,
-          card: at.card,
-          count: macroDon,
-        });
-      line.push({
-        kind: 'attack',
-        text: `Attack ${tg.isLeader ? 'your Leader' : tg.name} with ${by}.`,
-        card: at.card,
-        target: tg.isLeader ? 'leader' : tg.card,
-      });
-      if (tg.isLeader) {
-        const attackers = legalActions(s).filter(
-          (x) => x.type === 'attack' && x.target === a.target,
-        );
-        const ready = new Set(attackers.map((x) => (x as { attacker: string }).attacker)).size;
-        const lethal = yourLife + 1 <= ready;
-        return explainMove({
-          claim: `It attacked your Leader with ${by} at ${power}.`,
-          evidence: [
-            {
-              text: `Stopping it takes ${stopText(power, tg.power)}.`,
-              figures: { attackPower: power, defencePower: tg.power, stopNeeded: need },
-            },
-            {
-              text: `You were at ${yourLife} Life with ${yourHand} ${yourHand === 1 ? 'card' : 'cards'} in hand; it had ${ready} ${ready === 1 ? 'attacker' : 'attackers'} ready.`,
-              figures: { yourLife, yourHandSize: yourHand, attackers: ready },
-            },
-          ],
-          line,
-          outcome:
-            need > 0
-              ? `Costs you ${need} of counters, or 1 Life.`
-              : 'You can let it fail without a card.',
-          term,
-          ...(lethal ? { concept: 'lethal-math' } : {}),
-          sources: ['CR 7-1-4-1', 'CR 7-1-4-1-1-2', 'SH-MIS'],
-        });
-      }
-      return explainMove({
-        claim: `It attacked ${tg.name} with ${by}.`,
-        evidence: [
-          {
-            text: `Saving ${tg.name} (${tg.power}) from ${power} takes ${stopText(power, tg.power)}.`,
-            figures: { attackPower: power, defencePower: tg.power, stopNeeded: need },
-          },
-        ],
-        line,
-        outcome: `${tg.name} is K.O.'d unless you spend ${need} of counters.`,
-        term,
-        concept: 'board-vs-face',
-        sources: ['CR 7-1-1-2', 'CR 7-1-4-1', 'SH-MIS'],
-      });
-    }
-    case 'giveDon': {
-      const t = cardFact(s, a.target, setup);
-      const by = t.isLeader ? 'its Leader' : t.name;
-      return explainMove({
-        claim: `It gave DON!! to ${by}.`,
-        evidence: [
-          {
-            text: `${t.isLeader ? 'Its Leader' : t.name} goes from ${t.power} to ${t.power + 1000}: given DON!! add +1000 each, on its own turn only.`,
-            figures: { powerBefore: t.power, powerAfter: t.power + 1000 },
-          },
-        ],
-        line: [{ kind: 'giveDon', text: `Give 1 DON!! to ${by}.`, card: t.card, count: 1 }],
-        outcome: `${t.isLeader ? 'Its Leader' : t.name} is 1000 stronger this turn.`,
-        term,
-        concept: 'don-efficiency',
-        sources: ['CR 6-5-5-2', 'SH-DON'],
-      });
-    }
-    case 'activate': {
-      const c = cardFact(s, a.card, setup);
-      const label =
-        (
-          SCRIPTS[c.card]?.abilities.find((x) => x.id === a.ability) as
-            { label?: string } | undefined
-        )?.label ?? 'its ability';
-      return explainMove({
-        claim: `It used ${c.isLeader ? 'its Leader' : c.name}'s ability.`,
-        evidence: [{ text: `${label}.`, figures: {} }],
-        line: [{ kind: 'activate', text: `Use ${c.name}: ${label}.`, card: c.card }],
-        outcome: `${label}.`,
-        term,
-        ...(c.isLeader ? { concept: 'leader-identity' } : {}),
-      });
-    }
-    case 'endTurn': {
-      const don = queries.don(s, me).active;
-      const hand = queries.zone(s, me, 'hand').length;
-      return explainMove({
-        claim: 'It ended its turn.',
-        evidence: [
-          {
-            text: `It kept ${don} DON!! active and ${hand} cards in hand: nothing else it could do scored higher.`,
-            figures: { activeDon: don, aiHandSize: hand },
-          },
-        ],
-        line: [{ kind: 'endTurn', text: 'End the turn.' }],
-        outcome: 'Its turn is over.',
-        term,
-        concept: term === 'counter' || term === 'hand' ? 'hand-management' : 'don-efficiency',
-      });
-    }
-    default:
-      return explainMove({
-        claim: 'Only legal move.',
-        evidence: [],
-        line: [],
-        outcome: '',
-        term: null,
-      });
-  }
-}
-
-/** Explanations of answers to non-main decisions. */
-function explainOther(
-  s: GameState,
-  a: Action,
-  me: PlayerId,
-  setup: PirateSetup,
-  term: WeightKey | 'deck' | 'result' | null,
-): Explanation {
-  const dec = queries.decision(s)!;
-  const f = battleFacts(s, me, setup);
-  const pb = setup.playbook;
-  if (a.type === 'block' && f) {
-    if (a.blocker === null)
-      return explainMove({
-        claim: 'It did not block this attack.',
-        evidence: [
-          {
-            text: `${f.aiName} was at ${f.aiLife} Life with ${f.aiHand} cards in hand.`,
-            figures: { aiLife: f.aiLife, aiHandSize: f.aiHand },
-          },
-        ],
-        line: [{ kind: 'take', text: 'No block.' }],
-        outcome: 'Its Blockers stay ready.',
-        term,
-        concept: 'counters-and-blockers',
-      });
-    const b = cardFact(s, a.blocker, setup);
-    return explainBlock(f, { ...b, hasOnPlay: hasOnPlay(b.card) });
-  }
-  if ((a.type === 'counter' || (a.type === 'activate' && a.ability === 'counter')) && f) {
-    const c = queries.card(s, a.card);
-    const card = setup.cards.get(c.card);
-    const event = card?.category === 'Event';
-    return explainCounter(f, {
-      card: c.card,
-      name: card?.name ?? c.card,
-      value: event ? eventCounterOf(c.card) : (c.counter ?? 0),
-      event,
-      cost: c.cost ?? 0,
-    });
-  }
-  if (a.type === 'endCounter' && f) return explainTake(f);
-  const src = dec.source;
-  if (a.type === 'optional' && src) {
-    const trick = pb?.leaderTrick;
-    const myLeader = queries.zone(s, me, 'leader')[0]!;
-    if (
-      a.accept &&
-      trick &&
-      f &&
-      src.card === trick.source &&
-      src.ability === trick.ability &&
-      src.instance === myLeader.instance &&
-      f.attacker.isLeader === false
-    ) {
-      const { amount, donCost } = abilityNumbers(src.card, src.ability);
-      const deckAfter = queries.don(s, me).deck + donCost;
-      return explainLeaderTrick(f, trick, myLeader.card, amount, donCost, deckAfter);
-    }
-    const srcName = setup.cards.get(src.card)?.name ?? src.card;
-    const own = src.instance === myLeader.instance ? 'its Leader' : srcName;
-    const effect = src.label ? `${src.label.charAt(0).toLowerCase()}${src.label.slice(1)}` : null;
-    return explainMove({
-      claim: a.accept ? `It used ${own}'s effect.` : `It held ${own}'s effect back.`,
-      evidence: effect ? [{ text: `The effect: ${effect}.`, figures: {} }] : [],
-      line: [
-        {
-          kind: 'activate',
-          text: a.accept ? `Use ${own}'s effect.` : `Skip ${own}'s effect this time.`,
-          card: src.card,
-        },
-      ],
-      outcome: a.accept
-        ? effect
-          ? `It chose to ${effect}.`
-          : 'The effect resolves.'
-        : 'The effect stays unused.',
-      term,
-    });
-  }
-  if (a.type === 'trigger') {
-    return explainMove({
-      claim: a.activate
-        ? 'It used the [Trigger] on its Life card.'
-        : 'It added its Life card to its hand.',
-      evidence: [],
-      line: [{ kind: 'trigger', text: a.activate ? 'Use the [Trigger].' : 'Add it to hand.' }],
-      outcome: a.activate ? 'The [Trigger] resolves.' : 'One more card in its hand.',
-      term,
-      concept: 'life-as-resource',
-      sources: ['CR 10-1-5'],
-    });
-  }
-  if (a.type === 'pick') {
-    const ch = a.choice;
-    let what: string;
-    if (typeof ch === 'string') {
-      const c = queries.card(s, ch);
-      // Only cards both players can see are named (flows D9).
-      what = ['characters', 'leader', 'stage', 'trash'].includes(c.zone)
-        ? c.zone === 'leader'
-          ? c.owner === me
-            ? 'its Leader'
-            : 'your Leader'
-          : (setup.cards.get(c.card)?.name ?? 'a card')
-        : 'a card';
-    } else if ('option' in ch)
-      what = dec.options?.find((o) => o.id === ch.option)?.label ?? 'an option';
-    else
-      what =
-        ch.from === 'given'
-          ? 'a given DON!!'
-          : ch.from === 'costRested'
-            ? 'a rested DON!!'
-            : 'an active DON!!';
-    const srcName = src ? (setup.cards.get(src.card)?.name ?? src.card) : 'its effect';
-    return explainMove({
-      claim: `It chose ${what} for ${srcName}.`,
-      evidence: src?.label ? [{ text: `${src.label}.`, figures: {} }] : [],
-      line: [{ kind: 'choose', text: `Choose ${what}.` }],
-      outcome: `${what.charAt(0).toUpperCase() + what.slice(1)} chosen.`,
-      term,
-    });
-  }
-  return explainMove({
-    claim: a.type === 'done' ? 'It finished choosing.' : 'It chose the order of its effects.',
-    evidence: [],
-    line: [{ kind: 'choose', text: a.type === 'done' ? 'Done.' : 'Choose the order.' }],
-    outcome: '',
-    term,
-  });
-}
-
-export function forced(): Explanation {
-  return explainMove({
-    claim: 'Only legal move.',
-    evidence: [],
-    line: null,
-    outcome: '',
-    term: null,
-  });
-}
-
-// ------------------------------------------------------------------------------------------------
 // Entry points
 // ------------------------------------------------------------------------------------------------
 
@@ -988,39 +598,26 @@ export function planTurn(
     const fp = n === 0 ? fingerprint(view) : fingerprint(project(root, me));
     if (n > 0 && states.some((s) => fingerprint(project(s, me)) !== fp)) break;
     const cands = mainCandidates(root, me);
-    const ranked = score(states, cands, me, ctx, clock, true, mainBias(root, me, ctx, setup));
+    const ranked = score(
+      states,
+      cands,
+      me,
+      ctx,
+      clock,
+      true,
+      mainBias(root, me, ctx, setup),
+      !!setup.shallow,
+    );
     setup.debug?.(
       'main',
       ranked.map((r) => ({ actions: r.c.actions, mean: r.mean, n: r.n, breakdown: r.breakdown })),
     );
     if (clock.cut) incomplete = true;
     let chosen: Candidate;
-    let term: ReturnType<typeof topTerm> = null;
     if (ranked.length === 0) {
       chosen = { actions: [quickAction(root, ctx)] };
       incomplete = true;
-    } else {
-      chosen = ranked[0]!.c;
-      const isEnd = chosen.actions[0]!.type === 'endTurn';
-      const alt = ranked.find((r) => (r.c.actions[0]!.type === 'endTurn') !== isEnd) ?? ranked[1];
-      term = topTerm(ranked[0]!, alt);
-    }
-    const macroDon = chosen.actions.filter((a) => a.type === 'giveDon').length;
-    const isAttackMacro = chosen.actions[chosen.actions.length - 1]!.type === 'attack';
-    // A DON!!-then-attack move is explained once, with the attack's final power.
-    let macroExplanation: Explanation | null = null;
-    if (isAttackMacro && macroDon > 0) {
-      let s = states[0]!;
-      for (const a of chosen.actions.slice(0, -1)) s = apply(s, a, ctx);
-      macroExplanation = explainMainAction(
-        s,
-        chosen.actions[chosen.actions.length - 1]!,
-        me,
-        setup,
-        term,
-        macroDon,
-      );
-    }
+    } else chosen = ranked[0]!.c;
     for (let i = 0; i < chosen.actions.length; i++) {
       const a = chosen.actions[i]!;
       const s0 = states[0]!;
@@ -1030,15 +627,8 @@ export function planTurn(
         stop = true;
         break;
       }
-      const explanation: Explanation = macroExplanation
-        ? structuredClone(macroExplanation)
-        : explainMainAction(s0, a, me, setup, term, 0);
-      if (macroExplanation && a.type === 'giveDon') {
-        // A DON!! given for the attack that follows: the line shows the whole move.
-        const t = cardFact(s0, a.target, setup);
-        explanation.claim = `It gave DON!! to ${t.isLeader ? 'its Leader' : t.name} for its attack.`;
-      }
-      if (incomplete) explanation.certainty = 'search-incomplete';
+      // Each step is explained as itself, from public facts only (why.ts).
+      const explanation = explainAction(s0, a, me, whyContext(view, setup));
       steps.push({ action: va, fingerprint: stepFp, explanation, value: ranked[0]?.mean ?? 0 });
       const next: GameState[] = [];
       for (const s of states) {
@@ -1059,6 +649,56 @@ export function planTurn(
   return { plan: { turn: view.turn.number, steps, next: 0, incomplete }, stats: ctx.stats };
 }
 
+/** Did the viewer's seat go first (from the turn number and whose turn it is). */
+function wentFirst(view: PlayerView): boolean {
+  return view.turn.number % 2 === 1
+    ? view.turn.activePlayer === view.player
+    : view.turn.activePlayer !== view.player;
+}
+
+function whyContext(view: PlayerView, setup: PirateSetup): WhyContext {
+  return { cards: setup.cards, playbook: setup.playbook, first: wentFirst(view) };
+}
+
+/** A view action in a determinized state's canonical ids. */
+function fromView(a: Action, handles: Record<string, string>): Action {
+  const back = new Map(Object.entries(handles).map(([id, h]) => [h, id]));
+  const map = (v: unknown): unknown => {
+    if (typeof v === 'string') {
+      const [head, ...rest] = v.split('#');
+      const id = back.get(head!);
+      return id === undefined ? v : [id, ...rest].join('#');
+    }
+    if (v && typeof v === 'object')
+      return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, map(x)]));
+    return v;
+  };
+  return map(a) as Action;
+}
+
+/**
+ * The public explanation of a view action, with no search (forced moves and fallbacks): the same
+ * builder as every other decision, so a forced move reads like a chosen one (review M5a-01).
+ */
+export function explainViewAction(
+  view: SearchView,
+  a: Action,
+  setup: PirateSetup,
+  seed: number,
+): Explanation {
+  const [state] = determinizations(view, setup, 1, seed);
+  return explainAction(
+    state!,
+    fromView(a, view.skeleton.handles),
+    view.player,
+    whyContext(view, setup),
+  );
+}
+
+/**
+ * Mulligan by the playbook's rule, taken from the guide (strategy-concepts §9 [S9]; the guides'
+ * "keepable hand"). Each card counts toward one piece only.
+ */
 function mulligan(view: PlayerView, setup: PirateSetup): PirateDecision {
   const pb = setup.playbook;
   const hand = view.zones[view.player].hand.map((c) => setup.cards.get(c.card ?? ''));
@@ -1066,38 +706,80 @@ function mulligan(view: PlayerView, setup: PirateSetup): PirateDecision {
   let keep = true;
   if (pb) {
     const m = pb.mulligan;
-    const early = hand.filter(
-      (c) =>
-        c?.category === 'Character' &&
-        (c.cost ?? 99) >= m.early.costMin &&
-        (c.cost ?? 99) <= m.early.costMax,
-    ).length;
-    const plan = hand.some((c) => c && m.planPieces.includes(c.id));
-    const counters = hand.filter((c) => counterValueOf(c) > 0).length;
-    const yeses = Number(early >= m.early.min) + Number(plan) + Number(counters >= m.minCounters);
-    keep = yeses >= m.yesesToKeep - (first ? 0 : 1);
-    if (first && m.requireEarlyGoingFirst && early < m.early.min) keep = false;
+    const left = hand.filter((c): c is Card => !!c);
+    const met: Record<string, boolean> = {};
+    for (const piece of m.pieces) {
+      let n = 0;
+      for (let i = 0; i < left.length && n < piece.min;) {
+        const c = left[i]!;
+        const fits = piece.cards ? piece.cards.includes(c.id) : counterValueOf(c) > 0;
+        if (fits) {
+          left.splice(i, 1);
+          n++;
+        } else i++;
+      }
+      met[piece.name] = n >= piece.min;
+    }
+    const missing = m.pieces.filter((p) => !met[p.name]).length;
+    keep = missing <= (first ? 0 : m.secondShort);
+    if (first && m.requireGoingFirst.some((name) => !met[name])) keep = false;
   }
   const action = view.actions.find((a) => a.type === 'mulligan' && a.redraw === !keep)!;
+  const m = pb?.mulligan;
+  // The guide's rule, one line for what it keeps and one for the seat allowance (copy: <= 30 words).
+  const rule: { text: string; figures: Record<string, number> }[] = m
+    ? [
+        {
+          text: `Its guide keeps a hand with ${m.pieces.map((p) => p.label).join(', and ')}.`,
+          figures: {},
+        },
+        ...(m.secondShort > 0
+          ? [
+              {
+                text: `Going second, ${m.secondShort === 1 ? 'one piece' : `${m.secondShort} pieces`} short is enough.`,
+                figures: {},
+              },
+            ]
+          : []),
+      ]
+    : [{ text: 'It keeps any opening hand.', figures: {} }];
   return {
     action,
     explanation: explainMove({
       claim: keep ? 'It kept its opening hand.' : 'It redrew its opening hand.',
-      evidence: [
-        {
-          text: "Its guide's rule: keep a hand that can act on its first two turns, holds a piece of its plan and can defend. Two of the three is a keep.",
-          figures: {},
-        },
-      ],
+      evidence: rule,
       line: [{ kind: keep ? 'keep' : 'redraw', text: keep ? 'Keep.' : 'Redraw all five.' }],
       outcome: keep ? 'It plays the hand it drew.' : 'A fresh five cards.',
-      term: null,
       concept: 'mulligan',
-      sources: ['CR 5-2-1-6', 'SH-MUL'],
+      sources: ['CR 5-2-1-6', ...(m ? [m.source] : [])],
     }),
     alternatives: [],
     stats: { rollouts: 0, actions: 0, planned: false },
   };
+}
+
+/** Is this battle lethal for `me` if nothing stops it (0 Life, Leader target, attack lands)? */
+function lethalOnMe(s: GameState, me: PlayerId): boolean {
+  const n = battleNumbers(s);
+  return (
+    !!n &&
+    n.target.owner === me &&
+    n.target.zone === 'leader' &&
+    n.need > 0 &&
+    queries.zone(s, me, 'life').length === 0
+  );
+}
+
+/** The Counter this hand can add now (Character Counters, and [Counter] Events it can pay for). */
+function handCounter(s: GameState, me: PlayerId, setup: PirateSetup): number {
+  const active = queries.don(s, me).active;
+  let t = 0;
+  for (const c of queries.zone(s, me, 'hand')) {
+    const card = setup.cards.get(c.card);
+    if (card?.category === 'Event') t += (c.cost ?? 0) <= active ? counterValueOf(card) : 0;
+    else t += c.counter ?? 0;
+  }
+  return t;
 }
 
 /** One decision (ARCHITECTURE §4.1 `decide`): follow the turn plan while it holds; search otherwise. */
@@ -1111,6 +793,7 @@ export function decide(
   const kind = view.decision?.kind;
   const options = view.actions.filter((a) => a.type !== 'concede');
   if (options.length === 0) throw new Error('Pirate was asked to decide with no legal action.');
+  const none = { rollouts: 0, actions: 0, planned: false };
   if (kind === 'mulligan') return mulligan(view, setup);
   if (kind === 'chooseFirst') {
     const goFirst = setup.playbook?.goFirst ?? false;
@@ -1129,22 +812,38 @@ export function decide(
           },
         ],
         line: null,
-        outcome: '',
-        term: null,
+        outcome: goFirst ? 'It takes the first turn.' : 'You take the first turn.',
         concept: 'turn-order',
-        sources: ['CR 6-3-1', 'CR 6-4-1', 'CR 6-5-6-1'],
+        sources: ['CR 6-3-1', 'CR 6-4-1', 'CR 6-5-6-1', 'S17'],
       }),
       alternatives: [],
-      stats: { rollouts: 0, actions: 0, planned: false },
+      stats: none,
     };
   }
-  if (options.length === 1)
+  const battle = (view as ProjectedView).battle;
+  const key = battle ? `${view.turn.number}|${battle.attacker}|${battle.target}` : '';
+  if (setup.searchless) {
+    const [state] = determinizations(view, setup, 1, seed);
+    const ctx = simContext(view, setup);
+    const quick = quickAction(state!, ctx);
+    const action = toView(quick, view.skeleton.handles) ?? options[0]!;
     return {
-      action: options[0]!,
-      explanation: forced(),
+      action,
+      explanation: explainViewAction(view, action, setup, seed),
       alternatives: [],
-      stats: { rollouts: 0, actions: 0, planned: false },
+      stats: none,
     };
+  }
+  // The same explanation builder whether or not there was a choice (review M5a-01).
+  if (options.length === 1) {
+    const action = options[0]!;
+    return {
+      action,
+      explanation: explainViewAction(view, action, setup, seed),
+      alternatives: [],
+      stats: none,
+    };
+  }
 
   if (kind === 'main') {
     const p = mem.plan;
@@ -1172,73 +871,89 @@ export function decide(
         stats: { ...stats, planned: false, value: st.value },
       };
     }
+    // No plan step is legal (never seen): end the turn, explained like any other end of turn.
     const end = options.find((a) => a.type === 'endTurn') ?? options[0]!;
     return {
       action: end,
-      explanation: forced(),
+      explanation: explainViewAction(view, end, setup, seed),
       alternatives: [],
       stats: { ...stats, planned: false },
     };
   }
 
-  // A defence already chosen for this battle continues while it is legal.
-  const battle = (view as ProjectedView).battle;
-  const key = battle ? `${view.turn.number}|${battle.attacker}|${battle.target}` : '';
-  if (
-    kind === 'counter' &&
-    mem.defence &&
-    mem.defence.key === key &&
-    mem.defence.actions.length > 0
-  ) {
+  // A defence chosen for this battle continues while it is legal, through the target picks of its
+  // [Counter] Events (review M5a-11).
+  if (mem.defence && mem.defence.key !== key) mem.defence = null;
+  if (kind === 'counter' && mem.defence && mem.defence.actions.length > 0) {
     const a = mem.defence.actions[0]!;
     if (options.some((o) => same(o, a))) {
       mem.defence.actions.shift();
       return {
         action: a,
-        explanation: mem.defence.explanation,
+        explanation: explainViewAction(view, a, setup, seed),
         alternatives: [],
         stats: { rollouts: 0, actions: 0, planned: true },
       };
     }
+    mem.defence = null;
   }
-  mem.defence = null;
 
   const me = view.player;
   const ctx = simContext(view, setup);
   const clock = clockFor(budgets.defence, ctx, setup.now);
   const states = determinizations(view, setup, setup.k, seed);
   const root = states[0]!;
-  const cands =
+  let cands =
     kind === 'counter'
       ? counterCandidates(root, me, setup)
       : legalActions(root)
           .filter((a) => a.type !== 'concede')
           .map((a) => ({ actions: [a] }));
-  const ranked = score(states, cands, me, ctx, clock, false, otherBias(root, me, setup));
-  const best = ranked[0];
-  const chosen = best?.c ?? cands[0]!;
-  const action = toView(chosen.actions[0]!, view.skeleton.handles) ?? options[0]!;
-  const explanation = explainOther(
-    root,
-    chosen.actions[0]!,
+  // Lethal is always defended where a defence exists, even when a later attack may still win
+  // (DECISIONS M5a "Defence"; Rookie's rule too; review M5a-05).
+  if (lethalOnMe(root, me)) {
+    if (kind === 'counter') {
+      const covers = cands.filter(
+        (c) =>
+          c.actions.length > 0 &&
+          c.actions.every(
+            (x) => x.type === 'counter' || (x.type === 'activate' && x.ability === 'counter'),
+          ),
+      );
+      if (covers.length > 0) cands = covers;
+    }
+    if (kind === 'block') {
+      const blocks = cands.filter(
+        (c) =>
+          c.actions[0]!.type === 'block' &&
+          (c.actions[0] as { blocker: string | null }).blocker !== null,
+      );
+      const n = battleNumbers(root)!;
+      if (blocks.length > 0 && handCounter(root, me, setup) < n.need) cands = blocks;
+    }
+  }
+  const ranked = score(
+    states,
+    cands,
     me,
-    setup,
-    best ? topTerm(best, ranked[1]) : null,
+    ctx,
+    clock,
+    false,
+    otherBias(root, me, setup),
+    !!setup.shallow,
   );
-  if (clock.cut) explanation.certainty = 'search-incomplete';
+  const chosen = ranked[0]?.c ?? cands[0]!;
+  const first = chosen.actions[0]!;
+  const action = toView(first, view.skeleton.handles) ?? options[0]!;
+  const explanation = explainAction(root, first, me, whyContext(view, setup));
   if (kind === 'counter' && chosen.actions.length > 1) {
     const rest = chosen.actions.slice(1).map((a) => toView(a, view.skeleton.handles));
-    if (rest.every((x) => x !== null))
-      mem.defence = { key, actions: rest as Action[], explanation };
+    if (rest.every((x) => x !== null)) mem.defence = { key, actions: rest as Action[] };
   }
-  const alternatives = ranked
-    .slice(1, 4)
-    .map((r) => toView(r.c.actions[0]!, view.skeleton.handles))
-    .filter((x): x is Action => x !== null);
   return {
     action,
     explanation,
-    alternatives,
-    stats: { ...ctx.stats, planned: false, value: best?.mean ?? 0 },
+    alternatives: [],
+    stats: { ...ctx.stats, planned: false, value: ranked[0]?.mean ?? 0 },
   };
 }

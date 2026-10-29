@@ -88,6 +88,11 @@ export class PlanTally {
     }
   }
 
+  /** Turns judged as finishing turns (not held to the plan), and all own turns (review M5a-08). */
+  get exempt(): { finishing: number; turns: number } {
+    return { finishing: this.turns.filter((t) => t.won).length, turns: this.turns.length };
+  }
+
   /** Close the game: judge every assertion over what was observed. */
   finish(): Tally[] {
     if (this.leader === 'OP17-039') this.rocks();

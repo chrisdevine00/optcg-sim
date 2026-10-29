@@ -56,7 +56,7 @@ interface Explanation {
 | --- | --- | --- | --- |
 | Review flag (lethal) | Proven in `public` mode: wins against any hand the opponent could hold | Proven only in `actual` mode, against the hand they held | Search hit its cap |
 | Review flag (other kinds), hint, drill answer | The reasons rest only on information the player had | The judgment leans on the opponent's hidden cards | Search hit its cap before ranking the lines |
-| AI "why" | Always the value for a single decision, because AI explanations cite only public information (flows D9) | Used for turn plans whose payoff depends on the player's hidden hand | AI ran out of budget (shown as "best found") |
+| AI "why" | The value for a single decision, because AI explanations cite only public information (flows D9) | An attack, whose result depends on the player's hidden hand; turn plans whose payoff does | Not used for AI "why" (M5a review M5a-01): whether the budget ran out depends on how many moves the AI's hidden hand allows |
 
 ### Certainty labels by context
 
@@ -578,7 +578,7 @@ Rocks (OP17-039) and Kaido (OP17-058) dominate because they are the slice decks 
 ```ts
 {
   conceptId: 'counter-or-take',
-  claim: 'It countered because at 1 Life it can take only one more hit.',
+  claim: 'It countered: at 1 Life it can take only one more hit.',
   evidence: [
     { text: 'Xebec was at 1 Life: one hit leaves 0, and the next hit wins for you.',
       figures: { aiLife: 1 } },
@@ -599,6 +599,8 @@ Rocks (OP17-039) and Kaido (OP17-058) dominate because they are the slice decks 
   sources: ['CR 7-1-4-1', 'CR 7-1-4-1-1-1', 'SH-CTR'],
 }
 ```
+
+**Copy note (M5a review M5a-14):** the claim was "It countered because at 1 Life it can take only one more hit." (13 words); it now keeps to the 12-word rule.
 
 **Check.** 6000 − 5000 + 1000 = 2000 needed; Rocks Pirates gives exactly 2000 (7000 > 6000). Sanji 7000 − 5000 + 1000 = 3000. Usopp 5000 vs 5000 ties, so 1000. Rocks Pirates is public once played.
 

@@ -36,6 +36,18 @@ export interface MatchOptions {
   /** Action cap (ARCHITECTURE §2.6: 2,000 for AI test games). */
   cap?: number;
   debug?: import('../../src/session.ts').SessionOptions['debug'];
+  /** Per-seat overrides (strength gates and A/B runs). */
+  seats?: Partial<
+    Record<
+      PlayerId,
+      Partial<
+        Pick<
+          import('../../src/session.ts').SessionOptions,
+          'budgets' | 'k' | 'biases' | 'priorWithout' | 'weights' | 'searchless' | 'shallow'
+        >
+      >
+    >
+  >;
 }
 
 export interface DecisionRecord {
@@ -88,6 +100,7 @@ export function playMatch(opts: MatchOptions): MatchResult {
       budgets: opts.budgets ?? 'iterations',
       ...(opts.k ? { k: opts.k } : {}),
       ...(opts.debug ? { debug: opts.debug } : {}),
+      ...(opts.seats?.[p] ?? {}),
     });
   }
   let state = createGame({ seed: opts.seed, cards: lookup, decks: opts.decks }).state;

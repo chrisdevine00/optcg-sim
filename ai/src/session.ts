@@ -4,18 +4,21 @@
  * the search skeleton) for Pirate, a plain view for Rookie.
  */
 import type { Card } from '@optcg/cards';
-import { CannotDeterminize, type PlayerView, type SearchView } from '@optcg/engine';
-import { averageCounter, counterValueOf, priorFor } from './knowledge.ts';
-import { playbookFor } from './playbook.ts';
+import { CannotDeterminize, type Action, type PlayerView, type SearchView } from '@optcg/engine';
+import { averageCounter, counterValueOf, priorFor, type Prior } from './knowledge.ts';
+import { playbookFor, type Playbook } from './playbook.ts';
 import { rookie, type Decided } from './rookie.ts';
+import type { Explanation } from './explanation.ts';
 import {
   decide,
+  explainViewAction,
   planTurn,
   type Budget,
   type PirateMemory,
   type PirateSetup,
 } from './search/pirate.ts';
 import type { AiTier } from './tiers.ts';
+import type { Weights } from './search/heuristic.ts';
 
 export type { Budget } from './search/pirate.ts';
 
@@ -42,10 +45,30 @@ export interface SessionOptions {
   now?: () => number;
   /** Tests only: see each ranking (PirateSetup.debug). */
   debug?: PirateSetup['debug'];
+  /** Tests only: false plays without the playbook's move biases (search alone; review M5a-08). */
+  biases?: boolean;
+  /** Tests only: an archetype prior leaving out one sourced list (by date). */
+  priorWithout?: string;
+  /** Tests and A/B runs only: replace some heuristic weights. */
+  weights?: Partial<Weights>;
+  /** Tests only: decide by the quick policy, with no search (a strength baseline). */
+  searchless?: boolean;
+  /** Tests only: score moves without rollouts (a strength baseline). */
+  shallow?: boolean;
 }
 
 export interface SessionDecision extends Decided {
   stats: { rollouts: number; actions: number; planned: boolean; value?: number };
+}
+
+function withoutBiases(pb: Playbook | null, off: boolean): Playbook | null {
+  return pb && off ? { ...pb, biases: [] } : pb;
+}
+
+function priorWithout(p: Prior | null, date: string | undefined): Prior | null {
+  if (!p || !date) return p;
+  const lists = p.lists.filter((l) => l.date !== date);
+  return lists.length ? { ...p, lists } : p;
 }
 
 export class AiSession {
@@ -63,9 +86,12 @@ export class AiSession {
     this.setup = {
       ownDeck: opts.ownDeck,
       cards: opts.cards,
-      playbook: playbookFor(opts.leader),
-      prior: priorFor(opts.opponentLeader),
+      playbook: withoutBiases(playbookFor(opts.leader), opts.biases === false),
+      prior: priorWithout(priorFor(opts.opponentLeader), opts.priorWithout),
       oppAvgCounter: averageCounter(opts.opponentLeader, opts.cards),
+      ...(opts.weights ? { weights: opts.weights } : {}),
+      ...(opts.searchless ? { searchless: true } : {}),
+      ...(opts.shallow ? { shallow: true } : {}),
       k: opts.k ?? 4,
       now: opts.now ?? (() => performance.now()),
       ...(opts.debug ? { debug: opts.debug } : {}),
@@ -101,10 +127,37 @@ export class AiSession {
     try {
       return decide(view, this.memory, this.setup, this.budgets, seed);
     } catch (e) {
-      // A public reference to a hidden card (rare): answer from the view alone, defending lethal.
+      // A public reference to a hidden card (never observed): answer from the view alone,
+      // defending lethal, with a Pirate's own wording (review M5a-15).
       if (!(e instanceof CannotDeterminize)) throw e;
       const d = rookie(view, { seed, counterOf });
-      return { ...d, stats: { rollouts: 0, actions: 0, planned: false } };
+      return {
+        ...d,
+        explanation: {
+          ...d.explanation,
+          conceptId: 'tempo',
+          claim: 'It could not search this position.',
+          evidence: [
+            {
+              text: 'It defended a lethal attack if it could, and otherwise chose a legal move at random.',
+              figures: {},
+            },
+          ],
+          lessonId: 'L17-tempo-and-rush',
+        },
+        stats: { rollouts: 0, actions: 0, planned: false },
+      };
     }
+  }
+
+  /** The public "Why?" for a given action (the same builder `decide` uses; tests). */
+  explain(view: SearchView, action: Action, seed = 1): Explanation {
+    return explainViewAction(view, action, this.setup, seed);
+  }
+
+  /** Forget the turn plan and the battle memory (a rewind: review M5a-11). */
+  reset(): void {
+    this.memory.plan = null;
+    this.memory.defence = null;
   }
 }

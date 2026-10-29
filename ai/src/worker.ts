@@ -28,22 +28,16 @@ function ensureSession(): AiSession | null {
   return session;
 }
 
-self.onmessage = (e: MessageEvent<AiRequest>) => {
-  const req = e.data;
-  if (req.type === 'init') {
-    for (const c of req.cards) cards.set(c.id, c);
-    game = req.game ?? null;
-    session = null;
-    return;
-  }
-  if (req.type === 'cards') {
-    for (const c of req.cards) cards.set(c.id, c);
-    return;
-  }
-  if (req.type === 'cancel') {
-    cancelled.add(req.id);
-    return;
-  }
+type Work = Extract<AiRequest, { type: 'planTurn' } | { type: 'decide' }>;
+
+/**
+ * Requests queue and run one at a time on a later task, so a `cancel` that arrives behind a request
+ * is read before that request starts and the stale work never runs (review M5a-12).
+ */
+const queue: Work[] = [];
+let running = false;
+
+function run(req: Work): void {
   const t0 = performance.now();
   try {
     if (req.type === 'planTurn') {
@@ -60,8 +54,51 @@ self.onmessage = (e: MessageEvent<AiRequest>) => {
       ? s.decide(req.view, req.seed)
       : { ...chooseAction(req.view, { tier: req.tier, seed: req.seed, cards }), stats: undefined };
     if (cancelled.delete(req.id)) return;
-    post({ type: 'decision', id: req.id, ...d, ms: performance.now() - t0 });
+    post({
+      type: 'decision',
+      id: req.id,
+      action: d.action,
+      explanation: d.explanation,
+      ...(d.stats ? { stats: d.stats } : {}),
+      ms: performance.now() - t0,
+    });
   } catch (err) {
     post({ type: 'error', id: req.id, message: err instanceof Error ? err.message : String(err) });
+  }
+}
+
+function drain(): void {
+  const req = queue.shift();
+  if (!req) {
+    running = false;
+    return;
+  }
+  if (!cancelled.delete(req.id)) run(req);
+  setTimeout(drain, 0);
+}
+
+self.onmessage = (e: MessageEvent<AiRequest>) => {
+  const req = e.data;
+  switch (req.type) {
+    case 'init':
+      for (const c of req.cards) cards.set(c.id, c);
+      game = req.game ?? null;
+      session = null;
+      return;
+    case 'cards':
+      for (const c of req.cards) cards.set(c.id, c);
+      return;
+    case 'cancel':
+      cancelled.add(req.id);
+      return;
+    case 'reset':
+      session?.reset();
+      return;
+    default:
+      queue.push(req);
+      if (!running) {
+        running = true;
+        setTimeout(drain, 0);
+      }
   }
 };

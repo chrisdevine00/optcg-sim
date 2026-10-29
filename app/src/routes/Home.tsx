@@ -7,7 +7,7 @@ export function Home() {
       <h1>OPTCG Sim</h1>
       <p className="lede">
         A One Piece Card Game practice simulator and strategy teacher. Play a full game against the
-        the Pirate or Rookie AI, or a friend at the same device, or browse every English card.
+        Pirate or Rookie AI, or a friend at the same device, or browse every English card.
       </p>
       <p className="home-actions">
         <Link to="/play" className="btn primary">

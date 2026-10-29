@@ -430,6 +430,18 @@ function WhyPanel({
   useEffect(() => {
     close.current = onClose;
   });
+  const e = g.ctl.whyAt(index);
+  const said = useRef(false);
+  useEffect(() => {
+    // flows F10.1: the claim, then the evidence lines, politely (review M5a-13).
+    if (said.current) return;
+    said.current = true;
+    g.ctl.announce(
+      e
+        ? `Why: ${e.claim} ${certaintyLabel(e.certainty, 'ai-why')}. ${e.evidence.map((x) => x.text).join(' ')}`
+        : 'Why: no explanation was kept for this move.',
+    );
+  }, [e, g.ctl]);
   useEffect(() => {
     ref.current?.querySelector<HTMLElement>('button')?.focus();
     // Escape closes it wherever focus is (the board may move focus as the game updates).
@@ -442,7 +454,6 @@ function WhyPanel({
     document.addEventListener('keydown', esc);
     return () => document.removeEventListener('keydown', esc);
   }, []);
-  const e = g.ctl.whyAt(index);
   const move = lines.find((l) => l.kind === 'move' && l.index === index);
   const rail = g.L.rail;
   return (
@@ -458,6 +469,7 @@ function WhyPanel({
         className="trash-viewer why-panel"
         role="dialog"
         aria-labelledby="why-title"
+        aria-describedby={e ? 'why-claim' : undefined}
         style={{
           left: rail.x + 8,
           width: rail.w - 16,
@@ -479,7 +491,7 @@ function WhyPanel({
         <div className="why-body">
           {move && <p className="subtle why-move">{move.text}</p>}
           {!e ? (
-            <p>Only legal move.</p>
+            <p>No explanation was kept for this move.</p>
           ) : (
             <section aria-labelledby="why-claim">
               <h3 id="why-claim" className="why-claim">

@@ -11,61 +11,76 @@ import kaido from '../playbooks/OP17-058.json';
 /** The heuristic terms a playbook can scale (see `search/heuristic.ts`). */
 export type WeightKey = 'life' | 'hand' | 'counter' | 'board' | 'don' | 'threat';
 
+/**
+ * What every bias may carry for "Why?": the guide's line a move follows, with its source. Only
+ * biases whose condition is public are cited (a play is public once made; "does not play Buckin
+ * while OP17-118 is in hand" is not, so it has no citation).
+ */
+export interface BiasCite {
+  cite?: string;
+  /** useOnAttacker: the line for holding the ability back when it changes nothing. */
+  citeHold?: string;
+  /** The guide's source tag for the line (docs/content/sources.md), or the guide itself. */
+  citeSource?: string;
+}
+
 /** A move bias. Bonuses are in heuristic units (about one card each). */
-export type Bias =
+export type Bias = BiasCite &
   /** The AI's Leader (or a card) attacks, from the AI's own turn `fromOwnTurn`. */
-  | {
-      kind: 'attackWith';
-      card: 'leader' | string;
-      fromOwnTurn: number;
-      bonus: number;
-      seed: number;
-    }
-  /** Accept this optional ability ("you may") while the AI holds at least `minHand` cards. */
-  | {
-      kind: 'acceptOptional';
-      source: string;
-      ability: string;
-      minHand: number;
-      bonus: number;
-      seed: number;
-    }
-  /** Play one of these cards, optionally only from or by an own turn. */
-  | {
-      kind: 'play';
-      cards: string[];
-      fromOwnTurn?: number;
-      byOwnTurn?: number;
-      bonus: number;
-      seed: number;
-    }
-  /** Do not play `card` while `whileInHand` is in hand, from own turn `fromOwnTurn`. */
-  | {
-      kind: 'avoidPlay';
-      card: string;
-      whileInHand: string;
-      fromOwnTurn: number;
-      penalty: number;
-      seed: number;
-    }
-  /** In this ability's target choice, prefer the opponent's Character with the highest power. */
-  | { kind: 'targetHighestPower'; source: string; ability: string; bonus: number; seed: number }
-  /**
-   * On the opponent's attack, use this once-per-turn ability on their attacking Character when it
-   * changes the battle (the attacker falls below the defender, or the Counter needed falls).
-   */
-  | { kind: 'useOnAttacker'; source: string; ability: string; bonus: number; seed: number }
-  /**
-   * Play `card` only after the Leader has attacked this turn (its [When Attacking] has had the
-   * chance to shrink a target), when the opponent has a Character in the power window.
-   */
-  | {
-      kind: 'playAfterLeaderAttack';
-      card: string;
-      targetPower: [number, number];
-      penalty: number;
-      seed: number;
-    };
+  (
+    | {
+        kind: 'attackWith';
+        card: 'leader' | string;
+        fromOwnTurn: number;
+        bonus: number;
+        seed: number;
+      }
+    /** Accept this optional ability ("you may") while the AI holds at least `minHand` cards. */
+    | {
+        kind: 'acceptOptional';
+        source: string;
+        ability: string;
+        minHand: number;
+        bonus: number;
+        seed: number;
+      }
+    /** Play one of these cards, optionally only from or by an own turn. */
+    | {
+        kind: 'play';
+        cards: string[];
+        fromOwnTurn?: number;
+        byOwnTurn?: number;
+        bonus: number;
+        seed: number;
+      }
+    /** Do not play `card` while `whileInHand` is in hand, from own turn `fromOwnTurn`. */
+    | {
+        kind: 'avoidPlay';
+        card: string;
+        whileInHand: string;
+        fromOwnTurn: number;
+        penalty: number;
+        seed: number;
+      }
+    /** In this ability's target choice, prefer the opponent's Character with the highest power. */
+    | { kind: 'targetHighestPower'; source: string; ability: string; bonus: number; seed: number }
+    /**
+     * On the opponent's attack, use this once-per-turn ability on their attacking Character when it
+     * changes the battle (the attacker falls below the defender, or the Counter needed falls).
+     */
+    | { kind: 'useOnAttacker'; source: string; ability: string; bonus: number; seed: number }
+    /**
+     * Play `card` only after the Leader has attacked this turn (its [When Attacking] has had the
+     * chance to shrink a target), when the opponent has a Character in the power window.
+     */
+    | {
+        kind: 'playAfterLeaderAttack';
+        card: string;
+        targetPower: [number, number];
+        penalty: number;
+        seed: number;
+      }
+  );
 
 /** A measurable game-plan assertion (ARCHITECTURE §4.6), checked by the tests. */
 export interface Assertion {
@@ -77,15 +92,24 @@ export interface Assertion {
   source: string;
 }
 
+/** One thing a keepable hand needs (strategy-concepts §9 [S9]; the guide's "keepable hand"). */
+export interface MulliganPiece {
+  name: string;
+  /** How the guide says it, for "Why?". */
+  label: string;
+  /** Cards that count for it; omitted: any card with a Counter (Character or [Counter] Event). */
+  cards?: string[];
+  min: number;
+}
+
+/** Keep when every piece is met; going second, `secondShort` pieces may be missing. */
 export interface MulliganRule {
-  /** Keep only with at least `min` Characters whose cost is within [costMin, costMax]... */
-  early: { costMin: number; costMax: number; min: number };
-  /** ...or at least one of these plan pieces (ramp, search). */
-  planPieces: string[];
-  /** Counter cards (Counter value or [Counter] Event) wanted. */
-  minCounters: number;
-  /** "Two yeses is a keep" (strategy-concepts §9, S9); going second, one fewer is enough. */
-  yesesToKeep: number;
+  pieces: MulliganPiece[];
+  secondShort: number;
+  /** Pieces required going first whatever `secondShort` says. */
+  requireGoingFirst: string[];
+  /** Where the rule comes from (docs/content/sources.md tag, or the guide). */
+  source: string;
 }
 
 export interface LeaderTrickCopy {
@@ -117,7 +141,7 @@ export interface Playbook {
   faceBias: { early: number; mid: number; late: number };
   /** Multiplier on the AI's own Life term: above 1 counters more readily. */
   counterAggression: number;
-  mulligan: MulliganRule & { requireEarlyGoingFirst: boolean };
+  mulligan: MulliganRule;
   biases: Bias[];
   assertions: Assertion[];
   /** The Leader's defensive trick, for "Why?" (explanations.md E16). */

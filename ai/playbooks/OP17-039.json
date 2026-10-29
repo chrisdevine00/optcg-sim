@@ -5,9 +5,15 @@
   "asOf": "2026-10-28",
   "guide": "docs/content/archetypes/OP17-039.md",
   "notes": [
-    "Written from the guide's 'Game plan by turn' and 'Playbook seeds'. Numbers are heuristic units (about one card); they are tuning, not strategy claims.",
+    "Written from the guide's 'Game plan by turn' and 'Playbook seeds'.",
     "goFirst: strategy-concepts §10 [S17] 'the general default is to go second'; go second with counter-heavy and late-game decks. The guide gives no Rocks-specific seat advice.",
-    "cardValue: ongoing effects named in the guide's Defining cards (Newgate's +3000, Shiki's −3000, Stussy's [Activate: Main], Captain John's attack lock, Linlin's +1000 on defence)."
+    "cardValue: ongoing effects named in the guide's Defining cards (Newgate's +3000, Shiki's −3000, Stussy's [Activate: Main], Captain John's attack lock, Linlin's +1000 on defence).",
+    "Every number here is an inference (review M5a-09): the guide gives the direction, not the value. weights, faceBias, counterAggression and cardValue were set by reasoning and have not been tuned on their own.",
+    "Bias sizes were chosen so the planted game-plan tests pass; ai/test/game-plan.test.ts runs every seed with the biases off too, and lists the seeds that pass only because a bias encodes the guide's line (docs/benchmarks.md).",
+    "Citations ('cite', 'citeSource') are what 'Why?' shows when a move follows the line; only biases whose condition is public carry one (avoidPlay does not: its condition is a card in hand).",
+    "weights.hand 1.15: the guide calls Rocks 'a blue card-advantage midrange deck' [SH-XEB]; inference: cards in hand weigh a little more.",
+    "faceBias 1.0/1.05/1.15: the guide's plan starts Leader attacks at T2 and finishes with OP17-118 [SH-XEB]; inference: slightly more weight on the opponent's Life late.",
+    "mulligan: the guide's keepable hand (one early play, plus a counter event or a 5–7 DON!! card; one piece short going second) and SH-XEB's baseline (redraw any hand with no 1- to 3-cost Character going first)."
   ],
   "goFirst": false,
   "digTargets": ["OP17-118", "OP17-048", "OP17-054", "OP17-046"],
@@ -20,27 +26,62 @@
     "OP17-044": 0.4,
     "OP17-049": 0.3
   },
-  "weights": { "hand": 1.15 },
-  "faceBias": { "early": 1.0, "mid": 1.05, "late": 1.15 },
+  "weights": {
+    "hand": 1.15
+  },
+  "faceBias": {
+    "early": 1.0,
+    "mid": 1.05,
+    "late": 1.15
+  },
   "counterAggression": 1.0,
   "mulligan": {
-    "early": { "costMin": 1, "costMax": 3, "min": 1 },
-    "planPieces": ["OP17-049", "OP17-046", "OP17-048", "OP17-040"],
-    "minCounters": 1,
-    "yesesToKeep": 2,
-    "requireEarlyGoingFirst": true
+    "pieces": [
+      {
+        "name": "early",
+        "label": "a 1- to 3-cost Character for turns 1–2",
+        "cards": ["OP17-050", "OP17-045", "OP08-051", "OP17-054", "OP17-052"],
+        "min": 1
+      },
+      {
+        "name": "backup",
+        "label": "a counter event or a card for 5–7 DON!!",
+        "cards": ["OP17-055", "OP17-056", "OP17-049", "OP17-046", "OP17-048"],
+        "min": 1
+      }
+    ],
+    "secondShort": 1,
+    "requireGoingFirst": ["early"],
+    "source": "SH-XEB; OP17-039 guide (keepable hand, inference)"
   },
   "biases": [
-    { "seed": 1, "kind": "attackWith", "card": "leader", "fromOwnTurn": 2, "bonus": 1.0 },
+    {
+      "seed": 1,
+      "kind": "attackWith",
+      "card": "leader",
+      "fromOwnTurn": 2,
+      "bonus": 1.0,
+      "cite": "Its guide: start attacking with the Leader, paying for the reveal, from turn 2.",
+      "citeSource": "SH-XEB"
+    },
     {
       "seed": 2,
       "kind": "acceptOptional",
       "source": "OP17-039",
       "ability": "reveal-draw",
       "minHand": 2,
-      "bonus": 1.0
+      "bonus": 1.0,
+      "cite": "Its guide: pay the reveal cost every time; in this deck the reveal almost always draws 2.",
+      "citeSource": "SH-XEB"
     },
-    { "seed": 3, "kind": "play", "cards": ["OP17-118"], "bonus": 2.5 },
+    {
+      "seed": 3,
+      "kind": "play",
+      "cards": ["OP17-118"],
+      "bonus": 2.5,
+      "cite": "Its guide: Rocks.D.Xebec (10 cost) lands at 10 DON!! and plays two more Rocks Pirates.",
+      "citeSource": "SH-XEB"
+    },
     {
       "seed": 4,
       "kind": "avoidPlay",
@@ -54,7 +95,9 @@
       "kind": "targetHighestPower",
       "source": "OP17-054",
       "ability": "on-play",
-      "bonus": 0.5
+      "bonus": 0.5,
+      "cite": "Its guide: Stussy keeps your best attacker home.",
+      "citeSource": "SH-XEB"
     }
   ],
   "assertions": [

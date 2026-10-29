@@ -529,7 +529,7 @@ CR 8-1-3-4: "instead" effects. Optional ones ("may") become an `optional` decisi
 
 2. **Only public information.** The AI's explanation is filtered before it reaches the UI: it may cite the board, public counts, cards already revealed, and its archetype's general plan. It never cites cards in its hand, its deck order, or its Life (PROMPT "Rules the AI must obey"). A turn plan shows only the steps already taken; future steps stay hidden until they happen.
 
-3. **Forced moves:** "Only legal move." **Auto-skipped AI windows:** no "Why?" link, since there was no choice (and the link's absence must not leak anything; the AI's considering beat is uniform, G5).
+3. **Every AI move has "Why?", forced or not** (M5a review M5a-01). Whether an AI window was forced can depend on its hidden cards (a Life card with or without a usable [Trigger], a hand with or without a Counter), so neither the link's presence nor its words may differ: there is no "Only legal move." for the AI, and every explanation is worded to stay true for any hidden hand consistent with what you can see ("It added its Life card to its hand", "It let the hit through"). The AI's considering beat is uniform (G5), and its "thinking" state shows only on its own turn.
 
 4. **Edge:** for the Rookie tier, "why" says "Rookie picks a random legal move, except that it always blocks or counters a lethal attack." (Design note, not copy: being honest about the tier teaches what the tier is.)
 
