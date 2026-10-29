@@ -6,6 +6,7 @@
  */
 import { useEffect, useRef, type ReactNode } from 'react';
 import type { Action, PlayerId } from '@optcg/engine';
+import { CardFace } from '../../art/index.ts';
 import { SPEEDS, speedLabel } from '../game/controller.ts';
 import { newIntentId, type Simulation } from '../../session/index.ts';
 import { num, other, resultReason, winnerWords } from '../game/text.ts';
@@ -93,6 +94,17 @@ export function DecisionPanel({
           <p className="dec-error" role="alert">
             {g.ctl.error}
           </p>
+        )}
+        {g.mine && g.ctl.recap && (
+          // Where Skip stopped (flows F21 step 4); cleared by the next action or a rewind.
+          <div className="recap" role="status">
+            <p className="subtle">Stopped here. While you skipped:</p>
+            <ul className="dec-list">
+              {g.ctl.recap.map((t, i) => (
+                <li key={i}>{t}</li>
+              ))}
+            </ul>
+          </div>
         )}
         {content.body}
       </div>
@@ -348,23 +360,15 @@ function waitingContent(g: G, tall: boolean, rewind: NonNullable<Foot['secondary
       ))}
     </div>
   );
-  const recap = ctl.recap && (
-    <div className="recap">
-      <p className="subtle">While you skipped:</p>
-      <ul className="dec-list">
-        {ctl.recap.map((t, i) => (
-          <li key={i}>{t}</li>
-        ))}
-      </ul>
-    </div>
-  );
   const battle = view.battle ? <BattleNumbers g={g} sim={null} perspective="watch" /> : null;
   return {
-    title: view.battle
-      ? battleTitle(g)
-      : aiTurn
-        ? `${names.hotseat ? names.player[view.turn.activePlayer] + '’s' : 'Opponent’s'} turn`
-        : 'Your turn',
+    title: ctl.curtainFor
+      ? `Handoff to ${names.player[ctl.curtainFor]}`
+      : view.battle
+        ? battleTitle(g)
+        : aiTurn
+          ? `${names.hotseat ? names.player[view.turn.activePlayer] + '’s' : 'Opponent’s'} turn`
+          : 'Your turn',
     tall,
     body: (
       <div>
@@ -374,34 +378,46 @@ function waitingContent(g: G, tall: boolean, rewind: NonNullable<Foot['secondary
           {status}
         </p>
         {ctl.activity && !view.battle && <p className="subtle">Last: {ctl.activity}</p>}
-        {recap}
         {aiTurn && !names.hotseat && speed}
       </div>
     ),
     foot:
       aiTurn && !names.hotseat
         ? {
-            secondary:
-              ctl.speed === 'step'
-                ? {
+            ...(ctl.speed === 'step'
+              ? {
+                  // Step pace: the primary is "Next move" (board.md §5.3, M3-19).
+                  secondary: {
+                    label: 'Skip to my decision',
+                    key: 'S',
+                    onClick: () => ctl.skip(),
+                    disabled: ctl.skipping,
+                    id: 'skip-btn',
+                  },
+                  primary: {
                     label: 'Next move',
                     key: '.',
+                    sub: ctl.stepWaiting ? 'the AI waits for you' : 'the AI is moving',
                     onClick: () => ctl.nextMove(),
                     disabled: !ctl.stepWaiting,
-                  }
-                : {
+                    id: 'next-btn',
+                  },
+                }
+              : {
+                  secondary: {
                     label: ctl.paused ? 'Resume' : 'Pause',
                     key: 'K',
                     onClick: () => ctl.togglePause(),
                   },
-            primary: {
-              label: 'Skip to my decision',
-              key: 'S',
-              sub: 'stops when you have a choice',
-              onClick: () => ctl.skip(),
-              disabled: ctl.skipping,
-              id: 'skip-btn',
-            },
+                  primary: {
+                    label: 'Skip to my decision',
+                    key: 'S',
+                    sub: 'stops when you have a choice',
+                    onClick: () => ctl.skip(),
+                    disabled: ctl.skipping,
+                    id: 'skip-btn',
+                  },
+                }),
           }
         : { secondary: rewind },
   };
@@ -410,7 +426,7 @@ function waitingContent(g: G, tall: boolean, rewind: NonNullable<Foot['secondary
 function waitingWords(kind: string, who: string): string {
   switch (kind) {
     case 'main':
-      return `${who} is in its Main Phase.`;
+      return `${who} is in the Main Phase.`;
     case 'block':
       return `${who} is choosing whether to block.`;
     case 'counter':
@@ -828,14 +844,28 @@ export function stagedActions(g: G, s: Staging): Action[] {
   const out: Action[] = [];
   if (g.view.decision?.kind === 'block')
     out.push({ type: 'block', blocker: s.blocker, player: me });
-  for (const c of s.counters)
+  for (const c of resolvedCounters(g, s))
     out.push({ type: 'counter', card: c.card, target: c.target, player: me });
   return out;
+}
+
+/**
+ * Staged Counters aim at whoever is defending when they are sent: the Blocker if one is staged,
+ * else the attack's target (flows F6.5: stage first, then pick a Blocker; review M3-05).
+ */
+function resolvedCounters(g: G, s: Staging): { card: string; target: string }[] {
+  const target = defendingTarget(g, s);
+  const opts = counterOptions(g, s);
+  return s.counters.map((c) => {
+    const a = opts.get(c.card)?.find((x) => x.type === 'counter' && x.target === target);
+    return { card: c.card, target: a?.type === 'counter' ? a.target : target };
+  });
 }
 
 /** The counter options once the block is settled (from the scratch view when still in the Block step). */
 export function counterOptions(g: G, s: Staging): Map<string, Action[]> {
   if (g.view.decision?.kind === 'counter') return g.legal.counters;
+  if (!g.ctl.revealed()) return new Map();
   const sim = g.ctl.session.simulate(g.me, [{ type: 'block', blocker: s.blocker, player: g.me }]);
   const m = new Map<string, Action[]>();
   for (const a of sim.view.actions) {
@@ -851,67 +881,125 @@ export function defendingTarget(g: G, s: Staging): string {
   return s.blocker ?? g.view.battle?.target ?? '';
 }
 
+/** The defence numbers the panel shows, also spoken (flows F6.1, F6.3; review M3-08). */
+export function defenceNumbers(g: G, s: Staging) {
+  const me = g.me;
+  // While the hand is veiled, staged Counters stay private: the numbers ignore them (M3-03).
+  const shown = g.ctl.revealed() ? s : { ...s, counters: [] };
+  const sim = cachedSim(g, shown);
+  const ap = sim.damage?.attackerPower ?? 0;
+  const tp = sim.damage?.targetPower ?? 0;
+  const hits = sim.damage?.attackerWins ?? true;
+  const target = defendingTarget(g, s);
+  const t = g.cardOf(target);
+  const total = shown.counters.reduce((n, c) => n + (g.cardOf(c.card)?.card?.counter ?? 0), 0);
+  return {
+    sim,
+    ap,
+    tp,
+    hits,
+    target,
+    leader: t?.zone === 'leader',
+    total,
+    need: hits ? ap - tp + 1000 : 0,
+    life: g.view.zones[me].life.length,
+  };
+}
+
+/** "Your Leader 6000 against 7000: still hits. Need 1000 more." */
+export function defenceSentence(g: G, s: Staging): string {
+  const n = defenceNumbers(g, s);
+  const who = n.leader ? 'Your Leader' : g.nameOf(n.target);
+  const verdict = !n.hits
+    ? 'the attack fails'
+    : n.ap === n.tp
+      ? 'tied: the attacker wins ties'
+      : 'still hits';
+  return `${who} ${n.tp} against ${n.ap}: ${verdict}.${n.hits ? ` Need ${n.need} more.` : ''}`;
+}
+
 function defenceContent(g: G): Content {
   const { view, staging: s } = g;
   const me = g.me;
   const b = view.battle!;
   const inBlock = view.decision?.kind === 'block';
-  const sim = cachedSim(g, s);
+  const hidden = !g.ctl.revealed();
+  const n = defenceNumbers(g, s);
+  const { sim, ap, tp, hits, total, need } = n;
   const none = g.ctl.session.simulate(
-    g.me,
+    me,
     inBlock ? [{ type: 'block', blocker: null, player: me }] : [],
   );
-  const ap = sim.damage?.attackerPower ?? 0;
-  const tp = sim.damage?.targetPower ?? 0;
-  const hits = sim.damage?.attackerWins ?? true;
-  const targetH = defendingTarget(g, s);
-  const t = g.cardOf(targetH);
-  const leaderTarget = t?.zone === 'leader';
-  const lifeNow = view.zones[me].life.length;
-  const noneLife = none.lifeAfter[me];
+  const targetH = n.target;
+  const leaderTarget = n.leader;
+  const lifeNow = n.life;
   const takeSub =
-    leaderTarget || !s.blocker
-      ? g.cardOf(b.target)?.zone === 'leader'
-        ? `Life ${lifeNow} → ${noneLife}${none.gameOver ? ' · you lose' : ''}`
-        : `${g.nameOf(b.target)} K.O.’d`
-      : '';
+    g.cardOf(b.target)?.zone === 'leader'
+      ? `Life ${lifeNow} → ${none.lifeAfter[me]}${none.gameOver ? ' · you lose' : ''}`
+      : `${g.nameOf(b.target)} K.O.’d`;
   const staged = s.counters.length > 0;
-  const total = s.counters.reduce((n, c) => n + (g.cardOf(c.card)?.card?.counter ?? 0), 0);
-  const need = hits ? ap - tp + 1000 : 0;
   const options = counterOptions(g, s);
   const take = () => commitDefence(g, { blocker: null, counters: [] });
   const commit = () => commitDefence(g, s);
+  const blockOnly = () => commitDefence(g, { blocker: s.blocker, counters: [] });
   const blockers = [...g.legal.blocks.keys()];
-  const targetWord = leaderTarget ? 'your Leader' : g.nameOf(targetH);
+  const targetWord = g.cardOf(b.target)?.zone === 'leader' ? 'your Leader' : g.nameOf(b.target);
   const result = hits
     ? leaderTarget
       ? `✕ Hit lands · your Life ${lifeNow} → ${sim.lifeAfter[me]}${sim.gameOver ? ' · you lose' : ''}`
       : `✕ K.O. · ${g.nameOf(targetH)}`
     : '✓ Attack fails';
-  const hotseatHidden = g.ctl.handHidden();
 
   let foot: Foot;
   const takeBtn = { label: 'Take the hit', sub: takeSub, onClick: take, id: 'take-hit' };
-  if (s.blocker) {
+  if (hidden && staged) {
+    // Veiled: no numbers for the staged cards, and nothing Enter can send blind.
     foot = {
-      // Taking the hit stays one action away even with a Blocker chosen (UX-R2).
-      secondary: { ...takeBtn, sub: `${takeSub} · no block` },
+      secondary: { ...takeBtn },
       primary: {
-        label: `Block with ${g.nameOf(s.blocker)}${staged ? ` · +${num(total)}` : ''}`,
-        key: 'Enter',
-        sub: hits
-          ? `${g.nameOf(s.blocker)} K.O.’d · Life stays ${lifeNow}`
-          : `${g.nameOf(s.blocker)} survives`,
+        label: s.blocker ? `Block with ${g.nameOf(s.blocker)}` : 'Commit defence',
+        sub: `${s.counters.length} staged · hidden`,
         onClick: commit,
-        id: 'commit-defence',
+        id: 'commit-hidden',
       },
     };
+  } else if (s.blocker) {
+    const name = g.nameOf(s.blocker);
+    // With a Blocker, staged Counters count only if they save it; wasted ones never go on Enter.
+    foot =
+      staged && hits
+        ? {
+            secondary: {
+              label: 'Play anyway',
+              sub: `${name} still K.O.’d`,
+              tone: 'warn',
+              onClick: commit,
+              id: 'play-anyway',
+            },
+            primary: {
+              label: `Block with ${name}`,
+              key: 'Enter',
+              sub: `${name} K.O.’d · Life stays ${lifeNow} · Counters kept`,
+              onClick: blockOnly,
+              id: 'commit-defence',
+            },
+          }
+        : {
+            secondary: { ...takeBtn, sub: `${takeSub} · no block` },
+            primary: {
+              label: `Block with ${name}${staged ? ` · +${num(total)}` : ''}`,
+              key: 'Enter',
+              sub: hits ? `${name} K.O.’d · Life stays ${lifeNow}` : `${name} survives`,
+              onClick: commit,
+              id: 'commit-defence',
+            },
+          };
   } else if (!staged) {
     foot = {
       secondary: {
         label: 'Counter',
         disabled: true,
-        reason: hotseatHidden ? 'hold R to see your hand' : 'Stage a lit hand card',
+        reason: hidden ? 'reveal your hand first' : 'Stage a lit hand card',
         onClick: commit,
       },
       primary: takeBtn,
@@ -941,6 +1029,7 @@ function defenceContent(g: G): Content {
   }
   const hand = view.zones[me].hand;
   const counterCards = hand.filter((c) => options.has(c.handle));
+  const base = g.cardOf(targetH)?.power ?? 0;
   return {
     title: `Defend ${targetWord} · ${g.nameOf(b.attacker)} attacks`,
     tall: true,
@@ -952,22 +1041,24 @@ function defenceContent(g: G): Content {
           perspective="defend"
           target={targetH}
           breakdownDef={
-            staged
-              ? // On tablet rails the staged names stay in the Counter lane only (one line fewer each).
-                `${num(tp - total)} + ${num(total)} staged${g.L.rail.w < 320 ? '' : ` (${s.counters.map((c) => g.nameOf(c.card)).join(', ')})`}`
-              : s.blocker
-                ? `redirected from your Leader`
-                : undefined
+            hidden && staged
+              ? `${num(base)} · ${s.counters.length} staged (hidden)`
+              : staged
+                ? // On tablet rails the staged names stay in the Counter lane only (one line fewer each).
+                  `${num(base)} + ${num(total)} staged${g.L.rail.w < 320 ? '' : ` (${s.counters.map((c) => g.nameOf(c.card)).join(', ')})`}`
+                : s.blocker
+                  ? `${num(base)} · blocking for your Leader`
+                  : undefined
           }
         />
         <p className={`result ${hits ? 'bad' : 'good'}`} data-testid="battle-result">
           <span>{ap === tp && hits ? '✕ Ties go to the attacker' : result}</span>
           {hits && <span className="need">Need +{num(need)} more</span>}
         </p>
-        {staged && hits && (
+        {staged && hits && !hidden && (
           <p className="warnline">
-            <span aria-hidden="true">⚠</span> {num(tp)} vs {num(ap)} still hits. Add {num(need)}{' '}
-            more to stop it, or take the hit and keep your cards.
+            <span aria-hidden="true">⚠</span> {num(tp)} vs {num(ap)} still{' '}
+            {s.blocker ? 'K.O.s the Blocker' : 'hits'}. Add {num(need)} more, or keep your cards.
           </p>
         )}
         <div className="lanes">
@@ -980,7 +1071,7 @@ function defenceContent(g: G): Content {
                     type="button"
                     className="opt"
                     aria-pressed={s.blocker === null}
-                    onClick={() => g.setStaging({ ...s, blocker: null })}
+                    onClick={() => setBlocker(g, null)}
                   >
                     No block
                   </button>
@@ -995,7 +1086,7 @@ function defenceContent(g: G): Content {
                         type="button"
                         className="opt"
                         aria-pressed={s.blocker === h}
-                        onClick={() => g.setStaging({ ...s, blocker: s.blocker === h ? null : h })}
+                        onClick={() => setBlocker(g, s.blocker === h ? null : h)}
                       >
                         {g.nameOf(h)} {num(g.cardOf(h)?.power)} · {dies ? 'K.O.’d' : 'survives'}
                       </button>
@@ -1013,9 +1104,10 @@ function defenceContent(g: G): Content {
           <div className="lane">
             <span className="ln">Counter</span>
             <div className="opts" role="group" aria-label="Counter">
-              {hotseatHidden ? (
+              {hidden ? (
                 <span className="subtle">
-                  {g.names.player[me]}: press and hold R to see your hand.
+                  {staged ? `${s.counters.length} staged. ` : ''}
+                  {g.names.player[me]}: hold R, or press and hold your hand area, to see it.
                 </span>
               ) : counterCards.length === 0 ? (
                 <span className="subtle">No Counter cards in hand</span>
@@ -1040,7 +1132,7 @@ function defenceContent(g: G): Content {
           </div>
           <div className="lanehd">
             <span className="subtle">
-              Click lit hand cards to stage
+              Select lit hand cards to stage
               <span className="wide-only"> · ties go to the attacker</span>
             </span>
             <button
@@ -1068,18 +1160,29 @@ function cachedSim(g: G, s: Staging): Simulation {
 }
 let simCache: { key: string; sim: Simulation | null } = { key: '', sim: null };
 
+function setBlocker(g: G, blocker: string | null) {
+  const next = { ...g.staging, blocker };
+  g.setStaging(next);
+  g.ctl.announce(
+    `${blocker ? `Block with ${g.nameOf(blocker)}` : 'No block'}. ${defenceSentence(g, next)}`,
+  );
+}
+
 export function toggleCounter(g: G, handle: string) {
   const s = g.staging;
   if (s.counters.some((c) => c.card === handle)) {
-    g.setStaging({ ...s, counters: s.counters.filter((c) => c.card !== handle) });
+    const next = { ...s, counters: s.counters.filter((c) => c.card !== handle) };
+    g.setStaging(next);
+    g.ctl.announce(`Unstaged ${g.nameOf(handle)}. ${defenceSentence(g, next)}`);
     return;
   }
-  const opts = counterOptions(g, s).get(handle);
-  if (!opts) return;
-  const target = defendingTarget(g, s);
-  const a = opts.find((x) => x.type === 'counter' && x.target === target) ?? opts[0];
-  if (a?.type === 'counter')
-    g.setStaging({ ...s, counters: [...s.counters, { card: handle, target: a.target }] });
+  if (!counterOptions(g, s).has(handle)) return;
+  const next = { ...s, counters: [...s.counters, { card: handle, target: defendingTarget(g, s) }] };
+  g.setStaging(next);
+  // flows F6.3: one polite sentence after each change.
+  g.ctl.announce(
+    `Staged ${g.nameOf(handle)}, plus ${g.cardOf(handle)?.card?.counter ?? 0}. ${defenceSentence(g, next)}`,
+  );
 }
 
 export function commitDefence(g: G, s: Staging) {
@@ -1087,7 +1190,7 @@ export function commitDefence(g: G, s: Staging) {
   const seq: Action[] = [];
   if (g.view.decision?.kind === 'block')
     seq.push({ type: 'block', blocker: s.blocker, player: me });
-  for (const c of s.counters)
+  for (const c of resolvedCounters(g, s))
     seq.push({ type: 'counter', card: c.card, target: c.target, player: me });
   seq.push({ type: 'endCounter', player: me });
   g.ctl.actSequence(seq);
@@ -1099,61 +1202,72 @@ export function commitDefence(g: G, s: Staging) {
 // ---------------------------------------------------------------------------------------------
 
 function triggerContent(g: G): Content {
-  const hidden = g.ctl.handHidden();
+  const hidden = !g.ctl.revealed();
   const activate = g.legal.triggers.find((a) => a.type === 'trigger' && a.activate);
   const toHand = g.legal.triggers.find((a) => a.type === 'trigger' && !a.activate);
-  const why = activate ? null : g.ctl.session.whyNot(g.me, { type: 'trigger', activate: true });
-  const prompt = g.view.decision?.prompt ?? '';
-  const nm =
-    /Damage: (?:activate the \[Trigger\] of |add )(.+?)(?:,| to your hand)/.exec(prompt)?.[1] ?? '';
+  const lifeId = g.ctl.pendingLifeCard();
+  const card = lifeId ? g.cards.get(lifeId) : undefined;
+  const why =
+    hidden || activate ? null : g.ctl.session.whyNot(g.me, { type: 'trigger', activate: true });
   const life = g.view.zones[g.me].life.length;
   return {
     title: 'Damage · your top Life card',
     tall: true,
-    body: hidden ? (
-      <p className="dec-lead">
-        {g.names.player[g.me]}: press and hold R to see your Life card. Only you should look.
-      </p>
-    ) : (
-      <div>
-        <p className="dec-lead" data-testid="life-card">
-          {nm ? (
-            <>
-              Life card: <b>{nm}</b>
-            </>
-          ) : (
-            prompt
-          )}
+    body:
+      hidden || !card ? (
+        <p className="dec-lead">
+          {g.names.player[g.me]}: hold R, or press and hold your hand area, to see your Life card.
+          Only you should look.
         </p>
-        <p className="subtle">
-          Only you see this. Life {life} → {life - 1}.
-        </p>
-        <ul className="dec-list">
-          <li>
-            <b>Activate Trigger:</b>{' '}
-            {activate ? 'reveal it and use its [Trigger].' : (why?.text ?? 'not available')}
-          </li>
-          <li>
-            <b>Add to hand:</b> hand +1, kept hidden from your opponent.
-          </li>
-        </ul>
-      </div>
-    ),
+      ) : (
+        <div className="life-reveal">
+          {/* The revealed card renders in the tall body (board.md §3.12), for its owner only. */}
+          <div
+            className="life-face"
+            style={{ ['--card-w' as string]: '96px', ['--card-h' as string]: '134px' }}
+          >
+            <CardFace card={card} />
+          </div>
+          <div>
+            <p className="dec-lead" data-testid="life-card">
+              Life card: <b>{card.name}</b>
+            </p>
+            <p className="subtle">
+              Only you see this. Life {life} → {life - 1}.
+            </p>
+            {card.triggerText && (
+              <p>
+                <b>[Trigger]</b> {card.triggerText}
+              </p>
+            )}
+            <ul className="dec-list">
+              <li>
+                <b>Activate Trigger:</b>{' '}
+                {activate ? 'reveal it and use its [Trigger].' : (why?.text ?? 'not available')}
+              </li>
+              <li>
+                <b>Add to hand:</b> hand +1, kept hidden from your opponent.
+              </li>
+            </ul>
+          </div>
+        </div>
+      ),
     foot: {
       equal: true,
       secondary: {
         label: 'Activate Trigger',
         disabled: !activate,
-        reason: why?.text ? 'not available' : undefined,
+        reason: hidden ? 'reveal first' : 'not available',
         onClick: () => activate && g.act(activate),
         id: 'trigger-activate',
+        // C9: focus starts on Activate, even when it explains why it is unavailable.
+        autoFocus: true,
       },
       primary: {
         label: 'Add to hand',
         key: 'Enter',
         onClick: () => toHand && g.act(toHand),
         id: 'trigger-hand',
-        autoFocus: true,
       },
     },
   };
@@ -1167,8 +1281,13 @@ function chooseContent(g: G): Content {
   const d = g.view.decision!;
   const min = d.min ?? 0;
   const max = d.max ?? 1;
-  const cands = [...g.legal.picks.keys()];
+  // Board order, left to right, so the list matches the slots (M3-22).
+  const slots = g.ctl.session.characterSlots(g.me);
+  const order = new Map(g.view.zones[g.me].characters.map((c, i) => [c.handle, slots[i] ?? i]));
+  const cands = [...g.legal.picks.keys()].sort((a, b) => (order.get(a) ?? 9) - (order.get(b) ?? 9));
   const chosen = g.picks.filter((h) => g.legal.picks.has(h));
+  const makingRoom = d.prompt.includes('Character area is full');
+  const playing = g.ctl.pendingPlay;
   const ready = chosen.length >= min && chosen.length <= max;
   const commit = () => {
     // Picks go to the engine in canonical (candidate) order, then `done` if still owed.
@@ -1181,7 +1300,7 @@ function chooseContent(g: G): Content {
     g.setPicks([]);
   };
   return {
-    title: 'Choose',
+    title: makingRoom ? `Make room for ${playing ?? 'the new Character'}` : 'Choose',
     tall: true,
     body: (
       <div>
@@ -1223,7 +1342,14 @@ function chooseContent(g: G): Content {
       </div>
     ),
     foot: {
-      secondary: { label: 'Reset', onClick: () => g.setPicks([]), disabled: chosen.length === 0 },
+      secondary: makingRoom
+        ? {
+            // flows F4b step 3: Cancel drops the whole play (a rewind of it).
+            label: 'Cancel the play',
+            onClick: () => g.requestRewind(() => g.ctl.rewindMove()),
+            id: 'choose-cancel',
+          }
+        : { label: 'Reset', onClick: () => g.setPicks([]), disabled: chosen.length === 0 },
       primary: {
         label: chosen.length === 0 && min === 0 ? 'Choose none' : 'Done',
         key: 'Enter',

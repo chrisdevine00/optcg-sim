@@ -35,7 +35,7 @@ test.describe('rewind (flows F11)', () => {
     await expect(page.locator('.count-line')).toHaveText('1 of 1 chosen');
     await page.locator('#choose-done').click();
     expect(await nextDecision(page)).toBe('main');
-    await expect(page.getByRole('group', { name: /Your hand, 1 cards/ })).toHaveCount(1);
+    await expect(page.getByRole('group', { name: /Your hand, 1 card\b/ })).toHaveCount(1);
     await page.locator('#decision-title').focus();
     await page.keyboard.press('r');
     const dialog = page.getByRole('dialog', { name: 'Rewind to before a move' });

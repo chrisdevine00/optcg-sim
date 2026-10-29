@@ -54,5 +54,12 @@ test.describe('M3 board: full games', () => {
     await expect(page.getByRole('button', { name: 'Your Life, 2 cards, face down' })).toHaveCount(
       1,
     );
+    // The recap shows where Skip stopped (M3-11).
+    await expect(page.locator('#decision .recap')).toContainText('While you skipped');
+    // M3-12: against the AI too, the damage decision shows which Life card you gain.
+    await page.locator('#take-hit').click();
+    expect(await nextDecision(page)).toBe('trigger');
+    await expect(page.getByTestId('life-card')).toContainText(/Life card: (Komachiyo|Sai)/);
+    await page.locator('#trigger-hand').click();
   });
 });

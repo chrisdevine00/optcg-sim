@@ -92,9 +92,18 @@ export function CardDock({
         </div>
       )}
       <div className="dock-body">
-        <div className="dock-art" style={{ ['--card-w' as string]: `${artW}px` }}>
-          <CardFace card={card} />
-        </div>
+        {/* A small dock keeps the words and drops the art (the card is on the board). */}
+        {rect.w >= 300 && (
+          <div
+            className="dock-art"
+            style={{
+              ['--card-w' as string]: `${artW}px`,
+              ['--card-h' as string]: `${Math.round((artW * 88) / 63)}px`,
+            }}
+          >
+            <CardFace card={card} />
+          </div>
+        )}
         <div className="dock-info">
           {!pinned && <h2 className="dock-name">{card.name}</h2>}
           <p className="subtle">

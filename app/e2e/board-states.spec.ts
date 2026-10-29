@@ -55,6 +55,8 @@ test.describe('board states', () => {
     await expect(page.getByRole('dialog', { name: 'Keyboard shortcuts' })).toBeVisible();
     await check(page, info, 'shortcuts');
     await page.keyboard.press('Escape');
+    // M3-25: closing a dialog returns focus to the card that opened it.
+    await expect(card).toBeFocused();
     await page.locator('.z.trash').last().click();
     await expect(page.getByRole('dialog', { name: /trash/ })).toBeVisible();
     await check(page, info, 'trash');
@@ -191,7 +193,7 @@ test.describe('adapted sizes', () => {
       await page.locator('[data-zone="hand"][data-glyph="play"]').first().click();
       await ok('defend-stop');
       await page.locator('#decision .lanehd button').click();
-      await page.locator('[data-zone="my-chars"][data-glyph="target"]').first().click();
+      await page.locator('[data-zone="my-chars"][data-glyph="block"]').first().click();
       await ok('defend-block');
       await page.locator('#decision .lanehd button').click();
       await page.locator('#take-hit').click();

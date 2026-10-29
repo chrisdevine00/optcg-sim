@@ -32,6 +32,38 @@ export const SCENARIOS: Record<string, Spec> = {
       costArea: { active: 2, rested: 2 },
     },
   },
+  /**
+   * Hotseat leak walk (review M3-01..04): every private card has a name no other card shares, so
+   * a test can look for each one. Player 2 attacks; Player 1 defends.
+   */
+  leak: {
+    mode: 'hotseat',
+    seed: 11,
+    turn: 4,
+    activePlayer: 'p2',
+    firstPlayer: 'p1',
+    p1: {
+      leader: 'ST01-001',
+      // Vergo, Krieg, Bellamy
+      life: ['OP01-065', 'OP01-066', 'OP01-076'],
+      // Hajrudin, Shinobu, Jean Bart, Wire
+      hand: ['OP01-018', 'OP01-043', 'OP01-045', 'OP01-053'],
+      characters: ['OP09-072'],
+      // Mocha
+      deck: filler('OP01-081', 10),
+      costArea: { active: 3, rested: 0 },
+    },
+    p2: {
+      leader: { card: 'ST04-001', don: 2 },
+      // Fukurokuju, Atmos
+      life: ['OP01-110', 'OP02-003'],
+      // Urashima, Babanuki
+      hand: ['OP01-092', 'OP01-107'],
+      // Mohji
+      deck: filler('OP02-060', 10),
+      costArea: { active: 2, rested: 2 },
+    },
+  },
   /** p1 has a full Character area and a playable Character: the sixth asks to trash one (choose). */
   full: {
     mode: 'ai',

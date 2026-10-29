@@ -57,6 +57,8 @@ export interface BoardProps {
   /** The bottom hand is hidden (hotseat) and why. */
   handHidden: 'none' | 'hold' | 'click';
   onShowHand: () => void;
+  /** Hotseat defence: a press and hold on the veil reveals the hand until released (M3-06). */
+  onRevealStart: (pointerId: number) => void;
   mulligan: boolean;
   midline: ReactNode;
   oppActivity: string;
@@ -282,7 +284,7 @@ export function Board(b: BoardProps) {
         </button>
       ) : (
         <button key="life" type="button" className="z life" style={rect(R.life)} {...item(zk, i++)}>
-          <span className="sr-only">{`${W} Life, ${lifeN} cards, face down`}</span>
+          <span className="sr-only">{`${W} Life, ${n(lifeN, 'card')}, face down`}</span>
           <span className="vis" aria-hidden="true">
             {Array.from({ length: lifeN }, (_, k) => {
               const top = mine ? 4 + k * lifeStep : R.life.h - 4 - lifeBackH - k * lifeStep;
@@ -323,7 +325,7 @@ export function Board(b: BoardProps) {
     const deckN = z.deck.length;
     items.push(
       <button key="deck" type="button" className="z deck" style={rect(R.deck)} {...item(zk, i++)}>
-        <span className="sr-only">{`${W} deck, ${deckN} cards${deckN <= 5 ? ', running low' : ''}`}</span>
+        <span className="sr-only">{`${W} deck, ${n(deckN, 'card')}${deckN <= 5 ? ', running low' : ''}`}</span>
         <span className="vis" aria-hidden="true">
           <CardBack style={{ inset: 0 }} />
           <span className={`plate count ${deckN <= 5 ? 'warn' : ''}`} aria-hidden="true">
@@ -343,10 +345,16 @@ export function Board(b: BoardProps) {
         onClick={() => b.onTrash(p)}
         {...item(zk, i)}
       >
-        <span className="sr-only">{`${W} trash, ${z.trash.length} cards${trashDef ? `, top: ${trashDef.name}` : ''}. Open the trash viewer`}</span>
+        <span className="sr-only">{`${W} trash, ${n(z.trash.length, 'card')}${trashDef ? `, top: ${trashDef.name}` : ''}. Open the trash viewer`}</span>
         <span className="vis" aria-hidden="true">
           {trashDef ? (
-            <span className="trash-face" style={{ ['--card-w' as string]: `${L.card.w}px` }}>
+            <span
+              className="trash-face"
+              style={{
+                ['--card-w' as string]: `${L.card.w}px`,
+                ['--card-h' as string]: `${L.card.h}px`,
+              }}
+            >
               <TrashFace def={trashDef} stacked={L.stacked} />
             </span>
           ) : (
@@ -431,11 +439,13 @@ export function Board(b: BoardProps) {
       aria-label={b.label}
       style={{ width: L.boardW, height: L.H }}
     >
-      <div
-        className={`turnbar ${view.turn.activePlayer === me ? 'me' : 'opp'}`}
-        style={turnbar(L, view.turn.activePlayer === me)}
-        aria-hidden="true"
-      />
+      {!view.result && (
+        <div
+          className={`turnbar ${view.turn.activePlayer === me ? 'me' : 'opp'}`}
+          style={turnbar(L, view.turn.activePlayer === me)}
+          aria-hidden="true"
+        />
+      )}
       {/* 1. Opponent identity and hand */}
       <div className="zone" role="group" aria-label="Opponent" data-zone="opp-id">
         <button type="button" className="oppid" style={rect(L.oppId)} {...item('opp-id', 0)}>
@@ -451,7 +461,7 @@ export function Board(b: BoardProps) {
           </span>
         </button>
         <button type="button" className="opphand" style={rect(L.oppHand)} {...item('opp-id', 1)}>
-          <span className="sr-only">{`${whoseWord(op)} hand, ${oppHand.length} cards`}</span>
+          <span className="sr-only">{`${whoseWord(op)} hand, ${n(oppHand.length, 'card')}`}</span>
           <span className="vis" aria-hidden="true">
             <span className="backs" aria-hidden="true">
               {Array.from({ length: showN }, (_, k) => (
@@ -511,7 +521,7 @@ export function Board(b: BoardProps) {
       <div
         className={`zone hand ${L.peek ? 'peek' : ''}`}
         role="group"
-        aria-label={`${whoseWord(me)} hand, ${handZ.length} cards`}
+        aria-label={`${whoseWord(me)} hand, ${n(handZ.length, 'card')}`}
         data-zone="hand"
       >
         {b.handHidden !== 'none' ? (
@@ -520,10 +530,19 @@ export function Board(b: BoardProps) {
             className="hand-veil"
             style={rect(H)}
             onClick={b.handHidden === 'click' ? b.onShowHand : undefined}
+            onPointerDown={
+              b.handHidden === 'hold'
+                ? (e) => {
+                    e.preventDefault();
+                    b.onRevealStart(e.pointerId);
+                  }
+                : undefined
+            }
+            onContextMenu={(e) => e.preventDefault()}
             {...item('hand', 0)}
           >
             {b.handHidden === 'hold'
-              ? `${b.names.player[me]}’s hand is hidden. ${b.names.player[me]}: press and hold R to see it.`
+              ? `${b.names.player[me]}’s hand is hidden. ${b.names.player[me]}: press and hold here, or hold R, to see it.`
               : `${b.names.player[me]}’s hand is hidden. ${b.names.player[me]}: press Space or click to show it.`}
           </button>
         ) : b.mulligan ? (
@@ -581,6 +600,7 @@ function leaderName(view: ProjectedView, p: PlayerId, cards: ReadonlyMap<string,
   return id ? (cards.get(id)?.name ?? '') : '';
 }
 
+const n = (k: number, word: string) => `${k} ${word}${k === 1 ? '' : 's'}`;
 const rect = (r: Rect) => ({ left: r.x, top: r.y, width: r.w, height: r.h });
 const tok = (w: number, h: number) => ({ width: w, height: h });
 const turnbar = (L: Layout, mine: boolean) => {
@@ -669,48 +689,57 @@ function Arrow({
   const x1 = a.x + a.w / 2;
   const y1 = a.y + a.h / 2;
   const x2 = t.x + t.w / 2;
-  const y2 = t.y + t.h * 0.72;
-  const len = Math.hypot(x2 - x1, y2 - y1) || 1;
-  const cut = 14;
-  const ex = x2 - ((x2 - x1) / len) * cut;
-  const ey = y2 - ((y2 - y1) / len) * cut;
+  // The ⌖ sits in the lower half of the art window, clear of the plates and the name (UX-R13).
+  const y2 = t.y + t.h * 0.45;
+  // The line runs under the cards, so it never crosses a plate or chip; only the last stretch,
+  // from the target's edge to its ⌖, draws on top.
+  const ey = y1 < y2 ? t.y - 2 : t.y + t.h + 2;
+  const k = (ey - y1) / (y2 - y1 || 1);
+  const ex = x1 + (x2 - x1) * k;
+  const len = Math.hypot(x2 - ex, y2 - ey) || 1;
+  const hx = x2 - ((x2 - ex) / len) * 13;
+  const hy = y2 - ((y2 - ey) / len) * 13;
+  const stroke = { stroke: 'var(--color-attack)', strokeWidth: 4 };
   return (
-    <svg className="arrow" aria-hidden="true" width="100%" height="100%">
-      <defs>
-        <marker
-          id="arrowhead"
-          viewBox="0 0 10 10"
-          refX="6"
-          refY="5"
-          markerWidth="5"
-          markerHeight="5"
-          orient="auto-start-reverse"
-        >
-          <path d="M0,0 L10,5 L0,10 z" fill="var(--color-attack)" />
-        </marker>
-      </defs>
-      <line
-        x1={x1}
-        y1={y1}
-        x2={ex}
-        y2={ey}
-        stroke="var(--color-attack)"
-        strokeWidth={4}
-        strokeDasharray={arrow.dashed ? '10 8' : undefined}
-        markerEnd="url(#arrowhead)"
-      />
-      <circle cx={x2} cy={y2} r={11} fill="none" stroke="var(--color-attack)" strokeWidth={2.5} />
-      <path
-        d={`M${x2 - 15},${y2} h8 M${x2 + 7},${y2} h8 M${x2},${y2 - 15} v8 M${x2},${y2 + 7} v8`}
-        stroke="var(--color-attack)"
-        strokeWidth={2}
-      />
-      {arrow.label && (
-        <text x={(x1 + x2) / 2 + 8} y={(y1 + y2) / 2} className="arrow-label">
-          {arrow.label}
-        </text>
-      )}
-    </svg>
+    <>
+      <svg className="arrow" aria-hidden="true" width="100%" height="100%">
+        <line
+          x1={x1}
+          y1={y1}
+          x2={ex}
+          y2={ey}
+          {...stroke}
+          strokeDasharray={arrow.dashed ? '10 8' : undefined}
+        />
+        {arrow.label && (
+          <text x={(x1 + ex) / 2 + 8} y={(y1 + ey) / 2} className="arrow-label">
+            {arrow.label}
+          </text>
+        )}
+      </svg>
+      <svg className="arrow top" aria-hidden="true" width="100%" height="100%">
+        <defs>
+          <marker
+            id="arrowhead"
+            viewBox="0 0 10 10"
+            refX="6"
+            refY="5"
+            markerWidth="5"
+            markerHeight="5"
+            orient="auto-start-reverse"
+          >
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--color-attack)" />
+          </marker>
+        </defs>
+        <line x1={ex} y1={ey} x2={hx} y2={hy} {...stroke} markerEnd="url(#arrowhead)" />
+        <circle cx={x2} cy={y2} r={11} fill="none" stroke="var(--color-attack)" strokeWidth={2.5} />
+        <path
+          d={`M${x2 - 15},${y2} h8 M${x2 + 7},${y2} h8 M${x2},${y2 - 15} v8 M${x2},${y2 + 7} v8`}
+          stroke="var(--color-attack)"
+          strokeWidth={2}
+        />
+      </svg>
+    </>
   );
 }
 

@@ -309,13 +309,12 @@ const hits = (a: Rect, b: Rect) =>
  * the focused element, it moves onto the board. On the board it avoids the attacker, the defender,
  * every lit card and the focused element, shrinking if no position is clear.
  */
-export function placeDock(L: Layout, avoid: Rect[], tall: boolean): Rect {
+export function placeDock(L: Layout, avoid: Rect[], tall: boolean, pinned = false): Rect | null {
   if (!tall && !avoid.some((a) => hits(a, L.dock))) return L.dock;
-  const sizes = [
-    { w: L.dock.w, h: L.dock.h },
-    { w: Math.round(L.dock.w * 0.8), h: Math.round(L.dock.h * 0.8) },
-    { w: Math.round(L.dock.w * 0.65), h: Math.round(L.dock.h * 0.65) },
-  ];
+  const sizes = [1, 0.8, 0.65, 0.5].map((k) => ({
+    w: Math.round(L.dock.w * k),
+    h: Math.round(L.dock.h * k),
+  }));
   for (const s of sizes) {
     for (let y = L.dockAlt.y; y + s.h <= L.H - 8; y += 8) {
       for (let x = L.dockAlt.x; x + s.w <= L.boardW - 8; x += 8) {
@@ -324,5 +323,10 @@ export function placeDock(L: Layout, avoid: Rect[], tall: boolean): Rect {
       }
     }
   }
+  // Nothing is clear. A hover preview then stays closed (the card's own name carries the same
+  // information); the pinned inspector, which the player asked for, takes the log's place when it
+  // can, else the board's top-left at the smallest size.
+  if (!pinned) return null;
+  if (!tall) return L.dock;
   return { ...L.dockAlt, w: sizes[2]!.w, h: sizes[2]!.h };
 }

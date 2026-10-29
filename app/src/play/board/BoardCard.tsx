@@ -9,12 +9,13 @@ import type { ViewCard } from '@optcg/engine';
 import { CardFace } from '../../art/index.ts';
 import { num } from '../game/text.ts';
 
-export type Glyph = 'play' | 'attack' | 'don' | 'target' | 'ability' | 'pick';
+export type Glyph = 'play' | 'attack' | 'don' | 'target' | 'block' | 'ability' | 'pick';
 export const GLYPHS: Record<Glyph, [string, string]> = {
   play: ['▶', 'can be played'],
   attack: ['⚔', 'can attack'],
   don: ['◆', 'can receive DON!!'],
   target: ['⌖', 'can be targeted'],
+  block: ['⌖', 'can block'],
   ability: ['⚡', 'ability ready'],
   pick: ['✓', 'chosen'],
 };
@@ -112,6 +113,8 @@ export function BoardCard(p: BoardCardProps) {
     width: bw,
     height: bh,
     ['--card-w' as string]: `${size.w}px`,
+    // --card-h is computed on :root, so it must be set wherever --card-w changes (63:88, M3-14).
+    ['--card-h' as string]: `${size.h}px`,
     ['--face-x' as string]: `${(bw - size.w) / 2}px`,
     ['--face-y' as string]: `${(bh - size.h) / 2}px`,
   };

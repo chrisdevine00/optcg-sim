@@ -3,7 +3,6 @@
  * and the keyboard model (board.md, flows.md, accessibility.md).
  */
 import {
-  useCallback,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -20,6 +19,7 @@ import {
   DecisionPanel,
   commitDefence,
   counterOptions,
+  defenceNumbers,
   defendingTarget,
   donIntent,
   giveOne,
@@ -54,6 +54,12 @@ function useViewport() {
   return vp;
 }
 
+/** The battle whose attack line was last announced (flows F6.1), so it is said once. */
+const lastBattleAnnounced: { key: string | null } = { key: null };
+function markAnnounced(key: string) {
+  lastBattleAnnounced.key = key;
+}
+
 /** Where focus returns when a dialog, menu or the inspector closes (accessibility §4.3). */
 const focusMemory: { el: HTMLElement | null } = { el: null };
 function rememberFocus(el: Element | null = document.activeElement) {
@@ -85,7 +91,8 @@ export function Game({
   const me = ctl.me;
   const opp = other(me);
   const mine = ctl.myDecision();
-  const legal = useMemo(() => legalOf(view, mine), [view, mine]);
+  // Legal moves come from the seat's own actions, limited while veiled (ctl.actions).
+  const legal = legalOf({ ...view, actions: ctl.actions() }, mine);
   const names = ctl.names();
   const cards = ctl.cards;
   const decisionKey = `${ctl.session.actionCount}|${view.decision?.kind ?? ''}|${view.decision?.player ?? ''}|${me}`;
@@ -121,40 +128,27 @@ export function Game({
   };
 
   // Card lookups by handle in the current view.
-  const index = useMemo(() => {
-    const m = new Map<
-      string,
-      { view: (typeof view.zones)['p1']['hand'][number]; owner: PlayerId; zone: string }
-    >();
-    for (const p of ['p1', 'p2'] as PlayerId[])
-      for (const [zone, list] of Object.entries(view.zones[p]))
-        for (const c of list) m.set(c.handle, { view: c, owner: p, zone });
-    return m;
-  }, [view]);
-  const cardOf = useCallback(
-    (h: string) => {
-      const x = index.get(h);
-      if (!x) return null;
-      return {
-        card: x.view.card ? cards.get(x.view.card) : undefined,
-        power: x.view.power,
-        owner: x.owner,
-        zone: x.zone,
-      };
-    },
-    [index, cards],
-  );
-  const nameOf = useCallback(
-    (h: string) => cardName(cards, index.get(h)?.view.card),
-    [index, cards],
-  );
-
-  const act = useCallback(
-    (a: Action, intentId?: string) => {
-      ctl.act(a, intentId);
-    },
-    [ctl],
-  );
+  const index = new Map<
+    string,
+    { view: (typeof view.zones)['p1']['hand'][number]; owner: PlayerId; zone: string }
+  >();
+  for (const p of ['p1', 'p2'] as PlayerId[])
+    for (const [zone, list] of Object.entries(view.zones[p]))
+      for (const c of list) index.set(c.handle, { view: c, owner: p, zone });
+  const cardOf = (h: string) => {
+    const x = index.get(h);
+    if (!x) return null;
+    return {
+      card: x.view.card ? cards.get(x.view.card) : undefined,
+      power: x.view.power,
+      owner: x.owner,
+      zone: x.zone,
+    };
+  };
+  const nameOf = (h: string) => cardName(cards, index.get(h)?.view.card);
+  const act = (a: Action, intentId?: string) => {
+    ctl.act(a, intentId);
+  };
 
   const openInspector = (h: string) => {
     rememberFocus();
@@ -184,11 +178,35 @@ export function Game({
     openInspector,
     onNewGame,
     onRematch,
-    onRewind: () => ctl.rewindMove(),
-    openRewindList: () => setDialog({ kind: 'rewind' }),
+    onRewind: () => requestRewind(() => ctl.rewindMove()),
+    openRewindList: () => openRewindList(),
+    requestRewind: (run) => requestRewind(run),
   };
 
   const tall = isTall(g);
+
+  /**
+   * Rewind is off while a hotseat hand is veiled or curtained (review M3-04, M3-24), and in
+   * hotseat it needs the other player's agreement (flows F11 step 7).
+   */
+  function requestRewind(run: () => void) {
+    if (!ctl.canRewind()) {
+      setWhy({ text: 'Rewind is unavailable while a hand is hidden.', at: null });
+      ctl.announce('Rewind is unavailable while a hand is hidden.');
+      return;
+    }
+    if (ctl.hotseat) {
+      rememberFocus();
+      setDialog({ kind: 'consent', run });
+      return;
+    }
+    run();
+  }
+  function openRewindList() {
+    if (!ctl.canRewind()) return requestRewind(() => undefined);
+    rememberFocus();
+    setDialog({ kind: 'rewind' });
+  }
 
   // ---------------- Decorations (board.md §2.5) ----------------
   const kind = legal.kind;
@@ -197,7 +215,7 @@ export function Game({
     mine && (kind === 'block' || kind === 'counter') ? counterOptions(g, staging) : null;
   // Staged Counters show on the board at once (flows F6 step 3), from the scratch simulation.
   const stagedPowers = new Map<string, number | null>();
-  if (counterOpts && staging.counters.length) {
+  if (counterOpts && staging.counters.length && ctl.revealed()) {
     const sim = ctl.session.simulate(me, stagedActions(g, staging));
     for (const c of [...sim.view.zones[me].leader, ...sim.view.zones[me].characters])
       stagedPowers.set(c.handle, c.power);
@@ -210,7 +228,8 @@ export function Game({
       out.power = stagedPowers.get(h)!;
     const owner = c.owner;
     if (ctl.highlight?.handle === h) out.acting = ctl.highlight.word;
-    if (battle && (battle.attacker === h || battle.target === h)) out.battle = true;
+    if (battle && (battle.attacker === h || battle.target === h || staging.blocker === h))
+      out.battle = true;
     if (battle?.attacker === h && !view.result)
       out.chips!.push({ text: '⚔ attacking', tone: 'attack' });
     const isSick =
@@ -257,7 +276,7 @@ export function Game({
     }
     if (kind === 'block' && legal.blocks.has(h)) {
       out.legal = true;
-      out.glyph = 'target';
+      out.glyph = 'block';
       if (staging.blocker === h) {
         out.selected = true;
         out.chips!.push({ text: '✓ Blocking', tone: 'you' });
@@ -544,7 +563,7 @@ export function Game({
       // Ctrl/Cmd+Z: alias for Rewind where the browser lets the page receive it.
       if ((e.ctrlKey || e.metaKey) && (key === 'z' || key === 'Z') && scoped && !e.shiftKey) {
         e.preventDefault();
-        ctl.rewindMove();
+        requestRewind(() => ctl.rewindMove());
       }
       return;
     }
@@ -649,16 +668,16 @@ export function Game({
         return;
       case 'u':
         e.preventDefault();
-        ctl.rewindMove();
+        requestRewind(() => ctl.rewindMove());
         return;
       case 'U':
         e.preventDefault();
-        ctl.backToMyLastDecision();
+        requestRewind(() => ctl.backToMyLastDecision());
         return;
       case 'r':
       case 'R':
         e.preventDefault();
-        setDialog({ kind: 'rewind' });
+        openRewindList();
         return;
       case 's':
       case 'S':
@@ -715,16 +734,44 @@ export function Game({
     const up = (e: KeyboardEvent) => {
       if (e.key === 'r' || e.key === 'R') ctl.setReveal(false);
     };
+    // A reveal never sticks: losing the window ends it (review M3-13).
+    const hide = () => ctl.setReveal(false);
+    const vis = () => document.visibilityState !== 'visible' && hide();
     window.addEventListener('keydown', down);
     window.addEventListener('keyup', up);
+    window.addEventListener('blur', hide);
+    document.addEventListener('visibilitychange', vis);
     return () => {
       window.removeEventListener('keydown', down);
       window.removeEventListener('keyup', up);
+      window.removeEventListener('blur', hide);
+      document.removeEventListener('visibilitychange', vis);
     };
   });
 
   // Focus moves to the decision when one arrives (accessibility §3.2).
   const focusSignal = ctl.focusDecision;
+
+  // flows F6.1: when you are attacked, say the attack and the maths once, assertively (M3-08).
+  const battleKey =
+    mine && (kind === 'block' || kind === 'counter') && view.battle
+      ? `${view.turn.number}|${view.battle.attacker}|${view.battle.target}`
+      : null;
+  useEffect(() => {
+    if (!battleKey || battleKey === lastBattleAnnounced.key) return;
+    markAnnounced(battleKey);
+    const b = view.battle!;
+    const n = defenceNumbers(g, NO_STAGING);
+    const target = n.leader ? 'your Leader' : nameOf(b.target);
+    const opts = ctl.revealed() ? counterOptions(g, NO_STAGING) : new Map();
+    const worth = [...opts.keys()].reduce((t, h) => t + (cardOf(h)?.card?.counter ?? 0), 0);
+    const hand = ctl.revealed()
+      ? ` You have ${opts.size} counter ${opts.size === 1 ? 'card' : 'cards'} worth ${worth}.`
+      : '';
+    ctl.alert(
+      `${nameOf(b.attacker)} attacks ${target}. ${nameOf(b.attacker)} ${n.ap}, ${target} ${n.tp}. ${n.hits ? `You need ${n.need} to stop it.` : 'It fails as things stand.'}${hand} Plan your defence.`,
+    );
+  });
 
   // Why-not popovers fade after 4 s (flows G4).
   useEffect(() => {
@@ -782,7 +829,7 @@ export function Game({
         {turnWords}
       </span>
       {view.turn.phase !== 'setup' && (
-        <span className="vis" aria-hidden="true">
+        <span className="vis-inline" aria-hidden="true">
           <PhaseStepper view={view} battle={!!view.battle} />
         </span>
       )}
@@ -818,7 +865,7 @@ export function Game({
 
   // The dock avoids the focused element, the battle's cards and every lit card (UX-V11).
   const dockRect = (() => {
-    if (!dock.handle) return L.dock;
+    if (!dock.handle) return null;
     const avoid: Rect[] = [];
     const add = (el: Element | null | undefined) => {
       const r = el?.getBoundingClientRect();
@@ -834,15 +881,21 @@ export function Game({
       add(document.querySelector(`[data-handle="${view.battle.attacker}"]`));
       add(document.querySelector(`[data-handle="${view.battle.target}"]`));
     }
-    document.querySelectorAll('.board .bc.legal, .board .bc.selected').forEach((el) => add(el));
-    avoid.push(L.midCentre);
-    return placeDock(L, avoid, tall);
+    // Every card, count and cost area stays visible, and the midline (review M3-15).
+    document
+      .querySelectorAll(
+        '.board .bc, .board .plate, .board .costarea, .board .dondeck, .board .dplate',
+      )
+      .forEach((el) => add(el));
+    avoid.push(L.mid);
+    return placeDock(L, avoid, tall, dock.pinned);
   })();
 
   const lines = ctl.logLines();
 
   const style = {
     ['--card-w' as string]: `${L.card.w}px`,
+    ['--card-h' as string]: `${L.card.h}px`,
     ['--rail-w' as string]: `${rail.w}px`,
   };
 
@@ -859,219 +912,236 @@ export function Game({
         <SmallScreen onHome={onHome} />
       ) : (
         <>
-          <a
-            className="skip-link"
-            href="#decision"
-            onClick={(e) => {
-              e.preventDefault();
-              focusDecision();
-            }}
-          >
-            Skip to decision
-          </a>
-          <h1 className="sr-only">
-            OPTCG Sim game: {names.player.p1} vs {names.player.p2}
-          </h1>
-          <Board
-            view={view}
-            L={L}
-            cards={cards}
-            names={names}
-            legal={legal}
-            slots={slots}
-            deco={deco}
-            roving={roving}
-            onRove={(z, i) => setRoving((r) => (r[z] === i ? r : { ...r, [z]: i }))}
-            onCard={(h, e: RMouseEvent<HTMLElement>) => {
-              e.stopPropagation();
-              activate(h, e.detail === 0);
-            }}
-            onCardKey={(_h, _e: RKeyboardEvent<HTMLElement>) => undefined}
-            onPreview={onPreview}
-            onCostArea={() => {
-              if (!mine || kind !== 'main') return;
-              if (legal.give.size === 0) {
-                const r = ctl.session.whyNot(me, {
-                  type: 'giveDon',
-                  target: view.zones[me].leader[0]!.handle,
-                });
-                if (r) setWhy({ text: r.text, at: null });
-                return;
+          {/* Under the hotseat curtain nothing behind it is reachable or read (review M3-01, M3-07). */}
+          <div className="stage-wrap" inert={ctl.curtainFor ? true : undefined}>
+            <a
+              className="skip-link"
+              href="#decision"
+              onClick={(e) => {
+                e.preventDefault();
+                focusDecision();
+              }}
+            >
+              Skip to decision
+            </a>
+            <h1 className="sr-only">
+              OPTCG Sim game: {names.player.p1} vs {names.player.p2}
+            </h1>
+            <Board
+              view={view}
+              L={L}
+              cards={cards}
+              names={names}
+              legal={legal}
+              slots={slots}
+              deco={deco}
+              roving={roving}
+              onRove={(z, i) => setRoving((r) => (r[z] === i ? r : { ...r, [z]: i }))}
+              onCard={(h, e: RMouseEvent<HTMLElement>) => {
+                e.stopPropagation();
+                activate(h, e.detail === 0);
+              }}
+              onCardKey={(_h, _e: RKeyboardEvent<HTMLElement>) => undefined}
+              onPreview={onPreview}
+              onCostArea={() => {
+                if (!mine || kind !== 'main') return;
+                if (legal.give.size === 0) {
+                  const r = ctl.session.whyNot(me, {
+                    type: 'giveDon',
+                    target: view.zones[me].leader[0]!.handle,
+                  });
+                  if (r) setWhy({ text: r.text, at: null });
+                  return;
+                }
+                setUi(ui.kind === 'don' ? { kind: 'idle' } : { kind: 'don' });
+              }}
+              onTrash={(p) => {
+                rememberFocus();
+                setDialog({ kind: 'trash', player: p });
+              }}
+              costLegal={
+                mine &&
+                kind === 'main' &&
+                legal.give.size > 0 &&
+                ui.kind !== 'target' &&
+                ui.kind !== 'confirm'
               }
-              setUi(ui.kind === 'don' ? { kind: 'idle' } : { kind: 'don' });
-            }}
-            onTrash={(p) => {
-              rememberFocus();
-              setDialog({ kind: 'trash', player: p });
-            }}
-            costLegal={
-              mine &&
-              kind === 'main' &&
-              legal.give.size > 0 &&
-              ui.kind !== 'target' &&
-              ui.kind !== 'confirm'
-            }
-            donMode={ui.kind === 'don'}
-            handHidden={ctl.hotseat ? (ctl.handHidden() ? ctl.handVeil : 'none') : 'none'}
-            onShowHand={() => ctl.showHand()}
-            mulligan={
-              view.turn.phase === 'setup' &&
-              view.zones[me].hand.length > 0 &&
-              view.zones[me].life.length === 0
-            }
-            midline={midline}
-            oppActivity={
-              view.turn.activePlayer !== me
-                ? ctl.thinking
-                  ? `${names.player[opp]} is thinking…`
-                  : ctl.activity
-                : ''
-            }
-            oppThinking={ctl.thinking}
-            arrow={arrow}
-            banner={banner}
-            label={boardLabel}
-          />
-          <div className="rail" style={{ left: rail.x, width: rail.w, height: L.H }}>
-            <DecisionPanel g={g} top={decTop} parts={parts} focusSignal={focusSignal} />
-            {ctl.toast && (
-              <p className="toast" style={{ top: decTop - 34 }} role="status">
-                {ctl.toast}
-                {ctl.session.canForward && (
-                  <button type="button" className="linkbtn" onClick={() => ctl.forward()}>
-                    ⟳ Forward
-                  </button>
-                )}
-              </p>
-            )}
-            <div inert={dialog?.kind === 'trash' || dock.pinned ? true : undefined}>
-              <GameLog
-                top={logTop}
-                height={logH}
-                lines={lines}
-                names={names}
-                ticker={tall}
-                onLink={() => undefined}
-                onRewindTo={(i) => ctl.rewindTo(i)}
-                canRewind={!view.result}
+              donMode={ui.kind === 'don'}
+              handHidden={ctl.hotseat ? (ctl.handHidden() ? ctl.handVeil : 'none') : 'none'}
+              onShowHand={() => ctl.showHand()}
+              onRevealStart={(id) => {
+                ctl.setReveal(true);
+                const end = (e: PointerEvent) => {
+                  if (e.pointerId !== id) return;
+                  ctl.setReveal(false);
+                  window.removeEventListener('pointerup', end);
+                  window.removeEventListener('pointercancel', end);
+                };
+                window.addEventListener('pointerup', end);
+                window.addEventListener('pointercancel', end);
+              }}
+              mulligan={
+                view.turn.phase === 'setup' &&
+                view.zones[me].hand.length > 0 &&
+                view.zones[me].life.length === 0
+              }
+              midline={midline}
+              oppActivity={
+                view.turn.activePlayer !== me
+                  ? ctl.thinking
+                    ? `${names.player[opp]} is thinking…`
+                    : ctl.activity
+                  : ''
+              }
+              oppThinking={ctl.thinking}
+              arrow={arrow}
+              banner={banner}
+              label={boardLabel}
+            />
+            <div className="rail" style={{ left: rail.x, width: rail.w, height: L.H }}>
+              <DecisionPanel g={g} top={decTop} parts={parts} focusSignal={focusSignal} />
+              {ctl.toast && (
+                <p className="toast" style={{ top: decTop - 34 }} role="status">
+                  {ctl.toast}
+                  {ctl.session.canForward && (
+                    <button type="button" className="linkbtn" onClick={() => ctl.forward()}>
+                      ⟳ Forward
+                    </button>
+                  )}
+                </p>
+              )}
+              <div inert={dialog?.kind === 'trash' || dock.pinned ? true : undefined}>
+                <GameLog
+                  top={logTop}
+                  height={logH}
+                  lines={lines}
+                  names={names}
+                  ticker={tall}
+                  onLink={() => undefined}
+                  onRewindTo={(i) => requestRewind(() => ctl.rewindTo(i))}
+                  canRewind={!view.result && ctl.canRewind()}
+                />
+              </div>
+              <RailHeader
+                top={0}
+                height={rail.head}
+                noticeH={rail.notice}
+                turnChip={
+                  view.turn.phase === 'setup'
+                    ? 'Setup'
+                    : result
+                      ? 'Game over'
+                      : names.hotseat
+                        ? `${names.player[view.turn.activePlayer]}’s turn`
+                        : view.turn.activePlayer === me
+                          ? 'Your turn'
+                          : 'Opponent’s turn'
+                }
+                myTurn={view.turn.activePlayer === me}
+                menuOpen={dialog?.kind === 'menu'}
+                onMenu={() => {
+                  rememberFocus();
+                  setDialog({ kind: 'menu' });
+                }}
+                onFullscreen={() => {
+                  if (document.fullscreenElement) void document.exitFullscreen();
+                  else void document.documentElement.requestFullscreen?.().catch(() => undefined);
+                }}
+                onHome={onHome}
+                rewound={ctl.session.rewound}
               />
             </div>
-            <RailHeader
-              top={0}
-              height={rail.head}
-              noticeH={rail.notice}
-              turnChip={
-                view.turn.phase === 'setup'
-                  ? 'Setup'
-                  : result
-                    ? 'Game over'
-                    : names.hotseat
-                      ? `${names.player[view.turn.activePlayer]}’s turn`
-                      : view.turn.activePlayer === me
-                        ? 'Your turn'
-                        : 'Opponent’s turn'
-              }
-              myTurn={view.turn.activePlayer === me}
-              menuOpen={dialog?.kind === 'menu'}
-              onMenu={() => {
-                rememberFocus();
-                setDialog({ kind: 'menu' });
+            {dock.handle && dockRect && (
+              <CardDock
+                g={g}
+                handle={dock.handle}
+                pinned={dock.pinned}
+                rect={dockRect}
+                onClose={() => {
+                  setDock({ handle: null, pinned: false, how: 'hover' });
+                  const back = focusMemory.el;
+                  if (dock.pinned && back?.isConnected) back.focus();
+                  else if (dock.pinned)
+                    document.querySelector<HTMLElement>(`[data-handle="${dock.handle}"]`)?.focus();
+                }}
+              />
+            )}
+            {menuFor && index.get(menuFor) && (
+              <ActionMenu
+                g={g}
+                handle={menuFor}
+                onClose={(refocus) => {
+                  setMenuFor(null);
+                  if (refocus)
+                    document.querySelector<HTMLElement>(`[data-handle="${menuFor}"]`)?.focus();
+                }}
+                onTarget={(h) => {
+                  setMenuFor(null);
+                  setUi({ kind: 'target', attacker: h });
+                  const first = legal.attacks.get(h)?.[0];
+                  if (first?.type === 'attack')
+                    setTimeout(
+                      () =>
+                        document
+                          .querySelector<HTMLElement>(`[data-handle="${first.target}"]`)
+                          ?.focus(),
+                      30,
+                    );
+                }}
+                onCount={(h) => {
+                  setMenuFor(null);
+                  setUi({ kind: 'count', target: h, n: 1 });
+                }}
+              />
+            )}
+            {countTarget && ui.kind === 'count' && (
+              <CountDialog
+                g={g}
+                target={countTarget}
+                n={ui.n}
+                setN={(n) => setUi({ kind: 'count', target: countTarget, n })}
+                onClose={() => {
+                  setUi({ kind: 'idle' });
+                  document.querySelector<HTMLElement>(`[data-handle="${countTarget}"]`)?.focus();
+                }}
+              />
+            )}
+            {why && (
+              <div
+                className="whynot"
+                role="status"
+                style={
+                  why.at
+                    ? { left: Math.min(why.at.x, L.boardW - 300), top: Math.max(4, why.at.y - 40) }
+                    : { left: L.axis - 150, top: L.mid.y - 44 }
+                }
+              >
+                {why.text}
+              </div>
+            )}
+            {goto && (
+              <div className="goto" role="status" style={{ left: L.axis - 160, top: L.mid.y - 70 }}>
+                Go to: <kbd>h</kbd> hand · <kbd>c</kbd> Characters · <kbd>l</kbd> Leader row ·{' '}
+                <kbd>m</kbd> midline · <kbd>p</kbd> decision · <kbd>g</kbd> log · Shift for the
+                opponent
+              </div>
+            )}
+            <Dialogs
+              g={g}
+              dialog={dialog}
+              lines={lines}
+              onClose={() => {
+                setDialog(null);
+                const back = focusMemory.el;
+                // After the dialog unmounts: a native dialog's close() moves focus itself (M3-25).
+                requestAnimationFrame(() => {
+                  if (back?.isConnected) back.focus();
+                  else focusDecision();
+                });
               }}
-              onFullscreen={() => {
-                if (document.fullscreenElement) void document.exitFullscreen();
-                else void document.documentElement.requestFullscreen?.().catch(() => undefined);
-              }}
-              onHome={onHome}
-              rewound={ctl.session.rewound}
+              setDialog={setDialog}
             />
           </div>
-          {dock.handle && (
-            <CardDock
-              g={g}
-              handle={dock.handle}
-              pinned={dock.pinned}
-              rect={dockRect}
-              onClose={() => {
-                setDock({ handle: null, pinned: false, how: 'hover' });
-                const back = focusMemory.el;
-                if (dock.pinned && back?.isConnected) back.focus();
-                else if (dock.pinned)
-                  document.querySelector<HTMLElement>(`[data-handle="${dock.handle}"]`)?.focus();
-              }}
-            />
-          )}
-          {menuFor && index.get(menuFor) && (
-            <ActionMenu
-              g={g}
-              handle={menuFor}
-              onClose={(refocus) => {
-                setMenuFor(null);
-                if (refocus)
-                  document.querySelector<HTMLElement>(`[data-handle="${menuFor}"]`)?.focus();
-              }}
-              onTarget={(h) => {
-                setMenuFor(null);
-                setUi({ kind: 'target', attacker: h });
-                const first = legal.attacks.get(h)?.[0];
-                if (first?.type === 'attack')
-                  setTimeout(
-                    () =>
-                      document
-                        .querySelector<HTMLElement>(`[data-handle="${first.target}"]`)
-                        ?.focus(),
-                    30,
-                  );
-              }}
-              onCount={(h) => {
-                setMenuFor(null);
-                setUi({ kind: 'count', target: h, n: 1 });
-              }}
-            />
-          )}
-          {countTarget && ui.kind === 'count' && (
-            <CountDialog
-              g={g}
-              target={countTarget}
-              n={ui.n}
-              setN={(n) => setUi({ kind: 'count', target: countTarget, n })}
-              onClose={() => {
-                setUi({ kind: 'idle' });
-                document.querySelector<HTMLElement>(`[data-handle="${countTarget}"]`)?.focus();
-              }}
-            />
-          )}
-          {why && (
-            <div
-              className="whynot"
-              role="status"
-              style={
-                why.at
-                  ? { left: Math.min(why.at.x, L.boardW - 300), top: Math.max(4, why.at.y - 40) }
-                  : { left: L.axis - 150, top: L.mid.y - 44 }
-              }
-            >
-              {why.text}
-            </div>
-          )}
-          {goto && (
-            <div className="goto" role="status" style={{ left: L.axis - 160, top: L.mid.y - 70 }}>
-              Go to: <kbd>h</kbd> hand · <kbd>c</kbd> Characters · <kbd>l</kbd> Leader row ·{' '}
-              <kbd>m</kbd> midline · <kbd>p</kbd> decision · <kbd>g</kbd> log · Shift for the
-              opponent
-            </div>
-          )}
-          <Dialogs
-            g={g}
-            dialog={dialog}
-            lines={lines}
-            onClose={() => {
-              setDialog(null);
-              const back = focusMemory.el;
-              if (back?.isConnected) back.focus();
-              else focusDecision();
-            }}
-            setDialog={setDialog}
-          />
           {ctl.curtainFor && (
             <div
               className="curtain"

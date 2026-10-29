@@ -68,11 +68,57 @@ test.describe('defence planner (flows F6, board.md §3.9)', () => {
 
   test('a Blocker takes the attack instead', async ({ page }) => {
     await attackLeader(page);
-    const franky = page.locator('[data-zone="my-chars"][data-glyph="target"]').first();
+    const franky = page.locator('[data-zone="my-chars"][data-glyph="block"]').first();
     await franky.click();
     await expect(page.locator('#commit-defence')).toContainText('Block with');
     await expect(page.locator('#take-hit')).toBeVisible();
     await page.locator('#commit-defence').click();
     await expect(page.locator('.log-row').filter({ hasText: 'Block:' })).toHaveCount(1);
+  });
+
+  test('Counters staged before a Blocker follow it, and wasted ones never go on Enter (M3-05)', async ({
+    page,
+  }) => {
+    await attackLeader(page);
+    await page.keyboard.down('r');
+    await page.locator('[data-zone="hand"][data-glyph="play"]').first().click();
+    await page.locator('[data-zone="my-chars"][data-glyph="block"]').first().click();
+    // Franky 5000 + 1000 staged = 6000 against 7000: still K.O.'d.
+    await expect(page.getByTestId('defender-power')).toHaveText('6000');
+    await expect(page.locator('#play-anyway')).toContainText('still K.O.’d');
+    await expect(page.locator('#commit-defence')).toContainText('Block with Franky');
+    await expect(page.locator('#commit-defence')).toContainText('Counters kept');
+    await page.locator('#decision-title').focus();
+    await page.keyboard.press('Enter');
+    await page.keyboard.up('r');
+    const line = page.locator('.log-row').filter({ hasText: 'Block:' });
+    await expect(line).toHaveCount(1);
+    await expect(line).not.toContainText('Counter:');
+  });
+
+  test('press and hold on the veiled hand reveals it, for touch (M3-06)', async ({ page }) => {
+    await attackLeader(page);
+    const veil = page.locator('.hand-veil');
+    await expect(veil).toContainText('press and hold here');
+    await veil.hover();
+    await page.mouse.down();
+    await expect(page.locator('[data-zone="hand"][data-glyph="play"]')).toHaveCount(4);
+    await page.mouse.up();
+    await expect(veil).toBeVisible();
+  });
+
+  test('the attack and each staging change are announced (M3-08)', async ({ page }) => {
+    await attackLeader(page);
+    await expect(page.locator('#announce-assertive')).toContainText(
+      'Kaido attacks your Leader. Kaido 7000, your Leader 5000. You need 3000 to stop it.',
+    );
+    await page.keyboard.down('r');
+    await page.locator('[data-zone="hand"][data-glyph="play"]').first().click();
+    await expect(page.locator('#announce-polite')).toContainText(
+      /Staged .+, plus 1000\. Your Leader 6000 against 7000: still hits\. Need 2000 more\./,
+    );
+    await page.keyboard.up('r');
+    // Released: the private sentence leaves the live region.
+    await expect(page.locator('#announce-polite')).not.toContainText('Staged');
   });
 });

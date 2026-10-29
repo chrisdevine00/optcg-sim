@@ -55,4 +55,6 @@ export interface G {
   onRematch: () => void;
   onRewind: () => void;
   openRewindList: () => void;
+  /** Run a rewind if allowed now (hotseat: after the other player agrees). */
+  requestRewind: (run: () => void) => void;
 }

@@ -25,6 +25,11 @@ export interface GameConfig {
   /** "Always skip to my decisions" (board.md §5.3). */
   alwaysSkip: boolean;
   speed: Speed;
+  /**
+   * The card ids of the AI's own deck: the only card data its worker receives (review M3-09,
+   * ARCHITECTURE §4.3: the AI never sees the human's decklist).
+   */
+  aiCardIds?: string[];
   /** Start with AI playback paused (K), e.g. to read the board first. */
   startPaused?: boolean;
 }
@@ -50,6 +55,12 @@ const reducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 class Cancelled extends Error {}
+
+/** The AI worker's `init` payload: its own deck's cards only (review M3-09). */
+export function aiInitCards(cards: ReadonlyMap<string, Card>, aiDeck: readonly string[]): Card[] {
+  const ids = new Set(aiDeck);
+  return [...cards.values()].filter((c) => ids.has(c.id));
+}
 
 export class GameController {
   readonly session: GameSession;
@@ -92,6 +103,8 @@ export class GameController {
   error: string | null = null;
   polite: Announcement = { text: '', seq: 0 };
   assertive: Announcement = { text: '', seq: 0 };
+  /** The card the screen's player is playing, while its play asks a question (M3-22). */
+  pendingPlay: string | null = null;
   /** Bumps when focus should move to the decision panel (accessibility §3.2). */
   focusDecision = 0;
   private lastDecisionKey = '';
@@ -109,7 +122,8 @@ export class GameController {
           >);
     this.session = new GameSession((id) => cards.get(id), start, seats);
     this.seat = config.mode === 'hotseat' ? (this.session.decider() ?? 'p1') : config.human;
-    this.ai = config.mode === 'ai' ? new AiClient([...cards.values()]) : null;
+    this.ai =
+      config.mode === 'ai' ? new AiClient(aiInitCards(cards, config.aiCardIds ?? [])) : null;
     if (config.mode === 'hotseat') {
       this.curtainFor = this.seat;
       this.curtainSeen[this.seat] = this.turnKey();
@@ -161,8 +175,50 @@ export class GameController {
     return this.hotseat || p === this.config.human ? 'human' : 'ai';
   }
 
+  /**
+   * May the screen show the seat's private information now? Against the AI, always. In hotseat,
+   * only with no curtain up and the hand not veiled (review M3-01..04): otherwise the other player
+   * may be the one looking.
+   */
+  revealed(): boolean {
+    return !this.hotseat || (this.curtainFor === null && !this.handHidden());
+  }
+
+  /** The view the screen renders: the seat's own, or only what both players may see. */
   view(): ProjectedView {
-    return this.session.view(this.me);
+    return this.revealed() ? this.session.view(this.me) : this.session.publicView(this.me);
+  }
+
+  /**
+   * The seat's legal actions, limited while veiled to those that name only cards both players can
+   * see (Take the hit, a Blocker, the damage decision), so nothing hidden is lit or listed.
+   */
+  actions(): Action[] {
+    const priv = this.session.view(this.me);
+    if (this.revealed()) return priv.actions;
+    const pub = this.session.publicView(this.me);
+    const visible = new Set<string>();
+    for (const p of ['p1', 'p2'] as const)
+      for (const z of Object.values(pub.zones[p]))
+        for (const c of z) if (c.card !== null) visible.add(c.handle);
+    const named = (a: Action) =>
+      ['card', 'target', 'attacker', 'blocker'].every((f) => {
+        const v = (a as Record<string, unknown>)[f];
+        return typeof v !== 'string' || visible.has(v);
+      }) &&
+      (a.type !== 'pick' || typeof a.choice !== 'string' || visible.has(a.choice));
+    // Whether a Life card's [Trigger] can be activated depends on the hidden card.
+    return priv.actions.filter((a) => named(a) && !(a.type === 'trigger' && a.activate));
+  }
+
+  /** The Life card of a pending damage decision, for its owner while revealed. */
+  pendingLifeCard(): string | null {
+    return this.revealed() ? this.session.pendingLifeCard(this.me) : null;
+  }
+
+  /** Rewind needs the seat unveiled in hotseat (review M3-04, M3-24). */
+  canRewind(): boolean {
+    return this.revealed();
   }
 
   names(): Names {
@@ -178,7 +234,7 @@ export class GameController {
   /** The log as lines, from the screen player's projected events (board.md §3.11). */
   private logCache: { key: string; lines: LogLine[] } | null = null;
   logLines(): LogLine[] {
-    const key = `${this.session.version}|${this.me}`;
+    const key = `${this.session.version}|${this.me}|${this.hotseat}`;
     if (this.logCache?.key === key) return this.logCache.lines;
     const lines = this.buildLog();
     this.logCache = { key, lines };
@@ -186,7 +242,10 @@ export class GameController {
   }
 
   private buildLog(): LogLine[] {
-    const { moves, events, start } = this.session.log(this.me);
+    // Hotseat: both players see the screen, so the log only ever shows what both may see.
+    const { moves, events, start } = this.hotseat
+      ? this.session.publicLog(this.me)
+      : this.session.log(this.me);
     const ctx = { cards: this.cards, names: this.names(), life: this.session.initialLife() };
     const out: LogLine[] = [];
     out.push(...describeMove(start, 'p1', ctx, 0, false).filter((l) => l.kind === 'turn'));
@@ -273,7 +332,9 @@ export class GameController {
           await this.aiStep(d);
           continue;
         }
-        if (this.config.autoSkip) {
+        // The damage decision is never auto-skipped for a human: it shows which Life card they
+        // gained (flows F6.8, review M3-12).
+        if (this.config.autoSkip && this.session.view(d).decision?.kind !== 'trigger') {
           const before = this.session.actionCount;
           const a = this.session.autoSkip(this.hotseat);
           if (a) {
@@ -390,19 +451,31 @@ export class GameController {
   /** Log, announce and record what the last action(s) did (accessibility §9.3). */
   private afterApply(before: number, actor: PlayerId, auto: boolean): void {
     const lines = this.linesSince(before);
-    const text = lines.map((l) => l.text).join('. ');
+    // Each line is credited to its own actor, in words (review M3-10).
+    const spoken = lines.map((l) => this.spoken(l));
+    const text = spoken.join(' ');
     if (this.skipping && this.seatOf(actor) === 'ai')
-      this.skippedLines.push(...lines.filter((l) => l.kind === 'move').map((l) => l.text));
+      this.skippedLines.push(...lines.filter((l) => l.kind === 'move').map((l) => this.spoken(l)));
     if (text && !this.skipping) {
-      const who =
-        this.seatOf(actor) === 'ai' || (this.hotseat && actor !== this.me)
-          ? `${this.config.names[actor]}: `
-          : '';
-      this.say(auto ? text : who + text);
+      this.say(text);
       if (this.seatOf(actor) === 'ai' && !auto)
         this.activity = lines.filter((l) => l.kind === 'move').at(-1)?.text ?? this.activity;
     }
     this.bump();
+  }
+
+  /** A log line as a sentence: "Your turn 5.", "Kaido: Play Queen.", "You: Counter: Sai +1000." */
+  spoken(l: LogLine): string {
+    const name = (p: PlayerId) =>
+      this.hotseat ? this.config.names[p] : p === this.me ? 'You' : this.config.names[p];
+    if (l.kind === 'turn') {
+      const n = /Turn (\d+)/.exec(l.text)?.[1] ?? '';
+      if (!l.actor) return `Turn ${n}.`;
+      return this.hotseat || l.actor !== this.me
+        ? `${this.config.names[l.actor]}’s turn ${n}.`
+        : `Your turn ${n}.`;
+    }
+    return `${l.actor ? `${name(l.actor)}: ` : ''}${l.text}.`;
   }
 
   private linesSince(index: number): LogLine[] {
@@ -416,6 +489,12 @@ export class GameController {
   /** A polite announcement from the UI (whyNot reasons, the status summary, speed changes). */
   announce(text: string): void {
     this.say(text);
+    this.bump();
+  }
+
+  /** An assertive announcement: a decision owed during the opponent's turn (flows F6.1). */
+  alert(text: string): void {
+    this.assertive = { text, seq: this.assertive.seq + 1 };
     this.bump();
   }
 
@@ -436,6 +515,8 @@ export class GameController {
           ? `Game over. ${r.winner === this.me && !this.hotseat ? 'You win' : `${this.config.names[r.winner]} wins`} on turn ${this.session.view('p1').turn.number}.`
           : 'Game over. Draw.';
       this.assertive = { text, seq: this.assertive.seq + 1 };
+      // flows F15: then, politely, what can be done next.
+      this.say('Rematch, or New game.');
       this.stopSkipping('end');
       this.focusDecision++;
     }
@@ -452,7 +533,9 @@ export class GameController {
     const defending = v.turn.battleStep !== null && d !== v.turn.activePlayer;
     const key = this.turnKey();
     this.seat = d;
+    if (this.revealHeld) this.clearAnnouncements();
     this.revealHeld = false;
+    this.recap = null;
     if (defending) this.handVeil = 'hold';
     else if (this.curtainSeen[d] === key) this.handVeil = 'click';
     else {
@@ -471,7 +554,14 @@ export class GameController {
   setReveal(held: boolean): void {
     if (this.handVeil === 'none' || this.revealHeld === held) return;
     this.revealHeld = held;
+    // What was said while revealed (staging sentences) leaves the live regions with the reveal.
+    if (!held) this.clearAnnouncements();
     this.bump();
+  }
+
+  private clearAnnouncements(): void {
+    this.polite = { text: '', seq: this.polite.seq + 1 };
+    this.assertive = { text: '', seq: this.assertive.seq + 1 };
   }
 
   showHand(): void {
@@ -495,6 +585,12 @@ export class GameController {
   act(action: Action, intentId?: string): boolean {
     if (!this.myDecision()) return false;
     const before = this.session.actionCount;
+    if (action.type === 'playCard') {
+      const c = this.session
+        .view(this.me)
+        .zones[this.me].hand.find((x) => x.handle === action.card);
+      this.pendingPlay = c?.card ? (this.cards.get(c.card)?.name ?? null) : null;
+    } else if (action.type !== 'pick' && action.type !== 'done') this.pendingPlay = null;
     const r = this.session.apply(this.me, action, intentId);
     if (!r.ok) {
       this.error = `That move couldn’t be applied. Nothing changed. (${r.error ?? 'unknown'})`;
@@ -502,6 +598,7 @@ export class GameController {
       return false;
     }
     this.error = null;
+    this.recap = null;
     if (this.hotseat && this.handVeil === 'click') this.handVeil = 'none';
     this.afterApply(before, this.me, false);
     void this.pump();
@@ -616,6 +713,7 @@ export class GameController {
     this.thinking = false;
     this.stepWaiting = false;
     this.skipping = false;
+    this.recap = null;
     this.lastDecisionKey = '';
   }
 

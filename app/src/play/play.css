@@ -682,6 +682,9 @@
 }
 .hand-veil {
   position: absolute;
+  touch-action: none;
+  user-select: none;
+  -webkit-touch-callout: none;
   display: grid !important;
   place-items: center;
   border: 1px dashed var(--color-line-strong) !important;
@@ -701,8 +704,15 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: var(--z-arrow);
+  /* Under the cards (z 1), over the mat and the midline; the last stretch and ⌖ draw on top. */
+  z-index: 0;
   overflow: visible;
+}
+.arrow.top {
+  z-index: var(--z-arrow);
+}
+.board .bc {
+  z-index: 1;
 }
 .arrow-label {
   fill: var(--color-text);
@@ -1675,9 +1685,16 @@
   pointer-events: none;
 }
 
-/* Visual content of a button whose name comes from its sr-only text (WCAG 2.5.3). */
+/* Visual content of a button whose name comes from its sr-only text (WCAG 2.5.3). A real box, not
+   display: contents, because Chrome ignores aria-hidden on a contents box (review M3-26). */
 .vis {
-  display: contents;
+  display: inherit;
+  align-items: inherit;
+  justify-content: inherit;
+  gap: inherit;
+}
+.vis-inline {
+  display: inline-flex;
 }
 
 .log-ol {
@@ -1720,4 +1737,41 @@
 }
 .narrow-rail .dec-body {
   padding: 4px 10px;
+}
+
+.life-reveal {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.life-face {
+  flex: none;
+}
+
+.stage-wrap {
+  display: contents;
+}
+
+/* Forced colours (visual-system.md §4, review M3-17): a card edge, token edges, and a focused legal
+   card keeps both rings: ButtonText legal outline inside, Highlight focus ring outside. */
+@media (forced-colors: active) {
+  .bc .face,
+  .tok,
+  .back {
+    border: 1px solid CanvasText;
+  }
+  .bc.legal:focus-visible,
+  .bc.selected:focus-visible {
+    outline: 3px solid ButtonText;
+    outline-offset: 3px;
+  }
+  .bc.legal:focus-visible::before,
+  .bc.selected:focus-visible::before {
+    content: '';
+    position: absolute;
+    inset: -11px;
+    border: 3px solid Highlight;
+    border-radius: 8px;
+    pointer-events: none;
+  }
 }

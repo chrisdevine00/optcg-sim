@@ -233,6 +233,80 @@ export class GameSession {
     };
   }
 
+  /**
+   * What both players may see, in `viewer`'s handles (hotseat, review M3-01..04): `viewer`'s view
+   * with every card the other player cannot see turned face down, no legal actions, and the other
+   * player's (generic) wording of the decision. The intersection of the two projections.
+   */
+  publicView(viewer: PlayerId): ProjectedView {
+    const own = this.view(viewer);
+    const theirs = this.view(viewer === 'p1' ? 'p2' : 'p1');
+    const zones = {} as ProjectedView['zones'];
+    for (const p of ['p1', 'p2'] as const) {
+      zones[p] = {} as ProjectedView['zones']['p1'];
+      for (const z of Object.keys(own.zones[p]) as (keyof ProjectedView['zones']['p1'])[]) {
+        zones[p][z] = own.zones[p][z].map((c, i) =>
+          c.card !== null &&
+          theirs.zones[p][z][i]?.card !== null &&
+          theirs.zones[p][z][i] !== undefined
+            ? c
+            : {
+                handle: `${p}.${z}.${i}`,
+                card: null,
+                rested: false,
+                faceUp: false,
+                don: 0,
+                power: null,
+                cost: null,
+                keywords: [],
+              },
+        );
+      }
+    }
+    return {
+      ...own,
+      zones,
+      actions: [],
+      decision:
+        own.decision && theirs.decision
+          ? { ...own.decision, prompt: theirs.decision.prompt }
+          : own.decision,
+      known: {},
+    };
+  }
+
+  /**
+   * The log as both players may see it: `viewer`'s projected events keeping only the fields the
+   * other player's projection also has (a draw keeps its zones but loses its card).
+   */
+  publicLog(viewer: PlayerId): { moves: Move[]; events: GameEvent[][]; start: GameEvent[] } {
+    const other = viewer === 'p1' ? 'p2' : 'p1';
+    const meet = (a: GameEvent[], b: GameEvent[]) =>
+      a.map((e, i) => {
+        const o = b[i] ?? {};
+        const out: GameEvent = { type: e.type };
+        for (const k of Object.keys(e)) if (k in o) out[k] = e[k];
+        return out;
+      });
+    return {
+      moves: this.moves(),
+      events: this.eventsByAction.map((e) =>
+        meet(projectEvents(e, viewer), projectEvents(e, other)),
+      ),
+      start: meet(projectEvents(this.startEvents, viewer), projectEvents(this.startEvents, other)),
+    };
+  }
+
+  /**
+   * The Life card waiting on `player`'s damage decision (CR 4-6-3), for that player only: the
+   * engine names it in the decision prompt it gives them. Null for anyone else.
+   */
+  pendingLifeCard(player: PlayerId): string | null {
+    const d = queries.decision(this.state);
+    if (!d || d.kind !== 'trigger' || d.player !== player) return null;
+    return queries.zone(this.state, player, 'life')[0]?.card ?? null;
+  }
+
   /** Event types of every action from `index` on (no card data: safe for any viewer). */
   eventTypesFrom(index: number): string[] {
     return this.eventsByAction.slice(index).flatMap((ev) => ev.map((e) => e.type));

@@ -40,6 +40,7 @@ async function startGame(choice: SetupChoice): Promise<GameController> {
     const cards = await loadCards(scenarioCardIds(sc));
     const { mode, ...spec } = sc;
     config.mode = mode;
+    config.aiCardIds = scenarioCardIds({ ...sc, p1: { leader: sc.p2.leader }, p2: sc.p2 });
     if (mode === 'hotseat')
       config.names = { p1: choice.names[0] || 'Player 1', p2: choice.names[1] || 'Player 2' };
     else
@@ -57,6 +58,7 @@ async function startGame(choice: SetupChoice): Promise<GameController> {
     ...theirDeck.spec.main,
   ]);
   if (config.mode === 'ai') config.names.p2 = cards.get(theirDeck.leader)?.name ?? 'Opponent';
+  config.aiCardIds = [theirDeck.spec.leader, ...theirDeck.spec.main];
   const chooser: PlayerId | undefined =
     choice.first === 'me' ? 'p1' : choice.first === 'opp' ? 'p2' : undefined;
   return new GameController(

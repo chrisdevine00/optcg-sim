@@ -14,7 +14,9 @@ export type DialogState =
   | { kind: 'rewind' }
   | { kind: 'shortcuts' }
   | { kind: 'menu' }
-  | { kind: 'concede' };
+  | { kind: 'concede' }
+  /** Hotseat: a rewind changes the game for both players, so the other one agrees (flows F11.7). */
+  | { kind: 'consent'; run: () => void };
 
 export function Dialogs({
   g,
@@ -52,7 +54,7 @@ export function Dialogs({
             >
               Concede
             </button>
-            <button type="button" className="btn primary" autoFocus onClick={onClose}>
+            <button type="button" className="btn primary" data-autofocus onClick={onClose}>
               Keep playing
             </button>
           </div>
@@ -60,6 +62,32 @@ export function Dialogs({
       );
     case 'menu':
       return <GameMenu g={g} onClose={onClose} setDialog={setDialog} />;
+    case 'consent': {
+      const run = dialog.run;
+      return (
+        <Modal title="Rewind for both players?" onClose={onClose}>
+          <p>
+            A rewind changes the game for both of you. The other player agrees by pressing Enter.
+          </p>
+          <div className="row end">
+            <button type="button" className="btn" onClick={onClose}>
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="btn primary"
+              data-autofocus
+              onClick={() => {
+                onClose();
+                run();
+              }}
+            >
+              Agree and rewind <kbd>Enter</kbd>
+            </button>
+          </div>
+        </Modal>
+      );
+    }
   }
 }
 
@@ -78,6 +106,8 @@ function Modal({
   useEffect(() => {
     const d = ref.current;
     if (d && !d.open) d.showModal();
+    // showModal focuses the first control (the ✕); the dialog's intended button takes focus.
+    d?.querySelector<HTMLElement>('[data-autofocus]')?.focus();
     return () => d?.close();
   }, []);
   return (
@@ -121,7 +151,8 @@ function TrashViewer({ g, player, onClose }: { g: G; player: PlayerId; onClose: 
     <>
       <div
         className="rail-scrim"
-        style={{ left: rail.x, width: rail.w }}
+        // The rail notice (the disclaimer) stays clear of the scrim (board.md §3.1, M3-21).
+        style={{ left: rail.x, width: rail.w, top: rail.head + rail.notice }}
         aria-hidden="true"
         onClick={onClose}
       />
@@ -210,7 +241,7 @@ function RewindList({ g, lines, onClose }: { g: G; lines: LogLine[]; onClose: ()
                 className="opt"
                 aria-pressed={sel === m.index}
                 onClick={() => setSel(m.index)}
-                autoFocus={i === 0}
+                data-autofocus={i === 0 ? '' : undefined}
               >
                 {m.text}
               </button>
@@ -229,7 +260,7 @@ function RewindList({ g, lines, onClose }: { g: G; lines: LogLine[]; onClose: ()
           onClick={() => {
             if (sel === null) return;
             onClose();
-            g.ctl.rewindTo(sel);
+            g.requestRewind(() => g.ctl.rewindTo(sel));
           }}
         >
           Rewind to before it
@@ -308,9 +339,17 @@ function GameMenu({
     ref.current?.querySelector<HTMLElement>('[role="menuitem"]')?.focus();
   }, []);
   const items: [string, () => void, boolean?][] = [
-    ['Rewind list…', () => setDialog({ kind: 'rewind' })],
-    ['Back to my last decision', () => (onClose(), g.ctl.backToMyLastDecision())],
-    ['Forward one move', () => (onClose(), g.ctl.forward()), !g.ctl.session.canForward],
+    ['Rewind list…', () => setDialog({ kind: 'rewind' }), !g.ctl.canRewind()],
+    [
+      'Back to my last decision',
+      () => (onClose(), g.requestRewind(() => g.ctl.backToMyLastDecision())),
+      !g.ctl.canRewind(),
+    ],
+    [
+      'Forward one move',
+      () => (onClose(), g.requestRewind(() => g.ctl.forward())),
+      !g.ctl.session.canForward || !g.ctl.canRewind(),
+    ],
     ['Keyboard shortcuts', () => setDialog({ kind: 'shortcuts' })],
     ['Concede…', () => setDialog({ kind: 'concede' }), !!g.view.result],
     ['New game', () => (onClose(), g.onNewGame())],
