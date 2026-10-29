@@ -4,7 +4,7 @@
  * always defended where possible, and no Counter is thrown away.
  */
 import { readdirSync, readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   legalActions,
   projectForSearch,
@@ -19,6 +19,9 @@ import { AiSession, BUDGETS } from '../src/index.ts';
 import { cardMap, metaDecks } from './support.ts';
 import { playMatch, type DecisionRecord } from './support/match.ts';
 import { lifeOf, listOf, session, start } from './support/scenario.ts';
+
+// Searching tests: CI runners are several times slower than a desktop.
+vi.setConfig({ testTimeout: 60_000 });
 
 const ROCKS = 'OP17-039';
 const KAIDO = 'OP17-058';

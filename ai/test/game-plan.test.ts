@@ -5,10 +5,13 @@
  * iteration budget. The same assertions are also measured statistically over Pirate-vs-Pirate games
  * in the nightly run (strength.test.ts, PLAN_GAMES).
  */
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { queries, reduce, type Action, type GameState } from '@optcg/engine';
 import { PLAYBOOKS } from '../src/index.ts';
 import { cardOf, lifeOf, listOf, play, start, type Spec } from './support/scenario.ts';
+
+// Searching tests: CI runners are several times slower than a desktop.
+vi.setConfig({ testTimeout: 60_000 });
 
 /** Apply an engine action by instance (the test plays the other seat directly). */
 const actRaw = (s: GameState, a: Action) => reduce(s, a).state;

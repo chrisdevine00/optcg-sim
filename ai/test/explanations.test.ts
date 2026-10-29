@@ -11,7 +11,7 @@
  * player could not see (flows D9).
  */
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { SCRIPTS } from '@optcg/cards';
 import {
   legalActions,
@@ -28,6 +28,9 @@ import { certaintyLabel, LESSON, type Explanation } from '../src/index.ts';
 import { cardMap, metaDecks } from './support.ts';
 import { playMatch } from './support/match.ts';
 import { cardOf, lifeOf, listOf, session, start } from './support/scenario.ts';
+
+// Searching tests: CI runners are several times slower than a desktop.
+vi.setConfig({ testTimeout: 60_000 });
 
 /** The example's Explanation object, evaluated from its ```ts block in explanations.md. */
 function docExample(id: string): Explanation {
