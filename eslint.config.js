@@ -78,7 +78,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['cards/src/**/*.ts'],
+    files: ['cards/src/**/*.ts', 'cards/effects/**/*.ts'],
     rules: {
       'no-restricted-imports': [
         'error',

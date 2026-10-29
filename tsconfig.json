@@ -4,6 +4,7 @@
     "engine/src",
     "engine/test",
     "cards/src",
+    "cards/effects",
     "cards/scripts",
     "cards/test",
     "ai/src",
