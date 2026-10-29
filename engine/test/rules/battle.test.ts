@@ -438,7 +438,7 @@ describe('Damage Step (CR 7-1-4)', () => {
     expect(g.zone('p2', 'trash').map((c) => c.card)).toEqual([PUR_1]);
   });
 
-  it('CR 7-1-5: end-of-battle effects see battle boosts; then they expire, then Main resumes', () => {
+  it('CR 7-1-5-1..7-1-5-5: end-of-battle effects see battle boosts; then they expire, then Main resumes', () => {
     const g = scenario({ p1: { leader: LUFFY }, p2: { leader: KAIDO, hand: [PUR_1], life } });
     give(g, KAIDO, [
       { id: 'eob', kind: 'auto', when: ['endOfBattle'], effect: [{ op: 'emit', label: 'eob' }] },
