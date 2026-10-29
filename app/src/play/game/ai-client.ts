@@ -112,7 +112,7 @@ export class AiClient {
       return {
         action: r.action,
         explanation: r.explanation,
-        alternatives: r.alternatives,
+        alternatives: [],
         ms: r.ms,
         ...(r.stats ? { stats: r.stats } : {}),
       };
@@ -126,6 +126,11 @@ export class AiClient {
     this.pending.delete(id);
     this.worker.postMessage({ type: 'cancel', id } satisfies AiRequest);
     p.reject(new Error('cancelled'));
+  }
+
+  /** Forget the turn plan and battle memory (a rewind). */
+  reset(): void {
+    this.worker.postMessage({ type: 'reset' } satisfies AiRequest);
   }
 
   terminate(): void {

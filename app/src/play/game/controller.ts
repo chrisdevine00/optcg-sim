@@ -35,6 +35,8 @@ export interface GameConfig {
   startPaused?: boolean;
   /** The AI seat's own main deck (it knows its own list; ARCHITECTURE §4.3). */
   aiDeck?: string[];
+  /** Search budgets: `ms` in play (the default), `iterations` for tests that must repeat. */
+  aiBudgets?: 'iterations' | 'ms';
   /** Tests: an in-process stand-in for the worker. */
   aiPort?: (cards: Card[], game: GameInfo) => AiPort;
 }
@@ -49,6 +51,8 @@ export interface AiPort {
   ): { id: number; result: Promise<AiDecision> };
   reveal(cards: Iterable<Card>): void;
   cancel(id: number): void;
+  /** Forget the turn plan and battle memory (a rewind). */
+  reset(): void;
   terminate(): void;
 }
 
@@ -67,6 +71,8 @@ const T = {
   considering: 600,
   autoStep: 400,
   thinkingAfter: 300,
+  /** "Still thinking…" after this long (flows F21.6). */
+  stillThinking: 3000,
   /** The AI's Refresh + Draw + DON!! segment; its turn plan starts with it (board.md §5.2). */
   turnStart: 700,
 };
@@ -113,6 +119,8 @@ export class GameController {
   private pumping = false;
   private disposed = false;
   private aiRequest: number | null = null;
+  /** The turn plan being computed, so a rewind can cancel it (review M5a-12). */
+  private planRequest: number | null = null;
   private wake: (() => void) | null = null;
 
   // Pacing and AI state (board.md §5).
@@ -130,6 +138,8 @@ export class GameController {
   /** What happened while skipping (flows F21 step 4). */
   recap: string[] | null = null;
   private skippedLines: string[] = [];
+  /** The log index of the last line in `skippedLines`. */
+  private skippedFrom = -1;
 
   // Hotseat (flows F13b).
   private seat: PlayerId;
@@ -176,7 +186,7 @@ export class GameController {
         ownDeck: config.aiDeck ?? (config.aiCardIds ?? []).filter((id) => id !== leader),
         leader,
         opponentLeader,
-        budgets: 'ms',
+        budgets: config.aiBudgets ?? 'ms',
       };
       const init = aiInitCards(cards, config.aiCardIds ?? [], opponentLeader);
       this.ai = config.aiPort ? config.aiPort(init, game) : new AiClient(init, game);
@@ -595,8 +605,7 @@ export class GameController {
   /** Ask for the AI's next decision now, so it searches while the last move animates. */
   private prefetch(d: PlayerId): void {
     if (this.prefetched || this.session.decider() !== d) return;
-    const v = this.session.view(d);
-    if (v.result || v.actions.filter((a) => a.type !== 'concede').length <= 1) return;
+    if (this.session.view(d).result) return;
     const at = this.session.actionCount;
     const r = this.requestDecision(d);
     r.result.catch(() => undefined);
@@ -607,12 +616,13 @@ export class GameController {
     const view = this.session.view(d);
     const kind = view.decision?.kind ?? 'main';
     const options = view.actions.filter((a) => a.type !== 'concede');
-    // The uniform considering beat is for the AI's defensive windows, on the player's turn (flows
-    // G5, board.md §5.2); its own effect choices on its turn are part of its moves.
-    const beat = kind !== 'main' && view.turn.activePlayer !== d;
+    const ownTurn = view.turn.activePlayer === d;
+    // The uniform considering beat covers every AI decision on the player's turn: Block, Counter,
+    // Trigger and optional effects alike (flows G5, F21.2; board.md §5.2).
+    const beat = kind !== 'main' && !ownTurn;
     const now = () => performance.now();
     // A new AI turn: plan it while its Refresh, Draw and DON!! play (board.md §5.2).
-    if (kind === 'main' && view.turn.activePlayer === d && this.aiTurn?.turn !== view.turn.number) {
+    if (kind === 'main' && ownTurn && this.aiTurn?.turn !== view.turn.number) {
       this.aiTurn = {
         turn: view.turn.number,
         start: now(),
@@ -622,12 +632,17 @@ export class GameController {
         moves: 0,
         thinkMs: 0,
       };
-      if (this.config.tier !== 'rookie' && options.length > 1) {
+      if (this.config.tier !== 'rookie') {
         const plan = this.ai!.planTurn(
           this.aiView(d) as SearchView,
           this.seedAt(this.session.actionCount),
         );
-        plan.result.catch(() => undefined);
+        this.planRequest = plan.id;
+        plan.result
+          .catch(() => undefined)
+          .finally(() => {
+            if (this.planRequest === plan.id) this.planRequest = null;
+          });
         this.prefetch(d);
       }
       await this.gate();
@@ -638,8 +653,11 @@ export class GameController {
       this.aiTurn.humanSince = null;
     }
     await this.gate();
-    // The request starts before the considering beat, so the search runs during it.
-    const pending = options.length > 1 ? this.requestDecision(d) : null;
+    // Every AI decision goes to the worker, whether or not it has a choice: "Why?" then exists
+    // for every AI move and reads the same either way (review M5a-01). The request starts before
+    // the considering beat, so the search runs during it, and it is tracked from the start.
+    const pending = this.requestDecision(d);
+    this.aiRequest = pending.id;
     if (beat && !this.skipping) {
       // The uniform considering beat (flows G5): the same time whether or not it had options.
       this.considering = kind;
@@ -649,26 +667,35 @@ export class GameController {
     }
     let action: Action;
     let explanation: Explanation | null = null;
-    if (!pending) action = options[0]!;
-    else {
-      const timer = setTimeout(() => {
-        this.thinking = true;
-        this.activity = `${this.config.names[d]} is thinking…`;
-        this.bump();
-      }, T.thinkingAfter);
-      this.aiRequest = pending.id;
+    {
+      // "Thinking" only on the AI's own turn: on the player's turn its presence would depend on
+      // whether the AI had a choice (review M5a-01); the considering beat covers the search.
+      const timers = ownTurn
+        ? [
+            setTimeout(() => {
+              this.thinking = true;
+              this.activity = `${this.config.names[d]} is thinking…`;
+              this.bump();
+            }, T.thinkingAfter),
+            setTimeout(() => {
+              this.activity = `${this.config.names[d]} is still thinking…`;
+              this.bump();
+            }, T.stillThinking),
+          ]
+        : [];
       const t0 = now();
       try {
         const r = await pending.result;
-        if (this.aiTurn && view.turn.activePlayer === d) this.aiTurn.thinkMs += now() - t0;
+        if (this.aiTurn && ownTurn) this.aiTurn.thinkMs += now() - t0;
         action = r.action;
         explanation = r.explanation;
       } catch (e) {
-        clearTimeout(timer);
         if (e instanceof Error && e.message === 'cancelled') throw new Cancelled();
-        throw e;
+        // A failed request still owes a move: the only one, if it is forced.
+        if (options.length !== 1) throw e;
+        action = options[0]!;
       } finally {
-        clearTimeout(timer);
+        for (const t of timers) clearTimeout(t);
         this.aiRequest = null;
         this.thinking = false;
       }
@@ -719,22 +746,32 @@ export class GameController {
       end: this.session.actionCount,
       ...(action.type === 'giveDon' ? { donTarget: action.target } : {}),
     };
-    if (this.aiTurn && view.turn.activePlayer === d && !follow) this.aiTurn.moves++;
-    // "Why?" only where the AI had a choice (flows F10.3).
-    if (explanation && options.length > 1 && !this.aiWhy.has(moveStart))
-      this.aiWhy.set(moveStart, explanation);
-    this.afterApply(before, d, false);
+    if (this.aiTurn && ownTurn && !follow) this.aiTurn.moves++;
+    // "Why?" for every AI move, from its first decision (flows F10; review M5a-01).
+    if (explanation && !this.aiWhy.has(moveStart)) this.aiWhy.set(moveStart, explanation);
+    // A follow-up joins its move's log line: announce that line again with what it added, so
+    // the screen reader hears the pick or the DON!! count (review M5a-03).
+    this.afterApply(before, d, false, moveStart);
     // The next decision is the AI's too: start its search now, during this move's animation.
     this.prefetch(d);
     const attackOnHuman = action.type === 'attack';
     if (kind === 'main') {
       if (action.type === 'attack') await this.wait(T.move, { attackOnHuman });
-      // A DON!! group shows as one move: the DON!! travel in, and the attack that follows shows
-      // the new power; each further DON!! of the group only ticks.
-      else if (action.type === 'giveDon') await this.wait(donRun ? T.highlight : T.move);
-      else if (action.type !== 'endTurn') await this.wait(T.move + T.dwell, { dwell: true });
+      else if (action.type === 'giveDon') {
+        // A DON!! group shows as one move: each DON!! travels in, and the group's dwell comes at
+        // its end, unless that card's attack follows at once (board.md §5.2; review M5a-12).
+        await this.wait(donRun ? T.highlight : T.move);
+        const next = await this.peekNext();
+        const continues =
+          next !== null &&
+          ((next.type === 'giveDon' && next.target === action.target) ||
+            (next.type === 'attack' && next.attacker === action.target));
+        if (!continues) await this.wait(T.dwell, { dwell: true });
+      } else if (action.type !== 'endTurn') await this.wait(T.move + T.dwell, { dwell: true });
       else await this.wait(300);
-    }
+    } else if (ownTurn && (action.type === 'pick' || (action.type === 'optional' && action.accept)))
+      // Its own effect's choice changed the board (a K.O., a −2000): hold it (review M5a-12).
+      await this.wait(T.dwell, { dwell: true });
     if (this.battleEndedSince(before)) await this.wait(T.damage + T.dwellAttack, { dwell: true });
     if (action.type === 'endTurn' && this.aiTurn && this.aiTurn.turn === view.turn.number) {
       const t = this.aiTurn;
@@ -753,14 +790,32 @@ export class GameController {
     }
   }
 
+  /** The AI's next action if it is already requested (the prefetch), else null. */
+  private async peekNext(): Promise<Action | null> {
+    const p = this.prefetched;
+    if (!p) return null;
+    try {
+      return (await p.result).action;
+    } catch {
+      return null;
+    }
+  }
+
   /** Log, announce and record what the last action(s) did (accessibility §9.3). */
-  private afterApply(before: number, actor: PlayerId, auto: boolean): void {
-    const lines = this.linesSince(before);
+  private afterApply(before: number, actor: PlayerId, auto: boolean, from = before): void {
+    // `from` < `before` when the action joined an earlier move: its merged line is spoken again,
+    // whole, so nothing it added goes unheard (review M5a-03).
+    const lines = this.linesSince(from);
     // Each line is credited to its own actor, in words (review M3-10).
     const spoken = lines.map((l) => this.spoken(l));
     const text = spoken.join(' ');
-    if (this.skipping && this.seatOf(actor) === 'ai')
-      this.skippedLines.push(...lines.filter((l) => l.kind === 'move').map((l) => this.spoken(l)));
+    if (this.skipping && this.seatOf(actor) === 'ai') {
+      const moves = lines.filter((l) => l.kind === 'move');
+      // A merged line replaces its earlier, shorter form in the recap.
+      if (from < before && moves[0] && this.skippedFrom === moves[0].index) this.skippedLines.pop();
+      this.skippedLines.push(...moves.map((l) => this.spoken(l)));
+      if (moves.length) this.skippedFrom = moves[moves.length - 1]!.index;
+    }
     if (text && !this.skipping) {
       this.say(text);
       if (this.seatOf(actor) === 'ai' && !auto)
@@ -1044,6 +1099,10 @@ export class GameController {
     this.aiRequest = null;
     if (this.prefetched) this.ai?.cancel(this.prefetched.id);
     this.prefetched = null;
+    if (this.planRequest !== null) this.ai?.cancel(this.planRequest);
+    this.planRequest = null;
+    // The worker forgets its plan and battle memory (review M5a-11).
+    this.ai?.reset();
     this.lastAi = null;
     this.aiTurn = null;
     this.wake?.();

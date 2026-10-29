@@ -297,35 +297,62 @@ describe('AI explanations over whole games', () => {
   );
   const all = cardMap();
 
-  it('are well formed, cite a concept and a lesson that exist, and name no card the player could not see (flows D9)', () => {
+  // A card name counts as one word ("There's No Authority in the World That Lasts Forever!!!").
+  const names = [...new Set([...all.values()].map((c) => c.name))]
+    .filter((n) => n.includes(' '))
+    .sort((a, b) => b.length - a.length);
+  const words = (t: string) => {
+    let x = t;
+    for (const n of names) if (x.includes(n)) x = x.split(n).join('Name');
+    return x.split(/\s+/).filter(Boolean).length;
+  };
+
+  it('follow the copy rules, cite a concept and a lesson that exist, show no future step, and name no card the player could not see (flows D9)', () => {
     const decks = metaDecks();
     const rocks = decks.find((d) => d.leader === ROCKS)!;
     const kaido = decks.find((d) => d.leader === KAIDO)!;
     let checked = 0;
-    for (let g = 0; g < 2; g++) {
+    const kinds = new Set<string>();
+    for (let g = 0; g < 6; g++) {
       playMatch({
         seed: 40 + g,
-        decks: g === 0 ? { p1: rocks, p2: kaido } : { p1: kaido, p2: rocks },
+        decks: g % 2 === 0 ? { p1: rocks, p2: kaido } : { p1: kaido, p2: rocks },
         tiers: { p1: 'pirate', p2: 'pirate' },
         onDecision: (d) => {
           const e = d.explanation;
+          kinds.add(`${d.view.decision?.kind}:${d.action.type}`);
+          // explanations.md copy rules (review M5a-14).
           expect(e.claim.length).toBeGreaterThan(0);
-          expect(e.claim.split(/\s+/).length, e.claim).toBeLessThanOrEqual(14);
+          expect(words(e.claim), e.claim).toBeLessThanOrEqual(12);
           expect(e.claim).not.toMatch(/!$/);
+          for (const ev of e.evidence) expect(words(ev.text), ev.text).toBeLessThanOrEqual(30);
+          expect(e.nextTime.length, 'a rule of thumb').toBeGreaterThan(0);
           expect(SLUGS.has(e.conceptId), e.conceptId).toBe(true);
           expect(curriculum.includes(e.lessonId), e.lessonId).toBe(true);
+          expect(e.sources.length).toBeGreaterThan(0);
           const text = [
             e.claim,
             e.outcome,
             ...e.evidence.map((x) => x.text),
             ...(e.line ?? []).map((m) => m.text),
           ].join(' ');
+          // The real minus sign, DON!! spelled out, no blame, plurals right.
+          expect(text).not.toMatch(/(^|[\s(])-\d/);
+          expect(text).not.toMatch(/\d\s+-\s+\d/);
+          expect(text).not.toMatch(/DON!(?!!)/);
+          expect(text).not.toMatch(/you should have/i);
+          expect(text).not.toMatch(/\b1 (cards|hits|attackers|Life cards)\b/);
+          // flows F10.2: a step's "Why?" shows no later step (review M5a-06).
+          if (d.action.type !== 'attack')
+            expect(
+              (e.line ?? []).map((m) => m.kind),
+              text,
+            ).not.toContain('attack');
           // Effect labels quote types and names from public card text ("Rocks Pirates", [Kaido]).
           const named = text.replace(/"[^"]*"|\[[^\]]*\]|\{[^}]*\}/g, '');
-          // Copy rules: the real minus sign, DON!! spelled out.
-          expect(text).not.toMatch(/(^|\s)-\d/);
-          expect(text).not.toMatch(/DON!(?!!)/);
-          // D9: every card named is one the other player can see once the move is made.
+          // D9: every card named is one the other player can see once the move is made: nothing
+          // from either player's hidden zones (the AI's hand, deck and Life, and the guesses it
+          // made about the player's).
           const opp = d.player === 'p1' ? 'p2' : 'p1';
           const visible = new Set<string>();
           for (const g2 of [d.before, d.after]) {
@@ -336,15 +363,21 @@ describe('AI explanations over whole games', () => {
             for (const c of (v as ProjectedView).resolving) if (c.card) visible.add(c.card);
           }
           for (const c of queries.zone(d.after, d.player, 'trash')) visible.add(c.card);
+          // A card the move plays is revealed by playing it (CR 2-7-2), even while its cost is paid.
+          const acted = (d.action as { card?: string }).card;
+          if (acted && d.action.type !== 'activate') {
+            for (const z of Object.values(d.view.zones[d.player])) {
+              const c = z.find((x) => x.handle === acted);
+              if (c?.card) visible.add(c.card);
+            }
+          }
           // A hidden card's name may be shared by a visible card (Kaido the Leader, Kaido the
           // Character): only names no visible card carries can leak.
           const visibleNames = new Set([...visible].map((id) => all.get(id)!.name));
-          const hidden = [
-            ...queries.zone(d.before, d.player, 'hand'),
-            ...queries.zone(d.before, d.player, 'deck'),
-            ...queries.zone(d.before, d.player, 'life'),
-          ].map((c) => c.card);
-          for (const id of new Set(hidden)) {
+          const hidden = (['p1', 'p2'] as const).flatMap((p) =>
+            (['hand', 'deck', 'life'] as const).flatMap((z) => queries.zone(d.before, p, z)),
+          );
+          for (const id of new Set(hidden.map((c) => c.card))) {
             if (visible.has(id) || visibleNames.has(all.get(id)!.name)) continue;
             const name = all.get(id)!.name;
             const re = new RegExp(
@@ -356,6 +389,19 @@ describe('AI explanations over whole games', () => {
         },
       });
     }
-    expect(checked).toBeGreaterThan(100);
-  }, 120_000);
+    expect(checked).toBeGreaterThan(300);
+    // Every template came up: main moves, defences, effect choices, Triggers, the mulligan.
+    for (const k of [
+      'main:attack',
+      'main:playCard',
+      'main:giveDon',
+      'main:endTurn',
+      'block:block',
+      'counter:endCounter',
+      'optional:optional',
+      'choose:pick',
+      'mulligan:mulligan',
+    ])
+      expect(kinds.has(k), k).toBe(true);
+  }, 300_000);
 });

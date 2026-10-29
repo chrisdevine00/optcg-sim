@@ -1,6 +1,7 @@
 /**
  * The typed worker protocol (ARCHITECTURE §4.1). M5a implements `init`, `cards`, `planTurn`,
- * `decide` and `cancel`; `lethal` and `analyze` arrive with the learning slice and Game Review.
+ * `decide`, `cancel` and `reset`; unchosen alternatives are not posted (no UI uses them, and they
+ * would carry the AI's intentions into the page: review M5a-15); `lethal` and `analyze` arrive with the learning slice and Game Review.
  *
  * The worker only ever receives the AI's own view: a `SearchView` (the view plus a skeleton with
  * every hidden card stripped, ADR 0005) for the searching tiers, a plain view for Rookie. Card data
@@ -36,7 +37,9 @@ export type AiRequest =
       seed: number;
       budgetMs: number;
     }
-  | { type: 'cancel'; id: number };
+  | { type: 'cancel'; id: number }
+  /** Forget the turn plan and battle memory (the player rewound). */
+  | { type: 'reset' };
 
 export type AiResponse =
   | {
@@ -44,7 +47,6 @@ export type AiResponse =
       id: number;
       action: Action;
       explanation: Explanation;
-      alternatives: Action[];
       ms: number;
       /** Rollouts spent, and whether the move came from the turn plan. */
       stats?: { rollouts: number; actions: number; planned: boolean };

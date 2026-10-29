@@ -5,10 +5,16 @@
   "asOf": "2026-10-28",
   "guide": "docs/content/archetypes/OP17-058.md",
   "notes": [
-    "Written from the guide's 'Game plan by turn' and 'Playbook seeds'. Numbers are heuristic units (about one card); they are tuning, not strategy claims.",
+    "Written from the guide's 'Game plan by turn' and 'Playbook seeds'.",
     "goFirst: strategy-concepts §10 [S17] 'go second with removal, late-game and counter-heavy decks'; the guide calls Kaido 'a removal-and-defense build' [SH-KAI].",
     "weights.don: the guide's DON!! engine (King, Queen, Hawkins, Yamato add DON!!; the top end pays DON!! −X).",
-    "cardValue: ongoing effects named in the guide's Defining cards (King's ramp and K.O. shield, Kaido OP17-062's refund, Kaido OP17-063's hand Counters, Queen OP17-065's Banish)."
+    "cardValue: ongoing effects named in the guide's Defining cards (King's ramp and K.O. shield, Kaido OP17-062's refund, Kaido OP17-063's hand Counters, Queen OP17-065's Banish).",
+    "Every number here is an inference (review M5a-09): the guide gives the direction, not the value. weights, faceBias, counterAggression and cardValue were set by reasoning and have not been tuned on their own.",
+    "Bias sizes were chosen so the planted game-plan tests pass; ai/test/game-plan.test.ts runs every seed with the biases off too, and lists the seeds that pass only because a bias encodes the guide's line (docs/benchmarks.md).",
+    "Citations ('cite', 'citeSource') are what 'Why?' shows when a move follows the line; only biases whose condition is public carry one (avoidPlay does not: its condition is a card in hand).",
+    "counterAggression 1.05: 'a removal-and-defense build' [SH-KAI]; inference: its own Life weighs a little more.",
+    "faceBias 0.95/1.0/1.1: inference from the same framing.",
+    "mulligan: the guide's keepable hand (a turn 1–2 play that ramps or draws, plus two or more counter cards) and SH-KAI's 'mulligan for early blockers and Purple counter density over a single Animal Kingdom Pirates piece'. Each card counts once (review M5a-09)."
   ],
   "goFirst": false,
   "digTargets": ["EB04-031", "OP17-061", "OP17-062", "OP17-063"],
@@ -30,15 +36,22 @@
   },
   "counterAggression": 1.05,
   "mulligan": {
-    "early": {
-      "costMin": 1,
-      "costMax": 3,
-      "min": 1
-    },
-    "planPieces": ["EB04-032", "OP17-073", "OP17-074", "OP07-077", "EB04-031"],
-    "minCounters": 2,
-    "yesesToKeep": 2,
-    "requireEarlyGoingFirst": false
+    "pieces": [
+      {
+        "name": "ramp",
+        "label": "a turn 1–2 play that ramps or draws",
+        "cards": ["EB04-032", "OP17-073", "OP17-074", "OP07-077"],
+        "min": 1
+      },
+      {
+        "name": "counters",
+        "label": "two or more counter cards",
+        "min": 2
+      }
+    ],
+    "secondShort": 0,
+    "requireGoingFirst": [],
+    "source": "SH-KAI; OP17-058 guide (keepable hand, inference)"
   },
   "biases": [
     {
@@ -46,28 +59,37 @@
       "kind": "useOnAttacker",
       "source": "OP17-058",
       "ability": "shrink",
-      "bonus": 1.5
+      "bonus": 1.5,
+      "cite": "Its guide: use the Leader's −2000 on your attacking Character when it changes the battle.",
+      "citeHold": "Its guide: hold the Leader's −2000 for the turn it changes an outcome.",
+      "citeSource": "SH-KAI"
     },
     {
       "seed": 3,
       "kind": "play",
       "cards": ["EB04-032", "OP17-073", "OP17-074", "EB04-031"],
       "byOwnTurn": 3,
-      "bonus": 0.8
+      "bonus": 0.8,
+      "cite": "Its guide: a DON!!-adding Character in its first three turns.",
+      "citeSource": "OP17-058 guide (inference from the lists)"
     },
     {
       "seed": 4,
       "kind": "playAfterLeaderAttack",
       "card": "OP17-060",
       "targetPower": [3001, 5000],
-      "penalty": 1.5
+      "penalty": 1.5,
+      "cite": "Its guide: attack with Kaido first, then play Ulti & Page One.",
+      "citeSource": "SH-KAI"
     },
     {
       "seed": 5,
       "kind": "play",
       "cards": ["OP17-061", "OP17-062", "OP17-063", "OP17-065", "ST34-004"],
       "byOwnTurn": 5,
-      "bonus": 0.8
+      "bonus": 0.8,
+      "cite": "Its guide: a 9- or 10-cost body on turn 4 or 5.",
+      "citeSource": "OP17-058 guide (inference)"
     }
   ],
   "assertions": [

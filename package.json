@@ -19,7 +19,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:nightly": "ENGINE_GAMES=10000 vitest run engine/test/property engine/test/golden --reporter=default --reporter=json --outputFile.json=test-results/nightly.json",
-    "test:strength": "STRENGTH_GAMES=200 PLAN_GAMES=40 vitest run ai/test/strength.test.ts",
+    "test:strength": "STRENGTH_GAMES=200 SHALLOW_GAMES=100 PLAN_GAMES=40 AB_GAMES=40 EXTRA=1 vitest run ai/test/strength.test.ts",
     "bench": "vitest bench --run",
     "bench:two-turn": "tsx engine/bench/two-turn.ts",
     "test:e2e": "playwright test",

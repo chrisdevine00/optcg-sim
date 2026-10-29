@@ -532,7 +532,7 @@ Each AI move plays as **highlight → move → dwell**, then the log line. The s
 - the opponent identity chip shows "Thinking";
 - the decision panel shows an indeterminate bar (a static "Thinking" label under reduced motion) and the speed control.
 
-Defensive decisions by the AI (block, counter, trigger; 0.4 s budget) show the uniform 600 ms considering beat above, and the "thinking" state only if the answer is later than that.
+Every AI decision on your turn (Block, Counter, Trigger, and optional effects and their choices, as flows F21.2 says) shows the uniform 600 ms considering beat above, and never the "thinking" state: on your turn its presence would depend on whether the AI had a choice (M5a review M5a-01). The search runs during the beat.
 
 ### 5.3 Controls
 

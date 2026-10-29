@@ -36,6 +36,28 @@ export interface SimContext {
 /** A rollout stops after this many actions (games cap at 2,000; a turn is far fewer). */
 const ROLLOUT_CAP = 400;
 
+/**
+ * The quick defence's thresholds (review M5a-09). Directions from strategy-concepts.md; every number
+ * is an inference, untested on its own (they steer rollouts, not the AI's own decisions, which are
+ * scored by search):
+ * - §3/§4: "always defend lethal"; "near zero Life, counter everything" [S38]; "below two Life,
+ *   block by default" [S40]. So at 1 Life it stops any hit that 2 cards of +2000 stop
+ *   (`needAtOne`), at 2 Life a hit one +2000 card stops (`needAtTwo`), and above that none.
+ * - §4 "counter to save a Character only if it has an important ongoing effect" [S7]: a Character
+ *   costing `saveCost` or more, if one +2000 card saves it (`saveNeed`).
+ * - §5 a Blocker "whose job is done": block at 2 Life or less with one costing `blockCost` or less.
+ * - Paying a cost: the card least worth keeping, scored by its Counter (per 1000), its cost
+ *   (`keepPerCost`) and the playbook's value for it.
+ */
+export const QUICK = {
+  needAtOne: 4000,
+  needAtTwo: 2000,
+  saveCost: 5,
+  saveNeed: 2000,
+  blockCost: 4,
+  keepPerCost: 0.1,
+} as const;
+
 const other = (p: PlayerId): PlayerId => (p === 'p1' ? 'p2' : 'p1');
 
 export function apply(s: GameState, a: Action, ctx: SimContext): GameState {
@@ -59,7 +81,11 @@ function counterOfAction(s: GameState, a: Action, ctx: SimContext): number {
 function keepValue(c: CardView, ctx: SimContext): number {
   const card = ctx.cards.get(c.card);
   const counter = card?.category === 'Event' ? counterValueOf(card) : (c.counter ?? 0);
-  return counter / 1000 + (c.cost ?? 0) * 0.1 + (ctx.evalCtx.playbook?.cardValue[c.card] ?? 0);
+  return (
+    counter / 1000 +
+    (c.cost ?? 0) * QUICK.keepPerCost +
+    (ctx.evalCtx.playbook?.cardValue[c.card] ?? 0)
+  );
 }
 
 /** The battle as numbers: attacker and target power, and the Counter needed to stop it. */
@@ -79,11 +105,11 @@ function worthDefending(s: GameState, need: number, ctx: SimContext): boolean {
   if (n.target.zone === 'leader') {
     const life = queries.zone(s, n.target.owner, 'life').length;
     if (life === 0) return true;
-    if (life === 1) return need <= 4000;
-    if (life === 2) return need <= 2000;
+    if (life === 1) return need <= QUICK.needAtOne;
+    if (life === 2) return need <= QUICK.needAtTwo;
     return false;
   }
-  return (n.target.cost ?? 0) >= 5 && need <= 2000 && ctx !== null;
+  return (n.target.cost ?? 0) >= QUICK.saveCost && need <= QUICK.saveNeed && ctx !== null;
 }
 
 /** The next Counter to play toward `need`, or null when the hand cannot reach it. */
@@ -128,7 +154,7 @@ export function quickAction(s: GameState, ctx: SimContext): Action {
         .sort((x, y) => (x.c.cost ?? 0) - (y.c.cost ?? 0));
       if (blockers.length === 0) return none;
       if (life === 0) return blockers[0]!.a;
-      if (life <= 2 && (blockers[0]!.c.cost ?? 0) <= 4) return blockers[0]!.a;
+      if (life <= 2 && (blockers[0]!.c.cost ?? 0) <= QUICK.blockCost) return blockers[0]!.a;
       return none;
     }
     case 'counter': {

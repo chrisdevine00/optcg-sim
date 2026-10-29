@@ -36,6 +36,7 @@ export function session(
   seat: PlayerId,
   state: GameState,
   tier: 'pirate' | 'rookie' = 'pirate',
+  biases = true,
 ): AiSession {
   const leader = queries.zone(state, seat, 'leader')[0]!.card;
   const opp = queries.zone(state, other(seat), 'leader')[0]!.card;
@@ -46,6 +47,7 @@ export function session(
     leader,
     opponentLeader: opp,
     budgets: 'iterations',
+    biases,
   });
 }
 
@@ -83,11 +85,17 @@ export function act(state: GameState, player: PlayerId, a: Action): GameState {
 export function play(
   state0: GameState,
   ai: PlayerId,
-  opts: { seed?: number; stop?: (s: GameState) => boolean; ai?: AiSession; max?: number } = {},
+  opts: {
+    seed?: number;
+    stop?: (s: GameState) => boolean;
+    ai?: AiSession;
+    max?: number;
+    biases?: boolean;
+  } = {},
 ): { steps: Step[]; state: GameState } {
   const s0turn = queries.turn(state0).number;
   const stop = opts.stop ?? ((s) => queries.turn(s).number > s0turn);
-  const me = opts.ai ?? session(ai, state0);
+  const me = opts.ai ?? session(ai, state0, 'pirate', opts.biases ?? true);
   let state = state0;
   const steps: Step[] = [];
   for (let i = 0; i < (opts.max ?? 300); i++) {

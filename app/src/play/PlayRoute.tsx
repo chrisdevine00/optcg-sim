@@ -60,6 +60,7 @@ async function startGame(choice: SetupChoice): Promise<GameController> {
     alwaysSkip: choice.alwaysSkip,
     speed: choice.speed,
     startPaused: choice.paused ?? false,
+    ...(choice.aiBudgets ? { aiBudgets: choice.aiBudgets } : {}),
   };
   if (choice.scenario) {
     const sc = scenarioFrom(choice.scenario);

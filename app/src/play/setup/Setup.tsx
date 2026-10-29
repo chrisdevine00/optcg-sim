@@ -24,6 +24,8 @@ export interface SetupChoice {
   seed: number | undefined;
   scenario?: string;
   paused?: boolean;
+  /** Tests: `iterations` makes the AI's search the same on every machine (`?aibudget=`). */
+  aiBudgets?: 'iterations' | 'ms';
 }
 
 function fromUrl(): Partial<SetupChoice> & { start?: boolean } {
@@ -45,6 +47,8 @@ function fromUrl(): Partial<SetupChoice> & { start?: boolean } {
   if (q.get('skip') === '1') out.alwaysSkip = true;
   if (q.get('ask') === '1') out.autoSkip = false;
   if (q.get('paused') === '1') out.paused = true;
+  const budget = q.get('aibudget');
+  if (budget === 'iterations' || budget === 'ms') out.aiBudgets = budget;
   const sc = q.get('scenario');
   // A named scenario, or `json:<base64url>` with a described position (tests, shared positions).
   if (sc && (SCENARIOS[sc] || sc.startsWith('json:'))) out.scenario = sc;
@@ -88,6 +92,7 @@ export function Setup({
     seed: /^\d+$/.test(seed) ? Number(seed) : undefined,
     ...(url.scenario ? { scenario: url.scenario } : {}),
     ...(url.paused ? { paused: true } : {}),
+    ...(url.aiBudgets ? { aiBudgets: url.aiBudgets } : {}),
   });
 
   useEffect(() => {
@@ -134,7 +139,8 @@ export function Setup({
               <span>
                 <b>Pirate AI</b>{' '}
                 <span className="subtle">
-                  · plays its deck’s game plan one turn at a time, and explains each move
+                  · plays its deck’s game plan one turn at a time, and explains each move · about
+                  1–7 s a turn at 1×
                 </span>
               </span>
             </label>
@@ -148,7 +154,8 @@ export function Setup({
               <span>
                 <b>Rookie AI</b>{' '}
                 <span className="subtle">
-                  · plays random legal moves, but always defends a lethal attack
+                  · plays random legal moves, but always defends a lethal attack · about 1–5 s a
+                  turn at 1×
                 </span>
               </span>
             </label>

@@ -112,7 +112,9 @@ describe('Pirate', () => {
       onDecision: (d) => (max = Math.max(max, d.rollouts)),
     });
     expect(max).toBeGreaterThan(0);
-    expect(max).toBeLessThanOrEqual(BUDGETS.pirate.iterations.turn.iterations);
+    // The first round of a step always completes (no candidate unscored), so a plan may run one
+    // round of candidates past its budget, never more.
+    expect(max).toBeLessThanOrEqual(BUDGETS.pirate.iterations.turn.iterations + 120);
   });
 
   it('stays within a wall-clock budget by at most 20% (p95)', () => {
@@ -220,12 +222,15 @@ describe('Pirate on defence', () => {
     let s = s0;
     const ai = session('p2', s);
     const took: string[] = [];
+    const planned: boolean[] = [];
     for (let i = 0; i < 12 && queries.battle(s) && queries.decision(s)?.player === 'p2'; i++) {
       const v = projectForSearch(s, 'p2');
       const d = ai.decide(v, 10 + i);
       took.push(
         d.action.type === 'block' ? (d.action.blocker ? 'block' : 'noBlock') : d.action.type,
       );
+      planned.push(d.stats.planned);
+
       const k = v.actions.findIndex(
         (x) =>
           JSON.stringify({ ...x, intentId: undefined }) ===
@@ -238,7 +243,7 @@ describe('Pirate on defence', () => {
           legalActions(s).find((x) => x.type === 'optional' && !x.accept) ?? legalActions(s)[0]!,
         ).state;
     }
-    return { took, s };
+    return { took, planned, s };
   }
 
   it('always blocks a lethal attack when it has a Blocker', () => {
@@ -274,5 +279,24 @@ describe('Pirate on defence', () => {
     expect(took).toContain('endCounter');
     expect(took).not.toContain('counter');
     expect(took).not.toContain('activate');
+  });
+
+  it('defends a lethal hit even when a second attacker makes every line look lost (review M5a-05)', () => {
+    // 7000 into 5000 at 0 Life, with Kaido (12000) still to attack: two +2000 Events stop this hit.
+    const { took, s } = defend(
+      attacked({ life: 0, hand: ['OP17-056', 'OP17-055', 'OP17-048'] }, 2, ['OP17-062']),
+    );
+    expect(took.filter((t) => t === 'activate').length).toBe(2);
+    expect(queries.result(s)).toBeNull();
+  });
+
+  it('keeps to its chosen defence through an Event’s target pick (review M5a-11)', () => {
+    const { took, planned } = defend(
+      attacked({ life: 0, hand: ['OP17-056', 'OP17-055', 'OP17-048'] }, 2, ['OP17-062']),
+    );
+    // The second Event comes from the defence chosen at the first, not from a new search.
+    const second = took.indexOf('activate', took.indexOf('activate') + 1);
+    expect(second).toBeGreaterThan(0);
+    expect(planned[second]).toBe(true);
   });
 });

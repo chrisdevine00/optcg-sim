@@ -92,3 +92,52 @@ Measured in the browser (Playwright, Chromium, the production build, the real wo
 | Late-game position (`scenario=late`) | 8 | 15 | 132 ms | 6.8 s |
 
 Every measured turn is within 8 s; the heaviest (15 moves) took 6.8 s. The worker plans during the turn-start segment and searches each next decision while the previous move animates, so the board waited on it for at most 132 ms in a turn. Per push, the late-game measurement must keep its median within 8 s; nightly, the turn-1 game must too (at least 3 turns).
+
+## M5a fix round 1 (2026-10-29): gates that can fail, game plan with and without biases, A/B
+
+All runs: iteration budgets, Node on the owner's Apple M4 Pro, `npm run test:strength` (nightly) unless noted.
+
+### Strength gates (review M5a-10)
+
+| Run | Games | Pirate wins | Wilson 95% | Gate |
+| --- | --- | --- | --- | --- |
+| vs Rookie, seeds 10,000–10,199 | 200 | 200 | 98.1%–100% | ≥ 95% nightly (≥ 90% over 20 per push: 20/20) |
+| vs a shallow Pirate (no rollouts), seeds 20,000–20,099 | 100 | 66 | 56.3%–74.5% | ≥ 60% (per push, 20 games: 14/20) |
+| Control: shallow vs shallow, seeds 20,000–20,039 | 40 | 21 | 37.5%–67.1% | none: it shows the 60% gate fails for a Pirate without rollouts |
+| vs Rookie, the Pirate's prior leaving out the opponent's actual list | 100 | 100 | 96.3%–100% | ≥ 95% nightly |
+
+Why "a shallow Pirate", not "1 rollout": since the scoring fix (M5a-15), the first round of samples always completes, so a 1-rollout budget still scores every candidate once and is no longer weak (it beat the shallow Pirate 29/40 and the searchless baseline 40/40). The searchless baseline (the rollouts' quick policy alone, which never plays a card) lost 60/60, too weak to gate on. The shallow Pirate, which scores each move by the position right after it, is what a Pirate with broken rollouts becomes. Search speed: 5,523 rollouts per second; per own turn median 30 ms, 95th percentile 270 ms.
+
+### Game-plan assertions, with and without the biases (review M5a-08)
+
+40 Pirate-vs-Pirate games (Rocks vs Kaido, seats swapped, seeds 30,000–30,039). Finishing turns (the AI's search scores a win in at least half its samples, or it wins that turn) are not judged: with biases 77 of 252 Rocks turns and 17 of 236 Kaido turns; without, 59 of 251 and 17 of 238.
+
+| Seed | With biases | Without biases | Threshold |
+| --- | --- | --- | --- |
+| Rocks 1 Leader attacks from T2 | 135/135 | 145/152 (95%) | 90% |
+| Rocks 2 pays the reveal cost | 212/212 | 200/200 | 90% |
+| Rocks 3 OP17-118 on the first 10-DON!! turn | 4/4 | 10/11 | 80% |
+| Rocks 4 no Buckin while OP17-118 is in hand | 52/53 | 37/51 (73%) | 80% |
+| Rocks 5 Stussy targets the highest power | 19/19 | 7/16 (44%) | 80% |
+| Kaido 1 −2000 on a Character attacker when it changes the result | 37/45 (82%) | 29/31 (94%) | 80% |
+| Kaido 2 each −2000 on their turn cuts the Counter needed | 92/105 (88%) | 31/67 (46%) | 80% |
+| Kaido 3 a DON!!-adding Character by T3 | 39/40 | 37/40 | 80% |
+| Kaido 4 Ulti & Page One after the Leader's −2000 | 3/6 | 1/11 | 80% |
+| Kaido 5 a 9- or 10-cost Character by T5 | 22/23 | 16/18 | 60% |
+
+**What this shows.** Search alone plays Rocks 1–3 and Kaido 1, 3 and 5 as the guides say. Rocks 4 and 5 and Kaido 2 and 4 hold only because a bias encodes the guide's line; Kaido 2 is close to true by construction when its bias applies (it rewards the −2000 exactly when the attack lands). Per push, the planted tests run both ways (`ai/test/game-plan.test.ts`): search alone passes 7 of the 10 seeds' planted positions plus the Leader-attack hold, and the two that need their bias (the −2000 hold, the Ulti set-up) are marked as such. The biases cost no strength: Pirate with biases beat Pirate without 22/40 (39.8%–69.3%).
+
+### Heuristic A/B (review M5a-09)
+
+Current Pirate against a Pirate with one weight set back to its M5a value:
+
+| Variant | Seeds 60,000–60,039 | Seeds 70,000–70,099 | Together |
+| --- | --- | --- | --- |
+| `restedExposed` 0.35 (M5a's first value) | 15/40 | 60/100 | 75/140 (53.6%) |
+| `lifeMine` as in M5a, 1 → 0 cheaper than 2 → 1 | 15/40 | 57/100 | 72/140 (51.4%) |
+
+Neither difference is measurable at this size. The weights are kept for what they were changed for, not for strength: 0.15 because 0.35 ended a traced turn with attackers unused, and the new Life table because 0 Life must cost the most (strategy-concepts §3) and because at 2 Life a cheap Blocker must beat a hit (E12). Both are labelled as inference in `heuristic.ts`.
+
+### Pacing (review M5a-12)
+
+The per-push pacing check now uses iteration budgets, measures four AI turns (the late-game turn and the first three of a turn-1 game), and checks each turn on its own: the whole turn within 8 s, the board's own pacing within 8 s, and the time waiting on the worker within 1 s. It runs without CI's retry.
