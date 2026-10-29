@@ -2,6 +2,18 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-10-29 — Hotseat renders a public view while veiled
+
+Context: M3 review 1 found four severity-4 leaks in hotseat (M3-01 to M3-04). Behind the handoff curtain and during a veiled defence, the board, log, live regions, staged-Counter breakdown and rewind list all rendered from the private view of the incoming or defending seat.
+
+Decision: the app session builds a **public view** from the two player views, keeping only cards both seats can see, with no actions and generic decision wording. It also builds a **public log**, keeping only event fields both projections share. The hotseat screen renders the public view unless a seat's reveal is active (holding R, or press-and-hold on touch). The hotseat log and live regions are always public, and they are cleared when a reveal ends. Everything behind the curtain is `inert`. Rewind is off while a seat is veiled, and a hotseat rewind needs the other player's agreement. The cost: a player's own draws no longer appear by name in the hotseat log.
+
+Rejected:
+- masking each widget separately, which is how the leaks happened;
+- adding a public projection to the engine, which would change the frozen API for something the app can derive from two views.
+
+Also decided in this round: with a Blocker chosen, Enter blocks without playing Counters that would be wasted, and "Play anyway" is a separate button (M3-05). Carried: 44 px lane chips on tablets (M3-18), because they would use up the cross-platform height margin; the chips pass WCAG 2.5.8 through the spacing exception.
+
 ## 2026-10-28 — Tablet defence panel compacts instead of scrolling
 
 Context: at 1024×690, the defence panel body had only 19 px of free height on macOS. Linux fonts wrap more text, so the panel scrolled on CI, and it would scroll for Linux and Windows users too.

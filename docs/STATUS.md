@@ -86,14 +86,14 @@ Builder decisions are logged in DECISIONS (2026-10-28, M3). Not done in M3, by t
 - the "you look away" line;
 - the forced-colours double ring.
 
-**Review 1 (`docs/reviews/m3-review.md`, commit 0cfa8cc): FAIL.** 26 findings:
-- 4 at severity 4, all hotseat hidden-information leaks while the screen is veiled (M3-01 to M3-04);
-- 4 at severity 3: Counters staged before choosing a Blocker (M3-05), no touch reveal (M3-06), the curtain's focus trap (M3-07), battle maths not announced (M3-08);
-- 17 at severity 2 and one combined severity-1 row.
+**Review 1 (`docs/reviews/m3-review.md`, 0cfa8cc): FAIL.** It had 26 findings: 4 hotseat leaks at severity 4 and 4 findings at severity 3. **Fix round 1 is done** (405751b, c379298; CI run 40815495263 green):
+- the leaks are fixed at the root with a public view and log (see DECISIONS, 2026-10-29);
+- every severity-3 finding and most severity-2 findings are fixed;
+- carried: M3-18 (tablet lane chip size), M3-23 (the not-built list) and some severity-1 nits.
 
-Against the AI, the reviewer found no leak. The tablet defence change (`d4701b7`, CI green) was re-checked and is fine. The builder is on fix round 1. Then the same reviewer re-reviews, and M3 is marked done.
+The same reviewer is now on re-review 1. If interrupted, re-launch it. When it passes, mark M3 done.
 
-The screen-reader section of the review is a proxy built from aria snapshots and live-region transcripts. A real VoiceOver or NVDA pass is still owed: it goes with owner session S1, or to the owner sooner if possible.
+The screen-reader section of the review is a proxy. A real VoiceOver or NVDA pass is still owed: it goes with owner session S1, or to the owner sooner.
 
 **M4a has started in parallel** (engine and cards; it touches `app/` only at the end, after rebasing). The builder works on `main` in this order:
 1. the carried M2 findings (M2-17 to M2-23, M2-19 first);
