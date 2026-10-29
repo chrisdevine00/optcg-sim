@@ -101,6 +101,14 @@
 - **CI:** a 20-game strength smoke runs in `npm test` per push; the 200-game run, the 40-game game-plan run and a turn-1 pacing game at 1× run nightly (`npm run test:strength`, `nightly.yml`).
 - **Tests:** 1,010 unit tests (164 todo), 116 e2e runs passed (28 skipped by design).
 
+- **Review (`docs/reviews/m5a-review.md`, 2bab1d8): FAIL.**
+  - **Severity 4:** M5a-01, the "Why?" chip's presence depends on the AI's private option count, so it leaks Trigger and Counter facts.
+  - **Severity 3:**
+    - M5a-02: `projectForSearch` copies a non-viewer's decision verbatim. It is not live, since nothing sends such a skeleton to the worker.
+    - M5a-03: the AI's follow-up picks and grouped DON!! are not announced.
+  - **Severity 2:** 11 findings. Verified: Pirate made the same decision in all 1,307 hidden-card variations, E12, E13 and E16 match the doc, Pirate is the right default per flows F3a, and pacing is 6.7 s (not flaky).
+  - The builder is on fix round 1. Then re-review.
+
 ### Verification caveats
 - A worktree that symlinks the main tree's `node_modules` resolves `@optcg/*` to the main tree. Use `npm ci` in the worktree.
 - Set `E2E_PORT`, so you don't reuse another copy's preview server.
