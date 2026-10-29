@@ -1,0 +1,92 @@
+{
+  "leaderId": "OP17-039",
+  "archetypeId": "OP17-039-rocks",
+  "aiName": "Xebec",
+  "asOf": "2026-10-28",
+  "guide": "docs/content/archetypes/OP17-039.md",
+  "notes": [
+    "Written from the guide's 'Game plan by turn' and 'Playbook seeds'. Numbers are heuristic units (about one card); they are tuning, not strategy claims.",
+    "goFirst: strategy-concepts §10 [S17] 'the general default is to go second'; go second with counter-heavy and late-game decks. The guide gives no Rocks-specific seat advice.",
+    "cardValue: ongoing effects named in the guide's Defining cards (Newgate's +3000, Shiki's −3000, Stussy's [Activate: Main], Captain John's attack lock, Linlin's +1000 on defence)."
+  ],
+  "goFirst": false,
+  "digTargets": ["OP17-118", "OP17-048", "OP17-054", "OP17-046"],
+  "winConditions": ["OP17-118", "OP17-048"],
+  "cardValue": {
+    "OP17-118": 0.8,
+    "OP17-040": 0.6,
+    "OP17-048": 0.6,
+    "OP17-054": 0.4,
+    "OP17-044": 0.4,
+    "OP17-049": 0.3
+  },
+  "weights": { "hand": 1.15 },
+  "faceBias": { "early": 1.0, "mid": 1.05, "late": 1.15 },
+  "counterAggression": 1.0,
+  "mulligan": {
+    "early": { "costMin": 1, "costMax": 3, "min": 1 },
+    "planPieces": ["OP17-049", "OP17-046", "OP17-048", "OP17-040"],
+    "minCounters": 1,
+    "yesesToKeep": 2,
+    "requireEarlyGoingFirst": true
+  },
+  "biases": [
+    { "seed": 1, "kind": "attackWith", "card": "leader", "fromOwnTurn": 2, "bonus": 1.0 },
+    {
+      "seed": 2,
+      "kind": "acceptOptional",
+      "source": "OP17-039",
+      "ability": "reveal-draw",
+      "minHand": 2,
+      "bonus": 1.0
+    },
+    { "seed": 3, "kind": "play", "cards": ["OP17-118"], "bonus": 2.5 },
+    {
+      "seed": 4,
+      "kind": "avoidPlay",
+      "card": "OP08-051",
+      "whileInHand": "OP17-118",
+      "fromOwnTurn": 4,
+      "penalty": 1.5
+    },
+    {
+      "seed": 5,
+      "kind": "targetHighestPower",
+      "source": "OP17-054",
+      "ability": "on-play",
+      "bonus": 0.5
+    }
+  ],
+  "assertions": [
+    {
+      "seed": 1,
+      "text": "Leader attacks every turn from T2 in at least 90% of turns where it is active.",
+      "threshold": 0.9,
+      "source": "SH-XEB"
+    },
+    {
+      "seed": 2,
+      "text": "Pays the reveal cost on at least 90% of leader attacks when holding 2+ cards.",
+      "threshold": 0.9,
+      "source": "SH-XEB"
+    },
+    {
+      "seed": 3,
+      "text": "Plays OP17-118 on the first turn with 10 DON!! when it is in hand, and uses its On Play to put two Characters into play.",
+      "threshold": 0.8,
+      "source": "SH-XEB (inference from the curve)"
+    },
+    {
+      "seed": 4,
+      "text": "Does not play Buckin from hand while OP17-118 is in hand after T3.",
+      "threshold": 0.8,
+      "source": "SH-XEB"
+    },
+    {
+      "seed": 5,
+      "text": "Targets Stussy's On Play at the opponent's highest-power Character with base cost 6 or less.",
+      "threshold": 0.8,
+      "source": "inference"
+    }
+  ]
+}

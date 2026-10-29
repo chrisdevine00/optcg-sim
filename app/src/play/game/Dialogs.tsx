@@ -4,6 +4,7 @@
  * one moves focus into it; closing returns focus to the element that opened it.
  */
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { certaintyLabel } from '@optcg/ai';
 import type { PlayerId } from '@optcg/engine';
 import type { LogLine } from './text.ts';
 import type { G } from './ui.ts';
@@ -15,6 +16,8 @@ export type DialogState =
   | { kind: 'shortcuts' }
   | { kind: 'menu' }
   | { kind: 'concede' }
+  /** "Why?" for the AI move that starts at this log index (flows F10). */
+  | { kind: 'why'; index: number }
   /** Hotseat: a rewind changes the game for both players, so the other one agrees (flows F11.7). */
   | { kind: 'consent'; run: () => void };
 
@@ -39,6 +42,8 @@ export function Dialogs({
       return <RewindList g={g} lines={lines} onClose={onClose} />;
     case 'shortcuts':
       return <Shortcuts onClose={onClose} />;
+    case 'why':
+      return <WhyPanel g={g} index={dialog.index} lines={lines} onClose={onClose} />;
     case 'concede':
       return (
         <Modal title="Concede this game?" onClose={onClose}>
@@ -290,6 +295,7 @@ const KEYS: [string, string][] = [
   ['R', 'Rewind list'],
   ['S', 'Skip to my decision (opponent’s turn)'],
   ['K', 'Pause or resume the AI'],
+  ['W', 'Why? for the AI’s last move'],
   ['.', 'Next AI move (Step pace)'],
   ['[ ]', 'Slower / faster'],
   ['?', 'This sheet'],
@@ -388,6 +394,145 @@ function GameMenu({
             {label}
           </button>
         ))}
+      </div>
+    </>
+  );
+}
+
+/** "L15-lethal-math" → "Lethal math (L15)". */
+function lessonName(id: string): string {
+  const m = /^(L\d+)-(.*)$/.exec(id);
+  if (!m) return id;
+  const words = m[2]!.replace(/-/g, ' ');
+  return `${words.charAt(0).toUpperCase()}${words.slice(1)} (${m[1]})`;
+}
+
+/**
+ * "Why did it do that" (flows F10, learning-ui §2.3, §2.5): the AI move's stored `Explanation`,
+ * docked over the log like the trash viewer (the coach panel arrives with the learning slice).
+ * Standard verbosity: claim, certainty, line and outcome; "More" opens the evidence, the rule of
+ * thumb, the lesson and the sources. Everything in it is public information (flows D9).
+ */
+function WhyPanel({
+  g,
+  index,
+  lines,
+  onClose,
+}: {
+  g: G;
+  index: number;
+  lines: LogLine[];
+  onClose: () => void;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [more, setMore] = useState(false);
+  const close = useRef(onClose);
+  useEffect(() => {
+    close.current = onClose;
+  });
+  useEffect(() => {
+    ref.current?.querySelector<HTMLElement>('button')?.focus();
+    // Escape closes it wherever focus is (the board may move focus as the game updates).
+    const esc = (ev: KeyboardEvent) => {
+      if (ev.key !== 'Escape') return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      close.current();
+    };
+    document.addEventListener('keydown', esc);
+    return () => document.removeEventListener('keydown', esc);
+  }, []);
+  const e = g.ctl.whyAt(index);
+  const move = lines.find((l) => l.kind === 'move' && l.index === index);
+  const rail = g.L.rail;
+  return (
+    <>
+      <div
+        className="rail-scrim"
+        style={{ left: rail.x, width: rail.w, top: rail.head + rail.notice }}
+        aria-hidden="true"
+        onClick={onClose}
+      />
+      <div
+        ref={ref}
+        className="trash-viewer why-panel"
+        role="dialog"
+        aria-labelledby="why-title"
+        style={{
+          left: rail.x + 8,
+          width: rail.w - 16,
+          top: rail.head + rail.notice + 4,
+          height: rail.decision.top - rail.head - rail.notice - 8,
+        }}
+      >
+        <div className="modal-head">
+          <h2 id="why-title">Why?</h2>
+          <button
+            type="button"
+            className="iconbtn"
+            aria-label="Close Why (Escape)"
+            onClick={onClose}
+          >
+            ✕
+          </button>
+        </div>
+        <div className="why-body">
+          {move && <p className="subtle why-move">{move.text}</p>}
+          {!e ? (
+            <p>Only legal move.</p>
+          ) : (
+            <section aria-labelledby="why-claim">
+              <h3 id="why-claim" className="why-claim">
+                {e.claim}
+              </h3>
+              <p className="chip outline why-certainty">
+                <span aria-hidden="true">◇ </span>
+                {certaintyLabel(e.certainty, 'ai-why')}
+              </p>
+              {e.line && e.line.length > 0 && (
+                <ol className="why-line" aria-label="What it did">
+                  {e.line.map((m, i) => (
+                    <li key={i}>{m.text}</li>
+                  ))}
+                </ol>
+              )}
+              {e.outcome && <p className="why-outcome">{e.outcome}</p>}
+              {(e.evidence.length > 0 || e.nextTime) && (
+                <button
+                  type="button"
+                  className="linkbtn"
+                  aria-expanded={more}
+                  onClick={() => setMore(!more)}
+                >
+                  {more ? 'Less' : 'More: why it works'}
+                </button>
+              )}
+              {more && (
+                <>
+                  {e.evidence.length > 0 && (
+                    <ul className="why-evidence" aria-label="Why it works">
+                      {e.evidence.map((x, i) => (
+                        <li key={i}>{x.text}</li>
+                      ))}
+                    </ul>
+                  )}
+                  {e.nextTime && (
+                    <p className="why-next">
+                      <b>Next time:</b> {e.nextTime}
+                    </p>
+                  )}
+                  <p className="subtle">Lesson: {lessonName(e.lessonId)}</p>
+                  {e.sources.length > 0 && (
+                    <details>
+                      <summary>Sources</summary>
+                      <p className="subtle">{e.sources.join(' · ')}</p>
+                    </details>
+                  )}
+                </>
+              )}
+            </section>
+          )}
+        </div>
       </div>
     </>
   );

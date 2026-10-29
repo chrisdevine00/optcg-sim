@@ -99,7 +99,13 @@ export function rookie(view: PlayerView, ctx: RookieContext): Decided {
   }
 
   const [action] = pick(options, rng);
-  return decided(action, options, 'random', 'Rookie picked a random legal move.');
+  // flows F10.4: being honest about the tier teaches what the tier is.
+  return decided(
+    action,
+    options,
+    'random',
+    'Rookie picks a random legal move, except that it always blocks or counters a lethal attack.',
+  );
 }
 
 function decided(action: Action, _options: Action[], conceptId: string, claim: string): Decided {

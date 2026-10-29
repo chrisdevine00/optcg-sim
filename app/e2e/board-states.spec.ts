@@ -30,7 +30,7 @@ async function attackInLethal(page: Page) {
 test.describe('board states', () => {
   test('setup, mulligan, main, inspector and dialogs', async ({ page }, info) => {
     await serveArt(page);
-    await page.goto('./play?seed=42&first=me');
+    await page.goto('./play?seed=42&first=me&opp=rookie');
     await expect(page.getByRole('heading', { name: 'New game' })).toBeVisible();
     await check(page, info, 'setup');
     await page.getByRole('button', { name: 'Start game' }).click();

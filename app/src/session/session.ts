@@ -16,6 +16,7 @@ import {
   previewFromView,
   project,
   projectEvents,
+  projectForSearch,
   queries,
   reduce,
   replay,
@@ -35,6 +36,7 @@ import {
   type Reason,
   type RecordWithSnapshots,
   type ScenarioSpec,
+  type SearchView,
 } from '@optcg/engine';
 import { assignSlots, type Slots } from './slots.ts';
 
@@ -162,6 +164,14 @@ export class GameSession {
 
   view(player: PlayerId): ProjectedView {
     return project(this.state, player) as ProjectedView;
+  }
+
+  /**
+   * The AI seat's view plus its search skeleton (M5a, ADR 0005): every card hidden from that seat
+   * is stripped. This is all the AI worker receives.
+   */
+  searchView(player: PlayerId): SearchView {
+    return projectForSearch(this.state, player);
   }
 
   /** Who owes the current decision, or null when the game is over. */

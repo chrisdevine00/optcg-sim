@@ -66,6 +66,8 @@ export interface BoardProps {
   midline: ReactNode;
   oppActivity: string;
   oppThinking: boolean;
+  /** The AI tier's name for the identity chip ("Pirate"), when playing against the AI. */
+  oppTier?: string;
   arrow: { from: string; to: string; dashed: boolean; label?: string } | null;
   banner: string | null;
   label: string;
@@ -458,7 +460,7 @@ export function Board(b: BoardProps) {
             <span className="oppname">
               {b.names.hotseat
                 ? leaderName(view, op, b.cards)
-                : `${b.names.player[op]} · Rookie AI`}
+                : `${b.names.player[op]} · ${b.oppTier ?? 'Rookie'} AI`}
             </span>
             {b.oppThinking && <span className="chip outline">Thinking</span>}
           </span>

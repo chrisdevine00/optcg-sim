@@ -14,7 +14,10 @@ export async function serveArt(page: Page) {
 
 export async function startGame(page: Page, query: string) {
   await serveArt(page);
-  await page.goto(`./play?${query}&start=1`);
+  // The M3/M4a flows were built against Rookie; since M5a the setup default is Pirate, so a flow
+  // that names no opponent keeps Rookie explicitly (Pirate flows say opp=pirate).
+  const q = /(^|&)opp=/.test(query) ? query : `${query}&opp=rookie`;
+  await page.goto(`./play?${q}&start=1`);
   await expect(page.locator('#decision')).toBeVisible({ timeout: 15_000 });
 }
 

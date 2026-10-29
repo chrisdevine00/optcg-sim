@@ -760,6 +760,17 @@ export function Game({
         rememberFocus(t);
         setDialog({ kind: 'shortcuts' });
         return;
+      case 'w':
+      case 'W': {
+        // "Why?" for the AI's last move with a choice (flows F10).
+        const i = ctl.hotseat ? null : ctl.lastWhy();
+        if (i !== null) {
+          e.preventDefault();
+          rememberFocus(t);
+          setDialog({ kind: 'why', index: i });
+        }
+        return;
+      }
       case 'M':
       case 'm':
         e.preventDefault();
@@ -950,6 +961,11 @@ export function Game({
       className={`play ${L.density} ${L.rail.w < 320 ? 'narrow-rail' : ''}`}
       style={style}
       data-me={me}
+      // Measured AI turns (flows F21), for the pacing check: "turn:ms@speed/moves/thinkMs".
+      data-ai-turns={ctl.aiTurns
+        .filter((t) => !t.skipped)
+        .map((t) => `${t.turn}:${t.ms}@${t.speed}/${t.moves}/${t.thinkMs}`)
+        .join(' ')}
     >
       {!L.supported ? (
         <SmallScreen onHome={onHome} />
@@ -1038,6 +1054,7 @@ export function Game({
                   : ''
               }
               oppThinking={ctl.thinking}
+              oppTier={ctl.config.tier === 'pirate' ? 'Pirate' : 'Rookie'}
               arrow={arrow}
               banner={banner}
               label={boardLabel}
@@ -1064,6 +1081,11 @@ export function Game({
                   onLink={() => undefined}
                   onRewindTo={(i) => requestRewind(() => ctl.rewindTo(i))}
                   canRewind={!view.result && ctl.canRewind()}
+                  hasWhy={(i) => ctl.whyAt(i) !== null}
+                  onWhy={(i) => {
+                    rememberFocus();
+                    setDialog({ kind: 'why', index: i });
+                  }}
                 />
               </div>
               <RailHeader

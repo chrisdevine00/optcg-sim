@@ -4,10 +4,10 @@
  * send view actions to it; it never decides legality.
  */
 import { SCRIPTS, type Card } from '@optcg/cards';
-import type { AiTier } from '@optcg/ai';
-import type { Action, PlayerId, ProjectedView } from '@optcg/engine';
+import { priorCardIds, type AiTier, type Explanation, type GameInfo } from '@optcg/ai';
+import type { Action, PlayerId, PlayerView, ProjectedView, SearchView } from '@optcg/engine';
 import { GameSession, newIntentId, type Move, type Start } from '../../session/index.ts';
-import { AiClient } from './ai-client.ts';
+import { AiClient, type AiDecision } from './ai-client.ts';
 import { readsHiddenZone, type VeiledProps } from './veiled.tsx';
 import { describeMove, other, type LogLine, type Names } from './text.ts';
 
@@ -33,6 +33,23 @@ export interface GameConfig {
   aiCardIds?: string[];
   /** Start with AI playback paused (K), e.g. to read the board first. */
   startPaused?: boolean;
+  /** The AI seat's own main deck (it knows its own list; ARCHITECTURE §4.3). */
+  aiDeck?: string[];
+  /** Tests: an in-process stand-in for the worker. */
+  aiPort?: (cards: Card[], game: GameInfo) => AiPort;
+}
+
+/** What the controller needs from the AI worker client (AiClient, or a test double). */
+export interface AiPort {
+  planTurn(view: SearchView, seed: number): { id: number; result: Promise<void> };
+  decide(
+    view: PlayerView | SearchView,
+    tier: AiTier,
+    seed: number,
+  ): { id: number; result: Promise<AiDecision> };
+  reveal(cards: Iterable<Card>): void;
+  cancel(id: number): void;
+  terminate(): void;
 }
 
 export interface Announcement {
@@ -50,6 +67,8 @@ const T = {
   considering: 600,
   autoStep: 400,
   thinkingAfter: 300,
+  /** The AI's Refresh + Draw + DON!! segment; its turn plan starts with it (board.md §5.2). */
+  turnStart: 700,
 };
 
 const reducedMotion = () =>
@@ -57,17 +76,37 @@ const reducedMotion = () =>
 
 class Cancelled extends Error {}
 
-/** The AI worker's `init` payload: its own deck's cards only (review M3-09). */
-export function aiInitCards(cards: ReadonlyMap<string, Card>, aiDeck: readonly string[]): Card[] {
-  const ids = new Set(aiDeck);
+/**
+ * The AI worker's `init` payload (review M3-09): its own deck's cards and the public archetype
+ * prior for its opponent's Leader (ARCHITECTURE §4.3), never the human's list.
+ */
+export function aiInitCards(
+  cards: ReadonlyMap<string, Card>,
+  aiDeck: readonly string[],
+  opponentLeader?: string,
+): Card[] {
+  const ids = new Set([
+    ...aiDeck,
+    ...(opponentLeader ? [opponentLeader, ...priorCardIds(opponentLeader)] : []),
+  ]);
   return [...cards.values()].filter((c) => ids.has(c.id));
+}
+
+/** Card ids a view lets its player identify (all public to that player). */
+function visibleCardIds(v: ProjectedView): Set<string> {
+  const out = new Set<string>();
+  for (const p of ['p1', 'p2'] as const)
+    for (const z of Object.values(v.zones[p])) for (const c of z) if (c.card) out.add(c.card);
+  for (const c of [...v.resolving, ...v.looking]) if (c.card) out.add(c.card);
+  for (const id of Object.values(v.known)) out.add(id);
+  return out;
 }
 
 export class GameController {
   readonly session: GameSession;
   readonly cards: Map<string, Card>;
   readonly config: GameConfig;
-  private ai: AiClient | null;
+  private ai: AiPort | null;
   private listeners = new Set<() => void>();
   version = 0;
   private gen = 0;
@@ -126,8 +165,22 @@ export class GameController {
           >);
     this.session = new GameSession((id) => cards.get(id), start, seats);
     this.seat = config.mode === 'hotseat' ? (this.session.decider() ?? 'p1') : config.human;
-    this.ai =
-      config.mode === 'ai' ? new AiClient(aiInitCards(cards, config.aiCardIds ?? [])) : null;
+    this.ai = null;
+    if (config.mode === 'ai') {
+      const aiSeat = other(config.human);
+      const v = this.session.view(aiSeat);
+      const leader = v.zones[aiSeat].leader[0]?.card ?? '';
+      const opponentLeader = v.zones[config.human].leader[0]?.card ?? '';
+      const game: GameInfo = {
+        tier: config.tier,
+        ownDeck: config.aiDeck ?? (config.aiCardIds ?? []).filter((id) => id !== leader),
+        leader,
+        opponentLeader,
+        budgets: 'ms',
+      };
+      const init = aiInitCards(cards, config.aiCardIds ?? [], opponentLeader);
+      this.ai = config.aiPort ? config.aiPort(init, game) : new AiClient(init, game);
+    }
     if (config.mode === 'hotseat') {
       this.curtainFor = this.seat;
       this.curtainSeen[this.seat] = this.turnKey();
@@ -440,7 +493,14 @@ export class GameController {
             continue;
           }
         }
-        // The human owes a real decision: Skip stops here (UX-R3).
+        // The human owes a real decision: Skip stops here (UX-R3). During the AI's turn, the
+        // time the human takes is not the AI's (flows F21).
+        if (
+          this.aiTurn &&
+          this.aiTurn.humanSince === null &&
+          this.session.view(d).turn.activePlayer !== d
+        )
+          this.aiTurn.humanSince = performance.now();
         this.stopSkipping('decision');
         this.updateSeat(d);
         this.announceDecision(d);
@@ -462,12 +522,124 @@ export class GameController {
     return this.session.eventTypesFrom(index).includes('BattleEnded');
   }
 
+  // -------------------------------------------------------------------------------------------
+  // The AI (ARCHITECTURE §4.1, §5; flows F10, F21)
+  // -------------------------------------------------------------------------------------------
+
+  /** Explanations of the AI's moves, by the action index where each move began (flows F10). */
+  private readonly aiWhy = new Map<number, Explanation>();
+  /** The AI's last move: its intent and span, so an effect's follow-up picks join it. */
+  private lastAi: { intentId: string; start: number; end: number; donTarget?: string } | null =
+    null;
+  /** A decision requested ahead, while the previous move animated (ARCHITECTURE §4.1). */
+  private prefetched: { at: number; id: number; result: Promise<AiDecision> } | null = null;
+  /** Measured AI turns (flows F21): wall-clock ms, the human's own decisions excluded. */
+  readonly aiTurns: {
+    turn: number;
+    ms: number;
+    speed: Speed;
+    skipped: boolean;
+    moves: number;
+    thinkMs: number;
+  }[] = [];
+  private aiTurn: {
+    turn: number;
+    start: number;
+    humanMs: number;
+    humanSince: number | null;
+    skipped: boolean;
+    /** Moves shown, and time the board waited on the worker. */
+    moves: number;
+    thinkMs: number;
+  } | null = null;
+
+  /** The stored explanation of the AI move that starts at this log index, if it had a choice. */
+  whyAt(index: number): Explanation | null {
+    return index < this.session.actionCount ? (this.aiWhy.get(index) ?? null) : null;
+  }
+
+  /** The log index of the AI's most recent move that has an explanation (W, flows F10). */
+  lastWhy(): number | null {
+    let best: number | null = null;
+    for (const k of this.aiWhy.keys())
+      if (k < this.session.actionCount && (best === null || k > best)) best = k;
+    return best;
+  }
+
+  /** The AI seat's own view: a search view for the searching tiers. It is all the worker gets. */
+  private aiView(d: PlayerId): PlayerView | SearchView {
+    const v = this.config.tier === 'rookie' ? this.session.view(d) : this.session.searchView(d);
+    // Public card data for every card the AI can now identify (its view shows them anyway).
+    const cards: Card[] = [];
+    for (const id of visibleCardIds(v as ProjectedView)) {
+      const c = this.cards.get(id);
+      if (c) cards.push(c);
+    }
+    this.ai!.reveal(cards);
+    return v;
+  }
+
+  private seedAt(at: number): number {
+    return (this.session.seed * 2654435761 + at * 40503) >>> 0;
+  }
+
+  private requestDecision(d: PlayerId): { id: number; result: Promise<AiDecision> } {
+    const at = this.session.actionCount;
+    const p = this.prefetched;
+    this.prefetched = null;
+    if (p && p.at === at) return p;
+    if (p) this.ai!.cancel(p.id);
+    return this.ai!.decide(this.aiView(d), this.config.tier, this.seedAt(at));
+  }
+
+  /** Ask for the AI's next decision now, so it searches while the last move animates. */
+  private prefetch(d: PlayerId): void {
+    if (this.prefetched || this.session.decider() !== d) return;
+    const v = this.session.view(d);
+    if (v.result || v.actions.filter((a) => a.type !== 'concede').length <= 1) return;
+    const at = this.session.actionCount;
+    const r = this.requestDecision(d);
+    r.result.catch(() => undefined);
+    this.prefetched = { at, id: r.id, result: r.result };
+  }
+
   private async aiStep(d: PlayerId): Promise<void> {
     const view = this.session.view(d);
     const kind = view.decision?.kind ?? 'main';
     const options = view.actions.filter((a) => a.type !== 'concede');
-    const beat = kind !== 'main';
+    // The uniform considering beat is for the AI's defensive windows, on the player's turn (flows
+    // G5, board.md §5.2); its own effect choices on its turn are part of its moves.
+    const beat = kind !== 'main' && view.turn.activePlayer !== d;
+    const now = () => performance.now();
+    // A new AI turn: plan it while its Refresh, Draw and DON!! play (board.md §5.2).
+    if (kind === 'main' && view.turn.activePlayer === d && this.aiTurn?.turn !== view.turn.number) {
+      this.aiTurn = {
+        turn: view.turn.number,
+        start: now(),
+        humanMs: 0,
+        humanSince: null,
+        skipped: this.skipping,
+        moves: 0,
+        thinkMs: 0,
+      };
+      if (this.config.tier !== 'rookie' && options.length > 1) {
+        const plan = this.ai!.planTurn(
+          this.aiView(d) as SearchView,
+          this.seedAt(this.session.actionCount),
+        );
+        plan.result.catch(() => undefined);
+        this.prefetch(d);
+      }
+      await this.gate();
+      await this.wait(T.turnStart);
+    }
+    if (this.aiTurn && this.aiTurn.humanSince !== null) {
+      this.aiTurn.humanMs += now() - this.aiTurn.humanSince;
+      this.aiTurn.humanSince = null;
+    }
     await this.gate();
+    // The request starts before the considering beat, so the search runs during it.
+    const pending = options.length > 1 ? this.requestDecision(d) : null;
     if (beat && !this.skipping) {
       // The uniform considering beat (flows G5): the same time whether or not it had options.
       this.considering = kind;
@@ -476,18 +648,21 @@ export class GameController {
       this.considering = null;
     }
     let action: Action;
-    if (options.length === 1) action = options[0]!;
+    let explanation: Explanation | null = null;
+    if (!pending) action = options[0]!;
     else {
       const timer = setTimeout(() => {
         this.thinking = true;
         this.activity = `${this.config.names[d]} is thinking…`;
         this.bump();
       }, T.thinkingAfter);
-      const seed = (this.session.seed * 2654435761 + this.session.actionCount * 40503) >>> 0;
-      const req = this.ai!.decide(view, this.config.tier, seed);
-      this.aiRequest = req.id;
+      this.aiRequest = pending.id;
+      const t0 = now();
       try {
-        action = (await req.result).action;
+        const r = await pending.result;
+        if (this.aiTurn && view.turn.activePlayer === d) this.aiTurn.thinkMs += now() - t0;
+        action = r.action;
+        explanation = r.explanation;
       } catch (e) {
         clearTimeout(timer);
         if (e instanceof Error && e.message === 'cancelled') throw new Cancelled();
@@ -508,7 +683,12 @@ export class GameController {
           : action.type === 'block' && action.blocker
             ? action.blocker
             : null;
-    if (src && !this.skipping) {
+    // DON!! given to the same card in a row is one move (board.md §5.2 "give DON!! group").
+    const donRun =
+      action.type === 'giveDon' &&
+      this.lastAi?.end === this.session.actionCount &&
+      this.lastAi.donTarget === action.target;
+    if (src && !this.skipping && !donRun) {
       const h = this.session.translate(d, src, this.me);
       if (h) {
         this.highlight = {
@@ -525,17 +705,48 @@ export class GameController {
       }
     }
     const before = this.session.actionCount;
-    const r = this.session.apply(d, action, action.intentId ?? newIntentId());
+    // An effect's follow-up picks belong to the move that started the effect (ARCH §2.3).
+    const follow =
+      ((kind === 'choose' || kind === 'order') && this.lastAi?.end === before) || donRun;
+    const intentId = follow ? this.lastAi!.intentId : (action.intentId ?? newIntentId());
+    const r = this.session.apply(d, action, intentId);
     this.highlight = null;
     if (!r.ok) throw new Error(r.error ?? 'The AI chose an action the engine refused.');
+    const moveStart = follow ? this.lastAi!.start : before;
+    this.lastAi = {
+      intentId,
+      start: moveStart,
+      end: this.session.actionCount,
+      ...(action.type === 'giveDon' ? { donTarget: action.target } : {}),
+    };
+    if (this.aiTurn && view.turn.activePlayer === d && !follow) this.aiTurn.moves++;
+    // "Why?" only where the AI had a choice (flows F10.3).
+    if (explanation && options.length > 1 && !this.aiWhy.has(moveStart))
+      this.aiWhy.set(moveStart, explanation);
     this.afterApply(before, d, false);
+    // The next decision is the AI's too: start its search now, during this move's animation.
+    this.prefetch(d);
     const attackOnHuman = action.type === 'attack';
     if (kind === 'main') {
       if (action.type === 'attack') await this.wait(T.move, { attackOnHuman });
+      // A DON!! group shows as one move: the DON!! travel in, and the attack that follows shows
+      // the new power; each further DON!! of the group only ticks.
+      else if (action.type === 'giveDon') await this.wait(donRun ? T.highlight : T.move);
       else if (action.type !== 'endTurn') await this.wait(T.move + T.dwell, { dwell: true });
       else await this.wait(300);
     }
     if (this.battleEndedSince(before)) await this.wait(T.damage + T.dwellAttack, { dwell: true });
+    if (action.type === 'endTurn' && this.aiTurn && this.aiTurn.turn === view.turn.number) {
+      const t = this.aiTurn;
+      this.aiTurns.push({
+        turn: t.turn,
+        ms: Math.round(now() - t.start - t.humanMs),
+        speed: this.speed,
+        skipped: t.skipped || this.skipping,
+        moves: t.moves,
+        thinkMs: Math.round(t.thinkMs),
+      });
+    }
     if (this.speed === 'step' && !this.skipping && kind === 'main') {
       this.stepWaiting = true;
       this.bump();
@@ -831,6 +1042,10 @@ export class GameController {
     this.pumping = false;
     if (this.aiRequest !== null) this.ai?.cancel(this.aiRequest);
     this.aiRequest = null;
+    if (this.prefetched) this.ai?.cancel(this.prefetched.id);
+    this.prefetched = null;
+    this.lastAi = null;
+    this.aiTurn = null;
     this.wake?.();
     this.highlight = null;
     this.considering = null;
@@ -866,6 +1081,7 @@ export class GameController {
       }
     }
     this.restart();
+    for (const k of [...this.aiWhy.keys()]) if (k >= this.session.actionCount) this.aiWhy.delete(k);
     this.bump();
     void this.pump();
     return true;

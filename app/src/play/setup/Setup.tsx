@@ -1,5 +1,5 @@
 /**
- * Game setup (flows F3a): your deck, the opponent (Rookie AI or a second player at this device),
+ * Game setup (flows F3a): your deck, the opponent (Pirate or Rookie AI, or a second player at this device),
  * who chooses first, and game options. Every choice has a default, so Start is one click away.
  * URL parameters prefill it for tests and shared links: `?p1=OP17-039&p2=OP17-058&opp=hotseat
  * &first=me&seed=42&speed=4&skip=1&scenario=defend&start=1`.
@@ -9,10 +9,13 @@ import type { Speed } from '../game/controller.ts';
 import { ARCHETYPES, automationLine, deckById, DECKS, deckByLeader } from './decks.ts';
 import { SCENARIOS } from './scenarios.ts';
 
+/** The opponent: an AI tier, or a second player at this device. */
+export type Opponent = 'pirate' | 'rookie' | 'hotseat';
+
 export interface SetupChoice {
   myDeck: string;
   theirDeck: string;
-  opponent: 'rookie' | 'hotseat';
+  opponent: Opponent;
   first: 'roll' | 'me' | 'opp';
   names: [string, string];
   autoSkip: boolean;
@@ -31,7 +34,7 @@ function fromUrl(): Partial<SetupChoice> & { start?: boolean } {
   if (p1) out.myDeck = (DECKS.find((d) => d.id === p1) ?? deckByLeader(p1))?.id;
   if (p2) out.theirDeck = (DECKS.find((d) => d.id === p2) ?? deckByLeader(p2))?.id;
   const opp = q.get('opp');
-  if (opp === 'hotseat' || opp === 'rookie') out.opponent = opp;
+  if (opp === 'hotseat' || opp === 'rookie' || opp === 'pirate') out.opponent = opp;
   const first = q.get('first');
   if (first === 'me' || first === 'opp' || first === 'roll') out.first = first;
   const seed = q.get('seed');
@@ -65,7 +68,7 @@ export function Setup({
   const [theirDeck, setTheirDeck] = useState(
     url.theirDeck ?? DECKS.find((d) => d.leader === 'OP17-058')?.id ?? DECKS[3]!.id,
   );
-  const [opponent, setOpponent] = useState<'rookie' | 'hotseat'>(url.opponent ?? 'rookie');
+  const [opponent, setOpponent] = useState<Opponent>(url.opponent ?? 'pirate');
   const [first, setFirst] = useState<'roll' | 'me' | 'opp'>(url.first ?? 'roll');
   const [names, setNames] = useState<[string, string]>(['Player 1', 'Player 2']);
   const [autoSkip, setAutoSkip] = useState(url.autoSkip ?? true);
@@ -121,6 +124,20 @@ export function Setup({
         <fieldset className="setup-col">
           <legend>Opponent</legend>
           <div className="radio-list">
+            <label className="check">
+              <input
+                type="radio"
+                name="opp"
+                checked={opponent === 'pirate'}
+                onChange={() => setOpponent('pirate')}
+              />
+              <span>
+                <b>Pirate AI</b>{' '}
+                <span className="subtle">
+                  · plays its deck’s game plan one turn at a time, and explains each move
+                </span>
+              </span>
+            </label>
             <label className="check">
               <input
                 type="radio"

@@ -89,6 +89,8 @@ export function GameLog({
   onLink,
   onRewindTo,
   canRewind,
+  hasWhy,
+  onWhy,
 }: {
   top: number;
   height: number;
@@ -98,6 +100,9 @@ export function GameLog({
   onLink: (card: string | null) => void;
   onRewindTo: (index: number) => void;
   canRewind: boolean;
+  /** Does the AI move starting at this index have an explanation (flows F10)? */
+  hasWhy?: (index: number) => boolean;
+  onWhy?: (index: number) => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [follow, setFollow] = useState(true);
@@ -135,8 +140,18 @@ export function GameLog({
         }}
       >
         <ol className="log-ol">
-          {shown.map((l, i) =>
-            l.kind === 'turn' ? (
+          {shown.map((l, i) => {
+            // One "Why?" per AI move, on its first line (flows F10; board.md §3.11).
+            const why =
+              !ticker &&
+              l.kind === 'move' &&
+              !names.hotseat &&
+              l.actor !== null &&
+              l.actor !== names.me &&
+              !l.auto &&
+              shown.findIndex((x) => x.kind === 'move' && x.index === l.index) === i &&
+              !!hasWhy?.(l.index);
+            return l.kind === 'turn' ? (
               <li key={i} className="log-turn">
                 {l.text}
               </li>
@@ -164,9 +179,19 @@ export function GameLog({
                     ⟲
                   </button>
                 )}
+                {why && (
+                  <button
+                    type="button"
+                    className="log-why"
+                    aria-label={`Why? ${l.text}`}
+                    onClick={() => onWhy?.(l.index)}
+                  >
+                    Why?
+                  </button>
+                )}
               </li>
-            ),
-          )}
+            );
+          })}
         </ol>
       </div>
       {!follow && fresh > 0 && (

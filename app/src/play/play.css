@@ -864,6 +864,55 @@
   background: var(--color-opponent);
   color: var(--color-on-opponent);
 }
+.log-why {
+  min-height: 24px;
+  margin-left: 4px;
+  padding: 0 8px;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  vertical-align: middle;
+}
+.log-why:hover,
+.log-why:focus-visible {
+  color: var(--color-text);
+  border-color: var(--color-focus);
+}
+.why-body {
+  overflow: auto;
+  padding: 8px 12px 12px;
+  font-size: var(--text-sm);
+}
+.why-body .why-move {
+  margin: 0 0 6px;
+}
+.why-claim {
+  margin: 0 0 6px;
+  font: var(--weight-semibold) var(--text-md) / 20px var(--font-ui);
+}
+.why-certainty {
+  display: inline-block;
+  margin: 0 0 8px;
+}
+.why-line,
+.why-evidence {
+  margin: 0 0 8px;
+  padding-left: 20px;
+}
+.why-line li,
+.why-evidence li {
+  margin: 2px 0;
+}
+.why-outcome {
+  margin: 0 0 8px;
+  font-weight: var(--weight-semibold);
+}
+.why-next {
+  margin: 8px 0;
+}
 .log-rw {
   min-width: 24px;
   height: 24px;

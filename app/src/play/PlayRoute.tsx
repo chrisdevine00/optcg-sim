@@ -10,7 +10,8 @@ import { navigate } from '../router.tsx';
 import { GameController, type GameConfig, type Speed } from './game/controller.ts';
 import { Game } from './game/Game.tsx';
 import { Setup, type SetupChoice } from './setup/Setup.tsx';
-import { deckById, loadCards } from './setup/decks.ts';
+import { deckById, deckByLeader, loadCards } from './setup/decks.ts';
+import { priorCardIds } from '@optcg/ai';
 import { SCENARIOS, scenarioCardIds } from './setup/scenarios.ts';
 import './play.css';
 
@@ -54,7 +55,7 @@ async function startGame(choice: SetupChoice): Promise<GameController> {
     mode: choice.opponent === 'hotseat' ? 'hotseat' : 'ai',
     human: 'p1',
     names,
-    tier: 'rookie',
+    tier: choice.opponent === 'rookie' ? 'rookie' : 'pirate',
     autoSkip: choice.autoSkip,
     alwaysSkip: choice.alwaysSkip,
     speed: choice.speed,
@@ -62,10 +63,19 @@ async function startGame(choice: SetupChoice): Promise<GameController> {
   };
   if (choice.scenario) {
     const sc = scenarioFrom(choice.scenario);
-    const cards = await loadCards(scenarioCardIds(sc));
     const { mode, ...spec } = sc;
+    const p1Leader = typeof sc.p1.leader === 'string' ? sc.p1.leader : sc.p1.leader.card;
+    const p2Leader = typeof sc.p2.leader === 'string' ? sc.p2.leader : sc.p2.leader.card;
+    // The AI's own list (its decklist, or its archetype's first list), and the public prior for
+    // the human's Leader (ARCHITECTURE §4.3).
+    const aiDeck = sc.p2.decklist ?? deckByLeader(p2Leader)?.spec.main ?? [];
+    const cards = await loadCards([...scenarioCardIds(sc), ...aiDeck, ...priorCardIds(p1Leader)]);
     config.mode = mode;
-    config.aiCardIds = scenarioCardIds({ ...sc, p1: { leader: sc.p2.leader }, p2: sc.p2 });
+    config.aiCardIds = [
+      ...scenarioCardIds({ ...sc, p1: { leader: sc.p2.leader }, p2: sc.p2 }),
+      ...aiDeck,
+    ];
+    config.aiDeck = aiDeck;
     if (mode === 'hotseat')
       config.names = { p1: choice.names[0] || 'Player 1', p2: choice.names[1] || 'Player 2' };
     else
@@ -81,9 +91,12 @@ async function startGame(choice: SetupChoice): Promise<GameController> {
     ...mineDeck.spec.main,
     theirDeck.spec.leader,
     ...theirDeck.spec.main,
+    // The AI's public prior for the human's Leader (ARCHITECTURE §4.3).
+    ...priorCardIds(mineDeck.spec.leader),
   ]);
   if (config.mode === 'ai') config.names.p2 = cards.get(theirDeck.leader)?.name ?? 'Opponent';
   config.aiCardIds = [theirDeck.spec.leader, ...theirDeck.spec.main];
+  config.aiDeck = theirDeck.spec.main;
   const chooser: PlayerId | undefined =
     choice.first === 'me' ? 'p1' : choice.first === 'opp' ? 'p2' : undefined;
   return new GameController(
