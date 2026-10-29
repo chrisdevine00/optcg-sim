@@ -2,9 +2,11 @@
 import { describe, expect, it } from 'vitest';
 import {
   createFromScenario,
+  IllegalAction,
   InvalidSetup,
   legalActions,
   queries,
+  reduce,
   whyNot,
 } from '../../src/index.ts';
 import { DefTable } from '../../src/defs.ts';
@@ -149,6 +151,40 @@ describe('activation windows (CR 6-5-4, 8-1-3-2, 10-2-2-1)', () => {
   });
 });
 
+describe('malformed actions (M2-06)', () => {
+  it('a concession from no player or an unknown player throws IllegalAction', () => {
+    const g = scenario({ p1: { leader: LUFFY }, p2: { leader: KAIDO } });
+    expect(() => reduce(g.state, { type: 'concede', player: 'p3' } as never)).toThrow(
+      IllegalAction,
+    );
+    expect(() => reduce(g.state, { type: 'concede' } as never)).toThrow(IllegalAction);
+    expect(queries.result(g.state)).toBeNull();
+  });
+
+  it('a pick with a null or malformed choice throws IllegalAction, and whyNot explains', () => {
+    const g = scenario({
+      p1: {
+        leader: LUFFY,
+        characters: times(5, RED_1),
+        hand: [RED_1],
+        costArea: { active: 1, rested: 0 },
+      },
+      p2: { leader: KAIDO },
+    });
+    g.act({ type: 'playCard', card: g.find('p1', 'hand', RED_1) });
+    expect(() => reduce(g.state, { type: 'pick', choice: null, player: 'p1' } as never)).toThrow(
+      IllegalAction,
+    );
+    expect(() =>
+      reduce(g.state, { type: 'pick', choice: { x: 1 }, player: 'p1' } as never),
+    ).toThrow(IllegalAction);
+    expect(whyNot(g.state, 'p1', { type: 'pick', choice: null } as never)).not.toBeNull();
+    expect(() => reduce(g.state, { type: 'nonsense', player: 'p1' } as never)).toThrow(
+      IllegalAction,
+    );
+  });
+});
+
 describe('scenario validation (ADR 0013)', () => {
   const base = {
     seed: 1,
@@ -165,6 +201,8 @@ describe('scenario validation (ADR 0013)', () => {
       { p1: { leader: LUFFY, costArea: { active: 11, rested: 0 } }, p2: { leader: KAIDO } },
       { p1: { leader: LUFFY, stage: { card: 'OP03-020', don: 1 } }, p2: { leader: KAIDO } },
       { p1: { leader: 'OP15-058', costArea: { active: 7, rested: 0 } }, p2: { leader: KAIDO } },
+      // M2-09: the DON!! total must equal the Leader's DON!! deck size.
+      { p1: { leader: LUFFY, donDeck: 3 }, p2: { leader: KAIDO } },
     ];
     for (const spec of bad)
       expect(() => createFromScenario({ ...base, ...spec })).toThrow(InvalidSetup);

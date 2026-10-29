@@ -138,7 +138,8 @@ export function moveCard(d: Draft, id: InstanceId, to: Zone, opts: MoveOptions =
     newInstance: nid,
     wasFaceUp,
     faceUp: w.faceUp,
-    keys: { [id]: oldKey, [nid]: w.key },
+    // By field: the old key for `instance`, the new one for `newInstance` (M2-03).
+    keys: { instance: oldKey, newInstance: w.key },
   };
   if (lki) e.lki = lki;
   if (opts.cause) e.cause = opts.cause;
@@ -336,21 +337,13 @@ export function expireModifiers(d: Draft, pred: (m: Modifier) => boolean, step: 
 // Rule processing (CR 9)
 // ---------------------------------------------------------------------------------------------
 
-const deckTouched = new WeakMap<Draft, Set<PlayerId>>();
-const damagedAtZero = new WeakMap<Draft, Set<PlayerId>>();
-
 function touchDeck(d: Draft, p: PlayerId): void {
-  if (d.ro(p).deck.length > 0) return;
-  let set = deckTouched.get(d);
-  if (!set) deckTouched.set(d, (set = new Set()));
-  set.add(p);
+  if (d.ro(p).deck.length === 0) d.deckTouched.add(p);
 }
 
 /** Leader damaged with 0 Life (CR 1-2-1-1-1). */
 export function markDamagedAtZero(d: Draft, p: PlayerId): void {
-  let set = damagedAtZero.get(d);
-  if (!set) damagedAtZero.set(d, (set = new Set()));
-  set.add(p);
+  d.damagedAtZero.add(p);
 }
 
 /**
@@ -360,16 +353,16 @@ export function markDamagedAtZero(d: Draft, p: PlayerId): void {
  */
 export function ruleProcessing(d: Draft): void {
   if (d.s.result) return;
-  const dt = deckTouched.get(d);
-  const dz = damagedAtZero.get(d);
-  if (!dt?.size && !dz?.size) return;
+  const dt = d.deckTouched;
+  const dz = d.damagedAtZero;
+  if (!dt.size && !dz.size) return;
   const losers: { p: PlayerId; reason: string }[] = [];
   for (const p of [d.s.active, other(d.s.active)]) {
-    if (dz?.has(p)) losers.push({ p, reason: 'damage at 0 Life' });
-    else if (dt?.has(p) && d.ro(p).deck.length === 0) losers.push({ p, reason: 'deck out' });
+    if (dz.has(p)) losers.push({ p, reason: 'damage at 0 Life' });
+    else if (dt.has(p) && d.ro(p).deck.length === 0) losers.push({ p, reason: 'deck out' });
   }
-  dt?.clear();
-  dz?.clear();
+  dt.clear();
+  dz.clear();
   if (losers.length === 0) return;
   if (losers.length === 2) {
     endGame(d, { draw: 'bothLost' });

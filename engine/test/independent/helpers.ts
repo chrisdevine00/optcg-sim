@@ -188,6 +188,20 @@ export function passBlock(g: TestGame): void {
 /** Finish the Counter Step without countering, if a Counter Step decision is pending. */
 export function passCounter(g: TestGame): void {
   if (decision(g)?.kind === 'counter') act(g, { type: 'endCounter' });
+  takeDamage(g);
+}
+
+/**
+ * Add Life cards to hand at each damage decision that offers no [Trigger] to activate. The engine
+ * asks for every Life card taken, so the opponent cannot tell [Trigger] cards apart (M2-01).
+ */
+export function takeDamage(g: TestGame): void {
+  while (
+    decision(g)?.kind === 'trigger' &&
+    !g.legal().some((a) => a.type === 'trigger' && a.activate)
+  ) {
+    act(g, { type: 'trigger', activate: false });
+  }
 }
 
 /** The defender neither blocks nor counters. */

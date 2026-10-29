@@ -175,6 +175,15 @@ export type Frame =
     }
   | { f: 'loop' };
 
+/** An auto effect that has activated and waits to resolve (CR 8-6). */
+export interface PendingEffect {
+  card: InstanceId;
+  cardId: CardId;
+  ability: string;
+  controller: PlayerId;
+  timing: string;
+}
+
 /** The pending decision plus what `legalActions` needs to enumerate it. */
 export interface DecisionState {
   kind: DecisionKind;
@@ -239,6 +248,14 @@ export interface State {
   result: GameResult | null;
   mods: Modifier[];
   nextMod: number;
+  /**
+   * Auto effects waiting to resolve, in resolution order (CR 8-6, ARCHITECTURE §2.2
+   * `pendingTriggers`). One queue: each batch of simultaneous triggers is appended turn player's
+   * first, so the non-turn player's pending effects resolve before a new turn-player effect
+   * (CR 8-6-1) and C triggered by A waits behind pending B (CR 8-6-1-1). It drains only when no
+   * activation, damage processing or K.O. is in progress (CR 8.6.3, 8-6-2).
+   */
+  pending: PendingEffect[];
   /** Once Per Turn marks, `${instance}/${abilityId}` (E-D9). Cleared when the turn passes. */
   oncePerTurn: string[];
   setup: SetupFacts;

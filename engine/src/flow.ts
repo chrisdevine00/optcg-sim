@@ -70,16 +70,18 @@ export function advance(d: Draft): void {
   let steps = 0;
   let seen: Set<string> | null = null;
   while (!d.s.result && !d.s.decision) {
-    const f = top(d);
-    if (!f) throw new Error('Engine stack is empty with no decision pending');
-    runFrame(d, f);
+    if (!drainPending(d)) {
+      const f = top(d);
+      if (!f) throw new Error('Engine stack is empty with no decision pending');
+      runFrame(d, f);
+    }
     ruleProcessing(d);
     steps++;
     if (steps > LOOP_CHECK_AFTER) {
       // A mandatory loop nobody can stop is a draw (CR 11-1-1-1): the same game summary repeats
       // within one step with no decision in between (ARCHITECTURE §2.6).
       seen ??= new Set();
-      const h = summaryHash(d.s, true);
+      const h = summaryHash(d.s);
       if (seen.has(h)) {
         d.emit({ type: 'LoopDetected', steps });
         endGame(d, { draw: 'loop' });
@@ -134,7 +136,7 @@ function runSetup(d: Draft, f: Extract<Frame, { f: 'setup' }>): void {
       // CR 5-2-1-5-1: the chooser processes "at the start of the game" effects first (RL-30).
       f.step = 'draw';
       const c = s.setup.chooser;
-      fireFor(d, [other(c), c], 'startOfGame', (p) => [d.ro(p).leader]);
+      fireFor(d, [c, other(c)], 'startOfGame', (p) => [d.ro(p).leader]);
       return;
     }
     case 'draw':
@@ -204,7 +206,7 @@ function runTurn(d: Draft, f: Extract<Frame, { f: 'turn' }>): void {
       );
       // 6-2-2: start-of-turn effects activate.
       f.step = 'refreshDon';
-      fireFor(d, [other(p), p], 'startOfYourTurn', (q) => (q === p ? fieldCards(d, q) : []));
+      fireFor(d, [p], 'startOfYourTurn', (q) => fieldCards(d, q));
       return;
     case 'refreshDon':
       // 6-2-3 then 6-2-4.
@@ -227,7 +229,7 @@ function runTurn(d: Draft, f: Extract<Frame, { f: 'turn' }>): void {
     case 'mainStart':
       setPhase(d, 'main');
       f.step = 'main';
-      fireFor(d, [other(p), p], 'startOfMainPhase', (q) => fieldCards(d, q));
+      fireFor(d, [p, other(p)], 'startOfMainPhase', (q) => fieldCards(d, q));
       return;
     case 'main':
       ask(d, {
@@ -240,8 +242,8 @@ function runTurn(d: Draft, f: Extract<Frame, { f: 'turn' }>): void {
       setPhase(d, 'end');
       // 6-6-1-1: [End of Your Turn] (turn player) then [End of Your Opponent's Turn] (non-turn).
       f.step = 'endExpire';
-      fireFor(d, [other(p)], 'endOfOpponentsTurn', (q) => fieldCards(d, q));
       fireFor(d, [p], 'endOfYourTurn', (q) => fieldCards(d, q));
+      fireFor(d, [other(p)], 'endOfOpponentsTurn', (q) => fieldCards(d, q));
       return;
     case 'endExpire':
       // 6-6-1-2: "until the end of the turn / End Phase" effects end, turn player's first; this
@@ -387,8 +389,8 @@ function runBattle(d: Draft): void {
     case 'attack':
       // CR 7-1-1-3, 10-2-16-1: [When Attacking] first, then [On Your Opponent's Attack].
       b.step = 'attackEnd';
-      fireFor(d, [defender], 'onOpponentAttack', (q) => fieldCards(d, q));
       fireFor(d, [b.attackerOwner], 'whenAttacking', () => [b.attacker]);
+      fireFor(d, [defender], 'onOpponentAttack', (q) => fieldCards(d, q));
       return;
     case 'attackEnd':
       // CR 7-1-1-4.
@@ -469,7 +471,7 @@ function runBattle(d: Draft): void {
     case 'end':
       // CR 7-1-5-1, 7-1-5-2: the battle ends; end-of-battle effects activate.
       b.step = 'endExpire';
-      fireFor(d, [other(s.active), s.active], 'endOfBattle', (q) => fieldCards(d, q));
+      fireFor(d, [s.active, other(s.active)], 'endOfBattle', (q) => fieldCards(d, q));
       return;
     case 'endExpire':
       // CR 7-1-5-3, 7-1-5-4: battle effects end, turn player's first; then back to Main.
@@ -506,17 +508,28 @@ function runDamage(d: Draft, f: Extract<Frame, { f: 'damage' }>): void {
     moveCard(d, card, 'trash', { revealed: true, extra: { reason: 'banish' } });
     return;
   }
-  if (def.abilities.some((a) => a.kind === 'trigger')) {
-    // CR 4-6-3, 10-1-5-1: the player may reveal and activate it instead (E-D8: scripted only).
-    f.pending = card;
-    ask(d, {
-      kind: 'trigger',
-      player: f.player,
-      prompt: `Activate the [Trigger] of ${def.name}, or add it to your hand?`,
-    });
-    return;
-  }
-  moveCard(d, card, 'hand', { extra: { reason: 'damage' } });
+  // CR 4-6-3, 10-1-5-1: the damaged player may reveal a [Trigger] and activate it instead. The
+  // decision is asked for every Life card taken, [Trigger] or not, so the opponent cannot tell
+  // the two apart (ADR 0005, M2-01); "activate" is offered only for a scripted [Trigger] (E-D8).
+  f.pending = card;
+  ask(d, {
+    kind: 'trigger',
+    player: f.player,
+    prompt: hasScriptedTrigger(d.s, card)
+      ? `Damage: activate the [Trigger] of ${def.name}, or add it to your hand?`
+      : `Damage: add ${def.name} to your hand.`,
+  });
+}
+
+export function hasScriptedTrigger(s: State, id: InstanceId): boolean {
+  const c = s.cards[id];
+  return !!c && s.defs[c.card]!.abilities.some((a) => a.kind === 'trigger');
+}
+
+/** The Life card waiting on the damaged player's decision, if any. */
+export function pendingLife(s: State): InstanceId | null {
+  const f = s.stack[s.stack.length - 1];
+  return f?.f === 'damage' ? f.pending : null;
 }
 
 /** The `trigger` decision's answer. */
@@ -675,8 +688,8 @@ export function fieldCards(d: Draft, p: PlayerId): InstanceId[] {
 }
 
 /**
- * Queue every auto ability with `timing` on the given cards. `order` lists players bottom-first:
- * the last player's effects resolve first (CR 8-6-1: pass `[nonTurn, turn]`).
+ * Activate every auto ability with `timing` on the given cards: they join the pending queue in
+ * `order` (players listed in resolution order; pass the turn player first, CR 8-6-1).
  */
 export function fireFor(
   d: Draft,
@@ -684,31 +697,42 @@ export function fireFor(
   timing: AutoTiming,
   cardsOf: (p: PlayerId) => InstanceId[],
 ): void {
+  let added: State['pending'] | null = null;
   for (const p of order) {
-    const found: [InstanceId, Ability][] = [];
     for (const id of cardsOf(p)) {
       const c = d.s.cards[id];
       if (!c) continue;
       for (const ab of d.s.defs[c.card]!.abilities) {
-        if (ab.kind === 'auto' && ab.when.includes(timing)) {
-          if (ab.oncePerTurn && d.s.oncePerTurn.includes(`${id}/${ab.id}`)) continue;
-          found.push([id, ab]);
-        }
+        if (ab.kind !== 'auto' || !ab.when.includes(timing)) continue;
+        if (ab.oncePerTurn && d.s.oncePerTurn.includes(`${id}/${ab.id}`)) continue;
+        (added ??= []).push({ card: id, cardId: c.card, ability: ab.id, controller: p, timing });
       }
     }
-    // Push in reverse so the first found resolves first.
-    for (let i = found.length - 1; i >= 0; i--) {
-      const [id, ab] = found[i]!;
-      d.emit({
-        type: 'EffectActivated',
-        instance: id,
-        card: d.card(id).card,
-        ability: ab.id,
-        timing,
-      });
-      pushEffect(d, id, d.card(id).card, ab, p, 'effect');
-    }
   }
+  if (added) d.s.pending = [...d.s.pending, ...added];
+}
+
+/**
+ * Resolve the next pending auto effect, if the game is at a point where effects may resolve:
+ * no activation, damage processing, K.O. or play is in progress (CR 8.6.3, 8-6-2).
+ */
+function drainPending(d: Draft): boolean {
+  if (d.s.pending.length === 0) return false;
+  const f = top(d);
+  if (!f || (f.f !== 'turn' && f.f !== 'battle' && f.f !== 'setup')) return false;
+  const [next, ...rest] = d.s.pending;
+  d.s.pending = rest;
+  const ab = abilityOf(d.s, next!.cardId, next!.ability);
+  if (!ab) return true;
+  d.emit({
+    type: 'EffectActivated',
+    instance: next!.card,
+    card: next!.cardId,
+    ability: next!.ability,
+    timing: next!.timing,
+  });
+  pushEffect(d, next!.card, next!.cardId, ab, next!.controller, 'effect');
+  return true;
 }
 
 export function pushEffect(

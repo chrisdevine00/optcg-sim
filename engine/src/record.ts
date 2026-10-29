@@ -13,29 +13,50 @@ import type {
   Step,
 } from './api.ts';
 import { project, type ProjectedView } from './project.ts';
-import { summaryHash } from './hash.ts';
+import { hashString, summaryHash } from './hash.ts';
 import type { State } from './state.ts';
 
 /**
  * Bump `ENGINE_VERSION` whenever a change alters how any recorded game plays out. Golden records are
  * re-recorded deliberately when it changes. `SCRIPTS_VERSION` is the effect-script hash (none until M4).
  */
-export const ENGINE_VERSION = '0.2.0';
+export const ENGINE_VERSION = '0.3.0';
 export const SCRIPTS_VERSION = 'none';
 
 export class RecordVersionMismatch extends Error {
-  constructor(readonly record: GameRecord['versions']) {
+  constructor(
+    readonly record: GameRecord['versions'],
+    readonly current: GameRecord['versions'] | null = null,
+  ) {
     super(
-      `Record was made with engine ${record.engine} / scripts ${record.scripts}; this build is ` +
-        `engine ${ENGINE_VERSION} / scripts ${SCRIPTS_VERSION}. Open it read-only from its snapshots.`,
+      `Record was made with engine ${record.engine} / scripts ${record.scripts} / cards ` +
+        `${record.cards}; this build is engine ${ENGINE_VERSION} / scripts ${SCRIPTS_VERSION}` +
+        (current ? ` / cards ${current.cards}` : '') +
+        '. Open it read-only from its snapshots.',
     );
     this.name = 'RecordVersionMismatch';
   }
 }
 
-/** True when this build can replay the record live. The caller checks the card-data version. */
+/** True when this build's engine and scripts match the record (the cards are checked in replay). */
 export function replayable(record: GameRecord): boolean {
   return record.versions.engine === ENGINE_VERSION && record.versions.scripts === SCRIPTS_VERSION;
+}
+
+/**
+ * The card-data version of a game: a hash of the game fields of every card in it (ADR 0004).
+ * Replay recomputes it from the lookup it is given, so a record made against other card data is
+ * never replayed live (M2-07).
+ */
+export function cardsVersionOf(state: GameState): string {
+  const s = state as unknown as State;
+  const fields = Object.keys(s.defs)
+    .sort()
+    .map((id) => {
+      const { abilities: _a, ...game } = s.defs[id]!;
+      return game;
+    });
+  return 'cards-' + hashString(JSON.stringify(fields)).slice(0, 16);
 }
 
 /** A projected-for-both summary at a turn boundary (ARCHITECTURE §2.9). */
@@ -60,13 +81,9 @@ function snapshot(state: GameState, actionIndex: number): TurnSnapshot {
 }
 
 /** Start a record from the state that `createGame` or `createFromScenario` returned. */
-export function startRecord(
-  start: GameRecord['start'],
-  cardsVersion: string,
-  initial: GameState,
-): RecordWithSnapshots {
+export function startRecord(start: GameRecord['start'], initial: GameState): RecordWithSnapshots {
   return {
-    versions: { engine: ENGINE_VERSION, cards: cardsVersion, scripts: SCRIPTS_VERSION },
+    versions: { engine: ENGINE_VERSION, cards: cardsVersionOf(initial), scripts: SCRIPTS_VERSION },
     start,
     actions: [],
     snapshots: [snapshot(initial, 0)],
@@ -106,6 +123,9 @@ export function replayWith(
     'setup' in record.start
       ? fns.createGame({ ...record.start.setup, cards })
       : fns.createFromScenario({ ...record.start.scenario, cards });
+  const current = cardsVersionOf(step.state);
+  if (current !== record.versions.cards)
+    throw new RecordVersionMismatch(record.versions, { ...record.versions, cards: current });
   const events = [...step.events];
   const n = Math.min(upTo ?? record.actions.length, record.actions.length);
   for (let i = 0; i < n; i++) {

@@ -16,13 +16,16 @@ export {
   autoSkip,
   projectEvents,
   actionFromView,
+  previewFromView,
 } from './game.ts';
 export type { ProjectedView } from './project.ts';
+export type { AutoSkipOptions } from './game.ts';
 export {
   ENGINE_VERSION,
   SCRIPTS_VERSION,
   RecordVersionMismatch,
   replayable,
+  cardsVersionOf,
   startRecord,
   appendAction,
   type TurnSnapshot,

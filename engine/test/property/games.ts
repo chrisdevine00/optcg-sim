@@ -21,6 +21,7 @@ import { internals } from '../../src/testing.ts';
 import { cards } from '../fixtures/index.ts';
 import { metaDecks } from '../support/decks.ts';
 import { playRandomGame } from '../support/random-game.ts';
+import { propertySeed } from '../support/seed.ts';
 
 /** Total games across the PARTS files; 500 per push, ENGINE_GAMES overrides (nightly 10,000). */
 export const TOTAL_GAMES = Number(process.env.ENGINE_GAMES ?? 500);
@@ -151,6 +152,6 @@ export function runGames(part: number, tally: Tally): void {
         tally.results[k] = (tally.results[k] ?? 0) + 1;
       },
     ),
-    { numRuns: runs, seed: 0x5eed + part, endOnFailure: true },
+    { numRuns: runs, seed: propertySeed(part), endOnFailure: true },
   );
 }

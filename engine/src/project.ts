@@ -144,7 +144,7 @@ const GENERIC_PROMPT: Record<Decision['kind'], string> = {
   main: "It is your opponent's Main Phase.",
   block: 'Your opponent is choosing whether to block.',
   counter: 'Your opponent is choosing Counters.',
-  trigger: 'Your opponent is deciding on a [Trigger].',
+  trigger: 'Your opponent is taking damage.',
   optional: 'Your opponent is deciding whether to use an effect.',
   choose: 'Your opponent is choosing.',
   order: 'Your opponent is ordering effects.',
@@ -242,7 +242,7 @@ export function projectEvents(events: readonly GameEvent[], viewer: PlayerId): G
     }
     for (const f of CARD_FIELDS) {
       const v = out[f];
-      if (typeof v === 'string' && keys[v] !== undefined) out[f] = handleFor(viewer, v, keys[v]);
+      if (typeof v === 'string' && keys[f] !== undefined) out[f] = handleFor(viewer, v, keys[f]);
     }
     return out;
   });

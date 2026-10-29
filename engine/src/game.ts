@@ -21,10 +21,12 @@ import {
 import { apply, check, legalActions as enumerate } from './actions.ts';
 import { Draft } from './draft.ts';
 import { advance } from './flow.ts';
+import { ruleProcessing } from './ops/index.ts';
 import { summaryHash as hash } from './hash.ts';
 import { checkInvariants as invariants } from './invariants.ts';
 import { preview as previewWith } from './preview.ts';
 import {
+  handleFor,
   actionFromView as fromView,
   project as projectState,
   projectEvents as projectEventsFor,
@@ -46,7 +48,10 @@ export const reduce = (state: GameState, action: Action): Step => {
   if (reason) throw new IllegalAction(reason.text, action);
   const d = new Draft(s, action.intentId);
   apply(d, action);
+  ruleProcessing(d);
   advance(d);
+  if (d.deckTouched.size || d.damagedAtZero.size)
+    throw new Error('Rule processing left a defeat flag unchecked (M2-14)');
   return { state: gs(d.s), events: d.events };
 };
 
@@ -81,24 +86,42 @@ export const queries: Queries = q;
 // Additions after the M2 freeze (additive only; no frozen shape changed).
 // ---------------------------------------------------------------------------------------------
 
+export interface AutoSkipOptions {
+  /**
+   * True when another human could see whether the game paused (hotseat, or a human opponent).
+   * Then a window is skipped only when its single option follows from public information.
+   */
+  observedByOtherHuman: boolean;
+}
+
 /**
- * Auto-skip support (ARCHITECTURE §2.3): the one action to apply when the pending decision has
- * exactly one legal answer: an empty Block or Counter window, or a forced pick. Concession is never
- * counted. Null when the player has a real choice. The store still records the action.
+ * Auto-skip support (ARCHITECTURE §2.3, flows.md decision 4): the one action to apply when the
+ * pending decision has exactly one legal answer: an empty Block or Counter window, a damage step
+ * with no [Trigger] to activate, or a forced pick. Concession is never counted. Null when the
+ * player has a real choice, or when skipping would tell an observing human something hidden
+ * (M2-02): the Counter window then skips only on an empty hand (hand size is public, CR 3-1-4),
+ * and the damage decision never skips. The store still records the action.
  */
-export const autoSkip = (state: GameState): Action | null => {
+export const autoSkip = (state: GameState, options: AutoSkipOptions): Action | null => {
   const s = st(state);
-  if (!s.decision) return null;
-  const options = enumerate(s).filter((a) => a.type !== 'concede');
-  if (options.length !== 1) return null;
-  const only = options[0]!;
-  // A do-nothing window, or a forced pick or finish.
+  const dec = s.decision;
+  if (!dec) return null;
+  const actions = enumerate(s).filter((a) => a.type !== 'concede');
+  if (actions.length !== 1) return null;
+  const only = actions[0]!;
   const skippable =
     (only.type === 'block' && only.blocker === null) ||
     only.type === 'endCounter' ||
+    (only.type === 'trigger' && !only.activate) ||
     only.type === 'done' ||
     only.type === 'pick';
-  return skippable ? only : null;
+  if (!skippable) return null;
+  if (options.observedByOtherHuman) {
+    // Only windows whose options depend on public information alone.
+    if (only.type === 'trigger') return null;
+    if (only.type === 'endCounter' && s.players[dec.player].hand.length > 0) return null;
+  }
+  return only;
 };
 
 /** Events as one player may see them (ARCHITECTURE §2.7). */
@@ -111,3 +134,25 @@ export const projectEvents = (events: readonly GameEvent[], player: PlayerId): G
  */
 export const actionFromView = (state: GameState, player: PlayerId, action: Action): Action =>
   fromView(st(state), player, action);
+
+/**
+ * `preview` for a view (M2-04): the action is given in `player`'s handles, and the result is keyed
+ * by that player's handles, so the UI can match it to its view and nothing exposes instance ids.
+ */
+export const previewFromView = (
+  state: GameState,
+  player: PlayerId,
+  viewAction: Action,
+): Preview => {
+  const s = st(state);
+  if (viewAction.player !== player)
+    throw new IllegalAction('Preview your own actions only.', viewAction);
+  const p = preview(state, fromView(s, player, viewAction));
+  const h = (id: string): string => handleFor(player, id, s.cards[id]!.key);
+  return {
+    cards: Object.fromEntries(Object.entries(p.cards).map(([id, v]) => [h(id), v])),
+    life: p.life,
+    ko: p.ko.map(h),
+    gameOver: p.gameOver,
+  };
+};

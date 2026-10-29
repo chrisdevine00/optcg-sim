@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { scenario } from '../../fixtures/index.ts';
-import { act, attack, endTurn, FILL, fill, L, passBlock, V } from '../helpers.ts';
+import { act, attack, endTurn, FILL, fill, L, passBlock, takeDamage, V } from '../helpers.ts';
 
 describe('battle tier (CR 7-1-5-3 / 7-1-5-4)', () => {
   it('CR 7-1-3-1-1 / 7-1-5-3 / 7-1-5-4: a Counter on a card not in the battle still ends with the battle', () => {
@@ -31,6 +31,7 @@ describe('battle tier (CR 7-1-5-3 / 7-1-5-4)', () => {
     act(g, { type: 'counter', card: g.find('p1', 'hand', V.ain), target: komachiyo });
     expect(g.power(komachiyo)).toBe(5000); // 3000 + Ain's +2000
     act(g, { type: 'endCounter' });
+    takeDamage(g); // M2-01: the engine now asks a damage decision for every Life card
     expect(g.power(komachiyo)).toBe(3000);
     expect(g.life('p1')).toBe(4); // the Leader was not boosted: 5000 vs 5000
   });

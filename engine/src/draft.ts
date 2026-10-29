@@ -29,6 +29,9 @@ export class Draft {
   private optCopied = false;
   /** Atomic operations since the step began; the loop guard reads it. */
   ops = 0;
+  /** Rule-processing flags (CR 9): players whose deck was touched, or who took damage at 0 Life. */
+  readonly deckTouched = new Set<PlayerId>();
+  readonly damagedAtZero = new Set<PlayerId>();
 
   constructor(base: State, intentId?: string) {
     this.s = { ...base, renames: [] };
@@ -110,12 +113,13 @@ export class Draft {
     if (this.intentId !== undefined) e.intentId = this.intentId;
     if (!e.keys) {
       // Record each referenced card's projection key, so `projectEvents` can derive view handles.
+      // Keyed by field, never by id, so two fields naming one card cannot share a key (M2-03).
       let keys: Record<string, string> | undefined;
       for (const f of CARD_FIELDS) {
         const v = e[f];
         if (typeof v === 'string') {
           const c = this.s.cards[v];
-          if (c) (keys ??= {})[v] = c.key;
+          if (c) (keys ??= {})[f] = c.key;
         }
       }
       if (keys) e.keys = keys;

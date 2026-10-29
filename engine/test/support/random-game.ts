@@ -12,10 +12,12 @@ import {
   reduce,
   seedRng,
   type Action,
+  type GameEvent,
   type GameRecord,
   type GameState,
   type PlayerId,
   ENGINE_VERSION,
+  cardsVersionOf,
   SCRIPTS_VERSION,
 } from '../../src/index.ts';
 import { cards } from '../fixtures/index.ts';
@@ -90,12 +92,26 @@ export function playRandomGame(opts: RandomGameOptions): RandomGame {
     p2: { leader: all[b]!.leader, main: all[b]!.main },
   };
   const setup = { seed: opts.seed, decks };
-  let state = createGame({ ...setup, cards: cards() }).state;
+  const state = createGame({ ...setup, cards: cards() }).state;
   const record: GameRecord = {
-    versions: { engine: ENGINE_VERSION, cards: 'test', scripts: SCRIPTS_VERSION },
+    versions: { engine: ENGINE_VERSION, cards: cardsVersionOf(state), scripts: SCRIPTS_VERSION },
     start: { setup },
     actions: [],
   };
+  return playFrom(state, record, rng, opts);
+}
+
+/** Random legal play from any state; `record.actions` collects the actions. */
+export function playFrom(
+  start: GameState,
+  record: GameRecord,
+  rng0: number,
+  opts: Omit<RandomGameOptions, 'decks'> & {
+    onEvents?: (events: GameEvent[], after: GameState) => void;
+  },
+): RandomGame {
+  let rng = rng0;
+  let state = start;
   const states: GameState[] = [state];
   let capped = false;
   for (;;) {
@@ -114,7 +130,9 @@ export function playRandomGame(opts: RandomGameOptions): RandomGame {
     }
     let action: Action;
     [action, rng] = pickAction(legal, rng, opts.policy);
-    const next = reduce(state, action).state;
+    const step = reduce(state, action);
+    const next = step.state;
+    opts.onEvents?.(step.events, next);
     opts.onStep?.(state, action, next, legal);
     record.actions.push(action);
     state = next;

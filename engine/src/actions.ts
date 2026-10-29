@@ -16,7 +16,9 @@ import {
   applyReplacement,
   beginEndPhase,
   fireFor,
+  hasScriptedTrigger,
   makeRoom,
+  pendingLife,
   push,
   pushEffect,
   top,
@@ -55,11 +57,13 @@ function sick(s: State, id: InstanceId): boolean {
 
 export function check(s: State, player: PlayerId, a: Intent): Reason | null {
   if (s.result) return r('The game is over.');
+  if (player !== 'p1' && player !== 'p2') return r('That is not a player in this game.');
+  if (!a || typeof a !== 'object' || typeof a.type !== 'string') return r('That is not an action.');
   if (a.type === 'concede') return null; // CR 1-2-3: either player, at any time.
   const dec = s.decision;
   if (!dec) return r('Nothing is waiting for a decision.');
   if (dec.player !== player) return r('Your opponent is deciding right now.');
-  const kindOf: Record<Intent['type'], string> = {
+  const kindOf: Partial<Record<Intent['type'], string>> = {
     chooseFirst: 'chooseFirst',
     mulligan: 'mulligan',
     playCard: 'main',
@@ -158,8 +162,18 @@ export function check(s: State, player: PlayerId, a: Intent): Reason | null {
     }
     case 'endCounter':
       return null;
-    case 'trigger':
-      return typeof a.activate === 'boolean' ? null : r('Activate or not.');
+    case 'trigger': {
+      if (typeof a.activate !== 'boolean') return r('Activate or not.');
+      const card = pendingLife(s);
+      if (a.activate && (card === null || !hasScriptedTrigger(s, card)))
+        return r(
+          card !== null && s.defs[s.cards[card]!.card]!.hasTrigger
+            ? "This card's [Trigger] is not automated yet."
+            : 'This card has no [Trigger].',
+          'CR 10-1-5-1',
+        );
+      return null;
+    }
     case 'optional':
       return typeof a.accept === 'boolean' ? null : r('Yes or no.');
     case 'pick':
@@ -227,6 +241,11 @@ function donKey(x: InstanceId | DonClass): string {
 
 function checkPick(s: State, choice: InstanceId | DonClass): Reason | null {
   const dec = s.decision!;
+  if (
+    typeof choice !== 'string' &&
+    (choice === null || typeof choice !== 'object' || !('from' in choice))
+  )
+    return r('That card cannot be chosen here.');
   const cands = dec.candidates ?? [];
   const picked = dec.picked ?? [];
   const key = donKey(choice);
@@ -310,10 +329,13 @@ export function legalActions(s: State): Action[] {
         out.push({ type: 'endCounter', player: p });
         break;
       }
-      case 'trigger':
-        out.push({ type: 'trigger', activate: true, player: p });
+      case 'trigger': {
+        const card = pendingLife(s);
+        if (card !== null && hasScriptedTrigger(s, card))
+          out.push({ type: 'trigger', activate: true, player: p });
         out.push({ type: 'trigger', activate: false, player: p });
         break;
+      }
       case 'optional':
         out.push({ type: 'optional', accept: true, player: p });
         out.push({ type: 'optional', accept: false, player: p });

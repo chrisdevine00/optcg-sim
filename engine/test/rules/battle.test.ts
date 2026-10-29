@@ -21,6 +21,7 @@ import {
   RUSH_CHAR,
   times,
   types,
+  takeDamage,
 } from '../support/game.ts';
 
 const life = times(5, PUR_1);
@@ -152,7 +153,7 @@ describe('Attack Step order (CR 7-1-1-3, 10-2-16-1)', () => {
     g.act({ type: 'attack', attacker: g.find('p1', 'characters', RED_5), target: t });
     g.act({ type: 'block', blocker: null });
     op(g, { op: 'bounce', card: t, by: 'p2' });
-    const ev = g.act({ type: 'endCounter' });
+    const ev = [...g.act({ type: 'endCounter' }), ...takeDamage(g)];
     expect(types(ev)).not.toContain('DamageStep');
   });
 });
@@ -195,6 +196,7 @@ describe('Block Step (CR 7-1-2, 10-1-4-1, RL-18, RL-19)', () => {
     expect(types(ev)).toEqual(expect.arrayContaining(['BlockerActivated', 'EffectResolved']));
     expect(g.card(b).rested).toBe(true);
     g.act({ type: 'endCounter' });
+    takeDamage(g);
     // 6000 vs 5000: the blocker is K.O.'d, the Leader untouched.
     expect(g.zone('p2', 'trash').map((c) => c.card)).toEqual([BLOCKER]);
     expect(g.life('p2')).toBe(5);
@@ -256,6 +258,7 @@ describe('Block Step (CR 7-1-2, 10-1-4-1, RL-18, RL-19)', () => {
     g.act({ type: 'block', blocker: g.leader('p1') });
     expect(g.card(g.leader('p1')).rested).toBe(true);
     g.act({ type: 'endCounter' });
+    takeDamage(g);
     expect(g.life('p1')).toBe(3);
     expect(g.zone('p1', 'characters')).toHaveLength(1);
   });
@@ -283,6 +286,7 @@ describe('Counter Step (CR 7-1-3-1-1, RL-08)', () => {
     expect(g.power(z)).toBe(4000);
     expect(queries.don(g.state, 'p2').rested).toBe(0);
     g.act({ type: 'endCounter' });
+    takeDamage(g);
     expect(g.life('p2')).toBe(4); // 5000 vs 5000: attacker wins ties
     expect(g.power(z)).toBe(3000); // expired at End of the Battle
   });
@@ -317,6 +321,7 @@ describe('Counter Step (CR 7-1-3-1-1, RL-08)', () => {
     g.act({ type: 'block', blocker: null });
     g.act({ type: 'counter', card: g.find('p2', 'hand', PUR_1), target: g.leader('p2') });
     g.act({ type: 'endCounter' });
+    takeDamage(g);
     expect(g.life('p2')).toBe(5); // 5000 < 6000
     expect(g.power(g.leader('p2'))).toBe(5000);
   });
@@ -398,7 +403,11 @@ describe('Damage Step (CR 7-1-4)', () => {
   it('CR 7-1-4-2: an attacker with less power does nothing', () => {
     const g = scenario({ p1: { leader: LUFFY, characters: [RED_1] }, p2: { leader: KAIDO, life } });
     g.act({ type: 'attack', attacker: g.find('p1', 'characters', RED_1), target: g.leader('p2') });
-    const ev = [...g.act({ type: 'block', blocker: null }), ...g.act({ type: 'endCounter' })];
+    const ev = [
+      ...g.act({ type: 'block', blocker: null }),
+      ...g.act({ type: 'endCounter' }),
+      ...takeDamage(g),
+    ];
     expect(ev.find((e) => e.type === 'DamageStep')).toMatchObject({ attackerWins: false });
     expect(g.life('p2')).toBe(5);
   });
@@ -430,7 +439,11 @@ describe('Damage Step (CR 7-1-4)', () => {
     });
     const t = g.find('p2', 'characters', PUR_1);
     g.act({ type: 'attack', attacker: g.leader('p1'), target: t });
-    const ev = [...g.act({ type: 'block', blocker: null }), ...g.act({ type: 'endCounter' })];
+    const ev = [
+      ...g.act({ type: 'block', blocker: null }),
+      ...g.act({ type: 'endCounter' }),
+      ...takeDamage(g),
+    ];
     expect(ev.find((e) => e.type === 'KO')).toMatchObject({
       instance: t,
       cause: { kind: 'battle', by: 'p1' },
@@ -446,7 +459,7 @@ describe('Damage Step (CR 7-1-4)', () => {
     g.act({ type: 'attack', attacker: g.leader('p1'), target: g.leader('p2') });
     g.act({ type: 'block', blocker: null });
     g.act({ type: 'counter', card: g.find('p2', 'hand', PUR_1), target: g.leader('p2') });
-    const ev = g.act({ type: 'endCounter' });
+    const ev = [...g.act({ type: 'endCounter' }), ...takeDamage(g)];
     const t = types(ev);
     expect(t.indexOf('EffectResolved')).toBeLessThan(t.indexOf('ModifierExpired'));
     expect(t.indexOf('ModifierExpired')).toBeLessThan(t.indexOf('BattleEnded'));
@@ -535,6 +548,7 @@ describe('keywords (CR 10-1)', () => {
     noDefence(g);
     expect(queries.decision(g.state)).toMatchObject({ kind: 'trigger', player: 'p2' });
     g.act({ type: 'trigger', activate: true });
+    takeDamage(g);
     expect(g.zone('p1', 'characters')).toHaveLength(0);
     expect(g.life('p2')).toBe(1);
   });
@@ -557,7 +571,11 @@ describe('keywords (CR 10-1)', () => {
       },
     });
     g.act({ type: 'attack', attacker: a, target: g.leader('p2') });
-    const ev = [...g.act({ type: 'block', blocker: null }), ...g.act({ type: 'endCounter' })];
+    const ev = [
+      ...g.act({ type: 'block', blocker: null }),
+      ...g.act({ type: 'endCounter' }),
+      ...takeDamage(g),
+    ];
     expect(ev.filter((e) => e.type === 'CardMoved' && e.reason === 'banish')).toHaveLength(2);
     expect(g.life('p2')).toBe(1);
     expect(g.zone('p2', 'hand')).toHaveLength(0);
@@ -609,7 +627,11 @@ describe('K.O. (CR 10-2-1)', () => {
       },
     });
     g.act({ type: 'attack', attacker: g.find('p1', 'characters', RED_5), target: t });
-    const ev = [...g.act({ type: 'block', blocker: null }), ...g.act({ type: 'endCounter' })];
+    const ev = [
+      ...g.act({ type: 'block', blocker: null }),
+      ...g.act({ type: 'endCounter' }),
+      ...takeDamage(g),
+    ];
     expect(types(ev)).toContain('KOPrevented');
     expect(types(ev)).not.toContain('KO');
     expect(g.card(t).zone).toBe('characters');

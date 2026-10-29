@@ -26,6 +26,7 @@ import {
   result,
   turn,
   V,
+  takeDamage,
 } from '../helpers.ts';
 
 type Side = Partial<ScenarioInput['p1']>;
@@ -183,6 +184,7 @@ describe('Counter Step (CR 7-1-3)', () => {
     passBlock(g);
     act(g, { type: 'counter', card: g.find('p2', 'hand', V.blugori), target: g.leader('p2') });
     act(g, { type: 'endCounter' });
+    takeDamage(g); // M2-01: the engine now asks a damage decision for every Life card
     expect(g.life('p2')).toBe(4);
   });
 

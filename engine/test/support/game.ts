@@ -6,6 +6,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import type { SetFile } from '@optcg/cards';
 import {
   createGame,
+  queries,
   reduce,
   type Action,
   type CardId,
@@ -135,8 +136,24 @@ export function endTurn(g: TestGame): void {
   g.act({ type: 'endTurn' });
 }
 
-/** Defender takes no block and no counter. */
+/** Defender takes no block and no counter, and adds Life cards without a [Trigger] to hand. */
 export function noDefence(g: TestGame): void {
   g.act({ type: 'block', blocker: null });
   g.act({ type: 'endCounter' });
+  takeDamage(g);
+}
+
+/**
+ * Answer each damage decision that has no [Trigger] to activate (the engine asks one per Life
+ * card so the opponent cannot tell [Trigger] cards apart, M2-01). Returns the events.
+ */
+export function takeDamage(g: TestGame): GameEvent[] {
+  const out: GameEvent[] = [];
+  while (
+    queries.decision(g.state)?.kind === 'trigger' &&
+    !g.legal().some((a) => a.type === 'trigger' && a.activate)
+  ) {
+    out.push(...g.act({ type: 'trigger', activate: false }));
+  }
+  return out;
 }

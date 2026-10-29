@@ -71,9 +71,9 @@ describe('DON!! Phase edge cases', () => {
       activePlayer: 'p2',
       phase: 'don',
       p1: { leader: LUFFY, deck },
-      p2: { leader: KAIDO, deck: pdeck, donDeck: 0, costArea: { active: 3, rested: 0 } },
+      p2: { leader: KAIDO, deck: pdeck, donDeck: 0, costArea: { active: 3, rested: 7 } },
     });
-    expect(queries.don(h.state, 'p2')).toEqual({ deck: 0, active: 3, rested: 0, given: 0 });
+    expect(queries.don(h.state, 'p2')).toEqual({ deck: 0, active: 3, rested: 7, given: 0 });
   });
 });
 

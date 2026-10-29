@@ -8,6 +8,7 @@ import { project, type GameState, type PlayerId } from '../../src/index.ts';
 import { internals } from '../../src/testing.ts';
 import type { State } from '../../src/state.ts';
 import { playRandomGame } from '../support/random-game.ts';
+import { propertySeed } from '../support/seed.ts';
 
 const RUNS = Math.max(40, Math.ceil(Number(process.env.ENGINE_GAMES ?? 500) / 10));
 
@@ -59,9 +60,9 @@ describe('projection linkage leak test', () => {
           }
         },
       ),
-      { numRuns: RUNS, seed: 0xc0ffee },
+      { numRuns: RUNS, seed: propertySeed(100) },
     );
-  });
+  }, 600_000);
 
   it('a change the viewer can see does change the view (the test has teeth)', () => {
     const game = playRandomGame({ seed: 99, keepStates: true, invariants: false });
@@ -78,5 +79,5 @@ describe('projection linkage leak test', () => {
       expect(JSON.stringify(project(changed, 'p1'))).not.toBe(JSON.stringify(project(g, 'p1')));
       expect(JSON.stringify(project(changed, 'p2'))).toBe(JSON.stringify(project(g, 'p2')));
     }
-  });
+  }, 600_000);
 });

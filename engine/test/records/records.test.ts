@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   appendAction,
+  cardsVersionOf,
   checkInvariants,
   createFromScenario,
   ENGINE_VERSION,
@@ -15,10 +16,11 @@ import {
   type ScenarioSpec,
 } from '../../src/index.ts';
 import { internals } from '../../src/testing.ts';
-import { cards } from '../fixtures/index.ts';
-import { KAIDO, LUFFY, PUR_1, RED_1, times } from '../support/game.ts';
+import { summary } from '../../src/hash.ts';
+import { cards, scenario } from '../fixtures/index.ts';
+import { KAIDO, LUFFY, op, PUR_1, PUR_1B, RED_1, RED_5, times } from '../support/game.ts';
 import { pickAction, playRandomGame } from '../support/random-game.ts';
-import { seedRng } from '../../src/index.ts';
+import { queries, seedRng } from '../../src/index.ts';
 
 describe('replay', () => {
   it('replays a record to the same summary hash, and to any prefix', () => {
@@ -35,6 +37,22 @@ describe('replay', () => {
     expect(() => replay(old, cards())).toThrow(RecordVersionMismatch);
   });
 
+  it('M2-07: a record made against other card data is not replayed live', () => {
+    const g = playRandomGame({ seed: 5 });
+    const other: GameRecord = {
+      ...g.record,
+      versions: { ...g.record.versions, cards: 'cards-0000' },
+    };
+    expect(() => replay(other, cards())).toThrow(RecordVersionMismatch);
+    // Changing one game field of one card in the lookup changes the version too.
+    const lookup = cards();
+    const changed = (id: string) => {
+      const c = lookup(id);
+      return c && { ...c, power: c.power === null ? null : c.power + 1000 };
+    };
+    expect(() => replay(g.record, changed)).toThrow(RecordVersionMismatch);
+  });
+
   it('records can start from a scenario', () => {
     const spec: Omit<ScenarioSpec, 'cards'> = {
       seed: 3,
@@ -46,7 +64,7 @@ describe('replay', () => {
     };
     let state = createFromScenario({ ...spec, cards: cards() }).state;
     const record: GameRecord = {
-      versions: { engine: ENGINE_VERSION, cards: 'test', scripts: 'none' },
+      versions: { engine: ENGINE_VERSION, cards: cardsVersionOf(state), scripts: 'none' },
       start: { scenario: spec },
       actions: [],
     };
@@ -64,7 +82,7 @@ describe('replay', () => {
 describe('snapshots', () => {
   it('a snapshot is taken at the start, at each turn boundary and at the end', () => {
     const g = playRandomGame({ seed: 77, keepStates: true });
-    let rec = startRecord(g.record.start, 'test', g.states[0]!);
+    let rec = startRecord(g.record.start, g.states[0]!);
     g.record.actions.forEach((a, i) => {
       rec = appendAction(rec, a, g.states[i + 1]!);
     });
@@ -90,7 +108,9 @@ describe('summaryHash', () => {
   it('ignores instance ids: the same game with re-labelled ids hashes the same', () => {
     const g = playRandomGame({ seed: 9 });
     const s = internals(g.final);
-    const map = new Map(Object.keys(s.cards).map((id, i) => [id, `x${i}`]));
+    const map = new Map(
+      Object.keys(s.cards).map((id, i) => [id, `c${String(i).padStart(7, '0')}`]),
+    );
     const relabel = JSON.parse(
       JSON.stringify(s).replace(
         /"c[a-z0-9]{7}"/g,
@@ -98,6 +118,82 @@ describe('summaryHash', () => {
       ),
     );
     expect(summaryHash(relabel)).toBe(summaryHash(g.final));
+  });
+});
+
+describe('summaryHash covers pending obligations (M2-08)', () => {
+  const atDamage = (double: boolean) => {
+    const g = scenario({
+      p1: { leader: 'OP13-001', characters: [RED_5] },
+      p2: { leader: KAIDO, life: [PUR_1B, PUR_1, PUR_1] },
+    });
+    const a = g.find('p1', 'characters', RED_5);
+    if (double)
+      op(g, {
+        op: 'modifier',
+        mod: {
+          kind: 'grant',
+          keyword: 'Double Attack',
+          target: a,
+          controller: 'p1',
+          duration: { kind: 'thisTurn', turn: 3 },
+        },
+      });
+    else
+      op(g, {
+        op: 'modifier',
+        mod: {
+          kind: 'grant',
+          keyword: 'Banish',
+          target: g.leader('p1'),
+          controller: 'p1',
+          duration: { kind: 'thisTurn', turn: 3 },
+        },
+      });
+    g.act({ type: 'attack', attacker: a, target: g.leader('p2') });
+    g.act({ type: 'block', blocker: null });
+    g.act({ type: 'endCounter' });
+    return g;
+  };
+
+  it('two positions with different remaining damage hash differently', () => {
+    const a = atDamage(true);
+    const b = atDamage(false);
+    expect(queries.decision(a.state)).toMatchObject({ kind: 'trigger' });
+    expect(queries.decision(b.state)).toMatchObject({ kind: 'trigger' });
+    // Same board apart from the grant's target; strip mods so only the pending damage differs.
+    const sa = { ...internals(a.state), mods: [] };
+    const sb = { ...internals(b.state), mods: [] };
+    expect(summaryHash(sa as never)).not.toBe(summaryHash(sb as never));
+  });
+
+  it('pending auto effects are part of the hash, and no instance id appears in the summary', () => {
+    const g = scenario({
+      p1: { leader: LUFFY, characters: [RED_1, RED_5] },
+      p2: { leader: KAIDO },
+    });
+    const src = g.find('p1', 'characters', RED_1);
+    op(g, {
+      op: 'modifier',
+      mod: {
+        kind: 'power',
+        target: g.find('p1', 'characters', RED_5),
+        amount: 1000,
+        controller: 'p1',
+        source: src,
+        duration: { kind: 'whileSource', source: src },
+      },
+    });
+    const s = internals(g.state);
+    const json = JSON.stringify(summary(s));
+    for (const id of Object.keys(s.cards)) expect(json).not.toContain(id);
+    const queued = {
+      ...s,
+      pending: [
+        { card: src, cardId: RED_1, ability: 'x', controller: 'p1' as const, timing: 'onPlay' },
+      ],
+    };
+    expect(summaryHash(queued as never)).not.toBe(summaryHash(g.state));
   });
 });
 

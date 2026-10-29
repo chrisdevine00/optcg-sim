@@ -15,6 +15,7 @@ import {
   RED_1,
   times,
   types,
+  takeDamage,
 } from '../support/game.ts';
 
 describe('damage and [Trigger] (CR 4-6, 10-1-5)', () => {
@@ -80,7 +81,7 @@ describe('damage and [Trigger] (CR 4-6, 10-1-5)', () => {
 
   it('CR 4-6-2 / 4-6-2-2: X-point effect damage moves X Life cards one at a time', () => {
     const g = scenario({ p1: { leader: LUFFY }, p2: { leader: KAIDO, life: times(3, PUR_1) } });
-    const ev = op(g, { op: 'damage', player: 'p2', n: 2, by: 'p1' });
+    const ev = [...op(g, { op: 'damage', player: 'p2', n: 2, by: 'p1' }), ...takeDamage(g)];
     expect(ev.filter((e) => e.type === 'CardMoved' && e.reason === 'damage')).toHaveLength(2);
     expect(g.life('p2')).toBe(1);
   });
@@ -88,14 +89,17 @@ describe('damage and [Trigger] (CR 4-6, 10-1-5)', () => {
   it('RL-22: effect damage at 0 Life defeats; effect damage reaching 0 does not', () => {
     const g = scenario({ p1: { leader: LUFFY }, p2: { leader: KAIDO, life: [PUR_1] } });
     op(g, { op: 'damage', player: 'p2', n: 1, by: 'p1' });
+    takeDamage(g);
     expect(queries.result(g.state)).toBeNull();
     op(g, { op: 'damage', player: 'p2', n: 1, by: 'p1' });
+    takeDamage(g);
     expect(queries.result(g.state)).toEqual({ winner: 'p1', reason: 'damage at 0 Life' });
   });
 
   it('Q-T3 / RL-22 best answer: a 2-point effect at 1 Life defeats on the second point', () => {
     const g = scenario({ p1: { leader: LUFFY }, p2: { leader: KAIDO, life: [PUR_1] } });
     op(g, { op: 'damage', player: 'p2', n: 2, by: 'p1' });
+    takeDamage(g);
     expect(queries.result(g.state)).toEqual({ winner: 'p1', reason: 'damage at 0 Life' });
   });
 });

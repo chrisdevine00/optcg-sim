@@ -20,6 +20,7 @@ import {
   ROSINANTE,
   times,
   types,
+  takeDamage,
 } from '../support/game.ts';
 
 const ROSINANTE_REPLACEMENT: Ability = {
@@ -90,7 +91,11 @@ describe('replacement hook: K.O. replaced (RL-41, CR 8-1-3-4)', () => {
     g.act({ type: 'activate', card: att, ability: 'up' });
     const law2 = g.find('p1', 'characters', LAW, 1);
     g.act({ type: 'attack', attacker: att, target: law2 });
-    const ev = [...g.act({ type: 'block', blocker: null }), ...g.act({ type: 'endCounter' })];
+    const ev = [
+      ...g.act({ type: 'block', blocker: null }),
+      ...g.act({ type: 'endCounter' }),
+      ...takeDamage(g),
+    ];
     expect(types(ev)).toContain('KO');
     expect(g.zone('p1', 'characters')).toHaveLength(1);
     expect(internals(g.state).oncePerTurn).toHaveLength(1);
@@ -252,7 +257,11 @@ describe('last-known information and renames (ADR 0013, CR 3-1-6)', () => {
       p2: { leader: KAIDO, characters: [{ card: PUR_1, rested: true }] },
     });
     g.act({ type: 'attack', attacker: g.leader('p1'), target: g.find('p2', 'characters', PUR_1) });
-    const ev = [...g.act({ type: 'block', blocker: null }), ...g.act({ type: 'endCounter' })];
+    const ev = [
+      ...g.act({ type: 'block', blocker: null }),
+      ...g.act({ type: 'endCounter' }),
+      ...takeDamage(g),
+    ];
     expect(ev.find((e) => e.type === 'CardMoved')!.lki).toMatchObject({
       cause: { kind: 'battle', by: 'p1' },
       power: 3000,

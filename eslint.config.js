@@ -13,6 +13,15 @@ const enginePublicOnly = {
   message: 'Import the package public API (@optcg/engine, @optcg/ai), never its internals.',
 };
 
+// Full-state engine functions (ADR 0005, M2-12). The AI and the UI see only views: these are
+// allowed only in the app's session store and in AI search over its own determinized states.
+const fullState = {
+  name: '@optcg/engine',
+  importNames: ['queries', 'legalActions', 'whyNot', 'preview', 'autoSkip', 'reduce', 'replay'],
+  message:
+    'Full-state engine calls are allowed only in app/src/session/ (the store) and ai/src/search/ (determinized states). Use project(), view actions and previewFromView().',
+};
+
 export default tseslint.config(
   {
     ignores: [
@@ -78,8 +87,12 @@ export default tseslint.config(
   },
   {
     files: ['ai/src/**/*.ts'],
+    ignores: ['ai/src/search/**'],
     rules: {
-      'no-restricted-imports': ['error', { patterns: [...noUi, enginePublicOnly] }],
+      'no-restricted-imports': [
+        'error',
+        { paths: [fullState], patterns: [...noUi, enginePublicOnly] },
+      ],
       'no-restricted-properties': [
         'error',
         { object: 'Math', property: 'random', message: 'Use a seeded RNG.' },
@@ -91,6 +104,22 @@ export default tseslint.config(
     plugins: { 'react-hooks': reactHooks },
     rules: {
       ...reactHooks.configs.recommended.rules,
+      'no-restricted-imports': ['error', { paths: [fullState], patterns: [enginePublicOnly] }],
+    },
+  },
+  {
+    files: ['ai/src/search/**/*.ts'],
+    rules: {
+      'no-restricted-imports': ['error', { patterns: [...noUi, enginePublicOnly] }],
+      'no-restricted-properties': [
+        'error',
+        { object: 'Math', property: 'random', message: 'Use a seeded RNG.' },
+      ],
+    },
+  },
+  {
+    files: ['app/src/session/**/*.{ts,tsx}'],
+    rules: {
       'no-restricted-imports': ['error', { patterns: [enginePublicOnly] }],
     },
   },

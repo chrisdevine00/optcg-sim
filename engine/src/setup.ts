@@ -70,6 +70,7 @@ function baseState(seed: number, defs: DefTable): State {
     resolving: [],
     battle: null,
     stack: [],
+    pending: [],
     decision: null,
     result: null,
     mods: [],
@@ -308,7 +309,10 @@ export function createFromScenario(spec: ScenarioSpec): Step {
     const deckDon = ps0.donDeck ?? std - given - active - rested;
     if (deckDon < 0) fail(`${p} has more than ${std} DON!! placed`);
     const total = deckDon + given + active + rested;
-    if (total > std) fail(`${p} has ${total} DON!!; this Leader's DON!! deck has ${std}`);
+    if (total !== std)
+      fail(
+        `${p} has ${total} DON!! in total; this Leader's DON!! deck has ${std} (CR 5-1-2, M2-09)`,
+      );
     ps.donDeck = deckDon;
     ps.donActive = active;
     ps.donRested = rested;

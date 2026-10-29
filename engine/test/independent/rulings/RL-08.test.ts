@@ -8,7 +8,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { scenario } from '../../fixtures/index.ts';
-import { act, attack, decision, FILL, fill, L, passBlock, V } from '../helpers.ts';
+import { act, attack, decision, FILL, fill, L, passBlock, takeDamage, V } from '../helpers.ts';
 
 function g0() {
   return scenario({
@@ -36,6 +36,7 @@ describe('RL-08: Counter boosts last for the battle', () => {
     expect(g.power(z)).toBe(5000);
     expect(g.power(g.leader('p1'))).toBe(5000);
     act(g, { type: 'endCounter' });
+    takeDamage(g); // M2-01: the engine now asks a damage decision for every Life card
     // 5000 ≥ 5000: p2 wins the battle and p1 takes 1 damage.
     expect(g.life('p1')).toBe(4);
     expect(g.power(z)).toBe(3000);

@@ -1,7 +1,7 @@
 /**
  * Semantic hash (ARCHITECTURE §2.9, ADR 0004). It hashes a canonical *game summary*: card ids per
  * zone in order, card states, given DON!!, DON!! counts, modifiers by kind and amount, turn, phase,
- * battle, decision, result and the RNG state. Instance ids are replaced by board positions, so a
+ * battle, decision, pending effects and interpreter frames, result and the RNG state. Instance ids are replaced by board positions, so a
  * refactor that changes id allocation or field names, but not the game, keeps every golden hash.
  */
 import type { InstanceId } from './api.ts';
@@ -9,7 +9,7 @@ import { PLAYERS, type State } from './state.ts';
 
 const ZONES = ['leader', 'characters', 'stage', 'hand', 'deck', 'life', 'trash'] as const;
 
-export function summary(s: State, internal = false): unknown {
+export function summary(s: State): unknown {
   const pos = new Map<InstanceId, string>();
   const players: Record<string, unknown> = {};
   for (const p of PLAYERS) {
@@ -32,19 +32,23 @@ export function summary(s: State, internal = false): unknown {
     players[p] = z;
   }
   s.resolving.forEach((id, i) => pos.set(id, `resolving.${i}`));
-  const at = (id: InstanceId | null | undefined): string | null =>
-    id == null ? null : (pos.get(id) ?? 'gone');
+  // Replace every instance id anywhere in a value with its board position (M2-08).
+  const canon = (v: unknown): unknown => {
+    if (typeof v === 'string') return ID.test(v) ? (pos.get(v) ?? 'gone') : v;
+    if (Array.isArray(v)) return v.map(canon);
+    if (v && typeof v === 'object')
+      return Object.fromEntries(
+        Object.keys(v)
+          .sort()
+          .map((k) => [k, canon((v as Record<string, unknown>)[k])]),
+      );
+    return v;
+  };
   const mods = s.mods
-    .map((m) =>
-      [
-        m.kind,
-        at(m.target),
-        m.amount,
-        m.keyword ?? '',
-        JSON.stringify(m.duration),
-        m.controller,
-      ].join('|'),
-    )
+    .map((m) => {
+      const { id: _id, ...rest } = m;
+      return JSON.stringify(canon(rest));
+    })
     .sort();
   const dec = s.decision;
   return {
@@ -54,28 +58,23 @@ export function summary(s: State, internal = false): unknown {
     phase: s.phase,
     players,
     resolving: s.resolving.map((id) => s.cards[id]!.card),
-    battle: s.battle && {
-      attacker: at(s.battle.attacker),
-      target: at(s.battle.target),
-      blocker: at(s.battle.blocker),
-      step: s.battle.step,
-    },
-    decision: dec && {
-      kind: dec.kind,
-      player: dec.player,
-      picked: dec.picked?.map((x) => (typeof x === 'string' ? at(x) : x)) ?? null,
-    },
-    // The interpreter stack is internal; only the loop detector (same build, one step) reads it.
-    stack: internal ? JSON.stringify(s.stack) : null,
+    battle: canon(s.battle),
+    decision: dec && canon({ ...dec, prompt: undefined }),
+    // Pending obligations: remaining damage, play steps, queued auto effects (M2-08).
+    stack: canon(s.stack),
+    pending: canon(s.pending),
     mods,
     oncePerTurn: s.oncePerTurn.map((k) => {
       const [id, ab] = k.split('/');
-      return `${at(id)}/${ab}`;
+      return `${canon(id)}/${ab}`;
     }),
     result: s.result,
     rng: s.rng,
   };
 }
+
+/** Engine instance ids (`Draft.newId`). Card numbers never match. */
+const ID = /^c[a-z0-9]{7}$/;
 
 /** 53-bit string hash (cyrb53), run twice with different seeds for a 106-bit digest. */
 function cyrb53(str: string, seed: number): string {
@@ -97,6 +96,6 @@ export function hashString(str: string): string {
   return cyrb53(str, 0) + cyrb53(str, 0x9e3779b9);
 }
 
-export function summaryHash(s: State, internal = false): string {
-  return hashString(JSON.stringify(summary(s, internal)));
+export function summaryHash(s: State): string {
+  return hashString(JSON.stringify(summary(s)));
 }

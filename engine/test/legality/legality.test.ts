@@ -1,9 +1,28 @@
 /** legalActions, whyNot, preview and autoSkip (ARCHITECTURE §2.1, §2.3). */
 import { describe, expect, it } from 'vitest';
-import { autoSkip, legalActions, preview, queries, reduce, whyNot } from '../../src/index.ts';
+import {
+  autoSkip,
+  legalActions,
+  preview,
+  previewFromView,
+  project,
+  queries,
+  reduce,
+  whyNot,
+} from '../../src/index.ts';
 import { internals } from '../../src/testing.ts';
 import { scenario } from '../fixtures/index.ts';
-import { BLOCKER, KAIDO, LUFFY, PUR_1, RED_1, RED_5, startedGame, times } from '../support/game.ts';
+import {
+  BLOCKER,
+  KAIDO,
+  LUFFY,
+  PUR_1,
+  RED_1,
+  RED_5,
+  STAGE_PUR,
+  startedGame,
+  times,
+} from '../support/game.ts';
 
 describe('choose decisions: canonical order and completability (ADR 0003)', () => {
   it('a choice offers only candidates, in canonical order; an exact-1 pick completes it', () => {
@@ -97,25 +116,58 @@ describe('whyNot', () => {
   });
 });
 
-describe('autoSkip (ARCHITECTURE §2.3)', () => {
-  it('reports an empty Block or Counter window, and nothing when there is a real choice', () => {
+describe('autoSkip (ARCHITECTURE §2.3, flows.md decision 4, M2-02)', () => {
+  const vsAi = { observedByOtherHuman: false };
+  const hotseat = { observedByOtherHuman: true };
+  const counterWindow = (hand: string[]) => {
+    const g = scenario({ p1: { leader: LUFFY }, p2: { leader: KAIDO, life: [PUR_1], hand } });
+    g.act({ type: 'attack', attacker: g.leader('p1'), target: g.leader('p2') });
+    g.act({ type: 'block', blocker: null });
+    return g;
+  };
+
+  it('skips an empty Block window in either mode: its options are public', () => {
     const g = scenario({
       p1: { leader: LUFFY },
       p2: { leader: KAIDO, life: [PUR_1], hand: [PUR_1] },
     });
-    expect(autoSkip(g.state)).toBeNull();
+    expect(autoSkip(g.state, vsAi)).toBeNull();
     g.act({ type: 'attack', attacker: g.leader('p1'), target: g.leader('p2') });
-    expect(autoSkip(g.state)).toEqual({ type: 'block', blocker: null, player: 'p2' });
-    g.act({ type: 'block', blocker: null });
-    expect(autoSkip(g.state)).toBeNull(); // p2 holds a Counter
+    expect(autoSkip(g.state, hotseat)).toEqual({ type: 'block', blocker: null, player: 'p2' });
     const h = scenario({
       p1: { leader: LUFFY },
       p2: { leader: KAIDO, characters: [BLOCKER], life: [PUR_1] },
     });
     h.act({ type: 'attack', attacker: h.leader('p1'), target: h.leader('p2') });
-    expect(autoSkip(h.state)).toBeNull();
-    h.act({ type: 'block', blocker: null });
-    expect(autoSkip(h.state)).toEqual({ type: 'endCounter', player: 'p2' });
+    expect(autoSkip(h.state, vsAi)).toBeNull();
+  });
+
+  it('M2-02: with another human watching, the Counter window never skips while the hand holds cards', () => {
+    const withCounter = counterWindow([PUR_1]);
+    const noCounter = counterWindow([STAGE_PUR]);
+    // The attacker cannot tell the two positions apart...
+    expect(JSON.stringify(project(withCounter.state, 'p1'))).toBe(
+      JSON.stringify(project(noCounter.state, 'p1')),
+    );
+    // ...so whether the game pauses must not differ either.
+    expect(autoSkip(withCounter.state, hotseat)).toBeNull();
+    expect(autoSkip(noCounter.state, hotseat)).toBeNull();
+    // Against the AI nobody else watches, so the empty window may skip.
+    expect(autoSkip(noCounter.state, vsAi)).toEqual({ type: 'endCounter', player: 'p2' });
+    expect(autoSkip(withCounter.state, vsAi)).toBeNull();
+    // An empty hand is public (CR 3-1-4): it may skip in either mode.
+    expect(autoSkip(counterWindow([]).state, hotseat)).toEqual({
+      type: 'endCounter',
+      player: 'p2',
+    });
+  });
+
+  it('M2-01: a damage decision with no [Trigger] skips only when no other human watches', () => {
+    const g = counterWindow([]);
+    g.act({ type: 'endCounter' });
+    expect(queries.decision(g.state)!.kind).toBe('trigger');
+    expect(autoSkip(g.state, hotseat)).toBeNull();
+    expect(autoSkip(g.state, vsAi)).toEqual({ type: 'trigger', activate: false, player: 'p2' });
   });
 });
 
@@ -160,6 +212,31 @@ describe('preview', () => {
       player: 'p1',
     });
     expect(q.gameOver).toBe(true);
+  });
+
+  it('M2-04: previewFromView takes and returns handles only', () => {
+    const g = scenario({
+      p1: { leader: LUFFY, characters: [RED_5] },
+      p2: {
+        leader: KAIDO,
+        characters: [{ card: PUR_1, rested: true }],
+        life: [{ card: PUR_1, faceUp: true }],
+      },
+    });
+    const v = project(g.state, 'p1');
+    const attack = v.actions.find(
+      (a) => a.type === 'attack' && a.target === v.zones.p2.characters[0]!.handle,
+    )!;
+    const p = previewFromView(g.state, 'p1', attack);
+    expect(p.ko).toEqual([v.zones.p2.characters[0]!.handle]);
+    const ids = Object.keys(internals(g.state).cards);
+    for (const id of ids) expect(JSON.stringify(p)).not.toContain(id);
+    const hit = v.actions.find(
+      (a) => a.type === 'attack' && a.target === v.zones.p2.leader[0]!.handle,
+    )!;
+    const q = previewFromView(g.state, 'p1', hit);
+    expect(q.cards[v.zones.p2.life[0]!.handle]).toEqual({ zone: 'hand' });
+    expect(JSON.stringify(q)).not.toMatch(/"c[a-z0-9]{7}"/);
   });
 
   it('throws for an illegal action, like reduce', () => {
