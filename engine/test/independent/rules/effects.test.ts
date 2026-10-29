@@ -69,6 +69,7 @@ describe('effect rules (M4a)', () => {
       { leader: PLAIN_PURPLE, characters: [V.c3] },
     );
     play(g, 'OP17-056');
+    accept(g); // the "you may" activation cost (CR 8-3-1-4)
     expect(g.zone('p1', 'trash').map((c) => c.card)).toEqual(['OP17-056']);
     expectDecision(g, 'choose', 'p1');
   });
@@ -85,11 +86,6 @@ describe('effect rules (M4a)', () => {
   });
 
   it("CR 7-1-3-1-2 / 10-2-4-1: an Event [Counter] costs DON!! and works only in the opponent's Counter Step", () => {
-    const g = game(
-      { leader: KAIDO, hand: ['EB04-040'], costArea: { active: 2, rested: 0 } },
-      { leader: PLAIN_BLUE },
-    );
-    expect(g.legal().some((a) => a.type === 'playCard')).toBe(false); // its [Main] needs 6 to rest
     const d = game(
       { leader: KAIDO, hand: ['EB04-040'] },
       { leader: PLAIN_BLUE, characters: [V.c7] },
@@ -233,6 +229,7 @@ describe('effect rules (M4a)', () => {
       { leader: PLAIN_PURPLE, characters: ['OP09-072'] },
     );
     play(g, 'OP17-055');
+    accept(g); // the "you may" activation cost (CR 8-3-1-4)
     pick(g, [g.leader('p1')]);
     g.act({ type: 'attack', attacker: g.leader('p1'), target: g.leader('p2') });
     if (dec(g)?.kind === 'optional') decline(g);

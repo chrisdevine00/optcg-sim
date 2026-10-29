@@ -2,6 +2,14 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-10-29 — An Event's "you may" activation cost can be declined (B-1)
+
+Context: the independent card tests (DISAGREEMENTS.md B-1) expected EB04-040's "[Main] You may rest 6 of your DON!! cards: …" to let the player decline the cost after playing the Event. The engine paid it automatically, and refused to play OP17-056 when its "you may" cost could not be paid. The coordinator ruled for the test author: under CR 8-3-1-4 a "can/may" cost is optional and skipping it means only that the effect does not activate; playing the Event (paying its printed cost and trashing it, CR 2-7-3, 8-4-2) is a separate step.
+
+Decision: the DSL marks such abilities `costOptional: true` (EB04-040, OP17-055, OP17-056, OP17-077 [Main]; OP17-076 [Counter]). The Event is legal to play, or to activate in the Counter Step, whenever its printed cost can be paid. After it is trashed, the engine asks a `use` decision; "use" is unavailable when the activation cost cannot be paid (a forced no). Declining trashes the Event with no effect. Costs written as DON!! −X or with no "may", and costs of [Activate: Main] and [Trigger] abilities, are unchanged: choosing to activate those is the consent. ENGINE_VERSION 0.5.1.
+
+Rejected: refusing the play when the optional cost cannot be paid (no rule supports it); asking only when payable (the AI and UI would see a different flow for the same card).
+
 ## 2026-10-29 — Hotseat reveal: hold for mouse and R, sticky tap for touch, pen and keyboard
 
 Context: M3 re-review 1 (M3-32) found that on touch the defender could hold to reveal their hand but could not stage a Counter. A second finger's tap fires no `click`, and lifting the holding finger hid the hand.

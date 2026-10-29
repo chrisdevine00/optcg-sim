@@ -1,6 +1,17 @@
 /** OP17-077 Kundali Dragon Swarm. */
 import { describe, expect, it } from 'vitest';
-import { don, game, KAIDO, passBlock, pick, play, PLAIN_BLUE, PURPLE, V } from './helpers.ts';
+import {
+  accept,
+  don,
+  game,
+  KAIDO,
+  passBlock,
+  pick,
+  play,
+  PLAIN_BLUE,
+  PURPLE,
+  V,
+} from './helpers.ts';
 
 describe('OP17-077 Kundali Dragon Swarm', () => {
   it('[Main] rest 3 DON!! and trash 2: add 3 rested DON!!', () => {
@@ -9,17 +20,23 @@ describe('OP17-077 Kundali Dragon Swarm', () => {
       { leader: PLAIN_BLUE },
     );
     play(g, 'OP17-077');
+    accept(g); // the "you may" activation cost (CR 8-3-1-4)
     pick(g, [g.find('p1', 'hand', PURPLE), g.find('p1', 'hand', V.c1)]);
     expect(don(g, 'p1')).toMatchObject({ active: 0, rested: 7, deck: 3 });
   });
 
-  it('[Main] is not playable with only 1 other card in hand', () => {
+  it('CR 8-3-1-4 (B-1): with only 1 other card in hand it is played for nothing (the cost cannot be paid)', () => {
     const g = game(
       { leader: KAIDO, hand: ['OP17-077', PURPLE], costArea: { active: 4, rested: 0 } },
       { leader: PLAIN_BLUE },
     );
     const ev = g.find('p1', 'hand', 'OP17-077');
-    expect(g.legal().some((a) => a.type === 'playCard' && a.card === ev)).toBe(false);
+    expect(g.legal().some((a) => a.type === 'playCard' && a.card === ev)).toBe(true);
+    play(g, 'OP17-077');
+    expect(g.isLegal({ type: 'optional', accept: true, player: 'p1' })).toBe(false);
+    g.act({ type: 'optional', accept: false });
+    expect(don(g, 'p1')).toMatchObject({ active: 3, rested: 1, deck: 6 });
+    expect(g.zone('p1', 'hand').map((c) => c.card)).toEqual([PURPLE]);
   });
 
   it('[Counter] DON!! −1: Leader +4000', () => {

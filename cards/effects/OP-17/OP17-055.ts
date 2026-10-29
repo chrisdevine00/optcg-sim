@@ -11,6 +11,7 @@ export const OP17_055: CardScript = {
   abilities: [
     {
       id: 'main',
+      costOptional: true,
       label: 'Up to 1 of your [Rocks.D.Xebec] gains [Unblockable]',
       kind: 'activate',
       when: 'main',

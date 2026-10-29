@@ -11,6 +11,7 @@ export const EB04_040: CardScript = {
   abilities: [
     {
       id: 'main',
+      costOptional: true,
       label: "Up to 1 of your [Kaido] gains +3000; then rest up to 1 of your opponent's Characters",
       kind: 'activate',
       when: 'main',

@@ -12,6 +12,7 @@ export const OP17_076: CardScript = {
   abilities: [
     {
       id: 'counter',
+      costOptional: true,
       label: 'Up to 1 of your Leader or Characters gains +3000 power during this battle',
       kind: 'activate',
       when: 'counter',

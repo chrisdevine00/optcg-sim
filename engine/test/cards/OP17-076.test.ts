@@ -1,6 +1,18 @@
 /** OP17-076 Wo Ro Ro Ro Ro... I Think I've Sobered Up. */
 import { describe, expect, it } from 'vitest';
-import { BLUE, don, game, hand, KAIDO, passBlock, pick, PLAIN_BLUE, PURPLE, V } from './helpers.ts';
+import {
+  accept,
+  BLUE,
+  don,
+  game,
+  hand,
+  KAIDO,
+  passBlock,
+  pick,
+  PLAIN_BLUE,
+  PURPLE,
+  V,
+} from './helpers.ts';
 import { damageWith } from './triggers.ts';
 
 describe('OP17-076', () => {
@@ -13,12 +25,13 @@ describe('OP17-076', () => {
     g.act({ type: 'attack', attacker: g.find('p2', 'characters', V.c7), target: g.leader('p1') });
     passBlock(g);
     g.act({ type: 'activate', card: g.find('p1', 'hand', 'OP17-076'), ability: 'counter' });
+    accept(g); // the "you may" activation cost (CR 8-3-1-4)
     pick(g, [g.find('p1', 'hand', PURPLE)]);
     pick(g, [g.leader('p1')]);
     expect(g.power(g.leader('p1'))).toBe(8000);
   });
 
-  it('[Counter] needs another card in hand to trash', () => {
+  it('CR 8-3-1-4 (B-1): with no other card it can be activated, but the trash cost is forced no: no +3000', () => {
     const g = game(
       { leader: KAIDO, hand: ['OP17-076'] },
       { leader: PLAIN_BLUE, characters: [V.c7] },
@@ -26,7 +39,11 @@ describe('OP17-076', () => {
     );
     g.act({ type: 'attack', attacker: g.find('p2', 'characters', V.c7), target: g.leader('p1') });
     passBlock(g);
-    expect(g.legal().some((a) => a.type === 'activate')).toBe(false);
+    g.act({ type: 'activate', card: g.find('p1', 'hand', 'OP17-076'), ability: 'counter' });
+    expect(g.isLegal({ type: 'optional', accept: true, player: 'p1' })).toBe(false);
+    g.act({ type: 'optional', accept: false });
+    expect(g.power(g.leader('p1'))).toBe(5000);
+    expect(g.zone('p1', 'trash').map((c) => c.card)).toEqual(['OP17-076']);
   });
 
   it('[Trigger] DON!! −1: draw 2; not offered with no DON!! on the field', () => {

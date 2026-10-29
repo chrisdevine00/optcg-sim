@@ -129,9 +129,8 @@ describe('EB04-040 Flame Dragon Torch: [Main] rest 6: [Kaido] +3000 this turn, t
     expect(g.card(g.find('p2', 'characters', VAN.marco)).rested).toBe(false);
   });
 
-  // Rules disagreement: see DISAGREEMENTS.md B-1. The engine pays a [Main] Event's "you may" cost
-  // whenever the Event is played; CR 8-3-1-4 lets the player skip it (and get no effect).
-  it.fails('CR 8-3-1-4: declining the rest-6 cost does nothing', () => {
+  // DISAGREEMENTS.md B-1, resolved (CR 8-3-1-4): the "you may" cost can be skipped.
+  it('CR 8-3-1-4: declining the rest-6 cost does nothing', () => {
     const g = mainGame();
     act(g, { type: 'playCard', card: g.find('p1', 'hand', AKP.flameDragon) });
     decline(g);

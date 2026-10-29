@@ -67,6 +67,12 @@ export type ActivateAbility = AbilityBase & {
   kind: 'activate';
   when: ActivateTiming | ActivateTiming[];
   cost?: Cost[];
+  /**
+   * The cost is worded "you may" (CR 8-3-1-4). On an Event, playing the card (paying its printed
+   * cost and trashing it) is separate from this cost, which is then asked and may be declined: the
+   * effect alone does not activate (DECISIONS 2026-10-29, B-1).
+   */
+  costOptional?: true;
   effect: Effect;
 };
 export type TriggerAbility = AbilityBase & { kind: 'trigger'; cost?: Cost[]; effect: Effect };

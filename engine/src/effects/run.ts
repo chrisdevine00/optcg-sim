@@ -56,8 +56,12 @@ export function pushEffect(
   part: 'effect' | 'instead',
   opts: { start?: number; delayed?: boolean } = {},
 ): void {
+  // An optional auto, an auto with a cost, or an Event whose activation cost is worded "you
+  // may" (CR 8-3-1-4): ask first.
   const optionalAuto =
-    part === 'effect' && ab.kind === 'auto' && (ab.optional === true || (ab.cost?.length ?? 0) > 0);
+    part === 'effect' &&
+    ((ab.kind === 'auto' && (ab.optional === true || (ab.cost?.length ?? 0) > 0)) ||
+      (ab.kind === 'activate' && ab.costOptional === true));
   const f: EffectFrame = {
     f: 'effect',
     card,
@@ -152,12 +156,14 @@ function askUse(d: Draft, f: EffectFrame, ab: Ability): void {
     }
     return;
   }
-  const costs = ab.kind === 'auto' ? ab.cost : undefined;
+  const costs = ab.kind === 'auto' || ab.kind === 'activate' ? ab.cost : undefined;
   const ok = payable(ctxOf(d, f), costs);
   const secret = costIsSecret(costs);
   // A cost that cannot be paid on public information: nothing happens. If payability depends on
-  // the hand, ask anyway (with "use" unavailable) so the opponent learns nothing (ADR 0005).
-  if (!ok && !secret) {
+  // the hand, ask anyway (with "use" unavailable) so the opponent learns nothing (ADR 0005). An
+  // Event's optional cost is always asked, so playing it for no effect is visible (B-1).
+  const eventCost = ab.kind === 'activate';
+  if (!ok && !secret && !eventCost) {
     pop(d);
     return;
   }

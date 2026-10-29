@@ -761,7 +761,9 @@ function ability(c: Ctx, path: string, v: unknown, ids: Set<string>): void {
       if (v.cost !== undefined) costs(c, `${path}.cost`, v.cost);
       return steps(c, `${path}.effect`, v.effect);
     case 'activate': {
-      fields(c, path, v, ['kind', 'when', 'effect', 'id'], [...base, 'cost']);
+      fields(c, path, v, ['kind', 'when', 'effect', 'id'], [...base, 'cost', 'costOptional']);
+      if (v.costOptional !== undefined && (v.costOptional !== true || !v.cost))
+        err(c, `${path}.costOptional`, 'expected true, with a cost');
       const when = Array.isArray(v.when) ? v.when : [v.when];
       for (const w of when) enumOf(c, `${path}.when`, w, ['activateMain', 'main', 'counter']);
       if (v.cost !== undefined) costs(c, `${path}.cost`, v.cost);

@@ -11,6 +11,7 @@ describe('OP15-069 Nola', () => {
       { turn: 4, activePlayer: 'p2' },
     );
     play(g, 'OP17-056');
+    accept(g); // the "you may" activation cost (CR 8-3-1-4)
     pick(g, [g.find('p1', 'characters', target)]);
     return g;
   };

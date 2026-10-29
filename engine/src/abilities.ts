@@ -43,6 +43,7 @@ export type Ability =
       kind: 'activate';
       when: ActivateTiming | ActivateTiming[];
       cost?: Cost[];
+      costOptional?: true;
       effect: EStep[];
     })
   | (Base & { kind: 'trigger'; cost?: Cost[]; effect: EStep[] })

@@ -11,6 +11,7 @@ export const OP17_077: CardScript = {
   abilities: [
     {
       id: 'main',
+      costOptional: true,
       label: 'Add up to 3 rested DON!!',
       kind: 'activate',
       when: 'main',

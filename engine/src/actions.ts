@@ -54,7 +54,9 @@ const ctx = (s: State, p: PlayerId, self: InstanceId): Ctx => ({ s, you: p, self
 /** Can `p` activate this Event's [Main] or [Counter] from hand: its cost plus its activation costs? */
 function eventPayable(s: State, p: PlayerId, card: InstanceId, ab: Ability): boolean {
   const cost = derive(s, card).cost ?? 0;
-  const costs = ab.kind === 'activate' ? ab.cost : undefined;
+  // A "you may" activation cost can always be skipped (CR 8-3-1-4): only the card's own cost must
+  // be payable to play it; the activation cost is asked afterwards (B-1).
+  const costs = ab.kind === 'activate' && !ab.costOptional ? ab.cost : undefined;
   return payable(ctx(s, p, card), costs, { playCost: cost, exclude: card });
 }
 

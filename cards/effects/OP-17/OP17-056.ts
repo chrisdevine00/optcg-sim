@@ -11,6 +11,7 @@ export const OP17_056: CardScript = {
   abilities: [
     {
       id: 'main',
+      costOptional: true,
       label: "Return up to 1 Character with a cost of 6 or less to its owner's hand",
       kind: 'activate',
       when: 'main',

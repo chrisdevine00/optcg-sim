@@ -9,6 +9,14 @@ settled, either fix the engine and drop `it.fails`, or change the test and delet
 
 ### B-1. EB04-040 Flame Dragon Torch: a [Main] Event's "you may" cost cannot be declined
 
+**Resolved 2026-10-29 for the test author** (coordinator's ruling, CR 8-3-1-4). The engine now asks
+an Event's "you may" activation cost as a `use` decision after the card is played; declining it
+trashes the Event with no effect. The Event is playable whenever its printed cost can be paid; if
+the activation cost cannot be paid, "use" is unavailable. Scripts with `costOptional`: EB04-040,
+OP17-055, OP17-056, OP17-077 ([Main]) and OP17-076 ([Counter]). The test is a plain `it` again.
+The original entry follows.
+
+
 - **Card text:** "[Main] You may rest 6 of your DON!! cards: Up to 1 of your [Kaido] cards gains
   +3000 power during this turn. Then, rest up to 1 of your opponent's Characters."
 - **Test:** `EB04-040.test.ts`, "CR 8-3-1-4: declining the rest-6 cost does nothing" (`it.fails`).
