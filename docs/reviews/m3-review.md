@@ -293,3 +293,99 @@ The tests are real: each one fails when its fix is removed. They do not cover th
 **Blocking:** M3-27, M3-28 and M3-32. Fix them, add the three tests described, then re-review.
 
 Severity 2 (M3-29 to M3-31 and M3-33, plus M3-18 carried) can be fixed or scheduled in DECISIONS. The manual screen-reader pass in PLAN's M3 exit criteria is still owed; this review's screen-reader work is a proxy, not that pass.
+
+---
+
+## Re-review 2
+
+**Date:** 2026-10-29
+**Build reviewed:** `f162b87` (fix `54e4fe0`, plus the `Dock.tsx` part of `cf2e304`; CI run 40818609741 green).
+- I served it from a clean detached worktree (`.cache/m3-rr2/head`, Vite on :5176).
+- Mutations and a scratch Event [Counter] scenario ran in a second worktree (`.cache/m3-rr2/mut`, :5177).
+- The main tree was not touched.
+- `main` has since moved to `66e4b43`. Between the two, `app/src` is unchanged: only engine commits, including the B-1 Event-cost fix, and longer e2e timeouts.
+
+**M3 re-review 2: FAIL.**
+- **Open severity 3:** M3-35. Under the hotseat veil, a decision the screen's player owes (an effect's choose or optional) reads "Your opponent is choosing." This is new surface: M4a effects now reach the defence.
+- **Severity 4:** none open. The sticky reveal did not leak to the other player before a game ended. It survives into game over after a concession (M3-36, severity 2).
+
+### Method
+
+1. **Sticky-reveal leak hunt** (`.cache/m3-review/rr2-sticky.mjs`, `rr2-rewind.mjs`; output in `rr2/sticky.txt`, screenshots `rr2/*.png`).
+   - It ran on the `leak` scenario, whose private names are unique, at 1024×690 with `hasTouch` and at 1280×720 with a mouse and keyboard.
+   - Paths tried:
+     - stage, then take the hit; reveal again in the damage decision; Add to hand; the attacker's seat;
+     - concede from the menu while revealed;
+     - U and Shift+U with consent while revealed, then the curtain and its lift;
+     - the inspector pinned on a hand card, then "Hide my hand";
+     - window `blur`;
+     - a mouse click on the veil (it must only hold);
+     - Enter on the veil (sticky), an R tap during a sticky reveal, and a Blocker-only commit.
+   - At each step I checked every text node and attribute, the rendered hand cards and the pixels.
+2. **Severity-3 fixes on real input.**
+   - `rr2-touch.mjs` drives real CDP `Input.dispatchTouchEvent` taps, not `.tap()`.
+   - `rr2-k.mjs` checks M3-27.
+   - `rr2g/ai-game.mjs` plays a full game vs Rookie, patched for M4a effect decisions, to check M3-28.
+3. **Regression on the earlier probes.**
+   - I re-ran `leak.mjs`.
+   - `rr2-hotseat.mjs` plays a full hotseat game with the Rocks and Kaido scripted effects live; it has stall detection, and its output is in `rr2/hotseat-report.txt`.
+   - `rr2-evc.mjs` used a scratch hotseat scenario in which Player 1 defends holding OP17-076 and OP07-076, both Event [Counter] cards. It went through veiled, R held, R released, activating an Event, and the cost and optional prompts.
+4. **Mutation tests:** remove each fix, then run its test.
+
+### Do the new tests catch the old bugs?
+
+| Mutation | Test | Result |
+| --- | --- | --- |
+| No auto-close of a dock whose card left the view (M3-27) | `review-rr1` "inspecting a card while R is held…" | **fails** (the veil is not focused) |
+| `finish()` back on `assertive.text === ''` (M3-28) | `review-rr1` "game over is announced…" | **fails** |
+| The veil's tap does not make a sticky reveal (M3-32) | `touch-hotseat.spec.ts` | **fails** (no hand cards) |
+| The unpinned dock is not `inert` (M3-30) | `review-rr1` "the hover preview is never a Tab stop" | **fails** |
+| The defence commit does not end the reveal | `touch-hotseat.spec.ts` | **passes**: the seat change after the commit hides the hand anyway, so the "commit ends the reveal" rule is not tested on its own (M3-38) |
+
+On the unmutated worktree, the 11 tests in `review-rr1`, `touch-hotseat`, `hotseat-leaks` and `defence` pass.
+
+### Claims verified
+
+| ID | Verdict | Evidence |
+| --- | --- | --- |
+| M3-27 | **Fixed.** The inspector closes when its card leaves the view, focus goes to the veil, and R reveals again. The log is no longer `inert`. With a sticky reveal, "Hide my hand" while the inspector is pinned also closes it and focuses the veil. | `rr2-k.mjs`; `rr2/sticky.txt` (S4) |
+| M3-28 | **Fixed.** A full game vs Rookie with six defence alerts ends with `A: Game over. You win on turn 11.` and `P: Rematch, or New game.`, focus on the heading "Game over", and Enter starts the rematch. | `rr2g/ai-announcements.txt`, `rr2g/ai-focus.txt` |
+| M3-32 | **Fixed** with real touch:<br>• one CDP tap reveals the hand, and three single taps stage "Counter +3000 · survive · 8000 vs 7000";<br>• "Hide my hand" re-veils with "3 staged";<br>• the commit lands with no hand cards left on screen.<br>A long press on touch reveals only when the finger lifts (it is a click), which is fine, but the copy says "press and hold" (M3-38). | `rr2-touch.mjs` |
+| M3-29 | **Fixed.** The 720 inspector docks over the rail with the art at 63:88 and full, scrolling text (`.cache/m3/720p-inspector.png`, taken at 00:45). The hover preview shows 168×235 art at both sizes (`rr2/hover-1280.png`, `rr2/hover-1920.png`). At 1920 that is smaller than board.md's 240×335 (M3-38). | as cited |
+| M3-30 | **Fixed:** the unpinned dock is `inert`. | mutation above |
+| M3-31 | **Fixed.**<br>• Hits are credited to the attacker: "You: Hit · 8000 vs 5000.", "Kaido: Hit · 6000 vs 5000."<br>• "You have no Counter cards."<br>• There is no "Opp" and no doubled full stop in 83 announcements. | `rr2g/ai-announcements.txt` |
+| M3-34 | **Fixed** for the title: it names the Blocker once one is chosen. | `rr2-m305`-style run |
+
+### The sticky reveal as a leak surface
+
+| Path | Result |
+| --- | --- |
+| Stage, then commit (Take the hit, or a Blocker only) | Reveal ends. The attacker's seat shows no hand of Player 1's; 0 names in the DOM. |
+| Damage decision: reveal again, then Add to hand | Ends at the seat change. At 150 ms the screen already shows Player 2's seat with the click veil; 0 names. |
+| `blur`, Hide my hand, the inspector | All end it; 0 names. |
+| R tapped during a sticky reveal | Ends it (a release counts as a hold ending), which is the safe direction. |
+| Mouse click on the veil | Holds only; it never goes sticky. |
+| Rewind with consent while revealed (U) | The curtain goes to Player 2; under it, 0 names; after it, Player 2's own hand only. The reveal flags survive the seat change, though (M3-36). |
+| **Concede while revealed** | **Player 1's hand stays on the game-over board** (Hajrudin, Shinobu, Jean Bart, Wire in the DOM and the pixels: `rr2/s2-concede-game-over.png`). This is M3-36. |
+| Event [Counter] (scratch scenario) | Buttons render only while revealed, and none show while veiled. An activated Event goes to the trash, which is public. Nothing private appears after R is released. |
+
+### New findings
+
+| ID | Sev | Area | Problem | Evidence | Fix |
+| --- | --- | --- | --- | --- | --- |
+| M3-35 | 3 | Hotseat: effect decisions under the veil | **When the defender owes an effect decision while veiled, the panel says the opponent is deciding.** `publicView` gives the decision the *other* seat's prompt, so Player 1's own decision reads:<br>• "Choose · **Your opponent is choosing.** · 0 of 1 chosen", with no candidates (they are hidden hand cards) and Done disabled, plus the make-room footnote "Trashing to make room is not a K.O.", which is wrong for this choice;<br>• "Optional effect · **Your opponent is deciding whether to use an effect.**", with Skip and Use live.<br>Nothing in the panel says it is Player 1's move or that they must reveal their hand to answer. In a real hotseat game (seed 202, turn 8, Queen attacks) my script stalled exactly there, and two people at one device would too: each waits for the other. The scripted M4a effects ("on your opponent's attack" costs, the Kaido Leader's DON!! −1, Event [Counter] costs) reach this panel in ordinary play. | `rr2/hotseat-stall.png`; `rr2/hotseat-report.txt` (STALL line); `rr2-evc.mjs` output (states 1 and 7); `session.ts` `publicView` (`prompt: theirs.decision.prompt`); `Decision.tsx` `chooseContent` (footnote always shown) | When the veiled seat owes the decision, title the panel for that player, for example "Player 1: your choice. Reveal your hand to answer (tap, hold, or R)", and put a reveal button inside the panel. Keep the prompt generic only where it names hidden cards. The effect's source card is public, so it can be named. Show the make-room note only for `purpose: 'makeRoom'`. Add a hotseat e2e with a scripted effect that asks the veiled defender to choose. |
+| M3-36 | 2 | The reveal outlives its owner | **Reveal flags survive game over and rewind.** `finish()` never calls `endReveal()`, so a concession made while revealed leaves the conceder's hand on the game-over board for whoever looks (it is still in the DOM and the pixels). `rewound()` switches the seat without going through `updateSeat`, so `revealHeld` and `revealSticky` survive, along with a stale `'hold'` veil. I saw no cross-seat exposure, because the new seat had just lifted its own curtain, but the state is wrong. `hotseat-leaks.spec` step 10 checks game over only when nothing was revealed. | `rr2/s2-concede-game-over.png`, `rr2/sticky.txt` (S2, S3); `controller.ts` `finish()`, `rewound()` | Call `endReveal()` in `finish()` and in `rewound()`/`restart()`, and set `handVeil` through `updateSeat` on every seat change. Extend the leak walk: reveal (sticky), then concede, then expect no private names. |
+| M3-37 | 2 | Public view: a new field passes through | M4a added `ProjectedView.looking` (cards this player is looking at through an effect). `publicView` copies `own` with `...own` and clears only `actions` and `known`, so `looking` survives into the veiled view. `Game.tsx` then indexes `view.looking`, so `nameOf`/`cardOf` resolve those cards while veiled. Nothing renders them today, because veiled pick candidates are filtered by `actions()`, so this is not a leak yet. It is one render away, and `hidden.test.ts` does not cover it. | `session.ts` `publicView`; `Game.tsx:147–149`; `engine/src/project.ts:45` | Build `publicView` from an allow-list of fields, not a spread, with `looking: []`, `resolving` intersected like the zones, and `known: {}`. Extend `hidden.test.ts` to assert every hidden-bearing field. |
+| M3-38 | 1 | Test gap and copy | • Removing "a commit ends the reveal" leaves `touch-hotseat.spec` green: assert the hand is veiled in a same-seat decision after the commit (Take the hit → damage decision).<br>• The Counter-lane and damage hints still say "hold R, or press and hold your hand area" and never mention tap. On touch a long press reveals only when the finger lifts, so make the veil read "Tap to show your hand".<br>• The 1920 hover preview art is 168×235, not board.md's 240×335, inside a 384×515 dock that is mostly empty. | mutation table; `rr2-touch.mjs`; `rr2/hover-1920.png` | Fix in passing. |
+
+### Regression notes
+
+- `leak.mjs`: every canary step is clean, with no page errors.
+- Full hotseat game: no "LEAK?" line before the M3-35 stall. The curtains hold no names, and Tab from the curtain reaches only `<body>`.
+- Full game vs Rookie: M4a effect decisions (optional, order, option picks) all resolve through the panel, with no page errors.
+
+### Disposition
+
+**Blocking:** M3-35. Fix it, add the hotseat effect-decision test, then re-review. M3-36 and M3-37 are small hardening steps and should go in the same change.
+
+Still owed: the manual screen-reader pass in PLAN's M3 exit criteria, and the carries already scheduled in DECISIONS (M3-18, M3-23).
