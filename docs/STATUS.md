@@ -72,74 +72,37 @@
 
 ## In progress
 
-**M3 is built** (commits 757d2c3 to d044539) and its review is running. Verified by the orchestrator:
-- 392 unit tests and 69 e2e tests pass (3 skipped);
-- lint, typecheck and the build pass;
-- initial JS is 71.0 KB gzipped, and the board route loads lazily at 56.7 KB;
-- the AI worker receives only a `PlayerView`.
+### M3 Playable board: code passes review; the screen-reader pass is outstanding
+- **Review:** `docs/reviews/m3-review.md` went through 4 fix rounds and 4 re-reviews. Re-review 4 (2c203ce) is a PASS, with no severity 3 or 4 open.
+  - The hotseat hidden-information leaks were fixed structurally: veiled screens render only from a branded `PublicView`, and a differential test requires identical veiled screens across hidden-card variations (DECISIONS, 2026-10-29).
+  - M3-41 to M3-43 were fixed in d3ed657.
+- **Carried, with targets:** M3-18 (M10), M3-23 (DECISIONS, 2026-10-29).
+- **Last exit criterion, the screen-reader pass** (PLAN M3; accessibility.md §11.2):
+  - An agent is running the scripted NVDA pass with Guidepup on a Windows GitHub Actions runner (`workflow_dispatch`), recording to `docs/design/a11y-passes/`.
+  - M3 is marked done when that record has no open severity 3 or 4 finding.
+  - The VoiceOver pass is the owner's (see Blockers).
 
-Builder decisions are logged in DECISIONS (2026-10-28, M3). Not done in M3, by the builder's own account:
-- drag;
-- hotseat rewind consent;
-- save and resume;
-- the "Why?" chip on AI log lines;
-- the "you look away" line;
-- the forced-colours double ring.
+### M4a Effects slice: fixed, in re-review
+- **Built:** 37 Rocks and Kaido scripts, the DSL runtime, and a benchmark of about 4,000 to 5,600 two-turn simulations per second in a worker (target 1,000; ADR 0008 confirmed).
+- **Independent card tests:** 314 black-box tests, merged in b05c19e. One rules disagreement (B-1, optional Event costs) was ruled under CR 8-3-1-4 and fixed.
+- **Review** `docs/reviews/m4a-review.md` (70c6aa8): FAIL, then fixed in two phases:
+  - **Phase A, engine** (292f730): ordered [On Play]s, the nightly false positive, the validator, DON!! −X optional (E-Q12 closed, RL-52), the hash.
+  - **Phase B, app** (d3ed657): [Activate: Main] in the UI, effect log lines and announcements, prompts matching flows F6 and F8, setup copy.
 
-**Review 1 (`docs/reviews/m3-review.md`, 0cfa8cc): FAIL.** It had 26 findings: 4 hotseat leaks at severity 4 and 4 findings at severity 3. **Fix round 1 is done** (405751b, c379298; CI run 40815495263 green):
-- the leaks are fixed at the root with a public view and log (see DECISIONS, 2026-10-29);
-- every severity-3 finding and most severity-2 findings are fixed;
-- carried: M3-18 (tablet lane chip size), M3-23 (the not-built list) and some severity-1 nits.
+  ENGINE_VERSION is 0.5.2.
+- **CI:** 2 min 35 s, with Playwright in 3 shards and per-push full games starting from a late-game scenario. The turn-1 full games run nightly (`E2E_FULL=1`).
+- **Re-review 1 is running.** When it passes, M4a is done.
 
-**Re-review 1 (dc494e8): FAIL.** The leaks are confirmed fixed, and each new test catches its bug. Three new severity-3 findings are open: M3-27 (the inspector pinned after R is released kills the shortcuts), M3-28 (game over is silent after a defence) and M3-32 (touch can't stage a Counter while revealing). **Fix round 2 is done** (54e4fe0; CI run 40818609741 green): M3-27, M3-28 and M3-32 are fixed, plus M3-29 to M3-31. **Re-review 2 (5d3f3a7): FAIL.** M3-27, M3-28 and M3-32 are verified, and no severity-4 finding is open. One new severity-3 finding: M3-35, where an effect decision the veiled defender owes is shown in the opponent's wording, so a hotseat game stalls. M4a's effects reaching the defence panel exposed it. **Fix round 3 is done** (64ddfb5; CI run 40822229184 green). Veiled effect decisions now name their seat and offer "Show my hand". The public view is built from an explicit list of fields. **Re-review 3 (1321736): FAIL.** One new severity-4 leak: M3-39, where whether "Use" is enabled under the veil reveals whether the defender's hand can pay a cost. The fixes for M3-35 to M3-38 are verified. **Fix round 4 is done** (97f5f4f, 61dc040; CI run 40827636985 green). Veiled rendering now goes through a branded `PublicView` (see DECISIONS), checked by a 52-pair differential test. **Re-review 4 (2c203ce): PASS on code.** No severity 3 or 4 finding is open, and M4a-01 is marked fixed. M3-41 to M3-43 (severity 2 and 1; M3-42 adds the missing test that presses Use under the veil) went to the M4a builder's phase B.
-
-**M3's last exit criterion is the screen-reader pass** (PLAN M3; accessibility.md §11.2). An agent is building the scripted NVDA pass with Guidepup on a Windows GitHub Actions runner (`workflow_dispatch`), with an `a11y-m3` scenario. It records to `docs/design/a11y-passes/` after phase B lands. The VoiceOver passes, scripted and by hand, are the owner's: Guidepup's setup changes macOS settings, so the agent won't run it on the owner's Mac. M3 is marked done once the NVDA record has no open severity 3 or 4 finding. The VoiceOver pass is listed under Blockers as an owner item. Carried items have target milestones (DECISIONS, 2026-10-29).
-
-The screen-reader section of the review is a proxy. A real VoiceOver or NVDA pass is still owed: it goes with owner session S1, or to the owner sooner.
-
-**M4a is built** (builder's report; awaiting the independent-test merge and review). Commits on `main`:
-- 799dfcd carried M2 findings M2-17 to M2-23;
-- b260938 DSL types, script schema (`validateScript`) and registry;
-- 495e4b8 the DSL runtime in `engine/src/effects/`;
-- cf2e304 all 37 Rocks and Kaido scripts, 134 per-card tests, effects in the board, an e2e test that resolves Kaido's [When Attacking] through the UI;
-- then the benchmark and docs.
-
-Notes:
-- **Coverage:** Rocks (OP17-039) and Kaido (OP17-058) lists 100% scripted (37 cards, `cards/effects/`).
-- **Benchmark:** median 5,588 two-turn simulations per second in a `worker_threads` worker (target 1,000; ADR 0008 confirmed, no fallback). Method in `docs/benchmarks.md`; run `npm run bench:two-turn`.
-- **Tests:** 633 unit tests (164 todo), 79 e2e.
-- **API additions:** `Decision.purpose/source/options`, `{ option }` picks, `CardView`/`ViewCard` effect flags, `ProjectedView.looking/known/attackLock/delayed` (DECISIONS 2026-10-29, M4a).
-
-Since the builder's report:
-- **Orchestrator check** on clean main: 633 unit tests, 37 scripts, and a benchmark median of 3,949 per second with other agents running.
-- **Independent card tests:** merged to main (b05c19e). After the test author adapted the kit to the API additions (no expected outcome changed), 946 tests pass and 1 is an expected fail. B-1 (EB04-040's optional "you may rest 6" cost was auto-paid) was ruled for the test author under CR 8-3-1-4. It is fixed in 6d13ba9, and the full-game e2e timeouts went up in 354e2a8 (CI run 40820443987 green). All 314 independent card tests now pass. E-Q12 stays open: an Event playable when its optional cost can't be paid, and whether DON!! −X is optional.
-- **M4a review (`docs/reviews/m4a-review.md`, 70c6aa8): FAIL.** The engine core is sound: all 37 scripts match their cards, the engine leaks nothing, M2-17 to M2-23 hold, and the benchmark measured 5,106 per second.
-  - Severity 4: M4a-01, the M3-39 leak plus an OP07-077 case, added to M3 fix round 4. M4a-02 is already fixed by 64ddfb5.
-  - Severity 3:
-    - M4a-03: [Activate: Main] can't be used from the UI.
-    - M4a-04: OP17-118's [On Play] order is decided by instance id.
-    - M4a-05: the log records no effects, so screen-reader users hear nothing.
-  - Severity 2:
-    - M4a-06: the nightly leak property's false positive.
-    - M4a-07: validator traps for M4b.
-    - M4a-08: DON!! −X on Events is optional, which answers E-Q12 (attribution of the ST04-016 Q&A row to be checked by hand).
-    - M4a-09: prompts deviate from flows F6/F8.
-  - **Phase A is done** (292f730; CI run 40826294923 green; ENGINE_VERSION 0.5.2). M4a-04: [On Play]s from one effect are ordered by the player. M4a-06: the nightly false positive is fixed and verified at 10,000 games. M4a-07: the validator rejects every shape the runtime would get wrong, and fall-throughs emit an `Anomaly`. M4a-08: DON!! −X on Events is declinable; the Q&A attribution was checked by hand, E-Q12 is closed and RL-52 added. M4a-11 and M4a-12 are fixed, and M4a-10 is recorded as M4b entry items. **Phase B** (app: M4a-03, 05, 09, 15, plus a shorter CI start for the full-game e2e tests, now 11–13 min) is running now that M3 fix round 4 has landed. Then the M4a re-review.
-- **Verification caveat:** a worktree that symlinks the main tree's `node_modules` resolves `@optcg/*` to the main tree, so local "clean worktree" runs may test the wrong code. Use `npm ci` in the worktree; CI is the ground truth.
-
-If interrupted, check `git log` and the branch, and re-launch whichever of these stopped.
+### Verification caveats
+- A worktree that symlinks the main tree's `node_modules` resolves `@optcg/*` to the main tree. Use `npm ci` in the worktree.
+- Set `E2E_PORT`, so you don't reuse another copy's preview server.
+- CI is the ground truth.
 
 ## Next (slice pass, PLAN.md §1)
 
-1. **M3 Playable board** (estimate 50 h):
-   - the board per `docs/design/board.md` at 1280×720 and 1920×1080, plus the adapted sizes;
-   - hotseat, and play vs Rookie (random legal moves, always blocks or counters lethal, in a Web Worker);
-   - every decision type from `flows.md`: the defence panel, multi-select, Trigger, order;
-   - rewind by move, the inspector, the live region, and the keyboard path from `accessibility.md`.
-
-   It also fixes the carried items: the Phase 4 severity-2 findings and M1-37/38.
-2. **M4a:** fix M2-19 first; then the DSL runtime, the Rocks and Kaido archetypes, and a throughput benchmark.
-3. **M5a** (Pirate), the learning slice L, and owner usability session S1.
+1. **M5a AI slice** (estimate 40 h): per-turn planning (ADR 0008), the **Pirate** tier, the `Explanation` builder, and game-plan assertions for the Rocks and Kaido playbooks. It also takes the carried "Why?" chip on AI log lines (M3-23).
+2. **L Learning slice:** the battle panel and DON!! overlay (`preview`), the tiered lethal detector, lethal search, the missed-lethal review flag end to end, and "Practice this". Then a manual screen-reader pass.
+3. **Owner usability session S1** on the real game (`usability-plan.md`).
 4. **M4b entry items** (from the M4a review, M4a-10; not reachable with the Rocks and Kaido scripts, so fix before M4b scripts can reach them):
    - one removal event over several Characters gets **one** replacement offer (QA-OP15 OP15-069: one DON!! return keeps both);
    - at the End Phase, fire [End of Your Turn], delayed "at the end of this turn" and [End of Your Opponent's Turn] effects as **one batch per player**, so the turn player can order a delayed effect against their own (CR 6-6-1-1, 8-6-1);
