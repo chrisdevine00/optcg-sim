@@ -6,7 +6,7 @@ import { nvdaTest as test } from '@guidepup/playwright';
 import { NvdaReader } from './src/reader.ts';
 import { Pass } from './src/pass.ts';
 import { M3_URL, runM3 } from './src/m3.ts';
-import { serveArt } from './src/art.ts';
+import { serveArt, startAtTop } from './src/art.ts';
 
 test.use({ nvdaStartOptions: { capture: true } });
 
@@ -22,6 +22,7 @@ test('M3 script (NVDA)', async ({ page, nvda }, info) => {
   await reader.start();
   // Guidepup: focus the browser window, enter browse mode at the top of the page.
   await nvda.navigateToWebContent();
+  await startAtTop(page);
   try {
     await runM3(pass);
   } finally {

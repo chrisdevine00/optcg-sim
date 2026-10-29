@@ -224,6 +224,7 @@ export class Pass {
     await this.reader.press(key);
     const captured = (await this.reader.actionLog()).slice(before).filter(Boolean);
     const f = await this.focus();
+    this.saveLater();
     this.cur?.keys.push({
       key,
       t,
@@ -248,7 +249,15 @@ export class Pass {
 
   // ------------------------------------------------------------------ output
 
+  private lastSave = 0;
+  /** Saves at most every 10 s while a step runs, so a hung run still leaves its speech. */
+  private saveLater() {
+    if (Date.now() - this.lastSave < 10_000) return;
+    this.save();
+  }
+
   save() {
+    this.lastSave = Date.now();
     mkdirSync(this.outDir, { recursive: true });
     const meta = {
       project: this.project,
@@ -261,9 +270,17 @@ export class Pass {
     };
     writeFileSync(
       join(this.outDir, 'm3.json'),
-      JSON.stringify({ meta, steps: this.steps }, null, 2),
+      JSON.stringify({ meta, steps: this.withCurrent() }, null, 2),
     );
-    writeFileSync(join(this.outDir, 'm3.md'), toMarkdown(meta, this.steps));
+    writeFileSync(join(this.outDir, 'm3.md'), toMarkdown(meta, this.withCurrent()));
+  }
+
+  /** The finished steps, plus the running one with the speech heard so far. */
+  private withCurrent(): StepRec[] {
+    if (!this.cur) return this.steps;
+    const c = this.cur;
+    const heard = this.reader.heardSince(c.start);
+    return [...this.steps, { ...c, status: 'error', error: 'in progress when saved', heard }];
   }
 }
 

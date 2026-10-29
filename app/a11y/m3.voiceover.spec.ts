@@ -7,7 +7,7 @@ import { voiceOverTest as test } from '@guidepup/playwright';
 import { VoiceOverReader } from './src/reader.ts';
 import { Pass } from './src/pass.ts';
 import { M3_URL, runM3 } from './src/m3.ts';
-import { serveArt } from './src/art.ts';
+import { serveArt, startAtTop } from './src/art.ts';
 
 test.use({ voiceOverStartOptions: { capture: true } });
 
@@ -21,6 +21,7 @@ test('M3 script (VoiceOver)', async ({ page, voiceOver }, info) => {
   await page.locator('#decision').waitFor({ timeout: 30_000 });
   await page.waitForTimeout(1000);
   await voiceOver.navigateToWebContent();
+  await startAtTop(page);
   try {
     await runM3(pass);
   } finally {

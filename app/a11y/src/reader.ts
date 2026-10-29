@@ -41,19 +41,47 @@ export class NvdaReader implements Reader {
     this.tapOk = await this.tap.start();
   }
 
+  /**
+   * Sends the key through NVDA. With the speech tap running, Guidepup's own capture is off: it
+   * presses NVDA's stop-speech key before every action and waits for a second of silence after it,
+   * which no real user does, and it never returns while something keeps talking (the first run
+   * hung for 30 minutes that way). Instead this waits until NVDA has been quiet for a second, at
+   * most 10 seconds, and the tap keeps every phrase.
+   */
   async press(key: string) {
+    const capture = !this.tapOk;
+    const t0 = Date.now();
     const special = VK[key];
-    if (special) {
-      // `perform` takes Guidepup key objects; these mimic `Key` for keys it does not name.
-      const shift = rawKey(0x10, 42);
-      const k = rawKey(special.vk, special.scan);
-      await this.nvda.perform({ keyCode: [k], modifiers: special.shift ? [shift] : [] } as never, {
-        capture: true,
-      });
-      return;
+    const send = special
+      ? // `perform` takes Guidepup key objects; these mimic `Key` for keys it does not name.
+        this.nvda.perform(
+          {
+            keyCode: [rawKey(special.vk, special.scan)],
+            modifiers: special.shift ? [rawKey(0x10, 42)] : [],
+          } as never,
+          { capture },
+        )
+      : // Guidepup splits on "+"; "Shift+Tab" works, a bare "+" does not (handled above).
+        this.nvda.press(key === ' ' ? 'Space' : key, { capture });
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const late = new Promise<'late'>((r) => (timer = setTimeout(() => r('late'), 20_000)));
+    const r = await Promise.race([send.then(() => 'sent' as const), late]);
+    clearTimeout(timer);
+    if (r === 'late') this.lateKeys.push(key);
+    if (!capture) await this.quiet(t0);
+  }
+
+  /** Keys whose NVDA command did not return within 20 s (noted in the record). */
+  lateKeys: string[] = [];
+
+  private async quiet(t0: number) {
+    for (;;) {
+      const now = Date.now();
+      const last = this.tap.heard.at(-1)?.t ?? 0;
+      if (now - t0 >= 1000 && now - Math.max(last, t0) >= 1000) return;
+      if (now - t0 >= 10_000) return;
+      await new Promise((r) => setTimeout(r, 100));
     }
-    // Guidepup splits on "+"; "Shift+Tab" works, a bare "+" does not (handled above).
-    await this.nvda.press(key === ' ' ? 'Space' : key, { capture: true });
   }
 
   heardSince(t: number) {
@@ -66,7 +94,12 @@ export class NvdaReader implements Reader {
 
   notes() {
     return this.tapOk
-      ? ['Speech tap: joined the NVDA Remote relay; every phrase NVDA spoke is timestamped.']
+      ? [
+          "Speech tap: joined the NVDA Remote relay; every phrase NVDA spoke is timestamped. Guidepup's per-key capture is off (it stops speech before each key).",
+          ...(this.lateKeys.length
+            ? [`NVDA commands that took over 20 s: ${this.lateKeys.join(', ')}`]
+            : []),
+        ]
       : [
           `Speech tap unavailable (${this.tap.error ?? 'unknown'}); only Guidepup's per-key capture is recorded.`,
         ];
