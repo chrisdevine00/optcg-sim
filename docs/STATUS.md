@@ -66,15 +66,15 @@
 
 ## In progress
 
-Two M2 subagents are running:
-1. **Engine author** (`engine/` on `main`). It implements the frozen API (`engine/src/api.ts`): rules, scenarios, replacement hooks, last-known information, leak-proof projection, records, invariants, property tests (500 games per push, 10,000 nightly) and benchmarks. It commits each green step.
-2. **Independent test author**, in a git worktree on branch `m2-independent-tests` (under `.claude/worktrees/`, ignored by git and lint). It writes rule and ruling tests from the digest and rulings without seeing the engine source. The branch is merged once the engine is ready, and failures are triaged as engine bugs or test errors.
-
-If interrupted: check `git log` and the branch, then re-launch each with its brief (PLAN M2 row, ARCHITECTURE §2), continuing from the last commit.
+- **M2 Engine core:** built on `main` (commits c1e0d2c, 13e358a, 0402711, 41c955d) and merged with the independent suite (c6d8661).
+  - Tests: 361 unit tests pass, 0 fail, plus 183 todos that wait for M4 effects. The independent suite (132 tests written blind) passes in full.
+  - Benchmark: median `reduce` about 4 µs (target under 20 µs), `legalActions` about 1.4 µs.
+  - Nightly property run: 10,000 random games in 39 s, with 0 invariant failures, 0 replay-hash mismatches and 0 projection leaks.
+- **Running:** a skeptical-engineer review (`docs/reviews/m2-review.md`) that tries to break rules, hidden information and determinism with probe tests. M2 is done on PASS. If interrupted, re-launch the review with the same brief.
 
 ## Next (slice pass, PLAN.md §1)
 
-1. **M2:** when the engine author reports, merge `m2-independent-tests` and triage its failures. Then the M2 review: a skeptical-engineer subagent and the done criteria (one test per non-effect rule, the replacement-hook and last-known-information tests, the projection leak test, 500/10,000 clean games, stable golden records, reduce benchmark).
+1. **M2 review** (running), then fix any severity-3 or severity-4 findings.
 2. **M3 Playable board:** the board from `docs/design/board.md`, hotseat, play vs Rookie, every decision type, rewind by move, the keyboard path, and the live region. It also fixes the carried items: the two Phase 4 severity-2 findings and M1-37/38.
 3. **M4a:** the DSL runtime, then the Rocks and Kaido archetypes and a throughput benchmark. Then M5a (Pirate), the learning slice L, and owner usability session S1.
 

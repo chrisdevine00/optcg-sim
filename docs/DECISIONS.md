@@ -2,6 +2,24 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-10-28 — M2 engine implementation decisions
+
+Context: the M2 engine author made these choices while implementing the frozen API.
+1. **View handles.** A view handle is a hash of the viewer, the instance id and a hidden per-card key. The key is re-rolled when the card enters a hidden zone and on every shuffle. Instance ids stay stable except under the new-object rule (CR 3-1-6). Rejected: re-keying the instance ids themselves (breaks ARCHITECTURE §2.2 and the tests).
+2. **Concession.** `legalActions` lists only the decider's actions, their own concede included. `reduce` accepts a concede from either player (CR 1-2-3).
+3. **Unscripted Events cannot be played** (E-D8), rather than playing as a no-op.
+4. **Deck-out** is checked when an operation draws from or touches an empty deck (CR 9-2-1-2 via rule processing), so scenarios may start with empty decks. Rejected: an immediate state check, which ends every minimal scenario.
+5. **Choices** complete automatically at `max` picks; `done` is only for stopping early.
+6. **State internals.**
+   - DON!! are counts by location class, not instances.
+   - Card definitions are copied into state, because `reduce` takes no lookup.
+   - Instance ids use a separate RNG stream.
+   - `summaryHash` hashes board positions, so internal refactors keep golden hashes.
+7. **Additions to the API** (no frozen shape changed): `autoSkip`, `projectEvents`, `actionFromView`, `ProjectedView`, `startRecord`/`appendAction`, `ENGINE_VERSION`, `validateDeck`, plus the root scripts `test:nightly` and `bench`.
+8. **Ordering and preview.** When the turn player has two or more replacement effects, they resolve in canonical order until M4 adds the `order` decision. `preview` is keyed by instance ids; M3 adds a handle-keyed preview for the app as an addition.
+
+Alternatives rejected are noted per item.
+
 ## 2026-10-28 — Frozen engine API amended after the independent test author's report
 
 Context: the independent test author (branch `m2-independent-tests`: 132 tests and 183 todos, written without seeing engine source) found three gaps in the API frozen earlier today. First, `Omit<Action, …>` does not distribute over the `Action` union, so the fixtures' documented `g.act({ type: 'attack', … })` did not typecheck. Second, `PlayerView` exposed only the decision and actions, so visibility rules (CR 3-1-4 public zone counts, CR 3-3-2 DON!! deck) could not be tested. Third, event names were not frozen. It also found a data gap: OP05-022, a Leader with printed [Blocker], had no keywords, because only meta cards had verified overrides.
