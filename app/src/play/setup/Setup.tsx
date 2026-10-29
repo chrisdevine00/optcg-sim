@@ -6,7 +6,7 @@
  */
 import { useEffect, useState } from 'react';
 import type { Speed } from '../game/controller.ts';
-import { ARCHETYPES, DECKS, deckByLeader } from './decks.ts';
+import { ARCHETYPES, automationLine, deckById, DECKS, deckByLeader } from './decks.ts';
 import { SCENARIOS } from './scenarios.ts';
 
 export interface SetupChoice {
@@ -96,10 +96,13 @@ export function Setup({
   return (
     <main className="page setup" id="main">
       <h1>New game</h1>
-      <p className="lede">
-        Pick two of the twelve meta decks, an opponent and who goes first. Card effects are not
-        automated yet: every card plays for its power, cost, Counter and verified keywords.
-      </p>
+      <p className="lede">Pick two of the twelve meta decks, an opponent and who goes first.</p>
+      <ul className="lede automation" data-testid="automation">
+        {[myDeck, theirDeck].map((id, i) => {
+          const d = deckById(id);
+          return d ? <li key={i}>{automationLine(d)}</li> : null;
+        })}
+      </ul>
       <form
         className="setup-grid"
         onSubmit={(e) => {

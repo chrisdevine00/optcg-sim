@@ -289,8 +289,14 @@ function contentFor(g: G): Content {
         body: <p className="dec-lead">{view.decision?.prompt}</p>,
         foot: {
           equal: true,
-          secondary: { label: 'Skip', onClick: () => no && g.act(no) },
-          primary: { label: 'Use', onClick: () => yes && g.act(yes), id: 'use-btn' },
+          secondary: { label: 'Skip', onClick: () => no && g.act(no), id: 'skip-btn' },
+          primary: {
+            label: 'Use',
+            onClick: () => yes && g.act(yes),
+            id: 'use-btn',
+            disabled: !yes,
+            reason: "can't pay the cost",
+          },
         },
       };
     }
@@ -305,7 +311,10 @@ function contentFor(g: G): Content {
               {legal.order.map((a) => (
                 <li key={a.type === 'order' ? a.first : ''}>
                   <button type="button" className="opt" onClick={() => g.act(a)}>
-                    Resolve first: {a.type === 'order' ? a.first : ''}
+                    {a.type === 'order'
+                      ? (view.decision?.options?.find((o) => o.id === a.first)?.label ??
+                        g.nameOf(a.first))
+                      : ''}
                   </button>
                 </li>
               ))}
@@ -1035,6 +1044,23 @@ function defenceContent(g: G): Content {
     tall: true,
     body: (
       <div className="defend">
+        {view.decision?.kind === 'counter' && !hidden && g.legal.activate.size > 0 && (
+          <div className="opts col" role="group" aria-label="Event Counters">
+            {[...g.legal.activate.entries()].flatMap(([h, list]) =>
+              list.map((a) => (
+                <button
+                  key={`${h}-${a.type === 'activate' ? a.ability : ''}`}
+                  type="button"
+                  className="opt"
+                  data-event-counter=""
+                  onClick={() => g.act(a)}
+                >
+                  Activate [Counter]: {g.nameOf(h)}
+                </button>
+              )),
+            )}
+          </div>
+        )}
         <BattleNumbers
           g={g}
           sim={sim}
@@ -1277,7 +1303,54 @@ function triggerContent(g: G): Content {
 // Picks: multi-select with a running count and one commit (flows F8a, accessibility §3.8)
 // ---------------------------------------------------------------------------------------------
 
+/** A choice whose candidates are not cards (modes, top or bottom, DON!! by location): one click each. */
+function optionChoice(g: G): Content | null {
+  const d = g.view.decision!;
+  const picks = [...g.legal.picks.entries()];
+  if (picks.length === 0 || picks.every(([, a]) => typeof a.choice === 'string')) return null;
+  const label = (a: Extract<Action, { type: 'pick' }>): string => {
+    const c = a.choice;
+    if (typeof c === 'string') return g.nameOf(c);
+    if ('option' in c) return d.options?.find((o) => o.id === c.option)?.label ?? c.option;
+    if (c.from === 'costActive') return 'An active DON!! in your cost area';
+    if (c.from === 'costRested') return 'A rested DON!! in your cost area';
+    return `A DON!! given to ${g.nameOf(c.card)}`;
+  };
+  return {
+    title: d.purpose === 'mode' ? 'Choose one' : 'Choose',
+    tall: true,
+    body: (
+      <div>
+        <p className="dec-lead">{d.prompt}</p>
+        {d.max !== undefined && d.max > 1 && (
+          <p className="count-line" role="status">
+            {d.max} more to choose
+          </p>
+        )}
+        <div className="opts col" role="group" aria-label="Options">
+          {picks.map(([k, a]) => (
+            <button key={k} type="button" className="opt" onClick={() => g.act(a)}>
+              {label(a)}
+            </button>
+          ))}
+        </div>
+      </div>
+    ),
+    foot: g.legal.done
+      ? {
+          primary: {
+            label: 'Done',
+            onClick: () => g.legal.done && g.act(g.legal.done),
+            id: 'choose-done',
+          },
+        }
+      : {},
+  };
+}
+
 function chooseContent(g: G): Content {
+  const options = optionChoice(g);
+  if (options) return options;
   const d = g.view.decision!;
   const min = d.min ?? 0;
   const max = d.max ?? 1;

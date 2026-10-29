@@ -1,10 +1,10 @@
 {
-  "note": "Random legal game, seed 2024, random policy. Engine 0.4.0.",
+  "note": "Random legal game, seed 2024, random policy. Engine 0.5.0.",
   "record": {
     "versions": {
-      "engine": "0.4.0",
+      "engine": "0.5.0",
       "cards": "cards-18b71006dd93f400",
-      "scripts": "scripts-1bc27f5a56d1e715"
+      "scripts": "scripts-0228821d1b51c411"
     },
     "start": {
       "setup": {

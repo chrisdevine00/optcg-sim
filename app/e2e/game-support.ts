@@ -86,8 +86,15 @@ export async function playMainPhase(page: Page) {
 
 export async function resolveChoose(page: Page) {
   const opt = page.locator('#decision .opts button').first();
-  await opt.click();
-  await page.locator('#choose-done').click();
+  if (await opt.count()) await opt.click();
+  // Card picks commit with Done; a named option (a mode, a DON!! location) acts on click.
+  const done = page.locator('#choose-done');
+  if (
+    (await decisionKind(page)) === 'choose' &&
+    (await done.count()) &&
+    (await done.getAttribute('aria-disabled')) !== 'true'
+  )
+    await done.click();
 }
 
 /** Plays a whole game from the screen's side(s): every decision, until the game ends. */
@@ -117,6 +124,13 @@ export async function playToEnd(page: Page, maxDecisions = 2000) {
         break;
       case 'choose':
         await resolveChoose(page);
+        break;
+      case 'optional':
+        // Card effects (M4a): decline optional effects, so the game is decided by the base rules.
+        await page.locator('#skip-btn').click();
+        break;
+      case 'order':
+        await page.locator('#decision .dec-list .opt').first().click();
         break;
       default:
         throw new Error(`Unexpected decision ${k}`);

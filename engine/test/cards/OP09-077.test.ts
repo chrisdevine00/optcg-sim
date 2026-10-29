@@ -1,0 +1,46 @@
+/** OP09-077 Gum-Gum Lightning. */
+import { describe, expect, it } from 'vitest';
+import { don, game, KAIDO, payDon, pick, play, PLAIN_BLUE, V } from './helpers.ts';
+import { damageWith } from './triggers.ts';
+
+describe('OP09-077 Gum-Gum Lightning', () => {
+  it("[Main] DON!! −2: K.O. an opponent's Character with 6000 power or less", () => {
+    const g = game(
+      { leader: KAIDO, hand: ['OP09-077'], costArea: { active: 4, rested: 0 } },
+      { leader: PLAIN_BLUE, characters: [V.c4, V.c5] },
+    );
+    play(g, 'OP09-077');
+    payDon(g);
+    expect(
+      g.isLegal({ type: 'pick', choice: g.find('p2', 'characters', V.c5), player: 'p1' }),
+    ).toBe(false);
+    pick(g, [g.find('p2', 'characters', V.c4)]);
+    expect(g.zone('p2', 'trash').map((c) => c.card)).toEqual([V.c4]);
+    expect(don(g, 'p1').deck).toBe(8);
+  });
+
+  it('not playable with too few DON!! for its cost and DON!! −2 together', () => {
+    const g = game(
+      { leader: KAIDO, hand: ['OP09-077'], costArea: { active: 2, rested: 0 } },
+      { leader: PLAIN_BLUE },
+    );
+    // cost 2 rests both; DON!! −2 then returns them: still payable (rested DON!! can be returned).
+    expect(g.legal().some((a) => a.type === 'playCard')).toBe(true);
+    const h = game(
+      { leader: KAIDO, hand: ['OP09-077'], costArea: { active: 2, rested: 0 } },
+      { leader: PLAIN_BLUE },
+    );
+    void h;
+    const tooFew = game(
+      { leader: KAIDO, hand: ['OP09-077'], costArea: { active: 1, rested: 0 } },
+      { leader: PLAIN_BLUE },
+    );
+    expect(tooFew.legal().some((a) => a.type === 'playCard')).toBe(false);
+  });
+
+  it('[Trigger] adds 1 active DON!!', () => {
+    const g = damageWith('OP09-077');
+    g.act({ type: 'trigger', activate: true });
+    expect(don(g, 'p1').active).toBe(1);
+  });
+});

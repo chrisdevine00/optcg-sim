@@ -125,8 +125,9 @@ test.describe('card browser', () => {
     await expect(page).toHaveURL(/card=OP17-087/);
     await expect(page).toHaveTitle('Nico Robin (OP17-087) · Cards · OPTCG Sim');
     await expect(dialog.getByText('✓ Verified')).toBeVisible();
-    await expect(dialog.getByText('Effect not automated', { exact: true })).toBeVisible();
-    await expect(dialog.getByText("Card effects aren't automated yet")).toBeVisible();
+    // M4a: some cards are scripted, so an unscripted one carries the per-card warning.
+    await expect(dialog.getByText('⚠ Effect not automated', { exact: true })).toBeVisible();
+    await expect(dialog.getByText(/In a game this card plays for its stats/)).toBeVisible();
     await expect(dialog.getByLabel('Card text')).toContainText('−3000 power during this turn');
     await dialog.getByText(/Repairs to the upstream data/).click();
     await expect(dialog.locator('.fixes li', { hasText: 'Corrected by hand' })).toContainText(

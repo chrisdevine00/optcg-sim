@@ -135,6 +135,9 @@ export function Game({
   for (const p of ['p1', 'p2'] as PlayerId[])
     for (const [zone, list] of Object.entries(view.zones[p]))
       for (const c of list) index.set(c.handle, { view: c, owner: p, zone });
+  // Cards this player is looking at through an effect (a deck search, M4a) are named too.
+  for (const c of view.looking ?? [])
+    index.set(c.handle, { view: c, owner: view.player, zone: 'looking' });
   const cardOf = (h: string) => {
     const x = index.get(h);
     if (!x) return null;

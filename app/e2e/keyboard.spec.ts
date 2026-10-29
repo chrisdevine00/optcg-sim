@@ -84,6 +84,23 @@ test('a whole game vs Rookie, keyboard only', async ({ page }) => {
       // Take the hit has no single key (C8): Tab to it, then Enter.
       await tabTo(page, (a) => a.id === 'take-hit');
       await page.keyboard.press('Enter');
+    } else if (k === 'optional') {
+      // Card effects (M4a): decline, by keyboard.
+      await tabTo(page, (a) => a.id === 'skip-btn');
+      await page.keyboard.press('Enter');
+    } else if (k === 'order' || k === 'choose') {
+      await tabTo(page, (a) => a.cls.split(' ').includes('opt'));
+      await page.keyboard.press('Enter');
+      await page.waitForTimeout(40);
+      const done = page.locator('#choose-done');
+      if (
+        (await decisionKind(page)) === 'choose' &&
+        (await done.count()) &&
+        (await done.getAttribute('aria-disabled')) !== 'true'
+      ) {
+        await tabTo(page, (a) => a.id === 'choose-done');
+        await page.keyboard.press('Enter');
+      }
     } else throw new Error(`Unexpected ${k}`);
     await page.waitForTimeout(30);
   }

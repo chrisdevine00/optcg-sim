@@ -6,6 +6,7 @@ import type { Card, Color } from '@optcg/cards';
 import { setCodeOf } from '@optcg/cards';
 import { loadSet } from '@optcg/cards/browser';
 import type { DeckSpec } from '@optcg/engine';
+import { SCRIPTED } from '../../cards/scripts.ts';
 import meta from '../../../../docs/research/meta-lists.json';
 
 export interface DeckOption {
@@ -55,6 +56,21 @@ export const DECKS: DeckOption[] = ARCHETYPES.flatMap((a) =>
 );
 
 export const deckById = (id: string) => DECKS.find((d) => d.id === id);
+
+/** How many of a deck's 51 cards (Leader included) have an effect script (M4a). */
+export function scriptedCount(d: DeckOption): { scripted: number; total: number } {
+  const ids = [d.spec.leader, ...d.spec.main];
+  return { scripted: ids.filter((id) => SCRIPTED.has(id)).length, total: ids.length };
+}
+
+/** Plain-language automation status of a deck, for the setup screen. */
+export function automationLine(d: DeckOption): string {
+  const { scripted, total } = scriptedCount(d);
+  if (scripted === total) return `${d.name}: every card's effect is automated.`;
+  if (scripted === 0)
+    return `${d.name}: effects are not automated yet; its cards play for their power, cost, Counter and verified keywords.`;
+  return `${d.name}: ${scripted} of ${total} cards have automated effects; the rest play for their stats and verified keywords.`;
+}
 /** A deck by leader id (URL parameters accept `OP17-039`), the first list. */
 export const deckByLeader = (leader: string) => DECKS.find((d) => d.leader === leader);
 

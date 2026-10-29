@@ -132,6 +132,32 @@ export const SCENARIOS: Record<string, Spec> = {
       costArea: { active: 0, rested: 5 },
     },
   },
+  /**
+   * M4a: p1's Kaido Leader (OP17-058) with 1 DON!! attacks; its [When Attacking] DON!! −1 can give
+   * the AI's Babanuki −2000 (a real scripted effect resolved through the UI).
+   */
+  kaido: {
+    mode: 'ai',
+    seed: 5,
+    turn: 3,
+    activePlayer: 'p1',
+    firstPlayer: 'p1',
+    p1: {
+      leader: 'OP17-058',
+      life: ['ST05-007', 'ST05-007', 'ST05-007'],
+      hand: [],
+      deck: filler('ST05-007', 10),
+      costArea: { active: 1, rested: 0 },
+    },
+    p2: {
+      leader: 'ST04-001',
+      life: ['OP01-010', 'OP01-012', 'OP01-010'],
+      hand: [],
+      characters: ['OP01-107'],
+      deck: filler('OP01-012', 10),
+      costArea: { active: 0, rested: 2 },
+    },
+  },
 };
 
 export const scenarioCardIds = (s: Spec): string[] => {

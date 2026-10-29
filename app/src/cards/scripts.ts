@@ -1,6 +1,8 @@
 /**
- * Effect scripts available to the app. None exist until M4a, so per-card "not automated" warnings would be
- * true of every card and teach players to ignore them (M1-09); the UI says it once instead.
+ * Effect scripts available to the app (M4a): the registry's card numbers. Cards outside it play
+ * for their stats and verified keywords, with an "effect not automated" badge (effect-dsl E-D8).
  */
-export const SCRIPTED: ReadonlySet<string> = new Set();
+import { SCRIPTED_IDS } from '@optcg/cards';
+
+export const SCRIPTED: ReadonlySet<string> = SCRIPTED_IDS;
 export const SCRIPTED_ANY = SCRIPTED.size > 0;

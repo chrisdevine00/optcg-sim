@@ -61,7 +61,8 @@ export function CardDock({
     live !== null && base !== null && live !== base
       ? `${num(live)} = ${num(base)} base${don && ownersTurn ? ` + ${don * 1000} DON!!` : ''}${live - base - (ownersTurn ? don * 1000 : 0) ? ` ${live - base - (ownersTurn ? don * 1000 : 0) > 0 ? '+' : '−'} ${Math.abs(live - base - (ownersTurn ? don * 1000 : 0))} effects` : ''}`
       : null;
-  const artW = rect.w >= 480 ? 240 : rect.w >= 400 ? 168 : rect.w >= 320 ? 140 : 104;
+  // The art keeps 63:88 at every dock size (board.md §3.12, review M3-29).
+  const artW = rect.w >= 480 ? 240 : rect.w >= 384 ? 168 : 140;
   return (
     <div
       ref={ref}
@@ -69,6 +70,8 @@ export function CardDock({
       style={{ left: rect.x, top: rect.y, width: rect.w, height: rect.h }}
       aria-label={pinned ? `Inspector: ${card.name}` : undefined}
       aria-hidden={pinned ? undefined : true}
+      // The hover preview is never a Tab stop (M3-30).
+      inert={pinned ? undefined : true}
       role={pinned ? 'dialog' : undefined}
       onKeyDown={(e) => {
         if (e.key === 'Escape') {
@@ -92,18 +95,16 @@ export function CardDock({
         </div>
       )}
       <div className="dock-body">
-        {/* A small dock keeps the words and drops the art (the card is on the board). */}
-        {rect.w >= 300 && (
-          <div
-            className="dock-art"
-            style={{
-              ['--card-w' as string]: `${artW}px`,
-              ['--card-h' as string]: `${Math.round((artW * 88) / 63)}px`,
-            }}
-          >
-            <CardFace card={card} />
-          </div>
-        )}
+        <div
+          className="dock-art"
+          style={{
+            ['--card-w' as string]: `${artW}px`,
+            ['--card-h' as string]: `${Math.round((artW * 88) / 63)}px`,
+          }}
+        >
+          <CardFace card={card} />
+        </div>
+
         <div className="dock-info">
           {!pinned && <h2 className="dock-name">{card.name}</h2>}
           <p className="subtle">
@@ -150,7 +151,12 @@ export function CardDock({
           </dl>
         </div>
       </div>
-      <div className="dock-text">
+      {/* Pinned: the text scrolls inside, by keyboard too, with shadow cues (M3-29). */}
+      <div
+        className="dock-text"
+        tabIndex={pinned ? 0 : undefined}
+        aria-label={pinned ? 'Card text' : undefined}
+      >
         {auto === 'not-automated' && <span className="chip warning">Effect not automated</span>}
         {card.effectText ? rich(card.effectText) : <p className="subtle">No effect text.</p>}
         {card.triggerText && (
@@ -160,8 +166,8 @@ export function CardDock({
         )}
         {auto === 'not-automated' && pinned && (
           <p className="subtle">
-            Effects are automated from M4. Until then this card plays for its power, cost, Counter
-            and verified keywords; its effect does not happen.
+            This card&apos;s effect is not automated yet: it plays for its power, cost, Counter and
+            verified keywords, and its effect does not happen.
           </p>
         )}
       </div>
