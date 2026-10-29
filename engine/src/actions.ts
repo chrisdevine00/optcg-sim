@@ -55,10 +55,43 @@ function sick(s: State, id: InstanceId): boolean {
 // check: null when legal, otherwise the first reason it is not
 // ---------------------------------------------------------------------------------------------
 
-export function check(s: State, player: PlayerId, a: Intent): Reason | null {
+/** Field types each action needs (M2-06, M2-18): checked before any field is read. */
+const SHAPES: Record<string, Record<string, 'string' | 'boolean' | 'stringOrNull'>> = {
+  chooseFirst: { goFirst: 'boolean' },
+  mulligan: { redraw: 'boolean' },
+  playCard: { card: 'string' },
+  giveDon: { target: 'string' },
+  activate: { card: 'string', ability: 'string' },
+  attack: { attacker: 'string', target: 'string' },
+  endTurn: {},
+  block: { blocker: 'stringOrNull' },
+  counter: { card: 'string', target: 'string' },
+  endCounter: {},
+  trigger: { activate: 'boolean' },
+  optional: { accept: 'boolean' },
+  pick: {},
+  done: {},
+  order: { first: 'string' },
+  concede: {},
+};
+
+function shapeError(a: unknown): Reason | null {
+  if (!a || typeof a !== 'object') return r('That is not an action.');
+  const t = (a as { type?: unknown }).type;
+  if (typeof t !== 'string' || !(t in SHAPES)) return r('That is not an action.');
+  for (const [k, kind] of Object.entries(SHAPES[t]!)) {
+    const v = (a as Record<string, unknown>)[k];
+    const ok = kind === 'stringOrNull' ? v === null || typeof v === 'string' : typeof v === kind;
+    if (!ok) return r(`That action is missing its ${k}.`);
+  }
+  return null;
+}
+
+export function check(s: State, player: PlayerId, a: Intent | null): Reason | null {
   if (s.result) return r('The game is over.');
   if (player !== 'p1' && player !== 'p2') return r('That is not a player in this game.');
-  if (!a || typeof a !== 'object' || typeof a.type !== 'string') return r('That is not an action.');
+  const bad = shapeError(a);
+  if (bad || !a) return bad ?? r('That is not an action.');
   if (a.type === 'concede') return null; // CR 1-2-3: either player, at any time.
   const dec = s.decision;
   if (!dec) return r('Nothing is waiting for a decision.');
@@ -414,6 +447,7 @@ export function apply(d: Draft, a: Action): void {
         step: 'attack',
         blocker: null,
         attackerWon: null,
+        keys: { attacker: d.card(a.attacker).key, target: d.card(a.target).key },
       };
       d.emit({
         type: 'AttackDeclared',
@@ -438,6 +472,7 @@ export function apply(d: Draft, a: Action): void {
         rest(d, a.blocker);
         b.blocker = a.blocker;
         b.target = a.blocker;
+        b.keys = { ...b.keys, target: d.card(a.blocker).key };
         d.emit({
           type: 'BlockerActivated',
           blocker: a.blocker,

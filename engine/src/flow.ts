@@ -476,7 +476,7 @@ function runBattle(d: Draft): void {
     case 'endExpire':
       // CR 7-1-5-3, 7-1-5-4: battle effects end, turn player's first; then back to Main.
       expireModifiers(d, (m) => m.duration.kind === 'battle', '7-1-5-3');
-      d.emit({ type: 'BattleEnded', attacker: b.attacker, target: b.target });
+      d.emit({ type: 'BattleEnded', attacker: b.attacker, target: b.target, keys: b.keys });
       s.battle = null;
       pop(d);
       return;
@@ -705,7 +705,14 @@ export function fireFor(
       for (const ab of d.s.defs[c.card]!.abilities) {
         if (ab.kind !== 'auto' || !ab.when.includes(timing)) continue;
         if (ab.oncePerTurn && d.s.oncePerTurn.includes(`${id}/${ab.id}`)) continue;
-        (added ??= []).push({ card: id, cardId: c.card, ability: ab.id, controller: p, timing });
+        (added ??= []).push({
+          card: id,
+          key: c.key,
+          cardId: c.card,
+          ability: ab.id,
+          controller: p,
+          timing,
+        });
       }
     }
   }
@@ -730,6 +737,7 @@ function drainPending(d: Draft): boolean {
     card: next!.cardId,
     ability: next!.ability,
     timing: next!.timing,
+    keys: { instance: next!.key },
   });
   pushEffect(d, next!.card, next!.cardId, ab, next!.controller, 'effect');
   return true;

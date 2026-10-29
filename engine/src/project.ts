@@ -27,7 +27,7 @@ import { derive } from './derive.ts';
 import { hashString } from './hash.ts';
 import { PLAYERS, type State, type Zone } from './state.ts';
 import type { Action } from './api.ts';
-import { CARD_FIELDS } from './draft.ts';
+import { CARD_FIELDS, INSTANCE_ID } from './draft.ts';
 import { battleStepOf, publicDecision, zoneIds } from './queries.ts';
 
 /** Extra runtime fields beyond the frozen `PlayerView`: the open battle and the no-area slot. */
@@ -243,6 +243,10 @@ export function projectEvents(events: readonly GameEvent[], viewer: PlayerId): G
     for (const f of CARD_FIELDS) {
       const v = out[f];
       if (typeof v === 'string' && keys[f] !== undefined) out[f] = handleFor(viewer, v, keys[f]);
+    }
+    // No raw instance id ever reaches a view (M2-17): a field with no key is dropped.
+    for (const [k, v] of Object.entries(out)) {
+      if (typeof v === 'string' && INSTANCE_ID.test(v)) Reflect.deleteProperty(out, k);
     }
     return out;
   });

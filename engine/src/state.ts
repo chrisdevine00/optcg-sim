@@ -178,6 +178,8 @@ export type Frame =
 /** An auto effect that has activated and waits to resolve (CR 8-6). */
 export interface PendingEffect {
   card: InstanceId;
+  /** The source's projection key when it triggered, for `EffectActivated` (M2-17). */
+  key: string;
   cardId: CardId;
   ability: string;
   controller: PlayerId;
@@ -196,6 +198,14 @@ export interface DecisionState {
   picked?: (InstanceId | DonClass)[];
   /** `optional`: the replacement on offer, if this is a replacement decision. */
   replacement?: ReplacementRef;
+  /**
+   * The decision's options depend on cards hidden from the other player (a search of a secret
+   * area, a cost paid from hand). An observing human must not learn anything from whether it
+   * pauses, so `autoSkip` never skips it when observed (M2-19).
+   */
+  secret?: boolean;
+  /** The candidates are a whole zone whose size is public, so the count alone can force a pick. */
+  publicCount?: boolean;
   /** Which frame or rule the decision serves, for prompts and `whyNot`. */
   purpose?: 'characterLimit' | 'replacement' | 'ability';
 }
@@ -210,6 +220,11 @@ export interface Battle {
   blocker: InstanceId | null;
   /** Did the attacker win the Damage Step (for "if this battles" checks later). */
   attackerWon: boolean | null;
+  /**
+   * Projection keys of the attacker and the current target, taken while they were on the field, so
+   * `BattleEnded` maps to the handles the players saw even after a K.O. made a new object (M2-17).
+   */
+  keys: { attacker: string; target: string };
 }
 
 export interface SetupFacts {

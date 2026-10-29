@@ -34,7 +34,11 @@ export function summary(s: State): unknown {
   s.resolving.forEach((id, i) => pos.set(id, `resolving.${i}`));
   // Replace every instance id anywhere in a value with its board position (M2-08).
   const canon = (v: unknown): unknown => {
-    if (typeof v === 'string') return ID.test(v) ? (pos.get(v) ?? 'gone') : v;
+    if (typeof v === 'string') {
+      // An id alone, or a compound key that starts with one (`$abc1234/ability`).
+      const m = ID.exec(v);
+      return m ? (pos.get(m[1]!) ?? 'gone') + (m[2] ?? '') : v;
+    }
     if (Array.isArray(v)) return v.map(canon);
     if (v && typeof v === 'object')
       return Object.fromEntries(
@@ -64,17 +68,14 @@ export function summary(s: State): unknown {
     stack: canon(s.stack),
     pending: canon(s.pending),
     mods,
-    oncePerTurn: s.oncePerTurn.map((k) => {
-      const [id, ab] = k.split('/');
-      return `${canon(id)}/${ab}`;
-    }),
+    oncePerTurn: s.oncePerTurn.map(canon),
     result: s.result,
     rng: s.rng,
   };
 }
 
-/** Engine instance ids (`Draft.newId`). Card numbers never match. */
-const ID = /^c[a-z0-9]{7}$/;
+/** Engine instance ids (`Draft.newId`, M2-22): `$` plus 7 characters, optionally a `/…` or `#…` tail. */
+const ID = /^(\$[a-z0-9]{7})([/#].*)?$/;
 
 /** 53-bit string hash (cyrb53), run twice with different seeds for a 106-bit digest. */
 function cyrb53(str: string, seed: number): string {

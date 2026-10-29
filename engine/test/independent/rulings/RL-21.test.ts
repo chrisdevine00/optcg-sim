@@ -8,7 +8,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { scenario } from '../../fixtures/index.ts';
-import { attack, decision, FILL, fill, K, L, noDefence, TRIGGER_SPEED } from '../helpers.ts';
+import { act, attack, decision, FILL, fill, K, L, passBlock, TRIGGER_SPEED } from '../helpers.ts';
 
 describe('RL-21: Banish', () => {
   it('RL-21: the Life card is trashed, no [Trigger] decision, hand unchanged', () => {
@@ -27,9 +27,11 @@ describe('RL-21: Banish', () => {
       },
     });
     attack(g, g.find('p1', 'characters', K.banishQueen), g.leader('p2'));
-    noDefence(g);
-    // No `trigger` decision: straight back to p1's Main Phase.
+    passBlock(g);
+    act(g, { type: 'endCounter' });
+    // M2-23: no damage (`trigger`) decision at all: straight back to p1's Main Phase.
     expect(decision(g)).toMatchObject({ kind: 'main', player: 'p1' });
+    expect(g.events.some((e) => e.type === 'TriggerRevealed')).toBe(false);
     expect(g.life('p2')).toBe(2);
     expect(g.zone('p2', 'hand').map((c) => c.card)).toEqual([FILL.purple]);
     expect(g.zone('p2', 'trash').map((c) => c.card)).toEqual([TRIGGER_SPEED]);

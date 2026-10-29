@@ -8,6 +8,14 @@ import { nextInt, type RngState } from './rng.ts';
 import type { CardInst, PlayerState, State } from './state.ts';
 
 const ID_CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789';
+/**
+ * Instance ids are `$` plus 7 characters (M2-22). No card number, ability id, label or handle starts
+ * with `$`, so the hash and the leak tests can recognise an id anywhere without knowing the field.
+ */
+export const ID_PREFIX = '$';
+/** An engine instance id, alone or at the start of a compound key such as `$abc1234/on-play`. */
+export const INSTANCE_ID = /^\$[a-z0-9]{7}$/;
+export const INSTANCE_ID_ANYWHERE = /\$[a-z0-9]{7}/;
 /** Event fields that may hold an instance id. */
 export const CARD_FIELDS = [
   'instance',
@@ -143,7 +151,7 @@ export class Draft {
    */
   newId(): InstanceId {
     for (;;) {
-      const id = 'c' + this.randomChars(7);
+      const id = ID_PREFIX + this.randomChars(7);
       if (!(id in this.s.cards)) return id;
     }
   }

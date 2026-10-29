@@ -27,6 +27,7 @@ import { checkInvariants as invariants } from './invariants.ts';
 import { preview as previewWith } from './preview.ts';
 import {
   handleFor,
+  visibleTo,
   actionFromView as fromView,
   project as projectState,
   projectEvents as projectEventsFor,
@@ -34,7 +35,7 @@ import {
 import { queries as q } from './queries.ts';
 import { replayWith } from './record.ts';
 import { createFromScenario as fromScenario, createGame as fromSetup } from './setup.ts';
-import type { State } from './state.ts';
+import { other, type State } from './state.ts';
 
 const st = (g: GameState): State => g as unknown as State;
 const gs = (s: State): GameState => s as unknown as GameState;
@@ -44,6 +45,9 @@ export const createFromScenario = (spec: ScenarioSpec): Step => fromScenario(spe
 
 export const reduce = (state: GameState, action: Action): Step => {
   const s = st(state);
+  // Guard the shape before reading any field (M2-18).
+  if (!action || typeof action !== 'object')
+    throw new IllegalAction('That is not an action.', action as unknown as Action);
   const reason = check(s, action.player, action);
   if (reason) throw new IllegalAction(reason.text, action);
   const d = new Draft(s, action.intentId);
@@ -61,7 +65,7 @@ export const project = (state: GameState, player: PlayerId): PlayerView =>
   projectState(st(state), player);
 
 export const whyNot = (state: GameState, player: PlayerId, intent: Intent): Reason | null =>
-  check(st(state), player, intent);
+  check(st(state), player, intent as Intent | null);
 
 export const preview = (state: GameState, action: Action): Preview =>
   previewWith(
@@ -113,6 +117,7 @@ export const autoSkip = (state: GameState, options: AutoSkipOptions): Action | n
     (only.type === 'block' && only.blocker === null) ||
     only.type === 'endCounter' ||
     (only.type === 'trigger' && !only.activate) ||
+    (only.type === 'optional' && !only.accept) ||
     only.type === 'done' ||
     only.type === 'pick';
   if (!skippable) return null;
@@ -120,6 +125,16 @@ export const autoSkip = (state: GameState, options: AutoSkipOptions): Action | n
     // Only windows whose options depend on public information alone.
     if (only.type === 'trigger') return null;
     if (only.type === 'endCounter' && s.players[dec.player].hand.length > 0) return null;
+    if (only.type === 'optional' && dec.secret) return null;
+    if (only.type === 'pick' || only.type === 'done') {
+      // M2-19: a forced pick is skipped only if the watcher could see every candidate, or the
+      // count alone (a whole zone of public size) forces it.
+      const watcher = other(dec.player);
+      const allVisible = (dec.candidates ?? []).every(
+        (c) => typeof c !== 'string' || !s.cards[c] || visibleTo(s, c, watcher),
+      );
+      if (!dec.publicCount && (dec.secret || !allVisible)) return null;
+    }
   }
   return only;
 };

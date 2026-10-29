@@ -15,11 +15,40 @@ const enginePublicOnly = {
 
 // Full-state engine functions (ADR 0005, M2-12). The AI and the UI see only views: these are
 // allowed only in the app's session store and in AI search over its own determinized states.
+// M2-20: the names below either read a GameState or hand one out, so a GameState value stays inside
+// the store (and AI search) as far as lint can see.
 const fullState = {
   name: '@optcg/engine',
-  importNames: ['queries', 'legalActions', 'whyNot', 'preview', 'autoSkip', 'reduce', 'replay'],
+  importNames: [
+    'queries',
+    'legalActions',
+    'whyNot',
+    'preview',
+    'autoSkip',
+    'reduce',
+    'replay',
+    'createGame',
+    'createFromScenario',
+    'project',
+    'projectEvents',
+    'actionFromView',
+    'previewFromView',
+    'checkInvariants',
+    'summaryHash',
+    'cardsVersionOf',
+    'startRecord',
+    'appendAction',
+    'GameState',
+    'Step',
+  ],
   message:
-    'Full-state engine calls are allowed only in app/src/session/ (the store) and ai/src/search/ (determinized states). Use project(), view actions and previewFromView().',
+    'Full-state engine calls (and GameState values) are allowed only in app/src/session/ (the store) and ai/src/search/ (determinized states). Use views, view actions and previewFromView() through the store.',
+};
+// M2-20: a dynamic import would bypass the rule above.
+const noDynamicEngine = {
+  selector: 'ImportExpression[source.value=/^@optcg\\/engine/]',
+  message:
+    'Dynamic import of @optcg/engine is allowed only in app/src/session/ and ai/src/search/ (M2-20).',
 };
 
 export default tseslint.config(
@@ -93,6 +122,7 @@ export default tseslint.config(
         'error',
         { paths: [fullState], patterns: [...noUi, enginePublicOnly] },
       ],
+      'no-restricted-syntax': ['error', noDynamicEngine],
       'no-restricted-properties': [
         'error',
         { object: 'Math', property: 'random', message: 'Use a seeded RNG.' },
@@ -105,6 +135,7 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
       'no-restricted-imports': ['error', { paths: [fullState], patterns: [enginePublicOnly] }],
+      'no-restricted-syntax': ['error', noDynamicEngine],
     },
   },
   {
@@ -121,6 +152,7 @@ export default tseslint.config(
     files: ['app/src/session/**/*.{ts,tsx}'],
     rules: {
       'no-restricted-imports': ['error', { patterns: [enginePublicOnly] }],
+      'no-restricted-syntax': 'off',
     },
   },
 );

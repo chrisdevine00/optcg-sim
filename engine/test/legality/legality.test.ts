@@ -162,6 +162,40 @@ describe('autoSkip (ARCHITECTURE §2.3, flows.md decision 4, M2-02)', () => {
     });
   });
 
+  it('M2-19: with another human watching, a forced pick among hidden cards never skips', () => {
+    const g = scenario({ p1: { leader: LUFFY, hand: [RED_1] }, p2: { leader: KAIDO } });
+    const card = g.find('p1', 'hand', RED_1);
+    const forced = (extra: Record<string, unknown>) => {
+      const s = internals(g.state);
+      return {
+        ...s,
+        decision: {
+          kind: 'choose' as const,
+          player: 'p1' as const,
+          prompt: 'Choose 1 card from your hand.',
+          min: 1,
+          max: 1,
+          candidates: [card],
+          picked: [],
+          purpose: 'effect' as const,
+          ...extra,
+        },
+      } as unknown as typeof g.state;
+    };
+    const pick = { type: 'pick', choice: card, player: 'p1' };
+    // A filtered search of the hand: the watcher must not learn that exactly one card matched.
+    expect(autoSkip(forced({ secret: true }), hotseat)).toBeNull();
+    expect(autoSkip(forced({ secret: true }), vsAi)).toEqual(pick);
+    // The whole hand with exactly one card: hand size is public, so the count forces the pick.
+    expect(autoSkip(forced({ secret: true, publicCount: true }), hotseat)).toEqual(pick);
+    // A candidate the watcher cannot see, even without the flag, blocks the skip.
+    expect(autoSkip(forced({}), hotseat)).toBeNull();
+    // A hidden search with no match leaves only `done`; still not skipped while watched.
+    const none = forced({ secret: true, candidates: [], min: 0 });
+    expect(autoSkip(none, hotseat)).toBeNull();
+    expect(autoSkip(none, vsAi)).toEqual({ type: 'done', player: 'p1' });
+  });
+
   it('M2-01: a damage decision with no [Trigger] skips only when no other human watches', () => {
     const g = counterWindow([]);
     g.act({ type: 'endCounter' });
@@ -236,7 +270,7 @@ describe('preview', () => {
     )!;
     const q = previewFromView(g.state, 'p1', hit);
     expect(q.cards[v.zones.p2.life[0]!.handle]).toEqual({ zone: 'hand' });
-    expect(JSON.stringify(q)).not.toMatch(/"c[a-z0-9]{7}"/);
+    expect(JSON.stringify(q)).not.toMatch(/"\$[a-z0-9]{7}"/);
   });
 
   it('throws for an illegal action, like reduce', () => {

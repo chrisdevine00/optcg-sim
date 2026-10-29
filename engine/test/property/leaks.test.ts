@@ -31,7 +31,7 @@ import {
   type GameState,
   type PlayerId,
 } from '../../src/index.ts';
-import { CARD_FIELDS } from '../../src/draft.ts';
+import { CARD_FIELDS, INSTANCE_ID_ANYWHERE } from '../../src/draft.ts';
 import { visibleTo } from '../../src/project.ts';
 import { internals, withAbilities } from '../../src/testing.ts';
 import type { State } from '../../src/state.ts';
@@ -167,8 +167,9 @@ describe('hidden-information leak properties', () => {
     expect(damageStates).toBeGreaterThan(0);
   }, 600_000);
 
-  it('a handle never links a card across a zone hidden from the viewer (M2-03)', () => {
+  it('a handle never links a card across a zone hidden from the viewer, and no projected event holds a raw id (M2-03, M2-17)', () => {
     let relinks = 0;
+    let rawChecked = 0;
     let returns = 0;
     fc.assert(
       fc.property(fc.integer({ min: 1, max: 0x7fffffff }), (seed) => {
@@ -217,6 +218,10 @@ describe('hidden-information leak properties', () => {
         leakGame(seed, false, (events: GameEvent[], after) => {
           for (const v of PLAYERS) {
             const projected = projectEvents(events, v);
+            // M2-17: no projected event carries a raw instance id, live or dead.
+            const raw = JSON.stringify(projected).match(INSTANCE_ID_ANYWHERE);
+            if (raw) throw new Error(`seed ${seed}: raw instance id ${raw[0]} projected to ${v}`);
+            rawChecked++;
             projected.forEach((pe, i) => {
               const raw = events[i]!;
               for (const f of CARD_FIELDS) {
@@ -236,6 +241,7 @@ describe('hidden-information leak properties', () => {
     );
     expect(relinks).toBe(0);
     expect(returns).toBeGreaterThan(0); // cards did come back from hidden zones
+    expect(rawChecked).toBeGreaterThan(0);
   }, 600_000);
 });
 

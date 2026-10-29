@@ -109,11 +109,11 @@ describe('summaryHash', () => {
     const g = playRandomGame({ seed: 9 });
     const s = internals(g.final);
     const map = new Map(
-      Object.keys(s.cards).map((id, i) => [id, `c${String(i).padStart(7, '0')}`]),
+      Object.keys(s.cards).map((id, i) => [id, `$${String(i).padStart(7, '0')}`]),
     );
     const relabel = JSON.parse(
       JSON.stringify(s).replace(
-        /"c[a-z0-9]{7}"/g,
+        /"\$[a-z0-9]{7}"/g,
         (m) => `"${map.get(m.slice(1, -1)) ?? m.slice(1, -1)}"`,
       ),
     );

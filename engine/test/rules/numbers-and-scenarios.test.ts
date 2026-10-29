@@ -151,7 +151,21 @@ describe('activation windows (CR 6-5-4, 8-1-3-2, 10-2-2-1)', () => {
   });
 });
 
-describe('malformed actions (M2-06)', () => {
+describe('malformed actions (M2-06, M2-18)', () => {
+  it('M2-18: reduce and whyNot reject a null or shapeless action with a reason, never a TypeError', () => {
+    const g = scenario({ p1: { leader: LUFFY }, p2: { leader: KAIDO } });
+    expect(() => reduce(g.state, null as never)).toThrow(IllegalAction);
+    expect(() => reduce(g.state, 'endTurn' as never)).toThrow(IllegalAction);
+    expect(whyNot(g.state, 'p1', null as never)).not.toBeNull();
+    // Fields of the wrong type are refused before they are read.
+    expect(() => reduce(g.state, { type: 'attack', player: 'p1' } as never)).toThrow(IllegalAction);
+    expect(() => reduce(g.state, { type: 'playCard', card: 3, player: 'p1' } as never)).toThrow(
+      IllegalAction,
+    );
+    expect(whyNot(g.state, 'p1', { type: 'block' } as never)).not.toBeNull();
+    expect(queries.decision(g.state)!.kind).toBe('main');
+  });
+
   it('a concession from no player or an unknown player throws IllegalAction', () => {
     const g = scenario({ p1: { leader: LUFFY }, p2: { leader: KAIDO } });
     expect(() => reduce(g.state, { type: 'concede', player: 'p3' } as never)).toThrow(
