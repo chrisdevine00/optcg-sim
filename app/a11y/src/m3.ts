@@ -154,6 +154,11 @@ export async function runM3(p: Pass) {
     'Skip link "Skip to decision"; then the board\'s name "Game board, turn 1, your Main Phase" and its role description',
     async () => {
       p.note('The scenario starts on turn 3 (see a11y-scenarios.ts), so the board reads "turn 3".');
+      // Tab straight after the load first (what a user may do while NVDA reads the page), then
+      // from the top of the page (Control+Home, then Tab).
+      const first = await p.press('Tab');
+      p.note(`Tab right after the page loaded reached: ${first.aria}`);
+      await p.press('Control+Home');
       await p.press('Tab');
       await p.press('Tab');
     },
@@ -166,6 +171,13 @@ export async function runM3(p: Pass) {
     'Tab through every zone',
     'Each zone in §3.1 order, with its name and count; empty zones say "empty"; the decision panel comes right after your hand',
     async () => {
+      const start = await p.focus();
+      if (!start.inBoard && !/^Skip to decision/.test(start.name)) {
+        p.note(
+          `Focus was not at the top of the board (${start.aria}); Shift+Tab back to the skip link first.`,
+        );
+        await p.until('Shift+Tab', named(/^Skip to decision/), 20);
+      }
       const f = await p.until('Tab', (x) => x.name === 'Game log' || /\blog\b/.test(x.aria), 24);
       if (!f) p.note('Tab did not reach the game log within 24 presses.');
     },
