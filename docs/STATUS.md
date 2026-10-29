@@ -110,7 +110,7 @@ Notes:
 
 Since the builder's report:
 - **Orchestrator check** on clean main: 633 unit tests, 37 scripts, and a benchmark median of 3,949 per second with other agents running.
-- **Independent card tests**, branch `m4a-independent-tests`: merged with main in a scratch worktree, 91 of 314 fail. Most failures are decision-shape mismatches with the new API additions. The test author is adapting the kit (not the expected outcomes) and classifying the rest as test bug, rules disagreement or API gap in `DISAGREEMENTS.md`. Then the orchestrator adjudicates each disagreement against the card text and the CR, the builder fixes engine bugs, and the branch is merged.
+- **Independent card tests:** merged to main (b05c19e). After the test author adapted the kit to the API additions (no expected outcome changed), 946 tests pass and 1 is an expected fail. That one, B-1 (EB04-040's optional "you may rest 6" cost is auto-paid), was ruled for the test author under CR 8-3-1-4 and is with the builder, along with allowing an Event to be played when its optional cost can't be paid.
 - **Independent M4a review**, `docs/reviews/m4a-review.md`: running.
 
 If interrupted, check `git log` and the branch, and re-launch whichever of these stopped.
