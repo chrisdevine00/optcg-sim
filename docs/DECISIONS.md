@@ -2,6 +2,17 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-10-29 — Hotseat reveal: hold for mouse and R, sticky tap for touch, pen and keyboard
+
+Context: M3 re-review 1 (M3-32) found that on touch the defender could hold to reveal their hand but could not stage a Counter. A second finger's tap fires no `click`, and lifting the holding finger hid the hand.
+
+Decision:
+- With a mouse, or the R key, the reveal is press-and-hold.
+- With touch, a pen, or Enter/Space on the veil, a tap turns on a sticky reveal. It ends on "Hide my hand", the defence commit, the window losing focus, or a seat change.
+- Single taps stage Counters while the hand is revealed. The commit always re-hides it.
+
+Rejected: handling second-finger taps on `pointerup`. Browsers don't reliably fire a click for them, so it would be fragile, and it needs two hands.
+
 ## 2026-10-29 — M4a effects slice: runtime and API decisions
 
 Context: M4a builds the effect DSL runtime and scripts the Rocks (OP17-039) and Kaido (OP17-058) lists, 37 cards. The independent card-test author reported API gaps (mode choices, Event [Counter] targets, decision sources, DON!! adds, looked-at cards, effect state in views, keyword strings). Each decision below lists what was rejected.
