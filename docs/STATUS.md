@@ -78,7 +78,11 @@
   - M3-41 to M3-43 were fixed in d3ed657.
 - **Carried, with targets:** M3-18 (M10), M3-23 (DECISIONS, 2026-10-29).
 - **Last exit criterion, the screen-reader pass** (PLAN M3; accessibility.md §11.2):
-  - An agent is running the scripted NVDA pass with Guidepup on a Windows GitHub Actions runner (`workflow_dispatch`), recording to `docs/design/a11y-passes/`.
+  - **The scripted NVDA pass runs** (`.github/workflows/a11y-nvda.yml`, Guidepup; recorded run 40866547375 at 6f826f2). **Both records FAIL** (`docs/design/a11y-passes/m3-nvda-chrome.md`, `m3-nvda-firefox.md`):
+    - F1 (severity 3, both browsers): focus is lost to the page body after playing from the menu, after Done on a pick, after the order choice, and at the end of the AI turn.
+    - FF1 (severity 3, Firefox): only the first assertive message is spoken.
+    - Ten findings at severity 2, among them `.` swallowed by NVDA's browse mode, no AI turn summary, a silent attack confirm that also shows a wrong result while a [When Attacking] effect is pending, and the order decision having no grab, move or drop.
+  - The fixes go to the M3 builder after M5a fix round 1 lands, because both touch focus and the live regions. Then re-run the workflow.
   - M3 is marked done when that record has no open severity 3 or 4 finding.
   - The VoiceOver pass is the owner's (see Blockers).
 
