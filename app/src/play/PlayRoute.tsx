@@ -14,6 +14,14 @@ import { deckById, loadCards } from './setup/decks.ts';
 import { SCENARIOS, scenarioCardIds } from './setup/scenarios.ts';
 import './play.css';
 
+/** A named scenario, or one described in the URL as `json:<base64url of the spec>`. */
+function scenarioFrom(name: string): (typeof SCENARIOS)[string] {
+  if (!name.startsWith('json:')) return SCENARIOS[name]!;
+  const b64 = name.slice(5).replace(/-/g, '+').replace(/_/g, '/');
+  const json = new TextDecoder().decode(Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)));
+  return JSON.parse(json) as (typeof SCENARIOS)[string];
+}
+
 function seedNow(): number {
   const a = new Uint32Array(1);
   crypto.getRandomValues(a);
@@ -36,7 +44,7 @@ async function startGame(choice: SetupChoice): Promise<GameController> {
     startPaused: choice.paused ?? false,
   };
   if (choice.scenario) {
-    const sc = SCENARIOS[choice.scenario]!;
+    const sc = scenarioFrom(choice.scenario);
     const cards = await loadCards(scenarioCardIds(sc));
     const { mode, ...spec } = sc;
     config.mode = mode;

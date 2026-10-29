@@ -4,6 +4,7 @@ export {
   CHECKPOINT_EVERY,
   type ApplyResult,
   type Move,
+  type PublicView,
   type RewindMark,
   type SessionRecord,
   type Simulation,

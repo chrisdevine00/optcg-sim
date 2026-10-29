@@ -43,7 +43,8 @@ function fromUrl(): Partial<SetupChoice> & { start?: boolean } {
   if (q.get('ask') === '1') out.autoSkip = false;
   if (q.get('paused') === '1') out.paused = true;
   const sc = q.get('scenario');
-  if (sc && SCENARIOS[sc]) out.scenario = sc;
+  // A named scenario, or `json:<base64url>` with a described position (tests, shared positions).
+  if (sc && (SCENARIOS[sc] || sc.startsWith('json:'))) out.scenario = sc;
   if (q.get('start') === '1') out.start = true;
   return out;
 }

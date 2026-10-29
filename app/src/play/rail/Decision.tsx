@@ -7,6 +7,7 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import type { Action, PlayerId } from '@optcg/engine';
 import { CardFace } from '../../art/index.ts';
+import { veiledContent } from '../game/veiled.tsx';
 import { SPEEDS, speedLabel } from '../game/controller.ts';
 import { newIntentId, type Simulation } from '../../session/index.ts';
 import { num, other, resultReason, winnerWords } from '../game/text.ts';
@@ -151,42 +152,26 @@ interface Content {
 }
 
 /**
- * A hotseat seat's own decision while its hand is veiled (review M3-35): the panel addresses that
- * player by name and offers to show their hand. A decision that needs no hidden information can
- * be answered as it is; the rest show only once the hand is shown. Nothing private is in the DOM.
+ * A hotseat seat's own effect decision while its hand is veiled (review M3-35, M3-39) renders from
+ * `veiledContent`, which takes only `VeiledProps` (the public view, the seat's name, callbacks), so
+ * no veiled pixel can depend on the seat's private legal answers.
  */
 function contentFor(g: G): Content {
-  const inner = contentInner(g);
   const k = g.view.decision?.kind;
   const own = new Set(['optional', 'choose', 'order']);
-  if (!g.mine || g.view.result || g.ctl.revealed() || !k || !own.has(k)) return inner;
-  const who = g.names.player[g.me];
-  const answerable = g.ctl.veiledAnswerable();
+  if (!g.mine || g.view.result || g.ctl.revealed() || !k || !own.has(k)) return contentInner(g);
+  const c = veiledContent(g.ctl.veiledProps());
   return {
-    title: `${who}: your decision`,
+    title: c.title,
     tall: true,
-    body: (
-      <>
-        <div className="veiled-ask">
-          <p className="dec-lead">
-            <b>{who}, it is your move.</b>{' '}
-            {answerable
-              ? 'You can answer without showing your hand, or show it first.'
-              : 'Show your hand to see this decision. Only you should look.'}
-          </p>
-          <button
-            type="button"
-            className="btn small"
-            id="show-hand"
-            onClick={() => g.ctl.revealNow()}
-          >
-            Show my hand <kbd>R</kbd>
-          </button>
-        </div>
-        {answerable && inner.body}
-      </>
-    ),
-    foot: answerable ? inner.foot : {},
+    body: c.body,
+    foot: c.foot
+      ? {
+          equal: true,
+          secondary: { label: 'Skip', onClick: c.foot.skip, id: 'skip-btn' },
+          primary: { label: 'Use', onClick: c.foot.use, id: 'use-btn' },
+        }
+      : {},
   };
 }
 

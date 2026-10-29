@@ -90,6 +90,12 @@ export interface Simulation {
   gameOver: boolean;
 }
 
+/**
+ * A view holding only what both players may see. Only `publicView` makes one, so a component that
+ * takes a `PublicView` cannot be handed a seat's private view by mistake (review M3-39).
+ */
+export type PublicView = ProjectedView & { readonly __public: true };
+
 let intentCounter = 0;
 export const newIntentId = (): string =>
   `i${Date.now().toString(36)}${(intentCounter++).toString(36)}`;
@@ -238,7 +244,7 @@ export class GameSession {
    * with every card the other player cannot see turned face down, no legal actions, and the other
    * player's (generic) wording of the decision. The intersection of the two projections.
    */
-  publicView(viewer: PlayerId): ProjectedView {
+  publicView(viewer: PlayerId): PublicView {
     const own = this.view(viewer);
     const theirs = this.view(viewer === 'p1' ? 'p2' : 'p1');
     const hidden = (handle: string) => ({
@@ -270,29 +276,27 @@ export class GameSession {
     const resolving = own.resolving.map((c, i) =>
       c.card !== null && theirs.resolving[i]?.card === c.card ? c : hidden(`resolving.${i}`),
     );
-    // The decision: for the viewer's own, only what both may see (review M3-35): its kind,
-    // purpose and counts, and its source only when that card is public. Otherwise the other
-    // player's generic wording.
-    let decision: ProjectedView['decision'] = own.decision;
-    if (own.decision && own.decision.player === viewer) {
-      const d = own.decision;
-      const src =
-        d.source && d.source.handle && visible.has(d.source.handle) ? d.source : undefined;
-      const name = src ? (this.cards(src.card)?.name ?? src.card) : null;
+    // The decision (review M3-35, M3-39, M4a-01): only what the other seat's own projection shows
+    // of it (its kind and whose it is), with constant wording for the viewer's own. No counts,
+    // purpose, source or options: each of those can depend on hidden cards.
+    const OWN: Record<string, string> = {
+      optional: 'Use an effect, or skip it.',
+      choose: 'Make a choice.',
+      order: 'Put effects in order.',
+      trigger: 'Take a Life card.',
+      block: 'Choose whether to block.',
+      counter: 'Use Counters, or finish.',
+      main: 'Your Main Phase.',
+      mulligan: 'Keep or redraw.',
+      chooseFirst: 'Go first or second.',
+    };
+    let decision: ProjectedView['decision'] = null;
+    if (own.decision && theirs.decision) {
+      const d = theirs.decision;
       decision = {
         kind: d.kind,
         player: d.player,
-        prompt: src ? `${name}: ${src.label ?? 'an effect'}` : 'Your decision.',
-        ...(d.purpose ? { purpose: d.purpose } : {}),
-        ...(d.min !== undefined ? { min: d.min } : {}),
-        ...(d.max !== undefined ? { max: d.max } : {}),
-        ...(src ? { source: src } : {}),
-      };
-    } else if (own.decision && theirs.decision) {
-      decision = {
-        kind: own.decision.kind,
-        player: own.decision.player,
-        prompt: theirs.decision.prompt,
+        prompt: d.player === viewer ? (OWN[d.kind] ?? 'Your decision.') : d.prompt,
       };
     }
     // An allow-list, not a spread, so a field added to views later is not public by accident
@@ -313,6 +317,7 @@ export class GameSession {
       // Delayed effects are public (who, which card, when).
       delayed: own.delayed,
       __brand: 'PlayerView',
+      __public: true,
     };
   }
 

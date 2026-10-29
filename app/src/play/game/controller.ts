@@ -8,6 +8,7 @@ import type { AiTier } from '@optcg/ai';
 import type { Action, PlayerId, ProjectedView } from '@optcg/engine';
 import { GameSession, newIntentId, type Move, type Start } from '../../session/index.ts';
 import { AiClient } from './ai-client.ts';
+import { readsHiddenZone, type VeiledProps } from './veiled.tsx';
 import { describeMove, other, type LogLine, type Names } from './text.ts';
 
 export type Speed = 'step' | 0.5 | 1 | 2 | 4;
@@ -199,6 +200,11 @@ export class GameController {
   actions(): Action[] {
     const priv = this.session.view(this.me);
     if (this.revealed()) return priv.actions;
+    // An effect decision under the veil offers nothing from the private answers: its panel is
+    // VeiledProps only (review M3-39, M4a-01). The defence and damage panels keep the answers
+    // that name public cards (Blockers, take the hit, add to hand).
+    const k = priv.decision?.kind;
+    if (k === 'optional' || k === 'choose' || k === 'order') return [];
     const pub = this.session.publicView(this.me);
     const visible = new Set<string>();
     for (const p of ['p1', 'p2'] as const)
@@ -220,18 +226,42 @@ export class GameController {
   }
 
   /**
-   * A veiled seat's own decision that needs no hidden information: every legal answer names only
-   * public cards and its source is public (review M3-35). It can be answered without a reveal.
+   * Everything the veiled panel may use (review M3-39): the public view, the seat's name and
+   * three callbacks. Nothing in it is computed from the seat's private legal answers.
    */
-  veiledAnswerable(): boolean {
-    if (this.revealed()) return true;
-    const priv = this.session
-      .view(this.me)
-      .actions.filter((a) => a.type !== 'concede' && !(a.type === 'trigger' && a.activate));
-    const pub = this.actions().filter((a) => a.type !== 'concede');
-    const d = this.session.view(this.me).decision;
-    const srcPublic = !d?.source || this.session.publicView(this.me).decision?.source !== undefined;
-    return priv.length === pub.length && srcPublic;
+  veiledProps(): VeiledProps {
+    return {
+      view: this.session.publicView(this.me),
+      seatName: this.config.names[this.me],
+      onShow: () => this.revealNow(),
+      onUse: () => this.veiledUse(),
+      onSkip: () => this.veiledSkip(),
+    };
+  }
+
+  /**
+   * "Use" pressed under the veil. If the ability's public shape reads a hidden zone (a cost from
+   * the hand, say), whether it can be paid is private: show the hand first, and the full decision
+   * says. Otherwise its legality rests on public facts, so it is applied, or, if it is not legal,
+   * the hand is shown and the full decision explains why.
+   */
+  veiledUse(): void {
+    const v = this.session.view(this.me);
+    if (v.decision?.kind !== 'optional' || readsHiddenZone(v.decision.source)) {
+      this.revealNow();
+      return;
+    }
+    const yes = v.actions.find((a) => a.type === 'optional' && a.accept);
+    if (yes) this.act(yes);
+    else this.revealNow();
+  }
+
+  /** "Skip" pressed under the veil: declining is always allowed. */
+  veiledSkip(): void {
+    const v = this.session.view(this.me);
+    const no = v.actions.find((a) => a.type === 'optional' && !a.accept);
+    if (no) this.act(no);
+    else this.revealNow();
   }
 
   /** Show the screen seat's hand: the click veil lifts; a held veil becomes a sticky reveal. */

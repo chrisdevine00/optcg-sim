@@ -35,14 +35,19 @@ test('the defender’s veiled effect decisions name them, offer the reveal, and 
   await expect(page.locator('#decision-title')).toHaveText('Player 1: your decision');
   await expect(page.locator('#decision')).not.toContainText('Your opponent');
   await expect(page.locator('#show-hand')).toBeVisible();
-  await expect(page.locator('#decision')).toContainText('Kaido');
+  // Use and Skip are both offered, whatever the hand holds (review M3-39).
+  await expect(page.locator('#use-btn')).not.toHaveAttribute('aria-disabled', 'true');
+  await expect(page.locator('#skip-btn')).toBeVisible();
   await expectHidden(page, [...P1_PRIVATE, ...P2_PRIVATE], 'veiled optional');
-  // It needs no hidden card, so it can be answered as it is: use it, then target Marco.
+  // Its cost reads no hidden zone, so Use applies at once; the target choice then asks for the
+  // hand to be shown (a choice under the veil offers no answers at all).
   await page.locator('#use-btn').click();
   expect(await nextDecision(page)).toBe('choose');
   await expect(page.locator('#decision-title')).toHaveText('Player 1: your decision');
   await expect(page.locator('#decision')).not.toContainText('make room');
+  await expect(page.locator('#decision .opts button')).toHaveCount(0);
   await expectHidden(page, [...P1_PRIVATE, ...P2_PRIVATE], 'veiled target choice');
+  await page.locator('#show-hand').click();
   await page.locator('#decision .opts button', { hasText: 'Marco' }).click();
   await page.locator('#choose-done').click();
   // The defence itself, still veiled.
