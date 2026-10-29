@@ -8,7 +8,7 @@
 import type { Cost, Duration as DslDuration, EffectAction, Selector } from '@optcg/cards';
 import type { DonClass, InstanceId, PlayerId } from '../api.ts';
 import type { Ability, InternalStep } from '../abilities.ts';
-import { hasTiming } from '../abilities.ts';
+import { hasTiming, optionalCost } from '../abilities.ts';
 import type { Draft } from '../draft.ts';
 import { abilityOf, fireEvent, pop, push, pushKo, pushRemove, sourceInfo, top } from '../flow.ts';
 import {
@@ -61,7 +61,7 @@ export function pushEffect(
   const optionalAuto =
     part === 'effect' &&
     ((ab.kind === 'auto' && (ab.optional === true || (ab.cost?.length ?? 0) > 0)) ||
-      (ab.kind === 'activate' && ab.costOptional === true));
+      optionalCost(ab));
   const f: EffectFrame = {
     f: 'effect',
     card,
@@ -247,7 +247,8 @@ function exec(d: Draft, f: EffectFrame, ins: Instr, ab: Ability): Out {
         instance: f.card,
         card: f.cardId,
         mode: i,
-        label: ins.labels[i],
+        // Both players see this event: the neutral wording, not the chooser's (M4a-11).
+        label: ins.neutral?.[i] ?? ins.labels[i],
         player: rel(ctxOf(d, f), ins.chooser),
       });
       f.ip = ins.to[i]!;
@@ -507,6 +508,7 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
   const c = ctxOf(d, f);
   const you = f.controller;
   if ('draw' in a) {
+    if (a.upTo) return unsupported(d, f, 'draw up to');
     draw(d, rel(c, a.player ?? 'you'), num(c, a.draw));
     return 'next';
   }
@@ -538,6 +540,7 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
   }
   if ('move' in a) return move(d, f, a.move.what, a.move.to);
   if ('play' in a) {
+    if (a.play.rested) return unsupported(d, f, 'play rested');
     const ids = select(d, f, a.play.what, {
       role: 'target',
       verb: 'play',
@@ -548,8 +551,14 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
       },
     });
     if (ids === WAIT) return WAIT;
-    for (const id of ids.slice().reverse())
-      push(d, { f: 'play', card: id, player: you, step: 'pay', free: true });
+    // Several cards played by one effect: their [On Play]s activate as one event, so the
+    // player orders them (M4a-04), whatever order the cards are placed in.
+    const batch = ids.length > 1 ? d.s.nextMod++ : undefined;
+    for (const id of ids.slice().reverse()) {
+      const pf: Frame = { f: 'play', card: id, player: you, step: 'pay', free: true };
+      if (batch !== undefined) pf.batch = batch;
+      push(d, pf);
+    }
     return 'next';
   }
   if ('ko' in a) {
@@ -601,7 +610,7 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
             : 'negate' in a
               ? a.negate
               : a.restrict;
-    if (typeof spec.target === 'string') return 'next';
+    if (typeof spec.target === 'string') return unsupported(d, f, 'restriction on a player');
     const ids = select(d, f, spec.target, { role: 'target', verb: 'choose' });
     if (ids === WAIT) return WAIT;
     const du = duration(d, f, spec.duration);
@@ -656,7 +665,15 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
     const ids = select(d, f, a.select, { role: 'target', verb: 'choose' });
     return ids === WAIT ? WAIT : 'next';
   }
-  d.emit({ type: 'Anomaly', what: `action not implemented: ${Object.keys(a)[0]}`, card: f.cardId });
+  return unsupported(d, f, `action ${Object.keys(a)[0]}`);
+}
+
+/**
+ * A shape the runtime does not implement: `validateScript` rejects these, so reaching one is a
+ * bug. It emits an `Anomaly` (the property tests fail on any) and skips the step (M4a-07).
+ */
+function unsupported(d: Draft, f: EffectFrame, what: string): Out {
+  d.emit({ type: 'Anomaly', what: `not implemented: ${what}`, card: f.cardId });
   return 'next';
 }
 
@@ -675,6 +692,8 @@ function move(
 ): Out {
   const zones = Array.isArray(what.from) ? what.from : [what.from];
   const you = f.controller;
+  if (zones.includes('deckTop') && (zones.length !== 1 || to.zone !== 'life'))
+    return unsupported(d, f, `move from the deck top to ${to.zone}`);
   if (zones.length === 1 && zones[0] === 'deckTop') {
     // "Add up to 1 card from the top of your deck to the top of your Life cards."
     const g = take(f);
@@ -704,11 +723,14 @@ function move(
     for (const id of ids)
       moveCard(d, id, to.zone as 'hand', {
         revealed: true,
-        position: to.position === 'top' ? 'top' : undefined,
+        // The declared deck position is honoured (M4a-07); hand and trash take the default.
+        position: to.zone === 'deck' ? (to.position === 'bottom' ? 'bottom' : 'top') : undefined,
         extra: { reason: 'effect' },
       });
     return 'next';
   }
+  if (!zones.every((z) => z === 'characters' || z === 'stage') || to.zone === 'life')
+    return unsupported(d, f, `move from ${zones.join('/')} to ${to.zone}`);
   const dest = to.zone as 'hand' | 'deck' | 'trash';
   for (const id of ids.slice().reverse()) {
     if (!FIELD.has(d.card(id).zone)) continue;

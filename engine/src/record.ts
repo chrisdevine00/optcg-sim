@@ -21,7 +21,7 @@ import type { State } from './state.ts';
  * Bump `ENGINE_VERSION` whenever a change alters how any recorded game plays out. Golden records are
  * re-recorded deliberately when it changes. `SCRIPTS_VERSION` is the effect-script hash (none until M4).
  */
-export const ENGINE_VERSION = '0.5.1';
+export const ENGINE_VERSION = '0.5.2';
 export const SCRIPTS_VERSION = 'scripts-' + hashString(JSON.stringify(SCRIPTS)).slice(0, 16);
 
 export class RecordVersionMismatch extends Error {

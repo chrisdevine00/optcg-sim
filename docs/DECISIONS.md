@@ -2,6 +2,19 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-10-29 — M4a fix round 1 (engine and cards)
+
+Context: the M4a review (`docs/reviews/m4a-review.md`) failed the milestone. Phase A covers the engine and card findings.
+
+- **M4a-04: cards played by one effect trigger as one event.** OP17-118 plays up to 2 cards; their play frames share a pending batch, so their [On Play]s queue together and the player orders them with the existing `order` decision (CR 8-6-1). The cards are still placed in canonical order, which only matters for the 5-Character rule. Rejected: asking the play order first (an extra decision that only stands in for the [On Play] order).
+- **M4a-08: an Event's DON!! −X activation cost is optional**, like its "you may" costs (B-1). The engine treats any DON!! −X in an Event's [Main] or [Counter] cost as declinable, without a per-script flag: QA-ST01–04 ST04-016 (attribution checked by hand from the cached text, RL-52), CR 8-3-1-4 and the "You may return" reminder. Affected: OP09-077, OP15-078 [Main]; OP07-076, EB04-040, OP17-077 [Counter]. E-Q12 is closed. Unchanged: [Activate: Main] and [Trigger] costs (activating is the consent) and auto costs (already asked).
+- **M4a-07: the schema rejects what the runtime would get wrong.** `validateScript` now rejects: a move from the deck top other than "up to 1 to the top of Life"; moves from hand or trash to the deck without a top or bottom position; moves into Life or from mixed zones; a restriction on a player; `play.rested`; plays from outside the hand; K.O. outside the Character area; modifiers on cards off the field; looking at the opponent's deck; trash-from-hand outside the hand. The runtime honours a declared deck position, and every fall-through emits an `Anomaly`, which fails any random game. Rejected: implementing each shape now (M4b will, with its cards).
+- **M4a-06: the leak property knows what the viewer knows.** A card whose play is in progress was revealed at its pay step, so it is no longer treated as hidden. Card ids in projected events are now compared up to the first reveal, instead of being stripped everywhere, and the follow-up `autoSkip` check is skipped only when an event revealed a card.
+- **M4a-11:** a "choose one" may give `neutral` labels for both players' logs; `ModeChosen.label` uses them (OP17-049).
+- **M4a-12:** the summary hash drops projection keys and batch counters (batches become queue positions) and adds each player's `known` cards by position.
+
+ENGINE_VERSION 0.5.2.
+
 ## 2026-10-29 — An Event's "you may" activation cost can be declined (B-1)
 
 Context: the independent card tests (DISAGREEMENTS.md B-1) expected EB04-040's "[Main] You may rest 6 of your DON!! cards: …" to let the player decline the cost after playing the Event. The engine paid it automatically, and refused to play OP17-056 when its "you may" cost could not be paid. The coordinator ruled for the test author: under CR 8-3-1-4 a "can/may" cost is optional and skipping it means only that the effect does not activate; playing the Event (paying its printed cost and trashing it, CR 2-7-3, 8-4-2) is a separate step.

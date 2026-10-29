@@ -1,7 +1,18 @@
 /** OP17-118 Rocks.D.Xebec. QA-OP17 OP17-118 (two rows). */
 import { describe, expect, it } from 'vitest';
 import { queries } from '@optcg/engine';
-import { BLUE, game, pick, play, PLAIN_PURPLE, ROCKS, V } from './helpers.ts';
+import {
+  BLUE,
+  expectDecision,
+  game,
+  hand,
+  option,
+  pick,
+  play,
+  PLAIN_PURPLE,
+  ROCKS,
+  V,
+} from './helpers.ts';
 
 describe('OP17-118 Rocks.D.Xebec', () => {
   const counterOf = (characters: string[]) => {
@@ -89,5 +100,38 @@ describe('OP17-118 Rocks.D.Xebec', () => {
     play(g, 'OP17-118');
     pick(g, [g.find('p1', 'hand', 'OP17-045')]);
     expect(g.zone('p1', 'characters')).toHaveLength(2);
+  });
+
+  it('M4a-04: the [On Play]s of the 2 cards it plays are one event: the player orders them', () => {
+    for (const streusenFirst of [true, false]) {
+      const g = game(
+        {
+          leader: ROCKS,
+          hand: ['OP17-118', 'OP17-050', 'OP17-045'],
+          deck: ['OP17-052', 'OP17-054', BLUE, BLUE, BLUE],
+          costArea: { active: 10, rested: 0 },
+        },
+        { leader: PLAIN_PURPLE },
+      );
+      play(g, 'OP17-118'); // draws OP17-052
+      pick(g, [g.find('p1', 'hand', 'OP17-050'), g.find('p1', 'hand', 'OP17-045')]);
+      const d = expectDecision(g, 'order', 'p1');
+      expect(d.options).toHaveLength(2);
+      const streusen = g.find('p1', 'characters', 'OP17-050');
+      const kyo = g.find('p1', 'characters', 'OP17-045');
+      g.act({ type: 'order', first: `${streusenFirst ? streusen : kyo}#on-play` });
+      if (streusenFirst) {
+        // Streusen looks at OP17-054 and BLUE and puts them on top, BLUE first; then draws BLUE.
+        option(g, 'top');
+        const blue = g.legal().find((a) => a.type === 'order' && g.card(a.first).card === BLUE)!;
+        g.act(blue);
+        // Then Kyo draws the card Streusen left on top.
+        expect(hand(g, 'p1').sort()).toEqual(['OP17-052', 'OP17-054', BLUE].sort());
+      } else {
+        // Kyo draws blind first (OP17-054); Streusen then looks at the next 2.
+        expect(hand(g, 'p1').sort()).toEqual(['OP17-052', 'OP17-054'].sort());
+        expectDecision(g, 'choose', 'p1');
+      }
+    }
   });
 });

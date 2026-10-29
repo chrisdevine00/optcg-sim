@@ -138,6 +138,10 @@ If interrupted, check `git log` and the branch, and re-launch whichever of these
    It also fixes the carried items: the Phase 4 severity-2 findings and M1-37/38.
 2. **M4a:** fix M2-19 first; then the DSL runtime, the Rocks and Kaido archetypes, and a throughput benchmark.
 3. **M5a** (Pirate), the learning slice L, and owner usability session S1.
+4. **M4b entry items** (from the M4a review, M4a-10; not reachable with the Rocks and Kaido scripts, so fix before M4b scripts can reach them):
+   - one removal event over several Characters gets **one** replacement offer (QA-OP15 OP15-069: one DON!! return keeps both);
+   - at the End Phase, fire [End of Your Turn], delayed "at the end of this turn" and [End of Your Opponent's Turn] effects as **one batch per player**, so the turn player can order a delayed effect against their own (CR 6-6-1-1, 8-6-1);
+   - skip the source-negation check for **delayed** effects in `drainPending` (a created delayed effect does not depend on its source).
 
 ## Blockers
 

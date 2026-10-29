@@ -131,6 +131,12 @@ export function playFrom(
     let action: Action;
     [action, rng] = pickAction(legal, rng, opts.policy);
     const step = reduce(state, action);
+    // A runtime fall-through is a bug (M4a-07): fail the game.
+    const anomaly = step.events.find((e) => e.type === 'Anomaly');
+    if (anomaly)
+      throw new Error(
+        `seed ${opts.seed}: Anomaly ${JSON.stringify(anomaly)} after ${JSON.stringify(action)}`,
+      );
     const next = step.state;
     opts.onEvents?.(step.events, next);
     opts.onStep?.(state, action, next, legal);

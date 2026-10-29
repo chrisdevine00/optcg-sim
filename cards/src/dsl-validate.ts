@@ -485,7 +485,7 @@ function step(c: Ctx, path: string, v: unknown): void {
     if: ['then', 'else'],
     may: ['label', 'prompt'],
     ifDid: ['then'],
-    chooseOne: ['chooser', 'labels'],
+    chooseOne: ['chooser', 'labels', 'neutral'],
     forEach: ['do'],
     delayed: ['do'],
   });
@@ -517,6 +517,14 @@ function step(c: Ctx, path: string, v: unknown): void {
       arr(c, `${path}.labels`, o.labels, (l, p) => str(c, p, l));
       if (Array.isArray(modes) && (!Array.isArray(o.labels) || o.labels.length !== modes.length))
         err(c, `${path}.labels`, 'needs one label per mode');
+      if (o.neutral !== undefined) {
+        arr(c, `${path}.neutral`, o.neutral, (l, p) => str(c, p, l));
+        if (
+          Array.isArray(modes) &&
+          (!Array.isArray(o.neutral) || o.neutral.length !== modes.length)
+        )
+          err(c, `${path}.neutral`, 'needs one neutral label per mode');
+      }
       return;
     }
     case 'forEach':
@@ -575,9 +583,23 @@ function action(c: Ctx, path: string, v: unknown): void {
       if (o.upTo !== undefined) err(c, `${path}.upTo`, '"draw up to" is not implemented yet');
       return;
     case 'trashFromHand':
+      selector(c, p, x);
+      return zonesIn(c, p, x, ['hand'], 'trashFromHand works on a hand');
     case 'ko':
+      selector(c, p, x);
+      return zonesIn(c, p, x, ['characters'], "only Characters are K.O.'d (CR 10-2-1)");
     case 'rest':
+      selector(c, p, x);
+      return zonesIn(c, p, x, FIELD_ZONES, 'the runtime rests cards on the field only');
     case 'setActive':
+      selector(c, p, x);
+      return zonesIn(
+        c,
+        p,
+        x,
+        [...FIELD_ZONES, 'donCostArea'],
+        'the runtime sets active field cards or cost-area DON!! only',
+      );
     case 'skipRefresh':
     case 'select':
       return selector(c, p, x);
@@ -587,7 +609,12 @@ function action(c: Ctx, path: string, v: unknown): void {
       fields(c, p, x, ['n', 'take', 'rest'], ['player']);
       if (!isObj(x)) return;
       int(c, `${p}.n`, x.n);
-      if (x.player !== undefined) enumOf(c, `${p}.player`, x.player, P);
+      if (x.player !== undefined && x.player !== 'you')
+        err(
+          c,
+          `${p}.player`,
+          "looking at the opponent's deck is not implemented in the runtime yet",
+        );
       arr(c, `${p}.take`, x.take, (t, q) => {
         fields(c, q, t, ['pick', 'to'], ['filter', 'reveal']);
         if (!isObj(t)) return;
@@ -610,24 +637,30 @@ function action(c: Ctx, path: string, v: unknown): void {
       fields(c, p, x, ['what', 'to']);
       if (!isObj(x)) return;
       selector(c, `${p}.what`, x.what);
-      return dest(c, `${p}.to`, x.to);
+      dest(c, `${p}.to`, x.to);
+      return moveShape(c, p, x.what, x.to);
     case 'trashLifeUntil':
       return int(c, p, x);
     case 'play':
       fields(c, p, x, ['what'], ['rested']);
-      if (isObj(x)) selector(c, `${p}.what`, x.what);
+      if (!isObj(x)) return;
+      selector(c, `${p}.what`, x.what);
+      zonesIn(c, `${p}.what`, x.what, ['hand'], 'the runtime plays cards from hand only');
+      if (x.rested !== undefined) err(c, `${p}.rested`, 'playing rested is not implemented yet');
       return;
     case 'power':
     case 'cost':
       fields(c, p, x, ['target', 'amount', 'duration']);
       if (!isObj(x)) return;
       selector(c, `${p}.target`, x.target);
+      zonesIn(c, `${p}.target`, x.target, FIELD_ZONES, 'modifiers apply to cards on the field');
       num(c, `${p}.amount`, x.amount);
       return enumOf(c, `${p}.duration`, x.duration, DURATIONS);
     case 'setBasePower':
       fields(c, p, x, ['target', 'value', 'duration']);
       if (!isObj(x)) return;
       selector(c, `${p}.target`, x.target);
+      zonesIn(c, `${p}.target`, x.target, FIELD_ZONES, 'modifiers apply to cards on the field');
       num(c, `${p}.value`, x.value);
       return enumOf(c, `${p}.duration`, x.duration, DURATIONS);
     case 'playCost':
@@ -649,18 +682,24 @@ function action(c: Ctx, path: string, v: unknown): void {
       fields(c, p, x, ['target', 'keyword', 'duration']);
       if (!isObj(x)) return;
       selector(c, `${p}.target`, x.target);
+      zonesIn(c, `${p}.target`, x.target, FIELD_ZONES, 'modifiers apply to cards on the field');
       enumOf(c, `${p}.keyword`, x.keyword, KEYWORDS);
       return enumOf(c, `${p}.duration`, x.duration, DURATIONS);
     case 'negate':
       fields(c, p, x, ['target', 'duration']);
       if (!isObj(x)) return;
       selector(c, `${p}.target`, x.target);
+      zonesIn(c, `${p}.target`, x.target, FIELD_ZONES, 'modifiers apply to cards on the field');
       return enumOf(c, `${p}.duration`, x.duration, DURATIONS);
     case 'restrict':
       fields(c, p, x, ['target', 'what', 'duration']);
       if (!isObj(x)) return;
-      if (typeof x.target === 'string') enumOf(c, `${p}.target`, x.target, P);
-      else selector(c, `${p}.target`, x.target);
+      if (typeof x.target === 'string')
+        err(c, `${p}.target`, 'a restriction on a player is not implemented in the runtime yet');
+      else {
+        selector(c, `${p}.target`, x.target);
+        zonesIn(c, `${p}.target`, x.target, FIELD_ZONES, 'modifiers apply to cards on the field');
+      }
       restriction(c, `${p}.what`, x.what);
       return enumOf(c, `${p}.duration`, x.duration, DURATIONS);
     case 'activate':
@@ -669,6 +708,48 @@ function action(c: Ctx, path: string, v: unknown): void {
       enumOf(c, `${p}.ability`, x.ability, ['main']);
       return enumOf(c, `${p}.of`, x.of, ['self']);
   }
+}
+
+const FIELD_ZONES = ['leader', 'characters', 'stage', 'field', 'self'];
+
+/** Every zone of a selector must be one of `allowed` (the runtime would mishandle others, M4a-07). */
+function zonesIn(c: Ctx, path: string, sel: unknown, allowed: string[], why: string): void {
+  if (!isObj(sel)) return;
+  const zones = Array.isArray(sel.from) ? sel.from : [sel.from];
+  for (const z of zones)
+    if (typeof z === 'string' && !allowed.includes(z)) err(c, `${path}.from`, `${z}: ${why}`);
+}
+
+/**
+ * The (from, to) pairs the runtime's `move` implements (E-D5, M4a-07). Anything else is rejected,
+ * so a script can never be silently misexecuted:
+ * - the deck top to the top of Life ("add up to 1 card from the top of your deck to your Life");
+ * - hand or trash to hand, trash, or the top or bottom of the deck;
+ * - Characters or Stage to hand, trash, or the top or bottom of the deck (a removal, E-D3).
+ */
+function moveShape(c: Ctx, path: string, what: unknown, to: unknown): void {
+  if (!isObj(what) || !isObj(to)) return;
+  const zones = (Array.isArray(what.from) ? what.from : [what.from]) as string[];
+  const dz = to.zone;
+  const pos = to.position;
+  const all = (set: string[]) => zones.every((z) => set.includes(z));
+  if (zones.includes('deckTop')) {
+    if (zones.length !== 1 || dz !== 'life' || pos !== 'top')
+      return err(c, path, 'a move from the deck top is implemented only to the top of Life');
+    const pk = what.pick as Record<string, unknown> | undefined;
+    if (!pk || pk.upTo !== 1)
+      err(c, `${path}.what.pick`, 'a move from the deck top needs { upTo: 1 }');
+    return;
+  }
+  if (to.faceUp !== undefined) err(c, `${path}.to.faceUp`, 'faceUp applies only to Life');
+  if (!all(['hand', 'trash']) && !all(['characters', 'stage']))
+    return err(c, `${path}.what.from`, `moving from ${zones.join(', ')} is not implemented yet`);
+  if (dz === 'life')
+    return err(c, `${path}.to`, 'moving into Life from here is not implemented yet');
+  if (dz === 'deck' && pos !== 'top' && pos !== 'bottom')
+    err(c, `${path}.to.position`, 'a move to the deck needs position "top" or "bottom"');
+  if (dz !== 'deck' && pos !== undefined)
+    err(c, `${path}.to.position`, 'position applies only to the deck');
 }
 
 function restriction(c: Ctx, path: string, v: unknown): void {

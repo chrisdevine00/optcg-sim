@@ -41,6 +41,10 @@ export const OP17_049: CardScript = {
           ],
           chooser: 'opponent',
           labels: ['Your opponent draws 2 cards.', 'You trash 2 cards from your hand.'],
+          neutral: [
+            "Charlotte Linlin's player draws 2 cards.",
+            "Charlotte Linlin's opponent trashes 2 cards from their hand.",
+          ],
         },
       ],
     },

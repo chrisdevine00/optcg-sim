@@ -20,7 +20,7 @@ export type Instr =
   /** Ask the controller; on "no" jump to `to`; on "yes" record `label` as done. */
   | { k: 'may'; label: string; prompt?: string; to: number }
   /** Ask `chooser` for a mode, then jump to that mode's code. */
-  | { k: 'mode'; chooser: P; labels: string[]; to: number[] }
+  | { k: 'mode'; chooser: P; labels: string[]; neutral?: string[]; to: number[] }
   /** Register a delayed body starting at the next instruction; continue at `to`. */
   | { k: 'delay'; to: number }
   | { k: 'end' };
@@ -101,6 +101,7 @@ function step(out: Instr[], st: EStep): void {
   }
   if ('chooseOne' in st) {
     const m: Instr = { k: 'mode', chooser: st.chooser ?? 'you', labels: st.labels, to: [] };
+    if (st.neutral) m.neutral = st.neutral;
     out.push(m);
     const ends: Instr[] = [];
     for (const mode of st.chooseOne) {

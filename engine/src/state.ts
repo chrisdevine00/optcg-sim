@@ -164,6 +164,11 @@ export type Frame =
       free?: true;
       /** An Event activated in the Counter Step for its [Counter] (CR 7-1-3-1-2). */
       counter?: true;
+      /**
+       * Cards placed by one effect's `play` share a pending batch, so their [On Play]s are one
+       * event and their controller orders them (M4a-04, CR 8-6-1).
+       */
+      batch?: number;
     }
   | { f: 'battle' }
   | {

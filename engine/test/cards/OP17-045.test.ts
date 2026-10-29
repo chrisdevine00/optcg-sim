@@ -35,6 +35,7 @@ describe('OP17-045 Kyo', () => {
       { turn: 4, activePlayer: 'p2' },
     );
     play(g, 'OP09-077');
+    accept(g); // DON!! −X on an Event is optional (CR 8-3-1-4, QA-ST01–04 ST04-016)
     payDon(g);
     pick(g, [g.find('p1', 'characters', V.c4)]);
     return g;

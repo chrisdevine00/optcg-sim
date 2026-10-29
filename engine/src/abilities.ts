@@ -58,6 +58,19 @@ export type Ability =
 export const isInternal = (s: unknown): s is InternalStep =>
   !!s && typeof s === 'object' && 'op' in s;
 
+/**
+ * Is this Event ability's activation cost optional, so that playing the card and paying the cost are
+ * separate (CR 8-3-1-4)? Either the script says "you may" (`costOptional`, B-1), or the cost holds a
+ * DON!! −X, whose reminder text reads "You may return …" (QA-ST01–04 ST04-016: an Event with
+ * DON!! −1 can be activated without paying it, and nothing happens; M4a-08).
+ */
+export function optionalCost(ab: Ability): boolean {
+  if (ab.kind !== 'activate' || !ab.cost?.length) return false;
+  if (ab.costOptional) return true;
+  const event = hasTiming(ab, 'main') || hasTiming(ab, 'counter');
+  return event && ab.cost.some((c) => 'donMinus' in c);
+}
+
 /** Does an activate ability have this timing ([Main], [Counter], [Activate: Main])? */
 export function hasTiming(ab: Ability, t: ActivateTiming): boolean {
   if (ab.kind !== 'activate') return false;

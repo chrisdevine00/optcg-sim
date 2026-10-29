@@ -97,6 +97,7 @@ Card text for the cards discussed was read from the official card list cache (`.
 | RL-49 | ST30-001 Luffy & Ace: what the two effects cover | leader |
 | RL-50 | OP09-062 Nico Robin: Banish and the DON!! ramp (no per-card Q&A) | leader |
 | RL-51 | OP13-004 Sabo: conditional permanent power (no per-card Q&A) | leader |
+| RL-52 | An Event's DON!! −X activation cost may be declined | E-Q12 |
 
 ---
 
@@ -846,6 +847,15 @@ Leader text below is the official card list's (`/cardlist/?series=…`, fetched 
   The three Usopp cases become golden tests (RL-32). The `order` decision for permanent effects is not needed for any current card.
 - **D-4. Protected Characters stay choosable.** `legalActions` should offer a "cannot be K.O.'d" Character as a K.O. target and as a "K.O. 1 of your Characters" cost pick. The pick then does nothing or the effect fizzles, as the Orlumbus and Hakuba Q&As describe (RL-16). The AI may prune these moves; the rules engine should not hide them. This is an exception to the completability lookahead in ARCHITECTURE §2.3, and it applies only when a Q&A says the choice is legal.
 - **D-5. Every RL entry becomes a test.** Put them at `engine/test/rulings/RL-xx.test.ts`, named by RL ID with the Q&A row in a comment, so a changed ruling points straight at its test.
+
+### RL-52 An Event's DON!! −X activation cost may be declined
+
+- **Question:** An Event's [Main] or [Counter] costs "DON!! −X". Can the player activate the Event (paying its printed cost, so it goes to the trash) without paying the DON!! −X?
+- **Answer:** Yes; the effect then does not happen. QA-ST01–04, card ST04-016 Blast Breath ("[Counter] DON!! −1 (You may return …): +4000"), asks whether the card can be activated without paying the DON!! −1, and answers: yes, but nothing will happen. This matches CR 8-3-1-4 (a cost worded "can" or "may" may be skipped, and then the effect after the colon cannot be activated) and the reminder text of every DON!! −X, "You may return the specified number of DON!! cards …".
+- **Attribution check (2026-10-29, cached text only):** the extracted PDF text puts each card label *below* its question rows. In `.cache/track-f/qa/qa_st-01-st-04.txt` the four consecutive rows read: "only the DON!! part … ?" → ST04-014 (Draw 1, then add DON!!); "no cards in my DON!! deck?" → ST04-014 and ST04-015 (each adds DON!!); "without paying the DON!! −1?" → **ST04-016** (the only one of these with DON!! −1); "[Activate: Main] … not {Animal Kingdom Pirates}?" → ST04-017 Onigashima Island (an [Activate: Main] with that condition). Every row fits the card below it, so the attribution holds.
+- **Confidence:** official explicit (for a [Counter] Event); by inference for a [Main] Event (same cost wording, same CR rule).
+- **Sources:** QA-ST01–04 ST04-016; CR 8-3-1-4, 8-3-1-6, 10-2-10-1.
+- **Engine test:** `engine/test/cards/OP09-077`, `OP15-078`, `OP07-076`, `EB04-040`, `OP17-077`: play or activate the Event, decline the DON!! −X; the Event is in the trash and nothing else changes.
 
 ## Appendix: per-card Q&A rows used by the M4a scripts (2026-10-29)
 

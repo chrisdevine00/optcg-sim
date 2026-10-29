@@ -6,7 +6,7 @@
  * the two together. `reduce` validates with `check`, so it never has to enumerate.
  */
 import type { Action, InstanceId, Intent, OptionChoice, PlayerId, Reason } from './api.ts';
-import { hasTiming, type Ability } from './abilities.ts';
+import { hasTiming, optionalCost, type Ability } from './abilities.ts';
 import { derive } from './derive.ts';
 import { attackLock, counterOf, payable, type Ctx } from './effects/eval.ts';
 import { answerEffect, pushEffect } from './effects/run.ts';
@@ -56,7 +56,7 @@ function eventPayable(s: State, p: PlayerId, card: InstanceId, ab: Ability): boo
   const cost = derive(s, card).cost ?? 0;
   // A "you may" activation cost can always be skipped (CR 8-3-1-4): only the card's own cost must
   // be payable to play it; the activation cost is asked afterwards (B-1).
-  const costs = ab.kind === 'activate' && !ab.costOptional ? ab.cost : undefined;
+  const costs = ab.kind === 'activate' && !optionalCost(ab) ? ab.cost : undefined;
   return payable(ctx(s, p, card), costs, { playCost: cost, exclude: card });
 }
 

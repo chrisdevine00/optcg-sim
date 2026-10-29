@@ -2,6 +2,10 @@
 
 ## Two-turn simulations on scripted decks (M4a exit criterion, ADR 0008)
 
+This is **engine playout throughput**: random playouts from real positions. It does not yet include
+what MCTS will add per iteration (determinization, `project` at the root, evaluation), and it runs in
+Node, not a browser worker; M5a adds those figures (review M4a-13).
+
 **Result (2026-10-29): median 5,588 two-turn simulations per second** in one `worker_threads`
 worker, on the scripted Rocks (OP17-039) and Kaido (OP17-058) lists. The target was at least 1,000,
 so ADR 0008's fallback is **not** triggered.

@@ -105,8 +105,14 @@ export function leakGame(
 function hiddenFrom(s: State, viewer: PlayerId): string[] {
   const top = s.stack[s.stack.length - 1];
   const pending = top?.f === 'damage' ? top.pending : null;
+  // A card whose play is in progress was revealed when it was paid for (CR 2-7-2); both players
+  // know it, though it is still in hand until placed (M4a-06).
+  const playing = new Set(s.stack.flatMap((f) => (f.f === 'play' ? [f.card] : [])));
   return Object.keys(s.cards).filter(
-    (id) => !canSee(s, id, viewer) && !(id === pending && s.cards[id]!.owner === viewer),
+    (id) =>
+      !canSee(s, id, viewer) &&
+      !playing.has(id) &&
+      !(id === pending && s.cards[id]!.owner === viewer),
   );
 }
 
@@ -123,15 +129,16 @@ function permuted(s: State, viewer: PlayerId, order: number[]): State {
   return { ...s, cards: cardsCopy };
 }
 
+/** Does this projected event show the viewer a card that was hidden from them? */
+const isReveal = (e: GameEvent): boolean =>
+  e.type === 'CardRevealed' ||
+  e.type === 'TriggerRevealed' ||
+  (e.type === 'CardMoved' &&
+    (e.revealed === true || (e.instance === undefined && e.newInstance !== undefined)));
+
 /** Projected events up to and including the first one that shows the viewer a hidden card. */
 function untilReveal(events: GameEvent[]): GameEvent[] {
-  const i = events.findIndex(
-    (e) =>
-      e.type === 'CardRevealed' ||
-      e.type === 'TriggerRevealed' ||
-      (e.type === 'CardMoved' &&
-        (e.revealed === true || (e.instance === undefined && e.newInstance !== undefined))),
-  );
+  const i = events.findIndex(isReveal);
   return i < 0 ? events : events.slice(0, i + 1);
 }
 
@@ -183,7 +190,7 @@ describe('hidden-information leak properties', () => {
               // way whatever the hidden cards are, unless a hidden card was revealed (M2-19).
               const pv = projectEvents(a, viewer);
               const nextDec = internals(ra).decision;
-              if (nextDec && nextDec.player !== viewer && untilReveal(pv).length === pv.length) {
+              if (nextDec && nextDec.player !== viewer && !pv.some(isReveal)) {
                 expect(autoSkip(rb, { observedByOtherHuman: true })).toEqual(
                   autoSkip(ra, { observedByOtherHuman: true }),
                 );
@@ -194,7 +201,12 @@ describe('hidden-information leak properties', () => {
               // including the first reveal.
               const pa = untilReveal(projectEvents(a, viewer));
               const pb = untilReveal(projectEvents(b, viewer)).slice(0, pa.length);
-              expect(stripCards(pb)).toBe(stripCards(pa));
+              // Card ids too must match before the reveal (a leaked id would differ, M4a-06);
+              // only the reveal itself may show a different card.
+              const head =
+                pa.length > 0 && isReveal(pa[pa.length - 1]!) ? pa.length - 1 : pa.length;
+              expect(JSON.stringify(pb.slice(0, head))).toBe(JSON.stringify(pa.slice(0, head)));
+              expect(stripCards(pb.slice(head))).toBe(stripCards(pa.slice(head)));
             }
           });
         },

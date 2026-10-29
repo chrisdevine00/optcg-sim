@@ -252,7 +252,11 @@ export type Step =
   | { if: Condition; then: Step[]; else?: Step[] }
   | { may: Step[]; label: Label; prompt?: string }
   | { ifDid: Label; then: Step[] }
-  | { chooseOne: Step[][]; chooser?: P; labels: string[] }
+  /**
+   * `labels` are worded for the chooser (shown on their decision). `neutral` words each mode for
+   * both players' logs, e.g. "Charlotte Linlin's player draws 2 cards." (M4a-11).
+   */
+  | { chooseOne: Step[][]; chooser?: P; labels: string[]; neutral?: string[] }
   | { forEach: Num; do: Step[] }
   | { delayed: { at: 'endOfThisTurn' }; do: Step[] };
 export type Effect = Step[];

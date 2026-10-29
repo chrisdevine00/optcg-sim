@@ -64,8 +64,24 @@ describe('EB04-040 Flame Dragon Torch', () => {
     g.act({ type: 'optional', accept: false });
     passBlock(g);
     g.act({ type: 'activate', card: g.find('p1', 'hand', 'EB04-040'), ability: 'counter' });
+    accept(g); // DON!! −X on an Event is optional (CR 8-3-1-4, QA-ST01–04 ST04-016)
     expect(g.power(g.leader('p1'))).toBe(9000);
     expect(don(g, 'p1')).toMatchObject({ active: 0, deck: 10 });
     expectDecision(g, 'counter');
+  });
+
+  it('M4a-08: the [Counter] DON!! −1 may be declined: no +4000', () => {
+    const g = game(
+      { leader: KAIDO, hand: ['EB04-040'], costArea: { active: 2, rested: 0 } },
+      { leader: PLAIN_BLUE, characters: [V.c7] },
+      { turn: 4, activePlayer: 'p2' },
+    );
+    g.act({ type: 'attack', attacker: g.find('p2', 'characters', V.c7), target: g.leader('p1') });
+    g.act({ type: 'optional', accept: false });
+    passBlock(g);
+    g.act({ type: 'activate', card: g.find('p1', 'hand', 'EB04-040'), ability: 'counter' });
+    g.act({ type: 'optional', accept: false });
+    expect(g.power(g.leader('p1'))).toBe(5000);
+    expect(don(g, 'p1')).toMatchObject({ active: 1, rested: 1, deck: 8 });
   });
 });

@@ -354,7 +354,14 @@ function runPlay(d: Draft, f: Extract<Frame, { f: 'play' }>): void {
       w.played = d.s.turn;
       d.emit({ type: 'CardPlayed', instance: f.card, card: c.card, player: f.player, zone: to });
       f.step = 'done';
-      fireFor(d, [f.player], 'onPlay', () => [f.card]);
+      fire(
+        d,
+        [f.player],
+        () => [f.card],
+        (w) => w === 'onPlay',
+        'onPlay',
+        f.batch,
+      );
       return;
     }
     case 'done':
@@ -785,9 +792,10 @@ export function fire(
   cardsOf: (p: PlayerId) => InstanceId[],
   match: TimingMatch,
   label: string,
+  shared?: number,
 ): void {
   let added: State['pending'] | null = null;
-  let batch = -1;
+  let batch = shared ?? -1;
   for (const p of order) {
     for (const id of cardsOf(p)) {
       const c = d.s.cards[id];

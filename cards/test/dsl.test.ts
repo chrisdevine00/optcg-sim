@@ -101,6 +101,138 @@ describe('validateScript', () => {
   });
 });
 
+describe('validateScript rejects shapes the runtime would get wrong (M4a-07)', () => {
+  const withStep = (step: unknown): CardScript =>
+    variant((s) => {
+      (s.abilities[0] as { effect: unknown[] }).effect = [step];
+    });
+  const bad: [string, unknown][] = [
+    [
+      'deck top to the trash',
+      {
+        do: {
+          move: {
+            what: { from: 'deckTop', owner: 'you', pick: { upTo: 1 } },
+            to: { zone: 'trash' },
+          },
+        },
+      },
+    ],
+    [
+      'deck top to the bottom of Life',
+      {
+        do: {
+          move: {
+            what: { from: 'deckTop', owner: 'you', pick: { upTo: 1 } },
+            to: { zone: 'life', position: 'bottom' },
+          },
+        },
+      },
+    ],
+    [
+      'deck top without "up to 1"',
+      {
+        do: {
+          move: {
+            what: { from: 'deckTop', owner: 'you', pick: { exactly: 2 } },
+            to: { zone: 'life', position: 'top' },
+          },
+        },
+      },
+    ],
+    [
+      'trash to the deck with no position',
+      {
+        do: {
+          move: { what: { from: 'trash', owner: 'you', pick: { upTo: 1 } }, to: { zone: 'deck' } },
+        },
+      },
+    ],
+    [
+      'trash to Life',
+      {
+        do: {
+          move: { what: { from: 'trash', owner: 'you', pick: { upTo: 1 } }, to: { zone: 'life' } },
+        },
+      },
+    ],
+    [
+      'mixed hand and Characters',
+      {
+        do: {
+          move: {
+            what: { from: ['hand', 'characters'], owner: 'you', pick: { upTo: 1 } },
+            to: { zone: 'trash' },
+          },
+        },
+      },
+    ],
+    [
+      'a restriction on a player',
+      { do: { restrict: { target: 'opponent', what: 'cannotAttack', duration: 'thisTurn' } } },
+    ],
+    [
+      'play rested',
+      { do: { play: { what: { from: 'hand', owner: 'you', pick: { upTo: 1 } }, rested: true } } },
+    ],
+    [
+      'play from the trash',
+      { do: { play: { what: { from: 'trash', owner: 'you', pick: { upTo: 1 } } } } },
+    ],
+    ['draw up to', { do: { draw: 2, upTo: true } }],
+    ['K.O. a Leader', { do: { ko: { from: 'leader', owner: 'opponent' } } }],
+    [
+      'power to a card in hand',
+      {
+        do: {
+          power: { target: { from: 'hand', owner: 'you' }, amount: 1000, duration: 'thisTurn' },
+        },
+      },
+    ],
+    [
+      'trash from the trash',
+      { do: { trashFromHand: { from: 'trash', owner: 'you', pick: { exactly: 1 } } } },
+    ],
+    [
+      "look at the opponent's deck",
+      { do: { lookAtTop: { n: 3, player: 'opponent', take: [], rest: 'bottomAnyOrder' } } },
+    ],
+  ];
+  it.each(bad)('rejects %s', (_name, step) => {
+    expect(validateScript(withStep(step))).not.toEqual([]);
+  });
+
+  it('accepts the implemented moves', () => {
+    for (const step of [
+      {
+        do: {
+          move: {
+            what: { from: 'deckTop', owner: 'you', pick: { upTo: 1 } },
+            to: { zone: 'life', position: 'top' },
+          },
+        },
+      },
+      {
+        do: {
+          move: {
+            what: { from: 'trash', owner: 'you', pick: { upTo: 1 } },
+            to: { zone: 'deck', position: 'bottom' },
+          },
+        },
+      },
+      {
+        do: {
+          move: {
+            what: { from: 'characters', owner: 'any', pick: { upTo: 1 } },
+            to: { zone: 'deck', position: 'bottom' },
+          },
+        },
+      },
+    ])
+      expect(validateScript(withStep(step))).toEqual([]);
+  });
+});
+
 describe('registered scripts', () => {
   const scripts = Object.values(SCRIPTS);
 

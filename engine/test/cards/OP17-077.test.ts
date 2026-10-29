@@ -49,7 +49,23 @@ describe('OP17-077 Kundali Dragon Swarm', () => {
     g.act({ type: 'optional', accept: false });
     passBlock(g);
     g.act({ type: 'activate', card: g.find('p1', 'hand', 'OP17-077'), ability: 'counter' });
+    accept(g); // DON!! −X on an Event is optional (CR 8-3-1-4, QA-ST01–04 ST04-016)
     if (g.legal().some((a) => a.type === 'pick')) g.act(g.legal().find((a) => a.type === 'pick')!);
     expect(g.power(g.leader('p1'))).toBe(9000);
+  });
+
+  it('M4a-08: the [Counter] DON!! −1 may be declined: no +4000', () => {
+    const g = game(
+      { leader: KAIDO, hand: ['OP17-077'], costArea: { active: 2, rested: 0 } },
+      { leader: PLAIN_BLUE, characters: [V.c7] },
+      { turn: 4, activePlayer: 'p2' },
+    );
+    g.act({ type: 'attack', attacker: g.find('p2', 'characters', V.c7), target: g.leader('p1') });
+    g.act({ type: 'optional', accept: false });
+    passBlock(g);
+    g.act({ type: 'activate', card: g.find('p1', 'hand', 'OP17-077'), ability: 'counter' });
+    g.act({ type: 'optional', accept: false });
+    expect(g.power(g.leader('p1'))).toBe(5000);
+    expect(don(g, 'p1').deck).toBe(8);
   });
 });

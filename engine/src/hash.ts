@@ -62,12 +62,26 @@ export function summary(s: State): unknown {
     phase: s.phase,
     players,
     resolving: s.resolving.map((id) => s.cards[id]!.card),
-    battle: canon(s.battle),
+    // Projection keys and batch counters are bookkeeping, not game (M4a-12): drop the keys and keep
+    // only which pending effects share a batch, by queue position.
+    battle: s.battle && canon({ ...s.battle, keys: undefined }),
     decision: dec && canon({ ...dec, prompt: undefined }),
     // Pending obligations: remaining damage, play steps, queued auto effects (M2-08).
-    stack: canon(s.stack),
-    pending: canon(s.pending),
-    delayed: canon(s.delayed ?? []),
+    stack: canon(
+      s.stack.map((f) => (f.f === 'play' && f.batch !== undefined ? { ...f, batch: 0 } : f)),
+    ),
+    pending: canon(
+      s.pending.map((e) => ({
+        ...e,
+        key: undefined,
+        batch: s.pending.findIndex((x) => x.batch === e.batch),
+      })),
+    ),
+    delayed: canon((s.delayed ?? []).map((x) => ({ ...x, key: undefined }))),
+    // What each player knows of hidden cards changes what they can do (M4a-12).
+    known: Object.fromEntries(
+      PLAYERS.map((p) => [p, (s.known?.[p] ?? []).map((id) => pos.get(id) ?? 'gone').sort()]),
+    ),
     mods,
     oncePerTurn: s.oncePerTurn.map(canon),
     result: s.result,

@@ -1,6 +1,8 @@
 /** OP15-078 Mamaragan. QA-OP15 OP15-078. */
 import { describe, expect, it } from 'vitest';
 import {
+  accept,
+  don,
   BLUE,
   expectDecision,
   game,
@@ -21,6 +23,7 @@ describe('OP15-078 Mamaragan', () => {
       { leader: PLAIN_BLUE, characters: [V.c3] },
     );
     play(g, 'OP15-078');
+    accept(g); // DON!! −X on an Event is optional (CR 8-3-1-4, QA-ST01–04 ST04-016)
     payDon(g);
     expect(hand(g, 'p1')).toHaveLength(1);
     pick(g, [g.find('p2', 'characters', V.c3)]);
@@ -30,6 +33,7 @@ describe('OP15-078 Mamaragan', () => {
       { leader: PLAIN_BLUE },
     );
     play(none, 'OP15-078');
+    accept(none);
     payDon(none);
     expectDecision(none, 'main', 'p1');
   });
@@ -60,5 +64,24 @@ describe('OP15-078 Mamaragan', () => {
     const seven = counter(7);
     expect(seven.power(seven.leader('p1'))).toBe(6000);
     expect(hand(seven, 'p1')).toEqual([]);
+  });
+
+  it('M4a-08: the [Main] DON!! −2 may be declined; no draw', () => {
+    const g = game(
+      { leader: KAIDO, hand: ['OP15-078'], costArea: { active: 2, rested: 0 } },
+      { leader: PLAIN_BLUE },
+    );
+    play(g, 'OP15-078');
+    g.act({ type: 'optional', accept: false });
+    expect(g.zone('p1', 'hand')).toHaveLength(0);
+    expect(don(g, 'p1').deck).toBe(8);
+  });
+
+  it('M4a-08: with no DON!! on the field it can still be played (cost 0), and "use" is unavailable', () => {
+    const g = game({ leader: KAIDO, hand: ['OP15-078'] }, { leader: PLAIN_BLUE });
+    play(g, 'OP15-078');
+    expect(g.isLegal({ type: 'optional', accept: true, player: 'p1' })).toBe(false);
+    g.act({ type: 'optional', accept: false });
+    expect(g.zone('p1', 'trash').map((c) => c.card)).toEqual(['OP15-078']);
   });
 });
