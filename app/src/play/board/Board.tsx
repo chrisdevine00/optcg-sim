@@ -557,7 +557,7 @@ export function Board(b: BoardProps) {
             {...item('hand', 0)}
           >
             {b.handHidden === 'hold'
-              ? `${b.names.player[me]}’s hand is hidden. ${b.names.player[me]}: tap here, press and hold, or hold R, to see it.`
+              ? `${b.names.player[me]}’s hand is hidden. ${b.names.player[me]}: tap here to show it (or hold R, or press and hold with a mouse).`
               : `${b.names.player[me]}’s hand is hidden. ${b.names.player[me]}: press Space or click to show it.`}
           </button>
         ) : b.mulligan ? (

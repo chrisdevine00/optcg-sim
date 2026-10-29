@@ -62,7 +62,8 @@ export function CardDock({
       ? `${num(live)} = ${num(base)} base${don && ownersTurn ? ` + ${don * 1000} DON!!` : ''}${live - base - (ownersTurn ? don * 1000 : 0) ? ` ${live - base - (ownersTurn ? don * 1000 : 0) > 0 ? '+' : '−'} ${Math.abs(live - base - (ownersTurn ? don * 1000 : 0))} effects` : ''}`
       : null;
   // The art keeps 63:88 at every dock size (board.md §3.12, review M3-29).
-  const artW = rect.w >= 480 ? 240 : rect.w >= 384 ? 168 : 140;
+  // Half the dock's width: 240 px in the 480 px dock at 1920 (board.md §3.12), 200 at 1280.
+  const artW = Math.max(140, Math.min(240, Math.round(rect.w / 2)));
   return (
     <div
       ref={ref}

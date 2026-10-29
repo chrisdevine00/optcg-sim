@@ -150,7 +150,47 @@ interface Content {
   tall: boolean;
 }
 
+/**
+ * A hotseat seat's own decision while its hand is veiled (review M3-35): the panel addresses that
+ * player by name and offers to show their hand. A decision that needs no hidden information can
+ * be answered as it is; the rest show only once the hand is shown. Nothing private is in the DOM.
+ */
 function contentFor(g: G): Content {
+  const inner = contentInner(g);
+  const k = g.view.decision?.kind;
+  const own = new Set(['optional', 'choose', 'order']);
+  if (!g.mine || g.view.result || g.ctl.revealed() || !k || !own.has(k)) return inner;
+  const who = g.names.player[g.me];
+  const answerable = g.ctl.veiledAnswerable();
+  return {
+    title: `${who}: your decision`,
+    tall: true,
+    body: (
+      <>
+        <div className="veiled-ask">
+          <p className="dec-lead">
+            <b>{who}, it is your move.</b>{' '}
+            {answerable
+              ? 'You can answer without showing your hand, or show it first.'
+              : 'Show your hand to see this decision. Only you should look.'}
+          </p>
+          <button
+            type="button"
+            className="btn small"
+            id="show-hand"
+            onClick={() => g.ctl.revealNow()}
+          >
+            Show my hand <kbd>R</kbd>
+          </button>
+        </div>
+        {answerable && inner.body}
+      </>
+    ),
+    foot: answerable ? inner.foot : {},
+  };
+}
+
+function contentInner(g: G): Content {
   const { view, ctl, legal, names } = g;
   const tall = isTall(g);
   const kind = view.decision?.kind;
@@ -1134,7 +1174,7 @@ function defenceContent(g: G): Content {
               {hidden ? (
                 <span className="subtle">
                   {staged ? `${s.counters.length} staged. ` : ''}
-                  {g.names.player[me]}: hold R, or press and hold your hand area, to see it.
+                  {g.names.player[me]}: tap your hand area, or hold R, to see it.
                 </span>
               ) : counterCards.length === 0 ? (
                 <span className="subtle">No Counter cards in hand</span>
@@ -1253,8 +1293,8 @@ function triggerContent(g: G): Content {
     body:
       hidden || !card ? (
         <p className="dec-lead">
-          {g.names.player[g.me]}: hold R, or press and hold your hand area, to see your Life card.
-          Only you should look.
+          {g.names.player[g.me]}: tap your hand area, or hold R, to see your Life card. Only you
+          should look.
         </p>
       ) : (
         <div className="life-reveal">
@@ -1380,7 +1420,8 @@ function chooseContent(g: G): Content {
   const order = new Map(g.view.zones[g.me].characters.map((c, i) => [c.handle, slots[i] ?? i]));
   const cands = [...g.legal.picks.keys()].sort((a, b) => (order.get(a) ?? 9) - (order.get(b) ?? 9));
   const chosen = g.picks.filter((h) => g.legal.picks.has(h));
-  const makingRoom = d.prompt.includes('Character area is full');
+  // The make-room title and note belong to the rule's own choice only (review M3-35).
+  const makingRoom = d.purpose === 'characterLimit';
   const playing = g.ctl.pendingPlay;
   const ready = chosen.length >= min && chosen.length <= max;
   const commit = () => {
@@ -1430,9 +1471,11 @@ function chooseContent(g: G): Content {
             );
           })}
         </div>
-        <p className="subtle">
-          Trashing to make room is not a K.O.: [On K.O.] effects don’t happen.
-        </p>
+        {makingRoom && (
+          <p className="subtle">
+            Trashing to make room is not a K.O.: [On K.O.] effects don’t happen.
+          </p>
+        )}
       </div>
     ),
     foot: {

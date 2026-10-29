@@ -98,12 +98,32 @@ export async function resolveChoose(page: Page) {
 }
 
 /** Plays a whole game from the screen's side(s): every decision, until the game ends. */
-export async function playToEnd(page: Page, maxDecisions = 2000) {
+/** What a whole game went through (hotseat effect decisions under the veil, review M3-35). */
+export interface GameStats {
+  veiledOwnDecisions: number;
+}
+
+export async function playToEnd(page: Page, maxDecisions = 2000): Promise<GameStats> {
+  const stats: GameStats = { veiledOwnDecisions: 0 };
   for (let i = 0; i < maxDecisions; i++) {
     const k = await nextDecision(page);
+    if (await page.locator('.hand-veil').count()) {
+      // Under a hotseat veil nothing private renders: no hand card and no Life card.
+      expect(await page.locator('.bc[data-zone="hand"]').count()).toBe(0);
+      expect(await page.getByTestId('life-card').count()).toBe(0);
+    }
+    // A seat's own effect decision under the veil names that seat and never reads as the
+    // opponent's; it is answered after showing the hand.
+    const show = page.locator('#show-hand');
+    if (await show.count()) {
+      stats.veiledOwnDecisions++;
+      await expect(page.locator('#decision-title')).toHaveText(/: your decision$/);
+      await expect(page.locator('#decision')).not.toContainText('Your opponent is');
+      await show.click();
+    }
     switch (k) {
       case 'over':
-        return;
+        return stats;
       case 'chooseFirst':
         await page.locator('#first-btn').click();
         break;

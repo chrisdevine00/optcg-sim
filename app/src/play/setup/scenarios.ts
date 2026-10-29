@@ -10,6 +10,39 @@ const filler = (id: string, n: number) => Array.from({ length: n }, () => id);
 
 export const SCENARIOS: Record<string, Spec> = {
   /**
+   * Review M3-35: Player 2's Character attacks; Player 1's Kaido Leader (OP17-058) offers its
+   * [On Your Opponent's Attack] DON!! −1 while Player 1's hand is veiled. Private cards have
+   * unique names, for the leak checks.
+   */
+  veiled: {
+    mode: 'hotseat',
+    seed: 3,
+    turn: 4,
+    activePlayer: 'p2',
+    firstPlayer: 'p1',
+    p1: {
+      leader: 'OP17-058',
+      // Vergo, Krieg
+      life: ['OP01-065', 'OP01-066'],
+      // Hajrudin, Shinobu
+      hand: ['OP01-018', 'OP01-043'],
+      // Mocha
+      deck: filler('OP01-081', 10),
+      costArea: { active: 2, rested: 0 },
+    },
+    p2: {
+      leader: 'ST01-001',
+      // Fukurokuju
+      life: ['OP01-110'],
+      // Urashima
+      hand: ['OP01-092'],
+      characters: ['OP01-023'],
+      // Mohji
+      deck: filler('OP02-060', 10),
+      costArea: { active: 0, rested: 2 },
+    },
+  },
+  /**
    * Review M3-28: Player 2 attacks (Player 1 defends), then Player 1 wins on their own turn by
    * hitting a Leader at 0 Life. The game ends after a defence alert was spoken.
    */

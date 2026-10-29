@@ -36,7 +36,9 @@ test.describe('M3 board: full games', () => {
         curtains++;
     };
     await countCurtain();
-    await playToEnd(page);
+    const stats = await playToEnd(page);
+    // Seed 202 reaches the defender's effect decisions under the veil (review M3-35).
+    expect(stats.veiledOwnDecisions).toBeGreaterThan(0);
     expect(curtains).toBeGreaterThan(0);
     await expect(page.locator('#decision-title')).toHaveText('Game over');
     await expect(page.locator('.banner')).toContainText(/Player [12] wins/);

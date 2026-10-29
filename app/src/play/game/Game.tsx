@@ -325,7 +325,7 @@ export function Game({
       if (k >= 0) {
         out.selected = true;
         out.chips!.push({ text: `✓ ${k + 1}`, tone: 'you' });
-      } else if (view.decision?.prompt.includes('Character area is full')) {
+      } else if (view.decision?.purpose === 'characterLimit') {
         // board.md §3.7: the candidates say what happens to them (M3-22).
         out.chips!.push({ text: 'Trash · not a K.O.', tone: 'warn' });
         out.extraName = ['trash to make room, not a K.O.'];
@@ -473,6 +473,11 @@ export function Game({
       return;
     }
     // Hold R to see your hand (hotseat defence) overrides R everywhere while it applies.
+    if (ctl.hotseat && ctl.handVeil === 'click' && (e.key === 'r' || e.key === 'R')) {
+      e.preventDefault();
+      ctl.showHand();
+      return;
+    }
     if (ctl.hotseat && ctl.handVeil === 'hold' && (e.key === 'r' || e.key === 'R')) {
       e.preventDefault();
       ctl.setReveal(true);

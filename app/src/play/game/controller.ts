@@ -219,6 +219,27 @@ export class GameController {
     return this.revealed() ? this.session.pendingLifeCard(this.me) : null;
   }
 
+  /**
+   * A veiled seat's own decision that needs no hidden information: every legal answer names only
+   * public cards and its source is public (review M3-35). It can be answered without a reveal.
+   */
+  veiledAnswerable(): boolean {
+    if (this.revealed()) return true;
+    const priv = this.session
+      .view(this.me)
+      .actions.filter((a) => a.type !== 'concede' && !(a.type === 'trigger' && a.activate));
+    const pub = this.actions().filter((a) => a.type !== 'concede');
+    const d = this.session.view(this.me).decision;
+    const srcPublic = !d?.source || this.session.publicView(this.me).decision?.source !== undefined;
+    return priv.length === pub.length && srcPublic;
+  }
+
+  /** Show the screen seat's hand: the click veil lifts; a held veil becomes a sticky reveal. */
+  revealNow(): void {
+    if (this.handVeil === 'click') this.showHand();
+    else this.setReveal(true, true);
+  }
+
   /** Rewind needs the seat unveiled in hotseat (review M3-04, M3-24). */
   canRewind(): boolean {
     return this.revealed();
@@ -512,6 +533,11 @@ export class GameController {
 
   private finish(): void {
     const r = this.session.view('p1').result;
+    // The game is over: no hand stays revealed on the final board (review M3-36).
+    if (r && (this.revealHeld || this.revealSticky)) {
+      this.revealHeld = false;
+      this.revealSticky = false;
+    }
     // Its own flag: the region may still hold a defence alert (review M3-28).
     if (r && !this.gameOverAnnounced) {
       this.gameOverAnnounced = true;
@@ -728,6 +754,9 @@ export class GameController {
   // -------------------------------------------------------------------------------------------
 
   private restart(): void {
+    // A rewind ends any reveal (review M3-36).
+    this.revealHeld = false;
+    this.revealSticky = false;
     this.gen++;
     this.pumping = false;
     if (this.aiRequest !== null) this.ai?.cancel(this.aiRequest);
@@ -757,9 +786,12 @@ export class GameController {
     this.say(`Rewound. ${this.toast}`);
     if (this.hotseat) {
       const d = this.session.decider();
-      if (d && d !== this.seat) {
+      // After a hotseat rewind the decider always gets the curtain, and no veil or reveal state
+      // carries over from the undone position (review M3-36).
+      if (d) {
         this.seat = d;
         this.curtainFor = d;
+        this.handVeil = 'none';
         this.curtainSeen[d] = this.turnKey();
       }
     }

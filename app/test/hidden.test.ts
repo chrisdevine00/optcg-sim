@@ -27,6 +27,23 @@ describe('hidden information (review M3-01..04, M3-09)', () => {
                 expect(theirs.zones[p][z as keyof typeof theirs.zones.p1][k]!.card).toBe(c.card);
             });
         expect(pub.actions).toEqual([]);
+        // Fields that can carry hidden cards are emptied or intersected (review M3-37).
+        expect(pub.looking).toEqual([]);
+        expect(pub.known).toEqual({});
+        for (const [k, c] of pub.resolving.entries())
+          if (c.card !== null) expect(theirs.resolving[k]?.card).toBe(c.card);
+        const own = s.view(viewer);
+        if (pub.decision && own.decision?.player === viewer) {
+          // The viewer's own decision: no options, and a source only when it is a public card.
+          expect(pub.decision.options).toBeUndefined();
+          if (pub.decision.source?.handle) {
+            const onBoard = Object.values(pub.zones)
+              .flatMap((z) => Object.values(z).flat())
+              .some((c) => c.handle === pub.decision!.source!.handle && c.card !== null);
+            expect(onBoard).toBe(true);
+          }
+          expect(pub.decision.prompt).not.toMatch(/^Your opponent/);
+        }
         // The public log holds no draw's card: compare with the other player's own projection.
         const mine = s.publicLog(viewer).events.flat();
         const theirsLog = s.log(other).events.flat();

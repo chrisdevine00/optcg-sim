@@ -241,37 +241,78 @@ export class GameSession {
   publicView(viewer: PlayerId): ProjectedView {
     const own = this.view(viewer);
     const theirs = this.view(viewer === 'p1' ? 'p2' : 'p1');
+    const hidden = (handle: string) => ({
+      handle,
+      card: null,
+      rested: false,
+      faceUp: false,
+      don: 0,
+      power: null,
+      cost: null,
+      keywords: [],
+    });
     const zones = {} as ProjectedView['zones'];
+    const visible = new Set<string>();
     for (const p of ['p1', 'p2'] as const) {
       zones[p] = {} as ProjectedView['zones']['p1'];
       for (const z of Object.keys(own.zones[p]) as (keyof ProjectedView['zones']['p1'])[]) {
-        zones[p][z] = own.zones[p][z].map((c, i) =>
-          c.card !== null &&
-          theirs.zones[p][z][i]?.card !== null &&
-          theirs.zones[p][z][i] !== undefined
-            ? c
-            : {
-                handle: `${p}.${z}.${i}`,
-                card: null,
-                rested: false,
-                faceUp: false,
-                don: 0,
-                power: null,
-                cost: null,
-                keywords: [],
-              },
-        );
+        zones[p][z] = own.zones[p][z].map((c, i) => {
+          const t = theirs.zones[p][z][i];
+          if (c.card !== null && t !== undefined && t.card !== null) {
+            visible.add(c.handle);
+            return c;
+          }
+          return hidden(`${p}.${z}.${i}`);
+        });
       }
     }
+    // A [Trigger] card being resolved is revealed to both; anything else stays hidden.
+    const resolving = own.resolving.map((c, i) =>
+      c.card !== null && theirs.resolving[i]?.card === c.card ? c : hidden(`resolving.${i}`),
+    );
+    // The decision: for the viewer's own, only what both may see (review M3-35): its kind,
+    // purpose and counts, and its source only when that card is public. Otherwise the other
+    // player's generic wording.
+    let decision: ProjectedView['decision'] = own.decision;
+    if (own.decision && own.decision.player === viewer) {
+      const d = own.decision;
+      const src =
+        d.source && d.source.handle && visible.has(d.source.handle) ? d.source : undefined;
+      const name = src ? (this.cards(src.card)?.name ?? src.card) : null;
+      decision = {
+        kind: d.kind,
+        player: d.player,
+        prompt: src ? `${name}: ${src.label ?? 'an effect'}` : 'Your decision.',
+        ...(d.purpose ? { purpose: d.purpose } : {}),
+        ...(d.min !== undefined ? { min: d.min } : {}),
+        ...(d.max !== undefined ? { max: d.max } : {}),
+        ...(src ? { source: src } : {}),
+      };
+    } else if (own.decision && theirs.decision) {
+      decision = {
+        kind: own.decision.kind,
+        player: own.decision.player,
+        prompt: theirs.decision.prompt,
+      };
+    }
+    // An allow-list, not a spread, so a field added to views later is not public by accident
+    // (review M3-37).
     return {
-      ...own,
-      zones,
+      player: own.player,
+      decision,
       actions: [],
-      decision:
-        own.decision && theirs.decision
-          ? { ...own.decision, prompt: theirs.decision.prompt }
-          : own.decision,
+      turn: own.turn,
+      result: own.result,
+      zones,
+      don: own.don,
+      battle: own.battle,
+      resolving,
       known: {},
+      looking: [],
+      attackLock: own.attackLock && own.attackLock.filter((h) => visible.has(h)),
+      // Delayed effects are public (who, which card, when).
+      delayed: own.delayed,
+      __brand: 'PlayerView',
     };
   }
 
