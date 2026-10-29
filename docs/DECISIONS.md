@@ -23,6 +23,19 @@ Decision: the DSL marks such abilities `costOptional: true` (EB04-040, OP17-055,
 
 Rejected: refusing the play when the optional cost cannot be paid (no rule supports it); asking only when payable (the AI and UI would see a different flow for the same card).
 
+## 2026-10-29 — Veiled hotseat screens are a pure function of a branded public view
+
+Context: three review rounds each found another veiled widget reading private data (M3-01 to M3-04, M3-35, M3-39/M4a-01). The last one, whether "Use" was enabled, revealed whether the hidden hand could pay a cost.
+
+Decision:
+- **One entry point:** veiled effect decisions render only through `veiledContent(VeiledProps)`. The props carry a branded `PublicView`, which only `GameSession.publicView()` returns, plus the seat name and callbacks.
+- **Public decision:** it keeps only its kind, its player and constant wording.
+- **No private answers under the veil:** `controller.actions()` returns nothing for veiled optional, choose and order decisions.
+- **Answerability is public:** Use and Skip are always enabled. Whether Use needs a reveal comes from the public script (`readsHiddenZone`), never from the private answer list.
+- **Guard:** a differential e2e test requires identical veiled HTML, aria and live-region text across 52 position pairs that differ only in hidden cards.
+
+Rejected: fixing each widget as it was found, which had already failed three times; and disabling Use when the cost can't be paid, which leaks the hand.
+
 ## 2026-10-29 — Hotseat reveal: hold for mouse and R, sticky tap for touch, pen and keyboard
 
 Context: M3 re-review 1 (M3-32) found that on touch the defender could hold to reveal their hand but could not stage a Counter. A second finger's tap fires no `click`, and lifting the holding finger hid the hand.
