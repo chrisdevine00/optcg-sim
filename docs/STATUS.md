@@ -1,8 +1,7 @@
 # Status
 
 **Phase:** 5 Build, slice pass (ADR 0012), starting at M0. Phases 1–4 gated 2026-10-28.
-**Milestone:** M3 Playable board (in progress). M0, M1 and M2 done 2026-10-28.
-**Milestone:** M0 scaffold started (allowed before the Phase 4 gate)
+**Milestone:** M3 Playable board (built; in review). M0, M1 and M2 done 2026-10-28.
 **Run the app:** `npm install && npm run dev` then open http://localhost:5173/optcg-sim/ and go to `/cards` for the card browser
 **Deployed:** https://chrisdevine00.github.io/optcg-sim/ (auto-deploys after green CI on `main`)
 
@@ -14,7 +13,7 @@
 | 2 Plan | docs/PLAN.md, docs/ARCHITECTURE.md, docs/adr/ | **Gated 2026-10-28** (revision 2 after two reviews; see docs/plan-review-1.md) |
 | 3 Deep research | docs/research/effect-dsl.md, rulings.md; docs/content/archetypes/, curriculum.md, glossary.md, sources.md | **Gated 2026-10-28** (competitive-player review: 20 findings, 0 severity-3 open; see docs/content/review-1.md) |
 | 4 Design | docs/design/principles.md, board.md, flows.md, visual-system.md, learning-ui.md, wireframes/, review-1.md | **Gated 2026-10-28** (review 1: 50 findings plus 2 verification passes; 0 severity-3 or severity-4 open) |
-| 5 Build | M0 through M10 per PROMPT.md | Not started |
+| 5 Build | M0 through M10 per PROMPT.md | In progress: M0–M2 done; M3 built, in review |
 
 ## Done
 
@@ -73,15 +72,21 @@
 
 ## In progress
 
-The M3 builder subagent is on `main`, in `app/` and `ai/`. It is building:
-- the session store;
-- Rookie in a Web Worker;
-- the setup screen with the 12 archetypes' lists;
-- the board per `board.md`, with every decision type;
-- hotseat, AI pacing, the inspector, the live region and keyboard play;
-- the carried fixes.
+**M3 is built** (commits 757d2c3 to d044539) and its review is running. Verified by the orchestrator:
+- 392 unit tests and 69 e2e tests pass (3 skipped);
+- lint, typecheck and the build pass;
+- initial JS is 71.0 KB gzipped, and the board route loads lazily at 56.7 KB;
+- the AI worker receives only a `PlayerView`.
 
-It commits each green step. If interrupted, check `git log`, then re-launch with the M3 brief (PLAN M3 row, `board.md`, `flows.md`, `accessibility.md`), continuing from the last commit. After the builder finishes come a screenshot review (`docs/reviews/m3-review.md`) and a manual screen-reader pass.
+Builder decisions are logged in DECISIONS (2026-10-28, M3). Not done in M3, by the builder's own account:
+- drag;
+- hotseat rewind consent;
+- save and resume;
+- the "Why?" chip on AI log lines;
+- the "you look away" line;
+- the forced-colours double ring.
+
+An independent reviewer is writing `docs/reviews/m3-review.md`: screenshots, driving the real app, hidden information, and an accessibility-tree proxy for the screen-reader pass. If interrupted, re-launch that review. Then fix severity 3 and 4 findings through the builder, and mark M3 done.
 
 ## Next (slice pass, PLAN.md §1)
 

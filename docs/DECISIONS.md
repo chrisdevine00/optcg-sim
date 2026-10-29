@@ -2,6 +2,15 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-10-28 — M3 board implementation decisions
+
+Context: the M3 builder made these choices while building the playable board.
+1. **No coach strip yet.** The coach arrives with the learning slice, and an empty strip would be dead UI. The decision panel keeps its `board.md` coordinates, and the strip's 48 px go to the log (and to the ticker when the panel is tall). Rejected: a placeholder strip of disabled buttons.
+2. **Hotseat seat.** The screen always belongs to whoever owes the decision. A defence flips the board to the defender, whose hand stays hidden until they hold R. When play returns to the attacker, their hand stays hidden until they click or press Space. Rejected: keeping the attacker's view throughout, which leaves the attacker's hand on screen while the defender looks.
+3. **Accessible names from content.** Cards and zones take their accessible name from visually hidden text instead of `aria-label`, because axe's label-in-name rule (WCAG 2.5.3) failed on the card art. Rejected: suppressing the rule.
+4. **Tablet footer.** Rails of 280 px and narrower get an 80 px footer, so the primary button keeps its 136 px minimum and its labels fit (UX-V12). Rejected: shortening labels or dropping key hints.
+5. **Test-only setup parameters.** Setup reads URL parameters (`scenario`, `seed`, `speed`, `skip`, `paused`, `start`), and three named scenarios ship in the app so the e2e tests are deterministic. Rejected: a separate test build, which would test a different bundle from the one users get.
+
 ## 2026-10-28 — M2 engine implementation decisions
 
 Context: the M2 engine author made these choices while implementing the frozen API.
