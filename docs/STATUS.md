@@ -93,6 +93,18 @@
 - **CI:** 2 min 35 s, with Playwright in 3 shards and per-push full games starting from a late-game scenario. The turn-1 full games run nightly (`E2E_FULL=1`).
 - **Re-review 1 (42833ee): PASS.** No severity 3 or 4 finding is open, and every fix has a test that fails on revert. A probe over 1,500 games (520,544 card-naming events) found no log line naming a card the viewer couldn't see. Non-blocking findings are carried with targets (see Next). The Nightly workflow was dispatched once by hand (M4a-20): run 40848871925.
 
+### M5a AI slice: started 2026-10-29
+The builder is on `main`. Scope:
+- the `planTurn` protocol, and determinization in `ai/src/search/`;
+- the Pirate tier and the heuristic;
+- playbooks and game-plan assertions for Rocks and Kaido;
+- the `Explanation` builder with snapshots;
+- the "Why?" chip in the app;
+- AI turn ≤8 s at 1×;
+- Pirate vs Rookie at ≥75% over 200 games, nightly.
+
+If interrupted, check `git log` and re-launch from the last commit with the M5a brief (PLAN row 12, ARCHITECTURE §4, explanations.md).
+
 ### Verification caveats
 - A worktree that symlinks the main tree's `node_modules` resolves `@optcg/*` to the main tree. Use `npm ci` in the worktree.
 - Set `E2E_PORT`, so you don't reuse another copy's preview server.
