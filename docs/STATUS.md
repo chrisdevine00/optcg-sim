@@ -122,7 +122,7 @@ Since the builder's report:
     - M4a-07: validator traps for M4b.
     - M4a-08: DON!! −X on Events is optional, which answers E-Q12 (attribution of the ST04-016 Q&A row to be checked by hand).
     - M4a-09: prompts deviate from flows F6/F8.
-  - **The builder's phase A** (engine: M4a-04, 06, 07, 08, 11, 12) is running. **Phase B** (app: M4a-03, 05, 09, 15) starts after M3 fix round 4 lands, to avoid conflicts in `app/src/play/`. Then re-review.
+  - **Phase A is done** (292f730; CI run 40826294923 green; ENGINE_VERSION 0.5.2). M4a-04: [On Play]s from one effect are ordered by the player. M4a-06: the nightly false positive is fixed and verified at 10,000 games. M4a-07: the validator rejects every shape the runtime would get wrong, and fall-throughs emit an `Anomaly`. M4a-08: DON!! −X on Events is declinable; the Q&A attribution was checked by hand, E-Q12 is closed and RL-52 added. M4a-11 and M4a-12 are fixed, and M4a-10 is recorded as M4b entry items. **Phase B** (app: M4a-03, 05, 09, 15, plus a shorter CI start for the full-game e2e tests, now 11–13 min) starts after M3 fix round 4 lands, to avoid conflicts in `app/src/play/`. Then re-review.
 - **Verification caveat:** a worktree that symlinks the main tree's `node_modules` resolves `@optcg/*` to the main tree, so local "clean worktree" runs may test the wrong code. Use `npm ci` in the worktree; CI is the ground truth.
 
 If interrupted, check `git log` and the branch, and re-launch whichever of these stopped.
