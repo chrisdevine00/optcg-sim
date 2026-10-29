@@ -282,7 +282,7 @@ export class GameController {
   /** True when the screen's player owes the current decision and may act on it now. */
   myDecision(): boolean {
     const d = this.session.decider();
-    return d === this.me && this.seatOf(d) === 'human' && this.curtainFor === null;
+    return d === this.me && this.seatOf(d) === 'human' && this.curtainFor === null && this.settled;
   }
 
   /** The log as lines, from the screen player's projected events (board.md §3.11). */
@@ -361,9 +361,17 @@ export class GameController {
     void this.pump();
   }
 
+  /**
+   * True once the loop has stopped at a decision the human really owes. While it is still
+   * applying auto-skips (with their short holds), a window it is about to skip is not offered as
+   * a decision, so it never flashes up as one (review M3-12; a CI race).
+   */
+  private settled = false;
+
   private async pump(): Promise<void> {
     if (this.pumping || this.disposed) return;
     this.pumping = true;
+    this.settled = false;
     const g = this.gen;
     try {
       for (let guard = 0; guard < 10000; guard++) {
@@ -405,6 +413,7 @@ export class GameController {
         this.stopSkipping('decision');
         this.updateSeat(d);
         this.announceDecision(d);
+        this.settled = true;
         this.bump();
         return;
       }
