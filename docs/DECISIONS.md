@@ -2,6 +2,12 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-10-29 — Scripted NVDA pass for M3 (accessibility.md §11.2)
+
+- **Harness in its own package.** `app/a11y/` holds the Guidepup script with its own `package.json` and lockfile; it is not an npm workspace, so `npm ci`, lint's type-free rules, typecheck, unit tests and e2e never install or compile it. The `a11y-nvda` workflow (manual `workflow_dispatch` only, `windows-2025`) installs it, NVDA 2026.2 through `npx @guidepup/setup install nvda` (the archived `guidepup/setup-action` says to use the CLI), and Playwright's Firefox. Versions are pinned exactly: `@guidepup/guidepup` 0.38.0, `@guidepup/playwright` 0.21.0, `@guidepup/setup` 0.29.3, `@playwright/test` 1.64.1. Rejected: the deployed Pages URL (it would test whatever deployed last, not the commit), and a root workspace (CI would install Guidepup on every push).
+- **Speech from a tap, not Guidepup's capture.** Guidepup records speech only during its own actions and presses NVDA's stop-speech key before each one, so an announcement that arrives after a key is cut or lost, and its capture never returns while something keeps talking (the first run hung for 30 minutes). The harness joins the same NVDA Remote relay channel as a second client and timestamps every `speak` message; each key then waits for a second of NVDA silence (at most 10 s). Keys still go through NVDA, so browse and focus mode apply as for a user.
+- **Assists are recorded.** When the keyboard path does not reach what a step needs, the harness moves focus with Playwright and writes a "harness assist" into the record. Pass verdicts are written by comparing the logs with the Expect column, not by the script.
+- **`a11y-m3` scenario** (`app/src/play/setup/a11y-scenarios.ts`): Kaido against Rookie's Kaido, every card scripted (M4a), turn 3 rather than turn 1 (on turn 1 the "played this turn" reason in step 7 is hidden by "no battles on the first turn"), seed 11 so Rookie's first attack is King at 7000 against the 5000 Leader (step 10's tie, then survive). Two OP17-062 Kaido give step 14's order decision when a DON!! returns; Queen OP17-065 gives step 13's two-target pick.
 ## 2026-10-29 — M5a AI slice: search views, the Pirate tier, playbooks and explanations
 
 Context: M5a (PLAN row 12) needs per-turn planning on views only (ADR 0005, 0008), the Pirate tier, the two slice playbooks with game-plan assertions, the `Explanation` builder, and the app's "Why?" chip (M3-23). Each decision lists what was rejected.
