@@ -89,6 +89,9 @@ export interface ScenarioSpec {
 // ---------------------------------------------------------------------------------------------
 
 /** DON!! are chosen by location class, not by instance (effect-dsl.md E-D4). */
+/** `Omit` that distributes over a union (plain `Omit` collapses a union to its common keys). */
+export type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never;
+
 export type DonClass =
   { from: 'costActive' } | { from: 'costRested' } | { from: 'given'; card: InstanceId };
 
@@ -158,10 +161,67 @@ export interface GameState {
   readonly __brand: 'GameState';
 }
 
+/** Every event type the engine emits (ARCHITECTURE §2.8). */
+export type GameEventType =
+  | 'GameStarted'
+  | 'ScenarioStarted'
+  | 'FirstPlayerChosen'
+  | 'Mulligan'
+  | 'Shuffled'
+  | 'LifePlaced'
+  | 'TurnStarted'
+  | 'TurnEnded'
+  | 'PhaseChanged'
+  | 'Refreshed'
+  | 'MainPhaseEnded'
+  | 'DonPlaced'
+  | 'DonGiven'
+  | 'DonRested'
+  | 'DonReturned'
+  | 'CardMoved'
+  | 'CardRevealed'
+  | 'CardPlayed'
+  | 'EventActivated'
+  | 'Rested'
+  | 'SetActive'
+  | 'PowerModified'
+  | 'ModifierAdded'
+  | 'ModifierExpired'
+  | 'AttackDeclared'
+  | 'BlockerActivated'
+  | 'NoBlock'
+  | 'CounterPlayed'
+  | 'DamageStep'
+  | 'DamageDealt'
+  | 'TriggerRevealed'
+  | 'KO'
+  | 'KOPrevented'
+  | 'ReplacementApplied'
+  | 'ReplacementDeclined'
+  | 'EffectActivated'
+  | 'EffectResolved'
+  | 'BattleEnded'
+  | 'Conceded'
+  | 'LoopDetected'
+  | 'GameEnded'
+  | 'Anomaly';
+
 export interface GameEvent {
-  type: string;
+  type: GameEventType;
   intentId?: string;
   [key: string]: unknown;
+}
+
+/** One card as a player sees it. A hidden card has `card: null` and a positional handle. */
+export interface ViewCard {
+  handle: string;
+  card: CardId | null;
+  rested: boolean;
+  faceUp: boolean;
+  don: number;
+  power: number | null;
+  cost: number | null;
+  keywords: string[];
 }
 
 /** What one player may see (ARCHITECTURE §2.7). Hidden cards carry no card id. */
@@ -170,11 +230,21 @@ export interface PlayerView {
   readonly decision: Decision | null;
   /** The legal actions for `player`, empty unless `player` owes the current decision. */
   readonly actions: Action[];
+  readonly turn: {
+    number: number;
+    activePlayer: PlayerId;
+    phase: Phase;
+    battleStep: BattleStep | null;
+  };
+  readonly result: GameResult | null;
+  /** Every zone of both players. Hidden cards have card: null and a handle re-keyed per ARCH §2.7. Zone lengths are always public (CR 3-1-4). */
+  readonly zones: Record<PlayerId, Record<ZoneName, ViewCard[]>>;
+  readonly don: Record<PlayerId, { deck: number; active: number; rested: number; given: number }>;
   readonly __brand: 'PlayerView';
 }
 
 /** Something the player tried or hovered, for `whyNot`: an action that may not be legal. */
-export type Intent = Omit<Action, 'player' | 'intentId'>;
+export type Intent = DistributiveOmit<Action, 'player' | 'intentId'>;
 
 export interface Reason {
   /** Plain-language explanation, e.g. "Active Characters can't be attacked." */

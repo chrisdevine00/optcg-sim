@@ -21,6 +21,7 @@ import {
   type CardId,
   type CardLookup,
   type CardView,
+  type DistributiveOmit,
   type GameEvent,
   type GameState,
   type InstanceId,
@@ -71,7 +72,7 @@ export class TestGame {
   }
 
   /** Apply an action for the deciding player. Throws unless the action is in `legalActions`. */
-  act(action: Omit<Action, 'player'> & { player?: PlayerId }): GameEvent[] {
+  act(action: DistributiveOmit<Action, 'player'> & { player?: PlayerId }): GameEvent[] {
     const full = { ...action, player: action.player ?? this.decider } as Action;
     if (!this.isLegal(full)) {
       throw new IllegalAction(`Not a legal action: ${JSON.stringify(full)}`, full);
@@ -87,7 +88,7 @@ export class TestGame {
     return legalActions(this.state);
   }
 
-  isLegal(action: Omit<Action, 'intentId'>): boolean {
+  isLegal(action: DistributiveOmit<Action, 'intentId'>): boolean {
     const key = canonical(action);
     return this.legal().some((a) => canonical(a) === key);
   }
@@ -144,7 +145,7 @@ function assertInvariants(state: GameState): void {
 }
 
 /** Stable string for comparing actions: keys sorted at every depth, intentId ignored. */
-function canonical(action: Omit<Action, 'intentId'>): string {
+function canonical(action: DistributiveOmit<Action, 'intentId'>): string {
   const { intentId: _ignored, ...rest } = action as Action;
   const sort = (v: unknown): unknown =>
     Array.isArray(v)
