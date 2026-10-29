@@ -2,6 +2,20 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-10-28 — Tablet defence panel compacts instead of scrolling
+
+Context: at 1024×690, the defence panel body had only 19 px of free height on macOS. Linux fonts wrap more text, so the panel scrolled on CI, and it would scroll for Linux and Windows users too.
+
+Decision: on rails 280 px and narrower:
+- the Attacker and Defender labels sit above the names, not in a 62 px column;
+- the defender breakdown reads "+N staged", with the card names listed only in the Counter lane;
+- the lane labels shrink to 52 px;
+- the staging hint drops "ties go to the attacker", which the result line already states.
+
+The e2e check now also requires at least 24 px of free height in every tall state at the adapted sizes. Rejected:
+- letting the body scroll, which `board.md` forbids for decision panels;
+- relaxing the test, which would hide a cross-platform failure.
+
 ## 2026-10-28 — M3 board implementation decisions
 
 Context: the M3 builder made these choices while building the playable board.
