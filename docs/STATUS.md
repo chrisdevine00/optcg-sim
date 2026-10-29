@@ -1,7 +1,7 @@
 # Status
 
 **Phase:** 5 Build, slice pass (ADR 0012), starting at M0. Phases 1–4 gated 2026-10-28.
-**Milestone:** M3 Playable board (built; in review) and M4a Effects slice (built; independent tests to merge). M0, M1 and M2 done 2026-10-28.
+**Milestone:** M5a AI slice next. M4a done 2026-10-29. M3 passes on code, with the NVDA screen-reader pass outstanding. M0, M1 and M2 done 2026-10-28.
 **Run the app:** `npm install && npm run dev` then open http://localhost:5173/optcg-sim/ and go to `/cards` for the card browser
 **Deployed:** https://chrisdevine00.github.io/optcg-sim/ (auto-deploys after green CI on `main`)
 
@@ -82,7 +82,7 @@
   - M3 is marked done when that record has no open severity 3 or 4 finding.
   - The VoiceOver pass is the owner's (see Blockers).
 
-### M4a Effects slice: fixed, in re-review
+### M4a Effects slice: done 2026-10-29
 - **Built:** 37 Rocks and Kaido scripts, the DSL runtime, and a benchmark of about 4,000 to 5,600 two-turn simulations per second in a worker (target 1,000; ADR 0008 confirmed).
 - **Independent card tests:** 314 black-box tests, merged in b05c19e. One rules disagreement (B-1, optional Event costs) was ruled under CR 8-3-1-4 and fixed.
 - **Review** `docs/reviews/m4a-review.md` (70c6aa8): FAIL, then fixed in two phases:
@@ -91,7 +91,7 @@
 
   ENGINE_VERSION is 0.5.2.
 - **CI:** 2 min 35 s, with Playwright in 3 shards and per-push full games starting from a late-game scenario. The turn-1 full games run nightly (`E2E_FULL=1`).
-- **Re-review 1 is running.** When it passes, M4a is done.
+- **Re-review 1 (42833ee): PASS.** No severity 3 or 4 finding is open, and every fix has a test that fails on revert. A probe over 1,500 games (520,544 card-naming events) found no log line naming a card the viewer couldn't see. Non-blocking findings are carried with targets (see Next). The Nightly workflow was dispatched once by hand (M4a-20): run 40848871925.
 
 ### Verification caveats
 - A worktree that symlinks the main tree's `node_modules` resolves `@optcg/*` to the main tree. Use `npm ci` in the worktree.
@@ -101,9 +101,9 @@
 ## Next (slice pass, PLAN.md §1)
 
 1. **M5a AI slice** (estimate 40 h): per-turn planning (ADR 0008), the **Pirate** tier, the `Explanation` builder, and game-plan assertions for the Rocks and Kaido playbooks. It also takes the carried "Why?" chip on AI log lines (M3-23).
-2. **L Learning slice:** the battle panel and DON!! overlay (`preview`), the tiered lethal detector, lethal search, the missed-lethal review flag end to end, and "Practice this". Then a manual screen-reader pass.
+2. **L Learning slice:** first, the carried M4a-16 (the veiled Use hint describes the last public activation, which can be the wrong effect; drive it from the decision's public source instead) and M4a-18 (an Event whose optional cost can't be paid looks fully usable; warn before it is wasted). Then the battle panel and DON!! overlay (`preview`), the tiered lethal detector, lethal search, the missed-lethal review flag end to end, and "Practice this". Then a manual screen-reader pass.
 3. **Owner usability session S1** on the real game (`usability-plan.md`).
-4. **M4b entry items** (from the M4a review, M4a-10; not reachable with the Rocks and Kaido scripts, so fix before M4b scripts can reach them):
+4. **M4b entry items:** M4a-17 (the veiled-Use safety check must use the engine's `secret` flag or a typed script walk, not a regex over the JSON); a check that each script's "you may" cost flag matches its card text; M4a-19 (four fixes have no test that fails on revert). Also, from M4a-10 ( not reachable with the Rocks and Kaido scripts, so fix before M4b scripts can reach them):
    - one removal event over several Characters gets **one** replacement offer (QA-OP15 OP15-069: one DON!! return keeps both);
    - at the End Phase, fire [End of Your Turn], delayed "at the end of this turn" and [End of Your Opponent's Turn] effects as **one batch per player**, so the turn player can order a delayed effect against their own (CR 6-6-1-1, 8-6-1);
    - skip the source-negation check for **delayed** effects in `drainPending` (a created delayed effect does not depend on its source).
