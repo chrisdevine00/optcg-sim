@@ -95,7 +95,15 @@ const url = (spec: unknown) =>
 /** Everything a sighted user, a screen reader and the DOM show, with nothing per-run in it. */
 async function snapshot(page: Page): Promise<string> {
   await page.waitForTimeout(250);
-  const html = await page.evaluate(() => document.querySelector('main.play')!.outerHTML);
+  // The polite region alternates two spans so a repeated message is read again; which span holds
+  // the text follows how many messages came before, which is timing, not information (the text is
+  // compared below). Compare the region by its text only.
+  const html = await page.evaluate(() => {
+    const main = document.querySelector('main.play')!.cloneNode(true) as HTMLElement;
+    const polite = main.querySelector('#announce-polite');
+    if (polite) polite.textContent = polite.textContent;
+    return main.outerHTML;
+  });
   const aria = await page.locator('main.play').ariaSnapshot();
   const live = await page.evaluate(
     () =>

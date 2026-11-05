@@ -1,7 +1,7 @@
 # Status
 
 **Phase:** 5 Build, slice pass (ADR 0012), starting at M0. Phases 1–4 gated 2026-10-28.
-**Milestone:** L Learning slice built and merged; independent review next. M5a done 2026-11-05 (re-review 1 PASS). M4a done 2026-10-29. M3: NVDA re-run PASS in Chrome; Firefox re-running after a harness fix. M0, M1 and M2 done 2026-10-28.
+**Milestone:** L Learning slice built and merged; independent review next. M5a done 2026-11-05 (re-review 1 PASS). M4a done 2026-10-29. M3 done 2026-11-05 (NVDA r4 PASS in Chrome and Firefox). M0, M1 and M2 done 2026-10-28.
 **Run the app:** `npm install && npm run dev` then open http://localhost:5173/optcg-sim/ and go to `/cards` for the card browser
 **Deployed:** https://chrisdevine00.github.io/optcg-sim/ (auto-deploys after green CI on `main`)
 
@@ -13,7 +13,7 @@
 | 2 Plan | docs/PLAN.md, docs/ARCHITECTURE.md, docs/adr/ | **Gated 2026-10-28** (revision 2 after two reviews; see docs/plan-review-1.md) |
 | 3 Deep research | docs/research/effect-dsl.md, rulings.md; docs/content/archetypes/, curriculum.md, glossary.md, sources.md | **Gated 2026-10-28** (competitive-player review: 20 findings, 0 severity-3 open; see docs/content/review-1.md) |
 | 4 Design | docs/design/principles.md, board.md, flows.md, visual-system.md, learning-ui.md, wireframes/, review-1.md | **Gated 2026-10-28** (review 1: 50 findings plus 2 verification passes; 0 severity-3 or severity-4 open) |
-| 5 Build | M0 through M10 per PROMPT.md | In progress: M0–M2, M4a and M5a done; M3 passes on code (NVDA fixes outstanding) |
+| 5 Build | M0 through M10 per PROMPT.md | In progress: M0–M3, M4a and M5a done; L built, in review |
 
 ## Done
 
@@ -72,11 +72,12 @@
 
 ## In progress
 
-### M3 Playable board: code passes review; the screen-reader pass is outstanding
+### M3 Playable board: done 2026-11-05
 - **Review:** `docs/reviews/m3-review.md` went through 4 fix rounds and 4 re-reviews. Re-review 4 (2c203ce) is a PASS, with no severity 3 or 4 open.
   - The hotseat hidden-information leaks were fixed structurally: veiled screens render only from a branded `PublicView`, and a differential test requires identical veiled screens across hidden-card variations (DECISIONS, 2026-10-29).
   - M3-41 to M3-43 were fixed in d3ed657.
 - **Carried, with targets:** M3-18 (M10), M3-23 (DECISIONS, 2026-10-29).
+- **Screen-reader pass: PASS** in NVDA r4 (run 42127510881; `docs/design/a11y-passes/m3-nvda-{chrome,firefox}-r4.md`), after the fixes in 0d5ab88, 81ba6df and the r2/r3 follow-ups (F21, F7, F8, F15 partly). Open, carried: F3 and F15 (sev 2: NVDA's first Tab lands on the decision heading; `.` does nothing on the heading after Done on your own effect's pick) and F2 (the same defect) → L's manual screen-reader pass; FF5 and F22 fixed after r4 ("You lose" against the AI; "You are"); severity 1 items F13 leftovers, F16–F20, FF3 → M10. VoiceOver stays the owner's.
 - **Last exit criterion, the screen-reader pass** (PLAN M3; accessibility.md §11.2):
   - **The scripted NVDA pass runs** (`.github/workflows/a11y-nvda.yml`, Guidepup; recorded run 40866547375 at 6f826f2). **Both records FAIL** (`docs/design/a11y-passes/m3-nvda-chrome.md`, `m3-nvda-firefox.md`):
     - F1 (severity 3, both browsers): focus is lost to the page body after playing from the menu, after Done on a pick, after the order choice, and at the end of the AI turn.
@@ -141,7 +142,7 @@
 
 ## Next (slice pass, PLAN.md §1)
 
-0. **In flight (2026-11-05):** M3's NVDA re-runs: Chrome r2 PASS; Firefox r3 FAIL only on F21 (a rewind chosen from the list was not announced), now fixed with the list rewind spoken again once focus lands. F7, F8 and F15 are fixed too, each with an e2e check. A final NVDA run on both browsers is next; F3 (NVDA's first Tab lands on the decision heading; not reproducible without NVDA) carries to L's manual screen-reader pass. The independent L review is running.
+0. **In flight (2026-11-05):** the independent L review (`docs/reviews/l-review.md`).
 1. **M3:** record the NVDA re-run in `docs/design/a11y-passes/`; M3 is done when neither browser has an open severity 3 or 4.
 2. **L Learning slice:** built (see above). Left: the independent L review; then a manual screen-reader pass of the coach, the guided count and the review (record it in `docs/design/a11y-passes/`).
 3. **Owner usability session S1** on the real game (`usability-plan.md`).

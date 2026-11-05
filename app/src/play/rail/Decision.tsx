@@ -572,21 +572,23 @@ function waitingContent(g: G, tall: boolean, rewind: NonNullable<Foot['secondary
 }
 
 function waitingWords(kind: string, who: string): string {
+  // "You are", not "You is" (M3 NVDA r4 F22).
+  const is = who === 'You' ? 'are' : 'is';
   switch (kind) {
     case 'main':
-      return `${who} is in the Main Phase.`;
+      return `${who} ${is} in the Main Phase.`;
     case 'block':
-      return `${who} is choosing whether to block.`;
+      return `${who} ${is} choosing whether to block.`;
     case 'counter':
-      return `${who} is choosing Counters.`;
+      return `${who} ${is} choosing Counters.`;
     case 'trigger':
-      return `${who} is taking damage.`;
+      return `${who} ${is} taking damage.`;
     case 'mulligan':
-      return `${who} is deciding whether to redraw.`;
+      return `${who} ${is} deciding whether to redraw.`;
     case 'chooseFirst':
-      return `${who} is choosing who goes first.`;
+      return `${who} ${is} choosing who goes first.`;
     default:
-      return `${who} is deciding.`;
+      return `${who} ${is} deciding.`;
   }
 }
 

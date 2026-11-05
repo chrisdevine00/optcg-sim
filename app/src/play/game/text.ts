@@ -425,7 +425,9 @@ function targetWords(ctx: Ctx, e: GameEvent): string {
 
 export function winnerWords(names: Names, winner: PlayerId): string {
   if (names.hotseat) return `${names.player[winner]} wins`;
-  return winner === names.me ? 'You win' : `${names.player[winner]} wins`;
+  // Against the AI the result is said from your side: in a mirror "Kaido wins" names both
+  // Leaders (M3 NVDA r4 FF5).
+  return winner === names.me ? 'You win' : 'You lose';
 }
 
 export function resultReason(reason: string | undefined, winner: PlayerId, names: Names): string {

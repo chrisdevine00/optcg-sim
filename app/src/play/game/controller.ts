@@ -1003,7 +1003,7 @@ export class GameController {
       this.gameOverAnnounced = true;
       const text =
         'winner' in r
-          ? `Game over. ${r.winner === this.me && !this.hotseat ? 'You win' : `${this.config.names[r.winner]} wins`} on turn ${this.session.view('p1').turn.number}.`
+          ? `Game over. ${this.hotseat ? `${this.config.names[r.winner]} wins` : r.winner === this.me ? 'You win' : 'You lose'} on turn ${this.session.view('p1').turn.number}.`
           : 'Game over. Draw.';
       this.assertive = { text, seq: this.assertive.seq + 1 };
       // flows F15: then, politely, what can be done next.
