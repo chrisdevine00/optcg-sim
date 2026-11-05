@@ -1,12 +1,12 @@
 /// <reference lib="webworker" />
 /**
- * The AI worker (ARCHITECTURE §4.1). It receives the AI's own views only, never game state. One
+ * The AI worker (ARCHITECTURE §4.1). It receives the AI's own views only; the one exception is a `lethal` request in `actual` mode (review, open hands), which carries a full state. One
  * request runs at a time; `cancel` drops the answer of a request that is no longer wanted. The
  * session (and its turn plan) lives here, so planning can run while the board animates.
  */
 import type { Card } from '@optcg/cards';
 import { chooseAction } from './choose.ts';
-import { answerLethal, insertByPriority } from './lethal/request.ts';
+import { answerLethal, insertByPriority } from './search/lethal/request.ts';
 import type { AiRequest, AiResponse, GameInfo } from './protocol.ts';
 import { AiSession } from './session.ts';
 

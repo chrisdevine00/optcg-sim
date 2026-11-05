@@ -626,3 +626,86 @@ describe('E20: the live lethal detector, three tiers (explanations.md)', () => {
     expect(wrong.split.correct).toBe(false);
   });
 });
+
+describe('too few attackers, and the copy rules', () => {
+  /**
+   * Luffy alone against 2 Life: 3 hits needed, 1 attacker. Each attack lands one hit (CR
+   * 7-1-4-1-1-1), so nothing can be done with DON!!, whatever their hand: certainty any-hand, and the
+   * answer is immediate (no search nodes).
+   */
+  it('refutes without a search, whatever their hand', () => {
+    const s = position({ chars: [], don: 10, life: 2, hand: [NO_COUNTER, NO_COUNTER, NO_COUNTER] });
+    for (const r of [pub(s), act(s)]) {
+      expect(r.status).toBe('refuted');
+      expect(r.nodes).toBe(0);
+      expect(r.defence).toMatchObject({ reason: 'attackers', hitsNeeded: 3 });
+      expect(tier1(r).text).toBe('No lethal: you need 3 hits and have 1 attacker.');
+    }
+    expect(pub(s).certainty).toBe('any-hand');
+    expect(explainLethal(pub(s), cards, 'coach').outcome).toBe(
+      'No win this turn: not enough attackers.',
+    );
+    // A Double Attack Character can make 2 attackers enough for 2 Life (it takes 2): the bound lets the search run.
+    const da = position({ chars: [LUFFY_DA], don: 0, life: 2, hand: [] });
+    expect(pub(da).defence?.reason).not.toBe('attackers');
+  });
+
+  const SLUGS = ['lethal-math', 'hand-reading'];
+  const names = [...new Set([...cards.values()].map((c) => c.name))]
+    .filter((n) => n.includes(' '))
+    .sort((a, b) => b.length - a.length);
+  const words = (t: string): number => {
+    let x = t;
+    for (const n of names) if (x.includes(n)) x = x.split(n).join('Name');
+    return x.split(/\s+/).filter(Boolean).length;
+  };
+  /** explanations.md "Copy rules", as the existing snapshot tests enforce them. */
+  function wellFormed(e: ReturnType<typeof explainLethal>): void {
+    expect(SLUGS).toContain(e.conceptId);
+    expect(words(e.claim), e.claim).toBeLessThanOrEqual(12);
+    expect(e.claim).not.toMatch(/!$/);
+    for (const ev of e.evidence) expect(words(ev.text), ev.text).toBeLessThanOrEqual(30);
+    expect(e.nextTime.length).toBeGreaterThan(0);
+    expect(e.sources.length).toBeGreaterThan(0);
+    expect(e.lessonId).toMatch(/^L1[56]-/);
+    const text = [
+      e.claim,
+      e.outcome,
+      ...e.evidence.map((x) => x.text),
+      ...(e.line ?? []).map((m) => m.text),
+    ].join(' ');
+    expect(text).not.toMatch(/(^|[\s(])-\d/);
+    expect(text).not.toMatch(/\d\s+-\s+\d/);
+    expect(text).not.toMatch(/DON!(?!!)/);
+    expect(text).not.toMatch(/you should have/i);
+    expect(text).not.toMatch(/\b1 (cards|hits|attackers|Life cards|Triggers|active Blockers)\b/);
+    // Every figure named in the evidence is a finite number.
+    for (const ev of e.evidence)
+      for (const [k, v] of Object.entries(ev.figures ?? {}))
+        expect(Number.isFinite(v), k).toBe(true);
+  }
+
+  it('every explanation the detector writes follows them', () => {
+    const made: ReturnType<typeof explainLethal>[] = [];
+    const add = (r: LethalResult, ctx: 'coach' | 'review', p?: LethalResult) =>
+      made.push(explainLethal(r, cards, ctx, p));
+    const proven = position({ chars: [SANJI, ZORO], don: 0, life: 2, hand: [] });
+    const refuted = position({ chars: [SANJI], don: 3, life: 1, hand: [NO_COUNTER, NO_COUNTER] });
+    const trig = position({ chars: [SANJI], don: 2, life: 1, hand: [], leader: KAIDO });
+    const few = position({ chars: [], don: 0, life: 2, hand: [] });
+    for (const s of [proven, refuted, trig, few]) {
+      for (const ctx of ['coach', 'review'] as const) {
+        add(pub(s), ctx);
+        add(act(s), ctx, pub(s));
+      }
+      add(pub(s, 3), 'coach');
+    }
+    expect(made.length).toBe(20);
+    for (const e of made) wellFormed(e);
+    // The Trigger chance reads in plain numbers.
+    const t = explainLethal(pub(trig), cards, 'review').evidence.find((x) =>
+      x.text.includes('Trigger'),
+    )!;
+    expect(t.figures).toMatchObject({ exposedLife: 1 });
+  });
+});

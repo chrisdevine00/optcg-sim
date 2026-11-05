@@ -1,15 +1,15 @@
 /**
  * The typed worker protocol (ARCHITECTURE §4.1). M5a implements `init`, `cards`, `planTurn`,
  * `decide`, `cancel` and `reset` (and, from the learning slice, `lethal`); unchosen alternatives are not posted (no UI uses them, and they
- * would carry the AI's intentions into the page: review M5a-15); `lethal` and `analyze` arrive with the learning slice and Game Review.
+ * would carry the AI's intentions into the page: review M5a-15); `analyze` arrives with Game Review.
  *
  * The worker only ever receives the AI's own view: a `SearchView` (the view plus a skeleton with
  * every hidden card stripped, ADR 0005) for the searching tiers, a plain view for Rookie. Card data
  * is public: the AI's own deck, its opponent's archetype prior and cards it has seen.
  */
 import type { Card } from '@optcg/cards';
-import type { Action, GameState, PlayerId, PlayerView, SearchView } from '@optcg/engine';
-import type { LethalResult } from './lethal/lethal.ts';
+import type { Action, PlayerId, PlayerView, SearchView } from '@optcg/engine';
+import type { LethalResult, LethalState } from './search/lethal/lethal.ts';
 import type { Explanation } from './explanation.ts';
 import type { Budget } from './search/pirate.ts';
 import type { AiTier } from './tiers.ts';
@@ -55,7 +55,7 @@ export type AiRequest =
       priority?: 2 | 3 | 4;
     } & (
       | { mode: 'public'; view: SearchView }
-      | { mode: 'actual'; state: GameState; attacker?: PlayerId }
+      | { mode: 'actual'; state: LethalState; attacker?: PlayerId }
     ))
   | { type: 'cancel'; id: number }
   /** Forget the turn plan and battle memory (the player rewound). */

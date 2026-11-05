@@ -8,8 +8,8 @@
  * hidden hand appears only as a count and the archetype's biggest Counter.
  */
 import type { Card } from '@optcg/cards';
-import { certaintyLabel, type Evidence, type Explanation, type Move } from '../explanation.ts';
-import { MINUS, figureKey } from '../explain.ts';
+import { certaintyLabel, type Evidence, type Explanation, type Move } from '../../explanation.ts';
+import { MINUS, figureKey } from '../../explain.ts';
 import type { DefenceEffect } from './defence.ts';
 import type { LineStep } from './analyse.ts';
 import type { LethalResult } from './lethal.ts';
@@ -67,6 +67,11 @@ export function tier1(r: LethalResult): Tier1 {
     };
   if (r.status === 'refuted') {
     const d = r.defence;
+    if (d?.reason === 'attackers') {
+      const n = r.facts.attackers.length;
+      const text = `No lethal: you need ${plural(d.hitsNeeded, 'hit')} and have ${plural(n, 'attacker')}.`;
+      return { status: r.status, certainty: r.certainty, text, chip, triggerNote: null, sr: text };
+    }
     const stop = d ? Math.max(1, d.hitsNeeded - d.lifeTaken) : 1;
     const need = d?.hitsNeeded ?? r.facts.hitsNeeded;
     return {
@@ -382,6 +387,21 @@ export function explainLethal(
   const gr = growthRow(r, tense);
   if (gr && r.status === 'proven') evidence.push(gr);
 
+  if (r.status === 'refuted' && r.defence?.reason === 'attackers') {
+    const n = f.attackers.length;
+    return {
+      conceptId: 'lethal-math',
+      claim: `No lethal: you need ${plural(f.hitsNeeded, 'hit')} and have ${plural(n, 'attacker')}.`,
+      evidence: [hitsRow(r, tense)],
+      line: null,
+      outcome: 'No win this turn: not enough attackers.',
+      certainty: 'any-hand',
+      nextTime:
+        'Count Life + 1 hits first. Each attacker lands one hit (two Life with Double Attack), so too few attackers means no DON!! split can make lethal.',
+      lessonId: 'L15-lethal-math',
+      sources: ['CR 7-1-4-1', 'CR 7-1-4-1-1-1'],
+    };
+  }
   if (r.status === 'refuted') {
     const d = r.defence!;
     const attacks = d.line.filter((s): s is Attack => s.kind === 'attack' && s.target === 'leader');

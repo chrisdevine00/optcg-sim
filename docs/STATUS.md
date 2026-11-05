@@ -123,6 +123,10 @@
     - **Pacing follow-up (2026-11-05, on resume):** the fix round's new holds made the late-game AI turn 11.5 s and the per-push pacing e2e failed. Dwell compression (board.md §5.2) is now built from elapsed board time, not the plan (which would leak a long turn ahead); the late turn takes 10.0 s, and the check follows §5.2: typical turns ≤ 8 s, heavy turns bounded (DECISIONS 2026-11-05; benchmarks.md "Pacing"). Carried to M10 is now only the midline overlap.
     - Strength (benchmarks.md): 200/200 vs Rookie; 66/100 vs a shallow (no-rollout) Pirate, gate 60%, control 21/40; 100/100 with the opponent's list left out of the prior. Game-plan assertions now run with and without the biases; search alone finds 7 of 10 seeds in planted positions.
 
+### L Learning slice: the engine-and-AI half is built (branch `worktree-agent-a5cbf39c892951813`); the UI half is not
+- **Done:** `lethal` (`public` and `actual` modes, Triggers as a labelled chance, node and wall-clock caps) in `ai/src/search/lethal/`; the `lethal` worker request with priorities 2 to 4 and cancel; tiers 1 to 3 (`tier1`, `tier2`, `explainLethal`; E20, E01, E02 and E03 are snapshot-tested against `explanations.md`); the guided count's data and `checkGuidedCount`; `reviewMissedLethal` (planted record flagged `any-hand` with a correct line). Decisions: DECISIONS 2026-11-05 (two entries). Tests: `ai/test/lethal.test.ts`, `lethal-review.test.ts`, `lethal-games.test.ts` (`npm run test:lethal` for the long run).
+- **Not done:** the opponent's-turn threat check (the skeleton refuses a foreign decision, M5a-02), the "lethal given away" flag, and a Blocker removed by an effect as a planted test (no scripted card does it). The UI (coach panel, guided count, flags on the review timeline, "Practice this") is the other builder's half.
+
 ### Verification caveats
 - A worktree that symlinks the main tree's `node_modules` resolves `@optcg/*` to the main tree. Use `npm ci` in the worktree.
 - Set `E2E_PORT`, so you don't reuse another copy's preview server.

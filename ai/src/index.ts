@@ -39,16 +39,18 @@ export { LESSON, MINUS } from './explain.ts';
 export { fingerprint } from './search/pirate.ts';
 export {
   lethal,
+  attackersPossible,
   type LethalInput,
   type LethalMode,
+  type LethalState,
   type LethalResult,
   type LethalFacts,
   type AttackerFact,
-} from './lethal/lethal.ts';
-export type { LineStep } from './lethal/analyse.ts';
-export type { TriggerRisk } from './lethal/public.ts';
-export type { Cap as LethalCap } from './lethal/search.ts';
-export type { DefenceEffect } from './lethal/defence.ts';
+} from './search/lethal/lethal.ts';
+export type { LineStep } from './search/lethal/analyse.ts';
+export type { TriggerRisk } from './search/lethal/public.ts';
+export type { Cap as LethalCap } from './search/lethal/search.ts';
+export type { DefenceEffect } from './search/lethal/defence.ts';
 export {
   tier1,
   tier2,
@@ -61,11 +63,6 @@ export {
   type CountAnswers,
   type CountCheck,
   type LethalContext,
-} from './lethal/explain.ts';
-export {
-  reviewMissedLethal,
-  attackersPossible,
-  type LethalFlag,
-  type ReviewOptions,
-} from './lethal/review.ts';
-export { answerLethal, insertByPriority, DEFAULT_CAP_MS } from './lethal/request.ts';
+} from './search/lethal/explain.ts';
+export { reviewMissedLethal, type LethalFlag, type ReviewOptions } from './search/lethal/review.ts';
+export { answerLethal, insertByPriority, DEFAULT_CAP_MS } from './search/lethal/request.ts';

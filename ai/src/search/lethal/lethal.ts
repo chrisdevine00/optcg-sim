@@ -20,13 +20,16 @@ import {
   type PlayerId,
   type SearchView,
 } from '@optcg/engine';
-import { counterValueOf, priorFor } from '../knowledge.ts';
+import { counterValueOf, priorFor } from '../../knowledge.ts';
 import { defenceEffectsOf, type DefenceEffect } from './defence.ts';
 import { analyseLine, type LineStep } from './analyse.ts';
 import { publicState, triggerRisk, type TriggerRisk } from './public.ts';
 import { search, searchPlan, type Cap } from './search.ts';
 
 export type LethalMode = 'public' | 'actual';
+
+/** A full game state, for `actual` mode only (review and open-hands games; never a live hidden game). */
+export type LethalState = GameState;
 
 export type LethalInput =
   { mode: 'public'; view: SearchView } | { mode: 'actual'; state: GameState; attacker?: PlayerId };
@@ -79,7 +82,14 @@ export interface LethalResult {
   /** Proven: the same moves work against every answer (no adapting between attacks). */
   oblivious: boolean;
   /** Refuted: the best attempt, and what stopped it. */
-  defence: { lifeTaken: number; hitsNeeded: number; line: LineStep[]; stoppedAt: number } | null;
+  defence: {
+    lifeTaken: number;
+    hitsNeeded: number;
+    line: LineStep[];
+    stoppedAt: number;
+    /** `attackers`: too few attackers could ever hit their Leader (no search was needed). */
+    reason?: 'attackers';
+  } | null;
   /** Public mode, proven: the chance a hidden Life [Trigger] stops it (null when none can). */
   trigger: TriggerRisk | null;
   facts: LethalFacts;
@@ -139,6 +149,38 @@ function factsOf(
       ? queries.zone(s, def, 'hand').reduce((t, c) => t + counterValueOf(cards.get(c.card)), 0)
       : null,
   };
+}
+
+/**
+ * Can this seat get enough attackers on their Leader to win at all? Its attackers now, plus any
+ * Character in its hand that mentions [Rush] (it could attack on arrival), against the Life it must
+ * remove: each attack takes one Life card, or two with [Double Attack], and the last attack lands at 0
+ * (CR 7-1-4-1-1-1, 10-1-2-1). A bound that only ever errs toward searching; it does not count effects
+ * that untap a Character or give it another attack (assumption A7 in DECISIONS).
+ */
+export function attackersPossible(
+  s: GameState,
+  attacker: PlayerId,
+  cards: ReadonlyMap<string, Card>,
+): boolean {
+  const def = other(attacker);
+  const life = queries.zone(s, def, 'life').length;
+  const leader = queries.zone(s, def, 'leader')[0]!.instance;
+  const seen = new Set<string>();
+  let n = 0;
+  let da = false;
+  for (const a of legalActions(s))
+    if (a.type === 'attack' && a.target === leader && !seen.has(a.attacker)) {
+      seen.add(a.attacker);
+      n++;
+      if (queries.card(s, a.attacker).keywords.includes('Double Attack')) da = true;
+    }
+  for (const c of queries.zone(s, attacker, 'hand')) {
+    const card = cards.get(c.card);
+    if (card?.category === 'Character' && /\[Rush/.test(card.effectText)) n++;
+    if (card && /Double Attack/.test(card.effectText)) da = true;
+  }
+  return n >= 1 && (n - 1) * (da ? 2 : 1) >= life;
 }
 
 /** `a` with every card id passed through `f` (view handles for `actionFromView`). */
@@ -201,6 +243,20 @@ function run(
       status: 'unknown',
       certainty: 'search-incomplete',
       reason: 'It is not that seat’s Main Phase decision.',
+    };
+  // Too few attackers: no search can find lethal, and the answer is immediate (CR 7-1-4-1-1-1).
+  if (!attackersPossible(root, attacker, cards))
+    return {
+      ...base,
+      status: 'refuted',
+      certainty: 'any-hand',
+      defence: {
+        lifeTaken: 0,
+        hitsNeeded: facts.hitsNeeded,
+        line: [],
+        stoppedAt: 0,
+        reason: 'attackers',
+      },
     };
   const t0 = performance.now();
   let nodes = 0;

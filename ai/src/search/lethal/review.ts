@@ -14,7 +14,6 @@
  */
 import type { Card } from '@optcg/cards';
 import {
-  legalActions,
   projectForSearch,
   queries,
   reduce,
@@ -24,9 +23,9 @@ import {
   type GameState,
   type PlayerId,
 } from '@optcg/engine';
-import type { Explanation } from '../explanation.ts';
+import type { Explanation } from '../../explanation.ts';
 import { explainLethal } from './explain.ts';
-import { lethal, type LethalResult } from './lethal.ts';
+import { attackersPossible, lethal, type LethalResult } from './lethal.ts';
 import type { Cap } from './search.ts';
 
 export interface LethalFlag {
@@ -51,40 +50,6 @@ export interface ReviewOptions {
   cap?: Cap;
   /** Skip turns that cannot reach the hits needed (default on). */
   prefilter?: boolean;
-}
-
-const other = (p: PlayerId): PlayerId => (p === 'p1' ? 'p2' : 'p1');
-
-/**
- * Can this seat get enough attackers on their Leader to win at all? Its attackers now, plus any
- * Character in its hand that mentions [Rush] (it could attack on arrival), against the Life it must
- * remove: each attack takes one Life card, or two with [Double Attack], and the last attack lands at 0.
- * An approximation that only ever errs toward searching.
- */
-export function attackersPossible(
-  s: GameState,
-  attacker: PlayerId,
-  cards: ReadonlyMap<string, Card>,
-): boolean {
-  const def = other(attacker);
-  const life = queries.zone(s, def, 'life').length;
-  const leader = queries.zone(s, def, 'leader')[0]!.instance;
-  const seen = new Set<string>();
-  let n = 0;
-  let da = false;
-  for (const a of legalActions(s))
-    if (a.type === 'attack' && a.target === leader && !seen.has(a.attacker)) {
-      seen.add(a.attacker);
-      n++;
-      if (queries.card(s, a.attacker).keywords.includes('Double Attack')) da = true;
-    }
-  for (const c of queries.zone(s, attacker, 'hand')) {
-    const card = cards.get(c.card);
-    if (card?.category === 'Character' && /\[Rush/.test(card.effectText)) n++;
-    if (card && /Double Attack/.test(card.effectText)) da = true;
-  }
-  // The attacks before the last one can take 1 (or 2) Life each; the last one needs 0 Life left.
-  return n >= 1 && (n - 1) * (da ? 2 : 1) >= life;
 }
 
 /** Replay `record` and flag every turn where a seat had lethal and did not win. */

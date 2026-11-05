@@ -4,7 +4,7 @@
  * sees a game state.
  */
 import type { Card } from '@optcg/cards';
-import type { AiRequest, AiResponse } from '../protocol.ts';
+import type { AiRequest, AiResponse } from '../../protocol.ts';
 import { lethal } from './lethal.ts';
 
 /** Put `item` in `queue` behind every item of equal or higher priority (lower number), ahead of the rest. */

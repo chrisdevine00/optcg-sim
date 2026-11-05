@@ -242,7 +242,10 @@ class Searcher {
     );
     const moves = out.map((x) => x.m);
     if (!this.simple)
-      for (const a of acts) if (a.type === 'playCard' || a.type === 'activate') moves.push([a]);
+      for (const a of acts) {
+        if (a.type === 'activate') moves.push([a]);
+        else if (a.type === 'playCard' && playMatters(queries.card(s, a.card))) moves.push([a]);
+      }
     return moves;
   }
 
@@ -262,6 +265,16 @@ class Searcher {
       .sort((x, y) => rank(x.a) - rank(y.a) || x.i - y.i)
       .map((x) => x.a);
   }
+}
+
+/**
+ * Playing a card can change a lethal turn only through what the engine knows about it: a scripted
+ * ability, or [Rush] (it can attack at once). A card with neither does nothing but spend DON!!, so
+ * the search does not play it (a Character's [Blocker] guards against attacks, which this turn has
+ * none of).
+ */
+function playMatters(c: { card: string; keywords: string[] }): boolean {
+  return (SCRIPTS[c.card]?.abilities.length ?? 0) > 0 || c.keywords.includes('Rush');
 }
 
 /** A Character target is worth an attack only if it blocks or has a scripted ability. */

@@ -20,7 +20,7 @@
  */
 import type { Card } from '@optcg/cards';
 import { determinize, type PlayerId, type SearchView } from '@optcg/engine';
-import { biggestCounter, priorFor, type Prior } from '../knowledge.ts';
+import { biggestCounter, priorFor, type Prior } from '../../knowledge.ts';
 
 export const WORST_COUNTER = '$WORST-COUNTER';
 export const BLANK = '$BLANK';
