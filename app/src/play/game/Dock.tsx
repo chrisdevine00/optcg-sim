@@ -75,7 +75,7 @@ export function CardDock({
       inert={pinned ? undefined : true}
       role={pinned ? 'dialog' : undefined}
       // The card's text is the dialog's description, so it is read on open (M3 pass F7).
-      aria-describedby={pinned ? 'dock-text' : undefined}
+      aria-describedby={pinned ? 'dock-text-body' : undefined}
       onKeyDown={(e) => {
         if (e.key === 'Escape') {
           e.preventDefault();
@@ -161,19 +161,23 @@ export function CardDock({
         tabIndex={pinned ? 0 : undefined}
         aria-label={pinned ? 'Card text' : undefined}
       >
-        {auto === 'not-automated' && <span className="chip warning">Effect not automated</span>}
-        {card.effectText ? rich(card.effectText) : <p className="subtle">No effect text.</p>}
-        {card.triggerText && (
-          <p>
-            <b>[Trigger]</b> {card.triggerText}
-          </p>
-        )}
-        {auto === 'not-automated' && pinned && (
-          <p className="subtle">
-            This card&apos;s effect is not automated yet: it plays for its power, cost, Counter and
-            verified keywords, and its effect does not happen.
-          </p>
-        )}
+        {/* The dialog's description (M3 re-run F7): an unlabelled wrapper, so NVDA reads the text
+            itself, not the scroll region's "Card text" label. */}
+        <div id="dock-text-body">
+          {auto === 'not-automated' && <span className="chip warning">Effect not automated</span>}
+          {card.effectText ? rich(card.effectText) : <p className="subtle">No effect text.</p>}
+          {card.triggerText && (
+            <p>
+              <b>[Trigger]</b> {card.triggerText}
+            </p>
+          )}
+          {auto === 'not-automated' && pinned && (
+            <p className="subtle">
+              This card&apos;s effect is not automated yet: it plays for its power, cost, Counter
+              and verified keywords, and its effect does not happen.
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

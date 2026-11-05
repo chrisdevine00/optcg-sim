@@ -968,6 +968,14 @@ export class GameController {
     this.bump();
   }
 
+  /**
+   * Speak the last rewind again. A rewind chosen from the list closes a dialog and moves focus in
+   * the same moment, and NVDA's focus speech cut the first announcement (M3 re-run F21).
+   */
+  repeatRewound(): void {
+    if (this.toast?.startsWith('Back to:')) this.announce(`Rewound. ${this.toast}`);
+  }
+
   /** An assertive announcement: a decision owed during the opponent's turn (flows F6.1). */
   alert(text: string): void {
     this.assertive = { text, seq: this.assertive.seq + 1 };

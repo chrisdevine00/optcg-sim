@@ -546,6 +546,9 @@ function waitingContent(g: G, tall: boolean, rewind: NonNullable<Foot['secondary
                     onClick: () => ctl.nextMove(),
                     disabled: !ctl.stepWaiting,
                     id: 'next-btn',
+                    // Focus lands here, inside the footer's role="application", so NVDA passes
+                    // `.` through; on the heading browse mode takes it (M3 re-run F15).
+                    autoFocus: true,
                   },
                 }
               : {

@@ -41,7 +41,31 @@ test.describe('rewind (flows F11)', () => {
     const dialog = page.getByRole('dialog', { name: 'Rewind to before a move' });
     await expect(dialog).toBeVisible();
     await dialog.getByRole('radio').last().check();
+    // Record every polite write: the rewind must be spoken again once the dialog has closed and
+    // focus has landed, or NVDA's focus speech cuts it (M3 re-run F21).
+    await page.evaluate(() => {
+      const w = window as unknown as { politeWrites: { t: number; text: string }[] };
+      w.politeWrites = [];
+      const region = document.getElementById('announce-polite')!;
+      new MutationObserver(() => {
+        const text = region.textContent ?? '';
+        if (text) w.politeWrites.push({ t: performance.now(), text });
+      }).observe(region, { subtree: true, childList: true, characterData: true });
+    });
+    const clicked = await page.evaluate(() => performance.now());
     await dialog.getByRole('button', { name: 'Rewind to before it' }).click();
     await expect(page.getByRole('group', { name: /Your hand, 2 cards/ })).toHaveCount(1);
+    await expect
+      .poll(() =>
+        page.evaluate(
+          (from) =>
+            (
+              window as unknown as { politeWrites: { t: number; text: string }[] }
+            ).politeWrites.filter((w) => w.t - from >= 500 && /^Rewound\. Back to:/.test(w.text))
+              .length,
+          clicked,
+        ),
+      )
+      .toBeGreaterThan(0);
   });
 });

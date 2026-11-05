@@ -112,6 +112,41 @@ test.describe('focus is never lost to the page body (accessibility §4.3)', () =
     await notBody(page, 'the AI turn ended');
   });
 
+  test('during the AI turn at Step pace, focus is on Next move, where `.` works (F15)', async ({
+    page,
+  }) => {
+    await startGame(page, M3);
+    await nextDecision(page);
+    // End turn by keyboard: the button goes away with the Main Phase, and focus is rescued.
+    await page.locator('#endturn-btn').focus();
+    await page.keyboard.press('Enter');
+    await expect
+      .poll(async () => (await active(page)).id, { message: 'focus on Next move', timeout: 5000 })
+      .toBe('next-btn');
+    // `.` from there moves the AI on (the footer strip is role="application").
+    const before = await page.locator('.log-list li').count();
+    await expect(page.locator('#next-btn:not([aria-disabled="true"])')).toHaveCount(1, {
+      timeout: 5000,
+    });
+    await page.keyboard.press('.');
+    await expect.poll(() => page.locator('.log-list li').count()).toBeGreaterThan(before);
+  });
+
+  test('the pinned inspector is described by the card text itself, not a label (F7)', async ({
+    page,
+  }) => {
+    await startGame(page, M3);
+    await nextDecision(page);
+    const card = page.locator('[data-zone="hand"][data-item]').first();
+    await card.focus();
+    await page.keyboard.press('i');
+    const dialog = page.locator('[aria-describedby="dock-text-body"]');
+    await expect(dialog).toHaveCount(1);
+    const body = page.locator('#dock-text-body');
+    await expect(body).not.toHaveAttribute('aria-label', /.*/);
+    expect(((await body.textContent()) ?? '').trim().length).toBeGreaterThan(0);
+  });
+
   test('each assertive announcement is a fresh child node, cleared after a second (FF1)', async ({
     page,
   }) => {

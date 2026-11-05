@@ -141,7 +141,7 @@
 
 ## Next (slice pass, PLAN.md §1)
 
-0. **In flight (2026-11-05):** the Firefox NVDA re-run (run 42125614507) after the step 15 harness fix; Chrome's re-run passed (`docs/design/a11y-passes/m3-nvda-chrome-r2.md`). Then the remaining severity-2 NVDA items F3, F7, F8 and F15.
+0. **In flight (2026-11-05):** M3's NVDA re-runs: Chrome r2 PASS; Firefox r3 FAIL only on F21 (a rewind chosen from the list was not announced), now fixed with the list rewind spoken again once focus lands. F7, F8 and F15 are fixed too, each with an e2e check. A final NVDA run on both browsers is next; F3 (NVDA's first Tab lands on the decision heading; not reproducible without NVDA) carries to L's manual screen-reader pass. The independent L review is running.
 1. **M3:** record the NVDA re-run in `docs/design/a11y-passes/`; M3 is done when neither browser has an open severity 3 or 4.
 2. **L Learning slice:** built (see above). Left: the independent L review; then a manual screen-reader pass of the coach, the guided count and the review (record it in `docs/design/a11y-passes/`).
 3. **Owner usability session S1** on the real game (`usability-plan.md`).

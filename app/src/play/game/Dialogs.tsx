@@ -267,7 +267,11 @@ function RewindList({ g, lines, onClose }: { g: G; lines: LogLine[]; onClose: ()
           onClick={() => {
             if (sel === null) return;
             onClose();
-            g.requestRewind(() => g.ctl.rewindTo(sel));
+            g.requestRewind(() => {
+              g.ctl.rewindTo(sel);
+              // Once the dialog is gone and focus has landed, say it again (M3 re-run F21).
+              window.setTimeout(() => g.ctl.repeatRewound(), 700);
+            });
           }}
         >
           Rewind to before it

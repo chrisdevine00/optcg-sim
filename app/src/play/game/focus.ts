@@ -47,6 +47,12 @@ export function rescueTarget(spot: Spot | null): HTMLElement | null {
     const at = items[Math.min(spot.index, items.length - 1)];
     if (at) return at;
   }
+  // While the AI moves at Step pace, its "Next move" is what the player acts on, and it sits in
+  // the footer's role="application" strip, so NVDA passes `.` through; on the heading, browse
+  // mode takes `.` and nothing happens (M3 re-run F15).
+  // It is aria-disabled, never disabled, while the AI moves, so it stays focusable.
+  const next = document.getElementById('next-btn');
+  if (next) return next;
   return document.getElementById('decision-title');
 }
 

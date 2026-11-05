@@ -75,6 +75,8 @@ export function describeMove(
 ): LogLine[] {
   const out: LogLine[] = [];
   let bits: string[] = [];
+  /** DON!! rested to pay a play's cost: the engine pays before the card arrives (CR 2-7-4). */
+  let paid = 0;
   let linked: string[] = [];
   let lineActor: PlayerId | null = actor;
   const flush = () => {
@@ -194,6 +196,7 @@ export function describeMove(
         break;
       }
       case 'EventActivated':
+        paid = 0;
         bits.push(`Event${e.timing === 'counter' ? ' [Counter]' : ''}: ${name(e.card)}`);
         lineActor = p ?? lineActor;
         break;
@@ -263,11 +266,13 @@ export function describeMove(
         }
         break;
       case 'CardPlayed':
-        bits.push(`Play ${name(e.card)}`);
+        bits.push(`Play ${name(e.card)}${paid ? ` · ${String(paid)} DON!!` : ''}`);
+        paid = 0;
         break;
       case 'DonRested':
         if (bits.length && bits.at(-1)!.startsWith('Play '))
           bits[bits.length - 1] += ` · ${String(e.count)} DON!!`;
+        else paid += Number(e.count);
         break;
       case 'DonGiven': {
         const k = String(e.card);
