@@ -34,10 +34,12 @@ import {
   explainLethal,
   guidedCount,
   lethal,
+  priorCardIds,
   tier1,
   tier2,
   type LethalResult,
 } from '../src/index.ts';
+import { counterProfile } from '../src/search/lethal/profile.ts';
 import { cardMap } from './support.ts';
 import { docExample } from './support/doc.ts';
 import { lifeOf, listOf, start } from './support/scenario.ts';
@@ -428,13 +430,14 @@ describe('lethal: planted positions with known answers', () => {
 
   /**
    * DEPENDS ON A TRIGGER. Kaido (OP17-058) defends at 1 Life with 0 cards. Its sourced lists run
-   * [Trigger] cards and a biggest Counter of +4000 (E02). Luffy 5000 and Sanji 7000, 2 DON!!:
-   * Leader first (tie), hand 1 (+4000), then Sanji with 2 DON!! is 9000 against 9000: wins. The proof
+   * [Trigger] cards and a biggest Counter of +4000 (E02). Luffy 5000, Sanji 7000 and Zoro 9000, no
+   * DON!!: Leader first (tie; no cards yet, so nothing to Counter or rest), hand 1 (+4000, and the
+   * card may rest an unattacked Character), then Zoro 9000 against 5000 + 4000 ties: wins. The proof
    * needs the one Life card it takes not to be a [Trigger]: with T Triggers in a 50-card list the
    * chance is (50 − T) / 50, averaged over the lists by recency weight 3, 2, 1.
    */
   it('depends on a Trigger: proven, labelled, with the chance worked out from the lists', () => {
-    const s = position({ chars: [SANJI], don: 2, life: 1, hand: [], leader: KAIDO });
+    const s = position({ chars: [SANJI, ZORO], don: 4, life: 1, hand: [], leader: KAIDO });
     const r = pub(s);
     expect(r.status).toBe('proven');
     expect(r.facts.maxPerCard).toBe(4000);
@@ -691,7 +694,7 @@ describe('too few attackers, and the copy rules', () => {
       made.push(explainLethal(r, cards, ctx, p));
     const proven = position({ chars: [SANJI, ZORO], don: 0, life: 2, hand: [] });
     const refuted = position({ chars: [SANJI], don: 3, life: 1, hand: [NO_COUNTER, NO_COUNTER] });
-    const trig = position({ chars: [SANJI], don: 2, life: 1, hand: [], leader: KAIDO });
+    const trig = position({ chars: [SANJI, ZORO], don: 4, life: 1, hand: [], leader: KAIDO });
     const few = position({ chars: [], don: 0, life: 2, hand: [] });
     for (const s of [proven, refuted, trig, few]) {
       for (const ctx of ['coach', 'review'] as const) {
@@ -707,5 +710,68 @@ describe('too few attackers, and the copy rules', () => {
       x.text.includes('Trigger'),
     )!;
     expect(t.figures).toMatchObject({ exposedLife: 1 });
+  });
+});
+
+describe('A1 is sound against every [Counter] effect in the prior', () => {
+  /**
+   * Kaido (OP17-058) defends at 2 Life, no hand. Luffy 5000, Sanji 7000, Zoro 9000, 6 DON!!.
+   * 3 hits needed. The superseded A1 (a hidden card is only +4000, Kaido's biggest Counter): the
+   * Leader first (no cards, 5000 hits; Life 2 → 1, hand 1), Zoro second (9000 against 5000 + 4000
+   * ties and hits; Life 0, hand 2), Sanji third with 6 DON!! (13000 against 5000 + 8000 ties and
+   * wins): "proven, any hand". But Kaido's lists run OP07-076 (+2000, then rest up to 1 of your
+   * opponent's Characters; cost DON!! −1). As the Life card from the first hit it is in their hand on
+   * the second attack, and playing it rests the Character that has not attacked yet; a rested
+   * Character cannot attack. Two hits land and the third attacker is gone. (The Leader is no
+   * Character, so it could attack last, but then it faces the cards from two hits: 13000 is not
+   * reachable.) So the corrected `public` model must not prove it.
+   */
+  it('a Counter that rests an attacker refutes a line the +power-only model proves', () => {
+    const s = start({
+      seed: 11,
+      turn: 9,
+      activePlayer: 'p1',
+      firstPlayer: 'p1',
+      p1: {
+        leader: LUFFY,
+        characters: [SANJI, ZORO],
+        life: lifeOf(4, NO_COUNTER),
+        hand: [],
+        costArea: { active: 6, rested: 0 },
+        decklist: listOf(ROCKS),
+      },
+      p2: {
+        leader: KAIDO,
+        life: lifeOf(2, NO_COUNTER),
+        hand: [],
+        costArea: { active: 0, rested: 0 },
+        decklist: listOf(KAIDO),
+      },
+    });
+    const view = projectForSearch(s, 'p1');
+    const old = lethal({ mode: 'public', view, model: 'power-only' }, cards, { nodes: 300_000 });
+    expect(old.status).toBe('proven'); // what the first A1 claimed
+    const r = lethal({ mode: 'public', view }, cards, { nodes: 60_000 });
+    expect(r.status).not.toBe('proven');
+    expect(r.facts.defenceExtras).toEqual({ rests: true, draws: true });
+  });
+
+  /**
+   * Every [Counter] ability in the cards of every slice prior (Rocks, Kaido) uses only effects the
+   * placeholder models: +power, rest an opponent Character, draw. A future card with another effect
+   * fails here instead of silently making `public` unsound (profile.ts `gaps`).
+   */
+  it('covers every [Counter] ability in the slice priors', () => {
+    for (const leader of [ROCKS, KAIDO]) {
+      const profile = counterProfile(priorCardIds(leader));
+      expect(profile.gaps, leader).toEqual([]);
+    }
+    // And the model is not empty: Kaido's lists rest and draw, Rocks's only add power.
+    const k = counterProfile(priorCardIds(KAIDO));
+    expect([k.rests, k.draws]).toEqual([true, true]);
+    const r = counterProfile(priorCardIds(ROCKS));
+    expect([r.rests, r.draws]).toEqual([false, false]);
+    // A card the model does not know downgrades the claim rather than hiding it.
+    expect(counterProfile(['OP13-001']).gaps).toEqual([]);
   });
 });

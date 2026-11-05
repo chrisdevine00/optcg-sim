@@ -298,6 +298,26 @@ function hitsRow(r: LethalResult, tense: 'coach' | 'review'): Evidence {
   };
 }
 
+/** What their Counter cards can do besides add power (public mode), so the proof's claim is honest. */
+function extrasRow(r: LethalResult, tense: 'coach' | 'review'): Evidence | null {
+  const f = r.facts;
+  const x = f.defenceExtras;
+  const can = tense === 'coach' ? 'can' : 'could';
+  const bits: string[] = [];
+  if (x.rests) bits.push('rest one of your Characters');
+  if (x.draws) bits.push('draw a card');
+  if (f.modelGaps.length > 0)
+    return {
+      text: `Some of their Counter effects are not modelled, so this does not hold against every hand.`,
+      figures: { unmodelled: f.modelGaps.length },
+    };
+  if (bits.length === 0) return null;
+  return {
+    text: `Their Counter cards ${can} also ${bits.join(' or ')}, and the line allows for it.`,
+    figures: { restsCharacter: x.rests ? 1 : 0, draws: x.draws ? 1 : 0 },
+  };
+}
+
 function blockerRow(r: LethalResult, tense: 'coach' | 'review'): Evidence | null {
   const n = r.facts.blockers.length;
   if (n === 0) return null;
@@ -382,6 +402,8 @@ export function explainLethal(
   const evidence: Evidence[] = [hitsRow(r, tense)];
   const figs: Record<string, number> = {};
   evidence.push({ text: defenceSentence(r, cards, tense, figs), figures: figs });
+  const extras = extrasRow(r, tense);
+  if (extras) evidence.push(extras);
   const blk = blockerRow(r, tense);
   if (blk) evidence.push(blk);
   const gr = growthRow(r, tense);

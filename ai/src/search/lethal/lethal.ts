@@ -32,7 +32,13 @@ export type LethalMode = 'public' | 'actual';
 export type LethalState = GameState;
 
 export type LethalInput =
-  { mode: 'public'; view: SearchView } | { mode: 'actual'; state: GameState; attacker?: PlayerId };
+  | {
+      mode: 'public';
+      view: SearchView;
+      /** `power-only` is the superseded A1 (a hidden card is only +power): kept so a test can show what it got wrong. */
+      model?: 'full' | 'power-only';
+    }
+  | { mode: 'actual'; state: GameState; attacker?: PlayerId };
 
 /** An attacker the player can use against the opponent's Leader this turn. */
 export interface AttackerFact {
@@ -62,6 +68,10 @@ export interface LethalFacts {
   activeDon: number;
   /** No sourced list for their Leader: `maxPerCard` is the assumed fallback. */
   noPrior: boolean;
+  /** Public mode: their Counter cards may also rest one of your Characters, or draw. */
+  defenceExtras: { rests: boolean; draws: boolean };
+  /** Public mode: Counter effects the model could not represent. */
+  modelGaps: string[];
   /** Their visible on-attack effects (public card scripts). */
   defence: DefenceEffect[];
   /** `actual` mode: the Counter value their real hand holds (printed Counters and [Counter] Events); else null. */
@@ -144,6 +154,8 @@ function factsOf(
     defenderCards,
     activeDon: queries.don(s, attacker).active,
     noPrior,
+    defenceExtras: { rests: false, draws: false },
+    modelGaps: [],
     defence: defenderCards.flatMap(defenceEffectsOf),
     actualCounter: actual
       ? queries.zone(s, def, 'hand').reduce((t, c) => t + counterValueOf(cards.get(c.card)), 0)
@@ -212,11 +224,15 @@ function run(
   extra: {
     maxPerCard: number;
     noPrior: boolean;
+    rests: boolean;
+    draws: boolean;
+    /** Counter effects the model does not know: a proof cannot claim any-hand. */
+    gaps: string[];
     hiddenLife: number;
     prior: ReturnType<typeof priorFor>;
   },
 ): LethalResult {
-  const facts = factsOf(
+  const facts: LethalFacts = factsOf(
     root,
     attacker,
     extra.maxPerCard,
@@ -225,6 +241,8 @@ function run(
     cards,
     mode === 'actual',
   );
+  facts.defenceExtras = { rests: extra.rests, draws: extra.draws };
+  facts.modelGaps = extra.gaps;
   const base = {
     mode,
     facts,
@@ -267,7 +285,7 @@ function run(
   const proven = (mine: Action[], oblivious: boolean): LethalResult => ({
     ...base,
     status: 'proven',
-    certainty: mode === 'public' ? 'any-hand' : 'needed-hidden-info',
+    certainty: mode === 'public' && extra.gaps.length === 0 ? 'any-hand' : 'needed-hidden-info',
     line: analyseLine(root, attacker, mine, refOf, cards).steps,
     actions: mine,
     viewActions: mine.map((a) => mapIds(a, refOf)),
@@ -321,12 +339,15 @@ export function lethal(
   if (input.mode === 'public') {
     const view = input.view;
     const me = view.player;
-    const pub = publicState(view, cards);
+    const pub = publicState(view, cards, input.model ?? 'full');
     const handles = view.skeleton.handles;
     const leader = view.zones[other(me)].leader[0]?.card ?? '';
     return run(pub.state, me, 'public', cap, cards, (id) => handles[id] ?? id, {
       maxPerCard: pub.maxPerCard,
       noPrior: pub.noPrior,
+      rests: pub.rests,
+      draws: pub.draws,
+      gaps: pub.gaps,
       hiddenLife: pub.hiddenLife,
       prior: leader ? priorFor(leader) : null,
     });
@@ -336,6 +357,9 @@ export function lethal(
   return run(state, attacker, 'actual', cap, cards, (id) => id, {
     maxPerCard: 0,
     noPrior: false,
+    rests: false,
+    draws: false,
+    gaps: [],
     hiddenLife: 0,
     prior: null,
   });
