@@ -66,6 +66,7 @@ export function cardFact(s: GameState, id: string, cards: ReadonlyMap<string, Ca
     name: cards.get(c.card)?.name ?? c.card,
     power: c.power ?? 0,
     isLeader: c.zone === 'leader',
+    keywords: c.keywords,
   };
 }
 

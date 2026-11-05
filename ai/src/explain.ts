@@ -40,6 +40,8 @@ export interface CardFact {
   name: string;
   power: number;
   isLeader: boolean;
+  /** Its keywords now (public), for what a hit on the Leader does (CR 10-1-2, 10-1-4). */
+  keywords?: readonly string[];
 }
 
 /** The battle the AI is defending, as both players can see it. */
@@ -70,6 +72,22 @@ const word = (n: number): string => WORDS[n] ?? String(n);
 
 function stopText(attack: number, defence: number): string {
   return `${attack} ${MINUS} ${defence} + 1000 = ${attack - defence + 1000}`;
+}
+
+/**
+ * What letting a hit through will do, stated before damage resolves (review M5a-17): true for any
+ * hidden Life card. [Double Attack] deals 2 damage, [Banish] trashes the Life card instead of
+ * adding it to the hand, and a Life card with a [Trigger] may be activated instead.
+ */
+export function takeOutcome(aiLife: number, attacker: CardFact): string {
+  const kw = attacker.keywords ?? [];
+  const lost = Math.min(aiLife, kw.includes('Double Attack') ? 2 : 1);
+  const after = aiLife - lost;
+  const cards = lost === 1 ? 'the Life card' : 'both Life cards';
+  const fate = kw.includes('Banish')
+    ? `[Banish] trashes ${cards}`
+    : `${cards} ${lost === 1 ? 'goes' : 'go'} to its hand unless it uses a [Trigger]`;
+  return `It drops to ${after} Life; ${fate}.`;
 }
 
 /** "your Leader", or the Character's name. */
@@ -307,7 +325,7 @@ export function explainTake(f: BattleFacts): Explanation {
       `It let the hit through at ${f.aiLife} Life.`,
       evidence,
       [{ kind: 'take', text: 'Take the hit.' }],
-      `It drops to ${f.aiLife - 1} Life, and the Life card goes to its hand.`,
+      takeOutcome(f.aiLife, f.attacker),
       'When they let a hit through at low Life, count their hand: they may be saving counters for a bigger attack, or have none.',
       ['CR 7-1-4-1-1-1', 'CR 7-1-4-1-1-2', 'SH-CTR'],
     );
@@ -317,7 +335,7 @@ export function explainTake(f: BattleFacts): Explanation {
     `It took the hit: at ${f.aiLife} Life, a hit is a card.`,
     evidence,
     [{ kind: 'take', text: 'Take the hit.' }],
-    'Lost 1 Life, and the Life card went to its hand.',
+    takeOutcome(f.aiLife, f.attacker),
     'At high Life, let a lone hit through. Keep counters for hits that would cost you the game or a Character you need.',
     ['CR 7-1-4-1-1-2', 'SH-CTR', 'SH-MIS'],
   );
