@@ -140,4 +140,15 @@ Neither difference is measurable at this size. The weights are kept for what the
 
 ### Pacing (review M5a-12)
 
-The per-push pacing check now uses iteration budgets, measures four AI turns (the late-game turn and the first three of a turn-1 game), and checks each turn on its own: the whole turn within 8 s, the board's own pacing within 8 s, and the time waiting on the worker within 1 s. It runs without CI's retry.
+The per-push pacing check now uses iteration budgets, measures four AI turns (the late-game turn and the first three of a turn-1 game), and checks each turn on its own. It runs without CI's retry.
+
+**After the fix round's added holds (2026-11-05).** The M5a-12 fixes added a 400 ms dwell after the AI's own effect picks and at the end of each DON!! group, as board.md §5.2 asks. That took the late-game turn (15 moves: two Queens with their draws, three DON!! groups, two attacks, King's activation, an Event with a reveal, Yamato, Mamaragan) from 6.8 s to **11.5 s**, and the "every turn within 8 s" check failed. The compression rule (§5.2) is now built: once the turn has spent 6 s of board time, non-attack dwells drop to 240 ms. Measured at 1× with iteration budgets, Chromium, production build:
+
+| Start | AI turn | Moves | Worker wait | Uncompressed | Compressed |
+| --- | --- | --- | --- | --- | --- |
+| Late-game position | 8 | 15 | 50 ms | 11.5 s | **10.0 s** |
+| Turn 1, seed 31 | 2 | 1 | 0 ms | 1.0 s | 1.0 s |
+| Turn 1, seed 31 | 4 | 6 | 37 ms | 3.5 s | 3.5 s |
+| Turn 1, seed 31 | 6 | 6 | 22 ms | 4.1 s | 4.1 s |
+
+The check now follows §5.2, which promises 8 s for a *typical* turn and budgets heavy turns above it rather than cutting attack holds (principle 10). A typical turn (at most 6 moves, §5.2's 3 moves and 3 attacks) must fit in 8 s of board pacing; the late turn, a heavy one with a fixed line, must fit in 10.6 s, which the uncompressed code fails; the nightly whole game allows heavy turns up to §5.2's 12.3 s; and the wait on the worker stays within 1 s on every turn. The table above in "AI turn time at 1×" is the pre-fix-round measurement.

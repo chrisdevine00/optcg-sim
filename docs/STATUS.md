@@ -1,7 +1,7 @@
 # Status
 
 **Phase:** 5 Build, slice pass (ADR 0012), starting at M0. Phases 1–4 gated 2026-10-28.
-**Milestone:** M5a AI slice: fix round 1 done 2026-10-29, awaiting re-review. M4a done 2026-10-29. M3 passes on code, with the NVDA screen-reader pass outstanding. M0, M1 and M2 done 2026-10-28.
+**Milestone:** M5a AI slice: fix round 1 done 2026-10-29 (pacing follow-up 2026-11-05), in re-review. M4a done 2026-10-29. M3 passes on code, with the NVDA screen-reader pass outstanding. M0, M1 and M2 done 2026-10-28.
 **Run the app:** `npm install && npm run dev` then open http://localhost:5173/optcg-sim/ and go to `/cards` for the card browser
 **Deployed:** https://chrisdevine00.github.io/optcg-sim/ (auto-deploys after green CI on `main`)
 
@@ -115,6 +115,7 @@
     - M5a-01: one public-only "Why?" builder (`ai/src/search/why.ts`) for every AI decision, forced or not; no term reasons, no "Only legal move.", no `search-incomplete` for the AI; "thinking" only on the AI's own turn. Guards: `ai/test/why-differential.test.ts` and the controller twin tests; both fail on the M5a code.
     - M5a-02: the skeleton keeps only the public shape of another player's decision and is opaque; `engine/test/property/skeleton-diff.test.ts` compares reachable pairs and fails on the M5a code.
     - M5a-03: a merged log line is announced again, whole; a live-region test.
+    - **Pacing follow-up (2026-11-05, on resume):** the fix round's new holds made the late-game AI turn 11.5 s and the per-push pacing e2e failed. Dwell compression (board.md §5.2) is now built from elapsed board time, not the plan (which would leak a long turn ahead); the late turn takes 10.0 s, and the check follows §5.2: typical turns ≤ 8 s, heavy turns bounded (DECISIONS 2026-11-05; benchmarks.md "Pacing"). Carried to M10 is now only the midline overlap.
     - Strength (benchmarks.md): 200/200 vs Rookie; 66/100 vs a shallow (no-rollout) Pirate, gate 60%, control 21/40; 100/100 with the opponent's list left out of the prior. Game-plan assertions now run with and without the biases; search alone finds 7 of 10 seeds in planted positions.
 
 ### Verification caveats
@@ -124,7 +125,8 @@
 
 ## Next (slice pass, PLAN.md §1)
 
-1. **M5a re-review** of fix round 1 (`docs/reviews/m5a-review.md`).
+1. **M5a re-review** of fix round 1 and the pacing follow-up (`docs/reviews/m5a-review.md`). Running 2026-11-05.
+1a. **M3 NVDA fixes** (F1 focus loss, FF1 Firefox assertive messages, then the severity-2 list), then re-run `a11y-nvda.yml`.
 2. **L Learning slice:** first, the carried M4a-16 (the veiled Use hint describes the last public activation, which can be the wrong effect; drive it from the decision's public source instead) and M4a-18 (an Event whose optional cost can't be paid looks fully usable; warn before it is wasted). Then the battle panel and DON!! overlay (`preview`), the tiered lethal detector, lethal search, the missed-lethal review flag end to end, and "Practice this". Then a manual screen-reader pass.
 3. **Owner usability session S1** on the real game (`usability-plan.md`).
 4. **M4b entry items:** M4a-17 (the veiled-Use safety check must use the engine's `secret` flag or a typed script walk, not a regex over the JSON); a check that each script's "you may" cost flag matches its card text; M4a-19 (four fixes have no test that fails on revert). Also, from M4a-10 ( not reachable with the Rocks and Kaido scripts, so fix before M4b scripts can reach them):

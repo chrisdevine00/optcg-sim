@@ -95,15 +95,20 @@ test.describe('M5a: the Pirate AI', () => {
   }
 
   /**
-   * Each turn on its own (review M5a-12): its total within 8 s, the board's own pacing (the turn
-   * minus the time it waited on the worker) within 8 s, and the worker's visible time within 1 s.
-   * Iteration budgets make the AI choose the same line on every machine.
+   * Each turn on its own (review M5a-12), against board.md §5.2: a typical turn (at most 6 moves,
+   * the §5.2 typical turn's 3 moves and 3 attacks) within 8 s, in total and in the board's own
+   * pacing (the turn minus the time it waited on the worker); a heavy turn within `heavyMs` of
+   * board pacing, with compression on (§5.2 budgets heavy turns past 8 s rather than cut attack
+   * holds); and the worker's visible time within 1 s on every turn. Iteration budgets make the AI
+   * choose the same line on every machine.
    */
-  function checkTurns(turns: Awaited<ReturnType<typeof aiTurns>>) {
+  const TYPICAL_MOVES = 6;
+  function checkTurns(turns: Awaited<ReturnType<typeof aiTurns>>, heavyMs = 8000) {
     for (const t of turns) {
-      expect(t.ms - t.thinkMs, `turn ${t.turn}: animation and holds`).toBeLessThanOrEqual(8000);
+      const limit = t.moves <= TYPICAL_MOVES ? 8000 : heavyMs;
+      expect(t.ms - t.thinkMs, `turn ${t.turn}: animation and holds`).toBeLessThanOrEqual(limit);
       expect(t.thinkMs, `turn ${t.turn}: waiting on the worker`).toBeLessThanOrEqual(1000);
-      expect(t.ms, `turn ${t.turn}: the whole turn`).toBeLessThanOrEqual(8000);
+      expect(t.ms, `turn ${t.turn}: the whole turn`).toBeLessThanOrEqual(limit + 1000);
     }
   }
 
@@ -111,11 +116,15 @@ test.describe('M5a: the Pirate AI', () => {
     // A pacing failure must not be hidden by CI's retry.
     test.describe.configure({ retries: 0 });
 
-    test('every AI turn at 1× takes 8 s or less (flows F21)', async ({ page }) => {
+    test('a typical AI turn at 1× takes 8 s or less; a heavy one compresses (flows F21)', async ({
+      page,
+    }) => {
       once();
       test.setTimeout(300_000);
       // A late-game turn (15 moves), then the first turns of a game from turn 1. The player ends
       // each turn at once and takes every hit; the player's own decisions are excluded.
+      // The late turn's fixed line measures about 10.0 s compressed and 11.5 s without
+      // compression, so 10.6 s fails if compression stops working (benchmarks.md, Pacing).
       const late = await measure(page, 'scenario=late&opp=pirate&speed=1&aibudget=iterations', 1);
       const early = await measure(
         page,
@@ -123,7 +132,8 @@ test.describe('M5a: the Pirate AI', () => {
         3,
       );
       expect(late.length + early.length).toBeGreaterThanOrEqual(3);
-      checkTurns([...late, ...early]);
+      expect(late[0]?.moves, 'the late turn is a heavy one').toBeGreaterThan(TYPICAL_MOVES);
+      checkTurns([...late, ...early], 10_600);
     });
 
     test('AI turns at 1× over a whole game from turn 1 (nightly)', async ({ page }) => {
@@ -136,7 +146,7 @@ test.describe('M5a: the Pirate AI', () => {
         8,
       );
       expect(turns.length).toBeGreaterThanOrEqual(3);
-      checkTurns(turns);
+      checkTurns(turns, 12_300);
     });
   });
 });

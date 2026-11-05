@@ -75,7 +75,22 @@ const T = {
   stillThinking: 3000,
   /** The AI's Refresh + Draw + DON!! segment; its turn plan starts with it (board.md §5.2). */
   turnStart: 700,
+  /** The non-attack dwell once the AI's turn has run this long on the board (board.md §5.2). */
+  dwellCompressed: 240,
+  compressAfter: 6000,
 };
+
+/**
+ * The hold after a non-attack move on the AI's own turn (board.md §5.2 compression rule). Once the
+ * turn has spent `boardMs` of board time (the human's decisions and the wait on the worker left
+ * out) past 6 s, plays, DON!! groups and effect picks hold 240 ms instead of 400. Attacks and
+ * battle results never compress. It is a function of what the player has already seen, never of
+ * the AI's plan, whose length depends on its hidden hand (DECISIONS 2026-11-05). Not in Step mode
+ * or below 1×.
+ */
+export function aiDwell(boardMs: number, speed: Speed): number {
+  return speed !== 'step' && speed >= 1 && boardMs >= T.compressAfter ? T.dwellCompressed : T.dwell;
+}
 
 const reducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -766,12 +781,14 @@ export class GameController {
           next !== null &&
           ((next.type === 'giveDon' && next.target === action.target) ||
             (next.type === 'attack' && next.attacker === action.target));
-        if (!continues) await this.wait(T.dwell, { dwell: true });
-      } else if (action.type !== 'endTurn') await this.wait(T.move + T.dwell, { dwell: true });
-      else await this.wait(300);
+        if (!continues) await this.wait(this.ownDwell(), { dwell: true });
+      } else if (action.type !== 'endTurn') {
+        await this.wait(T.move);
+        await this.wait(this.ownDwell(), { dwell: true });
+      } else await this.wait(300);
     } else if (ownTurn && (action.type === 'pick' || (action.type === 'optional' && action.accept)))
       // Its own effect's choice changed the board (a K.O., a −2000): hold it (review M5a-12).
-      await this.wait(T.dwell, { dwell: true });
+      await this.wait(this.ownDwell(), { dwell: true });
     if (this.battleEndedSince(before)) await this.wait(T.damage + T.dwellAttack, { dwell: true });
     if (action.type === 'endTurn' && this.aiTurn && this.aiTurn.turn === view.turn.number) {
       const t = this.aiTurn;
@@ -788,6 +805,13 @@ export class GameController {
       this.stepWaiting = true;
       this.bump();
     }
+  }
+
+  /** The non-attack dwell for the AI's own turn now: compressed late in a long turn. */
+  private ownDwell(): number {
+    const t = this.aiTurn;
+    if (!t) return T.dwell;
+    return aiDwell(performance.now() - t.start - t.humanMs - t.thinkMs, this.speed);
   }
 
   /** The AI's next action if it is already requested (the prefetch), else null. */
