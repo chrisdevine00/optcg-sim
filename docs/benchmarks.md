@@ -152,3 +152,10 @@ The per-push pacing check now uses iteration budgets, measures four AI turns (th
 | Turn 1, seed 31 | 6 | 6 | 22 ms | 4.1 s | 4.1 s |
 
 The check now follows §5.2, which promises 8 s for a *typical* turn and budgets heavy turns above it rather than cutting attack holds (principle 10). A typical turn (at most 6 moves, §5.2's 3 moves and 3 attacks) must fit in 8 s of board pacing; the late turn, a heavy one with a fixed line, must fit in 10.6 s, which the uncompressed code fails; the nightly whole game allows heavy turns up to §5.2's 12.3 s; and the wait on the worker stays within 1 s on every turn. The table above in "AI turn time at 1×" is the pre-fix-round measurement.
+
+### Setup copy (review M5a-21, 2026-11-05)
+
+The turn-time lines on the Setup screen are exported from `app/src/play/setup/Setup.tsx` and checked against this file by `app/test/carried.test.ts`; if the numbers here change, change the copy with them.
+
+- Pirate: typically 1–8 s a turn at 1×, up to about 10 s for a long one. From the Pacing section above: ordinary turns 1.0–7.5 s (a typical turn, at most 6 moves, must fit 8 s), the 15-move late-game turn 10.0 s.
+- Rookie: typically 1–8 s a turn at 1×, up to about 12 s for a long one. First measured 2026-11-05 (Chromium, production build, 1×, iteration budgets, the player ends each turn at once and takes every hit; `seed=31`, `seed=7` and `scenario=late`, 12 turns). Turns of 6 moves or fewer took 1.0–4.0 s; longer turns took 4.8–12.1 s (the longest, 17 moves, 12.1 s). Rookie plays more moves per turn than the Pirate because it has no plan, which is why its long turns run longer.

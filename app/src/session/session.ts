@@ -630,6 +630,23 @@ export class GameSession {
     return out;
   }
 
+  /** The game's turns in order, with whose each was (the review timeline's columns). */
+  turns(): { turn: number; player: PlayerId }[] {
+    const out: { turn: number; player: PlayerId }[] = [];
+    let s = this.initial;
+    const note = () => {
+      const t = queries.turn(s);
+      if (t.number > 0 && out.at(-1)?.turn !== t.number)
+        out.push({ turn: t.number, player: t.activePlayer });
+    };
+    note();
+    for (const a of this.record.actions) {
+      s = reduce(s, a).state;
+      note();
+    }
+    return out;
+  }
+
   /** Replays the record from scratch and checks it lands on the same state (tests, bug reports). */
   verify(): boolean {
     const r = replay(this.record, this.cards);

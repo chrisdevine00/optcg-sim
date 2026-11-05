@@ -14,7 +14,7 @@ import { SCENARIOS } from './scenarios.ts';
  * fails when the two drift apart.
  */
 export const TURN_TIME_PIRATE = 'typically 1–8 s a turn at 1×, up to about 10 s for a long one';
-export const TURN_TIME_ROOKIE = 'about 1–5 s a turn at 1×';
+export const TURN_TIME_ROOKIE = 'typically 1–8 s a turn at 1×, up to about 12 s for a long one';
 
 /** The opponent: an AI tier, or a second player at this device. */
 export type Opponent = 'pirate' | 'rookie' | 'hotseat';

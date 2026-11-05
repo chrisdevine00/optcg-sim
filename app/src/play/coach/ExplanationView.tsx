@@ -109,7 +109,10 @@ export function ExplanationView({
         <ol className="why-line ex-line" aria-label="The line">
           {ex.line.map((m, i) => (
             <li key={i}>
-              <span>{m.text}</span>
+              <span className="ex-n" aria-hidden="true">
+                {i + 1}.
+              </span>
+              <span className="ex-text">{m.text}</span>
               {onShow && (
                 <button
                   type="button"

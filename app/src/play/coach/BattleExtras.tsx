@@ -61,11 +61,26 @@ export function theyCouldHave(
   return { blockers, effects, hand, perCard, total: hand * perCard, assumed: !prior };
 }
 
-export function WhatTheyCouldHave({ they }: { they: TheyCouldHave }) {
+export function WhatTheyCouldHave({
+  they,
+  compact = false,
+}: {
+  they: TheyCouldHave;
+  /** A short panel (tablet, a 600 px window) keeps one line: the hand's bound. */
+  compact?: boolean;
+}) {
   const { blockers, effects, hand, perCard, total, assumed } = they;
+  if (compact)
+    return (
+      <p className="bx-note" data-testid="what-they-could-have">
+        <b>They could have:</b> {blockers.length} {blockers.length === 1 ? 'Blocker' : 'Blockers'},{' '}
+        {hand} {hand === 1 ? 'card' : 'cards'}
+        {hand > 0 ? `, up to +${num(total)} of Counters` : ''}.
+      </p>
+    );
   return (
     <section className="bx" aria-label="What they could have" data-testid="what-they-could-have">
-      <h4 className="bx-h">What they could have</h4>
+      <h3 className="bx-h">What they could have</h3>
       <ul className="bx-list">
         <li>
           {blockers.length === 0
@@ -104,7 +119,7 @@ export function WhatYouHave({
 }) {
   return (
     <section className="bx" aria-label="What you have" data-testid="what-you-have">
-      <h4 className="bx-h">What you have</h4>
+      <h3 className="bx-h">What you have</h3>
       <ul className="bx-list">
         <li>
           {counters} Counter {counters === 1 ? 'card' : 'cards'}
@@ -117,7 +132,9 @@ export function WhatYouHave({
             active DON!! for costs.
           </li>
         )}
-        {events === 0 && <li>{activeDon} active DON!! (nothing to spend them on here).</li>}
+        {events === 0 && activeDon > 0 && (
+          <li>{activeDon} active DON!!: no Event Counter in hand to pay for.</li>
+        )}
       </ul>
     </section>
   );
@@ -132,12 +149,12 @@ const NOTES: Record<NoteKind, string> = {
 };
 
 /** A rule footnote, shown the first three times it is relevant per profile (§2.7). */
-export function RuleNote({ kind }: { kind: NoteKind }) {
+export function RuleNote({ kind, compact = false }: { kind: NoteKind; compact?: boolean }) {
   const [seen] = useState(() => noteCount(kind));
   useEffect(() => {
     bumpNote(kind);
   }, [kind]);
-  if (seen >= 3) return null;
+  if (seen >= 3 || compact) return null;
   return (
     <p className="bx-note" data-testid={`note-${kind}`}>
       {NOTES[kind]}

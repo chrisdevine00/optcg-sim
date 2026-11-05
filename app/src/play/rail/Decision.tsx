@@ -20,12 +20,7 @@ import {
 } from '../game/text.ts';
 import type { G, Staging } from '../game/ui.ts';
 import { confirmWaste, unpayable, UNPAYABLE_NOTE } from '../game/unpayable.ts';
-import {
-  RuleNote,
-  WhatTheyCouldHave,
-  WhatYouHave,
-  theyCouldHave,
-} from '../coach/BattleExtras.tsx';
+import { RuleNote, WhatTheyCouldHave, WhatYouHave, theyCouldHave } from '../coach/BattleExtras.tsx';
 
 export function isTall(g: G): boolean {
   const k = g.view.decision?.kind;
@@ -976,6 +971,10 @@ function confirmContent(g: G, attacker: string, target: string): Content {
           : '✕ Attack fails';
   const need = ap >= tp ? ap - tp + 1000 : 0;
   const hand = g.view.zones[opp].hand.length;
+  // The coach's additions (learning-ui §2.7) are for games against the AI, and only where the
+  // tall body has room: a short window keeps one line, so a tall body never scrolls (board.md §3.9).
+  const coachOn = !g.ctl.hotseat;
+  const short = g.L.rail.tall.parts[1] < 400;
   return {
     title: `Attack · ${g.nameOf(attacker)} → ${t?.zone === 'leader' ? 'their Leader' : g.nameOf(target)}`,
     tall: true,
@@ -1003,11 +1002,13 @@ function confirmContent(g: G, attacker: string, target: string): Content {
             They need <b>+{num(need)}</b> to survive · {hand} cards in hand
           </p>
         )}
-        {t?.zone === 'leader' && !g.ctl.hotseat && (
-          <WhatTheyCouldHave they={theyCouldHave(g.view, opp, g.cards)} />
+        {t?.zone === 'leader' && coachOn && (
+          <WhatTheyCouldHave they={theyCouldHave(g.view, opp, g.cards)} compact={short} />
         )}
-        {ap === tp && <RuleNote kind="ties" />}
-        {(findCard(g, attacker)?.don ?? 0) > 0 && <RuleNote kind="don" />}
+        {coachOn && ap === tp && <RuleNote kind="ties" compact={short} />}
+        {coachOn && (findCard(g, attacker)?.don ?? 0) > 0 && (
+          <RuleNote kind="don" compact={short} />
+        )}
         {findCard(g, attacker)?.keywords.includes('Double Attack') && (
           <p>Double Attack: 2 damage.</p>
         )}
@@ -1314,7 +1315,7 @@ function defenceContent(g: G): Content {
             {s.blocker ? 'K.O.s the Blocker' : 'hits'}. Add {num(need)} more, or keep your cards.
           </p>
         )}
-        {!hidden && (
+        {!hidden && !g.ctl.hotseat && g.L.rail.tall.parts[1] >= 400 && (
           <WhatYouHave
             counters={counterCards.length}
             worth={counterCards.reduce((t, c) => t + (g.cardOf(c.handle)?.card?.counter ?? 0), 0)}
@@ -1323,8 +1324,12 @@ function defenceContent(g: G): Content {
             staged={s.counters.length}
           />
         )}
-        {ap === tp && <RuleNote kind="ties" />}
-        {staged && !hidden && <RuleNote kind="battle" />}
+        {!g.ctl.hotseat && ap === tp && (
+          <RuleNote kind="ties" compact={g.L.rail.tall.parts[1] < 400} />
+        )}
+        {!g.ctl.hotseat && staged && !hidden && (
+          <RuleNote kind="battle" compact={g.L.rail.tall.parts[1] < 400} />
+        )}
         <div className="lanes">
           <div className="lane">
             <span className="ln">Block</span>

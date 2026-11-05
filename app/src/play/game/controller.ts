@@ -219,6 +219,7 @@ export class GameController {
       me: config.human,
       hotseat: config.mode === 'hotseat',
       readOnly: this.readOnly,
+      puzzle: this.puzzle !== null,
       cards,
       session: this.session,
       myDecision: () => this.myDecision(),
@@ -268,7 +269,25 @@ export class GameController {
 
   private bump(): void {
     this.coach.sync();
+    this.checkPuzzle();
     this.notifyRaw();
+  }
+
+  private puzzleNoted = false;
+  /** A lethal puzzle says how it went, once: politely, and (failed) with a toast. */
+  private checkPuzzle(): void {
+    if (!this.puzzle || this.puzzleNoted) return;
+    const s = this.puzzleState();
+    if (s !== 'solved' && s !== 'failed') return;
+    this.puzzleNoted = true;
+    if (s === 'failed')
+      this.toast =
+        'Not this time: the turn ended without a win. Use ⌂ to go back to the review and try again.';
+    this.announce(
+      s === 'solved'
+        ? 'Solved: you found lethal.'
+        : 'Not this time: the turn ended without a win. Use the home button to go back to the review.',
+    );
   }
 
   /** Re-render without re-reading the coach's position (the coach calls this itself). */

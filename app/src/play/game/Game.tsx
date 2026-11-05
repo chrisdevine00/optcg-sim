@@ -623,12 +623,11 @@ export function Game({
     }
 
     // The coach keys (accessibility §3.12): L reveals the next lethal tier, C opens or closes the
-    // coach. They work from the board, the decision panel and the coach itself.
+    // coach. They work wherever focus is, except in a text field (handled above).
     if (
       !e.altKey &&
       !e.ctrlKey &&
       !e.metaKey &&
-      (scoped || t?.closest('.coach')) &&
       !ctl.hotseat &&
       !ctl.readOnly &&
       (key === 'l' || key === 'L' || key === 'c' || key === 'C')
@@ -1252,6 +1251,15 @@ export function Game({
                 }}
                 onHome={onHome}
                 rewound={ctl.session.rewound}
+                puzzle={
+                  ctl.puzzle
+                    ? ctl.puzzleState() === 'solved'
+                      ? 'Practice · solved'
+                      : ctl.puzzleState() === 'failed'
+                        ? 'Practice · not this time'
+                        : 'Practice'
+                    : null
+                }
               />
             </div>
             {dock.handle && dockRect && (

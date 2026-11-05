@@ -10,7 +10,7 @@ import type { Explanation } from '@optcg/ai';
 import type { G } from '../game/ui.ts';
 import { num } from '../game/text.ts';
 import { CertaintyChip, ExplanationView } from './ExplanationView.tsx';
-import type { Coach, GuidedState, Tier } from './coach.ts';
+import type { GuidedState, Tier } from './coach.ts';
 import type { AlwaysOn } from './profile.ts';
 import { lethalBadge } from './badge.ts';
 import './coach.css';
@@ -174,7 +174,6 @@ function LethalSection({
   const coach = g.ctl.coach;
   const { lethal, guided, profile } = coach;
   const t1 = coach.tier1();
-  const t2 = coach.tier2();
   const tier: Tier = lethal.tier;
   const settings = (
     <label className="coach-setting">
@@ -191,52 +190,51 @@ function LethalSection({
       </select>
     </label>
   );
-  if (!lethal.key)
-    return (
-      <div ref={resultRef} tabIndex={-1} className="coach-result" aria-label="Lethal">
-        <p className="subtle">
-          {g.ctl.hotseat
-            ? 'The lethal detector is for games against the AI.'
-            : 'Available in your Main Phase, once it is your move.'}
-        </p>
-        {settings}
-      </div>
-    );
-  if (guided)
-    return (
-      <div ref={resultRef} tabIndex={-1} className="coach-result" aria-label="Count it with me">
-        <GuidedCount g={g} guided={guided} />
-      </div>
-    );
+  // One tree for every state, with the detector setting in the same slot, so changing it (which
+  // re-renders this section) never remounts the control or drops the keyboard's place in it.
+  const unavailable = !lethal.key;
+  const label = guided ? 'Count it with me' : 'Lethal';
   return (
-    <div ref={resultRef} tabIndex={-1} className="coach-result" aria-label="Lethal">
-      {tier === 0 && lethal.status === 'idle' && (
-        <>
-          <p className="coach-lead">
-            Is there lethal this turn? Reveal one step at a time: whether it exists, how many hits,
-            then the line.
+    <div ref={resultRef} tabIndex={-1} className="coach-result" role="group" aria-label={label}>
+      <div className="coach-state">
+        {unavailable && (
+          <p className="subtle">
+            {g.ctl.hotseat
+              ? 'The lethal detector is for games against the AI.'
+              : 'Available in your Main Phase, once it is your move.'}
           </p>
-          <button type="button" className="btn small primary" onClick={() => coach.press()}>
-            Check for lethal <kbd>L</kbd>
-          </button>
-        </>
-      )}
-      {lethal.status === 'checking' && (
-        <div className="coach-checking" role="status">
-          <span className="coach-bar" aria-hidden="true" />
-          <span>Checking…</span>
-        </div>
-      )}
-      {lethal.status === 'failed' && (
-        <>
-          <p>Couldn’t finish checking.</p>
-          <button type="button" className="btn small" onClick={() => coach.retry()}>
-            Check again
-          </button>
-        </>
-      )}
-      {lethal.status === 'ready' && t1 && tier >= 1 && tier < 3 && <Tiers g={g} />}
-      {lethal.status === 'ready' && tier >= 3 && <Tier3 g={g} />}
+        )}
+        {!unavailable && guided && <GuidedCount g={g} guided={guided} />}
+        {!unavailable && !guided && tier === 0 && lethal.status === 'idle' && (
+          <>
+            <p className="coach-lead">
+              Is there lethal this turn? Reveal one step at a time: whether it exists, how many
+              hits, then the line.
+            </p>
+            <button type="button" className="btn small primary" onClick={() => coach.press()}>
+              Check for lethal <kbd>L</kbd>
+            </button>
+          </>
+        )}
+        {!unavailable && !guided && lethal.status === 'checking' && (
+          <div className="coach-checking" role="status">
+            <span className="coach-bar" aria-hidden="true" />
+            <span>Checking…</span>
+          </div>
+        )}
+        {!unavailable && !guided && lethal.status === 'failed' && (
+          <>
+            <p>Couldn’t finish checking.</p>
+            <button type="button" className="btn small" onClick={() => coach.retry()}>
+              Check again
+            </button>
+          </>
+        )}
+        {!unavailable && !guided && lethal.status === 'ready' && t1 && tier >= 1 && tier < 3 && (
+          <Tiers g={g} />
+        )}
+        {!unavailable && !guided && lethal.status === 'ready' && tier >= 3 && <Tier3 g={g} />}
+      </div>
       {settings}
     </div>
   );

@@ -9,6 +9,7 @@ import { Header } from '../Header.tsx';
 import { navigate } from '../router.tsx';
 import { GameController, type GameConfig, type Speed } from './game/controller.ts';
 import { Game } from './game/Game.tsx';
+import { ReviewFlow } from './review/ReviewFlow.tsx';
 import { Setup, type SetupChoice } from './setup/Setup.tsx';
 import { deckById, deckByLeader, loadCards } from './setup/decks.ts';
 import { priorCardIds } from '@optcg/ai';
@@ -126,6 +127,8 @@ export default function PlayRoute() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const last = useRef<SetupChoice | null>(null);
+  // The finished game is being reviewed (learning-ui §4): the controller stays, its record is read.
+  const [reviewing, setReviewing] = useState(false);
 
   const begin = (choice: SetupChoice) => {
     last.current = choice;
@@ -137,6 +140,7 @@ export default function PlayRoute() {
           old?.dispose();
           return c;
         });
+        setReviewing(false);
         c.start();
       })
       .catch((e: unknown) => setError(e instanceof Error ? e.message : String(e)))
@@ -149,16 +153,22 @@ export default function PlayRoute() {
     document.title = ctl ? 'Game · OPTCG Sim' : 'New game · OPTCG Sim';
   }, [ctl]);
 
+  const goHome = () => {
+    ctl?.dispose();
+    setCtl(null);
+    setReviewing(false);
+    navigate('/');
+  };
+  if (ctl && reviewing) {
+    return <ReviewFlow ctl={ctl} onBackToGame={() => setReviewing(false)} onHome={goHome} />;
+  }
   if (ctl) {
     return (
       <Game
         key={ctl.session.seed + ':' + String(ctl.config.mode)}
         ctl={ctl}
-        onHome={() => {
-          ctl.dispose();
-          setCtl(null);
-          navigate('/');
-        }}
+        {...(ctl.config.mode === 'ai' ? { onReview: () => setReviewing(true) } : {})}
+        onHome={goHome}
         onNewGame={() => {
           ctl.dispose();
           setCtl(null);

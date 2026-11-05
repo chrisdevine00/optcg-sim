@@ -38,6 +38,8 @@ export interface CoachHost {
   readonly me: PlayerId;
   readonly hotseat: boolean;
   readonly readOnly: boolean;
+  /** A lethal puzzle from a review flag (no background checks). */
+  readonly puzzle: boolean;
   readonly cards: Map<string, Card>;
   readonly session: GameSession;
   myDecision(): boolean;
@@ -130,7 +132,8 @@ export class Coach {
     this.shown = null;
     this.wantTall = false;
     this.lethal = { ...IDLE, key };
-    if (key && this.profile.alwaysOn > 0) this.request(true);
+    // A puzzle never checks for you (it is the exercise); the Lethal button still answers a press.
+    if (key && this.profile.alwaysOn > 0 && !this.host.puzzle) this.request(true);
     this.host.notify();
   }
 

@@ -23,6 +23,7 @@ export function RailHeader({
   onFullscreen,
   onHome,
   rewound,
+  puzzle,
 }: {
   top: number;
   height: number;
@@ -34,6 +35,8 @@ export function RailHeader({
   onFullscreen: () => void;
   onHome: () => void;
   rewound: boolean;
+  /** A lethal puzzle from a review flag: its chip text ("Practice", "Solved"). */
+  puzzle?: string | null;
 }) {
   return (
     <div className="rail-top" style={{ top, height: height + noticeH }}>
@@ -45,6 +48,15 @@ export function RailHeader({
             title="This game was rewound: it won’t count in your win rate"
           >
             Rewound
+          </span>
+        )}
+        {puzzle && (
+          <span
+            className="chip outline"
+            data-testid="puzzle-chip"
+            title="A lethal puzzle cut from your game: win this turn. Home goes back to the review."
+          >
+            {puzzle}
           </span>
         )}
         <span className="spacer" />

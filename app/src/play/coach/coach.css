@@ -157,8 +157,14 @@
   font-weight: var(--weight-semibold);
 }
 .ex-line {
-  list-style-position: inside;
+  list-style: none;
   padding-left: 0;
+}
+.ex-n {
+  flex: none;
+  min-width: 18px;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
 }
 .ex-line li {
   display: flex;
@@ -166,7 +172,7 @@
   align-items: baseline;
   justify-content: space-between;
 }
-.ex-line li > span {
+.ex-line li > .ex-text {
   flex: 1;
 }
 .ex-show {
