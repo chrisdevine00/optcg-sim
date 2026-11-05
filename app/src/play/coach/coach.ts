@@ -76,8 +76,12 @@ export interface GuidedState {
 
 const IDLE: LethalState = { key: null, status: 'idle', result: null, tier: 0, auto: false };
 
-/** Wall-clock cap for the live detector: a late answer is "Couldn't finish checking", never "no lethal". */
-const CAP_MS = 1500;
+/**
+ * Wall-clock caps for the live detector: a search that runs out is "Couldn't finish checking",
+ * never "no lethal". The coach's worker is its own, so a long search never delays the AI's turn.
+ * The background detector is short, a press longer, "Check again" longer still.
+ */
+const CAP_MS = { auto: 1500, press: 3000, retry: 8000 } as const;
 
 /** Card ids a view lets its player identify (all public to that player). */
 export function visibleIds(v: ProjectedView): Set<string> {
@@ -161,7 +165,7 @@ export class Coach {
     return this.port;
   }
 
-  private request(auto: boolean): void {
+  private request(auto: boolean, capMs: number = auto ? CAP_MS.auto : CAP_MS.press): void {
     const key = this.lethal.key;
     if (!key) return;
     const view = this.host.session.view(this.host.me);
@@ -176,7 +180,7 @@ export class Coach {
     port.reveal(cards);
     const r = port.lethal(this.host.session.searchView(this.host.me), {
       priority: auto ? 4 : 2,
-      capMs: CAP_MS,
+      capMs,
     });
     this.pending = { id: r.id, key, auto };
     this.lethal = { ...this.lethal, status: 'checking', auto };
@@ -320,7 +324,7 @@ export class Coach {
     if (!this.lethal.key) return;
     this.cancelPending();
     this.lethal = { ...this.lethal, status: 'idle', result: null };
-    this.request(false);
+    this.request(false, CAP_MS.retry);
     this.host.notify();
   }
 

@@ -1258,7 +1258,9 @@ export function Game({
                       : ctl.puzzleState() === 'failed'
                         ? 'Practice · not this time'
                         : 'Practice'
-                    : null
+                    : ctl.config.restore && !ctl.readOnly
+                      ? 'From review'
+                      : null
                 }
               />
             </div>

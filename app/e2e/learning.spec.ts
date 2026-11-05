@@ -231,6 +231,46 @@ test.describe('the battle panel on defence', () => {
   });
 });
 
+test.describe('an Event that cannot pay its cost (M4a-18)', () => {
+  test('is marked before it is wasted and asks for a second press', async ({ page }) => {
+    // The `skip` scenario with Wo Ro (OP17-076) as the only card in hand: its optional cost
+    // (trash a card from hand) cannot be paid, so activating it would waste it.
+    const spec = {
+      mode: 'ai',
+      seed: 3,
+      turn: 4,
+      activePlayer: 'p2',
+      firstPlayer: 'p1',
+      p1: {
+        leader: 'ST01-001',
+        life: ['OP01-010', 'OP01-012'],
+        hand: ['OP17-076'],
+        deck: Array.from({ length: 10 }, () => 'OP01-010'),
+        costArea: { active: 0, rested: 4 },
+      },
+      p2: {
+        leader: { card: 'ST04-001', don: 2 },
+        life: ['OP01-010', 'OP01-012'],
+        hand: [],
+        deck: Array.from({ length: 10 }, () => 'OP01-012'),
+        costArea: { active: 0, rested: 2 },
+      },
+    };
+    const b64 = Buffer.from(JSON.stringify(spec)).toString('base64url');
+    await serveArt(page);
+    await page.goto(`./play?scenario=json:${b64}&opp=rookie&speed=4&start=1`);
+    // The AI attacks; the player is asked to block or counter.
+    expect(['block', 'counter']).toContain(await nextDecision(page));
+    const eventCounter = page.locator('[data-event-counter]');
+    await expect(eventCounter).toBeVisible();
+    await expect(page.getByTestId('unpayable')).toContainText('can’t pay its cost now');
+    // The first press warns and does nothing; the log shows no activation.
+    await eventCounter.click();
+    await expect(page.locator('.whynot')).toContainText('Press again');
+    await expect(page.locator('.log-row').filter({ hasText: 'Counter' })).toHaveCount(0);
+  });
+});
+
 test.describe('the missed-lethal review (learning-ui §4.2–4.5)', () => {
   async function concede(page: Page) {
     await page.getByRole('button', { name: 'Game menu' }).click();

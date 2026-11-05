@@ -1,7 +1,7 @@
 # Status
 
 **Phase:** 5 Build, slice pass (ADR 0012), starting at M0. Phases 1–4 gated 2026-10-28.
-**Milestone:** L Learning slice next. M5a done 2026-11-05 (re-review 1 PASS). M4a done 2026-10-29. M3 passes on code, with the NVDA screen-reader pass outstanding. M0, M1 and M2 done 2026-10-28.
+**Milestone:** L Learning slice built and merged; independent review next. M5a done 2026-11-05 (re-review 1 PASS). M4a done 2026-10-29. M3: NVDA re-run PASS in Chrome; Firefox re-running after a harness fix. M0, M1 and M2 done 2026-10-28.
 **Run the app:** `npm install && npm run dev` then open http://localhost:5173/optcg-sim/ and go to `/cards` for the card browser
 **Deployed:** https://chrisdevine00.github.io/optcg-sim/ (auto-deploys after green CI on `main`)
 
@@ -123,10 +123,16 @@
     - **Pacing follow-up (2026-11-05, on resume):** the fix round's new holds made the late-game AI turn 11.5 s and the per-push pacing e2e failed. Dwell compression (board.md §5.2) is now built from elapsed board time, not the plan (which would leak a long turn ahead); the late turn takes 10.0 s, and the check follows §5.2: typical turns ≤ 8 s, heavy turns bounded (DECISIONS 2026-11-05; benchmarks.md "Pacing"). Carried to M10 is now only the midline overlap.
     - Strength (benchmarks.md): 200/200 vs Rookie; 66/100 vs a shallow (no-rollout) Pirate, gate 60%, control 21/40; 100/100 with the opponent's list left out of the prior. Game-plan assertions now run with and without the biases; search alone finds 7 of 10 seeds in planted positions.
 
-### L Learning slice: the engine-and-AI half is built (branch `worktree-agent-a5cbf39c892951813`); the UI half is not
-- **Done:** `lethal` (`public` and `actual` modes, Triggers as a labelled chance, node and wall-clock caps) in `ai/src/search/lethal/`; the `lethal` worker request with priorities 2 to 4 and cancel; tiers 1 to 3 (`tier1`, `tier2`, `explainLethal`; E20, E01, E02 and E03 are snapshot-tested against `explanations.md`); the guided count's data and `checkGuidedCount`; `reviewMissedLethal` (planted record flagged `any-hand` with a correct line). Decisions: DECISIONS 2026-11-05 (two entries). Tests: `ai/test/lethal.test.ts`, `lethal-review.test.ts`, `lethal-games.test.ts` (`npm run test:lethal` for the long run).
-- **A1 corrected (2026-11-05):** `public` lethal now models every [Counter] effect in the defender's prior (OP07-076's rest, OP15-078's draw) as the defender's choice. A planted test proves the old model wrong, and a coverage test fails on any unmodelled future Counter. Cost: E20 now takes 128,700 nodes (4.0 s), and Kaido positions hit the cap ("Couldn't finish checking") more often.
-- **Not done:** the opponent's-turn threat check (the skeleton refuses a foreign decision, M5a-02), the "lethal given away" flag, and a Blocker removed by an effect as a planted test (no scripted card does it). The UI (coach panel, guided count, flags on the review timeline, "Practice this") is next.
+### L Learning slice: both halves built and merged; review and the screen-reader pass next
+- **Engine and AI half** (merged earlier): `lethal` (`public` and `actual`), the tiered answers, the guided count's data, `reviewMissedLethal`, the `lethal` worker request. **A1 corrected** (c2e4054): `public` lethal models every [Counter] effect in the prior; the UI suites pass on top of it.
+- **UI half** (merged 2026-11-05, DECISIONS 2026-11-05 "L UI" entries):
+  - **Carried:** M4a-16, M4a-18, M5a-18 guards, M5a-21 (Setup copy matches benchmarks.md; Rookie measured).
+  - **Coach strip** in the rail (Why, Lethal, chevron; `L` and `C` keys) and the **tiered detector**: tiers 1 to 3, Checking/Proven/Refuted/Unknown, the Trigger note, the always-on settings at priority 4 with a badge and a polite line, Show on the line. It runs `public` only, in a second worker holding only the player's own data. Not offered in hotseat.
+  - **"Count it with me"**: four questions in the tall coach, checked by `checkGuidedCount`; the board sandbox is replaced by a table in the panel (DECISIONS).
+  - **Battle panel**: "What they could have" (public bound) on your attack, "What you have" on defence, rule footnotes.
+  - **Missed-lethal review** end to end: after a game, "Review this game" runs the check in a worker; Overview with a turn timeline, flag list and Explanation; Study (restored read-only board); Play from here; Practice this (a lethal puzzle, judged on its turn).
+  - **Tests:** 1,084 unit tests before this branch's last additions (`npm test`), with new `app/test/coach.test.ts`, `review.test.ts`, `carried.test.ts`, `ai-guards.test.ts`; `app/e2e/learning.spec.ts` (keyboard-only tiers, Count it with me, always-on, hidden-information pair, battle panel, unpayable Event, the planted game through Study and Practice, axe on every panel, screenshots in `.cache/l/`).
+- **Not done:** the opponent's-turn threat check (the skeleton refuses a foreign decision, M5a-02), the "lethal given away" flag, the board sandbox for the guided count, "Do step 1", the Hint, DON!! math and Tempo sections, "DON!! math on the board", the opponent row and Life sparkline on the review timeline, History, any-hand puzzles with a harder hand than the real one (all in DECISIONS), and the manual screen-reader pass of the new panels (nothing here was heard in a screen reader).
 
 ### Verification caveats
 - A worktree that symlinks the main tree's `node_modules` resolves `@optcg/*` to the main tree. Use `npm ci` in the worktree.
@@ -135,9 +141,9 @@
 
 ## Next (slice pass, PLAN.md §1)
 
-0. **In flight (2026-11-05):** (a) the M3 NVDA fixes are merged; the NVDA workflow re-run is pending. (b) L's lethal search is merged (b850c18, 7d8f5a5); its A1 soundness fix is merged. (c) A builder is writing L's UI half (`app/`). M5a-17 is fixed (37d2c01).
+0. **In flight (2026-11-05):** the Firefox NVDA re-run (run 42125614507) after the step 15 harness fix; Chrome's re-run passed (`docs/design/a11y-passes/m3-nvda-chrome-r2.md`). Then the remaining severity-2 NVDA items F3, F7, F8 and F15.
 1. **M3:** record the NVDA re-run in `docs/design/a11y-passes/`; M3 is done when neither browser has an open severity 3 or 4.
-2. **L Learning slice:** first, the carried M5a-17, M5a-18, M5a-21, M4a-16 (the veiled Use hint describes the last public activation, which can be the wrong effect; drive it from the decision's public source instead) and M4a-18 (an Event whose optional cost can't be paid looks fully usable; warn before it is wasted). Then the battle panel and DON!! overlay (`preview`), the tiered lethal detector, lethal search, the missed-lethal review flag end to end, and "Practice this". Then a manual screen-reader pass.
+2. **L Learning slice:** built (see above). Left: the independent L review; then a manual screen-reader pass of the coach, the guided count and the review (record it in `docs/design/a11y-passes/`).
 3. **Owner usability session S1** on the real game (`usability-plan.md`).
 4. **M4b entry items:** M4a-17 (the veiled-Use safety check must use the engine's `secret` flag or a typed script walk, not a regex over the JSON); a check that each script's "you may" cost flag matches its card text; M4a-19 (four fixes have no test that fails on revert). Also, from M4a-10 ( not reachable with the Rocks and Kaido scripts, so fix before M4b scripts can reach them):
    - one removal event over several Characters gets **one** replacement offer (QA-OP15 OP15-069: one DON!! return keeps both);
