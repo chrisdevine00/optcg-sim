@@ -9,6 +9,13 @@ import type { Speed } from '../game/controller.ts';
 import { ARCHETYPES, automationLine, deckById, DECKS, deckByLeader } from './decks.ts';
 import { SCENARIOS } from './scenarios.ts';
 
+/**
+ * Turn-time copy (review M5a-21). It must match docs/benchmarks.md "Pacing"; `app/test/setup-copy.test.ts`
+ * fails when the two drift apart.
+ */
+export const TURN_TIME_PIRATE = 'typically 1–8 s a turn at 1×, up to about 10 s for a long one';
+export const TURN_TIME_ROOKIE = 'about 1–5 s a turn at 1×';
+
 /** The opponent: an AI tier, or a second player at this device. */
 export type Opponent = 'pirate' | 'rookie' | 'hotseat';
 
@@ -139,8 +146,8 @@ export function Setup({
               <span>
                 <b>Pirate AI</b>{' '}
                 <span className="subtle">
-                  · plays its deck’s game plan one turn at a time, and explains each move · about
-                  1–7 s a turn at 1×
+                  · plays its deck’s game plan one turn at a time, and explains each move ·{' '}
+                  {TURN_TIME_PIRATE}
                 </span>
               </span>
             </label>
@@ -154,8 +161,8 @@ export function Setup({
               <span>
                 <b>Rookie AI</b>{' '}
                 <span className="subtle">
-                  · plays random legal moves, but always defends a lethal attack · about 1–5 s a
-                  turn at 1×
+                  · plays random legal moves, but always defends a lethal attack ·{' '}
+                  {TURN_TIME_ROOKIE}
                 </span>
               </span>
             </label>

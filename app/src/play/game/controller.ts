@@ -3,7 +3,7 @@
  * worker, pacing, auto-skip, hotseat seats and the live region. Components read views from it and
  * send view actions to it; it never decides legality.
  */
-import { SCRIPTS, type Card } from '@optcg/cards';
+import type { Card } from '@optcg/cards';
 import { priorCardIds, type AiTier, type Explanation, type GameInfo } from '@optcg/ai';
 import type { Action, PlayerId, PlayerView, ProjectedView, SearchView } from '@optcg/engine';
 import { GameSession, newIntentId, type Move, type Start } from '../../session/index.ts';
@@ -319,33 +319,16 @@ export class GameController {
   }
 
   /**
-   * Does the effect being asked about read a hidden zone (review M3-41)? Judged only from the
-   * public log: the last effect or Event both seats saw activate, and its public script. Null when
-   * the public log names no such effect (a replacement, for instance).
+   * Does Use show the hand first (review M3-41, M4a-16)? Decided from the decision's own source
+   * (card and ability), the same input and the same rule `veiledUse` applies, so the hint can
+   * never describe another effect. A source is a card on the table or an Event just played, and
+   * its script is public card text, so the answer is the same for any hidden cards. A decision
+   * with no source reads as "uses the hand", as `veiledUse` treats it.
    */
   private publicEffectReadsHand(): boolean | null {
-    if (this.session.view(this.me).decision?.kind !== 'optional') return null;
-    const events = this.session.publicLog(this.me).events.flat();
-    for (let i = events.length - 1; i >= 0; i--) {
-      const e = events[i]!;
-      if (
-        e.type === 'EffectActivated' &&
-        typeof e.card === 'string' &&
-        typeof e.ability === 'string'
-      )
-        return readsHiddenZone({ card: e.card, ability: e.ability });
-      if (e.type === 'EventActivated' && typeof e.card === 'string') {
-        const timing = e.timing === 'counter' ? 'counter' : 'main';
-        const ab = SCRIPTS[e.card]?.abilities.find(
-          (a) =>
-            a.kind === 'activate' &&
-            (Array.isArray(a.when) ? a.when.includes(timing) : a.when === timing),
-        );
-        return ab ? readsHiddenZone({ card: e.card, ability: ab.id }) : null;
-      }
-      if (e.type === 'TurnStarted' || e.type === 'AttackDeclared') return null;
-    }
-    return null;
+    const d = this.session.view(this.me).decision;
+    if (d?.kind !== 'optional') return null;
+    return readsHiddenZone(d.source);
   }
 
   /**

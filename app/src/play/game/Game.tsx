@@ -35,6 +35,7 @@ import { useFocusRescue } from './focus.ts';
 import { legalOf } from './legal.ts';
 import { cardName, num, other, statusSummary } from './text.ts';
 import { NO_STAGING, type G, type Staging, type UiMode } from './ui.ts';
+import { confirmWaste, unpayable, UNPAYABLE_NOTE } from './unpayable.ts';
 import { CardDock, type DockState } from './Dock.tsx';
 import { Dialogs, type DialogState } from './Dialogs.tsx';
 
@@ -1337,9 +1338,9 @@ function ActionMenu({
   if (g.mine && g.legal.kind === 'main') {
     if (play)
       items.push({
-        label: `▶ Play · rest ${c?.card?.cost ?? 0} DON!!`,
+        label: `▶ Play · rest ${c?.card?.cost ?? 0} DON!!${unpayable(g, handle, play) ? ` · ${UNPAYABLE_NOTE}` : ''}`,
         key: 'P',
-        run: () => g.act(play),
+        run: () => confirmWaste(g, handle, play, () => g.act(play)),
       });
     else if (c?.zone === 'hand' && c.owner === g.me) {
       const r = g.ctl.session.whyNot(g.me, { type: 'playCard', card: handle });

@@ -19,6 +19,7 @@ import {
   winnerWords,
 } from '../game/text.ts';
 import type { G, Staging } from '../game/ui.ts';
+import { confirmWaste, unpayable, UNPAYABLE_NOTE } from '../game/unpayable.ts';
 
 export function isTall(g: G): boolean {
   const k = g.view.decision?.kind;
@@ -695,8 +696,20 @@ function mainContent(g: G, rewind: NonNullable<Foot['secondary']>): Content {
           </p>
           <div className="opts col">
             {play && (
-              <button type="button" className="opt" data-first="" onClick={() => g.act(play)}>
-                ▶ Play · rest {c?.card?.cost ?? 0} DON!! <kbd>P</kbd>
+              <button
+                type="button"
+                className="opt"
+                data-first=""
+                onClick={() => confirmWaste(g, ui.handle, play, () => g.act(play))}
+              >
+                <span>
+                  ▶ Play · rest {c?.card?.cost ?? 0} DON!! <kbd>P</kbd>
+                </span>
+                {unpayable(g, ui.handle, play) && (
+                  <span className="sub warnline" data-testid="unpayable">
+                    <span aria-hidden="true">⚠</span> {UNPAYABLE_NOTE}
+                  </span>
+                )}
               </button>
             )}
             {attacks && (
@@ -1231,12 +1244,21 @@ function defenceContent(g: G): Content {
                 className="opt"
                 data-event-counter=""
                 aria-disabled={ec.action ? undefined : true}
-                onClick={() => ec.action && g.act(ec.action)}
+                onClick={() => {
+                  const a = ec.action;
+                  if (a) confirmWaste(g, ec.handle, a, () => g.act(a));
+                }}
               >
                 <span>
                   Activate [Counter]: {g.nameOf(ec.handle)} · {ec.cost}
                 </span>
-                <span className="sub">{ec.action ? ec.effect : ec.why}</span>
+                {ec.action && unpayable(g, ec.handle, ec.action) ? (
+                  <span className="sub warnline" data-testid="unpayable">
+                    <span aria-hidden="true">⚠</span> {UNPAYABLE_NOTE}
+                  </span>
+                ) : (
+                  <span className="sub">{ec.action ? ec.effect : ec.why}</span>
+                )}
               </button>
             ))}
           </div>

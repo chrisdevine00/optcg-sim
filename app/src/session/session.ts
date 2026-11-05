@@ -13,6 +13,7 @@ import {
   createGame,
   ENGINE_VERSION,
   IllegalAction,
+  legalActions,
   previewFromView,
   project,
   projectEvents,
@@ -406,6 +407,24 @@ export class GameSession {
   preview(player: PlayerId, viewAction: Action): Preview | null {
     try {
       return previewFromView(this.state, player, viewAction);
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Would `viewAction` (an Event's [Main] or [Counter], played or activated) be asked for an
+   * optional cost that `player` cannot pay (M4a-18)? Tried on a scratch copy: the engine's own
+   * answer, `optional` with no "use" choice, says so. True when the cost can be paid or none is
+   * asked; false when the effect would play for nothing; null when the action is not legal.
+   * Reads the player's own hand, so callers use it only while that hand is shown.
+   */
+  optionalCostPayable(player: PlayerId, viewAction: Action): boolean | null {
+    try {
+      const r = reduce(this.state, actionFromView(this.state, player, { ...viewAction, player }));
+      const d = queries.decision(r.state);
+      if (!d || d.kind !== 'optional' || d.player !== player) return true;
+      return legalActions(r.state).some((a) => a.type === 'optional' && a.accept);
     } catch {
       return null;
     }
