@@ -9,7 +9,7 @@ import type { Action, PlayerId, PlayerView, ProjectedView, SearchView } from '@o
 import { GameSession, newIntentId, type Move, type Start } from '../../session/index.ts';
 import { AiClient, type AiDecision } from './ai-client.ts';
 import { readsHiddenZone, type VeiledProps } from './veiled.tsx';
-import { describeMove, other, type LogLine, type Names } from './text.ts';
+import { describeMove, other, turnSummary, type LogLine, type Names } from './text.ts';
 
 export type Speed = 'step' | 0.5 | 1 | 2 | 4;
 export const SPEEDS: Speed[] = ['step', 0.5, 1, 2, 4];
@@ -840,26 +840,53 @@ export class GameController {
       this.skippedLines.push(...moves.map((l) => this.spoken(l)));
       if (moves.length) this.skippedFrom = moves[moves.length - 1]!.index;
     }
+    // An AI turn ends with one sentence for the whole turn (accessibility §9.3, "AI turns" 3).
+    const summary = this.seatOf(actor) === 'ai' && !this.hotseat ? this.turnEnd(lines, actor) : '';
     if (text && !this.skipping) {
-      this.say(text);
+      this.say(summary ? `${summary} ${text}` : text);
       if (this.seatOf(actor) === 'ai' && !auto)
         this.activity = lines.filter((l) => l.kind === 'move').at(-1)?.text ?? this.activity;
     }
     this.bump();
   }
 
-  /** A log line as a sentence: "Your turn 5.", "Kaido: Play Queen.", "You: Counter: Sai +1000." */
+  /** The summary of the AI turn that `lines` ends, or '' when they do not end one. */
+  private turnEnd(lines: LogLine[], ai: PlayerId): string {
+    const ending = lines.find((l) => l.kind === 'move' && /^End of turn/.test(l.text));
+    if (!ending) return '';
+    const upTo = this.logLines().filter((l) => l.index <= ending.index);
+    let start = upTo.length - 1;
+    while (start > 0 && !(upTo[start]!.kind === 'turn' && upTo[start]!.actor === ai)) start--;
+    const turn = Number(/Turn (\d+)/.exec(upTo[start]?.text ?? '')?.[1] ?? 0);
+    const mine = this.session.view(this.me).zones[this.me].leader[0]?.card;
+    const same = mine && this.cards.get(mine)?.name === this.config.names[ai];
+    return turnSummary(upTo.slice(start), turn, same ? 'Opponent’s' : `${this.config.names[ai]}’s`);
+  }
+
+  /** A log line as a sentence: "Your turn 5.", "Kaido: Played Queen.", "You: Counter: Sai +1000." */
   spoken(l: LogLine): string {
-    const name = (p: PlayerId) =>
-      this.hotseat ? this.config.names[p] : p === this.me ? 'You' : this.config.names[p];
+    // Both Leaders may share a name (a mirror): the opponent is then "Opponent", never a name
+    // that could be yours (M3 pass F6a).
+    const mine = this.session.view(this.me).zones[this.me].leader[0]?.card;
+    const myLeader = mine ? this.cards.get(mine)?.name : undefined;
+    const label = (p: PlayerId) => {
+      if (this.hotseat) return this.config.names[p];
+      if (p === this.me) return 'You';
+      return this.config.names[p] === myLeader ? 'Opponent' : this.config.names[p];
+    };
     if (l.kind === 'turn') {
       const n = /Turn (\d+)/.exec(l.text)?.[1] ?? '';
       if (!l.actor) return `Turn ${n}.`;
       return this.hotseat || l.actor !== this.me
-        ? `${this.config.names[l.actor]}’s turn ${n}.`
+        ? `${label(l.actor)}’s turn ${n}.`
         : `Your turn ${n}.`;
     }
-    return `${l.actor ? `${name(l.actor)}: ` : ''}${l.text.replace(/\.+$/, '')}.`;
+    // Spoken in the past tense with the cost: "Played Black Maria, rested 3 DON!!" (F8).
+    const text = l.text
+      .replace(/^Play (.+?) · (\d+) DON!!/, 'Played $1, rested $2 DON!!')
+      .replace(/^Play /, 'Played ')
+      .replace(/ · Play (.+?) · (\d+) DON!!/g, ' · Played $1, rested $2 DON!!');
+    return `${l.actor ? `${label(l.actor)}: ` : ''}${text.replace(/\.+$/, '')}.`;
   }
 
   private linesSince(index: number): LogLine[] {
@@ -1217,5 +1244,12 @@ export class GameController {
 
 function moveText(lines: LogLine[], m: Move): string {
   const l = lines.find((x) => x.kind === 'move' && x.index === m.start);
-  return l ? l.text.charAt(0).toLowerCase() + l.text.slice(1) : 'that move';
+  if (!l) return 'that move';
+  // A line that starts with a verb reads after "before"; one that starts with a card's name
+  // keeps its capital ("before Basil Hawkins cannot attack", not "before basil Hawkins", F13).
+  return /^(Play|Give|Attack|Activate|Counter|Block|End|Trigger|Event|Return|Draw|Look|Rest|Set|Add|Reveal|Trash|Chose|Kept|Redrew|Conceded)\b/.test(
+    l.text,
+  )
+    ? l.text.charAt(0).toLowerCase() + l.text.slice(1)
+    : l.text;
 }

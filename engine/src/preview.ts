@@ -69,5 +69,6 @@ export function preview(reduce: Reducer, s0: State, action: Action): Preview {
     life: { p1: s1.players.p1.life.length, p2: s1.players.p2.life.length },
     ko,
     gameOver: s1.result !== null,
+    battleUndecided: action.type === 'attack' && !events.some((e) => e.type === 'DamageStep'),
   };
 }

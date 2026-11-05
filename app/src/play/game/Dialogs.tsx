@@ -238,21 +238,22 @@ function RewindList({ g, lines, onClose }: { g: G; lines: LogLine[]; onClose: ()
       {moves.length === 0 ? (
         <p>No moves of yours to rewind yet.</p>
       ) : (
-        <ul className="rewind-list" role="listbox" aria-label="Your moves, newest first">
+        // One native radio group: NVDA switches to focus mode, the arrows move through the moves
+        // in order and select as they go, and Tab reaches the buttons (M3 pass F12).
+        <div className="rewind-list" role="radiogroup" aria-label="Your moves, newest first">
           {moves.map((m, i) => (
-            <li key={`${m.index}-${i}`} role="option" aria-selected={sel === m.index}>
-              <button
-                type="button"
-                className="opt"
-                aria-pressed={sel === m.index}
-                onClick={() => setSel(m.index)}
+            <label key={`${m.index}-${i}`} className="opt rewind-opt">
+              <input
+                type="radio"
+                name="rewind-move"
+                checked={sel === m.index}
+                onChange={() => setSel(m.index)}
                 data-autofocus={i === 0 ? '' : undefined}
-              >
-                {m.text}
-              </button>
-            </li>
+              />
+              <span>{m.text}</span>
+            </label>
           ))}
-        </ul>
+        </div>
       )}
       <div className="row end">
         <button type="button" className="btn" onClick={onClose}>
@@ -307,7 +308,8 @@ function Shortcuts({ onClose }: { onClose: () => void }) {
       <p className="subtle">
         Single-key shortcuts work while focus is on the board or the decision panel. In a defence,
         Enter commits only a Counter that stops the attack or a block; “Take the hit” needs focus,
-        then Enter.
+        then Enter. With NVDA, the buttons at the foot of the decision panel are in focus mode, so
+        these keys work there; in the panel’s text, press NVDA+Space first.
       </p>
       <table className="tbl keys-table">
         <tbody>

@@ -74,6 +74,8 @@ export function CardDock({
       // The hover preview is never a Tab stop (M3-30).
       inert={pinned ? undefined : true}
       role={pinned ? 'dialog' : undefined}
+      // The card's text is the dialog's description, so it is read on open (M3 pass F7).
+      aria-describedby={pinned ? 'dock-text' : undefined}
       onKeyDown={(e) => {
         if (e.key === 'Escape') {
           e.preventDefault();
@@ -155,6 +157,7 @@ export function CardDock({
       {/* Pinned: the text scrolls inside, by keyboard too, with shadow cues (M3-29). */}
       <div
         className="dock-text"
+        id="dock-text"
         tabIndex={pinned ? 0 : undefined}
         aria-label={pinned ? 'Card text' : undefined}
       >

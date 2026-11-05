@@ -1550,7 +1550,6 @@
   margin-top: 12px;
 }
 .rewind-list {
-  list-style: none;
   padding: 0;
   margin: 8px 0;
   max-height: 50vh;
@@ -1562,6 +1561,24 @@
 .rewind-list .opt {
   width: 100%;
   min-height: 28px;
+}
+.rewind-list .rewind-opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  cursor: pointer;
+}
+.rewind-list .rewind-opt input {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+.rewind-list .rewind-opt:has(input:checked) {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  border-color: var(--color-accent);
 }
 .keys-table th {
   white-space: nowrap;

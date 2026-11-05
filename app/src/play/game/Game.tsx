@@ -31,6 +31,7 @@ import {
 } from '../rail/Decision.tsx';
 import { GameLog, RailHeader } from '../rail/Rail.tsx';
 import type { GameController } from './controller.ts';
+import { useFocusRescue } from './focus.ts';
 import { legalOf } from './legal.ts';
 import { cardName, num, other, statusSummary } from './text.ts';
 import { NO_STAGING, type G, type Staging, type UiMode } from './ui.ts';
@@ -95,6 +96,7 @@ export function Game({
   onHome: () => void;
 }) {
   useSyncExternalStore(ctl.subscribe, ctl.getVersion);
+  useFocusRescue();
   const vp = useViewport();
   const L: Layout = useMemo(() => computeLayout(vp.w, vp.h), [vp.w, vp.h]);
   const view = ctl.view();
@@ -829,6 +831,17 @@ export function Game({
     );
   });
 
+  // The attack confirm opens with focus still on the target, so it is spoken (M3 pass F4).
+  const confirmKey = ui.kind === 'confirm' ? `${ui.attacker}>${ui.target}` : null;
+  useEffect(() => {
+    if (!confirmKey) return;
+    const t = setTimeout(() => {
+      const text = document.getElementById('confirm-spoken')?.textContent;
+      if (text) ctl.announce(text);
+    }, 60);
+    return () => clearTimeout(t);
+  }, [confirmKey, ctl]);
+
   // Why-not popovers fade after 4 s (flows G4).
   useEffect(() => {
     if (!why) return;
@@ -1412,17 +1425,25 @@ function ActionMenu({
           role="menuitem"
           className="mi"
           aria-disabled={i.disabled ? true : undefined}
+          aria-keyshortcuts={i.key}
           onClick={() => run(i)}
         >
           <span>
-            {i.label}
+            {glyph(i.label).glyph && <span aria-hidden="true">{glyph(i.label).glyph} </span>}
+            {glyph(i.label).text}
             {i.disabled && <span className="mi-why">: {i.disabled}</span>}
           </span>
-          {i.key && <kbd>{i.key}</kbd>}
+          {i.key && <kbd aria-hidden="true">{i.key}</kbd>}
         </button>
       ))}
     </div>
   );
+}
+
+/** A menu label's leading glyph is decoration: it is kept out of the accessible name (F13). */
+function glyph(label: string): { glyph: string; text: string } {
+  const m = /^([▶⚔◆✦⌖])\s+(.*)$/u.exec(label);
+  return m ? { glyph: m[1]!, text: m[2]! } : { glyph: '', text: label };
 }
 
 function CountDialog({
@@ -1543,7 +1564,13 @@ function SmallScreen({ onHome }: { onHome: () => void }) {
   );
 }
 
-/** Two live regions from load, never removed (accessibility §9.3); polite alternates two nodes. */
+/**
+ * Two live regions from load, never removed (accessibility §9.3). Polite alternates two nodes.
+ * Assertive writes a fresh child node per message into an `aria-live="assertive"` region and
+ * empties it a second later: NVDA with Firefox announces `role="alert"` only when the alert first
+ * appears, so a changing text is spoken once and then never again (M3 pass FF1), and a region that
+ * keeps its text is re-read when a dialog closes (F6b).
+ */
 function Announcer({
   polite,
   assertive,
@@ -1552,14 +1579,24 @@ function Announcer({
   assertive: { text: string; seq: number };
 }) {
   const a = polite.seq % 2 === 0;
+  const [spent, setSpent] = useState(0);
+  useEffect(() => {
+    if (!assertive.text) return;
+    const t = setTimeout(() => setSpent(assertive.seq), 1000);
+    return () => clearTimeout(t);
+  }, [assertive.seq, assertive.text]);
   return (
     <>
       <div id="announce-polite" className="sr-only" role="status" aria-live="polite">
         <span>{a ? polite.text : ''}</span>
         <span>{a ? '' : polite.text}</span>
       </div>
-      <div id="announce-assertive" className="sr-only" role="alert">
-        {assertive.text}
+      <div id="announce-assertive" className="sr-only" aria-live="assertive" aria-atomic="false">
+        {assertive.text && spent !== assertive.seq ? (
+          <p key={assertive.seq} data-seq={assertive.seq}>
+            {assertive.text}
+          </p>
+        ) : null}
       </div>
     </>
   );

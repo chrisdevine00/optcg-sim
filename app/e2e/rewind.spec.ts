@@ -28,7 +28,7 @@ test.describe('rewind (flows F11)', () => {
     await nextDecision(page);
     // Play a Character: the area is full, so the engine asks which to trash (a choose decision).
     await page.locator('[data-zone="hand"][data-glyph="play"]').first().click();
-    await page.getByRole('menuitem', { name: /^▶ Play/ }).click();
+    await page.getByRole('menuitem', { name: /^Play/ }).click();
     expect(await nextDecision(page)).toBe('choose');
     await expect(page.locator('#choose-done')).toHaveAttribute('aria-disabled', 'true');
     await page.locator('#decision .opts button').first().click();
@@ -40,7 +40,7 @@ test.describe('rewind (flows F11)', () => {
     await page.keyboard.press('r');
     const dialog = page.getByRole('dialog', { name: 'Rewind to before a move' });
     await expect(dialog).toBeVisible();
-    await dialog.getByRole('option').last().locator('button').click();
+    await dialog.getByRole('radio').last().check();
     await dialog.getByRole('button', { name: 'Rewind to before it' }).click();
     await expect(page.getByRole('group', { name: /Your hand, 2 cards/ })).toHaveCount(1);
   });

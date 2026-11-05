@@ -93,7 +93,26 @@ export function DecisionPanel({
       data-mode={g.ui.kind}
     >
       <div className="dec-head" style={{ minHeight: hh }}>
-        <h2 id="decision-title" ref={headRef} tabIndex={-1}>
+        <h2
+          id="decision-title"
+          ref={headRef}
+          tabIndex={-1}
+          // NVDA's Enter on a heading clicks it. In Firefox that moved the sequential-focus start
+          // to the page top, so Tab went through the whole board before the panel (M3 pass FF2).
+          // A click keeps focus on the heading; Tab from it goes to the panel's first control.
+          onClick={(e) => e.currentTarget.focus()}
+          onKeyDown={(e) => {
+            if (e.key !== 'Tab' || e.shiftKey) return;
+            const first = e.currentTarget
+              .closest('section')
+              ?.querySelector<HTMLElement>(
+                'button:not([disabled]), [href], input:not([disabled]), [tabindex="0"]',
+              );
+            if (!first) return;
+            e.preventDefault();
+            first.focus();
+          }}
+        >
           {content.title}
         </h2>
       </div>
@@ -116,7 +135,17 @@ export function DecisionPanel({
         )}
         {content.body}
       </div>
-      <div className={`dec-foot ${content.foot.equal ? 'equal' : ''}`} style={{ height: fh }}>
+      <div
+        className={`dec-foot ${content.foot.equal ? 'equal' : ''}`}
+        style={{ height: fh }}
+        // Buttons only: focus mode here lets NVDA pass single-key shortcuts (`.`, `E`, `S`) to the
+        // page instead of reading them as browse-mode keys (M3 pass F2; DECISIONS 2026-11-05).
+        role={content.foot.primary || content.foot.secondary ? 'application' : undefined}
+        aria-roledescription={
+          content.foot.primary || content.foot.secondary ? 'decision actions' : undefined
+        }
+        aria-label={content.foot.primary || content.foot.secondary ? 'Decision actions' : undefined}
+      >
         {content.foot.secondary ? (
           <FootButton b={content.foot.secondary} primary={false} />
         ) : (
@@ -137,15 +166,20 @@ function FootButton({ b, primary }: { b: FootBtn; primary: boolean }) {
       data-autofocus={b.autoFocus ? '' : undefined}
       className={`btn big ${(primary && b.tone !== 'quiet') || b.tone === 'primary' ? 'primary' : ''} ${b.tone === 'warn' ? 'warn' : ''}`}
       aria-disabled={disabled || undefined}
+      aria-keyshortcuts={b.key && b.key.length === 1 ? b.key : undefined}
       onClick={() => {
         if (!disabled) b.onClick?.();
       }}
     >
       <span className="lbl2">
-        {b.label} {b.key && <kbd>{b.key}</kbd>}
+        {b.label} {b.key && <kbd aria-hidden="true">{b.key}</kbd>}
       </span>
       {(b.sub || (disabled && b.reason)) && (
-        <span className="sub">{disabled && b.reason ? b.reason : b.sub}</span>
+        <span className="sub">
+          {/* A pause between the label and its sub-label: "Play anyway, still hits" (F13). */}
+          <span className="sr-only">, </span>
+          {disabled && b.reason ? b.reason : b.sub}
+        </span>
       )}
     </button>
   );
@@ -343,8 +377,26 @@ function contentInner(g: G): Content {
     case 'order': {
       // Pending effects (ids "<handle>#<ability>") or cards to place (plain handles), flows F8b/F8c.
       const cardsToPlace = legal.order.every((a) => a.type === 'order' && !a.first.includes('#'));
-      const labelOf = (first: string) =>
-        view.decision?.options?.find((o) => o.id === first)?.label ?? g.nameOf(first);
+      const slotOf = new Map(
+        g.view.zones[g.me].characters.map((c, i) => [
+          c.handle,
+          g.ctl.session.characterSlots(g.me)[i] ?? i,
+        ]),
+      );
+      // Two sources with one name (two Kaido) are told apart by where they stand (M3 pass F10).
+      const where = (first: string): string => {
+        const h = first.split('#')[0]!;
+        const c = g.cardOf(h);
+        if (c?.zone === 'leader') return 'your Leader';
+        if (c?.zone === 'characters' && slotOf.has(h))
+          return `Character slot ${slotOf.get(h)! + 1}`;
+        return '';
+      };
+      const labelOf = (first: string) => {
+        const base = view.decision?.options?.find((o) => o.id === first)?.label ?? g.nameOf(first);
+        const w = cardsToPlace ? '' : where(first);
+        return w ? `${base} (${w})` : base;
+      };
       const keep = () =>
         g.ctl.actSequence(legal.order.slice(0, -1).map((a) => ({ ...a }) as Action));
       return {
@@ -848,6 +900,20 @@ function simCard(
   return null;
 }
 
+/** What the player hears when the attack confirm opens (the target keeps focus, so Enter confirms). */
+export function confirmSentence(
+  ap: number,
+  tp: number,
+  attacker: string,
+  target: string,
+  undecided: boolean,
+  result: string,
+): string {
+  const maths = `${attacker} ${num(ap)} against ${target} ${num(tp)}`;
+  if (undecided) return `${maths}. ${result}. Enter to attack, Escape to go back.`;
+  return `${maths}: ${ap >= tp ? 'hits unless they counter' : 'fails unless you gain power'}. Enter to attack, Escape to go back.`;
+}
+
 function confirmContent(g: G, attacker: string, target: string): Content {
   const action = (g.legal.attacks.get(attacker) ?? []).find(
     (a) => a.type === 'attack' && a.target === target,
@@ -863,13 +929,18 @@ function confirmContent(g: G, attacker: string, target: string): Content {
   const ko = preview?.ko.includes(target) ?? false;
   const wins = preview?.gameOver ?? false;
   const ok = wins || ko || lifeAfter < lifeNow;
-  const result = wins
-    ? '✓ Wins the game if it is not stopped'
-    : ko
-      ? `✓ K.O.s ${g.nameOf(target)}`
-      : lifeAfter < lifeNow
-        ? `✓ Hit lands · their Life ${lifeNow} → ${lifeAfter}`
-        : '✕ Attack fails';
+  // The preview stops at an attack effect the attacker owes first ([When Attacking]); its Life
+  // and K.O. figures then say nothing about the battle (M3 pass F4).
+  const undecided = preview?.battleUndecided ?? false;
+  const result = undecided
+    ? 'Result depends on [When Attacking]'
+    : wins
+      ? '✓ Wins the game if it is not stopped'
+      : ko
+        ? `✓ K.O.s ${g.nameOf(target)}`
+        : lifeAfter < lifeNow
+          ? `✓ Hit lands · their Life ${lifeNow} → ${lifeAfter}`
+          : '✕ Attack fails';
   const need = ap >= tp ? ap - tp + 1000 : 0;
   const hand = g.view.zones[opp].hand.length;
   return {
@@ -878,7 +949,17 @@ function confirmContent(g: G, attacker: string, target: string): Content {
     body: (
       <div>
         <BattleNumbers g={g} sim={null} perspective="attack" attacker={attacker} target={target} />
-        <p className={`result ${ok ? 'good' : 'bad'}`} data-testid="battle-result">
+        <p className="sr-only" id="confirm-spoken" aria-hidden="true">
+          {confirmSentence(
+            ap,
+            tp,
+            g.nameOf(attacker),
+            t?.zone === 'leader' ? 'their Leader' : g.nameOf(target),
+            undecided,
+            result,
+          )}
+        </p>
+        <p className={`result ${undecided ? '' : ok ? 'good' : 'bad'}`} data-testid="battle-result">
           <span>
             {result}
             {ap === tp && <span className="subtle"> · ties go to the attacker</span>}
@@ -1450,7 +1531,7 @@ function optionChoice(g: G): Content | null {
       <div>
         <p className="dec-lead">{d.prompt}</p>
         {d.max !== undefined && d.max > 1 && (
-          <p className="count-line" role="status">
+          <p className="count-line" role="status" aria-atomic="true">
             {d.max} more to choose
           </p>
         )}
@@ -1486,6 +1567,20 @@ function chooseContent(g: G): Content {
   const order = new Map(g.view.zones[g.me].characters.map((c, i) => [c.handle, slots[i] ?? i]));
   const cands = [...g.legal.picks.keys()].sort((a, b) => (order.get(a) ?? 9) - (order.get(b) ?? 9));
   const chosen = g.picks.filter((h) => g.legal.picks.has(h));
+  // Cards on the board in the candidates' zone that the effect does not allow are listed too, as
+  // unavailable with the reason, so nothing is silently missing from the list (M3 pass F9).
+  const zonesOf = new Set(
+    cands
+      .map((h) => g.cardOf(h))
+      .filter((c) => c && (c.zone === 'characters' || c.zone === 'stage' || c.zone === 'leader'))
+      .map((c) => `${c!.owner}|${c!.zone}`),
+  );
+  const ineligible = [...zonesOf].flatMap((k) => {
+    const [owner, zone] = k.split('|') as [PlayerId, 'characters' | 'stage' | 'leader'];
+    return g.view.zones[owner][zone]
+      .filter((c) => c.card && !g.legal.picks.has(c.handle))
+      .map((c) => c.handle);
+  });
   // The make-room title and note belong to the rule's own choice only (review M3-35).
   const makingRoom = d.purpose === 'characterLimit';
   const playing = g.ctl.pendingPlay;
@@ -1531,12 +1626,25 @@ function chooseContent(g: G): Content {
                   )
                 }
               >
-                {d.purpose === 'cost' ? '' : '⌖ '}
+                {d.purpose === 'cost' ? null : <span aria-hidden="true">⌖ </span>}
                 {g.nameOf(h)}
                 {g.cardOf(h)?.power !== null && g.cardOf(h)?.power !== undefined
                   ? ` · ${num(g.cardOf(h)?.power)}`
                   : ''}
                 {on ? ` ✓ ${chosen.indexOf(h) + 1}` : ''}
+              </button>
+            );
+          })}
+          {ineligible.map((h) => {
+            const c = g.cardOf(h);
+            return (
+              <button key={h} type="button" className="opt" aria-disabled="true">
+                {g.nameOf(h)}
+                {c?.card?.cost !== null && c?.card?.cost !== undefined
+                  ? ` · cost ${c.card.cost}`
+                  : ''}
+                {c?.power !== null && c?.power !== undefined ? ` · ${num(c.power)}` : ''}
+                <span className="mi-why">: can’t be chosen. {d.prompt}</span>
               </button>
             );
           })}

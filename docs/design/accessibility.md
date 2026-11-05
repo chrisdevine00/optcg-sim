@@ -144,6 +144,8 @@ Applies to `choose` decisions with `max > 1` (for example "K.O. up to 2", "add u
 
 Applies to `order` decisions: simultaneous triggers, replacements, cards going to the bottom of the deck (CR 3-1-7, 8-6).
 
+**As built (M3, DECISIONS 2026-11-05):** simultaneous effect triggers are answered as "choose what resolves first", one button per option, each naming its source and where it stands; the grab, move and drop control below is not built for them. It remains the design for ordering a set of cards (deck bottom), if one is ever needed.
+
 1. The items appear as an ordered `listbox` in the suggested (canonical) order: "1 of 3: Zoro [On Play], draw 1".
 2. Arrows move focus. Space **grabs** the focused item ("grabbed Zoro [On Play], position 1 of 3"). Up/Down then move it, announcing "moved to position 2 of 3". Space drops it. `Alt+Up`/`Alt+Down` move the focused item in one step without grabbing.
 3. A "Use suggested order" button resets the list.
@@ -414,7 +416,7 @@ Rules for names:
 ### 9.3 Live-region announcement policy
 
 **Plumbing**
-- Two regions exist in the DOM from page load and are never removed: `#announce-polite` (`role="status"`, `aria-live="polite"`) and `#announce-assertive` (`role="alert"`).
+- Two regions exist in the DOM from page load and are never removed: `#announce-polite` (`role="status"`, `aria-live="polite"`) and `#announce-assertive` (`aria-live="assertive"`, no `role="alert"`: NVDA with Firefox speaks an alert only when it first appears). Each assertive message is a fresh child node, removed a second later (M3 pass FF1, F6b).
 - The game log is `role="log"` with **`aria-live="off"`**. It is the full, readable history, but it is not spoken automatically, so nothing is said twice.
 - One **announcer** module consumes **projected** events (ARCHITECTURE §2.8) from the store. It groups them by `intentId` into **one sentence per player move**, and writes the sentence into a region.
 - **Repeated identical strings:** VoiceOver may skip a string that equals the previous one. The announcer alternates between two polite nodes and clears the old one after 1 s.
@@ -549,13 +551,13 @@ Scenario: `a11y-m3` (hotseat off, vs Rookie, both decks with Blockers, Counters,
 | 5 | Enter on a playable Character; choose Play | Menu items with costs; after playing: "Played Nami, rested 2 DON!!." Focus is on the new card or the hand |
 | 6 | `+` on your Leader; Up twice; Enter | Count dialog "1 of N"; "3: Leader 8000"; "Gave 3 DON!! to Leader. Leader 8000." |
 | 7 | `A` on a Character played this turn | "Nami can't attack: it was played this turn." No dialog |
-| 8 | `E`, then confirm; let Rookie play its turn at Step pace, pressing `.` for each move | One sentence per AI move; the end-of-turn summary |
+| 8 | `E` (it ends the turn at once; `U` undoes it, flows D1); let Rookie play its turn at Step pace, pressing `.` for each move | One sentence per AI move; the end-of-turn summary (plays, attacks, damage to you, your K.O.s) |
 | 9 | When attacked: the defence planner | Focus moves to it; the heading reads the attack; Blockers listed with previews; the primary reads "Take the hit" and Enter alone does not commit it |
-| 10 | Choose "No block"; stage one counter that ties; check the footer; stage a second; change one counter's target; Enter | After the first Space: the tie wording and a footer of "Take the hit" (primary) and "Play anyway · still hits"; after the second: "Counter plus 3000, survive" as the primary; Enter plays the counters; then the result |
+| 10 | Choose "No block"; stage one counter that ties; check the footer; stage a second; Enter | After the first Space: the tie wording and a footer of "Take the hit" (primary) and "Play anyway · still hits"; after the second: "Counter plus 3000, survive" as the primary; Enter plays the counters; then the result |
 | 11 | Take a hit that reveals a [Trigger] | The Trigger prompt with two buttons; the result is announced |
 | 12 | Your turn: `A` on the Leader; arrows; Enter; Enter | Only legal targets cycle; the confirm reads the `preview` maths; "Leader attacks…" |
-| 13 | Resolve the two-target effect (Pick mode) | Count line "1 selected of up to 2"; an unavailable candidate gives its reason; commit |
-| 14 | Resolve an `order` decision (two simultaneous triggers) | Grab, move and drop are announced with positions; commit |
+| 13 | Resolve the two-target effect (Pick mode) | Count line "1 of up to 2 chosen"; an unavailable candidate gives its reason; commit |
+| 14 | Resolve an `order` decision (two simultaneous triggers) | "Choose what resolves first": each option names its source and where it stands ("Kaido (Character slot 2)"); choosing one commits; focus stays on the page |
 | 15 | `U`, then `R`, then choose a move and confirm | The rewind sentence; the list reads each move; focus is restored per §4.3 |
 | 16 | `?`, then Escape | Sheet dialog read; focus returns |
 | 17 | Settings → Single-key shortcuts off; back to the board; press `A` | Nothing happens; the action menu still offers Attack |

@@ -170,6 +170,7 @@ export const previewFromView = (
     life: p.life,
     ko: p.ko.map(h),
     gameOver: p.gameOver,
+    battleUndecided: p.battleUndecided,
   };
 };
 

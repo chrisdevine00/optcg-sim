@@ -315,6 +315,12 @@ export interface Preview {
   ko: InstanceId[];
   /** True when the action ends the game. */
   gameOver: boolean;
+  /**
+   * True when `action` is an attack whose Damage Step was not reached: the preview stopped at a
+   * decision that the acting player owes first (a [When Attacking] to use or decline), so
+   * `life`, `ko` and `cards` do not say how the battle ends.
+   */
+  battleUndecided: boolean;
 }
 
 /** A whole game (ADR 0004). Replaying `actions` from `start` reproduces the same summaryHash. */

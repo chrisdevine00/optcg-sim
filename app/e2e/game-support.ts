@@ -43,7 +43,7 @@ export async function playMainPhase(page: Page) {
     const card = page.locator('[data-zone="hand"][data-glyph="play"]').first();
     if (!(await card.count())) break;
     await card.click();
-    const play = page.getByRole('menuitem', { name: /^▶ Play/ });
+    const play = page.getByRole('menuitem', { name: /^Play/ });
     if (!(await play.count())) {
       await page.keyboard.press('Escape');
       break;

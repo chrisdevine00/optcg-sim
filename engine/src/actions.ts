@@ -521,7 +521,13 @@ export function apply(d: Draft, a: Action): void {
       }
       const c = d.card(a.card);
       const ab = s.defs[c.card]!.abilities.find((x) => x.id === a.ability)!;
-      d.emit({ type: 'EffectActivated', instance: a.card, card: c.card, ability: ab.id });
+      d.emit({
+        type: 'EffectActivated',
+        player: p,
+        instance: a.card,
+        card: c.card,
+        ability: ab.id,
+      });
       pushEffect(d, a.card, c.card, ab, p, 'effect');
       break;
     }

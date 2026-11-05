@@ -176,7 +176,13 @@ function askUse(d: Draft, f: EffectFrame, ab: Ability): void {
     if (g === true) {
       f.stage = 'run';
     } else {
-      d.emit({ type: 'EffectDeclined', instance: f.card, card: f.cardId, ability: f.ability });
+      d.emit({
+        type: 'EffectDeclined',
+        player: f.controller,
+        instance: f.card,
+        card: f.cardId,
+        ability: f.ability,
+      });
       pop(d);
     }
     return;

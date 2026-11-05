@@ -188,7 +188,9 @@ export function describeMove(
       // ---- Effects (M4a-05): one phrase per resolution step, from projected fields only ----
       case 'EffectActivated': {
         const label = abilityLabel(e.card, e.ability);
-        bits.push(`${name(e.card)}${label ? `: ${label}` : ' effect'}`);
+        // Whose card it is, so a mirror's two Kaidos cannot be mistaken for each other (F6a).
+        const own = p ? `${whose(ctx.names, p, true)} ` : '';
+        bits.push(`${own}${name(e.card)}${label ? `: ${label}` : ' effect'}`);
         break;
       }
       case 'EventActivated':
@@ -196,7 +198,7 @@ export function describeMove(
         lineActor = p ?? lineActor;
         break;
       case 'EffectDeclined':
-        bits.push(`${name(e.card)}: effect not used`);
+        bits.push(`${p ? `${whose(ctx.names, p, true)} ` : ''}${name(e.card)}: effect not used`);
         break;
       case 'CardRevealed':
         // A played card is named by its play line; other reveals are news to the opponent.
@@ -336,6 +338,44 @@ export function describeMove(
   return out;
 }
 
+/**
+ * The end-of-turn sentence for a turn the AI played (accessibility §9.3, "AI turns" 3), from the
+ * turn's own log lines: what it played, how often it attacked, what you lost. Nothing here is
+ * read from outside the public log, so it cannot say what the log does not.
+ */
+export function turnSummary(lines: readonly LogLine[], turn: number, who: string): string {
+  const played: string[] = [];
+  const kos: string[] = [];
+  let attacks = 0;
+  let lifeFrom: number | null = null;
+  let lifeTo: number | null = null;
+  // A K.O. bit is "K.O. · Your Drake", which the split below would cut in two.
+  for (const l of lines)
+    for (const m of l.text.matchAll(/K\.O\. · (Your|Their) ([^·]+?)(?= · |$)/g))
+      kos.push(`${m[1]!.toLowerCase()} ${m[2]}`);
+  const bitsOf = lines.flatMap((l) => l.text.split(' · '));
+  for (const b of bitsOf) {
+    const play = /^Play (.+)$/.exec(b);
+    if (play) played.push(play[1]!);
+    if (/ attacks /.test(b)) attacks++;
+    const life = /^your Life (\d+) → (\d+)$/.exec(b);
+    if (life) {
+      lifeFrom ??= Number(life[1]);
+      lifeTo = Number(life[2]);
+    }
+  }
+  const and = (xs: string[]) =>
+    xs.length > 1 ? `${xs.slice(0, -1).join(', ')} and ${xs.at(-1)}` : (xs[0] ?? '');
+  const parts: string[] = [];
+  parts.push(played.length ? `played ${and(played)}` : 'played no cards');
+  parts.push(attacks === 1 ? '1 attack' : `${attacks} attacks`);
+  if (lifeFrom !== null && lifeTo !== null && lifeFrom > lifeTo)
+    parts.push(`you took ${lifeFrom - lifeTo} damage, Life ${lifeFrom} to ${lifeTo}`);
+  else parts.push('you took no damage');
+  if (kos.length) parts.push(`${and(kos)} ${kos.length > 1 ? 'were' : 'was'} K.O.’d`);
+  return `${who} turn ${turn}: ${parts.join('; ')}.`;
+}
+
 /** A scripted Event's [Counter] ability, if it has one. */
 export function eventCounterAbility(cardId: string): ActivateAbility | undefined {
   return SCRIPTS[cardId]?.abilities.find(
@@ -424,7 +464,8 @@ export function cardAccessibleName(
   },
 ): string {
   const card = c.card ? opts.cards.get(c.card) : undefined;
-  const nm = card?.name ?? 'Face-down card';
+  // "X.Drake" is read "X dot Drake"; a space after the stop reads as a pause (M3 pass F13).
+  const nm = card?.name.replace(/(\p{L})\.(\p{L})/gu, '$1. $2') ?? 'Face-down card';
   const bits: string[] = [];
   bits.push(opts.zone === 'leader' ? `${opts.owner} Leader, ${nm}` : `${opts.owner} ${nm}`);
   if (opts.zone === 'hand') {
@@ -453,7 +494,7 @@ export function statusSummary(view: PlayerView, names: Names, phaseWords: string
     const z = view.zones[p];
     const d = view.don[p];
     const rested = z.characters.filter((c) => c.rested).length;
-    return `${z.life.length} Life, ${z.hand.length} cards in hand, ${d.active} of ${d.active + d.rested + d.given} DON!! active, ${z.characters.length} Characters${rested ? `, ${rested} rested` : ''}`;
+    return `${z.life.length} Life, ${z.hand.length} ${z.hand.length === 1 ? 'card' : 'cards'} in hand, ${d.active} of ${d.active + d.rested + d.given} DON!! active, ${z.characters.length} Characters${rested ? `, ${rested} rested` : ''}`;
   };
   const who = names.hotseat ? names.player[op] : 'Opponent';
   return `Turn ${view.turn.number}, ${phaseWords}. You: ${side(me)}. ${who}: ${side(op)}.`;

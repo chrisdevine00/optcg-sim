@@ -101,7 +101,7 @@ test.describe('board states', () => {
     await startGame(page, 'scenario=full&speed=step');
     await nextDecision(page);
     await page.locator('[data-zone="hand"][data-glyph="play"]').first().click();
-    await page.getByRole('menuitem', { name: /^▶ Play/ }).click();
+    await page.getByRole('menuitem', { name: /^Play/ }).click();
     expect(await nextDecision(page)).toBe('choose');
     await check(page, info, 'choose');
     await page.locator('#decision .opts button').first().click();

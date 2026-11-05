@@ -969,6 +969,7 @@ function drainPending(d: Draft): boolean {
     return true;
   d.emit({
     type: 'EffectActivated',
+    player: next!.controller,
     instance: next!.card,
     card: next!.cardId,
     ability: next!.ability,
