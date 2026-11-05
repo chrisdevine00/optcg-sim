@@ -130,6 +130,7 @@
 
 ## Next (slice pass, PLAN.md §1)
 
+0. **In flight (2026-11-05):** two builders on worktree branches, merged after review: (a) the M3 NVDA findings (F1, FF1, then the severity-2 list; `app/`), (b) L's lethal search, detector answers and missed-lethal flag (`ai/`). M5a-17 is fixed (37d2c01).
 1. **M3 NVDA fixes** (F1 focus loss, FF1 Firefox assertive messages, then the severity-2 list), then re-run `a11y-nvda.yml`.
 2. **L Learning slice:** first, the carried M5a-17, M5a-18, M5a-21, M4a-16 (the veiled Use hint describes the last public activation, which can be the wrong effect; drive it from the decision's public source instead) and M4a-18 (an Event whose optional cost can't be paid looks fully usable; warn before it is wasted). Then the battle panel and DON!! overlay (`preview`), the tiered lethal detector, lethal search, the missed-lethal review flag end to end, and "Practice this". Then a manual screen-reader pass.
 3. **Owner usability session S1** on the real game (`usability-plan.md`).
