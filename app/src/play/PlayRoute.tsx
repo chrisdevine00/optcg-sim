@@ -70,7 +70,13 @@ async function startGame(choice: SetupChoice): Promise<GameController> {
     // The AI's own list (its decklist, or its archetype's first list), and the public prior for
     // the human's Leader (ARCHITECTURE §4.3).
     const aiDeck = sc.p2.decklist ?? deckByLeader(p2Leader)?.spec.main ?? [];
-    const cards = await loadCards([...scenarioCardIds(sc), ...aiDeck, ...priorCardIds(p1Leader)]);
+    const cards = await loadCards([
+      ...scenarioCardIds(sc),
+      ...aiDeck,
+      ...priorCardIds(p1Leader),
+      // The public prior for their Leader: the lethal detector’s biggest Counter (ARCHITECTURE §4.4).
+      ...priorCardIds(p2Leader),
+    ]);
     config.mode = mode;
     config.aiCardIds = [
       ...scenarioCardIds({ ...sc, p1: { leader: sc.p2.leader }, p2: sc.p2 }),
@@ -94,6 +100,8 @@ async function startGame(choice: SetupChoice): Promise<GameController> {
     ...theirDeck.spec.main,
     // The AI's public prior for the human's Leader (ARCHITECTURE §4.3).
     ...priorCardIds(mineDeck.spec.leader),
+    // And for theirs: the lethal detector's biggest Counter (ARCHITECTURE §4.4).
+    ...priorCardIds(theirDeck.spec.leader),
   ]);
   if (config.mode === 'ai') config.names.p2 = cards.get(theirDeck.leader)?.name ?? 'Opponent';
   config.aiCardIds = [theirDeck.spec.leader, ...theirDeck.spec.main];

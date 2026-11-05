@@ -8,6 +8,7 @@ import { certaintyLabel } from '@optcg/ai';
 import type { PlayerId } from '@optcg/engine';
 import type { LogLine } from './text.ts';
 import type { G } from './ui.ts';
+import { lessonName } from '../coach/ExplanationView.tsx';
 
 export type DialogState =
   | null
@@ -399,14 +400,6 @@ function GameMenu({
       </div>
     </>
   );
-}
-
-/** "L15-lethal-math" → "Lethal math (L15)". */
-function lessonName(id: string): string {
-  const m = /^(L\d+)-(.*)$/.exec(id);
-  if (!m) return id;
-  const words = m[2]!.replace(/-/g, ' ');
-  return `${words.charAt(0).toUpperCase()}${words.slice(1)} (${m[1]})`;
 }
 
 /**

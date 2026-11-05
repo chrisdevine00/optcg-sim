@@ -30,6 +30,7 @@ import {
   toggleCounter,
 } from '../rail/Decision.tsx';
 import { GameLog, RailHeader } from '../rail/Rail.tsx';
+import { CoachPanel, STRIP_H, type CoachMode } from '../coach/Coach.tsx';
 import type { GameController } from './controller.ts';
 import { useFocusRescue } from './focus.ts';
 import { legalOf } from './legal.ts';
@@ -90,11 +91,21 @@ export function Game({
   onNewGame,
   onRematch,
   onHome,
+  onReview,
+  reviewLabel,
+  studyRail,
 }: {
   ctl: GameController;
   onNewGame: () => void;
   onRematch: () => void;
   onHome: () => void;
+  onReview?: () => void;
+  reviewLabel?: string;
+  /**
+   * Study (learning-ui §4.1): the rail shows this (the explanation and its actions) instead of the
+   * log, the coach and the decision panel, beside a read-only restored board.
+   */
+  studyRail?: React.ReactNode;
 }) {
   useSyncExternalStore(ctl.subscribe, ctl.getVersion);
   useFocusRescue();
@@ -194,6 +205,8 @@ export function Game({
     openInspector,
     onNewGame,
     onRematch,
+    onReview,
+    reviewLabel,
     onRewind: () => requestRewind(() => ctl.rewindMove()),
     openRewindList: () => openRewindList(),
     requestRewind: (run) => requestRewind(run),
@@ -255,6 +268,12 @@ export function Game({
       out.power = stagedPowers.get(h)!;
     const owner = c.owner;
     if (ctl.highlight?.handle === h) out.acting = ctl.highlight.word;
+    // A coach "Show" lights the cards of one step of the line (learning-ui §2.3).
+    const lit = ctl.coach.shown;
+    if (lit?.refs.includes(h)) {
+      out.selected = true;
+      out.chips!.push({ text: `Step ${lit.step + 1}`, tone: 'you' });
+    }
     if (battle && (battle.attacker === h || battle.target === h || staging.blocker === h))
       out.battle = true;
     if (battle?.attacker === h && !view.result)
@@ -603,6 +622,23 @@ export function Game({
       return;
     }
 
+    // The coach keys (accessibility §3.12): L reveals the next lethal tier, C opens or closes the
+    // coach. They work from the board, the decision panel and the coach itself.
+    if (
+      !e.altKey &&
+      !e.ctrlKey &&
+      !e.metaKey &&
+      (scoped || t?.closest('.coach')) &&
+      !ctl.hotseat &&
+      !ctl.readOnly &&
+      (key === 'l' || key === 'L' || key === 'c' || key === 'C')
+    ) {
+      e.preventDefault();
+      if (key === 'l' || key === 'L') ctl.coach.press();
+      else ctl.coach.toggle();
+      return;
+    }
+
     if (!scoped || e.altKey || e.ctrlKey || e.metaKey) {
       // Ctrl/Cmd+Z: alias for Rewind where the browser lets the page receive it.
       if ((e.ctrlKey || e.metaKey) && (key === 'z' || key === 'Z') && scoped && !e.shiftKey) {
@@ -928,10 +964,48 @@ export function Game({
   const slots = { p1: ctl.session.characterSlots('p1'), p2: ctl.session.characterSlots('p2') };
 
   const rail = L.rail;
-  const decTop = tall ? rail.tall.top : rail.decision.top;
-  const parts = tall ? rail.tall.parts : rail.decision.parts;
+  const decTop0 = tall ? rail.tall.top : rail.decision.top;
+  const parts0 = tall ? rail.tall.parts : rail.decision.parts;
   const logTop = rail.head + rail.notice;
-  const logH = tall ? (rail.ticker > 0 ? rail.ticker : 0) : rail.decision.top - logTop;
+
+  // The coach (board.md §3.13): a strip between the log and the decision panel, taking its height
+  // from the log; open (244 / 368 px) or tall (468 / 796 px) when the player asked. An owed
+  // decision wins: while the decision panel is tall the coach is its strip. Where the rail is too
+  // narrow or short (tablet, hand peek) there is no coach and the L key speaks its answer only.
+  const coach = ctl.coach;
+  const coachRoom = L.supported && rail.w >= 320 && !L.peek && !ctl.hotseat && !ctl.readOnly;
+  const idleMain =
+    mine && kind === 'main' && ui.kind === 'idle' && !view.battle && !view.result && !tall;
+  const cmode: CoachMode =
+    coachRoom && !tall && coach.profile.expanded
+      ? coach.wantTall && idleMain
+        ? 'tall'
+        : 'open'
+      : 'strip';
+  const tickerH = Math.max(0, rail.ticker - STRIP_H);
+  let decTop = decTop0;
+  let parts = parts0;
+  let coachTop = 0;
+  let coachH = 0;
+  let logH: number;
+  if (!coachRoom) {
+    logH = tall ? (rail.ticker > 0 ? rail.ticker : 0) : decTop0 - logTop;
+  } else if (cmode === 'tall') {
+    parts = [parts0[0], 0, parts0[2]];
+    decTop = L.H - parts0[0] - parts0[2];
+    coachTop = logTop + tickerH;
+    coachH = decTop - coachTop;
+    logH = tickerH;
+  } else if (cmode === 'open') {
+    coachH = L.density === 'roomy' ? 368 : 244;
+    coachTop = decTop0 - coachH;
+    logH = coachTop - logTop;
+  } else {
+    coachH = STRIP_H;
+    coachTop = decTop0 - STRIP_H;
+    logH = tall ? tickerH : coachTop - logTop;
+  }
+  const logTicker = tall || cmode === 'tall';
 
   // The dock avoids the focused element, the battle's cards and every lit card (UX-V11).
   const dockRect = (() => {
@@ -1076,40 +1150,81 @@ export function Game({
               label={boardLabel}
             />
             <div className="rail" style={{ left: rail.x, width: rail.w, height: L.H }}>
-              <DecisionPanel g={g} top={decTop} parts={parts} focusSignal={focusSignal} />
-              {ctl.toast && (
-                <p className="toast" style={{ top: decTop - 34 }} role="status">
-                  {ctl.toast}
-                  {ctl.session.canForward && (
-                    <button type="button" className="linkbtn" onClick={() => ctl.forward()}>
-                      ⟳ Forward
-                    </button>
+              {studyRail ? (
+                <div className="study-rail" style={{ top: logTop, height: L.H - logTop }}>
+                  {studyRail}
+                </div>
+              ) : (
+                <>
+                  <DecisionPanel
+                    g={g}
+                    top={decTop}
+                    parts={parts}
+                    focusSignal={focusSignal}
+                    bodyHidden={cmode === 'tall'}
+                  />
+                  {ctl.toast && (
+                    <p className="toast" style={{ top: decTop - 34 }} role="status">
+                      {ctl.toast}
+                      {ctl.session.canForward && (
+                        <button type="button" className="linkbtn" onClick={() => ctl.forward()}>
+                          ⟳ Forward
+                        </button>
+                      )}
+                    </p>
                   )}
-                </p>
+                  <div
+                    inert={
+                      dialog?.kind === 'trash' ||
+                      dialog?.kind === 'why' ||
+                      (dock.pinned && dockOpen)
+                        ? true
+                        : undefined
+                    }
+                  >
+                    <GameLog
+                      top={logTop}
+                      height={logH}
+                      lines={lines}
+                      names={names}
+                      ticker={logTicker}
+                      onLink={() => undefined}
+                      onRewindTo={(i) => requestRewind(() => ctl.rewindTo(i))}
+                      canRewind={!view.result && ctl.canRewind()}
+                      hasWhy={(i) => ctl.whyAt(i) !== null}
+                      onWhy={(i) => {
+                        rememberFocus();
+                        setDialog({ kind: 'why', index: i });
+                      }}
+                    />
+                  </div>
+                  {coachRoom && (
+                    <div
+                      inert={
+                        dialog?.kind === 'trash' ||
+                        dialog?.kind === 'why' ||
+                        (dock.pinned && dockOpen)
+                          ? true
+                          : undefined
+                      }
+                    >
+                      <CoachPanel
+                        g={g}
+                        top={coachTop}
+                        height={coachH}
+                        mode={cmode}
+                        onWhy={() => {
+                          const i = ctl.lastWhy();
+                          if (i !== null) {
+                            rememberFocus();
+                            setDialog({ kind: 'why', index: i });
+                          }
+                        }}
+                      />
+                    </div>
+                  )}
+                </>
               )}
-              <div
-                inert={
-                  dialog?.kind === 'trash' || dialog?.kind === 'why' || (dock.pinned && dockOpen)
-                    ? true
-                    : undefined
-                }
-              >
-                <GameLog
-                  top={logTop}
-                  height={logH}
-                  lines={lines}
-                  names={names}
-                  ticker={tall}
-                  onLink={() => undefined}
-                  onRewindTo={(i) => requestRewind(() => ctl.rewindTo(i))}
-                  canRewind={!view.result && ctl.canRewind()}
-                  hasWhy={(i) => ctl.whyAt(i) !== null}
-                  onWhy={(i) => {
-                    rememberFocus();
-                    setDialog({ kind: 'why', index: i });
-                  }}
-                />
-              </div>
               <RailHeader
                 top={0}
                 height={rail.head}

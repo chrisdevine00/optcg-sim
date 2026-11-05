@@ -1,0 +1,266 @@
+/* The coach (learning-ui §2, board.md §3.13): a strip, open or tall section in the rail. */
+.coach {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface-1);
+  border-top: 1px solid var(--color-line);
+  border-bottom: 1px solid var(--color-line);
+  overflow: hidden;
+}
+.coach-strip {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 46px;
+  padding: 0 8px;
+}
+.coach-strip .spacer {
+  flex: 1;
+}
+.coach-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-2);
+  background: transparent;
+  color: var(--color-text);
+  font: var(--weight-semibold) var(--text-sm) / 1 var(--font-ui);
+  cursor: pointer;
+}
+.coach-btn:hover {
+  background: var(--color-surface-3);
+}
+.coach-btn[aria-pressed='true'] {
+  background: var(--color-surface-3);
+  border-color: var(--color-accent);
+}
+.coach-btn kbd {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+.coach-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--radius-1);
+  background: var(--color-attack);
+  color: var(--color-on-attack);
+  font: var(--weight-bold) var(--text-xs) / 16px var(--font-ui);
+}
+.coach-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 4px 12px 12px;
+  border-top: 1px solid var(--color-line);
+  font-size: var(--text-sm);
+  line-height: var(--leading-sm);
+}
+.coach-result:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+.coach-lead {
+  margin: 6px 0 8px;
+}
+.coach-head {
+  margin: 6px 0 4px;
+  font: var(--weight-semibold) var(--text-md) / 20px var(--font-ui);
+}
+.coach-head[data-status='proven'] {
+  color: var(--color-warning-text);
+}
+.coach-status {
+  margin: 0 0 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.coach-status .why-certainty {
+  margin: 0;
+}
+.coach-note {
+  margin: 4px 0;
+  color: var(--color-text-muted);
+}
+.coach-tier2 {
+  margin: 4px 0 8px;
+  font-weight: var(--weight-semibold);
+}
+.coach-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0;
+}
+.coach-setting {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  color: var(--color-text-muted);
+}
+.coach-setting select {
+  min-height: 28px;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-1);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: inherit;
+}
+.coach-checking {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0;
+}
+.coach-bar {
+  position: relative;
+  display: block;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--color-surface-3);
+  overflow: hidden;
+}
+.coach-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0 70% 0 0;
+  background: var(--color-line-strong);
+  animation: coach-sweep 1.2s ease-in-out infinite;
+}
+@keyframes coach-sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(340%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .coach-bar::after {
+    animation: none;
+    inset: 0 40% 0 30%;
+  }
+}
+.ex-sub {
+  margin: 8px 0 2px;
+  font-weight: var(--weight-semibold);
+}
+.ex-line {
+  list-style-position: inside;
+  padding-left: 0;
+}
+.ex-line li {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.ex-line li > span {
+  flex: 1;
+}
+.ex-show {
+  flex: none;
+}
+.ex-outcome {
+  height: auto;
+  white-space: normal;
+}
+.guided-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.guided-q {
+  margin: 4px 0 6px;
+  font: var(--weight-semibold) var(--text-md) / 20px var(--font-ui);
+}
+.guided-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.guided-field input {
+  width: 72px;
+  min-height: 32px;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-1);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: inherit;
+  padding: 0 6px;
+}
+.guided-check {
+  margin: 6px 0;
+  padding: 4px 8px;
+  border-radius: var(--radius-1);
+  border: 1px solid var(--color-line-strong);
+}
+.guided-check.ok {
+  border-color: var(--color-success);
+  color: var(--color-success-text);
+}
+.guided-check.bad {
+  border-color: var(--color-attack);
+  color: var(--color-danger-text);
+}
+.guided-don {
+  white-space: nowrap;
+}
+.guided-don .iconbtn {
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
+}
+.guided-don .num {
+  display: inline-block;
+  min-width: 18px;
+  text-align: center;
+}
+.guided-split th {
+  color: var(--color-text-muted);
+  font-weight: var(--weight-medium);
+}
+/* The coach's additions inside the battle panel (learning-ui §2.7). */
+.bx {
+  margin: 6px 0;
+  padding: 6px 8px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-1);
+  background: var(--color-surface-1);
+}
+.bx-h {
+  margin: 0 0 2px;
+  font: var(--weight-semibold) var(--text-xs) / 16px var(--font-ui);
+  color: var(--color-text-muted);
+}
+.bx-list {
+  margin: 0;
+  padding-left: 16px;
+  font-size: var(--text-sm);
+  line-height: var(--leading-sm);
+}
+.bx-note {
+  margin: 4px 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  line-height: var(--leading-xs);
+}
+.cert-any-hand {
+  color: var(--color-success-text);
+}
+.cert-needed-hidden-info,
+.cert-search-incomplete {
+  color: var(--color-warning-text);
+}

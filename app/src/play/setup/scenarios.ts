@@ -193,6 +193,35 @@ export const SCENARIOS: Record<string, Spec> = {
     },
   },
   /**
+   * L (explanations.md E01 and E20): turn 9, your Main Phase. Kaido (OP17-058) Leader and an
+   * active Kaido (OP17-062, 12000) with 4 active DON!!; Rocks (OP17-039) at 1 Life with 2 cards in
+   * hand. Lethal works against any hand: 2 DON!! on each, the Leader first (9000 against 5000 plus
+   * two +2000 Counters is a tie, a hit), then Kaido at 12000 against 11000. The planted
+   * missed-lethal game of the review tests, and the position of the lethal detector's tiers.
+   */
+  lethalDemo: {
+    mode: 'ai',
+    seed: 5,
+    turn: 9,
+    activePlayer: 'p1',
+    firstPlayer: 'p1',
+    p1: {
+      leader: 'OP17-058',
+      characters: ['OP17-062'],
+      life: filler('EB04-007', 3),
+      hand: [],
+      deck: filler('EB04-007', 12),
+      costArea: { active: 4, rested: 0 },
+    },
+    p2: {
+      leader: 'OP17-039',
+      life: filler('EB04-007', 1),
+      hand: ['OP17-056', 'OP17-055'],
+      deck: filler('EB04-007', 12),
+      costArea: { active: 0, rested: 0 },
+    },
+  },
+  /**
    * M4a: p1's Kaido Leader (OP17-058) with 1 DON!! attacks; its [When Attacking] DON!! −1 can give
    * the AI's Babanuki −2000 (a real scripted effect resolved through the UI).
    */

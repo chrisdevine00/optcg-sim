@@ -20,6 +20,12 @@ import {
 } from '../game/text.ts';
 import type { G, Staging } from '../game/ui.ts';
 import { confirmWaste, unpayable, UNPAYABLE_NOTE } from '../game/unpayable.ts';
+import {
+  RuleNote,
+  WhatTheyCouldHave,
+  WhatYouHave,
+  theyCouldHave,
+} from '../coach/BattleExtras.tsx';
 
 export function isTall(g: G): boolean {
   const k = g.view.decision?.kind;
@@ -64,11 +70,14 @@ export function DecisionPanel({
   top,
   parts,
   focusSignal,
+  bodyHidden = false,
 }: {
   g: G;
   top: number;
   parts: [number, number, number];
   focusSignal: number;
+  /** The coach is tall: only the header and footer show (board.md §3.13). */
+  bodyHidden?: boolean;
 }) {
   const headRef = useRef<HTMLHeadingElement>(null);
   const firstRef = useRef<HTMLDivElement>(null);
@@ -117,7 +126,7 @@ export function DecisionPanel({
           {content.title}
         </h2>
       </div>
-      <div className="dec-body" style={{ height: bh }} ref={firstRef}>
+      <div className="dec-body" style={{ height: bh }} ref={firstRef} hidden={bodyHidden}>
         {g.ctl.error && (
           <p className="dec-error" role="alert">
             {g.ctl.error}
@@ -247,7 +256,18 @@ function contentInner(g: G): Content {
               : 'Both players lost at the same time (CR 9-2-1).'}
           </p>
           {ctl.session.rewound && <p className="subtle">Rewound: not counted in your win rate.</p>}
-          <p className="subtle">Game Review arrives in a later milestone. The full log is above.</p>
+          {ctl.puzzleState() === 'solved' && (
+            <p className="good" data-testid="puzzle-result">
+              ✓ Solved: you won on the turn it was cut from.
+            </p>
+          )}
+          {g.onReview && (
+            <p>
+              <button type="button" className="btn small" id="review-btn" onClick={g.onReview}>
+                {g.reviewLabel ?? 'Review this game'}
+              </button>
+            </p>
+          )}
         </div>
       ),
       foot: {
@@ -983,6 +1003,11 @@ function confirmContent(g: G, attacker: string, target: string): Content {
             They need <b>+{num(need)}</b> to survive · {hand} cards in hand
           </p>
         )}
+        {t?.zone === 'leader' && !g.ctl.hotseat && (
+          <WhatTheyCouldHave they={theyCouldHave(g.view, opp, g.cards)} />
+        )}
+        {ap === tp && <RuleNote kind="ties" />}
+        {(findCard(g, attacker)?.don ?? 0) > 0 && <RuleNote kind="don" />}
         {findCard(g, attacker)?.keywords.includes('Double Attack') && (
           <p>Double Attack: 2 damage.</p>
         )}
@@ -1289,6 +1314,17 @@ function defenceContent(g: G): Content {
             {s.blocker ? 'K.O.s the Blocker' : 'hits'}. Add {num(need)} more, or keep your cards.
           </p>
         )}
+        {!hidden && (
+          <WhatYouHave
+            counters={counterCards.length}
+            worth={counterCards.reduce((t, c) => t + (g.cardOf(c.handle)?.card?.counter ?? 0), 0)}
+            events={eventCounters.length}
+            activeDon={view.don[me].active}
+            staged={s.counters.length}
+          />
+        )}
+        {ap === tp && <RuleNote kind="ties" />}
+        {staged && !hidden && <RuleNote kind="battle" />}
         <div className="lanes">
           <div className="lane">
             <span className="ln">Block</span>

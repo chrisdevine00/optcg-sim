@@ -53,6 +53,9 @@ export interface G {
   openInspector: (handle: string) => void;
   onNewGame: () => void;
   onRematch: () => void;
+  /** After a game: open its review (a puzzle: go back to the review it came from). */
+  onReview?: (() => void) | undefined;
+  reviewLabel?: string | undefined;
   onRewind: () => void;
   openRewindList: () => void;
   /** Run a rewind if allowed now (hotseat: after the other player agrees). */

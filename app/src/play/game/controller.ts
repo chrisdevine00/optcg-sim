@@ -6,8 +6,15 @@
 import type { Card } from '@optcg/cards';
 import { priorCardIds, type AiTier, type Explanation, type GameInfo } from '@optcg/ai';
 import type { Action, PlayerId, PlayerView, ProjectedView, SearchView } from '@optcg/engine';
-import { GameSession, newIntentId, type Move, type Start } from '../../session/index.ts';
-import { AiClient, type AiDecision } from './ai-client.ts';
+import {
+  GameSession,
+  newIntentId,
+  type Move,
+  type SessionRecord,
+  type Start,
+} from '../../session/index.ts';
+import { AiClient, type AiDecision, type LethalPort } from './ai-client.ts';
+import { Coach } from '../coach/coach.ts';
 import { readsHiddenZone, type VeiledProps } from './veiled.tsx';
 import { describeMove, other, turnSummary, type LogLine, type Names } from './text.ts';
 
@@ -39,6 +46,15 @@ export interface GameConfig {
   aiBudgets?: 'iterations' | 'ms';
   /** Tests: an in-process stand-in for the worker. */
   aiPort?: (cards: Card[], game: GameInfo) => AiPort;
+  /** Tests: an in-process stand-in for the coach's lethal worker (a second client). */
+  coachPort?: (cards: Card[]) => LethalPort;
+  /**
+   * Review (learning-ui §4.4): start from the first `actions.length` actions of a finished game's
+   * record, with its hidden cards, instead of a new game. `readOnly` makes it a restored board to
+   * look at (Study): nothing can be played and the AI never starts. `puzzle` marks it a lethal
+   * puzzle ("Practice this", §4.5), judged when its turn ends.
+   */
+  restore?: { record: SessionRecord; readOnly?: boolean; puzzle?: { turn: number } };
 }
 
 /** What the controller needs from the AI worker client (AiClient, or a test double). */
@@ -127,6 +143,12 @@ export class GameController {
   readonly session: GameSession;
   readonly cards: Map<string, Card>;
   readonly config: GameConfig;
+  /** A restored board to look at: nothing can be played (review Study). */
+  readonly readOnly: boolean;
+  /** A lethal puzzle from a review flag: the turn it was cut from. */
+  readonly puzzle: { turn: number } | null;
+  /** The coach: its lethal detector and its panel state (learning-ui §2, §3). */
+  readonly coach: Coach;
   private ai: AiPort | null;
   private listeners = new Set<() => void>();
   version = 0;
@@ -188,7 +210,23 @@ export class GameController {
             PlayerId,
             'human' | 'ai'
           >);
-    this.session = new GameSession((id) => cards.get(id), start, seats);
+    this.session = config.restore
+      ? GameSession.fromRecord((id) => cards.get(id), config.restore.record)
+      : new GameSession((id) => cards.get(id), start, seats);
+    this.readOnly = config.restore?.readOnly === true;
+    this.puzzle = config.restore?.puzzle ?? null;
+    this.coach = new Coach({
+      me: config.human,
+      hotseat: config.mode === 'hotseat',
+      readOnly: this.readOnly,
+      cards,
+      session: this.session,
+      myDecision: () => this.myDecision(),
+      announce: (t) => this.announce(t),
+      notify: () => this.notifyRaw(),
+      makePort: (init) => (config.coachPort ? config.coachPort(init) : new AiClient(init)),
+    });
+    this.session.subscribe(() => this.coach.sync());
     this.seat = config.mode === 'hotseat' ? (this.session.decider() ?? 'p1') : config.human;
     this.ai = null;
     if (config.mode === 'ai') {
@@ -229,6 +267,12 @@ export class GameController {
   getVersion = () => this.version * 100000 + this.session.version;
 
   private bump(): void {
+    this.coach.sync();
+    this.notifyRaw();
+  }
+
+  /** Re-render without re-reading the coach's position (the coach calls this itself). */
+  private notifyRaw(): void {
     this.version++;
     for (const fn of this.listeners) fn();
   }
@@ -236,6 +280,7 @@ export class GameController {
   dispose(): void {
     this.disposed = true;
     this.gen++;
+    this.coach.dispose();
     this.ai?.terminate();
     this.wake?.();
   }
@@ -277,6 +322,7 @@ export class GameController {
    */
   actions(): Action[] {
     const priv = this.session.view(this.me);
+    if (this.readOnly) return [];
     if (this.revealed()) return priv.actions;
     // An effect decision under the veil offers nothing from the private answers: its panel is
     // VeiledProps only (review M3-39, M4a-01). The defence and damage panels keep the answers
@@ -374,7 +420,24 @@ export class GameController {
   /** True when the screen's player owes the current decision and may act on it now. */
   myDecision(): boolean {
     const d = this.session.decider();
-    return d === this.me && this.seatOf(d) === 'human' && this.curtainFor === null && this.settled;
+    return (
+      !this.readOnly &&
+      d === this.me &&
+      this.seatOf(d) === 'human' &&
+      this.curtainFor === null &&
+      this.settled
+    );
+  }
+
+  /**
+   * How a restored lethal puzzle stands (learning-ui §4.5): solved when the player wins on the
+   * turn it was cut from, failed once that turn ends without a win, else open.
+   */
+  puzzleState(): 'open' | 'solved' | 'failed' | null {
+    if (!this.puzzle) return null;
+    const v = this.session.view(this.me);
+    if (v.result) return 'winner' in v.result && v.result.winner === this.me ? 'solved' : 'failed';
+    return v.turn.number > this.puzzle.turn || v.turn.activePlayer !== this.me ? 'failed' : 'open';
   }
 
   /** The log as lines, from the screen player's projected events (board.md §3.11). */

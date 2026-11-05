@@ -7,7 +7,7 @@
  * cards that have become visible) and the AI seat's own view (review M3-09, ADR 0005).
  */
 import type { Card } from '@optcg/cards';
-import type { AiRequest, AiResponse, AiTier, Decided, GameInfo } from '@optcg/ai';
+import type { AiRequest, AiResponse, AiTier, Decided, GameInfo, LethalResult } from '@optcg/ai';
 import type { PlayerView, SearchView } from '@optcg/engine';
 
 export interface AiDecision extends Decided {
@@ -16,7 +16,23 @@ export interface AiDecision extends Decided {
   stats?: { rollouts: number; actions: number; planned: boolean };
 }
 
-type Req = Extract<AiRequest, { type: 'decide' } | { type: 'planTurn' }>;
+type Req = Extract<AiRequest, { type: 'decide' } | { type: 'planTurn' } | { type: 'lethal' }>;
+
+/** What the coach asks of a worker (a second `AiClient`, which never sees the AI seat's data). */
+export interface LethalPort {
+  lethal(
+    view: SearchView,
+    opts: { priority: 2 | 3 | 4; capMs?: number; nodes?: number },
+  ): { id: number; result: Promise<LethalAnswer> };
+  reveal(cards: Iterable<Card>): void;
+  cancel(id: number): void;
+  terminate(): void;
+}
+
+export interface LethalAnswer {
+  result: LethalResult;
+  ms: number;
+}
 
 interface Pending {
   resolve: (r: AiResponse) => void;
@@ -116,6 +132,31 @@ export class AiClient {
         ms: r.ms,
         ...(r.stats ? { stats: r.stats } : {}),
       };
+    });
+    return { id, result };
+  }
+
+  /**
+   * Can the viewing seat win this turn (`public` mode: only its own `SearchView`)? Used by the
+   * coach's worker, a second client holding only the player's own data and the public prior.
+   */
+  lethal(
+    view: SearchView,
+    opts: { priority: 2 | 3 | 4; capMs?: number; nodes?: number },
+  ): { id: number; result: Promise<LethalAnswer> } {
+    const id = this.nextId++;
+    const req = {
+      type: 'lethal',
+      id,
+      mode: 'public',
+      view,
+      priority: opts.priority,
+      ...(opts.capMs !== undefined ? { capMs: opts.capMs } : {}),
+      ...(opts.nodes !== undefined ? { nodes: opts.nodes } : {}),
+    } satisfies Req;
+    const result = this.send(req).then((r) => {
+      if (r.type !== 'lethal') throw new Error('The worker answered the wrong request.');
+      return { result: r.result, ms: r.ms };
     });
     return { id, result };
   }
