@@ -82,7 +82,7 @@
     - F1 (severity 3, both browsers): focus is lost to the page body after playing from the menu, after Done on a pick, after the order choice, and at the end of the AI turn.
     - FF1 (severity 3, Firefox): only the first assertive message is spoken.
     - Ten findings at severity 2, among them `.` swallowed by NVDA's browse mode, no AI turn summary, a silent attack confirm that also shows a wrong result while a [When Attacking] effect is pending, and the order decision having no grab, move or drop.
-  - **Fixes written 2026-11-05** (branch `worktree-agent-a38ff78f137bae79b`, DECISIONS 2026-11-05 "M3 NVDA pass fixes"): F1 and FF1 and every severity 2 finding except F3 and FF2 (not reproduced in Chromium; hardened) are fixed in code with e2e checks. Nothing was heard in NVDA. **Next: re-run `a11y-nvda.yml` on that branch** and record the result; F2, F3, FF2 and the F1/FF1 speech need that run to confirm.
+  - **Fixes written 2026-11-05** (on `main` as 0d5ab88 and 81ba6df, DECISIONS 2026-11-05 "M3 NVDA pass fixes"): F1 and FF1 and every severity 2 finding except F3 and FF2 (not reproduced in Chromium; hardened) are fixed in code with e2e checks. Nothing was heard in NVDA. **Next: the `a11y-nvda.yml` re-run on `main`** (dispatched 2026-11-05) and record the result; F2, F3, FF2 and the F1/FF1 speech need that run to confirm.
   - M3 is marked done when that record has no open severity 3 or 4 finding.
   - The VoiceOver pass is the owner's (see Blockers).
 
@@ -130,8 +130,8 @@
 
 ## Next (slice pass, PLAN.md §1)
 
-0. **In flight (2026-11-05):** two builders on worktree branches, merged after review: (a) the M3 NVDA findings (F1, FF1, then the severity-2 list; `app/`), (b) L's lethal search, detector answers and missed-lethal flag (`ai/`). M5a-17 is fixed (37d2c01).
-1. **M3 NVDA fixes** (F1 focus loss, FF1 Firefox assertive messages, then the severity-2 list), then re-run `a11y-nvda.yml`.
+0. **In flight (2026-11-05):** (a) the M3 NVDA fixes are merged; the NVDA workflow re-run is pending. (b) A builder on a worktree branch is writing L's lethal search, detector answers and missed-lethal flag (`ai/`). M5a-17 is fixed (37d2c01).
+1. **M3:** record the NVDA re-run in `docs/design/a11y-passes/`; M3 is done when neither browser has an open severity 3 or 4.
 2. **L Learning slice:** first, the carried M5a-17, M5a-18, M5a-21, M4a-16 (the veiled Use hint describes the last public activation, which can be the wrong effect; drive it from the decision's public source instead) and M4a-18 (an Event whose optional cost can't be paid looks fully usable; warn before it is wasted). Then the battle panel and DON!! overlay (`preview`), the tiered lethal detector, lethal search, the missed-lethal review flag end to end, and "Practice this". Then a manual screen-reader pass.
 3. **Owner usability session S1** on the real game (`usability-plan.md`).
 4. **M4b entry items:** M4a-17 (the veiled-Use safety check must use the engine's `secret` flag or a typed script walk, not a regex over the JSON); a check that each script's "you may" cost flag matches its card text; M4a-19 (four fixes have no test that fails on revert). Also, from M4a-10 ( not reachable with the Rocks and Kaido scripts, so fix before M4b scripts can reach them):
