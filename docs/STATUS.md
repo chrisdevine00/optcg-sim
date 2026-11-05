@@ -125,7 +125,7 @@
 
 ### L Learning slice: the engine-and-AI half is built (branch `worktree-agent-a5cbf39c892951813`); the UI half is not
 - **Done:** `lethal` (`public` and `actual` modes, Triggers as a labelled chance, node and wall-clock caps) in `ai/src/search/lethal/`; the `lethal` worker request with priorities 2 to 4 and cancel; tiers 1 to 3 (`tier1`, `tier2`, `explainLethal`; E20, E01, E02 and E03 are snapshot-tested against `explanations.md`); the guided count's data and `checkGuidedCount`; `reviewMissedLethal` (planted record flagged `any-hand` with a correct line). Decisions: DECISIONS 2026-11-05 (two entries). Tests: `ai/test/lethal.test.ts`, `lethal-review.test.ts`, `lethal-games.test.ts` (`npm run test:lethal` for the long run).
-- **Open (severity 4, being fixed):** `public` assumption A1 is unsound. [Counter] Events such as OP07-076 and EB04-040 also rest an opponent's Character, so a line labelled "works against any hand" can lose to a real hand. The fix models every [Counter] effect in the prior. The lethal search is not wired to any UI until this lands.
+- **A1 corrected (2026-11-05):** `public` lethal now models every [Counter] effect in the defender's prior (OP07-076's rest, OP15-078's draw) as the defender's choice. A planted test proves the old model wrong, and a coverage test fails on any unmodelled future Counter. Cost: E20 now takes 128,700 nodes (4.0 s), and Kaido positions hit the cap ("Couldn't finish checking") more often.
 - **Not done:** the opponent's-turn threat check (the skeleton refuses a foreign decision, M5a-02), the "lethal given away" flag, and a Blocker removed by an effect as a planted test (no scripted card does it). The UI (coach panel, guided count, flags on the review timeline, "Practice this") is next.
 
 ### Verification caveats
@@ -135,7 +135,7 @@
 
 ## Next (slice pass, PLAN.md §1)
 
-0. **In flight (2026-11-05):** (a) the M3 NVDA fixes are merged; the NVDA workflow re-run is pending. (b) L's lethal search is merged (b850c18, 7d8f5a5); its A1 soundness fix is in progress on a branch. M5a-17 is fixed (37d2c01).
+0. **In flight (2026-11-05):** (a) the M3 NVDA fixes are merged; the NVDA workflow re-run is pending. (b) L's lethal search is merged (b850c18, 7d8f5a5); its A1 soundness fix is merged. (c) A builder is writing L's UI half (`app/`). M5a-17 is fixed (37d2c01).
 1. **M3:** record the NVDA re-run in `docs/design/a11y-passes/`; M3 is done when neither browser has an open severity 3 or 4.
 2. **L Learning slice:** first, the carried M5a-17, M5a-18, M5a-21, M4a-16 (the veiled Use hint describes the last public activation, which can be the wrong effect; drive it from the decision's public source instead) and M4a-18 (an Event whose optional cost can't be paid looks fully usable; warn before it is wasted). Then the battle panel and DON!! overlay (`preview`), the tiered lethal detector, lethal search, the missed-lethal review flag end to end, and "Practice this". Then a manual screen-reader pass.
 3. **Owner usability session S1** on the real game (`usability-plan.md`).
