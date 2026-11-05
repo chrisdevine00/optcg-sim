@@ -535,19 +535,19 @@ export async function runM3(p: Pass) {
         p.note(`R did not open the rewind list; focus: ${g.aria}`);
         return;
       }
-      // The list: arrows first (as the spec says), then Tab if arrows do not move focus.
+      // The list is one native radio group (M3 pass F12): the arrows select an older move, and
+      // Tab then reaches "Rewind to before it". Never walk focus with Shift+Tab here: in Firefox
+      // that left the dialog for the browser's toolbar and lost the page (re-run FF4).
       let h = g;
       for (let i = 0; i < 2; i++) h = await p.press('ArrowDown');
-      if (h.aria === g.aria) p.note('ArrowDown did not move focus in the rewind list.');
-      // Choose a move by Tab (Tab moves focus, and NVDA's browse cursor with it; its arrows move
-      // only the browse cursor, and Enter then acts there), then confirm.
-      h = await p.press('Tab');
-      if (!h.inDialog || /^(Cancel|Rewind to before it|Close)/.test(h.name))
-        h = (await p.until('Shift+Tab', (x) => x.aria === g.aria, 8)) ?? h;
+      if (h.aria === g.aria) p.note('ArrowDown did not move the selection in the rewind list.');
       p.note(`Chose: ${h.aria}`);
-      h = await p.press('Enter');
-      if (h.inDialog && !/^Rewind to before it/.test(h.name))
-        h = (await p.until('Tab', named(/^Rewind to before it/), 30)) ?? h;
+      for (let i = 0; i < 6 && h.inDialog && !/^Rewind to before it/.test(h.name); i++)
+        h = await p.press('Tab');
+      if (!h.inDialog) {
+        await p.assist('Tab left the rewind dialog', '.rewind-list input[type="radio"]:checked');
+        h = await p.focus();
+      }
       if (/^Rewind to before it/.test(h.name) && !h.aria.includes('[disabled]'))
         h = await p.press('Enter');
       if (h.inDialog) {
