@@ -45,7 +45,11 @@ export function CoachPanel({
   const signal = coach.focusSignal;
   useEffect(() => {
     if (signal === 0) return;
-    const t = setTimeout(() => resultRef.current?.focus(), 40);
+    const t = setTimeout(() => {
+      // In the guided count, focus goes to the current question (accessibility §4.3).
+      const q = document.querySelector<HTMLElement>('.guided-q');
+      (q ?? resultRef.current)?.focus();
+    }, 40);
     return () => clearTimeout(t);
   }, [signal]);
 
@@ -190,6 +194,16 @@ function LethalSection({
       </select>
     </label>
   );
+  const donMath = (
+    <label className="coach-setting coach-check">
+      <input
+        type="checkbox"
+        checked={profile.donMath}
+        onChange={(e) => coach.setProfile({ donMath: e.target.checked })}
+      />
+      <span>DON!! math on the board</span>
+    </label>
+  );
   // One tree for every state, with the detector setting in the same slot, so changing it (which
   // re-renders this section) never remounts the control or drops the keyboard's place in it.
   const unavailable = !lethal.key;
@@ -236,6 +250,7 @@ function LethalSection({
         {!unavailable && !guided && lethal.status === 'ready' && tier >= 3 && <Tier3 g={g} />}
       </div>
       {settings}
+      {donMath}
     </div>
   );
 }
@@ -256,7 +271,7 @@ function Tiers({ g }: { g: G }) {
       </h3>
       <p className="coach-status">
         <span className="chip outline">{statusWord(t1.status)}</span>{' '}
-        <CertaintyChip certainty={t1.certainty} context="coach" />
+        <CertaintyChip certainty={t1.certainty} context="coach" caveat={t1.triggerNote} />
       </p>
       {t1.triggerNote && <p className="coach-note">{t1.triggerNote}</p>}
       {tier >= 2 && (
@@ -310,6 +325,7 @@ function Tier3({ g }: { g: G }) {
         context="coach"
         verbosity={coach.profile.verbosity}
         idPrefix="coach-lethal"
+        caveat={t1.triggerNote}
         onShow={r.line ? (i) => coach.show(i) : undefined}
         extra={t1.triggerNote ? <p className="coach-note">{t1.triggerNote}</p> : null}
       />
@@ -371,7 +387,7 @@ function GuidedCount({ g, guided }: { g: G; guided: GuidedState }) {
         <h3 className="coach-head">Count it with me</h3>
         <span className="subtle">Question {step} of 4 · nothing is played</span>
       </div>
-      <h4 className="guided-q" id="guided-q">
+      <h4 className="guided-q" id="guided-q" tabIndex={-1}>
         {QUESTIONS[step - 1]}
       </h4>
       {step === 1 && (
@@ -473,8 +489,8 @@ function GuidedCount({ g, guided }: { g: G; guided: GuidedState }) {
       {step === 4 && (
         <div className="guided-body">
           <p className="subtle">
-            DON!! to give: {used} of {budget}. Order the attacks: smallest first, the hardest to
-            stop last.
+            DON!! to give: {used} of {budget}. Order the attacks: the one that has to beat the most
+            cards goes last, because every hit gives them a card.
           </p>
           <table className="tbl guided-split">
             <thead>

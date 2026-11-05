@@ -13,6 +13,8 @@ export interface CoachProfile {
   /** The lethal detector: 0 "Ask me" (default), 1 "Tier 1 always on", 2 "Tier 2 always on". */
   alwaysOn: AlwaysOn;
   verbosity: Verbosity;
+  /** "DON!! math on the board" (learning-ui §2.7): "+X to stop" tags on legal targets. Default off. */
+  donMath: boolean;
 }
 
 export const DEFAULT_PROFILE: CoachProfile = {
@@ -20,6 +22,7 @@ export const DEFAULT_PROFILE: CoachProfile = {
   tab: 'lethal',
   alwaysOn: 0,
   verbosity: 'standard',
+  donMath: false,
 };
 
 const KEY = 'optcg.coach.v1';
@@ -34,6 +37,7 @@ export function loadProfile(): CoachProfile {
       tab: p.tab === 'why' ? 'why' : 'lethal',
       alwaysOn: p.alwaysOn === 1 || p.alwaysOn === 2 ? p.alwaysOn : 0,
       verbosity: p.verbosity === 'learner' || p.verbosity === 'terse' ? p.verbosity : 'standard',
+      donMath: p.donMath === true,
     };
   } catch {
     return { ...DEFAULT_PROFILE };

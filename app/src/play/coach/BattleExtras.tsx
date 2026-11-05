@@ -7,13 +7,37 @@
  */
 import { useEffect, useState } from 'react';
 import { SCRIPTS, type Card } from '@optcg/cards';
-import { biggestCounter, priorFor } from '@optcg/ai';
+import { biggestCounter, priorCardIds, priorFor } from '@optcg/ai';
 import type { PlayerId, ProjectedView } from '@optcg/engine';
 import { num } from '../game/text.ts';
 import { noteCount, bumpNote } from './profile.ts';
 
-/** The assumed biggest Counter when their Leader has no sourced list (the search's fallback). */
+/**
+ * The assumed biggest Counter when their Leader has no sourced list (the search's fallback).
+ * TODO(L fix round): switch to the `FALLBACK_COUNTER` and the public-defence-bound function the
+ * `ai/` fix exports, so this panel and `public` lethal share one number and one model (L-08).
+ */
 export const FALLBACK_COUNTER = 4000;
+
+/**
+ * Do their deck's [Counter] Events do more than add power? Read from the public scripts of the
+ * archetype prior's cards: an effect that rests a Character, or draws, appears in the panel as one
+ * line, because the power bound alone would suggest nothing else can change a battle (review L-08).
+ */
+export function counterExtras(leader: string): { rests: boolean; draws: boolean } {
+  let rests = false;
+  let draws = false;
+  for (const id of priorCardIds(leader))
+    for (const ab of SCRIPTS[id]?.abilities ?? []) {
+      const a = ab as unknown as { kind?: string; when?: unknown };
+      const w = Array.isArray(a.when) ? a.when : [a.when];
+      if (a.kind !== 'activate' || !w.includes('counter')) continue;
+      const json = JSON.stringify(ab);
+      rests ||= /"rest":/.test(json);
+      draws ||= /"draw":/.test(json);
+    }
+  return { rests, draws };
+}
 
 export interface TheyCouldHave {
   blockers: string[];
@@ -25,6 +49,8 @@ export interface TheyCouldHave {
   total: number;
   /** Their deck's biggest Counter comes from the assumed fallback, not a sourced list. */
   assumed: boolean;
+  /** Their Counters can also rest a Character or draw (not only add power). */
+  extras: { rests: boolean; draws: boolean };
 }
 
 const isAttackTrigger = (w: unknown): boolean =>
@@ -58,7 +84,15 @@ export function theyCouldHave(
   const prior = leader ? priorFor(leader) : null;
   const perCard = prior ? biggestCounter(leader, cards) : FALLBACK_COUNTER;
   const hand = z.hand.length;
-  return { blockers, effects, hand, perCard, total: hand * perCard, assumed: !prior };
+  return {
+    blockers,
+    effects,
+    hand,
+    perCard,
+    total: hand * perCard,
+    assumed: !prior,
+    extras: prior ? counterExtras(leader) : { rests: false, draws: false },
+  };
 }
 
 export function WhatTheyCouldHave({
@@ -69,7 +103,11 @@ export function WhatTheyCouldHave({
   /** A short panel (tablet, a 600 px window) keeps one line: the hand's bound. */
   compact?: boolean;
 }) {
-  const { blockers, effects, hand, perCard, total, assumed } = they;
+  const { blockers, effects, hand, perCard, total, assumed, extras } = they;
+  const more =
+    extras.rests || extras.draws
+      ? `Their Counters can also ${[extras.rests && 'rest one of your Characters', extras.draws && 'draw a card'].filter(Boolean).join(' or ')}.`
+      : null;
   if (compact)
     return (
       <p className="bx-note" data-testid="what-they-could-have">
@@ -99,6 +137,7 @@ export function WhatTheyCouldHave({
             : ''}
           .
         </li>
+        {more && hand > 0 && <li>{more}</li>}
       </ul>
     </section>
   );

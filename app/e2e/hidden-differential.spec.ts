@@ -101,7 +101,10 @@ async function snapshot(page: Page): Promise<string> {
   const html = await page.evaluate(() => {
     const main = document.querySelector('main.play')!.cloneNode(true) as HTMLElement;
     const polite = main.querySelector('#announce-polite');
-    if (polite) polite.textContent = polite.textContent;
+    if (polite) {
+      const text = polite.textContent;
+      polite.textContent = text;
+    }
     return main.outerHTML;
   });
   const aria = await page.locator('main.play').ariaSnapshot();

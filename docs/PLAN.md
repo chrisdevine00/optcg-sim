@@ -28,7 +28,7 @@ Phases 3 and 4 still come before any engine or UI code beyond scaffolding.
 | 10 | M3 Board: hotseat, play vs **Rookie**, every decision type in the UI, rewind by move, inspector, live region, keyboard path | slice | 5, 9 | 50 |
 | 11 | M4a Effects slice: DSL runtime, then **Rocks (OP17-039)** and **Kaido (OP17-058)**, about 35 cards, each with a test. Throughput benchmark on these scripted decks | slice | E, 9 | 60 |
 | 12 | M5a AI slice: worker protocol, per-turn planning, Pirate, `Explanation` builder, game-plan assertions for the two playbooks | slice | 11 | 40 |
-| 13 | L Learning slice: battle panel and DON!! overlay (`preview`), tiered lethal detector, lethal search (`public` and `actual`), missed-lethal review flag end to end with real copy, "Practice this" | slice | 12 | 45 |
+| 13 | L Learning slice: battle panel and DON!! overlay (`preview`), tiered lethal detector, lethal search (`public` and `actual`), missed-lethal review flag end to end with real copy, "Practice this" | *(Not in row 13, owned elsewhere, DECISIONS 2026-11-05 "L fix round": opponent's-turn threat check M7; "Practised" mark and "lethal given away" M8; hindsight-puzzle label and harder any-hand hand M9.)* slice | 12 | 45 |
 | 14 | **Slice checkpoint:** owner usability session 1 on the real game (`usability-plan.md`); fold findings in | slice | 13 | 6 |
 | 15 | M4b Effects breadth: the other 10 archetypes (about 147 cards), DSL additions | breadth | 14 | 85 |
 | 16 | M5b AI breadth: Warlord, Emperor, 12 playbooks with assertions, nightly strength CI | breadth | 15 | 60 |

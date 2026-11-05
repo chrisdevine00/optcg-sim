@@ -455,7 +455,14 @@ export class GameController {
   puzzleState(): 'open' | 'solved' | 'failed' | null {
     if (!this.puzzle) return null;
     const v = this.session.view(this.me);
-    if (v.result) return 'winner' in v.result && v.result.winner === this.me ? 'solved' : 'failed';
+    // Solved only by a win on the puzzle's own turn: a win after its turn has passed is not it
+    // (review L-06).
+    if (v.result)
+      return 'winner' in v.result &&
+        v.result.winner === this.me &&
+        v.turn.number === this.puzzle.turn
+        ? 'solved'
+        : 'failed';
     return v.turn.number > this.puzzle.turn || v.turn.activePlayer !== this.me ? 'failed' : 'open';
   }
 
@@ -1214,6 +1221,9 @@ export class GameController {
   // -------------------------------------------------------------------------------------------
 
   private restart(): void {
+    // A rewound puzzle is a new attempt: its result is announced again (review L-06).
+    this.puzzleNoted = false;
+    if (this.puzzle && this.toast?.startsWith('Not this time')) this.toast = null;
     // A rewind ends any reveal (review M3-36).
     this.revealHeld = false;
     this.revealSticky = false;

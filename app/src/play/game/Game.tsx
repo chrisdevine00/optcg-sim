@@ -260,6 +260,36 @@ export function Game({
     for (const c of [...sim.view.zones[me].leader, ...sim.view.zones[me].characters])
       stagedPowers.set(c.handle, c.power);
   }
+  const donMathOn = !ctl.hotseat && ctl.coach.profile.donMath;
+  const donMathTag = (target: string): string | null => {
+    const tp = cardOf(target)?.power ?? 0;
+    const need = (attacker: string): number | null => {
+      const atk = legal.attacks
+        .get(attacker)
+        ?.find((a) => a.type === 'attack' && a.target === target);
+      if (!atk) return null;
+      const ap = cardOf(attacker)?.power ?? 0;
+      const pv = ctl.session.preview(me, atk);
+      // A preview that stops at a [When Attacking] decision does not say how the battle ends.
+      const lands =
+        pv && !pv.battleUndecided
+          ? pv.ko.includes(target) || pv.gameOver || pv.life[opp] < view.zones[opp].life.length
+          : ap >= tp;
+      return lands || ap >= tp ? Math.max(0, ap - tp) + 1000 : 0;
+    };
+    if (ui.kind === 'target' || ui.kind === 'confirm') {
+      const n = need(ui.attacker);
+      return n === null ? null : n > 0 ? `+${n} to stop` : 'fails alone';
+    }
+    if (ui.kind === 'don' || ui.kind === 'count') {
+      const best = [...legal.attacks.keys()]
+        .map(need)
+        .filter((n): n is number => n !== null && n > 0)
+        .sort((a, b) => b - a)[0];
+      return best === undefined ? null : `+${best} to stop your best`;
+    }
+    return null;
+  };
   const deco = (h: string): CardDeco => {
     const c = index.get(h);
     const out: CardDeco = { chips: [] };
@@ -285,6 +315,13 @@ export function Game({
       !c.view.rested &&
       view.turn.number > 2 &&
       !legal.attacks.has(h);
+    // "DON!! math on the board" (learning-ui §2.7, default off): while an attacker is chosen, each
+    // legal target says what they need to stop it, from the engine's `preview`; while giving
+    // DON!!, their Leader says what stops your strongest attacker.
+    if (donMathOn && !view.battle && mine && kind === 'main' && c.owner === opp) {
+      const tag = donMathTag(h);
+      if (tag) out.chips!.push({ text: tag, tone: 'attack' });
+    }
     if (kind === 'main') {
       if (ui.kind === 'target' || ui.kind === 'confirm') {
         const tgts = legal.attacks.get(ui.attacker) ?? [];

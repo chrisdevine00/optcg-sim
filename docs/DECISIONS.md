@@ -2,6 +2,20 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-05 — L fix round (app): puzzle judging, coach focus, DON!! math on the board, and owners for what is not built
+
+Context: `docs/reviews/l-review.md` failed L; these are the app findings.
+
+- **L-06.** A puzzle is "solved" only by a win on the turn it was cut from; a win on a later turn reads "not this time". A Rewind starts a new attempt (the result is announced again and the old toast goes). Tests in `app/test/fixround.test.ts`, each checked by reverting its fix.
+- **L-07.** Count it with me, each step change and Close send focus to the current question or the coach result, and the M3 focus rescue hands a coach control's focus to the coach, never the decision heading. Keyboard e2e walks every step and checks `activeElement` (it fails without the fix).
+- **`C` and focus (L-11).** learning-ui §2.1 wins: `C` toggles the coach and focus does not move; only the keys that ask for a result (L, W, H) send focus to it. accessibility.md §3.12 is corrected.
+- **L-04 (app part).** The live coach's `any-hand` tooltip speaks of the lists we know and what you can see now (the review's "every hand they could have had" stays in review), carries the Trigger caveat when `tier1` supplies one, and the polite tier 1 line appends the caveat when the `ai/` sr text lacks it.
+- **L-08 (app part).** "What they could have" adds one line, "Their Counters can also rest one of your Characters or draw a card", when a [Counter] Event in the archetype prior does (read from the public scripts). `FALLBACK_COUNTER` and this reading are interim: switch to the `ai/` exports (one fallback, one defence-bound function) when they land.
+- **L-09, DON!! math on the board.** Built, smallest honest form: the setting "DON!! math on the board" (a checkbox in the coach's Lethal section, default off, kept per browser). With it on, while an attacker is chosen each legal target shows "+X to stop" (or "fails alone"), computed from the engine's `preview` (a [When Attacking] decision that leaves the battle undecided falls back to the power difference); while giving DON!!, their Leader shows "+X to stop your best" for your strongest attacker, and it updates as DON!! go on. Against the AI only. Not built: tags on Characters other than legal targets, and drag-time tags.
+- **L-10.** M9 was a real bug (setting always-on inside a puzzle checked at once): fixed, test added. M16 (the hand count) now has a unit test. Both checked by reverting.
+- **L-11 copy.** The guided count says the attack that has to beat the most cards goes last, because every hit gives them a card (curriculum L16 has no smallest-first rule).
+- **Owners for the unscheduled items (PLAN row 13 split).** The opponent's-turn threat check: **M7**, with the engine change it needs (a search skeleton that accepts a foreign decision, undoing M5a-02's refusal safely). The "Practised: solved" mark on the flag: **M8** (it is per-flag state that History owns). The "Their real hand: one way to see it" label on a hindsight puzzle and the any-hand puzzle's harder hand: **M9** (the drill bank builds puzzles; it can choose real strongest hands from the prior). "Lethal given away": **M8**. The board sandbox for the guided count: after owner usability session 1 (flows decide whether it is worth it).
+
 ## 2026-11-05 — L UI: the missed-lethal review is a minimal Overview, a read-only Study and a puzzle, run in its own worker
 
 Context: PLAN row 13 needs the missed-lethal flag "end to end": run after a game, shown with its Explanation, restorable, and openable as a puzzle. Full Game Review is M8, and `ai/` is frozen for this task (another builder is fixing A1 there), so the worker protocol cannot grow a `review` request.

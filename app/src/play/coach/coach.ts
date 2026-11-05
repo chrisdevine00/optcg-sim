@@ -245,11 +245,17 @@ export class Coach {
     return this.lethal.result ? explainLethal(this.lethal.result, this.host.cards, 'coach') : null;
   }
 
+  /** The polite tier 1 line carries the Trigger caveat when it applies (review L-04). */
+  private t1Speech(r: LethalResult): string {
+    const t = tier1(r);
+    return t.triggerNote && !t.sr.includes('Trigger') ? `${t.sr} ${t.triggerNote}` : t.sr;
+  }
+
   private speakResult(auto: boolean): void {
     const r = this.lethal.result;
     if (!r) return;
     const t = this.lethal.tier;
-    const text = t >= 2 ? tier2(r).sr : t === 1 ? tier1(r).sr : '';
+    const text = t >= 2 ? tier2(r).sr : t === 1 ? this.t1Speech(r) : '';
     if (!text) return;
     // The background detector speaks only when its answer changes (learning-ui §2.2: polite).
     if (auto && text === this.lastSpoken) return;
@@ -296,7 +302,7 @@ export class Coach {
   private speakTier(t: Tier): void {
     const r = this.lethal.result;
     if (!r) return;
-    if (t === 1) this.host.announce(tier1(r).sr);
+    if (t === 1) this.host.announce(this.t1Speech(r));
     else if (t === 2) {
       this.host.announce(tier2(r).sr);
       this.progress('tier2');
@@ -342,7 +348,8 @@ export class Coach {
     saveProfile(this.profile);
     if (p.alwaysOn !== undefined) {
       // A new always-on level takes effect on this position at once.
-      if (p.alwaysOn > 0 && this.lethal.key && this.lethal.status === 'idle') this.request(true);
+      if (p.alwaysOn > 0 && !this.host.puzzle && this.lethal.key && this.lethal.status === 'idle')
+        this.request(true);
       if (p.alwaysOn > 0 && this.lethal.result)
         this.lethal = {
           ...this.lethal,
@@ -370,6 +377,7 @@ export class Coach {
     if (!data) return;
     this.profile = { ...this.profile, expanded: true, tab: 'lethal' };
     this.wantTall = true;
+    this.focusSignal++;
     this.guided = { step: 1, hits: '', picked: [], split: [], check: null, data };
     this.progress('count');
     this.host.announce('Count it with me. Question 1: how many hits do you need?');
@@ -379,11 +387,14 @@ export class Coach {
   endGuided(): void {
     this.guided = null;
     this.wantTall = false;
+    // The button that held focus is gone: the section's result takes it (review L-07).
+    this.focusSignal++;
     this.host.notify();
   }
 
   guide(patch: Partial<GuidedState>): void {
     if (!this.guided) return;
+    if (patch.step !== undefined && patch.step !== this.guided.step) this.focusSignal++;
     this.guided = {
       ...this.guided,
       ...patch,

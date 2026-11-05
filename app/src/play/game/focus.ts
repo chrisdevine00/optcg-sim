@@ -60,16 +60,27 @@ export function useFocusRescue(): void {
   useEffect(() => {
     let spot: Spot | null = null;
     let tracked: Element | null = null;
+    let inCoach = false;
     const onIn = (e: FocusEvent) => {
       const t = e.target as Element | null;
       if (!t || t === document.body) return;
       tracked = t;
+      inCoach = !!t.closest('.coach');
       // A menu or dialog keeps the spot of the card that opened it.
       spot = spotOf(t) ?? spot;
     };
     const check = () => {
       if (!tracked || tracked.isConnected || !lostToBody() || modalOpen()) return;
       tracked = null;
+      // A coach control that unmounted (Count it with me, Next, Close) hands focus to the coach's
+      // own question or result, never out to the decision heading (review L-07).
+      if (inCoach) {
+        const here = document.querySelector<HTMLElement>('.guided-q, .coach-result');
+        if (here) {
+          here.focus();
+          return;
+        }
+      }
       const to = rescueTarget(spot);
       to?.focus({ preventScroll: false });
     };

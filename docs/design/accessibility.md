@@ -201,7 +201,7 @@ The engine runs Block Step, then Counter Step, as two decisions (CR 7-1-2, 7-1-3
 | `W` | Why did the opponent do that | Same pattern as `H`, for the last AI move. |
 | `L` | Lethal check, tiered (ARCHITECTURE §4.4) | First press: "Lethal: yes" / "no" / "unknown, search incomplete". Second press: the number of hits. Third press: the full line. Each tier is text in the coach panel and is announced politely. |
 | `M` | Focus the battle panel and DON!! maths | During a battle. It reads attacker power, defender power, the gap, and the counters in hand. |
-| `C` | Toggle the coach panel and move focus into or out of it | The panel is an `<aside aria-label="Coach">` in normal document flow: browse mode works there, and Tab order is header, Hint, Why, Lethal, toggles, then content. Pressing `C` again returns focus to the card that had it. |
+| `C` | Toggle the coach panel (focus does not move: learning-ui §2.1 wins, decided 2026-11-05, L-11) | The panel is an `<aside aria-label="Coach">` in normal document flow: browse mode works there, and Tab order is header, Hint, Why, Lethal, toggles, then content. Focus stays where it was; only L, W and H, which ask for a result, send focus to it. |
 
 The coach never takes focus on its own. Detector lights and the tempo meter change silently, unless the player has switched on "Announce coach alerts". This follows "the coach never interrupts unless asked" (PROMPT.md).
 

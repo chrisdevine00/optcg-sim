@@ -271,6 +271,58 @@ test.describe('an Event that cannot pay its cost (M4a-18)', () => {
   });
 });
 
+test.describe('focus stays in the coach (L-07) and DON!! math on the board (L-09)', () => {
+  test('keyboard walk of Count it with me keeps focus inside the coach at every step', async ({
+    page,
+  }) => {
+    await lethalGame(page);
+    await nextDecision(page);
+    const inCoach = () => page.evaluate(() => !!document.activeElement?.closest('.coach'));
+    await page.keyboard.press('l');
+    await expect(page.locator('.coach-head')).toContainText('Lethal is on the board.', {
+      timeout: 15_000,
+    });
+    await page.keyboard.press('l');
+    const press = async (name: string) => {
+      const b = page.getByRole('button', { name, exact: true });
+      await b.focus();
+      await page.keyboard.press('Enter');
+      await page.waitForTimeout(200);
+      expect(await inCoach(), `after ${name}`).toBe(true);
+    };
+    await press('Count it with me');
+    await expect(page.locator('.guided-q')).toBeFocused();
+    await press('Next');
+    await expect(page.locator('.guided-q')).toHaveText(/Which of your cards/);
+    await expect(page.locator('.guided-q')).toBeFocused();
+    await press('Next');
+    await press('Next');
+    await expect(page.locator('.guided-q')).toHaveText('Split your DON!!');
+    await expect(page.locator('.guided-q')).toBeFocused();
+    await press('Close');
+    expect(await page.evaluate(() => document.activeElement?.id)).not.toBe('decision-title');
+  });
+
+  test('"DON!! math on the board" is off by default and tags legal targets when on', async ({
+    page,
+  }, info) => {
+    await lethalGame(page);
+    await nextDecision(page);
+    await page.locator('[data-zone="my-row"].bc-leader').click();
+    await expect(page.locator('.cchip', { hasText: 'to stop' })).toHaveCount(0);
+    await page.keyboard.press('Escape');
+    await page.keyboard.press('c');
+    const box = page.getByLabel('DON!! math on the board');
+    await box.focus();
+    await page.keyboard.press('Space');
+    await expect(box).toBeChecked();
+    await page.locator('[data-zone="my-row"].bc-leader').click();
+    // Kaido's Leader (5000) against theirs (5000): they need +1000 to stop it.
+    await expect(page.locator('.cchip', { hasText: '+1000 to stop' })).toBeVisible();
+    await page.screenshot({ path: `.cache/l/${info.project.name}-don-math.png` });
+  });
+});
+
 test.describe('the missed-lethal review (learning-ui §4.2–4.5)', () => {
   async function concede(page: Page) {
     await page.getByRole('button', { name: 'Game menu' }).click();
