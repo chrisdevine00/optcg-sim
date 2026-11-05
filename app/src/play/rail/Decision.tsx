@@ -1639,12 +1639,14 @@ function chooseContent(g: G): Content {
             const c = g.cardOf(h);
             return (
               <button key={h} type="button" className="opt" aria-disabled="true">
-                {g.nameOf(h)}
-                {c?.card?.cost !== null && c?.card?.cost !== undefined
-                  ? ` · cost ${c.card.cost}`
-                  : ''}
-                {c?.power !== null && c?.power !== undefined ? ` · ${num(c.power)}` : ''}
-                <span className="mi-why">: can’t be chosen. {d.prompt}</span>
+                <span>
+                  {g.nameOf(h)}
+                  {c?.card?.cost !== null && c?.card?.cost !== undefined
+                    ? ` · cost ${c.card.cost}`
+                    : ''}
+                  {c?.power !== null && c?.power !== undefined ? ` · ${num(c.power)}` : ''}
+                  <span className="mi-why">: can’t be chosen for this effect</span>
+                </span>
               </button>
             );
           })}

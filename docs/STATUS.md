@@ -82,7 +82,7 @@
     - F1 (severity 3, both browsers): focus is lost to the page body after playing from the menu, after Done on a pick, after the order choice, and at the end of the AI turn.
     - FF1 (severity 3, Firefox): only the first assertive message is spoken.
     - Ten findings at severity 2, among them `.` swallowed by NVDA's browse mode, no AI turn summary, a silent attack confirm that also shows a wrong result while a [When Attacking] effect is pending, and the order decision having no grab, move or drop.
-  - The fixes go to the M3 builder after M5a fix round 1 lands, because both touch focus and the live regions. Then re-run the workflow.
+  - **Fixes written 2026-11-05** (branch `worktree-agent-a38ff78f137bae79b`, DECISIONS 2026-11-05 "M3 NVDA pass fixes"): F1 and FF1 and every severity 2 finding except F3 and FF2 (not reproduced in Chromium; hardened) are fixed in code with e2e checks. Nothing was heard in NVDA. **Next: re-run `a11y-nvda.yml` on that branch** and record the result; F2, F3, FF2 and the F1/FF1 speech need that run to confirm.
   - M3 is marked done when that record has no open severity 3 or 4 finding.
   - The VoiceOver pass is the owner's (see Blockers).
 
