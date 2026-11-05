@@ -1,7 +1,7 @@
 # Status
 
 **Phase:** 5 Build, slice pass (ADR 0012), starting at M0. Phases 1–4 gated 2026-10-28.
-**Milestone:** L Learning slice built and merged; independent review next. M5a done 2026-11-05 (re-review 1 PASS). M4a done 2026-10-29. M3 done 2026-11-05 (NVDA r4 PASS in Chrome and Firefox). M0, M1 and M2 done 2026-10-28.
+**Milestone:** L Learning slice: review FAILED 2026-11-05; fix round 1 in progress. M5a done 2026-11-05 (re-review 1 PASS). M4a done 2026-10-29. M3 done 2026-11-05 (NVDA r4 PASS in Chrome and Firefox). M0, M1 and M2 done 2026-10-28.
 **Run the app:** `npm install && npm run dev` then open http://localhost:5173/optcg-sim/ and go to `/cards` for the card browser
 **Deployed:** https://chrisdevine00.github.io/optcg-sim/ (auto-deploys after green CI on `main`)
 
@@ -142,7 +142,12 @@
 
 ## Next (slice pass, PLAN.md §1)
 
-0. **In flight (2026-11-05):** the independent L review (`docs/reviews/l-review.md`).
+0. **In flight (2026-11-05): L fix round 1.** The L review (`docs/reviews/l-review.md`, 65d1fdf) FAILED:
+   - L-01 (sev 4): the attackers bound misses "gains Rush", so a real lethal is called refuted at any-hand, and review skips it.
+   - L-02 (sev 4): the `public` placeholder can't pay type-named costs, so Shiki's −3000 is never modelled; 60 of 91 oblivious proofs broke against exhaustive defenders.
+   - L-03 (sev 3): "Couldn't finish checking" on 86% of searched positions (99.5% against Kaido).
+   - Eight severity-2 findings.
+   Two builders are fixing it: `ai/` (L-01..L-05, plus a soundness harness and an Unknown-rate target of about 30%) and `app/` (L-06..L-11, including the DON!! overlay).
 1. **M3:** record the NVDA re-run in `docs/design/a11y-passes/`; M3 is done when neither browser has an open severity 3 or 4.
 2. **L Learning slice:** built (see above). Left: the independent L review; then a manual screen-reader pass of the coach, the guided count and the review (record it in `docs/design/a11y-passes/`).
 3. **Owner usability session S1** on the real game (`usability-plan.md`).
