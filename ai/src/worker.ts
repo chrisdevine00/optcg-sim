@@ -6,6 +6,7 @@
  */
 import type { Card } from '@optcg/cards';
 import { chooseAction } from './choose.ts';
+import { answerLethal, insertByPriority } from './lethal/request.ts';
 import type { AiRequest, AiResponse, GameInfo } from './protocol.ts';
 import { AiSession } from './session.ts';
 
@@ -28,7 +29,10 @@ function ensureSession(): AiSession | null {
   return session;
 }
 
-type Work = Extract<AiRequest, { type: 'planTurn' } | { type: 'decide' }>;
+type Work = Extract<AiRequest, { type: 'planTurn' } | { type: 'decide' } | { type: 'lethal' }>;
+
+/** Lower runs first: the turn's own search 1, a pressed Lethal 2, review 3, the background detector 4. */
+const priorityOf = (w: Work): number => (w.type === 'lethal' ? (w.priority ?? 2) : 1);
 
 /**
  * Requests queue and run one at a time on a later task, so a `cancel` that arrives behind a request
@@ -40,6 +44,12 @@ let running = false;
 function run(req: Work): void {
   const t0 = performance.now();
   try {
+    if (req.type === 'lethal') {
+      const res = answerLethal(req, cards);
+      if (cancelled.delete(req.id)) return;
+      post(res);
+      return;
+    }
     if (req.type === 'planTurn') {
       const r = ensureSession()?.planTurn(req.view, req.seed, req.budget) ?? {
         steps: 0,
@@ -95,7 +105,9 @@ self.onmessage = (e: MessageEvent<AiRequest>) => {
       session?.reset();
       return;
     default:
-      queue.push(req);
+      // By priority, first come first served within one: a background Lethal check never waits
+      // ahead of the AI's own turn or of a press of the Lethal button.
+      insertByPriority(queue, req, priorityOf);
       if (!running) {
         running = true;
         setTimeout(drain, 0);
