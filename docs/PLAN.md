@@ -36,7 +36,7 @@ Phases 3 and 4 still come before any engine or UI code beyond scaffolding.
 | 18 | M7 Tutorial and the rest of the coach (hint as a line, why, blunder warning, tempo meter); owner usability session 2 | breadth | 16 | 40 |
 | 19 | M8 Review breadth: every flag category, timeline, restore and replay, local save, analysis time cap | breadth | 16 | 30 |
 | 20 | M9 Meta explorer, matchup grid, `meta:update`, four drills (puzzles drawn from real review flags), rules reference, progress with "what to work on next" | breadth | G, 16, 17 | 40 |
-| 21 | M10 Polish and release; owner usability session 3 | breadth | all | 20 |
+| 21 | M10 Polish and release; owner usability session 3; findings carried to M10 (listed in STATUS.md) | breadth | all | 20 |
 | 22 | Overhead: the verification ritual, screenshot reviews, STATUS and DECISIONS upkeep (about 10% of the build) | | | 55 |
 | | **Total** | | | **718** |
 

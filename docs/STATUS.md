@@ -1,7 +1,7 @@
 # Status
 
 **Phase:** 5 Build, slice pass (ADR 0012), starting at M0. Phases 1–4 gated 2026-10-28.
-**Milestone:** M5a AI slice: fix round 1 done 2026-10-29 (pacing follow-up 2026-11-05), in re-review. M4a done 2026-10-29. M3 passes on code, with the NVDA screen-reader pass outstanding. M0, M1 and M2 done 2026-10-28.
+**Milestone:** L Learning slice next. M5a done 2026-11-05 (re-review 1 PASS). M4a done 2026-10-29. M3 passes on code, with the NVDA screen-reader pass outstanding. M0, M1 and M2 done 2026-10-28.
 **Run the app:** `npm install && npm run dev` then open http://localhost:5173/optcg-sim/ and go to `/cards` for the card browser
 **Deployed:** https://chrisdevine00.github.io/optcg-sim/ (auto-deploys after green CI on `main`)
 
@@ -13,7 +13,7 @@
 | 2 Plan | docs/PLAN.md, docs/ARCHITECTURE.md, docs/adr/ | **Gated 2026-10-28** (revision 2 after two reviews; see docs/plan-review-1.md) |
 | 3 Deep research | docs/research/effect-dsl.md, rulings.md; docs/content/archetypes/, curriculum.md, glossary.md, sources.md | **Gated 2026-10-28** (competitive-player review: 20 findings, 0 severity-3 open; see docs/content/review-1.md) |
 | 4 Design | docs/design/principles.md, board.md, flows.md, visual-system.md, learning-ui.md, wireframes/, review-1.md | **Gated 2026-10-28** (review 1: 50 findings plus 2 verification passes; 0 severity-3 or severity-4 open) |
-| 5 Build | M0 through M10 per PROMPT.md | In progress: M0–M2 and M4a done; M3 passes on code; M5a fix round 1 done, awaiting re-review |
+| 5 Build | M0 through M10 per PROMPT.md | In progress: M0–M2, M4a and M5a done; M3 passes on code (NVDA fixes outstanding) |
 
 ## Done
 
@@ -97,7 +97,7 @@
 - **CI:** 2 min 35 s, with Playwright in 3 shards and per-push full games starting from a late-game scenario. The turn-1 full games run nightly (`E2E_FULL=1`).
 - **Re-review 1 (42833ee): PASS.** No severity 3 or 4 finding is open, and every fix has a test that fails on revert. A probe over 1,500 games (520,544 card-naming events) found no log line naming a card the viewer couldn't see. Non-blocking findings are carried with targets (see Next). The Nightly workflow was dispatched once by hand (M4a-20): run 40848871925.
 
-### M5a AI slice: built 2026-10-29, in review
+### M5a AI slice: done 2026-11-05
 - **Engine (additive):** `projectForSearch` (the view plus a search skeleton with every hidden card stripped) and `determinize`; queries `battle`, `usedThisTurn`, `CardView.played`. The leak property now covers the skeleton. ENGINE_VERSION unchanged (0.5.2).
 - **AI:** the **Pirate** tier, a greedy per-turn planner over 4 determinized states (archetype prior from the sourced lists), scored by rollouts and a named heuristic; `planTurn`/`decide`/`cancel` in the worker, with the plan kept there; playbooks `ai/playbooks/OP17-039.json` and `OP17-058.json`; the `Explanation` builder (public facts only).
 - **Results** (`docs/benchmarks.md`): Pirate beat Rookie in **200 of 200** iteration-budgeted games (Rocks and Kaido, swapped seats; Wilson 95% interval 98.1–100%). Game-plan assertions: 12 planted-position tests pass; nightly over 40 Pirate-vs-Pirate games, every seed with 10+ cases meets its threshold (two seeds have too few cases to enforce). E12, E13 and E16 match `explanations.md` exactly. AI turns at 1× measured 1.0–6.8 s in the browser.
@@ -115,6 +115,11 @@
     - M5a-01: one public-only "Why?" builder (`ai/src/search/why.ts`) for every AI decision, forced or not; no term reasons, no "Only legal move.", no `search-incomplete` for the AI; "thinking" only on the AI's own turn. Guards: `ai/test/why-differential.test.ts` and the controller twin tests; both fail on the M5a code.
     - M5a-02: the skeleton keeps only the public shape of another player's decision and is opaque; `engine/test/property/skeleton-diff.test.ts` compares reachable pairs and fails on the M5a code.
     - M5a-03: a merged log line is announced again, whole; a live-region test.
+    - **Re-review 1 (`docs/reviews/m5a-review.md`): PASS.** Every guard was checked by reverting its fix. Strength 60/60 vs Rookie (reduced run), typical turns 1.0–7.5 s, the 15-move turn 10.0 s (within board.md §5.2's heavy-turn budget; the 8 s target holds for typical turns only). Open, with targets:
+      - M5a-17 (sev 2): the take template says the Life card "goes to its hand" / "drops to N−1 Life" before damage resolves, which is false for [Banish], [Double Attack] or a Trigger → **L** (explanations are its core).
+      - M5a-10 (sev 2, partly fixed): the strength gates catch broken rollouts but not a too-small search (a 1-iteration Pirate passes) → **M5b**, which owns the tier gates.
+      - M5a-16 (sev 2, partly fixed): the midline activity text overprints the turn label at 1280×720 → **M10**.
+      - Severity 1: M5a-18 (no guard for the own-turn "thinking" gate, worker `reset`, `planTurn` cancel) and M5a-21 (Setup's turn-time copy) → **L**; M5a-19 (considering beat scales with speed), M5a-20 (`peekNext` wait counts as board time), M5a-22 ("its deck's biggest counter" wording) → **M10**.
     - **Pacing follow-up (2026-11-05, on resume):** the fix round's new holds made the late-game AI turn 11.5 s and the per-push pacing e2e failed. Dwell compression (board.md §5.2) is now built from elapsed board time, not the plan (which would leak a long turn ahead); the late turn takes 10.0 s, and the check follows §5.2: typical turns ≤ 8 s, heavy turns bounded (DECISIONS 2026-11-05; benchmarks.md "Pacing"). Carried to M10 is now only the midline overlap.
     - Strength (benchmarks.md): 200/200 vs Rookie; 66/100 vs a shallow (no-rollout) Pirate, gate 60%, control 21/40; 100/100 with the opponent's list left out of the prior. Game-plan assertions now run with and without the biases; search alone finds 7 of 10 seeds in planted positions.
 
@@ -125,9 +130,8 @@
 
 ## Next (slice pass, PLAN.md §1)
 
-1. **M5a re-review** of fix round 1 and the pacing follow-up (`docs/reviews/m5a-review.md`). Running 2026-11-05.
-1a. **M3 NVDA fixes** (F1 focus loss, FF1 Firefox assertive messages, then the severity-2 list), then re-run `a11y-nvda.yml`.
-2. **L Learning slice:** first, the carried M4a-16 (the veiled Use hint describes the last public activation, which can be the wrong effect; drive it from the decision's public source instead) and M4a-18 (an Event whose optional cost can't be paid looks fully usable; warn before it is wasted). Then the battle panel and DON!! overlay (`preview`), the tiered lethal detector, lethal search, the missed-lethal review flag end to end, and "Practice this". Then a manual screen-reader pass.
+1. **M3 NVDA fixes** (F1 focus loss, FF1 Firefox assertive messages, then the severity-2 list), then re-run `a11y-nvda.yml`.
+2. **L Learning slice:** first, the carried M5a-17, M5a-18, M5a-21, M4a-16 (the veiled Use hint describes the last public activation, which can be the wrong effect; drive it from the decision's public source instead) and M4a-18 (an Event whose optional cost can't be paid looks fully usable; warn before it is wasted). Then the battle panel and DON!! overlay (`preview`), the tiered lethal detector, lethal search, the missed-lethal review flag end to end, and "Practice this". Then a manual screen-reader pass.
 3. **Owner usability session S1** on the real game (`usability-plan.md`).
 4. **M4b entry items:** M4a-17 (the veiled-Use safety check must use the engine's `secret` flag or a typed script walk, not a regex over the JSON); a check that each script's "you may" cost flag matches its card text; M4a-19 (four fixes have no test that fails on revert). Also, from M4a-10 ( not reachable with the Rocks and Kaido scripts, so fix before M4b scripts can reach them):
    - one removal event over several Characters gets **one** replacement offer (QA-OP15 OP15-069: one DON!! return keeps both);
