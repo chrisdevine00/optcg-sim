@@ -142,10 +142,8 @@
 
 ## Next (slice pass, PLAN.md §1)
 
-0. **In flight (2026-11-05): L re-review 1.** The L review (`docs/reviews/l-review.md`, 65d1fdf) FAILED on L-01, L-02 (sev 4) and L-03 (sev 3). Fix round 1 is merged (e4f82b9 app, 0f2cb45 and f5d8b0c ai, 20f4538 the panel uses `defenceBound`); lint, build, 1,098 unit tests and 150 e2e pass.
-   - L-01 and L-02 fixed with a permanent soundness harness (`ai/test/lethal-sound.test.ts`: 0 of 180 replays broken; the old model breaks 22 of 168).
-   - **L-03 not met:** "Couldn't finish checking" on 61% of searched positions (was 86%); against Rocks 33%, against Kaido 80%. E20 is proven in about 120 ms. The levers left are in DECISIONS ("L fix round (AI half)").
-   - An independent re-review is running; it decides whether L-03 needs a second round.
+0. **Paused 2026-11-05 night: L fix round 2.** L re-review 1 (`docs/reviews/l-review.md`, 8ae2afa) FAILED. Open: L-03 (sev 3, Unknown on 72% of searched positions, target under about 30%), L-12 (sev 3, the attackers bound ignores draw and search into a Rush Character), L-13 (sev 3, the screen-reader Trigger note says "any hand" when the certainty is `needed-hidden-info`), and L-14's ai part (the screen-reader caveat has no test; the `lethal-games.test.ts:141` gate counts bound answers as decided, so it can't fail on L-03). The app part is merged (1b100e0: Unknown states the public defence bound; tests for the Counter extras and the coach focus rescue). L-15 (sev 1) goes to M10.
+   - **The ai/ round-2 work in progress** is on branch `worktree-agent-a94ee856e00d82aad` (worktree `.claude/worktrees/agent-a94ee856e00d82aad`, WIP commits fcbeff4 "search-free refutation bound" and de121fb). It is unverified: review it, finish it or redo it, then run the soundness harness, the leak differential and the reviewer's rate probe (3 seeds, 1.5 s cap).
 1. **L Learning slice:** built (see above). Left: the re-review; then a manual screen-reader pass of the coach, the guided count and the review (record it in `docs/design/a11y-passes/`).
 2. **Owner usability session S1** on the real game (`usability-plan.md`).
 3. **M4b entry items:** M4a-17 (the veiled-Use safety check must use the engine's `secret` flag or a typed script walk, not a regex over the JSON); a check that each script's "you may" cost flag matches its card text; M4a-19 (four fixes have no test that fails on revert). Also, from M4a-10 ( not reachable with the Rocks and Kaido scripts, so fix before M4b scripts can reach them):
