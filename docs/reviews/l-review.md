@@ -223,3 +223,80 @@ What the app shows on Unknown: tier 1 "?" and chip "Unknown"; tier 2 "You need N
 - PASS requires no open severity 3 or 4. Open: L-03, L-12, L-13 (all severity 3).
 
 L re-review 1: FAIL
+
+## Re-review 2
+
+**Verdict: PASS.** No severity 3 or 4 finding is open. L-03 is not closed in the builders' own terms (35% Unknown among searched positions, target under about 30%), but it no longer blocks the milestone's purpose, so I re-graded it from severity 3 to **2**. L-12 and L-13 are fixed. The new refutation paths held up under everything I threw at them (0 unsound in about 1,000 checks), but the suite that is meant to guard them is weak: 9 of 13 mutations of `bound.ts` pass every test (L-16, severity 2).
+
+**Build reviewed:** `ba74433` on main, in a clean worktree with its own `npm ci`; no production code changed. Probes lived in a gitignored `.cache/rr2/`. Mutations were applied by a script that restores each file; `git status` was clean after every run. E2E ran on `E2E_PORT=4512`.
+
+**What I ran**
+- **Soundness of `refutedByBound` and the reduced-defender pass.**
+  - I read the `bound.ts` header argument and re-derived it. It holds as written: the online defender stops an attack when it costs at most `t = floor(H/k)` cards, up to `k` stops, and Blockers take the `free` expensive attacks. I checked the case split (`C >= k` gives at most `need-1` landed; `C < k` needs `E >= need+free`), the adaptive attacker, ties, `t = 0`, Double Attack at 1 Life, and `handLoss` taken up front (the most favourable timing for the attacker, so it is safe).
+  - I audited all 37 scripts: every `do` op, every `restrict`, every `trashFromHand`, `setActive`, `grant`, `addDon`, `power`. No op the scan classes as neutral can raise power, DON!!, attacks or reduce their hand. The two `restrict` forms in the slice (`cannotAttack`, on the opponent's Characters) are neutral. The DSL has no restriction that bars Counters, so the loose `typeof what === 'string'` check (L-17) cannot be hit today.
+  - **My harness (`wide.probe.ts`)**, wider than `lethal-bound.test.ts`:
+    - Attacker side: any of the 37 scripted cards in hand, Characters, Stage and trash; rested, summoning-sick and DON!!-carrying Characters; rested DON!!; scripted and vanilla Leaders.
+    - Defender side: Rocks, Kaido, Sabo and Luffy, with Blockers (OP17-042, OP17-062) rested or active, 0 to 7 hidden cards, 1 to 2 Life, 0 to 4 DON!!.
+    - Checks: wherever a public answer refutes by `bound` or `reduced`, `lethal(public, bound:'off')` at 150,000 nodes must not prove. Wherever it refutes by `attackers` at `any-hand`, `lethal(actual)` at 150,000 nodes must not prove. Every oblivious `any-hand` proof is replayed against every defender answer on its own hand and 2 re-rolled hands. Every second position gets the hidden-information differential (re-rolled hand, Life and decks of both seats).
+    - 4 seeds x 120 positions = 436 usable positions: 92 `bound` and 79 `reduced` refutations (171), of which 119 were decided by the off search, **0 proven**, and 52 were off-search Unknown, so unchecked. 17 `attackers` `any-hand` refutations against `actual`: **0 proven**. 22 oblivious `any-hand` proofs, 66 replays: **0 broken**. Differential: **0 differences**.
+    - The builders' `BOUND_POSITIONS=300`: 47 bound, 41 reduced, 131 attackers, 88 checked, 0 differences, 16 of 16 tests pass.
+  - **Planted counterexamples:** the hand-built families (Torch, Blocker plus a KO card, a rested King adding DON!!, over DON!! 0 to 10 and hand 0 to 3) found no position where the real bound refutes and the off search proves. The same families do show what the suite cannot see (L-16).
+- **Engine hash change.** I loaded the old `hash.ts` (from `ba74433~6`) next to the new one. 20,000 random strings, including non-BMP and empty: identical `hashString`. 2,710 states from 8 Rookie games: identical `summaryHash`, and identical `summary` JSON. The new code is the same cyrb53 pair with the same seeds in one pass, and `canon` returns an empty array unchanged, which `JSON.stringify` cannot tell from a copy. It is a correct canonical hash, with the same output. The engine golden and property suites pass in `npm test`.
+- **Any-hand replay harness** (`LETHAL_POSITIONS=160 LETHAL_HANDS=4`): 85 proven, 316 replays, **0 broken** (126 decided of 160). Hidden-information differential on real positions, including bound-refuted ones: covered by the 300-position bound property (0 differences) and my 436-position harness (0).
+- **Rate** (`npx tsx ai/bench/rate.ts`, `RATE_OUT` set, nothing else running): see "L-03 measured".
+- **Suites:** `npm run typecheck` clean; `npm run lint` clean (eslint and prettier); `npm test`: 159 files passed, 1,118 tests passed (2 expected fail, 164 todo); Playwright `learning.spec.ts` and `focus.spec.ts` at 720p and 1080p: 22 of 22 pass.
+
+### Old findings
+
+| ID | Status | Evidence |
+| --- | --- | --- |
+| L-03 | **Improved, not closed. Re-graded to severity 2** | 35% Unknown of searched positions (was 72%); 20.7% of all Main decisions; Kaido defender 40% (was 68%); E20 proven at 97 ms (was Unknown at 3 s). Detail below. |
+| L-12 | **Fixed** | The reviewer's repro, played through the engine: `actual` is now `proven` (255 nodes), not `refuted`; `reviewMissedLethal` flags the turn. `public` says `refuted`, `needed-hidden-info`, reason `attackers`, `drawsIgnored: true`, worded "from what you hold (cards you draw are not counted)". Mutations: `actual` using the no-deck count fails 2 tests; the deck not counted (`deckKnown` off) fails 2. One gap: see L-16. |
+| L-13 | **Fixed** | `triggerNote` follows the certainty, and the Sabo case (`needed-hidden-info`) now reads "Depends on their hand, and a Life card's Trigger could stop it". Mutations: certainty ignored fails 3 tests (ai and app); the polite line dropping the caveat fails 3. |
+| L-14 | **Fixed (3 of 4 checked)** | (a) the polite-line caveat is caught (above); (b) forcing `theyCouldHave` extras off fails `fixround.test.ts`; (d) the gate is now (proven + refuted) / searched over positions the attackers bound did not answer. (c) the `focus.ts` rescue-only e2e is new and passes at both sizes; I did not run the revert mutation. |
+| L-15 | **Carried to M10** | Not touched; still severity 1. |
+
+### L-03 measured
+
+Rookie v Rookie, Rocks and Kaido in all four pairings, 3 seeds, 1,181 Main-phase decisions of either seat, `public` at `{ ms: 1500 }`, Node, nothing else running (stock script, my reading of its row output).
+
+| Quantity | Result |
+| --- | --- |
+| Answered at once by the attackers bound | 480 of 1,181 (41%; was 748) |
+| "Searched" (everything else) | 701 |
+| Of those: refuted by `bound` / by the reduced pass / proven / **Unknown** | 33 / 398 / 26 / **244** |
+| **Unknown as a share of searched** | **34.8%** (36.5% if the 33 free `bound` answers are left out of the denominator) |
+| **Unknown as a share of all Main decisions** | **20.7%** |
+| Unknown against Rocks | 88 of 313 searched (28%); 15.8% of 558 decisions |
+| Unknown against Kaido | 156 of 388 searched (40%); 25.0% of 623 decisions |
+| Unknown at the first Main decision of a turn | 88 of 152 searched (58%): Rocks 35 of 70, Kaido 53 of 82 (was 74 of 82, 90%) |
+| Median wall time of a searched position | 246 ms (a real search, excluding `bound`: 294 ms; p90 1,503 ms, the cap) |
+| Proven against a Kaido defender | 0 of 388 |
+| E01 / E20 | proven `any-hand` in 10 ms / 97 ms (was Unknown at 1.5 s and 3 s) |
+
+The builders' 35% of searched and 20.5% of all decisions reproduce (244 against their 242). **Is "searched" gamed by the denominator?** Not materially. The replay accounting made the attackers bound answer fewer positions (748 to 480), which moves positions into the searched pool, the honest direction. The `bound` refutations take 1 ms and are 33 of 701, so counting them as searched changes the rate by 1.7 points. What the figure does hide is that of the 701 "searched", only 26 are proofs and 398 are refutations by the reduced-defender pass: the detector's strongest output is "they can stop it, depends on their hand", and a proof is rare (none against Kaido). That is a true statement about this play (Rookie rarely has lethal), not a defect.
+
+**Grade for L-03:** on "of searched" it still misses its target (35% against under about 30%, and 58% at a turn's first decision). On "of all decisions" a learner gets an answer 79% of the time, and the flagship examples answer in under 100 ms. The original finding was a coach that "almost never answers" against Kaido (99.5%); that is gone. I keep it open as **severity 2**, not 3: it no longer blocks the purpose of the slice, and what remains is a tuning problem, not a soundness or honesty one. What the app shows on Unknown is now useful: tier 2 ("You need N hits. You have M attackers") plus a new public-bound line ("Their 3 cards in hand could add up to +6000 ... 1 active Blocker stops one attack. Their Counters can also rest one of your Characters."). It does not say what to do, and "Check again" reruns at the same cap and, being deterministic in nodes, mostly the same answer; but the player gets a figure to count with. Fix: close the 58% at the turn's first decision (the Kaido case) or lift the cap for the first press of a turn; gate on `rate.ts` with a fixed node cap in `benchmarks.md`.
+
+### New findings
+
+| ID | Sev | Where | Problem and repro | Fix |
+| --- | --- | --- | --- | --- |
+| L-16 | 2 | `ai/test/lethal-bound.test.ts` (tests with teeth for the bound) | **Nine of thirteen mutations of the new bound pass `lethal-bound.test.ts` and `lethal.test.ts`, and my 436-position harness did not catch them either.** Caught: `handLoss` dropped (2 tests), replay multiplier dropped (1), the K formula (12), `deckKnown` (2). **Survive:** `blockerLoss` ignored (`free = blockers`), `i < need + free` reduced to `need`, `gainTotal` not subtracted, permanent `gain` not subtracted, `unblockable` ignored, Double Attack ignored (`h = 1`), `addDon` dropped, `bounces > 4` guard removed, `rushy` replay attacks dropped. Of these, all but `need + free` and the bounce guard move the bound toward refuting (unsound if they are wrong). **One is shown real:** Kaido Leader, a rested King EB04-031 (adds 1 DON!!), Zoro, 1 active DON!!, against Rocks at 1 Life with 1 hidden card: the off search **proves** lethal and the real bound does not refute; with `addDon` dropped the bound **refutes** it (`planted.probe.ts`, row "king don 1 hand 1"). The planted tests in the suite for `blockerLoss` and `gainTotal` assert only the potential (`blockerLoss > 0`, `gainTotal` equals 2x), not a refutation. Also not caught: removing the reduced-defender pass (`reduced-pass-off`) fails nothing, and the search playing a `draw` when the deck is known (`DECK_OPS`) fails nothing, because the L-12 test asserts only `not refuted` (the `actual` result is `proven`, 255 nodes, so it could assert that). | One planted test per mutation, each a position where the off search proves and the mutated bound would refute (the King case above is one); assert `proven` in the L-12 test; a test that E01 or E20 is decided in under N nodes with the reduced pass on and not without it. |
+| L-17 | 1 | `bound.ts` `scanAbility` `restrict` branch; `explain.ts` copy | (a) The code and DECISIONS say a `restrict` is neutral "only for the attack-side kinds (a barred Counter or Event play is not)", but the code only rejects a non-string `what`; a string kind that bars Counters would pass as neutral. The DSL has no such kind today (`Restriction` is `cannotAttack`, `cannotActivateBlockerAgainstIt`, `cannotDrawByOwnEffects`, `cannotBeRemovedByOpponentEffects`, `cannotBeKOd`, `{cannotPlay}`), so it is latent. (b) The headline of a bound refutation is "No lethal: their N cards can stop enough of the M hits you need", at chip "Depends on their hand"; "No lethal" is stronger than "could be stopped if each card is a Counter". Same family as the search refutations, so not new. (c) The `don` budget ignores the untap in OP17-062's `setActive` of a rested DON!!; I could not make it exceed the bound (the DON!! it adds is paid for by the return that triggers it), not reproduced. | (a) Whitelist the two attack-side kinds by name. (b) Lead with "They could stop this" when `reason` is `bound` or `reduced`. (c) Note the argument in `bound.ts`. |
+
+### What I did not verify
+
+- The 52 bound or reduced refutations whose off search was itself Unknown at 150,000 nodes: unchecked, not shown sound. Nor positions the random families do not reach (a Stage plus a rested bounce card, Life-to-hand scripts; none exist in the 37 scripts).
+- The full real-game hidden-information differential on the `lethal-games` run beyond what `npm test` covers at its default 6 games; I did not run `npm run test:lethal` (24 games at 60,000 nodes).
+- A replay of `reduced` or `bound` refutations against real hands: a refutation is a statement about the worst-case model, so a real hand can lack the Counters; there is nothing to replay it against, and its certainty is `needed-hidden-info`, which says so.
+- The `focus.ts` rescue-only revert mutation, and the app's behaviour at a real worker slowdown (the 1.5 s cap is wall-clock; a browser worker at half the speed would see more Unknown than my Node figure).
+- The Kaido `OP17-062` untap argument (L-17 c) beyond the cases I worked by hand.
+
+### Verdict on the fix round
+
+- Fixed: L-12, L-13, L-14; L-03 is down from severity 3 to 2 (35% of searched, 20.7% of all decisions, flagship in under 100 ms).
+- The new refutation paths are sound on everything I tried: 171 refutations checked against the off search (0 proven), 17 `attackers` refutations against `actual` (0 proven), 316 + 66 proof replays (0 broken), 0 hidden-information differences in about 900 comparisons, hash output identical.
+- Open: L-03 (2), L-16 (2), L-17 (1), L-15 (1). None at severity 3 or 4.
+
+L re-review 2: PASS
