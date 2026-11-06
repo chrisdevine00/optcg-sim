@@ -2,6 +2,10 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-06 — L re-review 2 PASS accepted, with L-03 re-graded to severity 2
+
+Context: L re-review 2 (`docs/reviews/l-review.md`, "## Re-review 2") passed L only because the reviewer re-graded L-03 from 3 to 2: Unknown is 34.8% of searched positions (target about 30%) and 20.7% of all Main decisions (was 72% and 26%), 58% at a turn's first decision (was 90%), and on Unknown the coach now states the public defence bound. Decision: accept the re-grade and mark L built-and-reviewed, because every answer is sound (0 broken, 0 bound-agreement violations, 0 leak differences in independent harnesses) and Unknown is honest and informative; the remaining gap is search speed on late-game Kaido boards. Carried: L-03 (sev 2) to M5b (search throughput: an incremental state key instead of `summaryHash`), L-16 (sev 2: 9 of 13 bound mutations and the reduced pass survive the suite; add planted tests, including the reviewer's `addDon` case, and make the L-12 test assert `proven`) to be fixed before the screen-reader pass, L-17 (sev 1) and L-15 to M10. Rejected: a fifth fix round on L-03 now (four rounds moved it 72% → 35%; the next lever is engine-side and belongs with M5b's search work).
+
 ## 2026-11-06 — L fix round 2: a search-free refutation, draws in the attackers bound, honest Trigger wording
 
 Context: the L re-review (`docs/reviews/l-review.md`, Re-review 1) failed on L-03 (72% Unknown among searched positions), L-12 (the attackers bound refuted a turn that wins by a draw) and L-13 (the Trigger caveat said "any hand" on a hidden-info proof). Not decided here: a **proof** without search (see "Still open").
