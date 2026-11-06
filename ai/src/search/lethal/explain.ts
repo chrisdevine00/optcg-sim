@@ -42,7 +42,7 @@ export interface Tier1 {
   text: string;
   /** The certainty chip's words, in the live coach. */
   chip: string;
-  /** Proven in `public` mode only: "unless a Life card's Trigger stops it (their deck runs N Triggers)". */
+  /** Proven in `public` mode only: "unless a Life card's Trigger stops it (their usual lists run N Triggers)". */
   triggerNote: string | null;
   /** The polite screen-reader text (learning-ui §3.1). */
   sr: string;
@@ -54,7 +54,7 @@ export function tier1(r: LethalResult): Tier1 {
   const t = r.trigger;
   const triggerNote =
     r.status === 'proven' && t && t.probabilityNone < 1
-      ? `Works against any hand, unless a Life card's Trigger stops it (their deck runs ${t.triggersInPrior}).`
+      ? `Works against any hand, unless a Life card's Trigger stops it (their usual lists run ${t.triggersInPrior}).`
       : null;
   if (r.status === 'proven')
     return {
@@ -63,7 +63,7 @@ export function tier1(r: LethalResult): Tier1 {
       text: 'Lethal is on the board.',
       chip,
       triggerNote,
-      sr: `Lethal: proven, ${chip.toLowerCase()}.`,
+      sr: triggerNote ? `Lethal: proven. ${triggerNote}` : `Lethal: proven, ${chip.toLowerCase()}.`,
     };
   if (r.status === 'refuted') {
     const d = r.defence;
@@ -347,12 +347,12 @@ function triggerRow(r: LethalResult, tense: 'coach' | 'review'): Evidence | null
     return {
       text:
         tense === 'coach'
-          ? "Their deck runs no Trigger cards, so the Life cards can't stop you."
-          : "Their deck runs no Trigger cards, so the Life card can't stop you either.",
+          ? "Their usual lists run no Trigger cards, so the Life cards can't stop you."
+          : "Their usual lists run no Trigger cards, so the Life card can't stop you either.",
       figures: { triggersInPrior: 0 },
     };
   return {
-    text: `Their deck runs ${plural(t.triggersInPrior, 'Trigger')}. This line works unless one of the ${plural(t.exposed, 'Life card')} you take is one.`,
+    text: `Their usual lists run ${plural(t.triggersInPrior, 'Trigger')}. This line works unless one of the ${plural(t.exposed, 'Life card')} you take is one.`,
     figures: {
       triggersInPrior: t.triggersInPrior,
       exposedLife: t.exposed,
@@ -485,7 +485,7 @@ export function explainLethal(
       evidence,
       line,
       outcome: 'Wins the game this turn.',
-      certainty: 'any-hand',
+      certainty: r.certainty,
       nextTime: NEXT_PROOF_REVIEW,
       lessonId: 'L15-lethal-math',
       sources: SOURCES_REVIEW,

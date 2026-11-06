@@ -19,6 +19,9 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import {
   actionFromView,
+  appendAction,
+  createFromScenario,
+  startRecord,
   legalActions,
   projectForSearch,
   queries,
@@ -34,13 +37,15 @@ import {
   explainLethal,
   guidedCount,
   lethal,
+  attackersPossible,
+  reviewMissedLethal,
   priorCardIds,
   tier1,
   tier2,
   type LethalResult,
 } from '../src/index.ts';
 import { counterProfile } from '../src/search/lethal/profile.ts';
-import { cardMap } from './support.ts';
+import { cardMap, lookup } from './support.ts';
 import { docExample } from './support/doc.ts';
 import { lifeOf, listOf, start } from './support/scenario.ts';
 
@@ -440,7 +445,8 @@ describe('lethal: planted positions with known answers', () => {
     const s = position({ chars: [SANJI, ZORO], don: 4, life: 1, hand: [], leader: KAIDO });
     const r = pub(s);
     expect(r.status).toBe('proven');
-    expect(r.facts.maxPerCard).toBe(4000);
+    // With no DON!! on their field the +4000 cards (DON!! −1) cannot be paid: OP17-076's +3000 is the most.
+    expect(r.facts.maxPerCard).toBe(3000);
     expect(r.trigger).not.toBeNull();
     expect(r.trigger!.exposed).toBe(1);
     expect(r.trigger!.triggersInPrior).toBeGreaterThan(0);
@@ -454,7 +460,7 @@ describe('lethal: planted positions with known answers', () => {
     expect(r.trigger!.probabilityNone).toBeLessThan(1);
     const t1 = tier1(r);
     expect(t1.triggerNote).toBe(
-      `Works against any hand, unless a Life card's Trigger stops it (their deck runs ${r.trigger!.triggersInPrior}).`,
+      `Works against any hand, unless a Life card's Trigger stops it (their usual lists run ${r.trigger!.triggersInPrior}).`,
     );
     // Rocks runs none: nothing to say.
     expect(
@@ -751,8 +757,9 @@ describe('A1 is sound against every [Counter] effect in the prior', () => {
     const view = projectForSearch(s, 'p1');
     const old = lethal({ mode: 'public', view, model: 'power-only' }, cards, { nodes: 300_000 });
     expect(old.status).toBe('proven'); // what the first A1 claimed
-    const r = lethal({ mode: 'public', view }, cards, { nodes: 60_000 });
-    expect(r.status).not.toBe('proven');
+    const r = lethal({ mode: 'public', view }, cards, { nodes: 200_000 });
+    expect(r.status).toBe('refuted');
+    expect(r.defence?.lifeTaken).toBeLessThan(r.defence?.hitsNeeded ?? 0);
     expect(r.facts.defenceExtras).toEqual({ rests: true, draws: true });
   });
 
@@ -763,15 +770,185 @@ describe('A1 is sound against every [Counter] effect in the prior', () => {
    */
   it('covers every [Counter] ability in the slice priors', () => {
     for (const leader of [ROCKS, KAIDO]) {
-      const profile = counterProfile(priorCardIds(leader));
+      const profile = counterProfile(priorCardIds(leader), cards);
       expect(profile.gaps, leader).toEqual([]);
     }
     // And the model is not empty: Kaido's lists rest and draw, Rocks's only add power.
-    const k = counterProfile(priorCardIds(KAIDO));
+    const k = counterProfile(priorCardIds(KAIDO), cards);
     expect([k.rests, k.draws]).toEqual([true, true]);
-    const r = counterProfile(priorCardIds(ROCKS));
+    const r = counterProfile(priorCardIds(ROCKS), cards);
     expect([r.rests, r.draws]).toEqual([false, false]);
     // A card the model does not know downgrades the claim rather than hiding it.
-    expect(counterProfile(['OP13-001']).gaps).toEqual([]);
+    expect(counterProfile(['OP13-001'], cards).gaps).toEqual([]);
+  });
+});
+
+describe('L fix round: the attackers bound, hand costs that name a type, certainty with gaps', () => {
+  /**
+   * L-01. Kaido (OP17-058) Leader and EB04-030 Kaido in hand ("[On Play] DON!! −2: … this Character
+   * gains Rush during this turn", printed without brackets), 10 active DON!!; Rocks at 1 Life with
+   * nothing: no hand, no DON!!, no Blockers. 2 hits needed. The Leader attacks first (5000 against
+   * 5000 ties and hits; Life 1 → 0, hand 1: one card, +2000), then EB04-030 (played, Rush, 9000)
+   * against 5000 + 2000: a hit at 0 Life wins. The old bound counted a hand Character only if its
+   * text had "[Rush", saw 1 attacker, and said "No lethal" at any-hand.
+   */
+  const rush = () =>
+    start({
+      seed: 4,
+      turn: 9,
+      activePlayer: 'p1',
+      firstPlayer: 'p1',
+      p1: {
+        leader: KAIDO,
+        hand: ['EB04-030'],
+        life: lifeOf(3, NO_COUNTER),
+        costArea: { active: 10, rested: 0 },
+        decklist: listOf(KAIDO),
+      },
+      p2: {
+        leader: ROCKS,
+        life: lifeOf(1, NO_COUNTER),
+        hand: [],
+        costArea: { active: 0, rested: 0 },
+        decklist: listOf(ROCKS),
+      },
+    });
+
+  it('a Character that gains Rush is a possible attacker: proven, not "too few attackers"', () => {
+    const s = rush();
+    expect(attackersPossible(s, 'p1', cards)).toBe(true);
+    for (const r of [pub(s), act(s)]) {
+      expect(r.status).toBe('proven');
+      expect(r.defence).toBeNull();
+    }
+    expect(pub(s).certainty).toBe('any-hand');
+    expect(pub(s).actions!.some((a) => a.type === 'playCard')).toBe(true);
+    // The line is a real win: play it (view actions) against the strongest defence.
+    expect(won(playOut(s, pub(s).viewActions!))).toBe(true);
+  });
+
+  it('review flags that turn as a missed lethal, any-hand, when the seat ended the turn', () => {
+    const spec = {
+      seed: 4,
+      turn: 9,
+      activePlayer: 'p1',
+      firstPlayer: 'p1',
+      p1: {
+        leader: KAIDO,
+        hand: ['EB04-030'],
+        life: lifeOf(3, NO_COUNTER),
+        costArea: { active: 10, rested: 0 },
+        decklist: listOf(KAIDO),
+      },
+      p2: {
+        leader: ROCKS,
+        life: lifeOf(1, NO_COUNTER),
+        hand: [],
+        costArea: { active: 0, rested: 0 },
+        decklist: listOf(ROCKS),
+      },
+    } as const;
+    const init = createFromScenario({
+      ...(spec as unknown as Omit<ScenarioSpec, 'cards'>),
+      cards: lookup,
+    });
+    let rec = startRecord({ scenario: spec as never }, init.state);
+    const a: Action = { type: 'endTurn', player: 'p1' };
+    const s1 = reduce(init.state, a).state;
+    rec = appendAction(rec, a, s1);
+    // a later action, so the turn is not the record's end
+    const next = legalActions(s1).find((x) => x.type !== 'concede')!;
+    rec = appendAction(rec, next, reduce(s1, next).state);
+    const flags = reviewMissedLethal(rec, lookup, cards, { seats: ['p1'] });
+    expect(flags).toHaveLength(1);
+    expect(flags[0]).toMatchObject({ kind: 'missed-lethal', severity: 'severe' });
+    expect(flags[0]!.explanation.certainty).toBe('any-hand');
+  });
+
+  /**
+   * The bound is conservative: a card that untaps, plays or grants Rush anywhere in the seat's reach
+   * turns it off, so it can only err toward searching. And a text regex decides nothing.
+   */
+  it('the bound is off when a script can add an attacker, and decided from keywords and scripts', () => {
+    // No such card: Luffy alone against 2 Life still has too few attackers.
+    const none = position({ chars: [], don: 10, life: 2, hand: [NO_COUNTER] });
+    expect(attackersPossible(none, 'p1', cards)).toBe(false);
+    expect(attackersPossible(rush(), 'p1', cards)).toBe(true);
+  });
+
+  /**
+   * L-02. Rocks's Shiki (OP17-048) on the board: "[When Attacking]/[On Your Opponent's Attack] [Once
+   * Per Turn] trash 1 card with a type including Rocks Pirates from your hand: give up to 1 of your
+   * opponent's Characters −3000". A hidden hand card must be able to pay it. Defender: Rocks, Shiki
+   * on the board, 1 Life, 1 card in hand. Sanji 7000 attacks first, then Luffy with 4 DON!! (9000).
+   * Hand-worked against a real Rocks Pirates card: Shiki trashes it, Sanji is 4000 against 5000 and
+   * is stopped; the Leader's hit then takes the last Life and no attacker is left. The old model never
+   * let Shiki fire and proved this "any hand". The placeholder now carries every type in the prior.
+   */
+  it('a hidden card pays Shiki: the old "proof" no longer stands', () => {
+    const s = start({
+      seed: 6,
+      turn: 9,
+      activePlayer: 'p1',
+      firstPlayer: 'p1',
+      p1: {
+        leader: LUFFY,
+        characters: [SANJI],
+        life: lifeOf(4, NO_COUNTER),
+        hand: [],
+        costArea: { active: 4, rested: 0 },
+        decklist: listOf(ROCKS),
+      },
+      p2: {
+        leader: ROCKS,
+        characters: ['OP17-048'],
+        life: lifeOf(1, NO_COUNTER),
+        hand: ['OP17-052'],
+        costArea: { active: 0, rested: 0 },
+        decklist: listOf(ROCKS),
+      },
+    });
+    const r = pub(s);
+    expect(r.status).toBe('refuted');
+    // The superseded model (a placeholder with no types) never let Shiki fire, and proved it.
+    const old = lethal(
+      { mode: 'public', view: projectForSearch(s, 'p1'), model: 'power-only' },
+      cards,
+      CAP,
+    );
+    expect(old.status).toBe('proven');
+  });
+
+  /** L-10 M2: a model gap means no `any-hand`, whatever the proof (a card whose Counter does something else). */
+  it('a proof with a model gap is not any-hand', () => {
+    // A defender whose board has an ability that spends a named card from hand: the placeholder
+    // cannot be one (OP17-061 chooses by name), so the claim must drop.
+    const s = start({
+      seed: 6,
+      turn: 9,
+      activePlayer: 'p1',
+      firstPlayer: 'p1',
+      p1: {
+        leader: LUFFY,
+        characters: [SANJI],
+        life: lifeOf(4, NO_COUNTER),
+        hand: [],
+        costArea: { active: 0, rested: 0 },
+        decklist: listOf(ROCKS),
+      },
+      p2: {
+        leader: ROCKS,
+        characters: [{ card: 'OP17-061', rested: true }],
+        life: lifeOf(1, NO_COUNTER),
+        hand: [],
+        costArea: { active: 0, rested: 0 },
+        decklist: listOf(ROCKS),
+      },
+    });
+    const r = pub(s);
+    expect(r.facts.modelGaps.length).toBeGreaterThan(0);
+    expect(r.status).toBe('proven');
+    expect(r.certainty).toBe('needed-hidden-info');
+    expect(tier1(r).chip).toBe('Depends on their hand');
   });
 });

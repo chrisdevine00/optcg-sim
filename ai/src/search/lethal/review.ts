@@ -14,6 +14,7 @@
  */
 import type { Card } from '@optcg/cards';
 import {
+  legalActions,
   projectForSearch,
   queries,
   reduce,
@@ -24,6 +25,7 @@ import {
   type PlayerId,
 } from '@optcg/engine';
 import type { Explanation } from '../../explanation.ts';
+import type { LineStep } from './analyse.ts';
 import { explainLethal } from './explain.ts';
 import { attackersPossible, lethal, type LethalResult } from './lethal.ts';
 import type { Cap } from './search.ts';
@@ -62,7 +64,16 @@ export function reviewMissedLethal(
   const seats = opts.seats ?? ['p1', 'p2'];
   const cap = opts.cap ?? { nodes: 150_000 };
   let state = replay(record, lookupCard, 0).state;
-  const candidates: { turn: number; player: PlayerId; index: number; state: GameState }[] = [];
+  const candidates: {
+    turn: number;
+    player: PlayerId;
+    index: number;
+    state: GameState;
+    /** The seat's attacks on their Leader that turn, in order, with the attacker's power. */
+    attacked: { card: string; power: number }[];
+    /** When the seat ended the turn: the cards that could still have attacked their Leader. */
+    canStillAttack: string[] | null;
+  }[] = [];
   let lastTurn = -1;
   let resultTurn = -1;
   for (let i = 0; i <= record.actions.length; i++) {
@@ -77,10 +88,34 @@ export function reviewMissedLethal(
       turn !== lastTurn
     ) {
       lastTurn = turn;
-      candidates.push({ turn, player: dec.player, index: i, state });
+      candidates.push({
+        turn,
+        player: dec.player,
+        index: i,
+        state,
+        attacked: [],
+        canStillAttack: null,
+      });
     }
     if (queries.result(state) && resultTurn < 0) resultTurn = turn;
-    if (i < record.actions.length) state = reduce(state, record.actions[i]!).state;
+    if (i < record.actions.length) {
+      const a = record.actions[i]!;
+      const open = candidates.at(-1);
+      if (open && open.turn === turn && a.type === 'attack' && a.player === open.player) {
+        const target = queries.card(state, a.target);
+        if (target.zone === 'leader') {
+          const atk = queries.card(state, a.attacker);
+          open.attacked.push({ card: atk.card, power: atk.power ?? 0 });
+        }
+      }
+      if (open && open.turn === turn && a.type === 'endTurn' && a.player === open.player) {
+        const leader = queries.zone(state, open.player === 'p1' ? 'p2' : 'p1', 'leader')[0]!;
+        open.canStillAttack = legalActions(state)
+          .filter((x) => x.type === 'attack' && x.target === leader.instance)
+          .map((x) => queries.card(state, (x as { attacker: string }).attacker).card);
+      }
+      state = reduce(state, a).state;
+    }
   }
   if (queries.result(state) && resultTurn < 0) resultTurn = queries.turn(state).number;
   const result = queries.result(state);
@@ -91,12 +126,32 @@ export function reviewMissedLethal(
     if ((opts.prefilter ?? true) && !attackersPossible(c.state, c.player, cards)) continue;
     const pub = lethal({ mode: 'public', view: projectForSearch(c.state, c.player) }, cards, cap);
     if (pub.status === 'proven') {
+      // The seat played the proof's attacks and still did not win: a Life Trigger (or a Counter
+      // the prior did not have) stopped it. That is not a miss it could have seen (L-05).
+      const need = (pub.line ?? []).filter(
+        (l): l is Extract<LineStep, { kind: 'attack' }> =>
+          l.kind === 'attack' && l.target === 'leader',
+      );
+      // The same attackers in the same order, each at least as strong as the line made it, as far
+      // as the seat could: an attacker the line still needed that could no longer attack (a Trigger
+      // K.O.'d or rested it) is the defender's doing, not a miss.
+      const prefix = c.attacked.every(
+        (x, i) => need[i] !== undefined && need[i]!.card === x.card && x.power >= need[i]!.power,
+      );
+      const rest = need.slice(c.attacked.length);
+      const playedIt =
+        need.length > 0 &&
+        c.attacked.length > 0 &&
+        prefix &&
+        (rest.length === 0 ||
+          (c.canStillAttack !== null && !c.canStillAttack.includes(rest[0]!.card)));
+      if (playedIt) continue;
       out.push({
         kind: 'missed-lethal',
         turn: c.turn,
         player: c.player,
         actionIndex: c.index,
-        severity: 'severe',
+        severity: pub.certainty === 'any-hand' ? 'severe' : 'hindsight',
         explanation: explainLethal(pub, cards, 'review'),
         public: pub,
         actual: null,

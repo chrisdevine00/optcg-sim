@@ -66,3 +66,5 @@ export {
 } from './search/lethal/explain.ts';
 export { reviewMissedLethal, type LethalFlag, type ReviewOptions } from './search/lethal/review.ts';
 export { answerLethal, insertByPriority, DEFAULT_CAP_MS } from './search/lethal/request.ts';
+export { defenceBound, counterProfile, type DefenceBound } from './search/lethal/profile.ts';
+export { FALLBACK_COUNTER } from './search/lethal/public.ts';

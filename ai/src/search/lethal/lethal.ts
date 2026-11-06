@@ -11,7 +11,7 @@
  * line (the fewest DON!! given, smaller attacks first, `search.ts`); a full-budget pass that finds
  * no win refutes. Either may stop at the cap: `unknown`, never "no lethal".
  */
-import type { Card } from '@optcg/cards';
+import { SCRIPTS, type Card } from '@optcg/cards';
 import {
   legalActions,
   queries,
@@ -24,7 +24,7 @@ import { counterValueOf, priorFor } from '../../knowledge.ts';
 import { defenceEffectsOf, type DefenceEffect } from './defence.ts';
 import { analyseLine, type LineStep } from './analyse.ts';
 import { publicState, triggerRisk, type TriggerRisk } from './public.ts';
-import { search, searchPlan, type Cap } from './search.ts';
+import { search, searchGreedy, searchPlan, type Cap } from './search.ts';
 
 export type LethalMode = 'public' | 'actual';
 
@@ -163,12 +163,63 @@ function factsOf(
   };
 }
 
+/** How many cards a selector can take: its `pick` count, 1 if none, 5 if it takes "all". */
+function pickCount(sel: unknown): number {
+  const pick = (sel as { pick?: Record<string, unknown> } | undefined)?.pick;
+  if (!pick) return 1;
+  if (typeof pick.upTo === 'number') return pick.upTo;
+  if (typeof pick.exactly === 'number') return pick.exactly;
+  return 5;
+}
+
+interface Reach {
+  /** Attacks a script can add: cards it untaps, plays, or gives [Rush]. */
+  extra: number;
+  doubleAttack: boolean;
+}
+
+const reachMemo = new Map<string, Reach>();
+
 /**
- * Can this seat get enough attackers on their Leader to win at all? Its attackers now, plus any
- * Character in its hand that mentions [Rush] (it could attack on arrival), against the Life it must
- * remove: each attack takes one Life card, or two with [Double Attack], and the last attack lands at 0
- * (CR 7-1-4-1-1-1, 10-1-2-1). A bound that only ever errs toward searching; it does not count effects
- * that untap a Character or give it another attack (assumption A7 in DECISIONS).
+ * What a card's script (typed data, not text) can add to the attacks of a turn: an untap
+ * (`setActive`), a card played (`play`), a [Rush] granted (`grant`), each as many cards as its pick
+ * allows (a `forEach` counts as 5), plus whether it grants [Double Attack].
+ */
+function reachOf(cardId: string): Reach {
+  let r = reachMemo.get(cardId);
+  if (!r) {
+    r = { extra: 0, doubleAttack: false };
+    const reach = r;
+    const walk = (n: unknown, mult: number): void => {
+      if (Array.isArray(n)) return n.forEach((x) => walk(x, mult));
+      if (!n || typeof n !== 'object') return;
+      const o = n as Record<string, unknown>;
+      const m = 'forEach' in o ? mult * 5 : mult;
+      if (o.do && typeof o.do === 'object') {
+        const d = o.do as Record<string, Record<string, unknown>>;
+        if (d.setActive) reach.extra += m * pickCount(d.setActive);
+        if (d.play) reach.extra += m * pickCount(d.play.what);
+        if (d.grant) {
+          if (d.grant.keyword === 'Rush') reach.extra += m * pickCount(d.grant.target);
+          if (d.grant.keyword === 'Double Attack') reach.doubleAttack = true;
+        }
+      }
+      for (const v of Object.values(o)) walk(v, m);
+    };
+    walk(SCRIPTS[cardId]?.abilities, 1);
+    reachMemo.set(cardId, reach);
+  }
+  return r;
+}
+
+/**
+ * Can this seat get enough attackers on their Leader to win at all? Its attackers now, plus every
+ * Character in its hand with printed [Rush], plus the attacks its scripts can add (untap, play, grant
+ * [Rush]; `reachOf`), against the Life it must remove: each attack takes one Life card, or two with
+ * [Double Attack], and the last attack lands at 0 (CR 7-1-4-1-1-1, 10-1-2-1).
+ *
+ * Decided from keywords and scripts, never from text, and conservative: every card the seat can reach
+ * (hand, Leader, Characters, Stage) adds the most its script could, so it can only err toward searching.
  */
 export function attackersPossible(
   s: GameState,
@@ -178,20 +229,27 @@ export function attackersPossible(
   const def = other(attacker);
   const life = queries.zone(s, def, 'life').length;
   const leader = queries.zone(s, def, 'leader')[0]!.instance;
-  const seen = new Set<string>();
   let n = 0;
   let da = false;
+  const seen = new Set<string>();
   for (const a of legalActions(s))
     if (a.type === 'attack' && a.target === leader && !seen.has(a.attacker)) {
       seen.add(a.attacker);
       n++;
       if (queries.card(s, a.attacker).keywords.includes('Double Attack')) da = true;
     }
-  for (const c of queries.zone(s, attacker, 'hand')) {
-    const card = cards.get(c.card);
-    if (card?.category === 'Character' && /\[Rush/.test(card.effectText)) n++;
-    if (card && /Double Attack/.test(card.effectText)) da = true;
-  }
+  for (const z of ['hand', 'leader', 'characters', 'stage'] as const)
+    for (const c of queries.zone(s, attacker, z)) {
+      const r = reachOf(c.card);
+      n += r.extra;
+      if (r.doubleAttack || c.keywords.includes('Double Attack')) da = true;
+      if (
+        z === 'hand' &&
+        cards.get(c.card)?.category === 'Character' &&
+        c.keywords.includes('Rush')
+      )
+        n++;
+    }
   return n >= 1 && (n - 1) * (da ? 2 : 1) >= life;
 }
 
@@ -293,23 +351,33 @@ function run(
     trigger,
     nodes,
   });
-  // 1. A fixed plan, the fewest DON!! first: what a person can follow without adapting.
-  const p = searchPlan(root, attacker, remaining(cap, nodes, t0));
-  nodes += p.nodes;
-  if (p.status === 'unknown')
+  // 1. The cheap path: a plan in which every attack lands, the fewest DON!! first (what a person
+  //    can follow without adapting).
+  const g = searchGreedy(root, attacker, remaining(cap, nodes, t0));
+  nodes += g.nodes;
+  if (g.status === 'unknown')
     return { ...base, status: 'unknown', certainty: 'search-incomplete', nodes };
-  if (p.status === 'proven') return proven(p.actions, true);
+  if (g.status === 'proven') return proven(g.actions, true);
   // 2. Adapting to the defender's answers: decides proven (with a line that depends on them),
   //    refuted, or unknown.
   const out = search(root, attacker, remaining(cap, nodes, t0));
   nodes += out.nodes;
   if (out.status === 'unknown')
     return { ...base, status: 'unknown', certainty: 'search-incomplete', nodes };
-  if (out.status === 'proven')
+  if (out.status === 'proven') {
+    // 3. A proof that adapts: look for a fixed plan with a bait attack too, with what is left.
+    const rest = remaining(cap, nodes, t0);
+    const p = searchPlan(root, attacker, {
+      ...(rest.nodes !== undefined ? { nodes: Math.min(rest.nodes, 40_000) } : {}),
+      ...(rest.ms !== undefined ? { ms: rest.ms } : {}),
+    });
+    nodes += p.nodes;
+    if (p.status === 'proven') return proven(p.actions, true);
     return proven(
       out.trace.filter((a) => a.player === attacker),
       false,
     );
+  }
   const attempt = out.bestAttempt!;
   const mine = attempt.trace.filter((a) => a.player === attacker);
   const an = analyseLine(root, attacker, mine, refOf, cards);

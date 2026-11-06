@@ -22,8 +22,8 @@
  */
 import type { Card } from '@optcg/cards';
 import { determinize, type PlayerId, type SearchView } from '@optcg/engine';
-import { biggestCounter, priorCardIds, priorFor, type Prior } from '../../knowledge.ts';
-import { counterProfile, worstAbility } from './profile.ts';
+import { priorCardIds, priorFor, type Prior } from '../../knowledge.ts';
+import { counterProfile, defenceBound, handCostGaps, worstAbility } from './profile.ts';
 
 export const WORST_COUNTER = '$WORST-COUNTER';
 export const WORST_LIGHT = '$WORST-LIGHT';
@@ -37,18 +37,19 @@ function placeholder(
   name: string,
   category: 'Character' | 'Event',
   counter: number | null,
+  traits?: { types: string[]; colors: string[] },
 ): Card {
   return {
     id,
     name,
     category,
-    colors: [],
+    colors: traits?.colors ?? [],
     cost: 0,
     power: category === 'Event' ? null : 0,
     counter,
     life: null,
     attributes: [],
-    types: [],
+    types: traits?.types ?? [],
     rarity: 'C',
     set: 'X',
     block: null,
@@ -99,8 +100,20 @@ export function publicState(
   const def = other(me);
   const leader = view.zones[def].leader[0]?.card ?? '';
   const prior = leader ? priorFor(leader) : null;
-  const maxPerCard = prior ? biggestCounter(leader, cards) : FALLBACK_COUNTER;
-  const fullProfile = counterProfile(prior ? priorCardIds(leader) : [], maxPerCard);
+  // The most one hidden card adds, given the DON!! on their field (public): a Counter that costs
+  // DON!! −N counts only if N are there.
+  const dn = view.don[def];
+  const maxPerCard = defenceBound(
+    prior ? priorCardIds(leader) : [],
+    cards,
+    dn.active + dn.rested + dn.given,
+    FALLBACK_COUNTER,
+  ).perCard;
+  const fullProfile = counterProfile(
+    prior ? priorCardIds(leader) : [],
+    cards,
+    prior ? 0 : FALLBACK_COUNTER,
+  );
   const profile: typeof fullProfile =
     model === 'full'
       ? fullProfile
@@ -111,9 +124,11 @@ export function publicState(
           rests: false,
           draws: false,
           drawIds: [],
+          types: [],
+          colors: [],
         };
-  const full = placeholder(WORST_COUNTER, 'Unknown card', 'Event', null);
-  const light = placeholder(WORST_LIGHT, 'Unknown card', 'Event', null);
+  const full = placeholder(WORST_COUNTER, 'Unknown card', 'Event', null, profile);
+  const light = placeholder(WORST_LIGHT, 'Unknown card', 'Event', null, profile);
   const blank = placeholder(BLANK, 'Unknown card', 'Character', null);
   // A deck holds at most this many copies of the cards that draw: only that many cards from the top
   // of the deck can be a drawing mode (the rest of a chain of draws is finite, as a real one is).
@@ -140,6 +155,10 @@ export function publicState(
   const lookup = (id: string) =>
     id === WORST_COUNTER ? full : id === WORST_LIGHT ? light : id === BLANK ? blank : cards.get(id);
   const state = determinize(view, fill, lookup, 1);
+  const z = view.zones[def];
+  const boardIds = [...z.leader, ...z.characters, ...z.stage]
+    .map((c) => c.card)
+    .filter((c): c is string => !!c);
   // The placeholder Events' one [Counter] ability each: the defender picks the best mode, no cost.
   const defs = (state as unknown as { defs: Record<string, { abilities: unknown[] }> }).defs;
   for (const [id, modes] of [
@@ -153,7 +172,7 @@ export function publicState(
     noPrior: !prior,
     rests: profile.rests,
     draws: profile.draws,
-    gaps: [...profile.gaps, ...(prior ? [] : ['no sourced list'])],
+    gaps: [...profile.gaps, ...(prior ? [] : ['no sourced list']), ...handCostGaps(boardIds)],
     hiddenLife,
     hiddenHand,
   };

@@ -77,7 +77,11 @@ function defence(s: GameState): Action {
 }
 
 /** A game record: player 1 plays `plan` (engine actions), player 2 defends with `defence`. */
-function recordOf(spec: Spec, plan: (s: GameState) => Action[]): RecordWithSnapshots {
+function recordOf(
+  spec: Spec,
+  plan: (s: GameState) => Action[],
+  answer: (s: GameState) => Action = defence,
+): RecordWithSnapshots {
   const init = createFromScenario({ ...spec, cards: lookup });
   let rec = startRecord({ scenario: spec }, init.state);
   let s = init.state;
@@ -90,7 +94,7 @@ function recordOf(spec: Spec, plan: (s: GameState) => Action[]): RecordWithSnaps
       const next = queue.shift();
       if (!next) break;
       a = next;
-    } else a = defence(s);
+    } else a = answer(s);
     s = reduce(s, a).state;
     rec = appendAction(rec, a, s);
   }
@@ -255,6 +259,52 @@ describe('missed lethal (E01): the planted game record', () => {
     expect(flags[0]).toMatchObject({ kind: 'not-fully-checked', severity: 'marker' });
     expect(flags[0]!.explanation.certainty).toBe('search-incomplete');
     expect(certaintyLabel('search-incomplete', 'review')).toBe('Not fully checked');
+  });
+});
+
+describe('a played proof that something outside the model stopped is not a miss (L-05)', () => {
+  /**
+   * E01's position, but their two cards are OP17-077 (+4000 to their Leader for DON!! −1), which Rocks's sourced
+   * lists do not run, with 6 DON!! to pay (each costs 1 to play and DON!! −1). The `public` proof (Leader with 4 DON!! at 9000, then
+   * Kaido at 12000) is any-hand against Rocks's lists. The player plays it exactly. On the Leader's
+   * attack they play both cards: 5000 + 8000 = 13000 stops 9000. Kaido's hit then takes the last
+   * Life card and no win follows (a hit at 1 Life). The player did what the proof said and lost to
+   * cards the model did not know (a Life Trigger acts the same way): not a flag.
+   */
+  const spec: Spec = {
+    ...E01,
+    p2: {
+      ...E01.p2,
+      hand: ['OP17-077', 'OP17-077'],
+      costArea: { active: 6, rested: 0 },
+    },
+  };
+  const answer = (s: GameState): Action => {
+    const counter = legalActions(s).find((a) => a.type === 'activate' && a.ability === 'counter');
+    const pay =
+      queries.decision(s)?.player === 'p2'
+        ? legalActions(s).find((a) => a.type === 'optional' && a.accept)
+        : undefined;
+    return counter ?? pay ?? defence(s);
+  };
+  it('played the line and lost to a card outside the model: no flag; played another way: flagged', () => {
+    const played = recordOf(
+      spec,
+      (s) => [
+        ...attacksOf(s, [
+          [KAIDO, 4],
+          [KAIDO_CHAR, 0],
+        ]),
+        endTurn,
+      ],
+      answer,
+    );
+    const end = replay(played, lookup).state;
+    expect(queries.result(end)).toBeNull();
+    expect(flagsOf(played)).toEqual([]);
+    // Attacking with Kaido alone and then ending the turn is a miss, not a played proof.
+    const other = recordOf(spec, (s) => [...attacksOf(s, [[KAIDO_CHAR, 0]]), endTurn], answer);
+    expect(flagsOf(other)).toHaveLength(1);
   });
 });
 

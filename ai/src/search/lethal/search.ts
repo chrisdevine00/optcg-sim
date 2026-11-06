@@ -243,7 +243,7 @@ class Searcher {
     const moves = out.map((x) => x.m);
     if (!this.simple)
       for (const a of acts) {
-        if (a.type === 'activate') moves.push([a]);
+        if (a.type === 'activate' && playMatters(queries.card(s, a.card))) moves.push([a]);
         else if (a.type === 'playCard' && playMatters(queries.card(s, a.card))) moves.push([a]);
       }
     return moves;
@@ -251,7 +251,7 @@ class Searcher {
 
   /** The defender's legal answers, strongest first, identical cards as one choice. */
   protected defenderAnswers(s: GameState): Action[] {
-    const acts = dedupe(s, this.legal(s));
+    const acts = prunePlaceholderBoosts(s, dedupe(s, this.legal(s)));
     const rank = (a: Action): number => {
       if (a.type === 'block') return a.blocker === null ? 90 : 0;
       if (a.type === 'endCounter') return 90;
@@ -268,18 +268,68 @@ class Searcher {
 }
 
 /**
- * Playing a card can change a lethal turn only through what the engine knows about it: a scripted
- * ability, or [Rush] (it can attack at once). A card with neither does nothing but spend DON!!, so
- * the search does not play it (a Character's [Blocker] guards against attacks, which this turn has
- * none of).
+ * Effect ops that cannot change this turn's lethal in the model: the seat's own deck is hidden and
+ * draws blanks (A3), so drawing, looking at the deck, milling and revealing it change nothing, and
+ * a card's own Trigger never fires from the hand. Everything else (power, K.O., rest, untap, DON!!,
+ * keywords, playing a card, restrictions, anything unknown) can.
  */
-function playMatters(c: { card: string; keywords: string[] }): boolean {
-  return (SCRIPTS[c.card]?.abilities.length ?? 0) > 0 || c.keywords.includes('Rush');
+const IDLE_OPS = new Set(['draw', 'lookAtTop', 'mill', 'reveal', 'trashLifeUntil', 'skipRefresh']);
+
+const matters = new Map<string, boolean>();
+
+/**
+ * Playing or activating a card can change a lethal turn only through what the engine knows about it:
+ * [Rush] (it can attack at once), a permanent or replacement ability, or an ability with an op that
+ * is not idle. A card with none of these does nothing but spend DON!!, so the search does not play it.
+ */
+function cardMatters(cardId: string, keywords: string[]): boolean {
+  if (keywords.includes('Rush')) return true;
+  let m = matters.get(cardId);
+  if (m === undefined) {
+    m = false;
+    for (const ab of (SCRIPTS[cardId]?.abilities ?? []) as unknown as Record<string, unknown>[]) {
+      if (ab.kind === 'trigger') continue;
+      if (ab.kind === 'permanent' || ab.kind === 'replacement') m = true;
+      const ops: string[] = [];
+      const walk = (n: unknown): void => {
+        if (Array.isArray(n)) return n.forEach(walk);
+        if (!n || typeof n !== 'object') return;
+        const o = n as Record<string, unknown>;
+        if (o.do && typeof o.do === 'object') ops.push(...Object.keys(o.do));
+        for (const k of ['then', 'else', 'do', 'chooseOne', 'may', 'effect']) if (o[k]) walk(o[k]);
+        if (Array.isArray(o.chooseOne)) o.chooseOne.forEach(walk);
+      };
+      walk(ab.effect);
+      if (ops.some((op) => !IDLE_OPS.has(op))) m = true;
+    }
+    matters.set(cardId, m);
+  }
+  return m;
 }
+
+const playMatters = (c: { card: string; keywords: string[] }): boolean =>
+  cardMatters(c.card, c.keywords);
 
 /** A Character target is worth an attack only if it blocks or has a scripted ability. */
 function worthAttacking(cardId: string, keywords: string[]): boolean {
   return keywords.includes('Blocker') || (SCRIPTS[cardId]?.abilities.length ?? 0) > 0;
+}
+
+/**
+ * A placeholder Counter's boost lasts one battle, so boosting a card of the defender's that is not in
+ * this battle changes nothing: of the defender's own cards only the one attacked (or its Blocker) is
+ * offered. Picks of the attacker's cards (a rest) and every other choice stay.
+ */
+function prunePlaceholderBoosts(s: GameState, acts: Action[]): Action[] {
+  const dec = queries.decision(s);
+  const b = queries.battle(s);
+  if (!dec || !b || dec.kind !== 'choose' || !dec.source?.card?.startsWith('$WORST')) return acts;
+  return acts.filter((a) => {
+    if (a.type !== 'pick' || typeof a.choice !== 'string') return true;
+    const c = queries.card(s, a.choice);
+    if (c.owner !== dec.player) return true;
+    return a.choice === b.target || a.choice === b.blocker;
+  });
 }
 
 /** Collapse interchangeable choices: the same card id in the same state is one option. */
@@ -412,9 +462,91 @@ class PlanSearcher extends Searcher {
     if (!found) this.fails.set(key, Math.max(this.fails.get(key) ?? -1, r));
     return found;
   }
+
+  /**
+   * The frontier with every non-Main attacker decision (a "may" effect) answered by declining it;
+   * `acts` are the declines, in order, for the plan.
+   */
+  private settle(f0: GameState[] | null): { f: GameState[]; acts: Action[] } | null {
+    let f = f0;
+    const acts: Action[] = [];
+    for (let i = 0; i < 20 && f; i++) {
+      if (f.every((s) => queries.decision(s)?.kind === 'main')) return { f, acts };
+      const first = f.find((s) => queries.decision(s)?.kind !== 'main')!;
+      acts.push(this.otherMoves(first)[0]![0]!);
+      f = this.expand(
+        f.map((s) =>
+          queries.decision(s)?.kind === 'main' ? s : applyMove(s, this.otherMoves(s)[0]!),
+        ),
+      );
+    }
+    return null;
+  }
+
+  /**
+   * The cheap path to a proof: plans in which **every attack lands** (the defender's Life falls, or
+   * the game is won, whatever it answers). Over the orders of the available attackers, each attack
+   * gets the fewest DON!! that still lands against every answer at that point (more DON!! never hurts
+   * an attack, so the first that lands is the least). Of the plans found, the one with the fewest DON!!
+   * in all, then the smallest DON!! for the earliest attack, is returned: the same line the full
+   * search's tidy order gives, found in a few thousand nodes instead of a hundred thousand.
+   * `null`: no such plan (a plan with a bait attack, or none at all, needs the full search).
+   */
+  greedy(root: GameState): Action[] | null {
+    let best: { plan: Action[]; ks: number[]; total: number } | null = null;
+    const lifeOf = (s: GameState): number => queries.zone(s, this.defender, 'life').length;
+    const dfs = (frontier: GameState[], plan: Action[], ks: number[], total: number): void => {
+      if (frontier.length === 0) {
+        if (!best || total < best.total || (total === best.total && lexLess(ks, best.ks)))
+          best = { plan, ks, total };
+        return;
+      }
+      if (best && total > best.total) return;
+      const before = Math.max(...frontier.map(lifeOf));
+      const landed = new Set<string>();
+      for (const m of this.common(frontier)) {
+        const atk = m[m.length - 1] as Extract<Action, { type: 'attack' }>;
+        if (atk.type !== 'attack' || landed.has(atk.attacker)) continue;
+        let next: GameState[];
+        try {
+          next = frontier.map((s) => applyMove(s, m));
+        } catch {
+          continue;
+        }
+        const st = this.settle(this.expand(next));
+        if (!st || st.f.some((s) => lifeOf(s) >= before)) continue;
+        landed.add(atk.attacker);
+        const k = m.length - 1;
+        dfs(st.f, [...plan, ...m, ...st.acts], [...ks, k], total + k);
+      }
+    };
+    dfs([root], [], [], 0);
+    return best ? (best as { plan: Action[] }).plan : null;
+  }
 }
 
+const lexLess = (a: number[], b: number[]): boolean => {
+  for (let i = 0; i < Math.min(a.length, b.length); i++) if (a[i] !== b[i]) return a[i]! < b[i]!;
+  return a.length < b.length;
+};
+
 const donGiven = (plan: Action[]): number => plan.filter((a) => a.type === 'giveDon').length;
+
+/** The cheap proof: a plan in which every attack lands (see `PlanSearcher.greedy`). */
+export function searchGreedy(
+  root: GameState,
+  attacker: PlayerId,
+  cap: Cap,
+): { status: 'proven' | 'none' | 'unknown'; actions: Action[]; nodes: number } {
+  const sr = new PlanSearcher(root, attacker, cap, queries.don(root, attacker).active, new Map());
+  try {
+    const plan = sr.greedy(root);
+    return { status: plan ? 'proven' : 'none', actions: plan ?? [], nodes: sr.nodes };
+  } catch (e) {
+    if (e instanceof CapReached) return { status: 'unknown', actions: [], nodes: sr.nodes };
+    throw e;
+  }
+}
 
 /**
  * The tidy fixed plan: a simple plan (Leader attacks, "may" effects declined) that wins against

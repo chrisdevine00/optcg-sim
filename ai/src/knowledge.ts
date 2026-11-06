@@ -6,6 +6,10 @@
 import { SCRIPTS, type Card } from '@optcg/cards';
 import meta from '../../docs/research/meta-lists.json';
 
+/** A script's `when` that names the [Counter] timing, alone or in a list. */
+export const hasCounterTiming = (when: unknown): boolean =>
+  when === 'counter' || (Array.isArray(when) && when.includes('counter'));
+
 /** The +power an Event's [Counter] gives (CR 10-2-9), read from its script; 0 if none. */
 export function eventCounterOf(cardId: string): number {
   const script = SCRIPTS[cardId];
@@ -21,7 +25,7 @@ export function eventCounterOf(cardId: string): number {
     }
   };
   for (const a of script.abilities)
-    if ((a as { when?: unknown }).when === 'counter') walk((a as { effect?: unknown }).effect);
+    if (hasCounterTiming((a as { when?: unknown }).when)) walk((a as { effect?: unknown }).effect);
   return best;
 }
 

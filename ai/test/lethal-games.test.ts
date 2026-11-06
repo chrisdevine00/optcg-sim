@@ -18,6 +18,7 @@ import {
 import { attackersPossible, lethal, type LethalResult } from '../src/index.ts';
 import { cardMap, metaDecks } from './support.ts';
 import { playMatch } from './support/match.ts';
+import { refuteLineOrNull } from './support/refute.ts';
 
 vi.setConfig({ testTimeout: 600_000 });
 
@@ -83,7 +84,7 @@ describe('lethal on positions from real games', () => {
     const rocks = decks.find((d) => d.leader === 'OP17-039')!;
     const kaido = decks.find((d) => d.leader === 'OP17-058')!;
     const seen = new Set<string>();
-    const stats = { searched: 0, proven: 0, refuted: 0, unknown: 0, publicProven: 0 };
+    const stats = { total: 0, searched: 0, proven: 0, refuted: 0, unknown: 0, publicProven: 0 };
     for (let g = 0; g < GAMES; g++) {
       const lastTurn: Record<PlayerId, number> = { p1: -1, p2: -1 };
       playMatch({
@@ -95,6 +96,7 @@ describe('lethal on positions from real games', () => {
           const turn = queries.turn(d.before).number;
           if (lastTurn[d.player] === turn) return;
           lastTurn[d.player] = turn;
+          stats.total++;
           if (!attackersPossible(d.before, d.player, cards)) return;
           stats.searched++;
           const act: LethalResult = lethal(
@@ -103,15 +105,27 @@ describe('lethal on positions from real games', () => {
             CAP,
           );
           stats[act.status]++;
-          if (act.status === 'proven') {
+          // An adaptive proof (not oblivious) is a strategy, not a fixed line: only fixed lines replay.
+          if (act.status === 'proven' && act.oblivious) {
             for (const p of ['greedy', 'thrifty', 'never'] as const)
               expect(plays(d.before, d.player, act.actions!, p), `${g}:${turn} ${p}`).toBe(true);
+            // ... and against every defender answer at once (the full-information claim).
+            expect(
+              refuteLineOrNull(d.before, act.actions!, d.player, 100_000, true),
+              `actual proof beaten, ${g}:${turn}`,
+            ).toBeNull();
           }
           const view = projectForSearch(d.before, d.player);
           const pub = lethal({ mode: 'public', view }, cards, CAP);
           seen.add(pub.status);
           if (pub.status === 'proven') {
             stats.publicProven++;
+            // The public claim, against every answer of the real hand in this real position.
+            if (pub.oblivious && pub.viewActions)
+              expect(
+                refuteLineOrNull(d.before, pub.viewActions, d.player, 100_000),
+                `public proof beaten by the real hand, ${g}:${turn}`,
+              ).toBeNull();
             expect(act.status, `public proven but the real hand refutes it, ${g}:${turn}`).not.toBe(
               'refuted',
             );
@@ -121,6 +135,12 @@ describe('lethal on positions from real games', () => {
     }
     // The property is only worth something if the search ran.
     expect(stats.searched).toBeGreaterThan(0);
+    // ... and it must decide a fair share, not pass by answering "unknown" (L-10): a position the
+    // attackers bound refutes counts as decided, a searched one only if proven or refuted.
+    const decided = stats.total - stats.searched + stats.proven + stats.refuted;
+    expect(decided / stats.total, `decided ${decided} of ${stats.total}`).toBeGreaterThanOrEqual(
+      Number(process.env.LETHAL_MIN_DECIDED ?? 0.5),
+    );
     if (process.env.LETHAL_LOG) process.stdout.write(`lethal games: ${JSON.stringify(stats)}\n`);
   });
 });
