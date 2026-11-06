@@ -156,3 +156,70 @@ E20 and E01 recompute their figures: `lethal.test.ts:535-565` derives the stop v
 - L-04 to L-10 are severity 2: each is an accurate defect with a small fix and no wrong game result.
 
 L review: FAIL
+
+## Re-review 1
+
+**Verdict: FAIL.** Open: L-03 (severity 3, not fixed), and two new severity 3 findings: L-12 (the attackers bound still says "No lethal, any hand" when a draw finds the Rush Character) and L-13 (the new polite and visual Trigger line says "Works against any hand" next to the chip "Depends on their hand").
+
+**Build reviewed:** `20f4538` on main, in a clean worktree with its own `npm ci`; no production code changed. Probes lived in a gitignored `.cache/rr/` and the probe test files were deleted. Mutations were applied by a script that restores each file; `git status` is clean apart from this doc.
+
+**What I ran**
+- Builders' soundness harness at 160 positions, 4 hands each (`LETHAL_POSITIONS=160 LETHAL_HANDS=4`): 83 proven, 316 replays against every defender answer, 0 broken.
+- My own harness (wider than theirs): p1 Leader plain or Kaido with Rush and draw Characters in hand; defender Rocks or Kaido with 0 to 2 random prior Characters (some rested), a prior Stage, 1 to 2 Life, 0 to 3 hand cards, 0 to 10 DON!!; every `any-hand` oblivious proof replayed against every defender answer on its own hand and on 5 re-rolled hands (half biased to Events and Counters of 2000 or more). 240 positions, 97 proven (85 any-hand), 474 replays, **0 broken**. Same run, hidden-info differential (re-rolled hand, Life and deck, then compare status, certainty, line, defence, facts, trigger, node count): **0 differences in 240**. The L-02 model holds on the slice.
+- Script audit: all 37 scripts, every `do` op, every `grant`. The attackers bound's script walk is right for what it names (setActive, play, grant Rush and Double Attack). Double Attack at 1 Life correctly does not win (flow.ts `runDamage`, RL-20), so the `(n-1)*2` bound is right.
+- Rate probe (Rookie v Rookie, 4 pairings, 3 seeds, `public`, 1.5 s cap): see L-03.
+- `learning.spec.ts`, 720p and 1080p: 20 of 20 pass. App unit suite: 67 pass.
+
+### Old findings
+
+| ID | Status | Evidence |
+| --- | --- | --- |
+| L-01 | **Partly fixed** | Planted Rush case now proven; `reachOf` off fails 3 tests. The claim "can only err toward searching" is false for **draw then play**: see L-12. |
+| L-02 | **Fixed for the slice** | Placeholder with the union of types and colours; Shiki now fires. 0 broken in 316 + 474 replays; mutation "types empty" fails the Shiki test; "gaps ignored" fails `a proof with a model gap is not any-hand`; "handCostGaps off" fails the same test. Caveats: 10 of 12 archetype priors have gaps (`Event without a script`), so their proofs are always "Depends on their hand" (honest, but see L-13 for how the UI words it). A `not: {type}` filter on a hand selection is not treated as a gap although an all-types placeholder cannot meet it; no slice card has one (not reproduced). |
+| L-03 | **Not fixed** | Measured 72% (311 of 433 searched positions) unknown at the 1.5 s cap; see below. |
+| L-04 | **Partly fixed** | The ai `tier1.sr` and the visual panel now carry the Trigger caveat, the tooltip is softened, "usual lists" wording is in. But the caveat text is wrong when the proof has gaps (L-13), and no test covers the polite line (L-14). |
+| L-05 | **Fixed** | Played-the-proof exemption added; removing it fails `played the line and lost to a card outside the model`. Not reproduced: a needed non-attack step (rest a Blocker first) that the player skipped, while attacking with the same attackers in order, would exempt the turn (reading only: `playedIt` compares attackers and power, not the line's other steps). Severity 1 to 2, untested. |
+| L-06 | **Fixed** | A win on a later turn is "failed"; reverting the turn test fails `a win on another turn…`; removing the `puzzleNoted` reset fails `a retry after Rewind is announced again`. The first test fakes the puzzle turn (`puzzle(7)`) rather than playing a real later win; acceptable. |
+| L-07 | **Fixed** | The keyboard e2e walks every step and checks `activeElement`. Removing the `focusSignal` increments in `coach.ts` fails it. Reverting only the `focus.ts` rescue fails nothing (the two fixes overlap; the rescue branch is untested alone). |
+| L-08 | **Fixed in the UI, untested** | The panel reads `defenceBound` and `FALLBACK_COUNTER` from `@optcg/ai` (20f4538). Forcing `extras` to `{false,false}` in `theyCouldHave` passes all 67 app tests; the unit test calls `counterExtras` directly and no e2e looks for the line. |
+| L-09 | **Fixed (scope)** | DON!! math built (off by default, e2e green); remaining items have owners M7, M8, M9 in DECISIONS and PLAN. See L-15 for a nit. |
+| L-10 | **Mostly fixed** | M2 (gaps claim any-hand): caught. M9 (always-on in a puzzle): caught. M16 (hand count): caught (`hand + 1` fails). New gaps: see L-14. |
+| L-11 | **Fixed** | L16 copy ("the one that has to beat the most cards goes last"); `C` key doc aligned with learning-ui §2.1. The E03 "N lines" copy is still unformatted; trivial. |
+
+### L-03 measured
+
+Rookie v Rookie, Rocks and Kaido in all four pairings, 3 seeds, 1,181 Main-phase decisions of either seat, `public` mode at `{ ms: 1500 }`, Node, nothing else running.
+
+| Quantity | Result |
+| --- | --- |
+| Answered at once by the attackers bound | 748 of 1,181 (63%) |
+| Needed a search | 433 |
+| Of those: proven / refuted / **unknown** | 26 / 96 / **311 (72%)** |
+| Unknown against a Rocks defender | 155 of 204 (76%) |
+| Unknown against a Kaido defender | 156 of 229 (68%) |
+| Unknown at the first Main decision of a turn | 74 of 82 (90%) |
+| Median wall time of a searched position | 1,502 ms (the cap) |
+| Hidden-info differential (every third position) | 393 checks, 0 differences |
+
+The builders' figure is 61% overall (33% Rocks, 80% Kaido); mine is worse against Rocks and a little better against Kaido. The seeds differ and the cap is wall time, so the two are not directly comparable, but both are far from the target of about 30%: **not fixed**. The suite's gate (`ai/test/lethal-games.test.ts:141`, at least 50% "decided") counts every position the attackers bound answers as decided, so it passes at any Unknown rate among searched positions; it does not guard L-03.
+
+What the app shows on Unknown: tier 1 "?" and chip "Unknown"; tier 2 "You need N hits. You have M attackers" (useful); tier 3 "checked N lines" (not useful). `defenceBound` is **not** shown on Unknown in the coach (only the battle panel uses it). "Check again" reruns at the same cap and gets the same answer. Grade: D for the milestone's purpose (Unknown for about three positions in four that need a search, nine in ten at the start of a turn).
+
+### New findings
+
+| ID | Sev | Where | Problem and repro | Fix |
+| --- | --- | --- | --- | --- |
+| L-12 | 3 | `ai/src/search/lethal/lethal.ts:224` `attackersPossible`; `ai/src/search/lethal/search.ts:276` `IDLE_OPS` | **The bound still refutes at certainty `any-hand` a turn that wins, when the Rush Character is drawn.** The builders' sentence "it can only err toward searching" is false: a hand card whose only op is `draw` adds nothing to the reach, and the search never plays such a card (`draw` is idle, A3: "own deck draws blanks"), although in `actual` mode the deck is known. Repro, played through the engine: p1 Kaido Leader (OP17-058), hand Queen EB04-032 and OP17-076 (an Animal Kingdom card to trash), deck top EB04-030 then Zoro, 10 active DON!!; p2 Rocks, 1 Life, no hand, no DON!!. Play Queen (trash OP17-076, draw 2 incl. EB04-030), play EB04-030 (DON!! −2, Rush), attack with it, then the Leader: **p1 wins, "damage at 0 Life"**. `lethal({mode:'actual'})` returns `refuted`, `any-hand`, reason `attackers`; `attackersPossible` is false; `reviewMissedLethal` skips the turn, so the miss is never flagged. In `public` mode the same shortcut says "No lethal: you need 2 hits and have 1 attacker" while the player's own draw could find it (A3 documents blanks; the explanation does not say so). | In `actual` mode (and review) count the real deck: a hand or board card with `draw`, `lookAtTop` or a search `move` turns the bound off (or add the known top cards to the reach); do not treat those ops as idle. In `public` mode do the same, or word the result "no lethal from what you hold" and not `any-hand`. Add this position as a test. |
+| L-13 | 3 | `ai/src/search/lethal/explain.ts:54-66`; shown in `app/src/play/coach/Coach.tsx` (`coach-note`) | **The Trigger caveat says "Works against any hand, unless a Life card's Trigger stops it" on a proof whose certainty is `needed-hidden-info`.** `tier1` builds `triggerNote` with those words whatever `r.certainty` is. Repro: p1 Luffy (OP13-001), three Characters, 10 DON!!; p2 Sabo (OP13-004), 1 Life, empty hand. `public` proves with certainty `needed-hidden-info` (4 model gaps), chip "Depends on their hand", and `tier1.sr` = "Lethal: proven. Works against any hand, unless a Life card's Trigger stops it (their usual lists run 5)." Same for OP14-041, OP12-061, OP05-098. Before the fix round the polite line read "Lethal: proven, depends on their hand." for these, so L-04's fix made the screen-reader line state the false thing alone, without the chip. Ten of twelve archetypes have gaps (OP17-079 has a gap and no Trigger note, so it reads correctly). | Build `triggerNote` from the certainty: as now for `any-hand`, otherwise "Depends on their hand, and a Life card's Trigger could stop it". Test both certainties in `tier1` and in the polite line. |
+| L-14 | 2 | tests: `ai/test/lethal-games.test.ts:141`; `app/test/fixround.test.ts` | Gaps in the new tests, each shown by a mutation that passes: (a) the polite tier 1 line without the Trigger caveat (`explain.ts:66` reverted) passes the ai, explanations and app suites; (b) `theyCouldHave` forcing `extras` to false passes the app suite; (c) the `focus.ts` rescue reverted passes the e2e; (d) the "decided" gate counts bound answers, so it cannot fail on L-03. | Add the tests named; gate (d) on `(proven + refuted) / searched`. |
+| L-15 | 1 | `app/src/play/game/Game.tsx:274` `donMathTag` | "+X to stop" uses the cards' current powers. When the preview says the attack lands but `ap < tp` (a [When Attacking] boost), it prints "+1000 to stop"; it also ignores Blockers and the defender's own on-attack effects, which the battle panel lists. From the code, not reproduced. | Use the preview's powers, or label it "Counters only". |
+
+### Verdict on the fix round
+
+- Fixed: L-02 (slice), L-05, L-06, L-07, L-08 (UI), L-09 (scope), L-11; L-10 mostly.
+- Partly: L-01 (L-12), L-04 (L-13).
+- Not fixed: L-03.
+- Soundness of the slice model is strong: 790 independent replays of any-hand proofs, none broken; no hidden-information leak (240 + 393 differentials, 0 differences).
+- PASS requires no open severity 3 or 4. Open: L-03, L-12, L-13 (all severity 3).
+
+L re-review 1: FAIL
