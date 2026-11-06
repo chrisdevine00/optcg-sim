@@ -23,7 +23,7 @@ import { refuteLineOrNull } from './support/refute.ts';
 vi.setConfig({ testTimeout: 3_600_000 });
 
 const cards = cardMap();
-const GAMES = Number(process.env.LETHAL_GAMES ?? 2);
+const GAMES = Number(process.env.LETHAL_GAMES ?? 6);
 const CAP = { nodes: Number(process.env.LETHAL_NODES ?? 8_000) };
 
 type Policy = 'greedy' | 'thrifty' | 'never';
@@ -84,7 +84,17 @@ describe('lethal on positions from real games', () => {
     const rocks = decks.find((d) => d.leader === 'OP17-039')!;
     const kaido = decks.find((d) => d.leader === 'OP17-058')!;
     const seen = new Set<string>();
-    const stats = { total: 0, searched: 0, proven: 0, refuted: 0, unknown: 0, publicProven: 0 };
+    const stats = {
+      total: 0,
+      searched: 0,
+      proven: 0,
+      refuted: 0,
+      unknown: 0,
+      publicProven: 0,
+      // `public` positions the attackers bound did not answer, and how many of those were decided.
+      pubSearched: 0,
+      pubDecided: 0,
+    };
     for (let g = 0; g < GAMES; g++) {
       const lastTurn: Record<PlayerId, number> = { p1: -1, p2: -1 };
       playMatch({
@@ -118,6 +128,10 @@ describe('lethal on positions from real games', () => {
           const view = projectForSearch(d.before, d.player);
           const pub = lethal({ mode: 'public', view }, cards, CAP);
           seen.add(pub.status);
+          if (pub.defence?.reason !== 'attackers') {
+            stats.pubSearched++;
+            if (pub.status !== 'unknown') stats.pubDecided++;
+          }
           if (pub.status === 'proven') {
             stats.publicProven++;
             // The public claim, against every answer of the real hand in this real position.
@@ -135,12 +149,22 @@ describe('lethal on positions from real games', () => {
     }
     // The property is only worth something if the search ran.
     expect(stats.searched).toBeGreaterThan(0);
-    // ... and it must decide a fair share, not pass by answering "unknown" (L-10): a position the
-    // attackers bound refutes counts as decided, a searched one only if proven or refuted.
-    const decided = stats.total - stats.searched + stats.proven + stats.refuted;
-    expect(decided / stats.total, `decided ${decided} of ${stats.total}`).toBeGreaterThanOrEqual(
-      Number(process.env.LETHAL_MIN_DECIDED ?? 0.5),
-    );
     if (process.env.LETHAL_LOG) process.stdout.write(`lethal games: ${JSON.stringify(stats)}\n`);
+    // ... and it must decide a fair share of the positions it searched, not pass by answering
+    // "unknown" (L-03, L-10). Positions the attackers bound answers are left out: counting them as
+    // decided let the gate pass at any Unknown rate among the positions that needed a search.
+    // Floors, not the L-03 measure (that is `ai/bench/rate.ts` at the app's 1.5 s cap). At this test's
+    // cap (8,000 nodes, 6 games, a deterministic count) the rates are: actual 26 of 94 decided (28%),
+    // public 7 of 52 (13%). Both floors are set just under that, so a regression that leaves more
+    // positions undecided fails; the earlier gate could not fail at any Unknown rate.
+    const decided = stats.proven + stats.refuted;
+    expect(
+      decided / stats.searched,
+      `actual: decided ${decided} of ${stats.searched}`,
+    ).toBeGreaterThanOrEqual(Number(process.env.LETHAL_MIN_DECIDED ?? 0.22));
+    expect(
+      stats.pubDecided / stats.pubSearched,
+      `public: decided ${stats.pubDecided} of ${stats.pubSearched}`,
+    ).toBeGreaterThanOrEqual(Number(process.env.LETHAL_MIN_DECIDED_PUBLIC ?? 0.1));
   });
 });

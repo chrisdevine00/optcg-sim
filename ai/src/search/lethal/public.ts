@@ -83,6 +83,8 @@ export interface PublicSetup {
   hiddenLife: number;
   /** Hidden cards in the defender's hand. */
   hiddenHand: number;
+  /** The +power one hidden card can always add with no cost: the plain mode of the placeholder. */
+  plain: number;
 }
 
 const other = (p: PlayerId): PlayerId => (p === 'p1' ? 'p2' : 'p1');
@@ -175,7 +177,15 @@ export function publicState(
     gaps: [...profile.gaps, ...(prior ? [] : ['no sourced list']), ...handCostGaps(boardIds)],
     hiddenLife,
     hiddenHand,
+    plain: plainOf(profile.modes[0]),
   };
+}
+
+/** The +power of the placeholder's first mode (the plain one: a single `power` step, no condition). */
+function plainOf(mode: unknown[] | undefined): number {
+  const step = mode?.[0] as { do?: { power?: { amount?: unknown } } } | undefined;
+  const amount = step?.do?.power?.amount;
+  return typeof amount === 'number' ? amount : 0;
 }
 
 /** The Trigger chance: how many [Trigger] cards the defender's deck runs, and the odds none is hit. */

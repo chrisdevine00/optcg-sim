@@ -16,6 +16,9 @@ import type { LethalResult } from './lethal.ts';
 
 type Attack = Extract<LineStep, { kind: 'attack' }>;
 
+/** Public mode: a card the seat holds draws or searches, and the cards it would find are not counted (A3). */
+const DRAWS_NOT_COUNTED: Evidence = { text: 'Cards you draw are not counted.' };
+
 export type LethalContext = 'coach' | 'review';
 
 const ORDINAL = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth'];
@@ -54,7 +57,9 @@ export function tier1(r: LethalResult): Tier1 {
   const t = r.trigger;
   const triggerNote =
     r.status === 'proven' && t && t.probabilityNone < 1
-      ? `Works against any hand, unless a Life card's Trigger stops it (their usual lists run ${t.triggersInPrior}).`
+      ? r.certainty === 'any-hand'
+        ? `Works against any hand, unless a Life card's Trigger stops it (their usual lists run ${t.triggersInPrior}).`
+        : `Depends on their hand, and a Life card's Trigger could stop it (their usual lists run ${t.triggersInPrior}).`
       : null;
   if (r.status === 'proven')
     return {
@@ -69,7 +74,11 @@ export function tier1(r: LethalResult): Tier1 {
     const d = r.defence;
     if (d?.reason === 'attackers') {
       const n = r.facts.attackers.length;
-      const text = `No lethal: you need ${plural(d.hitsNeeded, 'hit')} and have ${plural(n, 'attacker')}.`;
+      const text = `No lethal: you need ${plural(d.hitsNeeded, 'hit')} and have ${plural(n, 'attacker')}${d.drawsIgnored ? ' from what you hold (cards you draw are not counted)' : ''}.`;
+      return { status: r.status, certainty: r.certainty, text, chip, triggerNote: null, sr: text };
+    }
+    if (d?.reason === 'bound') {
+      const text = `No lethal: their ${plural(r.facts.handSize, 'card')} can stop enough of the ${d.hitsNeeded} hits you need${d.drawsIgnored ? ', from what you hold (cards you draw are not counted)' : ''}.`;
       return { status: r.status, certainty: r.certainty, text, chip, triggerNote: null, sr: text };
     }
     const stop = d ? Math.max(1, d.hitsNeeded - d.lifeTaken) : 1;
@@ -413,15 +422,41 @@ export function explainLethal(
     const n = f.attackers.length;
     return {
       conceptId: 'lethal-math',
-      claim: `No lethal: you need ${plural(f.hitsNeeded, 'hit')} and have ${plural(n, 'attacker')}.`,
-      evidence: [hitsRow(r, tense)],
+      claim: r.defence.drawsIgnored
+        ? 'No lethal from what you hold.'
+        : `No lethal: you need ${plural(f.hitsNeeded, 'hit')} and have ${plural(n, 'attacker')}.`,
+      evidence: [hitsRow(r, tense), ...(r.defence.drawsIgnored ? [DRAWS_NOT_COUNTED] : [])],
       line: null,
       outcome: 'No win this turn: not enough attackers.',
-      certainty: 'any-hand',
+      certainty: r.certainty,
       nextTime:
         'Count Life + 1 hits first. Each attacker lands one hit (two Life with Double Attack), so too few attackers means no DON!! split can make lethal.',
       lessonId: 'L15-lethal-math',
       sources: ['CR 7-1-4-1', 'CR 7-1-4-1-1-1'],
+    };
+  }
+  if (r.status === 'refuted' && r.defence?.reason === 'bound') {
+    const hand = f.handSize;
+    return {
+      conceptId: 'lethal-math',
+      claim: r.defence.drawsIgnored
+        ? 'No lethal from what you hold.'
+        : `No lethal: their ${plural(hand, 'card')} can stop enough of the ${f.hitsNeeded} hits.`,
+      evidence: [
+        hitsRow(r, tense),
+        ...(r.defence.drawsIgnored ? [DRAWS_NOT_COUNTED] : []),
+        {
+          text: `They hold ${plural(hand, 'card')}, and each can be a Counter. Even with every DON!! you can give on your best attackers, they can stop enough hits.`,
+          figures: { handSize: hand, hitsNeeded: f.hitsNeeded },
+        },
+      ],
+      line: null,
+      outcome: 'No win this turn: they can stop it.',
+      certainty: r.certainty,
+      nextTime:
+        'Count Life + 1 hits against their best possible defence before you commit your attackers.',
+      lessonId: 'L15-lethal-math',
+      sources: SOURCES_PROOF,
     };
   }
   if (r.status === 'refuted') {

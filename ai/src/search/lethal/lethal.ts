@@ -11,7 +11,7 @@
  * line (the fewest DON!! given, smaller attacks first, `search.ts`); a full-budget pass that finds
  * no win refutes. Either may stop at the cap: `unknown`, never "no lethal".
  */
-import { SCRIPTS, type Card } from '@optcg/cards';
+import type { Card } from '@optcg/cards';
 import {
   legalActions,
   queries,
@@ -23,6 +23,7 @@ import {
 import { counterValueOf, priorFor } from '../../knowledge.ts';
 import { defenceEffectsOf, type DefenceEffect } from './defence.ts';
 import { analyseLine, type LineStep } from './analyse.ts';
+import { attackReach, refutedByBound } from './bound.ts';
 import { publicState, triggerRisk, type TriggerRisk } from './public.ts';
 import { search, searchGreedy, searchPlan, type Cap } from './search.ts';
 
@@ -37,6 +38,12 @@ export type LethalInput =
       view: SearchView;
       /** `power-only` is the superseded A1 (a hidden card is only +power): kept so a test can show what it got wrong. */
       model?: 'full' | 'power-only';
+      /**
+       * The search-free bound (`bound.ts`). `off` turns it off (the soundness harness compares it with
+       * the search); `overstated` makes it believe a plain Counter is worth twice what it is, to show a
+       * test catches a broken bound. `off` also skips the reduced-defender pass.
+       */
+      bound?: 'on' | 'off' | 'overstated';
     }
   | { mode: 'actual'; state: GameState; attacker?: PlayerId };
 
@@ -98,7 +105,9 @@ export interface LethalResult {
     line: LineStep[];
     stoppedAt: number;
     /** `attackers`: too few attackers could ever hit their Leader (no search was needed). */
-    reason?: 'attackers';
+    reason?: 'attackers' | 'bound' | 'reduced';
+    /** Public mode: a card the seat holds draws or searches, and the draw is not counted (A3). */
+    drawsIgnored?: boolean;
   } | null;
   /** Public mode, proven: the chance a hidden Life [Trigger] stops it (null when none can). */
   trigger: TriggerRisk | null;
@@ -163,55 +172,6 @@ function factsOf(
   };
 }
 
-/** How many cards a selector can take: its `pick` count, 1 if none, 5 if it takes "all". */
-function pickCount(sel: unknown): number {
-  const pick = (sel as { pick?: Record<string, unknown> } | undefined)?.pick;
-  if (!pick) return 1;
-  if (typeof pick.upTo === 'number') return pick.upTo;
-  if (typeof pick.exactly === 'number') return pick.exactly;
-  return 5;
-}
-
-interface Reach {
-  /** Attacks a script can add: cards it untaps, plays, or gives [Rush]. */
-  extra: number;
-  doubleAttack: boolean;
-}
-
-const reachMemo = new Map<string, Reach>();
-
-/**
- * What a card's script (typed data, not text) can add to the attacks of a turn: an untap
- * (`setActive`), a card played (`play`), a [Rush] granted (`grant`), each as many cards as its pick
- * allows (a `forEach` counts as 5), plus whether it grants [Double Attack].
- */
-function reachOf(cardId: string): Reach {
-  let r = reachMemo.get(cardId);
-  if (!r) {
-    r = { extra: 0, doubleAttack: false };
-    const reach = r;
-    const walk = (n: unknown, mult: number): void => {
-      if (Array.isArray(n)) return n.forEach((x) => walk(x, mult));
-      if (!n || typeof n !== 'object') return;
-      const o = n as Record<string, unknown>;
-      const m = 'forEach' in o ? mult * 5 : mult;
-      if (o.do && typeof o.do === 'object') {
-        const d = o.do as Record<string, Record<string, unknown>>;
-        if (d.setActive) reach.extra += m * pickCount(d.setActive);
-        if (d.play) reach.extra += m * pickCount(d.play.what);
-        if (d.grant) {
-          if (d.grant.keyword === 'Rush') reach.extra += m * pickCount(d.grant.target);
-          if (d.grant.keyword === 'Double Attack') reach.doubleAttack = true;
-        }
-      }
-      for (const v of Object.values(o)) walk(v, m);
-    };
-    walk(SCRIPTS[cardId]?.abilities, 1);
-    reachMemo.set(cardId, reach);
-  }
-  return r;
-}
-
 /**
  * Can this seat get enough attackers on their Leader to win at all? Its attackers now, plus every
  * Character in its hand with printed [Rush], plus the attacks its scripts can add (untap, play, grant
@@ -225,31 +185,11 @@ export function attackersPossible(
   s: GameState,
   attacker: PlayerId,
   cards: ReadonlyMap<string, Card>,
+  /** The seat's deck is known (a full state); `public` passes false: a draw finds a blank there (A3). */
+  deckKnown = true,
 ): boolean {
-  const def = other(attacker);
-  const life = queries.zone(s, def, 'life').length;
-  const leader = queries.zone(s, def, 'leader')[0]!.instance;
-  let n = 0;
-  let da = false;
-  const seen = new Set<string>();
-  for (const a of legalActions(s))
-    if (a.type === 'attack' && a.target === leader && !seen.has(a.attacker)) {
-      seen.add(a.attacker);
-      n++;
-      if (queries.card(s, a.attacker).keywords.includes('Double Attack')) da = true;
-    }
-  for (const z of ['hand', 'leader', 'characters', 'stage'] as const)
-    for (const c of queries.zone(s, attacker, z)) {
-      const r = reachOf(c.card);
-      n += r.extra;
-      if (r.doubleAttack || c.keywords.includes('Double Attack')) da = true;
-      if (
-        z === 'hand' &&
-        cards.get(c.card)?.category === 'Character' &&
-        c.keywords.includes('Rush')
-      )
-        n++;
-    }
+  const life = queries.zone(s, other(attacker), 'life').length;
+  const { n, da } = attackReach(s, attacker, cards, deckKnown);
   return n >= 1 && (n - 1) * (da ? 2 : 1) >= life;
 }
 
@@ -269,6 +209,7 @@ function remaining(cap: Cap, used: number, t0: number): Cap {
   return {
     ...(cap.nodes !== undefined ? { nodes: Math.max(1, cap.nodes - used) } : {}),
     ...(cap.ms !== undefined ? { ms: Math.max(1, cap.ms - (performance.now() - t0)) } : {}),
+    ...(cap.deckKnown ? { deckKnown: true } : {}),
   };
 }
 
@@ -288,6 +229,14 @@ function run(
     gaps: string[];
     hiddenLife: number;
     prior: ReturnType<typeof priorFor>;
+    /** Public mode: what the search-free refutation may assume (`bound.ts`); null: no bound. */
+    bound: { hand: number; plain: number } | null;
+    /**
+     * Public mode: the same position against the reduced defender (every hidden card only its plain
+     * +power mode). A refutation there is a refutation against the real one (it has more answers);
+     * a proof there says nothing. null: not tried.
+     */
+    reducedRoot: GameState | null;
   },
 ): LethalResult {
   const facts: LethalFacts = factsOf(
@@ -320,22 +269,67 @@ function run(
       certainty: 'search-incomplete',
       reason: 'It is not that seat’s Main Phase decision.',
     };
+  // In `public` a draw finds a blank (A3): when a card the seat holds draws or searches, a refutation
+  // by count is "from what you hold", not "against any hand" (L-12).
+  const drawsIgnored = mode === 'public' && attackReach(root, attacker, cards, false).drawsIgnored;
   // Too few attackers: no search can find lethal, and the answer is immediate (CR 7-1-4-1-1-1).
-  if (!attackersPossible(root, attacker, cards))
+  if (!attackersPossible(root, attacker, cards, mode === 'actual'))
     return {
       ...base,
       status: 'refuted',
-      certainty: 'any-hand',
+      certainty: drawsIgnored ? 'needed-hidden-info' : 'any-hand',
       defence: {
         lifeTaken: 0,
         hitsNeeded: facts.hitsNeeded,
         line: [],
         stoppedAt: 0,
         reason: 'attackers',
+        ...(drawsIgnored ? { drawsIgnored } : {}),
+      },
+    };
+  // Too many cards in their hand for any DON!! split to beat: refuted without a search (`bound.ts`).
+  if (extra.bound && refutedByBound(root, attacker, cards, extra.bound))
+    return {
+      ...base,
+      status: 'refuted',
+      certainty: 'needed-hidden-info',
+      defence: {
+        lifeTaken: 0,
+        hitsNeeded: facts.hitsNeeded,
+        line: [],
+        stoppedAt: 0,
+        reason: 'bound',
+        ...(drawsIgnored ? { drawsIgnored } : {}),
       },
     };
   const t0 = performance.now();
   let nodes = 0;
+  const refutedFrom = (
+    attempt: NonNullable<ReturnType<typeof search>['bestAttempt']>,
+    reason?: 'reduced',
+  ): LethalResult => {
+    const mine = attempt.trace.filter((a) => a.player === attacker);
+    const an = analyseLine(root, attacker, mine, refOf, cards);
+    return {
+      ...base,
+      status: 'refuted',
+      certainty: 'needed-hidden-info',
+      defence: {
+        lifeTaken: attempt.lifeTaken,
+        hitsNeeded: facts.hitsNeeded,
+        line: an.steps,
+        stoppedAt: Math.min(
+          an.steps.filter((s) => s.kind === 'attack').length,
+          attempt.lifeTaken + 1,
+        ),
+        ...(reason ? { reason } : {}),
+        ...(drawsIgnored ? { drawsIgnored } : {}),
+      },
+      nodes,
+    };
+  };
+  // `actual` mode knows the seat's real deck: draws and searches are searched, not idle (L-12).
+  if (mode === 'actual') cap = { ...cap, deckKnown: true };
   const trigger =
     mode === 'public' && extra.hiddenLife > 0
       ? triggerRisk(extra.hiddenLife, extra.prior, cards)
@@ -351,6 +345,21 @@ function run(
     trigger,
     nodes,
   });
+  // 0. The reduced defender (public only): a refutation here holds against the real one. A proof or
+  //    a cap hit here is thrown away, so it comes after a short try at the cheap path (a position
+  //    that is provable is usually found there at once) and gets a share of the cap.
+  if (extra.reducedRoot) {
+    const share = (f: number): Cap => ({
+      ...(cap.nodes !== undefined ? { nodes: Math.max(1, Math.floor(cap.nodes * f)) } : {}),
+      ...(cap.ms !== undefined ? { ms: Math.max(1, cap.ms * f) } : {}),
+    });
+    const g0 = searchGreedy(root, attacker, share(0.1));
+    nodes += g0.nodes;
+    if (g0.status === 'proven') return proven(g0.actions, true);
+    const r0 = search(extra.reducedRoot, attacker, share(0.85));
+    nodes += r0.nodes;
+    if (r0.status === 'refuted') return refutedFrom(r0.bestAttempt!, 'reduced');
+  }
   // 1. The cheap path: a plan in which every attack lands, the fewest DON!! first (what a person
   //    can follow without adapting).
   const g = searchGreedy(root, attacker, remaining(cap, nodes, t0));
@@ -370,6 +379,7 @@ function run(
     const p = searchPlan(root, attacker, {
       ...(rest.nodes !== undefined ? { nodes: Math.min(rest.nodes, 40_000) } : {}),
       ...(rest.ms !== undefined ? { ms: rest.ms } : {}),
+      ...(rest.deckKnown ? { deckKnown: true } : {}),
     });
     nodes += p.nodes;
     if (p.status === 'proven') return proven(p.actions, true);
@@ -378,24 +388,7 @@ function run(
       false,
     );
   }
-  const attempt = out.bestAttempt!;
-  const mine = attempt.trace.filter((a) => a.player === attacker);
-  const an = analyseLine(root, attacker, mine, refOf, cards);
-  return {
-    ...base,
-    status: 'refuted',
-    certainty: 'needed-hidden-info',
-    defence: {
-      lifeTaken: attempt.lifeTaken,
-      hitsNeeded: facts.hitsNeeded,
-      line: an.steps,
-      stoppedAt: Math.min(
-        an.steps.filter((s) => s.kind === 'attack').length,
-        attempt.lifeTaken + 1,
-      ),
-    },
-    nodes,
-  };
+  return refutedFrom(out.bestAttempt!);
 }
 
 /** `lethal({ view, mode, capMs })` of ARCHITECTURE §4.1; `cap` carries a node and a millisecond cap. */
@@ -407,7 +400,10 @@ export function lethal(
   if (input.mode === 'public') {
     const view = input.view;
     const me = view.player;
-    const pub = publicState(view, cards, input.model ?? 'full');
+    const model = input.model ?? 'full';
+    const pub = publicState(view, cards, model);
+    const reduced =
+      model === 'full' && input.bound !== 'off' ? publicState(view, cards, 'power-only') : null;
     const handles = view.skeleton.handles;
     const leader = view.zones[other(me)].leader[0]?.card ?? '';
     return run(pub.state, me, 'public', cap, cards, (id) => handles[id] ?? id, {
@@ -418,6 +414,14 @@ export function lethal(
       gaps: pub.gaps,
       hiddenLife: pub.hiddenLife,
       prior: leader ? priorFor(leader) : null,
+      reducedRoot: reduced ? reduced.state : null,
+      bound:
+        input.bound === 'off'
+          ? null
+          : {
+              hand: pub.hiddenHand,
+              plain: input.bound === 'overstated' ? pub.plain * 2 : pub.plain,
+            },
     });
   }
   const state = input.state;
@@ -430,5 +434,7 @@ export function lethal(
     gaps: [],
     hiddenLife: 0,
     prior: null,
+    bound: null,
+    reducedRoot: null,
   });
 }

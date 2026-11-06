@@ -259,3 +259,41 @@ describe('hidden information', () => {
     ctl.dispose();
   });
 });
+
+describe('the polite tier 1 line carries the Trigger caveat that fits the certainty (L-13, L-14)', () => {
+  /** The detector's answer with a Trigger chance, and a certainty chosen by the test. */
+  class WithTrigger extends InProcessLethal {
+    constructor(private readonly certainty: 'any-hand' | 'needed-hidden-info') {
+      super();
+    }
+    override lethal(view: SearchView, o: { priority: 2 | 3 | 4; capMs?: number; nodes?: number }) {
+      const r = super.lethal(view, o);
+      return {
+        id: r.id,
+        result: r.result.then((x) => ({
+          ms: x.ms,
+          result: {
+            ...x.result,
+            certainty: this.certainty,
+            trigger: { exposed: 1, triggersInPrior: 5, probabilityNone: 0.4 },
+          },
+        })),
+      };
+    }
+  }
+
+  it.each([
+    ['any-hand', 'Works against any hand, unless a Life card'],
+    ['needed-hidden-info', "Depends on their hand, and a Life card's Trigger could stop it"],
+  ] as const)('%s', async (certainty, words) => {
+    const { ctl } = game((s) => s, new WithTrigger(certainty));
+    await sleep(50);
+    ctl.coach.press();
+    await ready(ctl);
+    expect(ctl.polite.text).toContain(words);
+    expect(ctl.polite.text).toContain('Trigger'); // dropping the caveat fails here
+    if (certainty === 'needed-hidden-info')
+      expect(ctl.polite.text.toLowerCase()).not.toContain('any hand');
+    ctl.dispose();
+  });
+});

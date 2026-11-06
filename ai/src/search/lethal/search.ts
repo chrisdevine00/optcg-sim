@@ -37,6 +37,11 @@ export interface Cap {
   nodes?: number;
   /** Wall-clock milliseconds (the app only). */
   ms?: number;
+  /**
+   * The attacker's own deck is the real one (`actual` mode): drawing and looking at the top are then
+   * searched, not idle (L-12). In `public` mode the deck draws blanks (A3).
+   */
+  deckKnown?: boolean;
 }
 
 export class CapReached extends Error {
@@ -152,11 +157,17 @@ class Searcher {
     if (queries.turn(s).number !== this.turn) return this.lose(s);
     const dec = queries.decision(s);
     if (!dec) return this.lose(s);
+    // Only the attacker's own decisions are memoised: states inside a defender's answer chain rarely
+    // repeat (interchangeable cards are one answer), and hashing a state costs more than expanding it.
+    if (dec.player !== this.attacker) {
+      this.tick();
+      return this.andNode(s);
+    }
     const key = hashOf(s);
     const hit = this.tt.get(key);
     if (hit) return hit;
     this.tick();
-    const res = dec.player === this.attacker ? this.orNode(s, dec.kind) : this.andNode(s);
+    const res = this.orNode(s, dec.kind);
     this.tt.set(key, res);
     return res;
   }
@@ -243,8 +254,10 @@ class Searcher {
     const moves = out.map((x) => x.m);
     if (!this.simple)
       for (const a of acts) {
-        if (a.type === 'activate' && playMatters(queries.card(s, a.card))) moves.push([a]);
-        else if (a.type === 'playCard' && playMatters(queries.card(s, a.card))) moves.push([a]);
+        if (a.type === 'activate' && playMatters(queries.card(s, a.card), this.cap.deckKnown))
+          moves.push([a]);
+        else if (a.type === 'playCard' && playMatters(queries.card(s, a.card), this.cap.deckKnown))
+          moves.push([a]);
       }
     return moves;
   }
@@ -275,6 +288,9 @@ class Searcher {
  */
 const IDLE_OPS = new Set(['draw', 'lookAtTop', 'mill', 'reveal', 'trashLifeUntil', 'skipRefresh']);
 
+/** With the deck known, a draw or a look at the top can find the card that wins: not idle. */
+const DECK_OPS = new Set(['draw', 'lookAtTop']);
+
 const matters = new Map<string, boolean>();
 
 /**
@@ -282,9 +298,10 @@ const matters = new Map<string, boolean>();
  * [Rush] (it can attack at once), a permanent or replacement ability, or an ability with an op that
  * is not idle. A card with none of these does nothing but spend DON!!, so the search does not play it.
  */
-function cardMatters(cardId: string, keywords: string[]): boolean {
+function cardMatters(cardId: string, keywords: string[], deckKnown: boolean): boolean {
   if (keywords.includes('Rush')) return true;
-  let m = matters.get(cardId);
+  const memoKey = `${cardId}|${deckKnown}`;
+  let m = matters.get(memoKey);
   if (m === undefined) {
     m = false;
     for (const ab of (SCRIPTS[cardId]?.abilities ?? []) as unknown as Record<string, unknown>[]) {
@@ -300,15 +317,15 @@ function cardMatters(cardId: string, keywords: string[]): boolean {
         if (Array.isArray(o.chooseOne)) o.chooseOne.forEach(walk);
       };
       walk(ab.effect);
-      if (ops.some((op) => !IDLE_OPS.has(op))) m = true;
+      if (ops.some((op) => !IDLE_OPS.has(op) || (deckKnown && DECK_OPS.has(op)))) m = true;
     }
-    matters.set(cardId, m);
+    matters.set(memoKey, m);
   }
   return m;
 }
 
-const playMatters = (c: { card: string; keywords: string[] }): boolean =>
-  cardMatters(c.card, c.keywords);
+const playMatters = (c: { card: string; keywords: string[] }, deckKnown = false): boolean =>
+  cardMatters(c.card, c.keywords, deckKnown);
 
 /** A Character target is worth an attack only if it blocks or has a scripted ability. */
 function worthAttacking(cardId: string, keywords: string[]): boolean {
@@ -597,6 +614,7 @@ function remainingCap(cap: Cap, used: number, t0: number): Cap {
   return {
     ...(cap.nodes !== undefined ? { nodes: Math.max(1, cap.nodes - used) } : {}),
     ...(cap.ms !== undefined ? { ms: Math.max(1, cap.ms - (performance.now() - t0)) } : {}),
+    ...(cap.deckKnown ? { deckKnown: true } : {}),
   };
 }
 

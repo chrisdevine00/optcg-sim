@@ -9,6 +9,7 @@
     "cards/test",
     "ai/src",
     "ai/test",
+    "ai/bench",
     "app/src",
     "app/test",
     "app/e2e",

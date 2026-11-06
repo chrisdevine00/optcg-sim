@@ -39,7 +39,7 @@ export function summary(s: State): unknown {
       const m = ID.exec(v);
       return m ? (pos.get(m[1]!) ?? 'gone') + (m[2] ?? '') : v;
     }
-    if (Array.isArray(v)) return v.map(canon);
+    if (Array.isArray(v)) return v.length === 0 ? v : v.map(canon);
     if (v && typeof v === 'object')
       return Object.fromEntries(
         Object.keys(v)
@@ -92,15 +92,8 @@ export function summary(s: State): unknown {
 /** Engine instance ids (`Draft.newId`, M2-22): `$` plus 7 characters, optionally a `/…` or `#…` tail. */
 const ID = /^(\$[a-z0-9]{7})([/#].*)?$/;
 
-/** 53-bit string hash (cyrb53), run twice with different seeds for a 106-bit digest. */
-function cyrb53(str: string, seed: number): string {
-  let h1 = 0xdeadbeef ^ seed;
-  let h2 = 0x41c6ce57 ^ seed;
-  for (let i = 0; i < str.length; i++) {
-    const ch = str.charCodeAt(i);
-    h1 = Math.imul(h1 ^ ch, 2654435761);
-    h2 = Math.imul(h2 ^ ch, 1597334677);
-  }
+/** One cyrb53 finalisation: the 53-bit digest as 14 hex digits. */
+function fin(h1: number, h2: number): string {
   h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
   h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
   h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
@@ -108,8 +101,24 @@ function cyrb53(str: string, seed: number): string {
   return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16).padStart(14, '0');
 }
 
+/**
+ * Two 53-bit cyrb53 digests (seeds 0 and 0x9e3779b9) of `str` for a 106-bit result, computed in one
+ * pass over the string (the same values as running cyrb53 twice).
+ */
 export function hashString(str: string): string {
-  return cyrb53(str, 0) + cyrb53(str, 0x9e3779b9);
+  const S = 0x9e3779b9;
+  let a1 = 0xdeadbeef;
+  let a2 = 0x41c6ce57;
+  let b1 = 0xdeadbeef ^ S;
+  let b2 = 0x41c6ce57 ^ S;
+  for (let i = 0; i < str.length; i++) {
+    const ch = str.charCodeAt(i);
+    a1 = Math.imul(a1 ^ ch, 2654435761);
+    a2 = Math.imul(a2 ^ ch, 1597334677);
+    b1 = Math.imul(b1 ^ ch, 2654435761);
+    b2 = Math.imul(b2 ^ ch, 1597334677);
+  }
+  return fin(a1, a2) + fin(b1, b2);
 }
 
 export function summaryHash(s: State): string {

@@ -248,7 +248,9 @@ describe('lethal: planted positions with known answers', () => {
    */
   it('refuted: the defender can stop a hit, and the best order lands one', () => {
     const s = position({ chars: [SANJI], don: 3, life: 1, hand: [NO_COUNTER, NO_COUNTER] });
-    const r = pub(s);
+    // The search-free bound refutes this too (lethal-bound.test.ts); here the search's own line is read.
+    expect(pub(s).defence?.reason).toBe('bound');
+    const r = lethal({ mode: 'public', view: projectForSearch(s, 'p1'), bound: 'off' }, cards, CAP);
     expect(r.status).toBe('refuted');
     expect(r.certainty).toBe('needed-hidden-info');
     expect(r.defence).toMatchObject({ lifeTaken: 1, hitsNeeded: 2 });
