@@ -2,6 +2,13 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-05 — L re-review 1 (app part): Unknown states the public defence bound; two fixes get tests
+
+Context: `docs/reviews/l-review.md` Re-review 1 failed L (L-03, L-12, L-13 open; the ai/ builder owns those). App-side:
+- **L-03 (what Unknown can say).** When the check doesn't finish, the coach adds one line built from the result's public facts: their hand size times `maxPerCard` (the `defenceBound` the search uses, DON!!-aware), active Blockers, and whether their Counters can rest or draw. Public facts only, so no leak. Rejected: a bigger cap on "Check again" (it costs the turn's pace and doesn't fix the rate).
+- **L-14 (app mutations that passed).** A unit test asserts `theyCouldHave` itself carries the Counter extras for a Kaido defender. An e2e removes a focused coach control outside React, so only the `focus.ts` rescue can act (it fails 8 of 8 with the rescue off).
+- **L-15 (sev 1, DON!! math tag ignores [When Attacking] boosts and Blockers):** carried to M10 polish.
+
 ## 2026-11-05 — L fix round (AI half): sound hand costs, a cheap proof path, a conservative attackers bound
 
 Context: the L review (`docs/reviews/l-review.md`) failed the milestone on L-01 and L-02 (false claims) and L-03 (the detector rarely answers). This entry records the AI-side fixes.

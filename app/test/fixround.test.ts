@@ -10,6 +10,7 @@ import type { PlayerView, SearchView } from '@optcg/engine';
 import { GameController, type AiPort } from '../src/play/game/controller.ts';
 import type { LethalPort } from '../src/play/game/ai-client.ts';
 import { counterExtras, theyCouldHave } from '../src/play/coach/BattleExtras.tsx';
+import { unknownBound } from '../src/play/coach/Coach.tsx';
 import { prefixOf, reviewInline } from '../src/play/review/analyse.ts';
 import { SCENARIOS } from '../src/play/setup/scenarios.ts';
 import { cardMap } from './support.ts';
@@ -141,5 +142,30 @@ describe('the battle panel’s bound (M16, L-08)', () => {
     // Kaido's sourced lists run [Counter] Events that rest a Character (L-08).
     const k = counterExtras('OP17-058', cardMap());
     expect(k.rests || k.draws).toBe(true);
+  });
+
+  it('the panel itself carries those extras for a Kaido defender (re-review L-14)', () => {
+    const { mode: _x, ...s3 } = SCENARIOS.lethalDemo!;
+    const g = new GameController(
+      cardMap(),
+      { scenario: { ...s3, p2: { ...s3.p2, leader: 'OP17-058', hand: ['OP17-056'] } } },
+      config(),
+    );
+    const they = theyCouldHave(g.view(), 'p2', g.cards);
+    expect(they.extras.rests || they.extras.draws).toBe(true);
+  });
+
+  it('on Unknown the coach states the public defence bound (L-03)', () => {
+    const f = {
+      handSize: 3,
+      maxPerCard: 2000,
+      blockers: ['x'],
+      noPrior: false,
+      defenceExtras: { rests: true, draws: false },
+    };
+    expect(unknownBound(f)).toBe(
+      'Their 3 cards in hand could add up to +6000 (+2000 each, their usual lists’ biggest); 1 active Blocker stops one attack. Their Counters can also rest one of your Characters.',
+    );
+    expect(unknownBound({ ...f, handSize: 0, blockers: [] })).toBe('They have no cards in hand.');
   });
 });

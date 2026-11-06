@@ -280,6 +280,11 @@ function Tiers({ g }: { g: G }) {
         </p>
       )}
       {r.status === 'unknown' && (
+        <p className="coach-note" data-testid="unknown-bound">
+          {unknownBound(r.facts)}
+        </p>
+      )}
+      {r.status === 'unknown' && (
         <button type="button" className="btn small" onClick={() => coach.retry()}>
           Check again
         </button>
@@ -303,6 +308,36 @@ function Tiers({ g }: { g: G }) {
       </div>
     </div>
   );
+}
+
+/**
+ * What the coach can still say when the search didn't finish (review L-03): the public bound on
+ * their defence, the same `defenceBound` the search uses. Public facts only.
+ */
+export function unknownBound(f: {
+  handSize: number;
+  maxPerCard: number;
+  blockers: readonly string[];
+  noPrior: boolean;
+  defenceExtras: { rests: boolean; draws: boolean };
+}): string {
+  const parts: string[] = [];
+  if (f.handSize === 0) parts.push('They have no cards in hand');
+  else
+    parts.push(
+      `Their ${f.handSize} ${f.handSize === 1 ? 'card' : 'cards'} in hand could add up to +${num(f.handSize * f.maxPerCard)} (+${num(f.maxPerCard)} each, ${f.noPrior ? 'a typical deck’s' : 'their usual lists’'} biggest)`,
+    );
+  if (f.blockers.length)
+    parts.push(
+      `${f.blockers.length} active ${f.blockers.length === 1 ? 'Blocker stops' : 'Blockers each stop'} one attack`,
+    );
+  const extras = [
+    f.defenceExtras.rests && 'rest one of your Characters',
+    f.defenceExtras.draws && 'draw a card',
+  ].filter(Boolean);
+  const more =
+    f.handSize > 0 && extras.length ? ` Their Counters can also ${extras.join(' or ')}.` : '';
+  return `${parts.join('; ')}.${more}`;
 }
 
 function statusWord(s: 'proven' | 'refuted' | 'unknown'): string {

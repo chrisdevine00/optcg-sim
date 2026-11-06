@@ -303,6 +303,28 @@ test.describe('focus stays in the coach (L-07) and DON!! math on the board (L-09
     expect(await page.evaluate(() => document.activeElement?.id)).not.toBe('decision-title');
   });
 
+  test('the focus rescue alone hands a vanished coach control to the coach (L-07, re-review L-14)', async ({
+    page,
+  }) => {
+    await lethalGame(page);
+    await nextDecision(page);
+    await page.keyboard.press('l');
+    await expect(page.locator('.coach-head')).toContainText('Lethal is on the board.', {
+      timeout: 15_000,
+    });
+    // Focus a coach button, then remove it outside React, so only the rescue in focus.ts can act.
+    const b = page.getByRole('button', { name: /How many hits/ });
+    await b.focus();
+    await b.evaluate((el) => el.remove());
+    await page.waitForTimeout(100);
+    expect(
+      await page.evaluate(() => {
+        const a = document.activeElement;
+        return a?.classList.contains('coach-result') || a?.classList.contains('guided-q') || false;
+      }),
+    ).toBe(true);
+  });
+
   test('"DON!! math on the board" is off by default and tags legal targets when on', async ({
     page,
   }, info) => {
