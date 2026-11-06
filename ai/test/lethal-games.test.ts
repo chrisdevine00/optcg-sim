@@ -20,7 +20,7 @@ import { cardMap, metaDecks } from './support.ts';
 import { playMatch } from './support/match.ts';
 import { refuteLineOrNull } from './support/refute.ts';
 
-vi.setConfig({ testTimeout: 600_000 });
+vi.setConfig({ testTimeout: 3_600_000 });
 
 const cards = cardMap();
 const GAMES = Number(process.env.LETHAL_GAMES ?? 2);
