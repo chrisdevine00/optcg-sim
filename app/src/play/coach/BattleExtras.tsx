@@ -7,36 +7,22 @@
  */
 import { useEffect, useState } from 'react';
 import { SCRIPTS, type Card } from '@optcg/cards';
-import { biggestCounter, priorCardIds, priorFor } from '@optcg/ai';
+import { defenceBound, FALLBACK_COUNTER, priorCardIds, priorFor } from '@optcg/ai';
 import type { PlayerId, ProjectedView } from '@optcg/engine';
 import { num } from '../game/text.ts';
 import { noteCount, bumpNote } from './profile.ts';
 
 /**
- * The assumed biggest Counter when their Leader has no sourced list (the search's fallback).
- * TODO(L fix round): switch to the `FALLBACK_COUNTER` and the public-defence-bound function the
- * `ai/` fix exports, so this panel and `public` lethal share one number and one model (L-08).
+ * Do their deck's [Counter] Events do more than add power (rest a Character, draw)? The same public
+ * reading `public` lethal search uses (`defenceBound`, review L-08).
  */
-export const FALLBACK_COUNTER = 4000;
-
-/**
- * Do their deck's [Counter] Events do more than add power? Read from the public scripts of the
- * archetype prior's cards: an effect that rests a Character, or draws, appears in the panel as one
- * line, because the power bound alone would suggest nothing else can change a battle (review L-08).
- */
-export function counterExtras(leader: string): { rests: boolean; draws: boolean } {
-  let rests = false;
-  let draws = false;
-  for (const id of priorCardIds(leader))
-    for (const ab of SCRIPTS[id]?.abilities ?? []) {
-      const a = ab as unknown as { kind?: string; when?: unknown };
-      const w = Array.isArray(a.when) ? a.when : [a.when];
-      if (a.kind !== 'activate' || !w.includes('counter')) continue;
-      const json = JSON.stringify(ab);
-      rests ||= /"rest":/.test(json);
-      draws ||= /"draw":/.test(json);
-    }
-  return { rests, draws };
+export function counterExtras(
+  leader: string,
+  cards: ReadonlyMap<string, Card>,
+  defenderDon = 10,
+): { rests: boolean; draws: boolean } {
+  const b = defenceBound(priorCardIds(leader), cards, defenderDon, FALLBACK_COUNTER);
+  return { rests: b.rests, draws: b.draws };
 }
 
 export interface TheyCouldHave {
@@ -82,7 +68,15 @@ export function theyCouldHave(
   }
   const leader = z.leader[0]?.card ?? '';
   const prior = leader ? priorFor(leader) : null;
-  const perCard = prior ? biggestCounter(leader, cards) : FALLBACK_COUNTER;
+  // One model with `public` lethal: the most one hidden card adds, given the DON!! on their field.
+  const dn = view.don[defender];
+  const bound = defenceBound(
+    prior ? priorCardIds(leader) : [],
+    cards,
+    dn.active + dn.rested + dn.given,
+    FALLBACK_COUNTER,
+  );
+  const perCard = bound.perCard;
   const hand = z.hand.length;
   return {
     blockers,
@@ -91,7 +85,7 @@ export function theyCouldHave(
     perCard,
     total: hand * perCard,
     assumed: !prior,
-    extras: prior ? counterExtras(leader) : { rests: false, draws: false },
+    extras: prior ? { rests: bound.rests, draws: bound.draws } : { rests: false, draws: false },
   };
 }
 

@@ -139,7 +139,7 @@ describe('the battle panel’s bound (M16, L-08)', () => {
 
   it('says when their Counters can also rest a Character or draw', () => {
     // Kaido's sourced lists run [Counter] Events that rest a Character (L-08).
-    const k = counterExtras('OP17-058');
+    const k = counterExtras('OP17-058', cardMap());
     expect(k.rests || k.draws).toBe(true);
   });
 });
