@@ -12,6 +12,8 @@ block the milestone.
 | m3-voiceover-safari.md | VoiceOver + Safari | Owed: the owner's passes, below |
 | [l-nvda-chrome.md](l-nvda-chrome.md) | NVDA + Chrome | Scripted (Guidepup), run 42649621521: **PASS** by the rule (no severity 3 or 4; 5 at severity 2), but steps 4b, 4c, 5 and the AI defence were not reached (harness) |
 | [l-nvda-firefox.md](l-nvda-firefox.md) | NVDA + Firefox | Scripted (Guidepup), run 42649621521: **PASS** by the rule, but only steps F3, 1 and 3 were heard; steps 6 to 9 not reached (harness). Re-run needed |
+| [l-nvda-chrome-r2.md](l-nvda-chrome-r2.md) | NVDA + Chrome | Scripted (Guidepup), run 42659930386, after fix round 1: **PASS** by the rule (no severity 3 or 4; L-SR1 not fixed, L-SR11 new); every step heard; coverage sufficient, with L-SR2 and L-SR10 unverified |
+| [l-nvda-firefox-r2.md](l-nvda-firefox-r2.md) | NVDA + Firefox | Scripted (Guidepup), run 42659930386: **INCOMPLETE** (no severity 3 or 4, but steps 4 to 9 not heard; the focus guard does not work in Firefox, harness). Re-run needed |
 
 ## The harness
 
