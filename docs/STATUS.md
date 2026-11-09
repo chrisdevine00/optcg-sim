@@ -1,7 +1,7 @@
 # Status
 
 **Phase:** 5 Build, slice pass (ADR 0012), starting at M0. Phases 1–4 gated 2026-10-28.
-**Milestone:** L Learning slice: re-review 2 PASS 2026-11-06 (L-03 re-graded to sev 2, carried); next L-16 tests, then the manual screen-reader pass. M5a done 2026-11-05 (re-review 1 PASS). M4a done 2026-10-29. M3 done 2026-11-05 (NVDA r4 PASS in Chrome and Firefox). M0, M1 and M2 done 2026-10-28.
+**Milestone:** L Learning slice: re-review 2 PASS 2026-11-06 (L-03 re-graded to sev 2, carried); L-16 fixed 2026-11-09 (5ae807a); next the L screen-reader pass (script being built), then S1 (kit ready, needs the owner). M5a done 2026-11-05 (re-review 1 PASS). M4a done 2026-10-29. M3 done 2026-11-05 (NVDA r4 PASS in Chrome and Firefox). M0, M1 and M2 done 2026-10-28.
 **Run the app:** `npm install && npm run dev` then open http://localhost:5173/optcg-sim/ and go to `/cards` for the card browser
 **Deployed:** https://chrisdevine00.github.io/optcg-sim/ (auto-deploys after green CI on `main`)
 
@@ -142,6 +142,7 @@
 
 ## Next (slice pass, PLAN.md §1)
 
+0. **2026-11-09:** L-16 fixed (5ae807a, tests only): a planted test per bound term; all 15 mutations (the 13 of the review, reduced pass off, DECK_OPS emptied) now fail a test; the lead re-applied `addDon` and reduced-pass-off and saw each fail. #3/#4 (`gainTotal`, permanent `gain`) and #8/#9 are pinned at bound level only: no position was found where the mutant refutes and the full search proves. Suites: `npm test` 1,134 passed, Playwright 152 passed (28 skipped by design). Also: the coach vanished at 1280×800/900 (rail 280 px); fixed in f2d51a5 (DECISIONS 2026-11-09). S1 scenarios and `docs/design/usability/S1-kit.md` ready (task 1.5's record link pending). In flight: the L screen-reader script for the NVDA harness (worktree agent).
 0. **L re-review 2: PASS (2026-11-06, `docs/reviews/l-review.md` "## Re-review 2").** Open with targets: L-03 sev 2 → M5b (search throughput); L-16 sev 2 (9 of 13 `bound.ts` mutations and the reduced pass survive the suite; reviewer's `addDon` planted case; L-12 test should assert `proven`) → **fix next**, before the screen-reader pass; L-17 sev 1 and L-15 → M10. History below.
    - **Paused 2026-11-05 night: L fix round 2.** L re-review 1 (`docs/reviews/l-review.md`, 8ae2afa) FAILED. Open: L-03 (sev 3, Unknown on 72% of searched positions, target under about 30%), L-12 (sev 3, the attackers bound ignores draw and search into a Rush Character), L-13 (sev 3, the screen-reader Trigger note says "any hand" when the certainty is `needed-hidden-info`), and L-14's ai part (the screen-reader caveat has no test; the `lethal-games.test.ts:141` gate counts bound answers as decided, so it can't fail on L-03). The app part is merged (1b100e0: Unknown states the public defence bound; tests for the Counter extras and the coach focus rescue). L-15 (sev 1) goes to M10.
    - **The ai/ round-2 work in progress** is on branch `worktree-agent-a94ee856e00d82aad` (worktree `.claude/worktrees/agent-a94ee856e00d82aad`, WIP commits fcbeff4 "search-free refutation bound" and de121fb). It is unverified: review it, finish it or redo it, then run the soundness harness, the leak differential and the reviewer's rate probe (3 seeds, 1.5 s cap).
