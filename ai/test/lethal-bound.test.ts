@@ -32,7 +32,9 @@ import {
   tier1,
   type LethalResult,
 } from '../src/index.ts';
+import { SCRIPTS } from '@optcg/cards';
 import { attackerPotential, refutedByBound } from '../src/search/lethal/bound.ts';
+import { attackersPossible } from '../src/search/lethal/lethal.ts';
 import { cardMap, lookup } from './support.ts';
 import { lifeOf, listOf, start } from './support/scenario.ts';
 
@@ -169,6 +171,8 @@ describe('planted: the bound counts what their hand can lose and every copy', ()
       },
     } as Spec);
     expect(attackerPotential(withKo, 'p1', cards)!.blockerLoss).toBeGreaterThan(0);
+    // ... and the outcome, not only the potential: the bound does not refute it (L-16).
+    expect(refutedByBound(withKo, 'p1', cards, { hand: 0, plain: 2000 })).toBe(false);
   });
 
   it('adds the power of each copy of an Event, not of each card id', () => {
@@ -380,10 +384,25 @@ describe('L-12: a draw can find the Rush Character', () => {
   } as unknown as Spec;
   const state = (): GameState => createFromScenario({ ...spec, cards: lookup }).state;
 
-  it('actual mode does not refute: the deck is known and the draw is played', () => {
+  it('actual mode proves it: the deck is known and the draw is played', () => {
+    // `proven` (255 nodes), not only "not refuted": a search that does not play a `draw` when the
+    // deck is known (`DECK_OPS`) ends `refuted` or `unknown` here (L-16).
     const r = lethal({ mode: 'actual', state: state() }, cards, { nodes: 200_000 });
-    expect(r.status).not.toBe('refuted');
+    expect(r.status).toBe('proven');
     expect(r.defence?.reason).not.toBe('attackers');
+  });
+
+  it('actual mode plays a card whose only ops are a look at the top and a draw (DECK_OPS)', () => {
+    // Queen above also has an [Activate] that adds DON!!, so it matters to the search whatever its
+    // draw is. OP17-050 (look at 2, reorder, draw 1) has nothing else: it is played only because the
+    // deck is known, and then the Rush Kaido on top is drawn, played and attacks with the Leader.
+    const s = createFromScenario({
+      ...(spec as object),
+      cards: lookup,
+      p1: { ...spec.p1, hand: ['OP17-050'] },
+    } as unknown as ScenarioSpec).state;
+    const r = lethal({ mode: 'actual', state: s }, cards, { nodes: 200_000 });
+    expect(r.status).toBe('proven');
   });
 
   it('public mode never says "any hand" about a refutation that ignores a draw, and says so', () => {
@@ -490,5 +509,238 @@ describe('the Trigger caveat follows the certainty (L-13) and is not dropped (L-
   it('with no Trigger chance there is no caveat', () => {
     const r = { ...proven('any-hand'), trigger: null };
     expect(tier1(r).triggerNote).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------------------------
+// L-16: every term of the refutation is pinned by a planted position, built through the engine. The
+// real bound must not refute it (or, for the two terms that only ever weaken it, must refute it),
+// and a bound with that one term wrong would say the opposite. Where the full search (bound off)
+// proves the position the assertion is `proven`, so a bound that refutes it is unsound. Where no
+// position is both provable and refuted by the mutant (the bound is sound but not tight there), the
+// position is one the search refutes by its own reduced pass and the assertion is that the bound
+// itself makes no claim.
+
+describe('L-16: each term of the bound is pinned by a planted position', () => {
+  const BLOCKER = 'OP17-042'; // [Blocker] 6000
+  const WEAK = 'OP06-108'; // vanilla 2000, no script
+  const WEAK0 = 'OP13-014'; // vanilla 0
+  const PLUS2 = 'OP08-051'; // [On Play] +2000 to a Leader or Character, cost 1
+  type Side = Record<string, unknown>;
+  const pos = (o: {
+    p1?: Side;
+    p2?: Side;
+    don: number;
+    life: number;
+    hand: number;
+    leader?: string;
+    defender?: string;
+  }): GameState => {
+    const leader = o.leader ?? LUFFY;
+    const defender = o.defender ?? ROCKS;
+    return start({
+      seed: 8,
+      turn: 9,
+      activePlayer: 'p1',
+      firstPlayer: 'p1',
+      p1: {
+        leader,
+        life: lifeOf(4, ZORO),
+        costArea: { active: o.don, rested: 0 },
+        decklist: listOf(leader === LUFFY ? ROCKS : leader),
+        ...o.p1,
+      },
+      p2: {
+        leader: defender,
+        life: lifeOf(o.life, ZORO),
+        hand: Array.from({ length: o.hand }, () => ZORO),
+        costArea: { active: 0, rested: 0 },
+        decklist: listOf(defender),
+        ...o.p2,
+      },
+    } as unknown as Spec);
+  };
+  const plain = (hand: number) => ({ hand, plain: 2000 });
+  const proves = (s: GameState): void => {
+    expect(pubOf(s, { nodes: 30_000 }).status).toBe('proven');
+    expect(pubOf(s, { bound: 'off', nodes: 150_000 }).status).toBe('proven');
+  };
+
+  it('blockerLoss: Torch rests their Blocker, so the two attackers still land (proven)', () => {
+    // Kaido Leader and Zoro against Rocks at 1 Life behind an active [Blocker]; Torch (EB04-040)
+    // rests it. With `free = blockers` the bound counts the Blocker as a stop and refutes.
+    const s = pos({
+      leader: KAIDO,
+      p1: { characters: [ZORO], hand: [TORCH] },
+      p2: { characters: [BLOCKER] },
+      don: 7,
+      life: 1,
+      hand: 0,
+    });
+    expect(attackerPotential(s, 'p1', cards)!.blockerLoss).toBe(1);
+    expect(refutedByBound(s, 'p1', cards, plain(0))).toBe(false);
+    proves(s);
+  });
+
+  it('need + free: the attackers a Blocker can stop must all be strong, so a weak third attacker refutes', () => {
+    // Luffy 5000, Zoro 9000 and a 2000 vanilla against Rocks at 1 Life, an active [Blocker] and 1
+    // hidden card, 3 DON!!: the defender blocks one attack and counters another, so all three must
+    // get past +2000, and the 2000 attacker cannot (it needs 5 DON!!). Dropping `+ free` from the
+    // loop looks at the best two only and does not refute.
+    const s = pos({
+      p1: { characters: [ZORO, WEAK] },
+      p2: { characters: [BLOCKER] },
+      don: 3,
+      life: 1,
+      hand: 1,
+    });
+    expect(refutedByBound(s, 'p1', cards, plain(1))).toBe(true);
+    expect(pubOf(s).defence?.reason).toBe('bound');
+    expect(pubOf(s, { bound: 'off', nodes: 150_000 }).status).not.toBe('proven');
+  });
+
+  it('gainTotal: every copy of a power card counts (one +2000 card is refuted, two are not)', () => {
+    // Luffy and Zoro against Rocks at 1 Life with 3 hidden cards and 4 DON!!, OP08-051 (+2000 for 1
+    // DON!!) in hand. One copy: the bound refutes. Two: the gap shrinks by 4000 and the bound makes no
+    // claim (the search refutes it itself, by its reduced pass). Not subtracting `gainTotal` refutes
+    // both.
+    const copies = (n: number): GameState =>
+      pos({ p1: { characters: [ZORO], hand: Array(n).fill(PLUS2) }, don: 4, life: 1, hand: 3 });
+    expect(refutedByBound(copies(1), 'p1', cards, plain(3))).toBe(true);
+    expect(refutedByBound(copies(2), 'p1', cards, plain(3))).toBe(false);
+    expect(pubOf(copies(2)).defence?.reason).not.toBe('bound');
+    expect(pubOf(copies(2), { bound: 'off', nodes: 150_000 }).status).not.toBe('proven');
+  });
+
+  it('gain: a permanent power boost to the seat counts (a planted card; no printed card has one)', () => {
+    // No scripted card boosts its own side permanently, so one is planted on a vanilla Character for
+    // this test and removed after. Luffy and it against Rocks at 1 Life, 1 DON!!, no hand: the aura
+    // makes the Leader 7000 and the bound must not refute. Not subtracting `gain` would. The aura is
+    // real in the engine: with 5 DON!! the search proves it.
+    const planted = {
+      cardId: WEAK,
+      textHash: 'planted',
+      verified: { source: 'planted for L-16', date: '2026-11-09' },
+      abilities: [
+        {
+          id: 'aura',
+          label: 'aura',
+          kind: 'permanent',
+          apply: [
+            { power: { target: { from: ['leader', 'characters'], owner: 'you' }, amount: 2000 } },
+          ],
+        },
+      ],
+    };
+    const table = SCRIPTS as unknown as Record<string, unknown>;
+    expect(table[WEAK]).toBeUndefined();
+    table[WEAK] = planted;
+    try {
+      const low = pos({ p1: { characters: [WEAK] }, don: 1, life: 1, hand: 0 });
+      expect(attackerPotential(low, 'p1', cards)!.gain).toBe(2000);
+      expect(refutedByBound(low, 'p1', cards, plain(0))).toBe(false);
+      expect(pubOf(low).defence?.reason).not.toBe('bound');
+      proves(pos({ p1: { characters: [WEAK] }, don: 5, life: 1, hand: 0 }));
+    } finally {
+      Reflect.deleteProperty(table, WEAK);
+    }
+  });
+
+  it('unblockable: an [Unblockable] attacker lands past their Blocker (proven)', () => {
+    // The Rocks Leader gets [Unblockable] from OP17-055 (rest 1 DON!!) and attacks Kaido at 0 Life:
+    // one landed attack wins. The 0-power vanilla is a second attacker that could not land. Counting
+    // the Blocker anyway makes both attackers need to land, and the bound refutes.
+    const s = pos({
+      leader: ROCKS,
+      defender: KAIDO,
+      p1: { characters: [WEAK0], hand: ['OP17-055'] },
+      p2: { characters: [BLOCKER] },
+      don: 1,
+      life: 0,
+      hand: 0,
+    });
+    expect(attackerPotential(s, 'p1', cards)!.unblockable).toBe(true);
+    expect(refutedByBound(s, 'p1', cards, plain(0))).toBe(false);
+    proves(s);
+  });
+
+  it('Double Attack: one Double Attack hit takes two Life (proven)', () => {
+    // Luffy and OP13-118 (Double Attack, 7000) against Rocks at 2 Life, 4 DON!!: the Double Attack
+    // takes both Life, then the Leader (9000 with all 4 DON!!) lands at 0 against 2 cards. With `h = 1`
+    // the bound needs 3 landed attacks out of 2 and refutes.
+    const s = pos({ p1: { characters: ['OP13-118'] }, don: 4, life: 2, hand: 0 });
+    expect(attackerPotential(s, 'p1', cards)!.da).toBe(true);
+    expect(refutedByBound(s, 'p1', cards, plain(0))).toBe(false);
+    proves(s);
+  });
+
+  it("addDon: the reviewer's King case, a rested King adds a DON!! (proven)", () => {
+    // Kaido Leader, a rested King (EB04-031: adds 1 active DON!!), Zoro and 1 active DON!! against
+    // Rocks at 1 Life with 1 hidden card. The search proves it; with `addDon` dropped the bound thinks
+    // the seat has 1 DON!! and refutes.
+    const s = pos({
+      leader: KAIDO,
+      p1: { characters: [ZORO, { card: 'EB04-031', rested: true }] },
+      don: 1,
+      life: 1,
+      hand: 1,
+    });
+    expect(attackerPotential(s, 'p1', cards)!.don).toBe(2);
+    expect(refutedByBound(s, 'p1', cards, plain(1))).toBe(false);
+    proves(s);
+  });
+
+  it('bounces: more than four ways to take a Character off the board, and the bound makes no claim', () => {
+    // Zoro and Luffy against Rocks at 1 Life with 2 hidden cards, 3 DON!!: the bound refutes (the first
+    // planted test). With five copies of OP17-056 (return a Character to hand) in hand the replays of
+    // an [On Play] are too many to bound: `attackerPotential` is null and nothing is refuted. With four
+    // it still computes and refutes. Without the guard the five-copy position is refuted.
+    const copies = (n: number): GameState =>
+      pos({
+        p1: { characters: [ZORO], hand: Array(n).fill('OP17-056') },
+        don: 3,
+        life: 1,
+        hand: 2,
+      });
+    expect(refutedByBound(copies(4), 'p1', cards, plain(2))).toBe(true);
+    expect(attackerPotential(copies(5), 'p1', cards)).toBeNull();
+    expect(refutedByBound(copies(5), 'p1', cards, plain(2))).toBe(false);
+    expect(pubOf(copies(5)).defence?.reason).not.toBe('bound');
+  });
+
+  it('rushy: a Rush Character that is taken off the board and played again attacks again', () => {
+    // Kaido Leader, EB04-030 (gives itself [Rush]: 2 attacks counted) and OP17-056 (one way to take
+    // a Character off the board) in hand, against Rocks at 3 Life: 4 attacks are needed and 1 + 2 + 1
+    // are counted. Dropping the replay attack leaves 3 and "too few attackers" refutes it.
+    const s = pos({
+      leader: KAIDO,
+      p1: { hand: ['EB04-030', 'OP17-056'] },
+      don: 10,
+      life: 3,
+      hand: 0,
+    });
+    expect(attackersPossible(s, 'p1', cards, false)).toBe(true);
+    expect(refutedByBound(s, 'p1', cards, plain(0))).toBe(false);
+    expect(pubOf(s).defence?.reason).not.toBe('attackers');
+  });
+
+  it('the reduced-defender pass decides, within a node budget, what the full search cannot', () => {
+    // The Rocks Leader and a 12000 Kaido against Kaido (OP17-058) at 1 Life with 3 hidden cards and
+    // 4 DON!!: the bound makes no claim, the reduced pass refutes it in about 540 nodes, and the full
+    // search (bound off, which also turns the pass off) is still `unknown` at 3000.
+    const s = pos({
+      leader: ROCKS,
+      defender: KAIDO,
+      p1: { characters: ['OP17-062'] },
+      don: 4,
+      life: 1,
+      hand: 3,
+    });
+    expect(refutedByBound(s, 'p1', cards, plain(3))).toBe(false);
+    const on = pubOf(s, { nodes: 3000 });
+    expect(on.status).toBe('refuted');
+    expect(on.defence?.reason).toBe('reduced');
+    expect(on.nodes).toBeLessThan(3000);
+    expect(pubOf(s, { bound: 'off', nodes: 3000 }).status).toBe('unknown');
   });
 });
