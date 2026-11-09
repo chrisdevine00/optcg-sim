@@ -1,5 +1,5 @@
 /** The L script without a screen reader: checks the harness and records focus and live regions. */
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { DryReader } from './src/reader.ts';
 import { Pass } from './src/pass.ts';
 import { L_URL, runL } from './src/l.ts';
@@ -16,4 +16,6 @@ test('L script (dry)', async ({ page }) => {
   await startAtTop(page);
   await runL(pass);
   pass.save();
+  // Every step must have reached the state it needs (a "harness: did not reach" note fails it).
+  expect(pass.unreached).toEqual([]);
 });

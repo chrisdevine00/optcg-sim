@@ -670,7 +670,12 @@ export function Game({
       (key === 'l' || key === 'L' || key === 'c' || key === 'C')
     ) {
       e.preventDefault();
-      if (key === 'l' || key === 'L') ctl.coach.press();
+      if (key === 'l' || key === 'L') ctl.coach.press(tall);
+      else if (tall && ctl.coach.supported)
+        // L-SR2: say why nothing opened (the tall decision panel owns the rail).
+        ctl.announce(
+          'The coach opens when this decision is done. Finish or cancel it, then press C.',
+        );
       else ctl.coach.toggle();
       return;
     }
@@ -826,8 +831,11 @@ export function Game({
         e.preventDefault();
         const phase = view.battle
           ? `battle, ${view.turn.battleStep ?? ''} step`
-          : `${view.turn.activePlayer === me ? 'your' : 'opponent’s'} ${view.turn.phase} phase`;
-        ctl.announce(statusSummary(view, names, phase));
+          : `${view.turn.activePlayer === me ? 'your' : 'opponent’s'} ${view.turn.phase} phase${ctl.readOnly ? ', read-only' : ''}`;
+        ctl.announce(
+          statusSummary(view, names, phase) +
+            (ctl.readOnly ? ' Read-only: nothing here is played.' : ''),
+        );
         return;
       }
       case '?':
@@ -995,7 +1003,7 @@ export function Game({
       ? `${result.winner === me && !names.hotseat ? 'You win' : `${names.player[result.winner]} wins`} · Turn ${view.turn.number}`
       : `Draw · Turn ${view.turn.number}`
     : null;
-  const boardLabel = `Game board, turn ${view.turn.number}, ${view.turn.activePlayer === me ? 'your' : 'opponent’s'} ${view.turn.phase === 'main' && view.battle ? 'battle' : view.turn.phase} phase`;
+  const boardLabel = `Game board, turn ${view.turn.number}, ${view.turn.activePlayer === me ? 'your' : 'opponent’s'} ${view.turn.phase === 'main' && view.battle ? 'battle' : view.turn.phase} phase${ctl.readOnly ? ', read-only' : ''}`;
 
   const slots = { p1: ctl.session.characterSlots('p1'), p2: ctl.session.characterSlots('p2') };
 

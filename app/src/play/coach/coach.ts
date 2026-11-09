@@ -267,7 +267,7 @@ export class Coach {
    * The Lethal button or L: the first press shows tier 1, each further press the next tier. The
    * panel opens on the Lethal section and focus goes to its result.
    */
-  press(): void {
+  press(panelBusy = false): void {
     if (!this.supported) {
       this.host.announce(
         this.host.readOnly
@@ -294,12 +294,13 @@ export class Coach {
       const next = (tier >= 3 ? 3 : tier + 1) as Tier;
       this.lethal = { ...this.lethal, tier: next, auto: false };
       if (next === 3) this.wantTall = true;
-      this.speakTier(next);
+      // L-SR10: past the last tier, say so once, ahead of the line again.
+      this.speakTier(next, panelBusy, tier >= 3);
     }
     this.host.notify();
   }
 
-  private speakTier(t: Tier): void {
+  private speakTier(t: Tier, panelBusy = false, again = false): void {
     const r = this.lethal.result;
     if (!r) return;
     if (t === 1) this.host.announce(this.t1Speech(r));
@@ -308,7 +309,14 @@ export class Coach {
       this.progress('tier2');
     } else if (t === 3) {
       const ex = explainLethal(r, this.host.cards, 'coach');
-      this.host.announce(`${ex.claim} ${ex.outcome}`);
+      // L-SR2: while a decision panel is tall the coach is its strip; say where the line is.
+      this.host.announce(
+        `${again ? 'That is everything the coach has for this turn. ' : ''}${ex.claim} ${ex.outcome}${
+          panelBusy
+            ? ' The numbered line is in the coach, which opens when this decision is done.'
+            : ''
+        }`,
+      );
       this.progress('tier3');
     }
   }

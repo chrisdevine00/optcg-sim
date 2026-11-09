@@ -76,6 +76,7 @@ export function DecisionPanel({
 }) {
   const headRef = useRef<HTMLHeadingElement>(null);
   const firstRef = useRef<HTMLDivElement>(null);
+  const pointerAt = useRef(0);
   const content = contentFor(g);
   useEffect(() => {
     if (focusSignal === 0) return;
@@ -105,7 +106,17 @@ export function DecisionPanel({
           // NVDA's Enter on a heading clicks it. In Firefox that moved the sequential-focus start
           // to the page top, so Tab went through the whole board before the panel (M3 pass FF2).
           // A click keeps focus on the heading; Tab from it goes to the panel's first control.
-          onClick={(e) => e.currentTarget.focus()}
+          // L-SR1 / FF-L1: while the attack confirm panel says "Enter to attack", that Enter is the
+          // click NVDA makes of a heading, so a click that no pointer made (no pointerdown just
+          // before it) commits the attack, the one safe primary (never "Take the hit", §11.3
+          // step 9). Focus is put back on the heading first, so it is never left on <body>.
+          onPointerDown={() => (pointerAt.current = Date.now())}
+          onClick={(e) => {
+            e.currentTarget.focus();
+            if (Date.now() - pointerAt.current < 1000) return;
+            if (g.mine && g.view.decision?.kind === 'main' && g.ui.kind === 'confirm')
+              document.getElementById('confirm-attack')?.click();
+          }}
           onKeyDown={(e) => {
             if (e.key !== 'Tab' || e.shiftKey) return;
             const first = e.currentTarget

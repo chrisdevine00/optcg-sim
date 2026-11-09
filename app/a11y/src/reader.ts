@@ -133,6 +133,22 @@ export class DryReader implements Reader {
       await this.page.waitForTimeout(100);
       return;
     }
+    // NVDA's browse mode takes Enter on a heading and clicks it instead of sending the key (the L
+    // pass, L-SR1): the dry run does the same, so it fails where a screen-reader user would.
+    if (key === 'Enter') {
+      const onHeading = await this.page.evaluate(() => {
+        const el = document.activeElement as HTMLElement | null;
+        if (el && /^H[1-6]$/.test(el.tagName)) {
+          el.click();
+          return true;
+        }
+        return false;
+      });
+      if (onHeading) {
+        await this.page.waitForTimeout(250);
+        return;
+      }
+    }
     await this.page.keyboard.press(key === ' ' ? 'Space' : key);
     await this.page.waitForTimeout(250);
   }

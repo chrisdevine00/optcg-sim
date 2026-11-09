@@ -138,7 +138,14 @@ export async function runL(p: Pass) {
           ? 'F3 re-check: Tab from the page top reached the skip link "Skip to decision".'
           : `F3 re-check FAILED: Tab from the page top reached ${f.aria}, not the skip link.`,
       );
-      await p.press('Tab');
+      if (ok) {
+        // Enter on the link must move focus to the decision (the re-grade's open question).
+        const g = await p.press('Enter');
+        p.note(
+          `Enter on the skip link: focus ${g.aria}; in the decision panel: ${g.inDecision ? 'yes' : 'NO'}.`,
+        );
+        await p.reached('the decision panel after Enter on the skip link', g.inDecision);
+      } else await p.press('Tab');
     },
   );
 
@@ -178,8 +185,26 @@ export async function runL(p: Pass) {
     "Enter to confirm; Use Kaido's [When Attacking]; pick their Character; Done",
     'The confirm is spoken; the optional prompt names the effect; the pick shows its candidate and a count; Done commits',
     async () => {
+      // After M focus is on the battle panel's heading and the panel says "Enter to attack". NVDA
+      // turns Enter on a heading into a click; the app commits the attack on that click (L-SR1).
+      const onHeading = (await p.focus()).id === 'decision-title';
       await p.press('Enter');
+      if (await page.locator('#confirm-attack').count()) {
+        // Still on the confirm panel: do what a user does who was not told, Tab to the button.
+        p.note(
+          `Enter${onHeading ? ' on the panel heading' : ''} did not confirm the attack (the panel still reads "${(await p.decisionText()).slice(0, 80)}...").`,
+        );
+        // An app finding (L-SR1), not a harness failure; recorded so the dry run fails on it.
+        await p.reached('the attack confirmed by Enter, as the panel says (L-SR1)', false);
+        await decide(p, (f) => f.id === 'confirm-attack', 'Confirm attack', '#confirm-attack');
+      }
+      await p.reached(
+        'the attack confirmed',
+        (await page.locator('#confirm-attack').count()) === 0,
+      );
+      let picked = false;
       if ((await p.kind()) === 'optional') {
+        picked = true;
         p.note(`Optional prompt: ${await p.decisionText()}`);
         await decide(p, (f) => f.id === 'use-btn', 'Use', '#use-btn');
       }
@@ -188,6 +213,7 @@ export async function runL(p: Pass) {
         await decide(p, (f) => f.inOptions, 'their Character', '#decision .opts button');
         await decide(p, (f) => f.id === 'choose-done', 'Done', '#choose-done');
       } else p.note(`No pick followed; the decision is "${await p.kind()}".`);
+      await p.reached('the Use prompt and the pick (an [When Attacking] decision)', picked);
     },
   );
 
@@ -215,7 +241,7 @@ export async function runL(p: Pass) {
         focus: await p.focus(),
       };
       p.note(`Before \`.\`: decision "${before.kind}", focus ${before.focus.aria}`);
-      if (before.kind !== 'waiting') {
+      if (!(await p.reached('the game waiting on the AI (F15)', before.kind === 'waiting'))) {
         p.note(
           `The game is not waiting on the AI (decision "${before.kind}"); nothing to re-check.`,
         );
@@ -260,12 +286,14 @@ export async function runL(p: Pass) {
       p.note(
         'Note: §11.4 words the Counter sentence with the new totals and the tie rule. As built, the live region speaks the move ("Rocks.D.Xebec: Counter: X.Drake +2000.") and then the result ("You: Attack fails · 5000 vs 7000."); the totals are in the battle panel (defender "5000 + 2000 7000"). Judge against that.',
       );
+      let sawAi = false;
       for (let i = 0; i < 12; i++) {
         const k = await p.kind();
         const panel = (await p.decisionText()).slice(0, 220);
         p.note(
           `Before "." ${i + 1}: decision "${k}"; polite: "${await polite(p)}"; panel: ${panel}`,
         );
+        if (k === 'waiting') sawAi = true;
         if (k === 'main' || k === 'over') break;
         if (['block', 'counter', 'trigger', 'choose', 'optional', 'order'].includes(k)) {
           await answerPlainly(p, k);
@@ -274,6 +302,10 @@ export async function runL(p: Pass) {
         await untilMine(p, 1);
       }
       p.note(`Position afterwards: ${(await p.decisionText()).slice(0, 300)}`);
+      await p.reached(
+        'the AI having defended and your Main Phase again (2b)',
+        (await p.kind()) === 'main' && sawAi,
+      );
     },
   );
 
@@ -284,6 +316,11 @@ export async function runL(p: Pass) {
     '`L`, `L`, `L`',
     'Coach tier 1: "Lethal: proven, works against any hand" (yes, proven against any hand); tier 2: the number of hits ("You need 1 hit. You have 2 attackers."); tier 3: the line as an ordered list in the coach panel ("You have lethal: 1 hit...")',
     async () => {
+      // The coach can only go tall in an idle Main Phase (no battle panel, no pick).
+      await p.reached(
+        'an idle Main Phase for the coach (3)',
+        (await p.kind()) === 'main' && (await page.locator('#confirm-attack').count()) === 0,
+      );
       await toZone(p, 'my-chars');
       await pressL(p, 1);
       p.note(
@@ -309,6 +346,7 @@ export async function runL(p: Pass) {
         `Tier 3 (coach mode "${f?.mode}"): lists: ${f?.lists.join('; ')}; headings: ${f?.headings.join('; ')}`,
       );
       p.note(`Focus after the third L: ${(await p.focus()).aria}`);
+      await p.reached('tier 3 with the coach tall (3)', f?.tier3 === true && f.mode === 'tall');
     },
   );
 
@@ -341,8 +379,8 @@ export async function runL(p: Pass) {
         p.note(
           'C does not move focus: it stays where it was (on the board). Tabbing to the coach to read it.',
         );
-        for (let i = 0; i < 16 && !(await inCoach()); i++) await p.press('Tab');
-        for (let i = 0; i < 30 && !(await inCoach()); i++) await p.press('Shift+Tab');
+        const here = (f: Focus) => f.tag !== 'body' && f.id !== 'decision-title' && f.inCoach;
+        if (!(await p.until('Tab', here, 16))) await p.until('Shift+Tab', here, 30);
         if (!(await inCoach())) await p.assist('Tab did not reach the coach', '.coach-result');
       }
       p.note(`Reading from: ${(await p.focus()).aria}`);
@@ -367,6 +405,11 @@ export async function runL(p: Pass) {
       await page.waitForTimeout(400);
       const f = await p.focus();
       p.note(`After Enter, focus: ${f.aria}`);
+      await p.reached(
+        'the guided count with the coach tall (4b)',
+        (await page.locator('.guided').count()) > 0 &&
+          (await page.locator('.coach').getAttribute('data-mode')) === 'tall',
+      );
       if (!/How many hits/.test(f.name) && !/How many hits/.test(f.aria))
         await p.assist('focus was not on question 1', '.guided-q');
       for (let i = 0; i < 3; i++) await p.press('Browse:Next');
@@ -387,12 +430,12 @@ export async function runL(p: Pass) {
       await p.press('1');
       await toCoachControl(p, /^Check my count/, 'Check my count', '.guided-nav .primary');
       await p.press('Enter');
-      p.note(
-        `Right answer (1): ${await page
-          .locator('.guided-check')
-          .textContent()
-          .catch(() => '(no check)')}`,
-      );
+      const right = await page
+        .locator('.guided-check')
+        .textContent()
+        .catch(() => '(no check)');
+      p.note(`Right answer (1): ${right}`);
+      await p.reached('a right answer to question 1 (4b)', /✓/.test(right ?? ''));
     },
   );
 
@@ -462,6 +505,15 @@ export async function runL(p: Pass) {
       p.note(
         `After Close, focus: ${f.aria}; on the decision heading: ${f.id === 'decision-title' ? 'YES (stranded)' : 'no'}`,
       );
+      await p.reached(
+        'questions 2 to 4 answered and the count closed (4c)',
+        /✓/.test(
+          (await page
+            .locator('.guided-check')
+            .textContent()
+            .catch(() => '')) ?? '',
+        ) || (await page.locator('.guided').count()) === 0,
+      );
       p.note(
         'Nothing was played: the guided count is a table in the coach (its board sandbox is not built, DECISIONS 2026-11-05).',
       );
@@ -508,6 +560,13 @@ export async function runL(p: Pass) {
         );
       }
       await page.waitForTimeout(1500);
+      await p.reached(
+        'the detector on (5)',
+        (await page
+          .locator('.coach-setting select')
+          .inputValue()
+          .catch(() => '')) === '2',
+      );
       p.note(
         `Detector now: ${await page
           .locator('.coach-setting select')
@@ -551,6 +610,9 @@ export async function runL(p: Pass) {
     await page.goto(L_RECORD_URL);
     await page.locator('#decision').waitFor({ timeout: 30_000 });
     await page.waitForTimeout(1500);
+    // After a goto the page may not have keyboard focus (Firefox left it in the toolbar, so every
+    // key of steps 6 to 9 went to the browser in the r1 run).
+    await p.focusPage('after the reload on the planted record');
     // The planted record: the game of learning.spec.ts. At turn 9 you hold lethal (4 DON!! on the
     // Leader, then the Leader, then Kaido). The script does not play it: it concedes, so the
     // review flags the missed lethal.
@@ -590,7 +652,9 @@ export async function runL(p: Pass) {
         .filter({ hasText: /flag|no missed lethal/ })
         .waitFor({ timeout: 40_000 });
       await page.waitForTimeout(800);
-      p.note(`Status: ${await page.getByTestId('review-status').textContent()}`);
+      const status = (await page.getByTestId('review-status').textContent()) ?? '';
+      p.note(`Status: ${status}`);
+      await p.reached('the review with a flag (6)', /flag/.test(status));
       p.note(
         'Note: not built as written — the timeline is a list of turn buttons ("Turns, left to right"), not an ARIA toolbar; Left and Right move between turns, N and Shift+N between flags.',
       );
@@ -604,7 +668,12 @@ export async function runL(p: Pass) {
       for (let i = 0; i < 4; i++) await p.press('ArrowRight');
       const n = await p.press('n');
       p.note(
-        `After N, focus: ${n.aria}. N selects the next flag (with one flag it stays) and speaks nothing by itself.`,
+        `After N, focus: ${n.aria}. N selects the next flag (with one flag it stays); the review says which in its own live region: "${
+          (await page
+            .getByTestId('review-announce')
+            .textContent({ timeout: 1000 })
+            .catch(() => '')) ?? ''
+        }".`,
       );
       // The flag's text: the Flags table row and the selected-flag section.
       await p.until('Tab', (x) => /missed lethal/i.test(x.name), 14);
@@ -629,7 +698,8 @@ export async function runL(p: Pass) {
     'Enter on the flag, then "Study this moment"; Q',
     'The board restores read-only; focus moves to the explanation; `Q` reads the restored position',
     async () => {
-      if (!toReview) return 'not reached';
+      if (!(await p.reached('the review of the planted record (7)', toReview)))
+        return 'not reached';
       // The flag button in the table selects it; Study is its own button below the explanation.
       const flagBtn = (f: Focus) => /missed lethal/i.test(f.name);
       if (!flagBtn(await p.focus())) await p.until('Shift+Tab', flagBtn, 30);
@@ -666,7 +736,8 @@ export async function runL(p: Pass) {
     '"Practice this"',
     'The puzzle opens; untimed; the board model is unchanged (same board region and zones as a game)',
     async () => {
-      if (!toReview) return 'not reached';
+      if (!(await p.reached('the review of the planted record (8)', toReview)))
+        return 'not reached';
       if (!(await p.until('Tab', (f) => f.id === 'practice-btn', 40)))
         await p.until('Shift+Tab', (f) => f.id === 'practice-btn', 40);
       if ((await p.focus()).id !== 'practice-btn')
@@ -698,7 +769,7 @@ export async function runL(p: Pass) {
     'Play the line: 4 DON!! on the Leader, the Leader attacks, then Kaido attacks; or "Declare no lethal"',
     'The result and the explanation are announced politely and are readable in a document region ("Solved: you won on the turn it was cut from"; chip "Practice · solved")',
     async () => {
-      if (!toReview) return 'not reached';
+      if (!(await p.reached('the practice board (9)', toReview))) return 'not reached';
       p.note(
         'Note: not built — there is no "Declare no lethal" control; the puzzle is answered only by playing the line (DECISIONS 2026-11-05).',
       );
@@ -754,7 +825,7 @@ export async function runL(p: Pass) {
           )
           .catch(() => 'n/a')}; polite: "${await polite(p)}"`,
       );
-      if (!result) return 'not reached';
+      if (!(await p.reached('the puzzle solved (9)', !!result))) return 'not reached';
       await toDecision(p);
     },
   );

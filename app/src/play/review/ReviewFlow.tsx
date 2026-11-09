@@ -133,6 +133,24 @@ export function ReviewFlow({
     setScreen({ kind: 'overview' });
   };
 
+  // L-SR4: "Practice this" and "Play from here" swap the whole screen, so the button that held
+  // focus is gone and the new <Game> starts with nothing to rescue. Put focus on the new
+  // decision's heading and say where the player is, once the board has mounted.
+  const playing = screen.kind === 'play' ? screen : null;
+  const playTurn = flag?.turn ?? 0;
+  useEffect(() => {
+    if (!playing) return;
+    const t = setTimeout(() => {
+      document.getElementById('decision-title')?.focus();
+      playing.ctl.announce(
+        playing.puzzle
+          ? `Practice: turn ${playTurn} as it stood. Nothing is timed. Find the win you missed.`
+          : `Playing from turn ${playTurn}, as it stood.`,
+      );
+    }, 150);
+    return () => clearTimeout(t);
+  }, [playing, playTurn]);
+
   if (screen.kind === 'study' && flag) {
     const idx = real.indexOf(flag);
     return (
@@ -259,13 +277,29 @@ function Overview({
 
   const byTurn = new Map(flags.map((f) => [f.turn, f]));
   const tl = useRef<HTMLOListElement>(null);
+  // The review screen is a new page: focus its heading (the button that opened it, or the board
+  // that was left, is gone), so it is never left on <body> (L-SR4).
+  useEffect(() => {
+    document.getElementById('rv-title')?.focus();
+  }, []);
+  // L-SR3: choosing a flag by N, Shift+N, the timeline or the table is said, not silent.
+  const [said, setSaid] = useState({ n: 0, text: '' });
+  const choose = (i: number) => {
+    setSel(i);
+    const f = real[i];
+    if (f)
+      setSaid((x) => ({
+        n: x.n + 1,
+        text: `Flag ${i + 1} of ${real.length} selected. ${flagName(f)}`,
+      }));
+  };
   // Left and Right move between turns on the timeline; N and Shift+N between flags (learning-ui §4.2).
   const onKey = (e: React.KeyboardEvent) => {
     const t = e.target as HTMLElement;
     if (t.tagName === 'INPUT' || t.tagName === 'SELECT') return;
     if ((e.key === 'n' || e.key === 'N') && real.length > 0) {
       e.preventDefault();
-      setSel((sel + (e.shiftKey ? real.length - 1 : 1)) % real.length);
+      choose((sel + (e.shiftKey ? real.length - 1 : 1)) % real.length);
       return;
     }
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
@@ -281,7 +315,9 @@ function Overview({
   return (
     <main id="main" className="review" aria-labelledby="rv-title" onKeyDown={onKey}>
       <div className="rv-head">
-        <h1 id="rv-title">Game review</h1>
+        <h1 id="rv-title" tabIndex={-1}>
+          Game review
+        </h1>
         <p className="rv-sub">
           {result}
           {` · turn ${view.turn.number} · against ${names.player[ctl.config.human === 'p1' ? 'p2' : 'p1'] || 'the AI'}`}
@@ -305,51 +341,63 @@ function Overview({
 
       <section aria-labelledby="rv-tl-h" className="rv-card">
         <h2 id="rv-tl-h">Turn timeline</h2>
-        <ol className="tl" ref={tl} aria-label="Turns, left to right">
-          <li className="tl-axis" aria-hidden="true">
-            <span>You</span>
-          </li>
-          {turns.map((t, i) => {
-            const mine = t.player === me;
-            const f = mine ? byTurn.get(t.turn) : undefined;
-            const s = f ? SEVERITY[f.severity] : null;
-            const idx = f ? real.indexOf(f) : -1;
-            return (
-              <li key={t.turn} className={`tl-col ${mine ? 'mine' : 'theirs'}`}>
-                <button
-                  type="button"
-                  className="tl-col"
-                  tabIndex={i === 0 || f ? 0 : -1}
-                  aria-current={idx >= 0 && idx === sel ? 'true' : undefined}
-                  onClick={() => idx >= 0 && setSel(idx)}
-                >
-                  <span className="tl-turn">
-                    T{t.turn} · {mine ? 'You' : 'Opp'}
-                  </span>
-                  <span
-                    className={`tl-cell ${f ? `sev-${f.severity}` : ''} ${analysis.status === 'running' && mine ? 'hatched' : ''}`}
+        {/* L-SR3: NVDA's browse mode keeps the arrows and N outside an application region, so the
+            timeline is one (the decision footer's pattern, M3 F2). Tab and Enter reach every
+            action without them: the flagged turns and the Flags table are tab stops. */}
+        <div
+          role="application"
+          aria-roledescription="turn timeline"
+          aria-label="Turn timeline. Left and Right arrows move between turns, N between flags."
+        >
+          <ol className="tl" ref={tl} aria-label="Turns, left to right">
+            <li className="tl-axis" aria-hidden="true">
+              <span>You</span>
+            </li>
+            {turns.map((t, i) => {
+              const mine = t.player === me;
+              const f = mine ? byTurn.get(t.turn) : undefined;
+              const s = f ? SEVERITY[f.severity] : null;
+              const idx = f ? real.indexOf(f) : -1;
+              return (
+                <li key={t.turn} className={`tl-col ${mine ? 'mine' : 'theirs'}`}>
+                  <button
+                    type="button"
+                    className="tl-col"
+                    tabIndex={i === 0 || f ? 0 : -1}
+                    aria-current={idx >= 0 && idx === sel ? 'true' : undefined}
+                    onClick={() => idx >= 0 && choose(idx)}
                   >
-                    {s && (
-                      <span className="tl-flag" style={{ fontSize: s.size }} aria-hidden="true">
-                        {s.glyph}
-                      </span>
-                    )}
-                    {s && <span className="tl-word">{s.word}</span>}
-                  </span>
-                  <span className="sr-only">
-                    {f
-                      ? `. ${flagName(f)}`
-                      : mine && analysis.status === 'running'
-                        ? '. Not analysed yet.'
-                        : mine
-                          ? '. No flag.'
-                          : '.'}
-                  </span>
-                </button>
-              </li>
-            );
-          })}
-        </ol>
+                    <span className="tl-turn">
+                      T{t.turn} · {mine ? 'You' : 'Opp'}
+                    </span>
+                    <span
+                      className={`tl-cell ${f ? `sev-${f.severity}` : ''} ${analysis.status === 'running' && mine ? 'hatched' : ''}`}
+                    >
+                      {s && (
+                        <span className="tl-flag" style={{ fontSize: s.size }} aria-hidden="true">
+                          {s.glyph}
+                        </span>
+                      )}
+                      {s && <span className="tl-word">{s.word}</span>}
+                    </span>
+                    <span className="sr-only">
+                      {f
+                        ? `. ${flagName(f)}`
+                        : mine && analysis.status === 'running'
+                          ? '. Not analysed yet.'
+                          : mine
+                            ? '. No flag.'
+                            : '.'}
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+        <div className="sr-only" role="status" aria-live="polite" data-testid="review-announce">
+          {said.text && <p key={said.n}>{said.text}</p>}
+        </div>
         <p className="subtle rv-legend">
           ◆ Missed lethal (severe) · ◉ Hindsight · ◌ Not fully checked · hatched: not analysed yet.
           Opponent moves and the Life line arrive with full Game Review.
@@ -383,7 +431,7 @@ function Overview({
                       className="linkbtn"
                       aria-label={flagName(f)}
                       aria-current={i === sel ? 'true' : undefined}
-                      onClick={() => setSel(i)}
+                      onClick={() => choose(i)}
                     >
                       Turn {f.turn}
                     </button>
@@ -511,7 +559,7 @@ function Study({
     >
       <div className="study-head">
         <button type="button" className="btn small" ref={back} onClick={onBack}>
-          ← Overview <kbd>Esc</kbd>
+          <span aria-hidden="true">←</span> Overview <kbd>Esc</kbd>
         </button>
         <span className="study-step">
           Flag {at + 1} of {count}

@@ -18,6 +18,7 @@ export interface Focus {
   inBoard: boolean;
   inDecision: boolean;
   inDialog: boolean;
+  inCoach: boolean;
   /** Inside a decision's list of options (order, choose). */
   inOptions: boolean;
   tag: string;
@@ -83,6 +84,8 @@ const LIVE_SCRIPT = () => {
 
 export class Pass {
   steps: StepRec[] = [];
+  /** Every "harness did not reach X" the run noted, with its step (the dry spec asserts none). */
+  unreached: string[] = [];
   private cur: StepRec | null = null;
   private logStart = 0;
 
@@ -114,6 +117,7 @@ export class Pass {
         inBoard: !!el?.closest('.board'),
         inDecision: !!el?.closest('#decision'),
         inDialog: !!el?.closest('dialog, [role="dialog"]'),
+        inCoach: !!el?.closest('.coach'),
         inOptions: !!el?.closest('.dec-list, .opts'),
         tag: el?.tagName.toLowerCase() ?? '',
       };
@@ -210,6 +214,38 @@ export class Pass {
   }
 
   /**
+   * The script's own check that a step reached the state it needs (the attack confirmed, the coach
+   * tall, the detector on). When it did not, the record says so, in the step's notes, instead of
+   * the script carrying on as if it had; the verdict then marks the step "not reached (harness)".
+   */
+  async reached(what: string, ok: boolean | Promise<boolean>): Promise<boolean> {
+    if (await ok) return true;
+    this.cur?.notes.push(`HARNESS: did not reach ${what}`);
+    this.unreached.push(`${this.cur?.n ?? '?'}: ${what}`);
+    return false;
+  }
+
+  /** True while the page (not the browser's toolbar or another window) has keyboard focus. */
+  async pageHasFocus(): Promise<boolean> {
+    // A headless dry run has no window focus to lose (document.hasFocus() is unreliable there).
+    if (this.reader.name.startsWith('dry')) return true;
+    return await this.page.evaluate(() => document.hasFocus()).catch(() => false);
+  }
+
+  /**
+   * Gives the page keyboard focus: after a reload or goto, Firefox leaves it in the toolbar while
+   * `document.activeElement` still points at the old element, so keys went to the browser. A click
+   * on the page's top-left corner (non-interactive: the header's margin) makes the page the target
+   * and starts Tab from there. Recorded as an assist.
+   */
+  async focusPage(why: string) {
+    await this.page.bringToFront();
+    await this.page.mouse.click(2, 2);
+    await this.page.waitForTimeout(300);
+    this.cur?.assists.push(`page given keyboard focus: ${why}`);
+  }
+
+  /**
    * The harness moved focus itself because the keyboard path did not get there (for example a
    * letter key that NVDA's browse mode took). Recorded, so the record never hides it.
    */
@@ -239,12 +275,20 @@ export class Pass {
     return f;
   }
 
-  /** Presses `key` until `pred` holds for the focus (checked before each press). */
+  /**
+   * Presses `key` until `pred` holds for the focus (checked before each press). Stops, with a
+   * note, when the keyboard focus has left the page (the browser's toolbar took it).
+   */
   async until(key: string, pred: (f: Focus) => boolean, max = 20): Promise<Focus | null> {
     let f = await this.focus();
     for (let i = 0; i < max; i++) {
       if (pred(f)) return f;
       f = await this.press(key);
+      if (!(await this.pageHasFocus())) {
+        this.note(`Keyboard focus left the page after ${key}; the key loop stopped.`);
+        await this.focusPage('keyboard focus had left the page');
+        return null;
+      }
     }
     return pred(f) ? f : null;
   }
@@ -265,6 +309,7 @@ export class Pass {
       project: this.project,
       reader: this.reader.name,
       readerNotes: this.reader.notes(),
+      unreached: this.unreached,
       url: this.page.url(),
       when: new Date().toISOString(),
       commit: process.env.GITHUB_SHA ?? process.env.A11Y_COMMIT ?? 'local',
