@@ -10,7 +10,8 @@ block the milestone.
 | [m3-nvda-chrome.md](m3-nvda-chrome.md) | NVDA + Chrome | Scripted (Guidepup), run 40866547375: **FAIL** (1 severity 3) |
 | [m3-nvda-firefox.md](m3-nvda-firefox.md) | NVDA + Firefox | Scripted (Guidepup), run 40866547375: **FAIL** (2 severity 3) |
 | m3-voiceover-safari.md | VoiceOver + Safari | Owed: the owner's passes, below |
-| l-nvda-chrome.md, l-nvda-firefox.md | NVDA + Chrome, Firefox | Script built (§11.4); not yet run on the runner |
+| [l-nvda-chrome.md](l-nvda-chrome.md) | NVDA + Chrome | Scripted (Guidepup), run 42649621521: **PASS** by the rule (no severity 3 or 4; 5 at severity 2), but steps 4b, 4c, 5 and the AI defence were not reached (harness) |
+| [l-nvda-firefox.md](l-nvda-firefox.md) | NVDA + Firefox | Scripted (Guidepup), run 42649621521: **PASS** by the rule, but only steps F3, 1 and 3 were heard; steps 6 to 9 not reached (harness). Re-run needed |
 
 ## The harness
 
