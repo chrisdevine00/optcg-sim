@@ -154,31 +154,44 @@ export function computeLayout(W: number, H: number): Layout {
     w = Math.round(h / RATIO);
   }
   const g2 = 2 * p.g;
-  const dd = Math.round(0.72 * w);
-
+  type Fit = { rail: number; ca: number; stacked: boolean; axis: number };
   // Horizontal fit: rail width, then cost-area width, then stacked Deck and Trash (§6.1).
-  let fit: { rail: number; ca: number; stacked: boolean; axis: number } | null = null;
   // Each step keeps the previous ones: narrow the rail fully, then the cost area, then stack.
-  const last = p.rails.at(-1)!;
-  const steps = [
-    ...p.rails.map((rail) => ({ rail, caF: 2.2, stacked: false })),
-    { rail: last, caF: 1.9, stacked: false },
-    { rail: last, caF: 1.9, stacked: true },
-  ];
-  for (const { rail, caF, stacked } of steps) {
-    const boardW = W - rail;
-    const ca = Math.round(caF * w);
-    const deckTrashW = stacked ? w : 2 * w + p.g;
-    const leftNeed = h / 2 + g2 + h + g2 + ca + p.g + dd + p.margin;
-    const rightNeed = h / 2 + g2 + h + g2 + deckTrashW + p.margin;
-    const charHalf = 2.5 * h + 2 * p.g + p.margin;
-    const lo = Math.max(leftNeed, charHalf);
-    const hi = boardW - Math.max(rightNeed, charHalf);
-    if (lo <= hi) {
-      fit = { rail, ca, stacked, axis: Math.round(Math.min(Math.max(boardW / 2, lo), hi)) };
-      break;
+  const fitFor = (h: number, w: number, rails: number[]): Fit | null => {
+    const dd = Math.round(0.72 * w);
+    const last = rails.at(-1)!;
+    const steps = [
+      ...rails.map((rail) => ({ rail, caF: 2.2, stacked: false })),
+      { rail: last, caF: 1.9, stacked: false },
+      { rail: last, caF: 1.9, stacked: true },
+    ];
+    for (const { rail, caF, stacked } of steps) {
+      const boardW = W - rail;
+      const ca = Math.round(caF * w);
+      const deckTrashW = stacked ? w : 2 * w + p.g;
+      const leftNeed = h / 2 + g2 + h + g2 + ca + p.g + dd + p.margin;
+      const rightNeed = h / 2 + g2 + h + g2 + deckTrashW + p.margin;
+      const charHalf = 2.5 * h + 2 * p.g + p.margin;
+      const lo = Math.max(leftNeed, charHalf);
+      const hi = boardW - Math.max(rightNeed, charHalf);
+      if (lo <= hi)
+        return { rail, ca, stacked, axis: Math.round(Math.min(Math.max(boardW / 2, lo), hi)) };
+    }
+    return null;
+  };
+  const widthOf = (h: number) => Math.round(h / RATIO);
+  // At 1280 px and wider, a taller window grows the cards, and the board would take the rail's
+  // width (1280×800 gave a 280 px rail and no coach, which needs 320). There, the full rail wins:
+  // the cards shrink back, no smaller than at 720 px tall, before the rail narrows.
+  if (!p.roomy && !p.peek && W >= 1280 && H > 720) {
+    const floor = Math.floor((720 - fixed) / (4 + handFactor));
+    while (h > floor && fitFor(h, w, p.rails)?.rail !== p.rails[0]) {
+      h -= 1;
+      w = widthOf(h);
     }
   }
+  const dd = Math.round(0.72 * w);
+  const fit: Fit | null = fitFor(h, w, p.rails);
   const supported = fit !== null && w >= MIN_CARD_W;
   const f = fit ?? {
     rail: p.rails.at(-1)!,

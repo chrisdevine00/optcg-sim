@@ -81,4 +81,15 @@ describe('board layout (board.md §3.1, §3.2, §6)', () => {
     expect(c.rail.tall.top).toBe(76);
     expect(computeLayout(900, 500).supported).toBe(false);
   });
+
+  it('keeps the 320 px rail (and so the coach) at 1280 wide and taller than 720', () => {
+    // 1280×800 once grew the cards until the rail fell to 280 px, under the coach's 320.
+    for (const H of [721, 768, 800, 832, 900, 1024]) {
+      const L = computeLayout(1280, H);
+      expect(L.supported).toBe(true);
+      expect(L.rail.w, `1280×${H}`).toBe(320);
+      expect(L.card.w, `1280×${H}`).toBeGreaterThanOrEqual(computeLayout(1280, 720).card.w);
+    }
+    for (const W of [1366, 1440, 1536]) expect(computeLayout(W, 900).rail.w).toBe(320);
+  });
 });
