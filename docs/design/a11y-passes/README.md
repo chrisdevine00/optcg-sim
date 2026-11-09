@@ -42,7 +42,7 @@ workspace), so normal CI never installs Guidepup.
 ```sh
 gh workflow run a11y-nvda.yml --ref main -f browsers=both   # or chrome, firefox
 gh run watch <run id>
-gh run download <run id>                                     # artifact a11y-nvda-<run id>
+gh run download <run id>                                     # artifacts a11y-nvda-<run id>-<browser>, one job per browser
 ```
 
 The workflow builds the app at that commit, serves it with `vite preview`, installs NVDA with

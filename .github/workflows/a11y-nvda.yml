@@ -1,6 +1,8 @@
 # Scripted NVDA screen-reader pass (docs/design/accessibility.md §11.2, step 1 of "Who runs them").
 # Manual only: Guidepup drives NVDA on a Windows runner through the §11.3 (M3) or §11.4 (L) script,
 # once with Chrome and once with Firefox, and uploads the spoken-phrase logs. Never runs on push.
+# Each browser runs in its own job on a fresh runner: in one job, NVDA's speech relay went silent
+# for the second browser (L pass r3 and r4: Firefox after Chrome heard nothing; alone it spoke).
 name: a11y NVDA pass
 on:
   workflow_dispatch:
@@ -17,6 +19,10 @@ on:
         default: l
 jobs:
   nvda:
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: ${{ fromJSON(inputs.browsers == 'both' && '["chrome","firefox"]' || format('["{0}"]', inputs.browsers)) }}
     runs-on: windows-2025
     timeout-minutes: 120
     defaults:
@@ -63,24 +69,16 @@ jobs:
         run: |
           $specs = switch ('${{ inputs.script }}') { 'm3' { 'm3\.nvda' } 'both' { 'm3\.nvda l\.nvda' } default { 'l\.nvda' } }
           "A11Y_SPECS=$specs" >> $env:GITHUB_ENV
-      - name: NVDA + Chrome
-        if: inputs.browsers != 'firefox'
+      - name: NVDA + ${{ matrix.browser }}
         continue-on-error: true
         working-directory: app/a11y
         run: |
           $specs = $env:A11Y_SPECS -split ' '
-          npx playwright test --project=nvda-chrome @specs
-      - name: NVDA + Firefox
-        if: inputs.browsers != 'chrome'
-        continue-on-error: true
-        working-directory: app/a11y
-        run: |
-          $specs = $env:A11Y_SPECS -split ' '
-          npx playwright test --project=nvda-firefox @specs
+          npx playwright test --project=nvda-${{ matrix.browser }} @specs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: a11y-nvda-${{ github.run_id }}
+          name: a11y-nvda-${{ github.run_id }}-${{ matrix.browser }}
           path: |
             app/a11y/results/
             app/a11y/test-results/
