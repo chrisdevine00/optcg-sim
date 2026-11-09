@@ -602,7 +602,8 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
   if ('ko' in a) {
     const ids = select(d, f, a.ko, { role: 'target', verb: 'K.O.' });
     if (ids === WAIT) return WAIT;
-    for (const id of ids.slice().reverse()) pushKo(d, id, { kind: 'effect', by: you });
+    const group = ids.length > 1 ? d.s.nextMod++ : undefined;
+    for (const id of ids.slice().reverse()) pushKo(d, id, { kind: 'effect', by: you }, group);
     return 'next';
   }
   if ('rest' in a) {
@@ -770,6 +771,7 @@ function move(
   if (!zones.every((z) => z === 'characters' || z === 'stage') || to.zone === 'life')
     return unsupported(d, f, `move from ${zones.join('/')} to ${to.zone}`);
   const dest = to.zone as 'hand' | 'deck' | 'trash';
+  const group = ids.length > 1 ? d.s.nextMod++ : undefined;
   for (const id of ids.slice().reverse()) {
     if (!FIELD.has(d.card(id).zone)) continue;
     pushRemove(
@@ -778,6 +780,7 @@ function move(
       dest,
       { kind: 'effect', by: you },
       dest === 'deck' ? (to.position === 'top' ? 'top' : 'bottom') : undefined,
+      group,
     );
   }
   return 'next';

@@ -6,6 +6,7 @@
  */
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { SCRIPTS, type Ability, type CardScript } from '@optcg/cards';
 import type { Action } from '@optcg/engine';
 import { GameController } from '../src/play/game/controller.ts';
 import { readsHiddenZone } from '../src/play/game/veiled.tsx';
@@ -113,5 +114,35 @@ describe('M5a-21: Setup turn-time copy matches docs/benchmarks.md', () => {
   it('lists both lines under "Setup copy"', () => {
     expect(bench).toContain(TURN_TIME_PIRATE);
     expect(bench).toContain(TURN_TIME_ROOKIE);
+  });
+});
+
+describe('M4a-17: the veiled Use check is a typed walk, not a pattern over JSON', () => {
+  // A real ability that reads no hidden zone carries planted shapes. The old regex ignored the
+  // planted map (it read only SCRIPTS) and missed array and lifeTop spellings.
+  const real = Object.values(SCRIPTS).flatMap((s) =>
+    s.abilities
+      .filter((a) => a.kind === 'activate' || a.kind === 'auto')
+      .map((a) => ({ card: s.cardId, ability: a.id, script: s, a })),
+  );
+  const carrier = real.find((r) => !readsHiddenZone({ card: r.card, ability: r.ability }))!;
+
+  const plant = (cost: unknown) => {
+    const a = { ...carrier.a, cost: [cost] } as unknown as Ability;
+    const script = { ...carrier.script, abilities: [a] } as CardScript;
+    return readsHiddenZone({ card: carrier.card, ability: a.id }, { [carrier.card]: script });
+  };
+
+  it('catches an array from that includes the hand', () => {
+    expect(
+      plant({ trash: { from: ['hand', 'characters'], owner: 'you', pick: { exactly: 1 } } }),
+    ).toBe(true);
+  });
+  it('catches lifeTop and lifeTopOrBottom', () => {
+    expect(plant({ trash: { from: 'lifeTop', owner: 'you', pick: { exactly: 1 } } })).toBe(true);
+    expect(plant({ trash: { from: ['trash', 'lifeTopOrBottom'], owner: 'you' } })).toBe(true);
+  });
+  it('does not flag a public zone', () => {
+    expect(plant({ rest: { from: 'characters', owner: 'you', pick: { exactly: 1 } } })).toBe(false);
   });
 });

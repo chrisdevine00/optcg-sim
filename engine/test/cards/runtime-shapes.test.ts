@@ -34,3 +34,37 @@ describe('move from the trash to the deck', () => {
     expect(g.eventsOfType('Anomaly')).toEqual([]);
   });
 });
+
+describe('the runtime refuses a deck-top move it does not implement (M4a-07)', () => {
+  const fromDeckTop = (to: { zone: 'trash' | 'life'; position?: 'top' }): Ability => ({
+    id: 'probe',
+    kind: 'activate',
+    when: 'activateMain',
+    effect: [{ do: { move: { what: { from: 'deckTop', owner: 'you' }, to } } }],
+  });
+
+  it('"trash the top card" does not add a Life card; it is an Anomaly and changes nothing', () => {
+    const g = game(
+      { leader: ROCKS, characters: [BLUE], deck: [BLUE, BLUE, BLUE], life: [BLUE, BLUE] },
+      { leader: PLAIN_PURPLE },
+    );
+    g.state = withAbilities(g.state, BLUE, [fromDeckTop({ zone: 'trash' })]);
+    g.act({ type: 'activate', card: g.find('p1', 'characters', BLUE), ability: 'probe' });
+    expect(g.eventsOfType('Anomaly')).toHaveLength(1);
+    expect(g.zone('p1', 'life')).toHaveLength(2);
+    expect(g.zone('p1', 'trash')).toHaveLength(0);
+    expect(g.zone('p1', 'deck')).toHaveLength(3);
+  });
+
+  it('a deck-top to Life move still works', () => {
+    const g = game(
+      { leader: ROCKS, characters: [BLUE], deck: [BLUE, BLUE, BLUE], life: [BLUE, BLUE] },
+      { leader: PLAIN_PURPLE },
+    );
+    g.state = withAbilities(g.state, BLUE, [fromDeckTop({ zone: 'life', position: 'top' })]);
+    g.act({ type: 'activate', card: g.find('p1', 'characters', BLUE), ability: 'probe' });
+    g.act({ type: 'optional', accept: true });
+    expect(g.eventsOfType('Anomaly')).toEqual([]);
+    expect(g.zone('p1', 'life')).toHaveLength(3);
+  });
+});

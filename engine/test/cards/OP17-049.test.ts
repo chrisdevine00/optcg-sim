@@ -38,6 +38,20 @@ describe('OP17-049 Charlotte Linlin', () => {
     expect(g.eventsOfType('ModeChosen').at(-1)).toMatchObject({ mode: 0, player: 'p2' });
   });
 
+  it('the ModeChosen label is neutral: it reads the same to both players (M4a-11)', () => {
+    for (const [mode, label] of [
+      ['0', "Charlotte Linlin's player draws 2 cards."],
+      ['1', "Charlotte Linlin's opponent trashes 2 cards from their hand."],
+    ] as const) {
+      const g = onPlay([PURPLE, PURPLE]);
+      option(g, mode);
+      const e = g.eventsOfType('ModeChosen').at(-1) as unknown as { label: string };
+      expect(e.label).toBe(label);
+      // Not the chooser's second-person wording, which would mislead the Linlin player.
+      expect(e.label).not.toMatch(/\b(Your|You)\b/);
+    }
+  });
+
   it('"trashes 2": the opponent chooses 2 cards from their own hand', () => {
     const g = onPlay([PURPLE, V.c1, V.c2]);
     option(g, '1');

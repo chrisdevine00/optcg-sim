@@ -181,7 +181,7 @@ export type Frame =
       /** Life card waiting on a `trigger` decision. */
       pending: InstanceId | null;
     }
-  | { f: 'ko'; card: InstanceId; cause: Cause; considered: string[] }
+  | { f: 'ko'; card: InstanceId; cause: Cause; considered: string[]; group?: number }
   | { f: 'trigger'; card: InstanceId; player: PlayerId; step: 'run' | 'finish' }
   | {
       f: 'effect';
@@ -219,6 +219,8 @@ export type Frame =
       position?: 'top' | 'bottom';
       cause: Cause;
       considered: string[];
+      /** Removals made by one effect share a group: one replacement answers for all it covers. */
+      group?: number;
     }
   | { f: 'loop' };
 

@@ -122,6 +122,69 @@ describe('summaryHash', () => {
   });
 });
 
+describe('the hash ignores bookkeeping and sees knowledge (M4a-12)', () => {
+  const base = () => {
+    const g = scenario({
+      p1: { leader: LUFFY, characters: [RED_1, RED_5] },
+      p2: { leader: KAIDO, deck: [PUR_1, PUR_1B, PUR_1] },
+    });
+    const src = g.find('p1', 'characters', RED_1);
+    return { g, src, s: internals(g.state) };
+  };
+  const pend = (src: string, key: string, batch: number) => ({
+    card: src,
+    key,
+    batch,
+    cardId: RED_1,
+    ability: 'x',
+    controller: 'p1' as const,
+    timing: 'onPlay',
+  });
+
+  it('two paths to the same position differ only in projection keys and batch counters', () => {
+    const { src, s } = base();
+    const a = { ...s, pending: [pend(src, 'k-aaa', 3), pend(src, 'k-bbb', 3)] };
+    const b = { ...s, pending: [pend(src, 'k-zzz', 41), pend(src, 'k-yyy', 41)] };
+    expect(summaryHash(a as never)).toBe(summaryHash(b as never));
+    const dl = (key: string) => ({
+      turn: 1,
+      card: src,
+      key,
+      cardId: RED_1,
+      ability: 'x',
+      controller: 'p1' as const,
+      start: 0,
+    });
+    expect(summaryHash({ ...s, delayed: [dl('one')] } as never)).toBe(
+      summaryHash({ ...s, delayed: [dl('two')] } as never),
+    );
+  });
+
+  it('but which pending effects share a batch is part of the position', () => {
+    const { src, s } = base();
+    const together = { ...s, pending: [pend(src, 'a', 3), pend(src, 'b', 3)] };
+    const apart = { ...s, pending: [pend(src, 'a', 3), pend(src, 'b', 4)] };
+    expect(summaryHash(together as never)).not.toBe(summaryHash(apart as never));
+  });
+
+  it('what a player knows of hidden cards changes the hash', () => {
+    const { s } = base();
+    const deckTop = s.players.p2.deck[0]!;
+    const knows = { ...s, known: { ...s.known, p1: [deckTop] } };
+    expect(summaryHash(knows as never)).not.toBe(summaryHash(s as never));
+  });
+
+  it('knowledge is hashed by position, not instance id', () => {
+    const { s } = base();
+    const [a, b] = s.players.p2.deck;
+    // Two different cards in different deck positions differ; the same position under a
+    // re-labelled id does not (checked by the relabel test above), so only position matters.
+    const ka = { ...s, known: { ...s.known, p1: [a!] } };
+    const kb = { ...s, known: { ...s.known, p1: [b!] } };
+    expect(summaryHash(ka as never)).not.toBe(summaryHash(kb as never));
+  });
+});
+
 describe('summaryHash covers pending obligations (M2-08)', () => {
   const atDamage = (double: boolean) => {
     const g = scenario({

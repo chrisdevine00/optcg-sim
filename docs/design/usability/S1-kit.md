@@ -40,8 +40,10 @@ Teach-back: Q3 "How much Counter did you need, and why?"
 
 Teach-back: Q1 "How many hits did you need, and why?" Q9 "Why did the DON!! go where they went?"
 
-**1.5** Open the planted missed-lethal record: `RECORD_LINK` (filled in when the L screen-reader
-script lands; it uses the same record).
+**1.5** Set up by the facilitator (or by you before reading the card): open
+`<base>play?scenario=lethalDemo&opp=pirate&start=1`, open the game menu (≡), choose Concede, and
+on the end screen stop before pressing anything. (This is the planted game: you had lethal on turn
+9 and conceded instead. There is no direct link to a finished game.)
 > "Open the review of this finished game. Find the missed win, then practise it."
 
 Teach-back: Q10 "What will you look for next time?"

@@ -156,10 +156,7 @@
      - **Squash-merged to main 2026-11-06**; lint, build, `npm test` (1,118 passed) and Playwright (152 passed, 28 skipped by design) green; pushed. Next: L re-review 2 (judge L-03 on both measures).
 1. **L Learning slice:** built (see above). Left: the re-review; then a manual screen-reader pass of the coach, the guided count and the review (record it in `docs/design/a11y-passes/`).
 2. **Owner usability session S1** on the real game (`usability-plan.md`).
-3. **M4b entry items:** M4a-17 (the veiled-Use safety check must use the engine's `secret` flag or a typed script walk, not a regex over the JSON); a check that each script's "you may" cost flag matches its card text; M4a-19 (four fixes have no test that fails on revert). Also, from M4a-10 ( not reachable with the Rocks and Kaido scripts, so fix before M4b scripts can reach them):
-   - one removal event over several Characters gets **one** replacement offer (QA-OP15 OP15-069: one DON!! return keeps both);
-   - at the End Phase, fire [End of Your Turn], delayed "at the end of this turn" and [End of Your Opponent's Turn] effects as **one batch per player**, so the turn player can order a delayed effect against their own (CR 6-6-1-1, 8-6-1);
-   - skip the source-negation check for **delayed** effects in `drainPending` (a created delayed effect does not depend on its source).
+3. **M4b entry items: done 2026-11-09, merged to main.** Suites green after the merge (1,206 unit, property and golden 14, Playwright 151 plus one Pirate full game that passed 6 of 6 on rerun: watch it in CI). M4a-17 (typed hidden-zone walk, `cards/src/hidden.ts`), the "you may" cost check (`cards/src/optional-cost.ts`; no mismatch in the 37 scripts), M4a-19 (four guards, each seen to fail on revert), and the three M4a-10 engine gaps (one replacement offer per removal event; one End Phase batch per player; delayed effects ignore source negation), tested with planted scripts in `engine/test/hooks/m4a10-latent.test.ts`. ENGINE_VERSION unchanged (0.5.2), goldens unchanged. See DECISIONS 2026-11-09 "M4b entry items".
 
 ## Blockers
 

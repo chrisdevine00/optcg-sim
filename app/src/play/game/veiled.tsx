@@ -7,7 +7,7 @@
  * hidden cards. Whether "Use" can be paid is checked only after the press, by the controller.
  */
 import type { ReactNode } from 'react';
-import { SCRIPTS } from '@optcg/cards';
+import { SCRIPTS, abilityReadsHiddenZone, type CardScript } from '@optcg/cards';
 import type { PublicView } from '../../session/index.ts';
 
 export interface VeiledProps {
@@ -34,17 +34,20 @@ export interface VeiledContent {
   foot: { use: () => void; skip: () => void } | null;
 }
 
-const HIDDEN_ZONE = /"(from|zone|in)":"(hand|deck|life)"|lookAt|reveal|"handSize"|"lifeCount"/;
-
 /**
  * Does the ability read a zone the other player cannot see (its cost, condition or effect)?
- * Judged from the script's public shape (card text is public). An unknown ability counts as yes.
+ * Judged from a typed walk of the script (`abilityReadsHiddenZone`; card text is public), not a
+ * pattern over its JSON (M4a-17). An unknown ability counts as yes. `scripts` is injectable so a
+ * test can plant a shape.
  */
-export function readsHiddenZone(source: { card: string; ability: string } | undefined): boolean {
+export function readsHiddenZone(
+  source: { card: string; ability: string } | undefined,
+  scripts: Readonly<Record<string, CardScript | undefined>> = SCRIPTS,
+): boolean {
   if (!source) return true;
-  const ability = SCRIPTS[source.card]?.abilities.find((a) => a.id === source.ability);
+  const ability = scripts[source.card]?.abilities.find((a) => a.id === source.ability);
   if (!ability) return true;
-  return HIDDEN_ZONE.test(JSON.stringify(ability));
+  return abilityReadsHiddenZone(ability);
 }
 
 /**

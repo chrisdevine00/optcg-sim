@@ -21,6 +21,7 @@ import {
   fireFor,
   hasScriptedTrigger,
   choosePending,
+  declineReplacement,
   makeRoom,
   pendingLife,
   push,
@@ -603,7 +604,10 @@ export function apply(d: Draft, a: Action): void {
     case 'optional':
       if (dec.purpose === 'replacement') {
         if (a.accept) applyReplacement(d, dec.replacement!);
-        else d.emit({ type: 'ReplacementDeclined', ability: dec.replacement!.ability, player: p });
+        else {
+          d.emit({ type: 'ReplacementDeclined', ability: dec.replacement!.ability, player: p });
+          declineReplacement(d, dec.replacement!);
+        }
       } else if (dec.purpose === 'effect') {
         answerEffect(d, a.accept);
       } else {

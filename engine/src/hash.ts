@@ -68,7 +68,13 @@ export function summary(s: State): unknown {
     decision: dec && canon({ ...dec, prompt: undefined }),
     // Pending obligations: remaining damage, play steps, queued auto effects (M2-08).
     stack: canon(
-      s.stack.map((f) => (f.f === 'play' && f.batch !== undefined ? { ...f, batch: 0 } : f)),
+      s.stack.map((f) => {
+        if (f.f === 'play' && f.batch !== undefined) return { ...f, batch: 0 };
+        // Removal groups are counters: keep only which frames share one, by stack position.
+        if ((f.f === 'ko' || f.f === 'remove') && f.group !== undefined)
+          return { ...f, group: s.stack.findIndex((x) => 'group' in x && x.group === f.group) };
+        return f;
+      }),
     ),
     pending: canon(
       s.pending.map((e) => ({

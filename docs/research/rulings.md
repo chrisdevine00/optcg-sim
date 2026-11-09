@@ -871,7 +871,7 @@ Paraphrased from the per-set Q&A files listed under "Sources and pages opened" (
 | OP17-075 X.Drake | QA-OP17 | The player who activated it chooses the card face-down. |
 | OP17-118 Rocks.D.Xebec | QA-OP17 (2 rows) | With 0 Characters it has no Counter; the [On Play] may play just 1 card. |
 | EB04-040 Flame Dragon Torch | QA-OP14/EB04 | The [Main] can be used with no [Kaido] on the field. |
-| OP15-069 Nola | QA-OP15 (2 rows) | It can protect Nola itself; two Characters removed at once are both kept by one DON!! return (*untested*: no scripted effect removes two at once yet, and the engine offers the replacement per card). |
+| OP15-069 Nola | QA-OP15 (2 rows) | It can protect Nola itself; two Characters removed at once are both kept by one DON!! return (tested with a planted multi-removal in `engine/test/hooks/m4a10-latent.test.ts`; no scripted card removes two at once yet). |
 | OP15-078 Mamaragan | QA-OP15 | The [Main] can be used with no Character to rest. |
 | OP08-074 Black Maria | QA-OP08 (2 rows) | The end-of-turn return still happens after Black Maria leaves; those returns count as DON!! returned for other effects (*untested* with OP17-062). |
 | ST34-004 Charlotte Linlin | QA-ST34 (2 rows) | The highest base-power setting applies; as the only card in hand, its costs cannot be paid and nothing resolves. |

@@ -246,12 +246,25 @@ function runTurn(d: Draft, f: Extract<Frame, { f: 'turn' }>): void {
       return;
     case 'endTriggers':
       setPhase(d, 'end');
-      // 6-6-1-1: [End of Your Turn] (turn player) then [End of Your Opponent's Turn] (non-turn).
+      // 6-6-1-1, 8-6-1: [End of Your Turn], "at the end of this turn" delayed effects and [End of
+      // Your Opponent's Turn] are all activated at once, so they are ONE batch per player: the turn
+      // player's first (their [End of Your Turn] and delayed effects, which they order among
+      // themselves), then the non-turn player's.
       f.step = 'endExpire';
-      fireFor(d, [p], 'endOfYourTurn', (q) => fieldCards(d, q));
-      // "At the end of this turn, …" effects registered earlier (OP08-074).
-      fireDelayed(d);
-      fireFor(d, [other(p)], 'endOfOpponentsTurn', (q) => fieldCards(d, q));
+      {
+        const batch = d.s.nextMod++;
+        for (const q of [p, other(p)]) {
+          fire(
+            d,
+            [q],
+            (x) => fieldCards(d, x),
+            (w) => w === (q === p ? 'endOfYourTurn' : 'endOfOpponentsTurn'),
+            q === p ? 'endOfYourTurn' : 'endOfOpponentsTurn',
+            batch,
+          );
+          fireDelayed(d, q, batch);
+        }
+      }
       return;
     case 'endExpire':
       // 6-6-1-2: "until the end of the turn / End Phase" effects end, turn player's first; this
@@ -607,8 +620,11 @@ export function pushKo(
   d: Draft,
   card: InstanceId,
   cause: { kind: 'battle' | 'effect'; by: PlayerId },
+  group?: number,
 ): void {
-  push(d, { f: 'ko', card, cause, considered: [] });
+  const f: Frame = { f: 'ko', card, cause, considered: [] };
+  if (group !== undefined) f.group = group;
+  push(d, f);
 }
 
 /** Push a removal from the field by an effect: to hand, to deck, or trashed (not a K.O.). */
@@ -618,9 +634,11 @@ export function pushRemove(
   dest: 'hand' | 'deck' | 'trash',
   cause: Cause,
   position?: 'top' | 'bottom',
+  group?: number,
 ): void {
   const f: Frame = { f: 'remove', card, dest, cause, considered: [] };
   if (position) f.position = position;
+  if (group !== undefined) f.group = group;
   push(d, f);
 }
 
@@ -761,6 +779,7 @@ export function applyReplacement(d: Draft, r: ReplacementRef): void {
   if (!f || (f.f !== 'ko' && f.f !== 'remove')) throw new Error('No K.O. or removal to replace');
   const c = d.card(r.card);
   const ab = abilityOf(d.s, c.card, r.ability)!;
+  const mates = groupMates(d.stack(), d.s, f, r);
   if (ab.oncePerTurn) d.opt().push(`${r.card}/${r.ability}`);
   d.emit({
     type: 'ReplacementApplied',
@@ -772,7 +791,52 @@ export function applyReplacement(d: Draft, r: ReplacementRef): void {
     controller: r.controller,
   });
   pop(d); // the K.O. or removal does not happen
+  // One removal event over several Characters: the same replacement covers every other one of the
+  // event it applies to, answered once (QA-OP15 OP15-069: one DON!! return keeps both).
+  for (const mate of mates) {
+    d.emit({
+      type: 'ReplacementApplied',
+      instance: r.card,
+      card: c.card,
+      ability: r.ability,
+      replaced: mate.f === 'ko' ? 'ko' : 'remove',
+      target: mate.card,
+      controller: r.controller,
+    });
+    d.stack().splice(d.stack().indexOf(mate), 1);
+  }
   pushEffect(d, r.card, c.card, ab, r.controller, 'instead');
+}
+
+type RemovalFrame = Extract<Frame, { f: 'ko' | 'remove' }>;
+
+/** The other removals of `f`'s event (same effect, same kind) that replacement `r` also covers. */
+function groupMates(
+  stack: State['stack'],
+  s: State,
+  f: RemovalFrame,
+  r: ReplacementRef,
+): RemovalFrame[] {
+  if (f.group === undefined) return [];
+  return stack.filter(
+    (x): x is RemovalFrame =>
+      x !== f &&
+      (x.f === 'ko' || x.f === 'remove') &&
+      x.f === f.f &&
+      x.group === f.group &&
+      s.cards[x.card] !== undefined &&
+      collectReplacements(s, x.card, x.f, x.cause, x.considered).some(
+        (y) => y.card === r.card && y.ability === r.ability,
+      ),
+  );
+}
+
+/** Declining a replacement declines it for the whole event: its other Characters are not asked. */
+export function declineReplacement(d: Draft, r: ReplacementRef): void {
+  const f = top(d);
+  if (!f || (f.f !== 'ko' && f.f !== 'remove')) return;
+  for (const mate of groupMates(d.stack(), d.s, f, r))
+    mate.considered = [...mate.considered, `${r.card}/${r.ability}`];
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -870,19 +934,17 @@ export function attackMatch(
   return pool({ s, you: p, self: card, live: true }, sel).includes(subject);
 }
 
-/** A delayed effect's registration point: "at the end of this turn" (CR 6-6-1-1). */
-function fireDelayed(d: Draft): void {
-  const now = d.s.delayed.filter((x) => x.turn === d.s.turn);
+/**
+ * A delayed effect's registration point: "at the end of this turn" (CR 6-6-1-1). `controller`'s
+ * delayed effects of this turn join the End Phase `batch` (see `endTriggers`).
+ */
+function fireDelayed(d: Draft, controller: PlayerId, batch: number): void {
+  const now = d.s.delayed.filter((x) => x.turn === d.s.turn && x.controller === controller);
   if (now.length === 0) return;
-  d.s.delayed = d.s.delayed.filter((x) => x.turn !== d.s.turn);
-  const batch = d.s.nextMod++;
-  const ordered = [
-    ...now.filter((x) => x.controller === d.s.active),
-    ...now.filter((x) => x.controller !== d.s.active),
-  ];
+  d.s.delayed = d.s.delayed.filter((x) => !now.includes(x));
   d.s.pending = [
     ...d.s.pending,
-    ...ordered.map((x) => ({
+    ...now.map((x) => ({
       batch,
       card: x.card,
       key: x.key,
@@ -958,9 +1020,12 @@ function drainPending(d: Draft): boolean {
   d.s.pending = rest;
   const ab = abilityOf(d.s, next!.cardId, next!.ability);
   if (!ab) return true;
-  // An effect whose source is negated before it resolves does nothing (CR 8-2-1-1).
+  // An effect whose source is negated before it resolves does nothing (CR 8-2-1-1). A delayed
+  // effect (`start` set) was created by an earlier resolution and does not depend on its source:
+  // negating the source afterwards, or its leaving the field, does not stop it (M4a-10).
   const src = d.s.cards[next!.card];
   if (
+    next!.start === undefined &&
     src &&
     src.zone !== 'trash' &&
     src.zone !== 'resolving' &&
