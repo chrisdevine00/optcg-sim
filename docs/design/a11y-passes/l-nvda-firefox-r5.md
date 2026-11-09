@@ -2,6 +2,8 @@
 
 **Kind of pass:** scripted (Guidepup), not a human listening pass (accessibility.md §11.2, risk R9). The Firefox-only rerun of the §11.4 script (`app/a11y/src/l.ts`) after fix round 3 (DECISIONS "2026-11-09 — L screen-reader fix round 3", commit `26b5c99`, the same code as Chrome r4). This is the first **valid** Firefox record since r2: r3 heard nothing and r4 was invalid (speech tap dead). Earlier runs: [l-nvda-firefox.md](l-nvda-firefox.md), [l-nvda-firefox-r2.md](l-nvda-firefox-r2.md), [l-nvda-firefox-r3.md](l-nvda-firefox-r3.md), [l-nvda-firefox-r4.md](l-nvda-firefox-r4.md). Chrome: [l-nvda-chrome-r4.md](l-nvda-chrome-r4.md). Finding numbers are shared by both browsers and all runs.
 **Result:** **PASS by the rule** (no severity 3 or 4, none open at severity 2). **Coverage: sufficient.** Every §11.4 step, F3 and F15 was heard in Firefox; 14 steps Pass, 2 Note (F15, step 9), 0 Fail, 0 not reached. The harness's one "did not reach" (step 10, L-SR4) is a **harness false negative**: the app did it and NVDA said it (diagnosis below). One finding **reproduced across browsers and needs a decision**: L-SR25 (the Concede's two announcements are not spoken; Chrome r4 said "make it 2 if the Firefox rerun shows it too"; it does; I keep it at 1 and say why).
+
+**Lead's note (2026-11-09):** L-SR25 is re-graded from 1 to **2**, as Chrome r4 proposed if Firefox reproduced it (it does). Severity 2 does not block, so the Result stands; L-SR25 is carried (STATUS, L).
 **Date:** 2026-11-09.
 
 ## Versions
