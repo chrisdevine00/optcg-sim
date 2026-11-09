@@ -417,6 +417,12 @@ function GuidedCount({ g, guided }: { g: G; guided: GuidedState }) {
       k === i ? { ...x, don: Math.max(0, Math.min(10, x.don + delta)) } : x,
     );
     coach.guide({ split: next });
+    // L-SR13c: the buttons changed a number nobody heard.
+    const x = next[i];
+    if (x) {
+      const who = g.cardOf(x.ref)?.zone === 'leader' ? 'Your Leader' : g.nameOf(x.ref);
+      g.ctl.announce(`${who}: ${x.don} DON!!, attack ${i + 1}.`);
+    }
   };
   const move = (i: number, dir: -1 | 1) => {
     const j = i + dir;
@@ -424,6 +430,11 @@ function GuidedCount({ g, guided }: { g: G; guided: GuidedState }) {
     const next = guided.split.slice();
     [next[i], next[j]] = [next[j]!, next[i]!];
     coach.guide({ split: next });
+    const x = next[j];
+    if (x) {
+      const who = g.cardOf(x.ref)?.zone === 'leader' ? 'Your Leader' : g.nameOf(x.ref);
+      g.ctl.announce(`${who}: now attack ${j + 1} of ${next.length}.`);
+    }
   };
   return (
     <div className="guided">

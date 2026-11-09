@@ -324,7 +324,7 @@ function Overview({
           {ctl.session.rewound && <span className="chip outline"> Rewound</span>}
         </p>
         <button type="button" className="btn small" onClick={onBack}>
-          ← Back to the board
+          <span aria-hidden="true">← </span>Back to the board
         </button>
       </div>
       <p className="rv-status" role="status" aria-live="polite" data-testid="review-status">

@@ -265,7 +265,9 @@ export class Coach {
 
   /**
    * The Lethal button or L: the first press shows tier 1, each further press the next tier. The
-   * panel opens on the Lethal section and focus goes to its result.
+   * panel opens on the Lethal section. Tiers 1 and 2 are spoken politely and focus stays where it
+   * is, so `L` can be pressed again (under NVDA, `L` in the coach is "next list": L-SR16). Focus
+   * goes to the result only at tier 3, the ordered line (learning-ui §2.1).
    */
   press(panelBusy = false): void {
     if (!this.supported) {
@@ -282,7 +284,6 @@ export class Coach {
     }
     this.profile = { ...this.profile, expanded: true, tab: 'lethal' };
     saveProfile(this.profile);
-    this.focusSignal++;
     const { status, result, tier } = this.lethal;
     if (status === 'idle' || status === 'failed') {
       this.lethal = { ...this.lethal, tier: 1, auto: false };
@@ -293,7 +294,11 @@ export class Coach {
     } else if (result) {
       const next = (tier >= 3 ? 3 : tier + 1) as Tier;
       this.lethal = { ...this.lethal, tier: next, auto: false };
-      if (next === 3) this.wantTall = true;
+      if (next === 3) {
+        this.wantTall = true;
+        // The player asked for the line: it is the one result worth moving focus to (L-SR16).
+        this.focusSignal++;
+      }
       // L-SR10: past the last tier, say so once, ahead of the line again.
       this.speakTier(next, panelBusy, tier >= 3);
     }
@@ -369,6 +374,8 @@ export class Coach {
 
   toggle(): void {
     this.setProfile({ expanded: !this.profile.expanded });
+    // L-SR22: C and the chevron change nothing a reader can hear; say what happened, politely.
+    this.host.announce(this.profile.expanded ? 'Coach open.' : 'Coach closed.');
   }
 
   setAlwaysOn(level: AlwaysOn): void {

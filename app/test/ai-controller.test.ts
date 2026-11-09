@@ -238,6 +238,12 @@ async function twin(edit: (p2: P2) => P2) {
       a.find((x) => x.type !== 'concede');
     if (plain) ctl.act(plain as Action);
   }
+  // Polite lines are spaced out and merged when they pile up (L-SR20): the same game gives the
+  // same lines only once the queue has drained, so wait for it before comparing.
+  for (let last = -1; last !== seq;) {
+    last = seq;
+    await settle(700);
+  }
   off();
   const lines = ctl.logLines();
   const out = {
@@ -248,7 +254,8 @@ async function twin(edit: (p2: P2) => P2) {
       .exportRecord()
       .actions.map((a, i) => (a.player === 'p2' ? JSON.stringify(ctl.whyAt(i)) : '-')),
     last: JSON.stringify(ctl.lastWhy() === null ? null : ctl.whyAt(ctl.lastWhy()!)),
-    spoken,
+    // One string: merged lines (L-SR20) must not make the same words differ by timing.
+    spoken: [spoken.join(' ')],
   };
   ctl.dispose();
   return out;
@@ -324,6 +331,11 @@ describe('every AI move is announced (review M5a-03)', () => {
           a.find((x) => x.type !== 'concede');
         if (plain) ctl.act(plain as Action);
       }
+    }
+    // Polite lines are spaced out (L-SR20): let the queue drain before listening stops.
+    for (let last = -1; last !== seq;) {
+      last = seq;
+      await settle(700);
     }
     off();
     const ai = movesBy(ctl, 'p2');

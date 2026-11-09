@@ -141,6 +141,9 @@ export class Pass {
   unreached: string[] = [];
   private cur: StepRec | null = null;
   private logStart = 0;
+  /** Set when the run cannot be a screen-reader result (the speech probe heard nothing). */
+  invalid: string | null = null;
+  private tapDeadNoted = false;
 
   constructor(
     readonly page: Page,
@@ -178,6 +181,50 @@ export class Pass {
           : '(no event reached the decision panel or the page body)'
       }`,
     );
+  }
+
+  /**
+   * The speech probe: before step 1 a phrase the app never says is written to a live region of its
+   * own; NVDA must speak it and the tap must hear it. The Firefox r3 run heard nothing from the
+   * first key to the last and the record still looked like a result. If the probe fails, the record
+   * says the run is invalid (header, JSON `meta.invalid`) and this throws, so the run stops at once.
+   * `A11Y_CONTINUE_WITHOUT_SPEECH=1` keeps going on Guidepup's capture (page evidence only).
+   * Readers with no speech source (dry, VoiceOver) pass trivially.
+   */
+  async speechProbe(): Promise<boolean> {
+    if (!this.reader.hearsSpeech) return true;
+    await this.page.bringToFront();
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      const phrase = `Speech probe ${['one', 'two', 'three'][attempt - 1]}, alpha bravo.`;
+      const t0 = Date.now();
+      await this.page.evaluate((text) => {
+        let el = document.getElementById('a11y-probe');
+        if (!el) {
+          el = document.createElement('div');
+          el.id = 'a11y-probe';
+          el.setAttribute('role', 'status');
+          el.setAttribute('aria-live', 'polite');
+          el.style.cssText = 'position:fixed;left:0;bottom:0;width:1px;height:1px;overflow:hidden';
+          document.body.appendChild(el);
+          // Written after a beat: a live region is spoken only for a change after it exists.
+          setTimeout(() => (el!.textContent = text), 400);
+        } else el.textContent = text;
+      }, phrase);
+      for (let i = 0; i < 40; i++) {
+        if (this.reader.heardSince(t0).some((h) => h.text.toLowerCase().includes('speech probe'))) {
+          await this.page.evaluate(() => document.getElementById('a11y-probe')?.remove());
+          this.reader.speechProven();
+          return true;
+        }
+        await this.page.waitForTimeout(250);
+      }
+    }
+    await this.page.evaluate(() => document.getElementById('a11y-probe')?.remove());
+    this.invalid =
+      'SPEECH TAP DEAD: a known phrase ("Speech probe ...") was written to a live region three times and the speech tap heard no NVDA speech. NVDA is mute, not attached to this browser, or the tap is not delivering. This record is INVALID as a screen-reader result: its focus and live-region rows are page state only.';
+    this.save();
+    if (process.env.A11Y_CONTINUE_WITHOUT_SPEECH === '1') return false;
+    throw new Error(this.invalid);
   }
 
   // ------------------------------------------------------------------ page state
@@ -279,6 +326,13 @@ export class Pass {
       rec.keys[i]!.live = rec.live
         .filter((l) => l.t >= from && l.t < to)
         .map((l) => (l.region === 'announce-assertive' ? `(assertive) ${l.text}` : l.text));
+    }
+    const dead = this.reader.tapDead();
+    if (dead && !this.tapDeadNoted) {
+      this.tapDeadNoted = true;
+      rec.notes.push(
+        `SPEECH TAP DEAD: ${dead}. The speech columns from here on are incomplete (Guidepup's per-key capture is used instead).`,
+      );
     }
     this.steps.push(rec);
     this.cur = null;
@@ -410,6 +464,7 @@ export class Pass {
       project: this.project,
       reader: this.reader.name,
       readerNotes: this.reader.notes(),
+      ...(this.invalid ? { invalid: this.invalid } : {}),
       unreached: this.unreached,
       url: this.page.url(),
       when: new Date().toISOString(),
@@ -454,6 +509,7 @@ const esc = (s: string) => s.replace(/\|/g, '\\|').replace(/\n/g, ' ');
 function toMarkdown(meta: Record<string, unknown>, steps: StepRec[], script: string): string {
   const out: string[] = [];
   out.push(`# ${script.toUpperCase()} screen-reader pass log (${String(meta.project)})`, '');
+  if (typeof meta.invalid === 'string') out.push(`> **INVALID RUN.** ${meta.invalid}`, '');
   out.push('```json', JSON.stringify(meta, null, 2), '```', '');
   for (const s of steps) {
     out.push(`## Step ${s.n}: ${s.title} (${s.status})`, '');

@@ -53,7 +53,8 @@ describe('the attack confirm sentence (F4)', () => {
       true,
       'Result depends on [When Attacking]',
     );
-    expect(t).toContain('Result depends on [When Attacking]');
+    // The brackets are dropped: NVDA read "When Attacking ." with a stray pause (L-SR23).
+    expect(t).toContain('Result depends on When Attacking.');
     expect(t).not.toMatch(/hits|fails/);
   });
   it('gives the maths otherwise', () => {

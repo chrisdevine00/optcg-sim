@@ -28,6 +28,8 @@ test('L script (NVDA)', async ({ page, nvda }, info) => {
   await page.locator('#decision').waitFor({ timeout: 30_000 });
   await page.waitForTimeout(2000);
   try {
+    // A known phrase must be heard before step 1, else the record is marked invalid and the run stops.
+    await pass.speechProbe();
     await runL(pass);
   } finally {
     pass.save();

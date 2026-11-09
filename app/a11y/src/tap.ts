@@ -16,6 +16,10 @@ export interface Heard {
 export class SpeechTap {
   heard: Heard[] = [];
   error: string | null = null;
+  /** Why the tap stopped delivering (closed, ended, errored after joining); null while it is up. */
+  dead: string | null = null;
+  /** When the tap last said it was dead, and how many phrases it had delivered by then. */
+  deadAt: number | null = null;
   private socket: TLSSocket | null = null;
   private buf = '';
 
@@ -35,9 +39,14 @@ export class SpeechTap {
       s.setEncoding('utf8');
       s.on('error', (e) => {
         this.error = String(e);
+        this.markDead(`socket error: ${String(e)}`);
         clearTimeout(timer);
         resolve(false);
       });
+      // A relay that goes away mid-run used to leave `tapOk` true with no phrase ever arriving
+      // (Firefox r3 heard nothing and nothing said so).
+      s.on('close', () => this.markDead('the relay closed the connection'));
+      s.on('end', () => this.markDead('the relay ended the connection'));
       s.on('data', (chunk: string) => {
         this.buf += chunk;
         let i: number;
@@ -67,11 +76,25 @@ export class SpeechTap {
     });
   }
 
+  private markDead(why: string) {
+    if (this.stopped || this.dead) return;
+    this.dead = why;
+    this.deadAt = Date.now();
+  }
+
+  /** True once the tap has joined and has not stopped delivering. */
+  get alive(): boolean {
+    return this.socket !== null && this.dead === null;
+  }
+
   since(t: number): Heard[] {
     return this.heard.filter((h) => h.t >= t);
   }
 
+  private stopped = false;
+
   stop() {
+    this.stopped = true;
     this.socket?.destroy();
     this.socket = null;
   }

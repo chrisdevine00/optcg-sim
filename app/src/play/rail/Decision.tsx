@@ -55,6 +55,8 @@ interface FootBtn {
   autoFocus?: boolean;
   /** Id of an element whose text is this button's accessible description. */
   describedBy?: string;
+  /** The sub-label repeats what the description says: show it, do not read it (L-SR23). */
+  subSilent?: boolean;
 }
 interface Foot {
   primary?: FootBtn;
@@ -187,9 +189,9 @@ function FootButton({ b, primary }: { b: FootBtn; primary: boolean }) {
         {b.label} {b.key && <kbd aria-hidden="true">{b.key}</kbd>}
       </span>
       {(b.sub || (disabled && b.reason)) && (
-        <span className="sub">
+        <span className="sub" aria-hidden={b.subSilent && !disabled ? 'true' : undefined}>
           {/* A pause between the label and its sub-label: "Play anyway, still hits" (F13). */}
-          <span className="sr-only">, </span>
+          {!(b.subSilent && !disabled) && <span className="sr-only">, </span>}
           <Arrows text={(disabled && b.reason ? b.reason : b.sub) ?? ''} />
         </span>
       )}
@@ -375,7 +377,18 @@ function contentInner(g: G): Content {
       return {
         title: 'Optional effect',
         tall,
-        body: <p className="dec-lead">{view.decision?.prompt}</p>,
+        // L-SR21: focus lands on a button and nothing else is read, so both buttons carry the
+        // prompt and its cost as their description (the confirm's pattern, round 2).
+        body: (
+          <>
+            <p className="dec-lead" id="optional-prompt">
+              {view.decision?.prompt}
+            </p>
+            <p className="sr-only" id="optional-choice">
+              Use it, or skip.
+            </p>
+          </>
+        ),
         foot: {
           equal: true,
           secondary: {
@@ -383,6 +396,7 @@ function contentInner(g: G): Content {
             onClick: () => no && g.act(no),
             id: 'skip-btn',
             autoFocus: !yes,
+            describedBy: 'optional-prompt',
           },
           primary: {
             label: view.decision?.purpose === 'replacement' ? 'Use instead' : 'Use',
@@ -393,6 +407,7 @@ function contentInner(g: G): Content {
             reason: "can't pay the cost",
             // flows F8d: focus starts on Use.
             autoFocus: !!yes,
+            describedBy: 'optional-prompt optional-choice',
           },
         },
       };
@@ -967,7 +982,8 @@ export function confirmSentence(
     : extra.need > 0
       ? ` They need plus ${num(extra.need)} to survive, ${extra.hand} ${extra.hand === 1 ? 'card' : 'cards'} in hand.`
       : ' They cannot stop it with Counters alone.';
-  if (undecided) return `${maths}. ${result}. ${gap}${need} ${keys}`;
+  // NVDA says the brackets of "[When Attacking]" as a stray pause before the full stop (L-SR23).
+  if (undecided) return `${maths}. ${result.replace(/[[\]]/g, '')}. ${gap}${need} ${keys}`;
   return `${maths}: ${ap >= tp ? 'hits unless they counter' : 'fails unless you gain power'}. ${gap}${need} ${keys}`;
 }
 
@@ -1061,6 +1077,8 @@ function confirmContent(g: G, attacker: string, target: string): Content {
         onClick: () => action && g.act(action),
         id: 'confirm-attack',
         describedBy: 'confirm-spoken',
+        // L-SR23: the description has the maths; the name was "Confirm attack , 5000 vs 5000".
+        subSilent: true,
       },
     },
   };

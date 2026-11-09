@@ -635,6 +635,12 @@ describe('E20: the live lethal detector, three tiers (explanations.md)', () => {
     expect(wrong.attackers.correct).toBe(false);
     expect(wrong.attackers.reason).toBe('2 attackers missing.');
     expect(wrong.split.correct).toBe(false);
+    // L-SR13b: one hit is "1 hit", never "1 hits".
+    const one = checkGuidedCount(
+      { ...g, hits: { ...g.hits, opponentLife: 0, hitsNeeded: 1 } },
+      { hits: 3, attackers: [], split: [] },
+    );
+    expect(one.hits.reason).toBe('They have 0 Life, so you need 0 + 1 = 1 hit.');
   });
 });
 

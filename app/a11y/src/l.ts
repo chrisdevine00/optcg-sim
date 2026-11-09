@@ -150,7 +150,36 @@ export async function runL(p: Pass) {
     async () => {
       p.note('Carried from the M3 pass (F3, severity 2): the first stop after Control+Home.');
       await p.focusPage('after the page loaded: keys must reach the page before anything else');
+      const topAt = Date.now();
       await p.press('Control+Home');
+      // Firefox r3: NVDA said nothing, the Enter below then went to <body> and 15 steps ran on
+      // nothing. With a speech source, the skip link must be heard before Enter is pressed.
+      if (p.reader.hearsSpeech) {
+        const heardLink = async (since: number) => {
+          for (let i = 0; i < 12; i++) {
+            if (p.reader.heardSince(since).some((h) => /Skip to decision/i.test(h.text)))
+              return true;
+            await page.waitForTimeout(250);
+          }
+          return false;
+        };
+        let ok = await heardLink(topAt);
+        if (!ok) {
+          p.note('NVDA did not speak the skip link after Control+Home; pressing it once more.');
+          const again = Date.now();
+          await p.press('Control+Home');
+          ok = await heardLink(again);
+        }
+        if (
+          !(await p.reached(
+            'NVDA speaking the skip link after Control+Home, before Enter (F3)',
+            ok,
+          ))
+        ) {
+          p.note('Enter was not pressed: nothing is under the cursor that NVDA announced.');
+          return;
+        }
+      }
       // NVDA's cursor is on the skip link after Control+Home (r2: "main landmark, same page,
       // link, Skip to decision"): the user path is Enter on it. The dry run has no virtual
       // cursor, so it Tabs to the link first.
@@ -242,28 +271,34 @@ export async function runL(p: Pass) {
       const probeAt = Date.now();
       await p.press('Enter');
       await page.waitForTimeout(300);
+      // NVDA + Chrome turns Enter on a heading into a mouse click (nothing commits). A real
+      // keydown (Firefox without NVDA's conversion) reaches the app's "Enter commits the primary"
+      // handler and confirms the attack (the Firefox r3 trace): record it, do not assume it.
+      const committedByProbe = (await page.locator('#confirm-attack').count()) === 0;
       p.note(
-        `Enter on the heading: attack confirm still open: ${(await page.locator('#confirm-attack').count()) > 0 ? 'yes (the heading does not commit)' : 'NO, it committed'}; focus ${(await p.focus()).aria}`,
+        `Enter on the heading: attack confirm still open: ${committedByProbe ? 'NO, the Enter committed the attack (a real keydown reached the page; the user path below is skipped)' : 'yes (the heading does not commit)'}; focus ${(await p.focus()).aria}`,
       );
       await p.dumpTrace('after Enter on the heading (L-SR1)', probeAt);
-      const tabAt = Date.now();
-      const ft = await p.press('Tab');
-      p.note(`Tab from the heading reached: ${ft.aria}`);
-      await p.dumpTrace('after Tab from the heading (L-SR11)', tabAt);
-      await p.reached(
-        'Tab from the attack heading landing on Cancel or Confirm attack (L-SR11)',
-        /^(Cancel|Confirm attack)/.test(ft.name),
-      );
-      // The user path: from the board, M, then Enter on Confirm attack.
-      await p.assist(
-        'focus moved to the target on the board (a user presses M from the board)',
-        '[data-zone="opp-row"].bc-leader',
-      );
-      const f = await p.press('m');
-      p.note(`After M, focus: ${f.aria}`);
-      const enterAt = Date.now();
-      await p.press('Enter');
-      await p.dumpTrace('after Enter on Confirm attack', enterAt);
+      if (!committedByProbe) {
+        const tabAt = Date.now();
+        const ft = await p.press('Tab');
+        p.note(`Tab from the heading reached: ${ft.aria}`);
+        await p.dumpTrace('after Tab from the heading (L-SR11)', tabAt);
+        await p.reached(
+          'Tab from the attack heading landing on Cancel or Confirm attack (L-SR11)',
+          /^(Cancel|Confirm attack)/.test(ft.name),
+        );
+        // The user path: from the board, M, then Enter on Confirm attack.
+        await p.assist(
+          'focus moved to the target on the board (a user presses M from the board)',
+          '[data-zone="opp-row"].bc-leader',
+        );
+        const f = await p.press('m');
+        p.note(`After M, focus: ${f.aria}`);
+        const enterAt = Date.now();
+        await p.press('Enter');
+        await p.dumpTrace('after Enter on Confirm attack', enterAt);
+      }
       await p.reached(
         'the attack confirmed by Enter on Confirm attack (L-SR1)',
         (await page.locator('#confirm-attack').count()) === 0,
@@ -333,16 +368,17 @@ export async function runL(p: Pass) {
       const f = await p.focus();
       p.note(
         `F15 re-check: focus was on the decision heading: ${stranded ? 'YES' : 'no'}; \`.\` moved the game: ${moved ? 'yes' : 'NO'} (panel now: ${after.text.slice(0, 120)}); focus after: ${f.aria}. ${
-          stranded
-            ? `F15 STILL OPEN: focus is stranded on the decision heading${
+          // F15's own condition (round 3): stranded means focus on the waiting panel's heading
+          // AND `.` doing nothing. The waiting panel's heading holds focus until the new
+          // decision arrives; that alone is not the finding.
+          stranded && !moved
+            ? `F15 STILL OPEN: focus is stranded on the decision heading and \`.\` did nothing${
                 isDry(p)
-                  ? ' (the dry run has no browse mode, so `.` still works here; under NVDA browse mode takes it)'
-                  : moved
-                    ? ' (`.` worked this time)'
-                    : ' and `.` did nothing'
+                  ? ' (the dry run has no browse mode: this would be a real fault here)'
+                  : ' (check whether NVDA browse mode took the key)'
               }.`
             : moved
-              ? 'F15 does not reproduce: focus is on a control (not the heading) and `.` moved the game.'
+              ? `F15 does not reproduce: \`.\` moved the game${stranded ? ' with focus on the waiting panel heading (it holds focus until the new decision arrives)' : ''}.`
               : 'Focus is not stranded, but `.` did nothing.'
         }`,
       );
@@ -406,7 +442,15 @@ export async function runL(p: Pass) {
             .catch(() => '')
         ).replace(/\s+/g, ' ')}; polite: "${await polite(p)}"; focus ${(await p.focus()).aria}`,
       );
+      await p.reached(
+        'focus staying out of the coach after the first L, so L can be pressed again (L-SR16)',
+        !(await p.focus()).inCoach,
+      );
       await pressL(p, 2);
+      await p.reached(
+        'focus staying out of the coach after the second L (L-SR16)',
+        !(await p.focus()).inCoach,
+      );
       p.note(
         `Tier 2: ${
           (await page
@@ -444,7 +488,9 @@ export async function runL(p: Pass) {
       await boardFocus(p, 'C is pressed from the board');
       const f1 = await p.press('c');
       const m1 = await page.locator('.coach').getAttribute('data-mode');
-      p.note(`First C: coach is "${m1}"; focus ${f1.aria}`);
+      p.note(
+        `First C: coach is "${m1}"; focus ${f1.aria}; polite: "${await polite(p)}" (L-SR22: C says Coach open or closed)`,
+      );
       if (m1 === 'strip') {
         const f2 = await p.press('c');
         const m2 = await page.locator('.coach').getAttribute('data-mode');
@@ -782,7 +828,10 @@ export async function runL(p: Pass) {
     if (!(await p.until('ArrowDown', named(/^Concede/), 8)))
       await p.assist('the Concede item was not reached', '[role="menuitem"]:has-text("Concede")');
     await p.press('Enter');
-    if (!(await p.until('Tab', (f) => f.name === 'Concede', 6)))
+    // "Concede" comes before "Keep playing" in the dialog and "Keep playing" has focus: the way
+    // is Shift+Tab. A Tab from the last control leaves the page for the browser (a native modal
+    // dialog; Firefox r3 lost its keys there).
+    if (!(await p.until('Shift+Tab', (f) => f.name === 'Concede', 3)))
       await p.assist(
         'the Concede button was not reached',
         'dialog button:has-text("Concede"), [role="dialog"] button:has-text("Concede")',

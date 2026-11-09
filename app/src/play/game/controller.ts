@@ -15,6 +15,7 @@ import {
 } from '../../session/index.ts';
 import { AiClient, type AiDecision, type LethalPort } from './ai-client.ts';
 import { Coach } from '../coach/coach.ts';
+import { PoliteQueue } from './politeQueue.ts';
 import { readsHiddenZone, type VeiledProps } from './veiled.tsx';
 import { describeMove, other, turnSummary, type LogLine, type Names } from './text.ts';
 
@@ -298,6 +299,7 @@ export class GameController {
 
   dispose(): void {
     this.disposed = true;
+    this.politeQueue.clear();
     this.gen++;
     this.coach.dispose();
     this.ai?.terminate();
@@ -965,8 +967,15 @@ export class GameController {
     return this.logLines().filter((l) => l.index >= index && (l.kind === 'move' || l.index > 0));
   }
 
-  private say(text: string): void {
+  /** Polite lines are spaced out so a later write never replaces an earlier one (L-SR20). */
+  private readonly politeQueue = new PoliteQueue((text) => {
+    if (this.disposed) return;
     this.polite = { text, seq: this.polite.seq + 1 };
+    this.bump();
+  });
+
+  private say(text: string): void {
+    this.politeQueue.push(text);
   }
 
   /** A polite announcement from the UI (whyNot reasons, the status summary, speed changes). */
@@ -1076,6 +1085,7 @@ export class GameController {
   }
 
   private clearAnnouncements(): void {
+    this.politeQueue.clear();
     this.polite = { text: '', seq: this.polite.seq + 1 };
     this.assertive = { text: '', seq: this.assertive.seq + 1 };
   }

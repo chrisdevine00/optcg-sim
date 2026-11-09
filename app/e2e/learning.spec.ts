@@ -48,7 +48,7 @@ test.describe('the tiered lethal detector (learning-ui §3.1)', () => {
     await page.waitForTimeout(600);
     expect(await page.evaluate(() => document.activeElement?.tagName)).toBe(before);
 
-    // L: tier 1. The panel opens and focus goes to its result (the player pressed a coach key).
+    // L: tier 1. The panel opens; focus stays where it is, so L can be pressed again (L-SR16).
     await page.keyboard.press('l');
     await expect(page.locator('.coach')).toHaveAttribute('data-mode', 'open');
     await expect(page.locator('.coach-head')).toContainText('Lethal is on the board.', {
@@ -56,7 +56,7 @@ test.describe('the tiered lethal detector (learning-ui §3.1)', () => {
     });
     await expect(page.locator('.coach-status')).toContainText('Proven');
     await expect(page.locator('.coach-status')).toContainText('Works against any hand');
-    await expect(page.locator('.coach-result')).toBeFocused();
+    expect(await page.evaluate(() => !!document.activeElement?.closest('.coach'))).toBe(false);
     await expect(page.getByTestId('tier2')).toHaveCount(0);
     await check(page, info, 'coach-tier1');
 

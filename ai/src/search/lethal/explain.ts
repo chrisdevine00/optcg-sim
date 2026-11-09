@@ -672,7 +672,7 @@ export function checkGuidedCount(g: GuidedCount, a: CountAnswers): CountCheck {
       correct: hitsOk,
       reason: hitsOk
         ? `${g.hits.opponentLife} Life, plus 1.`
-        : `They have ${g.hits.opponentLife} Life, so you need ${g.hits.opponentLife} + 1 = ${g.hits.hitsNeeded} hits.`,
+        : `They have ${g.hits.opponentLife} Life, so you need ${g.hits.opponentLife} + 1 = ${plural(g.hits.hitsNeeded, 'hit')}.`,
     },
     attackers: {
       correct: attOk,

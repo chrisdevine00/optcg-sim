@@ -20,6 +20,15 @@ export interface Reader {
   heardSince(t: number): Heard[];
   /** Guidepup's per-action log since index `i` (empty for the dry reader). */
   actionLog(): Promise<string[]>;
+  /** Does this reader hear speech at all (a tap or a capture)? The probe needs it. */
+  readonly hearsSpeech: boolean;
+  /**
+   * The reader's speech source has proved it delivers (the probe heard a known phrase). Only then
+   * does the NVDA reader turn Guidepup's own per-key capture off.
+   */
+  speechProven(): void;
+  /** Why the speech tap died during the run, or null (always null where there is no tap). */
+  tapDead(): string | null;
   /** Anything the reader wants to note in the record (tap status, versions). */
   notes(): string[];
 }
@@ -45,16 +54,32 @@ const rawKey = (vk: number, scan: number) => ({
 
 export class NvdaReader implements Reader {
   readonly name = 'NVDA';
+  readonly hearsSpeech = true;
   private tap = new SpeechTap();
   private tapOk = false;
+  /** Set by the probe: a known phrase reached the tap. Until then Guidepup's capture stays on. */
+  private proven = false;
   constructor(private nvda: NVDA) {}
 
   async start() {
     this.tapOk = await this.tap.start();
   }
 
+  speechProven() {
+    this.proven = true;
+  }
+
+  tapDead() {
+    return this.tapOk ? this.tap.dead : null;
+  }
+
+  /** The tap is the speech source only while it has proved it delivers and is still up. */
+  private get tapUsable() {
+    return this.tapOk && this.proven && this.tap.alive;
+  }
+
   /**
-   * Sends the key through NVDA. With the speech tap running, Guidepup's own capture is off: it
+   * Sends the key through NVDA. With a proven speech tap, Guidepup's own capture is off: it
    * presses NVDA's stop-speech key before every action and waits for a second of silence after it,
    * which no real user does, and it never returns while something keeps talking (the first run
    * hung for 30 minutes that way). Instead this waits until NVDA has been quiet for a second, at
@@ -62,7 +87,7 @@ export class NvdaReader implements Reader {
    */
   async press(key: string) {
     key = BROWSE_NVDA[key] ?? key;
-    const capture = !this.tapOk;
+    const capture = !this.tapUsable;
     const t0 = Date.now();
     const special = VK[key];
     const send = special
@@ -106,9 +131,18 @@ export class NvdaReader implements Reader {
   }
 
   notes() {
+    const dead = this.tap.dead
+      ? [
+          `SPEECH TAP DEAD: ${this.tap.dead} at ${new Date(this.tap.deadAt ?? 0).toISOString()}; ${this.tap.heard.length} phrases had been heard. Keys after that use Guidepup's per-key capture only, and the speech columns of the steps after it are incomplete.`,
+        ]
+      : [];
     return this.tapOk
       ? [
-          "Speech tap: joined the NVDA Remote relay; every phrase NVDA spoke is timestamped. Guidepup's per-key capture is off (it stops speech before each key).",
+          this.proven
+            ? "Speech tap: joined the NVDA Remote relay and passed the speech probe; every phrase NVDA spoke is timestamped. Guidepup's per-key capture is off while the tap is up (it stops speech before each key)."
+            : 'Speech tap: joined the NVDA Remote relay but did NOT pass the speech probe: Guidepup per-key capture stayed on.',
+          `Speech tap phrases heard: ${this.tap.heard.length}.`,
+          ...dead,
           ...(this.lateKeys.length
             ? [`NVDA commands that took over 20 s: ${this.lateKeys.join(', ')}`]
             : []),
@@ -125,6 +159,11 @@ export class NvdaReader implements Reader {
 
 export class DryReader implements Reader {
   readonly name = 'dry (no screen reader)';
+  readonly hearsSpeech = false;
+  speechProven() {}
+  tapDead() {
+    return null;
+  }
   constructor(private page: Page) {}
   async press(key: string) {
     // No screen reader, no virtual cursor: the browse pseudo-keys move nothing (the page's own
@@ -171,6 +210,11 @@ export class DryReader implements Reader {
  */
 export class VoiceOverReader implements Reader {
   readonly name = 'VoiceOver';
+  readonly hearsSpeech = false;
+  speechProven() {}
+  tapDead() {
+    return null;
+  }
   constructor(private vo: VoiceOver) {}
   async press(key: string) {
     // VoiceOver's own navigation (Quick Nav is off): VO+Right, and the rotor-style find commands.

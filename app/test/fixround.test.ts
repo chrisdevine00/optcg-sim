@@ -106,9 +106,11 @@ describe('L-06: puzzle judging', () => {
     expect(p.puzzleState()).toBe('open');
     await play(p, f.public.viewActions!);
     expect(p.puzzleState()).toBe('solved');
-    // The second attempt is spoken too (the first result was "Not this time").
-    expect(said.has('Solved: you found lethal.')).toBe(true);
-  });
+    // The second attempt is spoken too (the first result was "Not this time"). Polite lines are
+    // spaced out (L-SR20), so it may come a moment later.
+    for (let i = 0; i < 100 && !said.has('Solved: you found lethal.'); i++) await sleep(50);
+    expect([...said].join(' | ')).toContain('Solved: you found lethal.');
+  }, 20_000);
 });
 
 describe('L-10: the always-on check stays out of a puzzle (M9)', () => {
