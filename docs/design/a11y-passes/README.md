@@ -18,6 +18,7 @@ block the milestone.
 | [l-nvda-firefox-r3.md](l-nvda-firefox-r3.md) | NVDA + Firefox | Scripted (Guidepup), run 42668723191: **INCOMPLETE** (the speech tap heard nothing at all, so no step was heard; step 6 harness error, 7 to 10 not run). Re-run needed after the harness fixes |
 | [l-nvda-chrome-r4.md](l-nvda-chrome-r4.md) | NVDA + Chrome | Scripted (Guidepup), run 42676731643, after fix round 3: **PASS** by the rule (no severity 3 or 4, none open at 2); L-SR16, L-SR20, L-SR21, L-SR22, L-SR23 fixed and heard; three new at severity 1 (L-SR25 to L-SR27); every step heard, coverage sufficient |
 | [l-nvda-firefox-r4.md](l-nvda-firefox-r4.md) | NVDA + Firefox | Run 42676731643: **INVALID** (speech tap dead, caught by the new probe; no step judged). Record follows from the Firefox-only run 42678583126 |
+| [l-nvda-firefox-r5.md](l-nvda-firefox-r5.md) | NVDA + Firefox | Scripted (Guidepup), Firefox-only run 42678583126, after fix round 3: **PASS** by the rule (no severity 3 or 4, none open at 2); every step heard, coverage sufficient; FF-L1 not reproduced, L-SR15 fixed; L-SR25 (Concede lines unspoken) reproduces in Firefox, held at 1; step 10's "did not reach" is a harness false negative; the speech tap works in a Firefox-only job |
 
 ## The harness
 
