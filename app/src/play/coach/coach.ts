@@ -422,12 +422,18 @@ export class Coach {
       split: g.split,
     });
     this.guided = { ...g, check };
-    const parts = [
-      `Hits: ${check.hits.correct ? 'right' : 'not quite'}. ${check.hits.reason}`,
-      `Attackers: ${check.attackers.correct ? 'right' : 'not quite'}. ${check.attackers.reason}`,
-      `Split: ${check.split.correct ? 'right' : 'not quite'}. ${check.split.reason}`,
-    ];
-    this.host.announce(parts.join(' '));
+    // Only the question being asked is graded aloud (L-SR13): the others are not answered yet.
+    const say = (name: string, c: { correct: boolean; reason: string }) =>
+      `${name}: ${c.correct ? 'right' : 'not quite'}. ${c.reason}`;
+    const line =
+      g.step === 1
+        ? say('Hits', check.hits)
+        : g.step === 2
+          ? say('Attackers', check.attackers)
+          : g.step === 4
+            ? say('Split', check.split)
+            : 'Nothing to check on this question. Press Next.';
+    this.host.announce(line);
     this.host.notify();
     return check;
   }

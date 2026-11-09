@@ -96,7 +96,7 @@ The direct keys `A` (attack), `+` or `=` (give DON!!) and `I` (inspect) skip the
 
 1. On your attacker, press `A` (or choose "Attack…"). Target mode starts: "Choose a target for Zoro's attack. 2 targets: opponent's Leader, rested Kid. Arrows to move, Enter to choose, Escape to cancel."
 2. Arrow keys and Tab cycle **only** legal targets, in reading order. The opponent's Leader is first. Illegal cards are skipped, so an active Character is never focusable as a target (CR 7-1-1-2).
-3. Enter chooses the target and opens the attack confirm in the battle panel. The confirm shows the `preview` numbers as text: "Zoro 7000 attacks Leader 5000. Attacker is ahead by 2000; opponent needs 3000 Counter to survive." Enter confirms; Escape goes back to target choice.
+3. Enter chooses the target and opens the attack confirm in the battle panel. The confirm shows the `preview` numbers as text: "Zoro 7000 attacks Leader 5000. Attacker is ahead by 2000; opponent needs 3000 Counter to survive." **When the confirm opens, focus moves to the "Confirm attack" button, and that text is the button's accessible description** (L-SR1, round 2), so it is spoken on focus and Enter is a native button press in browse and focus mode. Enter confirms; Escape goes back to target choice and returns focus to the target.
 4. Whether the confirm appears is a `flows.md` decision (confirm vs undo, plus a setting). The keyboard path is the same either way: the confirm is a focused button, so pressing Enter twice is the fast path.
 
 ### 3.6 Giving N DON!! by keyboard
@@ -200,7 +200,7 @@ The engine runs Block Step, then Counter Step, as two decisions (CR 7-1-2, 7-1-3
 | `H` | Hint | Opens the coach panel if it is closed. The hint arrives asynchronously from the worker. While waiting the panel shows "Thinking…" (no spinner-only state), then the line as an ordered list of moves with its reason. A polite announcement says "Hint ready: attack the Leader with Zoro first. Press C to read it." Focus stays on the board. |
 | `W` | Why did the opponent do that | Same pattern as `H`, for the last AI move. |
 | `L` | Lethal check, tiered (ARCHITECTURE §4.4) | First press: "Lethal: yes" / "no" / "unknown, search incomplete". Second press: the number of hits. Third press: the full line. Each tier is text in the coach panel and is announced politely. |
-| `M` | Focus the battle panel and DON!! maths | During a battle. It reads attacker power, defender power, the gap, and the counters in hand. |
+| `M` | Focus the battle panel and DON!! maths | During a battle. During the attack confirm, focus goes to "Confirm attack", whose accessible description reads attacker power, defender power, the gap, and the counters needed. In any other battle state it focuses the panel heading, which reads the attack and the maths. (Round 2 of the L pass: "Enter on the heading" is not a commit; NVDA's Enter on a heading did not confirm in Chrome or Firefox.) |
 | `C` | Toggle the coach panel (focus does not move: learning-ui §2.1 wins, decided 2026-11-05, L-11) | The panel is an `<aside aria-label="Coach">` in normal document flow: browse mode works there, and Tab order is header, Hint, Why, Lethal, toggles, then content. Focus stays where it was; only L, W and H, which ask for a result, send focus to it. |
 
 The coach never takes focus on its own. Detector lights and the tempo meter change silently, unless the player has switched on "Announce coach alerts". This follows "the coach never interrupts unless asked" (PROMPT.md).
@@ -571,7 +571,7 @@ Scenario: `a11y-l` (Rocks vs Kaido, a planted position with lethal available, th
 
 | # | Do | Expect |
 | --- | --- | --- |
-| 1 | Declare an attack; `M` | The battle panel reads attacker power, defender power, the gap, and counters needed |
+| 1 | Declare an attack; `M` | Focus is on "Confirm attack" when the confirm opens and after `M`; its description reads attacker power, defender power, the gap, and counters needed; the panel text says the same |
 | 2 | Confirm the attack and let the AI defend | One sentence for its Counter Step with the new totals, for example "Opponent countered +2000; Leader now 7000 vs your 7000. Tied: the attacker wins ties." The battle panel's text matches |
 | 3 | `L`, `L`, `L` | Tier 1 "Lethal: yes, proven against any hand"; tier 2 the number of hits; tier 3 the line as an ordered list in the coach panel |
 | 4 | `C`; read the panel with the virtual cursor or VO navigation | Browse mode works there; headings and lists are present |

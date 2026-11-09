@@ -71,11 +71,18 @@ async function coachSettled(p: Pass, ms = 25_000) {
 }
 
 /**
- * Presses `L` (the player's key) and checks the coach moved to `tier`. NVDA's browse mode takes
- * letter keys outside the application region, so if the tier did not advance the harness goes back
- * to the board and presses L there, and says so.
+ * Puts focus on the board, where `L`, `C` and the other single keys work (NVDA takes them once
+ * focus is inside the coach, L-SR12). A direct, recorded assist instead of a Tab loop: the loops
+ * walked out of the page into the browser's toolbar in r2.
  */
+async function boardFocus(p: Pass, why = 'a user returns to the board (the keys work from there)') {
+  if ((await p.focus()).inBoard) return;
+  await p.assist(`focus moved to the board: ${why}`, '[data-zone="my-chars"][data-item]');
+}
+
+/** Presses `L` from the board and checks the coach moved to `tier`. */
 async function pressL(p: Pass, tier: 1 | 2 | 3) {
+  await boardFocus(p, 'L is pressed from the board');
   await p.press('l');
   await coachSettled(p);
   const at = async () => {
@@ -90,33 +97,45 @@ async function pressL(p: Pass, tier: 1 | 2 | 3) {
             : 0
       : -1;
   };
-  if ((await at()) >= tier) return;
-  p.note(`L did not reach tier ${tier} from where focus was (coach tier now ${await at()}).`);
-  await p.assist(
-    `L was pressed again from the board: the reader or the page did not take it from the coach`,
-    async () => {
-      await toZone(p, 'my-chars');
-    },
-  );
-  await p.press('l');
-  await coachSettled(p);
-  if ((await at()) < tier) p.note(`Still not at tier ${tier} (coach tier ${await at()}).`);
+  if ((await at()) < tier)
+    p.note(`L did not reach tier ${tier} from the board (coach tier ${await at()}).`);
 }
 
-/** Opens the coach if it is a strip (C toggles it). */
+/** Opens the coach if it is a strip (C toggles it), pressing C from the board. */
 async function ensureCoachOpen(p: Pass) {
   if ((await p.page.locator('.coach').getAttribute('data-mode')) !== 'strip') return;
+  await boardFocus(p, 'C is pressed from the board');
   await p.press('c');
   await p.page.waitForTimeout(200);
 }
 
-/** Tab (then Shift+Tab) to a control in the coach by its accessible name; assists if it cannot. */
+/**
+ * A control in the coach by its accessible name: a short Tab walk if focus is near, then a direct
+ * recorded assist (the long Tab and Shift+Tab loops left the page in r2).
+ */
 async function toCoachControl(p: Pass, re: RegExp, what: string, fallback: string) {
   const inCoach = (f: Focus) => re.test(f.name) || re.test(f.aria);
   const f0 = await p.focus();
   if (inCoach(f0)) return;
-  const ok = (await p.until('Tab', inCoach, 16)) ?? (await p.until('Shift+Tab', inCoach, 30));
-  if (!ok) await p.assist(`Tab did not reach ${what}`, fallback);
+  if (
+    f0.inCoach &&
+    ((await p.until('Tab', inCoach, 5)) ?? (await p.until('Shift+Tab', inCoach, 5)))
+  )
+    return;
+  await p.assist(`focus moved to ${what} (Tab did not reach it quickly)`, fallback);
+}
+
+/** The accessible description of an element, as the browser computes it from aria-describedby. */
+async function describedBy(p: Pass, selector: string) {
+  return await p.page
+    .locator(selector)
+    .evaluate((e) =>
+      (e.getAttribute('aria-describedby') ?? '')
+        .split(/\s+/)
+        .map((id) => (document.getElementById(id)?.textContent ?? '').trim())
+        .join(' '),
+    )
+    .catch(() => '');
 }
 
 export async function runL(p: Pass) {
@@ -129,23 +148,25 @@ export async function runL(p: Pass) {
     'Load the game; Control+Home; Tab',
     'The skip link "Skip to decision", not the decision heading ("Your Main phase, heading")',
     async () => {
-      p.note('Carried from the M3 pass (F3, severity 2): the first Tab stop after Control+Home.');
+      p.note('Carried from the M3 pass (F3, severity 2): the first stop after Control+Home.');
+      await p.focusPage('after the page loaded: keys must reach the page before anything else');
       await p.press('Control+Home');
-      const f = await p.press('Tab');
-      const ok = /^Skip to decision/.test(f.name);
-      p.note(
-        ok
-          ? 'F3 re-check: Tab from the page top reached the skip link "Skip to decision".'
-          : `F3 re-check FAILED: Tab from the page top reached ${f.aria}, not the skip link.`,
-      );
-      if (ok) {
-        // Enter on the link must move focus to the decision (the re-grade's open question).
-        const g = await p.press('Enter');
+      // NVDA's cursor is on the skip link after Control+Home (r2: "main landmark, same page,
+      // link, Skip to decision"): the user path is Enter on it. The dry run has no virtual
+      // cursor, so it Tabs to the link first.
+      if (isDry(p)) {
+        const f = await p.press('Tab');
         p.note(
-          `Enter on the skip link: focus ${g.aria}; in the decision panel: ${g.inDecision ? 'yes' : 'NO'}.`,
+          /^Skip to decision/.test(f.name)
+            ? 'Dry run (no virtual cursor): Tab from the page top reached the skip link.'
+            : `F3 FAILED: Tab from the page top reached ${f.aria}, not the skip link.`,
         );
-        await p.reached('the decision panel after Enter on the skip link', g.inDecision);
-      } else await p.press('Tab');
+      }
+      const g = await p.press('Enter');
+      p.note(
+        `Enter on the skip link: focus ${g.aria}; in the decision panel: ${g.inDecision ? 'yes' : 'NO'}.`,
+      );
+      await p.reached('the decision panel after Enter on the skip link (F3)', g.inDecision);
     },
   );
 
@@ -164,11 +185,37 @@ export async function runL(p: Pass) {
       await p.press('a');
       if (!(await p.until('ArrowRight', named(/^Opponent.s Leader/), 8)))
         await p.assist('arrows did not reach their Leader', '[data-zone="opp-row"].bc-leader');
-      await p.press('Enter');
-      // M: focus to the decision panel (the battle panel), then read it line by line.
+      const open = await p.press('Enter');
+      await page.waitForTimeout(500);
+      // L-SR1 round 2: the confirm opens with focus on "Confirm attack", whose description is the
+      // battle maths. NVDA speaks both when focus lands, and Enter is a native button press.
+      const onConfirm = await p.focus();
+      p.note(
+        `After Enter on the target, focus: ${onConfirm.aria} (key's own result: ${open.aria})`,
+      );
+      await p.reached(
+        'focus on "Confirm attack" when the attack confirm opens',
+        onConfirm.id === 'confirm-attack',
+      );
+      const desc = await describedBy(p, '#confirm-attack');
+      p.note(`Confirm attack's accessible description (NVDA reads it on focus): ${desc}`);
+      await p.reached(
+        'the confirm description carrying power, gap and counters needed',
+        /against/.test(desc) && /Gap|Level/.test(desc) && /need plus|cannot stop/.test(desc),
+      );
+      // M from the board: focus goes to Confirm attack (its description is the battle maths).
+      await p.assist(
+        'focus moved back to the target on the board (a user presses M from the board)',
+        '[data-zone="opp-row"].bc-leader',
+      );
       const f = await p.press('m');
       p.note(`After M, focus: ${f.aria}`);
-      for (let i = 0; i < 7; i++) await p.press('Browse:Next');
+      await p.reached(
+        'M focusing "Confirm attack" during the attack confirm',
+        f.id === 'confirm-attack',
+      );
+      // Then read the panel with the virtual cursor, a line at a time.
+      for (let i = 0; i < 14; i++) await p.press('Browse:Next');
       const text = await p.decisionText();
       p.note(`Battle panel: ${text.slice(0, 700)}`);
       const has = (re: RegExp) => (re.test(text) ? 'yes' : 'NO');
@@ -185,21 +232,40 @@ export async function runL(p: Pass) {
     "Enter to confirm; Use Kaido's [When Attacking]; pick their Character; Done",
     'The confirm is spoken; the optional prompt names the effect; the pick shows its candidate and a count; Done commits',
     async () => {
-      // After M focus is on the battle panel's heading and the panel says "Enter to attack". NVDA
-      // turns Enter on a heading into a click; the app commits the attack on that click (L-SR1).
-      const onHeading = (await p.focus()).id === 'decision-title';
+      // L-SR1 / L-SR11 probe: NVDA's Enter on the panel heading and the Tab after it. The app no
+      // longer depends on either (focus is on "Confirm attack"), but the trace of what NVDA
+      // delivers to the page is what the r2 diagnosis lacked.
+      await p.assist(
+        'focus moved to the panel heading to probe what NVDA delivers on Enter and Tab there',
+        '#decision-title',
+      );
+      const probeAt = Date.now();
       await p.press('Enter');
-      if (await page.locator('#confirm-attack').count()) {
-        // Still on the confirm panel: do what a user does who was not told, Tab to the button.
-        p.note(
-          `Enter${onHeading ? ' on the panel heading' : ''} did not confirm the attack (the panel still reads "${(await p.decisionText()).slice(0, 80)}...").`,
-        );
-        // An app finding (L-SR1), not a harness failure; recorded so the dry run fails on it.
-        await p.reached('the attack confirmed by Enter, as the panel says (L-SR1)', false);
-        await decide(p, (f) => f.id === 'confirm-attack', 'Confirm attack', '#confirm-attack');
-      }
+      await page.waitForTimeout(300);
+      p.note(
+        `Enter on the heading: attack confirm still open: ${(await page.locator('#confirm-attack').count()) > 0 ? 'yes (the heading does not commit)' : 'NO, it committed'}; focus ${(await p.focus()).aria}`,
+      );
+      await p.dumpTrace('after Enter on the heading (L-SR1)', probeAt);
+      const tabAt = Date.now();
+      const ft = await p.press('Tab');
+      p.note(`Tab from the heading reached: ${ft.aria}`);
+      await p.dumpTrace('after Tab from the heading (L-SR11)', tabAt);
       await p.reached(
-        'the attack confirmed',
+        'Tab from the attack heading landing on Cancel or Confirm attack (L-SR11)',
+        /^(Cancel|Confirm attack)/.test(ft.name),
+      );
+      // The user path: from the board, M, then Enter on Confirm attack.
+      await p.assist(
+        'focus moved to the target on the board (a user presses M from the board)',
+        '[data-zone="opp-row"].bc-leader',
+      );
+      const f = await p.press('m');
+      p.note(`After M, focus: ${f.aria}`);
+      const enterAt = Date.now();
+      await p.press('Enter');
+      await p.dumpTrace('after Enter on Confirm attack', enterAt);
+      await p.reached(
+        'the attack confirmed by Enter on Confirm attack (L-SR1)',
         (await page.locator('#confirm-attack').count()) === 0,
       );
       let picked = false;
@@ -234,6 +300,13 @@ export async function runL(p: Pass) {
         await answerPlainly(p, 'order');
         await page.waitForTimeout(300);
       }
+      // The counterfactual (`.` pressed before any AI timer could fire) is not available here:
+      // Step pace holds the AI only after its own Main moves, and K does not help (the controller's
+      // nextMove acts at Step pace only, so `.` after K does nothing). The AI answers your attack on
+      // timers that start as soon as the effect is done, so a move after `.` may be a timer.
+      p.note(
+        'F15 counterfactual NOT available in this scenario: the AI answers on timers that start at once, and K then `.` does not advance a paused AI (nextMove acts at Step pace only; accessibility.md 3.13 says it should). The `.` below is pressed as soon as the decision is waiting.',
+      );
       const before = {
         kind: await p.kind(),
         text: await p.decisionText(),
@@ -286,7 +359,10 @@ export async function runL(p: Pass) {
       p.note(
         'Note: §11.4 words the Counter sentence with the new totals and the tie rule. As built, the live region speaks the move ("Rocks.D.Xebec: Counter: X.Drake +2000.") and then the result ("You: Attack fails · 5000 vs 7000."); the totals are in the battle panel (defender "5000 + 2000 7000"). Judge against that.',
       );
-      let sawAi = false;
+      // F15 already played the defence: seed from the live-region history, not just this step.
+      let sawAi = (await p.live()).some((l) =>
+        /Counter|Attack fails|Hit \d+ vs|Life card to hand/.test(l.text),
+      );
       for (let i = 0; i < 12; i++) {
         const k = await p.kind();
         const panel = (await p.decisionText()).slice(0, 220);
@@ -321,7 +397,6 @@ export async function runL(p: Pass) {
         'an idle Main Phase for the coach (3)',
         (await p.kind()) === 'main' && (await page.locator('#confirm-attack').count()) === 0,
       );
-      await toZone(p, 'my-chars');
       await pressL(p, 1);
       p.note(
         `Tier 1: ${(
@@ -346,6 +421,14 @@ export async function runL(p: Pass) {
         `Tier 3 (coach mode "${f?.mode}"): lists: ${f?.lists.join('; ')}; headings: ${f?.headings.join('; ')}`,
       );
       p.note(`Focus after the third L: ${(await p.focus()).aria}`);
+      // L-SR10: a fourth L, from the board, says there is nothing more.
+      await pressL(p, 3);
+      const more = await polite(p);
+      p.note(`Fourth L (past tier 3), polite: "${more}"`);
+      await p.reached(
+        'the "everything the coach has" line after tier 3 (L-SR10)',
+        /everything the coach has/.test(more),
+      );
       await p.reached('tier 3 with the coach tall (3)', f?.tier3 === true && f.mode === 'tall');
     },
   );
@@ -358,6 +441,7 @@ export async function runL(p: Pass) {
     "Browse mode works there; headings and lists are present (the coach is outside the board's application region); coach tier 3 shows the claim as a heading and the line as an ordered list",
     async () => {
       // C toggles: the coach is open at tier 3 (tall), so C collapses it and the second C opens it.
+      await boardFocus(p, 'C is pressed from the board');
       const f1 = await p.press('c');
       const m1 = await page.locator('.coach').getAttribute('data-mode');
       p.note(`First C: coach is "${m1}"; focus ${f1.aria}`);
@@ -371,18 +455,14 @@ export async function runL(p: Pass) {
       p.note(
         `Coach structure: ${facts?.headings.length ?? 0} headings (${facts?.headings.join('; ')}); ${facts?.lists.length ?? 0} lists (${facts?.lists.join('; ')})`,
       );
-      // Read it as a browse-mode user does: lines, then the next heading, the next list.
-      // The board is an application region (arrow keys go to the page), so a user Tabs to the
-      // coach, which is outside it, and reads there.
-      const inCoach = () => page.evaluate(() => !!document.activeElement?.closest('.coach'));
-      if (!(await inCoach())) {
-        p.note(
-          'C does not move focus: it stays where it was (on the board). Tabbing to the coach to read it.',
-        );
-        const here = (f: Focus) => f.tag !== 'body' && f.id !== 'decision-title' && f.inCoach;
-        if (!(await p.until('Tab', here, 16))) await p.until('Shift+Tab', here, 30);
-        if (!(await inCoach())) await p.assist('Tab did not reach the coach', '.coach-result');
-      }
+      // Read it as a browse-mode user does: lines, then the next heading, the next list. The board
+      // is an application region (arrow keys go to the page), so a user leaves it for the coach,
+      // which is outside it, and reads there. C does not move focus.
+      p.note('C does not move focus: it stays on the board.');
+      await p.assist(
+        'focus moved into the coach to read it (Tab out of the board)',
+        '#coach-lethal',
+      );
       p.note(`Reading from: ${(await p.focus()).aria}`);
       for (let i = 0; i < 6; i++) await p.press('Browse:Next');
       await p.press('Browse:Heading');
@@ -579,9 +659,7 @@ export async function runL(p: Pass) {
         }; polite: "${await polite(p)}"`,
       );
       // Play on: give 1 DON!! to the first Kaido, which changes the position.
-      await p.assist('focus moved to the board to play on (a user Tabs back to it)', async () => {
-        await toZone(p, 'my-chars');
-      });
+      await boardFocus(p, 'to play on (a user returns to the board)');
       const f = await p.press('+');
       if (f.inDialog || (await page.locator('dialog[open], [role="dialog"]').count())) {
         await p.press('Enter');
@@ -598,6 +676,86 @@ export async function runL(p: Pass) {
       const writes = (await p.live()).filter((l) => l.t >= t0 && /hit|Lethal|lethal/.test(l.text));
       p.note(
         `Detector lines written since: ${JSON.stringify(writes.map((w) => `${w.region}: ${w.text}`))}`,
+      );
+    },
+  );
+
+  // 5b --------------------------------------------------------------------------------------
+  await p.step(
+    '5b',
+    'C and L from the board while the battle panel is up (L-SR2)',
+    'Attack with a Kaido so the confirm is open; from the board press C, then L four times; Escape out',
+    'C says "The coach opens when this decision is done"; the L presses give the tiers and then say where the numbered line is, with the coach still a strip; the position is unchanged afterwards',
+    async () => {
+      if (!(await p.reached('an idle Main Phase for L-SR2 (5b)', (await p.kind()) === 'main')))
+        return 'not reached';
+      await boardFocus(p, 'to declare an attack with a Kaido');
+      await toZone(p, 'my-chars');
+      await arrowTo(p, named(/Kaido/), 'Kaido', '[data-zone="my-chars"][data-item]');
+      await p.press('a');
+      if (!(await p.until('ArrowRight', named(/^Opponent.s Leader/), 8)))
+        await p.assist('arrows did not reach their Leader', '[data-zone="opp-row"].bc-leader');
+      await p.press('Enter');
+      await page.waitForTimeout(500);
+      await p.reached(
+        'the attack confirm open (5b)',
+        (await page.locator('#confirm-attack').count()) > 0,
+      );
+      p.note(
+        `Coach mode with the confirm up: ${await page.locator('.coach').getAttribute('data-mode')}`,
+      );
+      await p.assist(
+        'focus moved to the target on the board (C and L work from there)',
+        '[data-zone="opp-row"].bc-leader',
+      );
+      const c0 = Date.now();
+      await p.press('c');
+      await page.waitForTimeout(400);
+      const cSaid = await polite(p);
+      p.note(
+        `C with the battle panel up, polite: "${cSaid}"; coach mode now ${await page.locator('.coach').getAttribute('data-mode')}`,
+      );
+      await p.reached(
+        'C saying the coach opens when this decision is done (L-SR2)',
+        /coach opens when this decision is done/.test(cSaid) ||
+          (await p.live()).some(
+            (l) => l.t >= c0 && /coach opens when this decision is done/.test(l.text),
+          ),
+      );
+      const said: string[] = [];
+      for (let i = 0; i < 4; i++) {
+        await boardFocus(p, 'L is pressed from the board');
+        if ((await p.focus()).id !== 'confirm-attack') {
+          const f = await p.focus();
+          if (!f.inBoard)
+            await p.assist(
+              'focus moved to the target on the board',
+              '[data-zone="opp-row"].bc-leader',
+            );
+        }
+        const t = Date.now();
+        await p.press('l');
+        await coachSettled(p, 15_000);
+        await page.waitForTimeout(500);
+        const lines = (await p.live()).filter((l) => l.t >= t).map((l) => l.text);
+        said.push(lines.join(' / '));
+        p.note(
+          `L ${i + 1} with the battle panel up: ${lines.join(' / ') || '(nothing written)'}; focus ${(await p.focus()).aria}`,
+        );
+      }
+      await p.reached(
+        'an L press saying where the numbered line is while the panel is tall (L-SR2)',
+        said.some((x) => /numbered line is in the coach/.test(x)),
+      );
+      // Escape twice: back to target choice, then out; the position is unchanged.
+      await p.assist(
+        'focus moved to the target on the board (Escape works from there)',
+        '[data-zone="opp-row"].bc-leader',
+      );
+      await p.press('Escape');
+      await p.press('Escape');
+      p.note(
+        `After Escape twice: decision "${await p.kind()}", panel: ${(await p.decisionText()).slice(0, 120)}`,
       );
     },
   );
@@ -827,6 +985,36 @@ export async function runL(p: Pass) {
       );
       if (!(await p.reached('the puzzle solved (9)', !!result))) return 'not reached';
       await toDecision(p);
+    },
+  );
+
+  // 10 --------------------------------------------------------------------------------------
+  await p.step(
+    '10',
+    'Play from here',
+    'Back to the review; "Play from here"',
+    'A polite "Playing from turn 9, as it stood." and focus on the new board\'s decision heading (L-SR4)',
+    async () => {
+      if (!(await p.reached('the solved practice board (10)', toReview))) return 'not reached';
+      // The finished puzzle's panel offers "Back to the review".
+      if (!(await p.until('Tab', (f) => f.id === 'review-btn', 14)))
+        await p.assist('Tab did not reach "Back to the review"', '#review-btn');
+      await p.press('Enter');
+      await page
+        .getByTestId('review-status')
+        .waitFor({ timeout: 20_000 })
+        .catch(() => undefined);
+      if (!(await p.until('Tab', (f) => f.id === 'play-from-btn', 40)))
+        await p.assist('Tab did not reach "Play from here"', '#play-from-btn');
+      await p.press('Enter');
+      await page.locator('#decision[data-kind="main"]').waitFor({ timeout: 20_000 });
+      await page.waitForTimeout(800);
+      const f = await p.focus();
+      p.note(`Focus after Play from here: ${f.aria}; polite: "${await polite(p)}"`);
+      await p.reached(
+        '"Playing from turn 9" announced with focus on the decision heading (L-SR4)',
+        /Playing from turn/.test(await polite(p)) && f.id === 'decision-title',
+      );
     },
   );
 }

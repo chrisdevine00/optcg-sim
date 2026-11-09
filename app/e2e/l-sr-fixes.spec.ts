@@ -19,7 +19,6 @@ test.beforeEach(async ({ page }) => {
 
 const polite = (page: Page) => page.locator('#announce-polite');
 const activeId = (page: Page) => page.evaluate(() => document.activeElement?.id ?? '');
-const activeTag = (page: Page) => page.evaluate(() => document.activeElement?.tagName ?? '');
 
 /** The a11y-l scenario, up to the attack confirm panel: Leader → their Leader. */
 async function toConfirm(page: Page) {
@@ -30,30 +29,60 @@ async function toConfirm(page: Page) {
   await page.locator('[data-zone="opp-row"].bc-leader').focus();
   await page.keyboard.press('Enter');
   await expect(page.locator('#confirm-attack')).toBeVisible();
-  // The confirm sentence is spoken 60 ms after the panel opens; later lines must not race it.
-  await expect(polite(page)).toContainText('Enter to attack');
+  // Focus moves to "Confirm attack" 30 ms after the panel opens (L-SR1 round 2).
+  await expect.poll(() => activeId(page)).toBe('confirm-attack');
 }
 
-test.describe('L-SR1 / FF-L1: Enter on the attack panel heading', () => {
-  test('a click no pointer made (NVDA Enter on a heading) commits the attack, focus is never <body>', async ({
+test.describe('L-SR1 / FF-L1 (round 2): the attack confirm does not depend on a heading click', () => {
+  test('the confirm opens with focus on Confirm attack, described by the battle maths; Enter is a native press', async ({
     page,
   }) => {
     await toConfirm(page);
-    await page.keyboard.press('m');
-    expect(await activeId(page)).toBe('decision-title');
-    await expect(page.locator('#decision')).toContainText('Enter to attack');
-    // NVDA's browse-mode Enter on a heading is a script click: no pointer event, no key event.
-    await page.evaluate(() => document.getElementById('decision-title')?.click());
+    const btn = page.locator('#confirm-attack');
+    await expect(btn).toHaveAttribute('aria-describedby', 'confirm-spoken');
+    const spoken = await page.locator('#confirm-spoken').textContent();
+    expect(spoken).toMatch(/Kaido 5000 against their Leader 5000/);
+    expect(spoken).toMatch(/Level: ties go to the attacker/);
+    expect(spoken).toMatch(/They need plus 1000 to survive, \d+ cards? in hand/);
+    expect(spoken).toMatch(/Enter to attack/);
+    await page.keyboard.press('Enter');
     await expect(page.locator('#confirm-attack')).toHaveCount(0);
     await expect(page.locator('#decision')).not.toHaveAttribute('data-mode', 'confirm');
-    await expect.poll(() => activeTag(page)).not.toMatch(/^(BODY|HTML)$/);
   });
 
-  test('a real mouse click on the heading never commits', async ({ page }) => {
+  test('M during the confirm puts focus on Confirm attack, not the heading; a heading click only focuses', async ({
+    page,
+  }) => {
     await toConfirm(page);
-    await page.locator('#decision-title').click();
+    await page.locator('[data-zone="opp-row"].bc-leader').focus();
+    await page.keyboard.press('m');
+    expect(await activeId(page)).toBe('confirm-attack');
+    // A click on the heading (NVDA's Enter, or a mouse) never commits.
+    await page.evaluate(() => document.getElementById('decision-title')?.click());
     await expect(page.locator('#confirm-attack')).toBeVisible();
     expect(await activeId(page)).toBe('decision-title');
+    await page.locator('#decision-title').click();
+    await expect(page.locator('#confirm-attack')).toBeVisible();
+  });
+
+  test('Escape from the Confirm button goes back to the target', async ({ page }) => {
+    await toConfirm(page);
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#decision')).toHaveAttribute('data-mode', 'target');
+    await expect
+      .poll(() => page.evaluate(() => !!document.activeElement?.closest('[data-handle]')))
+      .toBe(true);
+  });
+
+  test('L-SR11: Tab from the decision heading goes to Cancel, then Confirm attack', async ({
+    page,
+  }) => {
+    await toConfirm(page);
+    await page.locator('#decision-title').focus();
+    await page.keyboard.press('Tab');
+    expect(await page.evaluate(() => document.activeElement?.textContent ?? '')).toMatch(/^Cancel/);
+    await page.keyboard.press('Tab');
+    expect(await activeId(page)).toBe('confirm-attack');
   });
 });
 

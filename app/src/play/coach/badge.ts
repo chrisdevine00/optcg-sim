@@ -19,7 +19,10 @@ export function lethalBadge(coach: Coach): Badge | null {
   if (r.status === 'proven')
     return {
       glyph: '◆',
-      text: lethal.tier >= 2 ? `${r.facts.hitsNeeded} hits` : 'Lethal',
+      text: lethal.tier >= 2 ? hitsText(r.facts.hitsNeeded) : 'Lethal',
     };
-  return lethal.tier >= 2 ? { glyph: '', text: `${r.facts.hitsNeeded} hits` } : null;
+  return lethal.tier >= 2 ? { glyph: '', text: hitsText(r.facts.hitsNeeded) } : null;
 }
+
+/** "1 hit", "2 hits" (L-SR13). */
+export const hitsText = (n: number): string => `${n} ${n === 1 ? 'hit' : 'hits'}`;

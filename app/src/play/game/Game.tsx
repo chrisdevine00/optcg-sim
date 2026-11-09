@@ -33,6 +33,7 @@ import { GameLog, RailHeader } from '../rail/Rail.tsx';
 import { CoachPanel, STRIP_H, type CoachMode } from '../coach/Coach.tsx';
 import type { GameController } from './controller.ts';
 import { useFocusRescue } from './focus.ts';
+import { Arrows, spokenArrows } from '../arrows.tsx';
 import { legalOf } from './legal.ts';
 import { cardName, num, other, statusSummary } from './text.ts';
 import { NO_STAGING, type G, type Staging, type UiMode } from './ui.ts';
@@ -526,7 +527,10 @@ export function Game({
   };
 
   const focusDecision = () => {
-    document.getElementById('decision-title')?.focus();
+    // During the attack confirm the battle maths is the Confirm button's description.
+    (
+      document.getElementById('confirm-attack') ?? document.getElementById('decision-title')
+    )?.focus();
   };
 
   const onKey = (e: KeyboardEvent) => {
@@ -650,8 +654,10 @@ export function Game({
       )
         setStaging(NO_STAGING);
       else if (mine && kind === 'choose' && picks.length) setPicks([]);
-      else if (ui.kind === 'confirm') setUi({ kind: 'target', attacker: ui.attacker });
-      else if (ui.kind !== 'idle') {
+      else if (ui.kind === 'confirm') {
+        setUi({ kind: 'target', attacker: ui.attacker });
+        document.querySelector<HTMLElement>(`[data-handle="${ui.target}"]`)?.focus();
+      } else if (ui.kind !== 'idle') {
         const back = ui.kind === 'target' ? ui.attacker : ui.kind === 'selected' ? ui.handle : null;
         setUi({ kind: 'idle' });
         if (back) document.querySelector<HTMLElement>(`[data-handle="${back}"]`)?.focus();
@@ -912,16 +918,15 @@ export function Game({
     );
   });
 
-  // The attack confirm opens with focus still on the target, so it is spoken (M3 pass F4).
+  // The attack confirm opens with focus on "Confirm attack" (L-SR1 round 2): a native button, so
+  // Enter attacks in browse and focus mode alike, and its description speaks the battle maths
+  // (M3 pass F4). It never depends on how a screen reader clicks a heading.
   const confirmKey = ui.kind === 'confirm' ? `${ui.attacker}>${ui.target}` : null;
   useEffect(() => {
     if (!confirmKey) return;
-    const t = setTimeout(() => {
-      const text = document.getElementById('confirm-spoken')?.textContent;
-      if (text) ctl.announce(text);
-    }, 60);
+    const t = setTimeout(() => document.getElementById('confirm-attack')?.focus(), 30);
     return () => clearTimeout(t);
-  }, [confirmKey, ctl]);
+  }, [confirmKey]);
 
   // Why-not popovers fade after 4 s (flows G4).
   useEffect(() => {
@@ -1709,7 +1714,7 @@ function CountDialog({
         <span className="subtle">of {max}</span>
       </div>
       <p className="small" aria-live="polite">
-        {name}: {num(c?.power)} → {num((c?.power ?? 0) + n * 1000)} this turn
+        {name}: <Arrows text={`${num(c?.power)} → ${num((c?.power ?? 0) + n * 1000)}`} /> this turn
       </p>
       <div className="row">
         <button type="button" className="btn small" onClick={onClose}>
@@ -1759,13 +1764,13 @@ function Announcer({
   return (
     <>
       <div id="announce-polite" className="sr-only" role="status" aria-live="polite">
-        <span>{a ? polite.text : ''}</span>
-        <span>{a ? '' : polite.text}</span>
+        <span>{a ? spokenArrows(polite.text) : ''}</span>
+        <span>{a ? '' : spokenArrows(polite.text)}</span>
       </div>
       <div id="announce-assertive" className="sr-only" aria-live="assertive" aria-atomic="false">
         {assertive.text && spent !== assertive.seq ? (
           <p key={assertive.seq} data-seq={assertive.seq}>
-            {assertive.text}
+            {spokenArrows(assertive.text)}
           </p>
         ) : null}
       </div>

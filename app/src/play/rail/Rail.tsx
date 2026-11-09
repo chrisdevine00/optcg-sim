@@ -5,6 +5,7 @@
  */
 import { useLayoutEffect, useRef, useState } from 'react';
 import type { LogLine, Names } from '../game/text.ts';
+import { Arrows, spokenArrows } from '../arrows.tsx';
 
 export const DISCLAIMER_SHORT =
   'Unofficial fan tool. Not affiliated with or endorsed by Bandai, Shueisha or Toei Animation.';
@@ -165,7 +166,7 @@ export function GameLog({
               !!hasWhy?.(l.index);
             return l.kind === 'turn' ? (
               <li key={i} className="log-turn">
-                {l.text}
+                <Arrows text={l.text} />
               </li>
             ) : (
               <li key={i} className={`log-row ${l.auto ? 'auto' : ''}`}>
@@ -179,13 +180,13 @@ export function GameLog({
                   onPointerEnter={() => onLink(l.cards[0] ?? null)}
                   onPointerLeave={() => onLink(null)}
                 >
-                  {l.text}
+                  <Arrows text={l.text} />
                 </span>
                 {canRewind && !ticker && l.actor === names.me && !l.auto && (
                   <button
                     type="button"
                     className="log-rw"
-                    aria-label={`Rewind to before: ${l.text}`}
+                    aria-label={`Rewind to before: ${spokenArrows(l.text)}`}
                     onClick={() => onRewindTo(l.index)}
                   >
                     ⟲
@@ -195,7 +196,7 @@ export function GameLog({
                   <button
                     type="button"
                     className="log-why"
-                    aria-label={`Why? ${l.text}`}
+                    aria-label={`Why? ${spokenArrows(l.text)}`}
                     onClick={() => onWhy?.(l.index)}
                   >
                     Why?

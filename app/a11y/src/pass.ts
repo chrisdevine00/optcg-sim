@@ -82,6 +82,59 @@ const LIVE_SCRIPT = () => {
   });
 };
 
+/**
+ * Records what the page is delivered, so the next NVDA run shows exactly what NVDA sends: a
+ * capture-phase logger on the decision panel (pointerdown, mousedown, mouseup, click with
+ * `isTrusted`, `detail` and `pointerType`; keydown; focus and blur) and a window keydown counter
+ * (the keyboard canary: when keys stop arriving, the browser's toolbar has the keyboard).
+ */
+const TRACE_SCRIPT = () => {
+  const w = window as unknown as { __a11yTrace: TraceRec[]; __a11yKeys: number };
+  w.__a11yTrace = [];
+  w.__a11yKeys = 0;
+  const desc = (t: EventTarget | null) => {
+    const e = t as HTMLElement | null;
+    if (!e || !e.tagName) return String(t);
+    return `${e.tagName.toLowerCase()}${e.id ? `#${e.id}` : ''}`;
+  };
+  window.addEventListener('keydown', () => void (w.__a11yKeys += 1), true);
+  const log = (e: Event) => {
+    const t = e.target as HTMLElement | null;
+    if (!t?.closest || !(t.closest('#decision') || t === document.body)) return;
+    const x = e as MouseEvent & KeyboardEvent & PointerEvent;
+    const rec: TraceRec = {
+      t: Date.now(),
+      type: e.type,
+      target: desc(e.target),
+      trusted: e.isTrusted,
+    };
+    if (e.type === 'click' || e.type.startsWith('mouse') || e.type.startsWith('pointer'))
+      rec.detail = `detail=${x.detail} pointerType=${x.pointerType ?? ''} button=${x.button}`;
+    if (e.type === 'keydown') rec.detail = `key=${x.key}${x.shiftKey ? '+shift' : ''}`;
+    if (e.type === 'focusin' || e.type === 'focusout')
+      rec.detail = `related=${desc((e as FocusEvent).relatedTarget)}`;
+    w.__a11yTrace.push(rec);
+  };
+  for (const type of [
+    'pointerdown',
+    'mousedown',
+    'mouseup',
+    'click',
+    'keydown',
+    'focusin',
+    'focusout',
+  ])
+    document.addEventListener(type, log, true);
+};
+
+interface TraceRec {
+  t: number;
+  type: string;
+  target: string;
+  trusted: boolean;
+  detail?: string;
+}
+
 export class Pass {
   steps: StepRec[] = [];
   /** Every "harness did not reach X" the run noted, with its step (the dry spec asserts none). */
@@ -101,6 +154,30 @@ export class Pass {
   /** Call before the first navigation: installs the live-region recorder. */
   async install() {
     await this.page.addInitScript(LIVE_SCRIPT);
+    await this.page.addInitScript(TRACE_SCRIPT);
+  }
+
+  /**
+   * Writes what the decision panel was delivered since `since` into the step's notes (L-SR1,
+   * L-SR11): every pointer, mouse, click, key and focus event, with `isTrusted`.
+   */
+  async dumpTrace(label: string, since: number) {
+    const all = await this.page
+      .evaluate(() => (window as unknown as { __a11yTrace?: TraceRec[] }).__a11yTrace ?? [])
+      .catch(() => [] as TraceRec[]);
+    const rows = all.filter((r) => r.t >= since);
+    this.cur?.notes.push(
+      `Event trace, ${label}: ${
+        rows.length
+          ? rows
+              .map(
+                (r) =>
+                  `${r.type}@${r.target}${r.trusted ? '' : ' (script-made)'}${r.detail ? ` [${r.detail}]` : ''}`,
+              )
+              .join(' | ')
+          : '(no event reached the decision panel or the page body)'
+      }`,
+    );
   }
 
   // ------------------------------------------------------------------ page state
@@ -225,24 +302,40 @@ export class Pass {
     return false;
   }
 
-  /** True while the page (not the browser's toolbar or another window) has keyboard focus. */
-  async pageHasFocus(): Promise<boolean> {
-    // A headless dry run has no window focus to lose (document.hasFocus() is unreliable there).
-    if (this.reader.name.startsWith('dry')) return true;
-    return await this.page.evaluate(() => document.hasFocus()).catch(() => false);
+  /**
+   * The keyboard canary: a harmless key (Shift) must reach the page's window keydown listener.
+   * `document.hasFocus()` cannot tell (Playwright's Firefox answers true whatever the OS does), and
+   * a Playwright click does not give the page OS keyboard focus.
+   */
+  async keyboardAlive(): Promise<boolean> {
+    const count = () =>
+      this.page
+        .evaluate(() => (window as unknown as { __a11yKeys?: number }).__a11yKeys ?? 0)
+        .catch(() => -1);
+    const before = await count();
+    await this.reader.press('Shift');
+    await this.page.waitForTimeout(250);
+    return (await count()) > before;
   }
 
   /**
-   * Gives the page keyboard focus: after a reload or goto, Firefox leaves it in the toolbar while
-   * `document.activeElement` still points at the old element, so keys went to the browser. A click
-   * on the page's top-left corner (non-interactive: the header's margin) makes the page the target
-   * and starts Tab from there. Recorded as an assist.
+   * Gives the page real keyboard focus: after a goto or reload Firefox leaves it in the toolbar
+   * while `document.activeElement` still points at the old element. Checks the canary; while it is
+   * silent presses F6 (browsers move the keyboard between the toolbar and the page with it) and
+   * checks again. Recorded as an assist; returns false (with a note) if it never arrives.
    */
-  async focusPage(why: string) {
+  async focusPage(why: string): Promise<boolean> {
     await this.page.bringToFront();
-    await this.page.mouse.click(2, 2);
-    await this.page.waitForTimeout(300);
-    this.cur?.assists.push(`page given keyboard focus: ${why}`);
+    for (let i = 0; i < 4; i++) {
+      if (await this.keyboardAlive()) {
+        if (i > 0) this.cur?.assists.push(`page given keyboard focus with F6 x${i}: ${why}`);
+        return true;
+      }
+      await this.reader.press('F6');
+      await this.page.waitForTimeout(300);
+    }
+    this.cur?.notes.push(`Keyboard focus could not be given to the page (${why}); canary silent.`);
+    return false;
   }
 
   /**
@@ -283,11 +376,19 @@ export class Pass {
     let f = await this.focus();
     for (let i = 0; i < max; i++) {
       if (pred(f)) return f;
+      const prev = `${f.id}|${f.tag}|${f.name}|${f.aria}`;
       f = await this.press(key);
-      if (!(await this.pageHasFocus())) {
-        this.note(`Keyboard focus left the page after ${key}; the key loop stopped.`);
-        await this.focusPage('keyboard focus had left the page');
-        return null;
+      // A Tab that moved nothing may have left the page (the toolbar has the keyboard). Ask the
+      // canary; if the keys are not arriving, stop and say so instead of walking the toolbar.
+      if (/Tab$/.test(key) && !pred(f) && prev === `${f.id}|${f.tag}|${f.name}|${f.aria}`) {
+        if (!(await this.keyboardAlive())) {
+          this.note(
+            `Keyboard focus left the page after ${key} (canary silent); the key loop stopped.`,
+          );
+          this.cur?.assists.push('keys were not reaching the page; loop stopped');
+          await this.focusPage('keyboard focus had left the page');
+          return null;
+        }
       }
     }
     return pred(f) ? f : null;

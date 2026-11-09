@@ -7,6 +7,7 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import type { Action, PlayerId } from '@optcg/engine';
 import { CardFace } from '../../art/index.ts';
+import { Arrows } from '../arrows.tsx';
 import { veiledContent } from '../game/veiled.tsx';
 import { SPEEDS, speedLabel } from '../game/controller.ts';
 import { newIntentId, type Simulation } from '../../session/index.ts';
@@ -52,6 +53,8 @@ interface FootBtn {
   id?: string;
   /** Focus lands here when the decision arrives (accessibility §3.2). */
   autoFocus?: boolean;
+  /** Id of an element whose text is this button's accessible description. */
+  describedBy?: string;
 }
 interface Foot {
   primary?: FootBtn;
@@ -76,7 +79,6 @@ export function DecisionPanel({
 }) {
   const headRef = useRef<HTMLHeadingElement>(null);
   const firstRef = useRef<HTMLDivElement>(null);
-  const pointerAt = useRef(0);
   const content = contentFor(g);
   useEffect(() => {
     if (focusSignal === 0) return;
@@ -106,17 +108,10 @@ export function DecisionPanel({
           // NVDA's Enter on a heading clicks it. In Firefox that moved the sequential-focus start
           // to the page top, so Tab went through the whole board before the panel (M3 pass FF2).
           // A click keeps focus on the heading; Tab from it goes to the panel's first control.
-          // L-SR1 / FF-L1: while the attack confirm panel says "Enter to attack", that Enter is the
-          // click NVDA makes of a heading, so a click that no pointer made (no pointerdown just
-          // before it) commits the attack, the one safe primary (never "Take the hit", §11.3
-          // step 9). Focus is put back on the heading first, so it is never left on <body>.
-          onPointerDown={() => (pointerAt.current = Date.now())}
-          onClick={(e) => {
-            e.currentTarget.focus();
-            if (Date.now() - pointerAt.current < 1000) return;
-            if (g.mine && g.view.decision?.kind === 'main' && g.ui.kind === 'confirm')
-              document.getElementById('confirm-attack')?.click();
-          }}
+          // L-SR1 / FF-L1 (round 2): this click only focuses. Round 1 made it commit the attack
+          // when no pointerdown preceded it; NVDA's Enter on a heading did not do that in Chrome or
+          // Firefox. The attack confirm now puts focus on "Confirm attack" instead, a native button.
+          onClick={(e) => e.currentTarget.focus()}
           onKeyDown={(e) => {
             if (e.key !== 'Tab' || e.shiftKey) return;
             const first = e.currentTarget
@@ -129,7 +124,7 @@ export function DecisionPanel({
             first.focus();
           }}
         >
-          {content.title}
+          <Arrows text={content.title} />
         </h2>
       </div>
       <div className="dec-body" style={{ height: bh }} ref={firstRef} hidden={bodyHidden}>
@@ -182,6 +177,7 @@ function FootButton({ b, primary }: { b: FootBtn; primary: boolean }) {
       data-autofocus={b.autoFocus ? '' : undefined}
       className={`btn big ${(primary && b.tone !== 'quiet') || b.tone === 'primary' ? 'primary' : ''} ${b.tone === 'warn' ? 'warn' : ''}`}
       aria-disabled={disabled || undefined}
+      aria-describedby={b.describedBy}
       aria-keyshortcuts={b.key && b.key.length === 1 ? b.key : undefined}
       onClick={() => {
         if (!disabled) b.onClick?.();
@@ -194,7 +190,7 @@ function FootButton({ b, primary }: { b: FootBtn; primary: boolean }) {
         <span className="sub">
           {/* A pause between the label and its sub-label: "Play anyway, still hits" (F13). */}
           <span className="sr-only">, </span>
-          {disabled && b.reason ? b.reason : b.sub}
+          <Arrows text={(disabled && b.reason ? b.reason : b.sub) ?? ''} />
         </span>
       )}
     </button>
@@ -684,7 +680,7 @@ function mainContent(g: G, rewind: NonNullable<Foot['secondary']>): Content {
                       </button>
                     </td>
                     <td className="num r">
-                      {num(c?.power)} → {num((c?.power ?? 0) + 1000)}
+                      <Arrows text={`${num(c?.power)} → ${num((c?.power ?? 0) + 1000)}`} />
                     </td>
                   </tr>
                 );
@@ -944,7 +940,11 @@ function simCard(
   return null;
 }
 
-/** What the player hears when the attack confirm opens (the target keeps focus, so Enter confirms). */
+/**
+ * What a screen reader says on "Confirm attack" (its accessible description, L-SR1 round 2): the
+ * battle maths, the gap, what they need to survive, and the keys. Focus lands on that button when
+ * the attack confirm opens and when `M` is pressed during it, so Enter is a native press.
+ */
 export function confirmSentence(
   ap: number,
   tp: number,
@@ -952,10 +952,23 @@ export function confirmSentence(
   target: string,
   undecided: boolean,
   result: string,
+  extra?: { need: number; hand: number },
 ): string {
   const maths = `${attacker} ${num(ap)} against ${target} ${num(tp)}`;
-  if (undecided) return `${maths}. ${result}. Enter to attack, Escape to go back.`;
-  return `${maths}: ${ap >= tp ? 'hits unless they counter' : 'fails unless you gain power'}. Enter to attack, Escape to go back.`;
+  const keys = 'Enter to attack, Escape to go back.';
+  const gap =
+    ap === tp
+      ? 'Level: ties go to the attacker.'
+      : ap > tp
+        ? `Gap: ahead by ${num(ap - tp)}.`
+        : `Gap: behind by ${num(tp - ap)}.`;
+  const need = !extra
+    ? ''
+    : extra.need > 0
+      ? ` They need plus ${num(extra.need)} to survive, ${extra.hand} ${extra.hand === 1 ? 'card' : 'cards'} in hand.`
+      : ' They cannot stop it with Counters alone.';
+  if (undecided) return `${maths}. ${result}. ${gap}${need} ${keys}`;
+  return `${maths}: ${ap >= tp ? 'hits unless they counter' : 'fails unless you gain power'}. ${gap}${need} ${keys}`;
 }
 
 function confirmContent(g: G, attacker: string, target: string): Content {
@@ -997,7 +1010,7 @@ function confirmContent(g: G, attacker: string, target: string): Content {
     body: (
       <div>
         <BattleNumbers g={g} sim={null} perspective="attack" attacker={attacker} target={target} />
-        <p className="sr-only" id="confirm-spoken" aria-hidden="true">
+        <p className="sr-only" id="confirm-spoken">
           {confirmSentence(
             ap,
             tp,
@@ -1005,11 +1018,12 @@ function confirmContent(g: G, attacker: string, target: string): Content {
             t?.zone === 'leader' ? 'their Leader' : g.nameOf(target),
             undecided,
             result,
+            { need: ap >= tp ? need : 0, hand },
           )}
         </p>
         <p className={`result ${undecided ? '' : ok ? 'good' : 'bad'}`} data-testid="battle-result">
           <span>
-            {result}
+            <Arrows text={result} />
             {ap === tp && <span className="subtle"> · ties go to the attacker</span>}
           </span>
         </p>
@@ -1031,7 +1045,7 @@ function confirmContent(g: G, attacker: string, target: string): Content {
         {findCard(g, attacker)?.keywords.includes('Banish') && (
           <p>Banish: Life card is trashed, no Trigger.</p>
         )}
-        <p className="subtle">Enter or click the target again to attack. Esc goes back.</p>
+        <p className="subtle">Enter attacks (focus is on Confirm attack). Esc goes back.</p>
       </div>
     ),
     foot: {
@@ -1046,6 +1060,7 @@ function confirmContent(g: G, attacker: string, target: string): Content {
         sub: `${num(ap)} vs ${num(tp)}`,
         onClick: () => action && g.act(action),
         id: 'confirm-attack',
+        describedBy: 'confirm-spoken',
       },
     },
   };
@@ -1528,7 +1543,7 @@ function triggerContent(g: G): Content {
               Life card: <b>{card.name}</b>
             </p>
             <p className="subtle">
-              Only you see this. Life {life} → {life - 1}.
+              Only you see this. <Arrows text={`Life ${life} → ${life - 1}.`} />
             </p>
             {g.ctl.revealSticky && (
               <button

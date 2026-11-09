@@ -80,7 +80,7 @@ export function CoachPanel({
             className="coach-btn"
             id="coach-lethal"
             aria-pressed={open && profile.tab === 'lethal'}
-            aria-keyshortcuts="L"
+            aria-describedby="coach-key-l"
             onClick={() => {
               // A press of the button is a press of L: it reveals the next tier.
               coach.press();
@@ -96,18 +96,27 @@ export function CoachPanel({
             <kbd aria-hidden="true">L</kbd>
           </button>
         )}
+        {/* NVDA takes L and C once focus is in the coach (L-SR12): say where they work. */}
+        {canLethal && (
+          <span id="coach-key-l" className="sr-only">
+            The L key works from the board. Here, press Enter.
+          </span>
+        )}
         <span className="spacer" />
         <button
           type="button"
           className="iconbtn coach-chevron"
           aria-expanded={open}
           aria-controls="coach-body"
-          aria-label={open ? 'Collapse the coach (C)' : 'Open the coach (C)'}
-          aria-keyshortcuts="C"
+          aria-label={open ? 'Collapse the coach' : 'Open the coach'}
+          aria-describedby="coach-key-c"
           onClick={() => coach.toggle()}
         >
           {open ? '▾' : '▴'}
         </button>
+        <span id="coach-key-c" className="sr-only">
+          The C key works from the board. Here, press Enter.
+        </span>
       </div>
       {open && (
         <div className="coach-body" id="coach-body">
@@ -226,7 +235,7 @@ function LethalSection({
               hits, then the line.
             </p>
             <button type="button" className="btn small primary" onClick={() => coach.press()}>
-              Check for lethal <kbd>L</kbd>
+              Check for lethal <kbd aria-hidden="true">L</kbd>
             </button>
           </>
         )}
@@ -292,7 +301,7 @@ function Tiers({ g }: { g: G }) {
       <div className="coach-actions">
         {tier === 1 && (
           <button type="button" className="btn small" onClick={() => coach.press()}>
-            How many hits? <kbd>L</kbd>
+            How many hits? <kbd aria-hidden="true">L</kbd>
           </button>
         )}
         {tier === 2 && r.status === 'proven' && (
@@ -302,7 +311,7 @@ function Tiers({ g }: { g: G }) {
         )}
         {tier === 2 && r.status !== 'unknown' && (
           <button type="button" className="btn small" onClick={() => coach.press()}>
-            {r.status === 'proven' ? 'Show the line' : 'Show why'} <kbd>L</kbd>
+            {r.status === 'proven' ? 'Show the line' : 'Show why'} <kbd aria-hidden="true">L</kbd>
           </button>
         )}
       </div>

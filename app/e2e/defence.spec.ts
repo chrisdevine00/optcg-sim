@@ -65,7 +65,9 @@ test.describe('defence planner (flows F6, board.md §3.9)', () => {
     await expect(page.locator('#trigger-activate')).toHaveAttribute('aria-disabled', 'true');
     await page.locator('#trigger-hand').click();
     await expect(hitLines(page).first()).toContainText('Hit · 7000 vs 5000');
-    await expect(page.locator('.log-row').filter({ hasText: 'Life 3 → 2' })).toHaveCount(1);
+    await expect(
+      page.locator('.log-row').filter({ hasText: /Life 3\s*→\s*(to)?\s*2/ }),
+    ).toHaveCount(1);
   });
 
   test('a Blocker takes the attack instead', async ({ page }) => {
