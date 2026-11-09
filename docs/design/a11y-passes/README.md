@@ -10,6 +10,7 @@ block the milestone.
 | [m3-nvda-chrome.md](m3-nvda-chrome.md) | NVDA + Chrome | Scripted (Guidepup), run 40866547375: **FAIL** (1 severity 3) |
 | [m3-nvda-firefox.md](m3-nvda-firefox.md) | NVDA + Firefox | Scripted (Guidepup), run 40866547375: **FAIL** (2 severity 3) |
 | m3-voiceover-safari.md | VoiceOver + Safari | Owed: the owner's passes, below |
+| l-nvda-chrome.md, l-nvda-firefox.md | NVDA + Chrome, Firefox | Script built (§11.4); not yet run on the runner |
 
 ## The harness
 
@@ -18,9 +19,11 @@ reader said, and what the app wrote to its live regions. It is its own package (
 workspace), so normal CI never installs Guidepup.
 
 - `src/m3.ts` is the §11.3 script, on the `a11y-m3` scenario (`app/src/play/setup/a11y-scenarios.ts`).
+  `src/l.ts` is the §11.4 script (the learning slice), described below.
   When the plain keyboard path does not reach the place a step needs, the harness moves focus itself
   and writes a **harness assist** into the record, so nothing is hidden.
-- Output: `app/a11y/results/<project>/m3.md` (a table per step) and `m3.json`.
+- Output: `app/a11y/results/<project>/<script>.md` (a table per step) and `<script>.json`, where
+  `<script>` is `m3` or `l`.
 - Projects: `nvda-chrome`, `nvda-firefox` (Windows only), `voiceover-webkit` (macOS only), and `dry`
   (Playwright keys, no screen reader, for checking the harness).
 - The script is deterministic: the scenario's seed and the script's own moves fix Rookie's moves.
@@ -36,7 +39,8 @@ gh run download <run id>                                     # artifact a11y-nvd
 ```
 
 The workflow builds the app at that commit, serves it with `vite preview`, installs NVDA with
-`npx @guidepup/setup install nvda`, and runs both browser projects. It runs only by hand (never on
+`npx @guidepup/setup install nvda`, and runs the chosen script (default `l`; `m3` and `both` are
+kept) in the chosen browser projects. It runs only by hand (never on
 push). Firefox is Playwright's Firefox build ("Nightly"), not a branded release.
 
 ### Dry run (any machine)
@@ -45,8 +49,46 @@ push). Firefox is Playwright's Firefox build ("Nightly"), not a branded release.
 npm run build -w @optcg/app
 (cd app && npx vite preview --port 4199 --strictPort) &
 cd app/a11y && npm ci
-A11Y_BASE_URL=http://localhost:4199/optcg-sim/ npx playwright test --project=dry
+A11Y_BASE_URL=http://localhost:4199/optcg-sim/ npx playwright test --project=dry              # both scripts
+A11Y_BASE_URL=http://localhost:4199/optcg-sim/ npx playwright test --project=dry l.dry.spec.ts # the L script only
 ```
+
+The L script takes about five minutes.
+
+### The L script (§11.4)
+
+`src/l.ts`, run by `l.nvda.spec.ts`, `l.voiceover.spec.ts` and `l.dry.spec.ts`. Steps, in order:
+
+| Step | What it does |
+| --- | --- |
+| F3 | Re-check of M3 finding F3: load, Control+Home, Tab: expect the skip link "Skip to decision". |
+| 1 | Declare an attack with the Leader; `M`; read the battle panel line by line. |
+| 2 | Confirm; use the Leader's [When Attacking] and pick Rocks' Character, Done. |
+| F15 | Re-check of M3 finding F15: resolve the `order` decision, then `.` right after Done: it must move the game, or focus must not sit on the decision heading. |
+| 2b | `.` for each AI move: Rocks counters (X.Drake +2000, Yamato +1000); the sentences and the battle panel totals. |
+| 3 | `L`, `L`, `L`: coach tiers 1, 2 and 3. |
+| 4 | `C`; read the coach with the virtual cursor (browse mode: next line, heading, list). |
+| 4b, 4c | "Count it with me": its four questions, a wrong then a right answer, Check my count, Next, Close. |
+| 5 | The detector: silent by default, then "Tier 2 always on", then a move. |
+| 6 to 9 | The planted missed-lethal record: review, flag, Study, Practice this, play the line. |
+
+Scenario and record:
+
+- Steps 1 to 5 run on `a11y-l` (`/play?scenario=a11y-l&speed=step&opp=rookie&aibudget=iterations&start=1`):
+  Kaido against Rocks, turn 9, with lethal on the board; the seed and its comment are in
+  `app/src/play/setup/a11y-scenarios.ts`. The AI opponent is Rookie, because it always counters a
+  lethal attack, so step 2 has a defence to read; the Pirate AI sees the game is lost and does not.
+- Steps 6 to 9 reload the page on `lethalDemo` (the planted missed-lethal game that
+  `app/e2e/learning.spec.ts` plays), concede it through the Game menu and open "Review this game".
+  That is the same record the e2e test flags (turn 9, severe, "holds whatever they held"). There is
+  no URL for a finished game, so the script reaches it this way.
+- Where §11.4 expects something that was not built, the step writes "Note: not built" into the
+  record: the AI Counter sentence with totals and the tie rule; the "Coach alerts" setting and
+  "Lethal available" line (the Detector levels are the equivalent); the timeline as a toolbar;
+  focus moving to the explanation when Study opens; "Declare no lethal". The board sandbox for the
+  guided count, and the Hint, DON!! math and Tempo sections, are not built either (STATUS.md).
+- Judge each step against the spoken log, as for M3; the "Expect" column in the record holds the
+  built behaviour where §11.4 has none.
 
 ## VoiceOver passes (the owner's Mac)
 

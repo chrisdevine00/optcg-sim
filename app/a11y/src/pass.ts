@@ -91,6 +91,8 @@ export class Pass {
     readonly reader: Reader,
     readonly project: string,
     readonly outDir: string,
+    /** The script's name: the record files are `<script>.json` and `<script>.md`. */
+    readonly script: string = 'm3',
   ) {}
 
   /** Call before the first navigation: installs the live-region recorder. */
@@ -269,10 +271,13 @@ export class Pass {
       versions: versions(),
     };
     writeFileSync(
-      join(this.outDir, 'm3.json'),
+      join(this.outDir, `${this.script}.json`),
       JSON.stringify({ meta, steps: this.withCurrent() }, null, 2),
     );
-    writeFileSync(join(this.outDir, 'm3.md'), toMarkdown(meta, this.withCurrent()));
+    writeFileSync(
+      join(this.outDir, `${this.script}.md`),
+      toMarkdown(meta, this.withCurrent(), this.script),
+    );
   }
 
   /** The finished steps, plus the running one with the speech heard so far. */
@@ -300,9 +305,9 @@ function versions(): Record<string, string> {
 
 const esc = (s: string) => s.replace(/\|/g, '\\|').replace(/\n/g, ' ');
 
-function toMarkdown(meta: Record<string, unknown>, steps: StepRec[]): string {
+function toMarkdown(meta: Record<string, unknown>, steps: StepRec[], script: string): string {
   const out: string[] = [];
-  out.push(`# M3 screen-reader pass log (${String(meta.project)})`, '');
+  out.push(`# ${script.toUpperCase()} screen-reader pass log (${String(meta.project)})`, '');
   out.push('```json', JSON.stringify(meta, null, 2), '```', '');
   for (const s of steps) {
     out.push(`## Step ${s.n}: ${s.title} (${s.status})`, '');

@@ -1,6 +1,7 @@
 /**
- * Scenario starts for the scripted screen-reader passes (accessibility.md §11.2, §11.3).
- * `/play?scenario=a11y-m3&speed=step&start=1` is the M3 script's position. Every card is a real
+ * Scenario starts for the scripted screen-reader passes (accessibility.md §11.2 to §11.4).
+ * `/play?scenario=a11y-m3&speed=step&start=1` is the M3 script's position;
+ * `/play?scenario=a11y-l&speed=step&opp=rookie&aibudget=iterations&start=1` is the L script's. Every card is a real
  * M4a-scripted card from the Kaido list (cards/effects/), so the effect text the script hears is
  * the printed text. Seeds are fixed so the AI's moves, and so the expected speech, are stable.
  */
@@ -46,6 +47,46 @@ export const A11Y_SCENARIOS: Record<string, Spec> = {
       life: ['OP09-077', 'OP07-076'],
       hand: ['OP17-065'],
       characters: ['EB04-031', 'OP17-074', 'OP17-073'],
+      deck: filler('OP15-069', 12),
+      costArea: { active: 0, rested: 0 },
+    },
+  },
+  /**
+   * L script (§11.4 steps 1 to 5, and the F3 and F15 re-checks): you (Kaido, OP17-058) against
+   * Rocks (OP17-039), turn 9, your Main Phase, with lethal on the board. Rocks has 0 Life (any
+   * hit wins), one Character (X.Drake OP17-075, not a Blocker) and two
+   * Counters in hand (X.Drake +2000, Yamato +1000). You have your Leader (5000) and two Kaido
+   * (OP17-062, 12000, Blockers) with 4 active DON!!.
+   * - Steps 1 and 2: the script attacks with the Leader. Rocks must stop it or lose, and Rookie
+   *   "always blocks or counters a lethal attack", so it plays X.Drake (+2000: 5000 against 7000,
+   *   "Attack fails"). Kaido's [When Attacking] (DON!! −1, -2000 to one of their Characters) is
+   *   offered first: the script Uses it and picks X.Drake, so the pick and its Done are the F15 case.
+   * - Steps 3 to 5: with the Leader rested, the two Kaido still win (12000 against at most 5000
+   *   plus Yamato's +1000): "1 hit", Proven, works against any hand.
+   * - Steps 6 to 9 do not use this position: they start the `lethalDemo` game (scenarios.ts, the
+   *   planted missed-lethal game of app/e2e/learning.spec.ts), concede it and open its review.
+   * Fixed seed and `opp=rookie`; the stepping `.` keys fix the rest. With `opp=pirate` the AI saw
+   * the game was lost and did not counter, so step 2 had nothing to read.
+   */
+  'a11y-l': {
+    mode: 'ai',
+    seed: 5,
+    turn: 9,
+    activePlayer: 'p1',
+    firstPlayer: 'p1',
+    p1: {
+      leader: 'OP17-058',
+      characters: ['OP17-062', 'OP17-062'],
+      life: filler('OP15-069', 3),
+      hand: [],
+      deck: filler('OP15-069', 12),
+      costArea: { active: 4, rested: 0 },
+    },
+    p2: {
+      leader: 'OP17-039',
+      life: [],
+      hand: ['OP17-075', 'OP17-074'],
+      characters: ['OP17-075'],
       deck: filler('OP15-069', 12),
       costArea: { active: 0, rested: 0 },
     },

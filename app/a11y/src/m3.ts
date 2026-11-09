@@ -9,10 +9,10 @@ import type { Pass, Focus } from './pass.ts';
 
 export const M3_URL = 'play?scenario=a11y-m3&speed=step&start=1';
 
-const isLeader = (f: Focus) => /^Your Leader\b/.test(f.name);
-const named = (re: RegExp) => (f: Focus) => re.test(f.name) || re.test(f.aria);
-const zoneIs = (z: string) => (f: Focus) => f.zone === z && f.inBoard;
-const HUMAN = new Set([
+export const isLeader = (f: Focus) => /^Your Leader\b/.test(f.name);
+export const named = (re: RegExp) => (f: Focus) => re.test(f.name) || re.test(f.aria);
+export const zoneIs = (z: string) => (f: Focus) => f.zone === z && f.inBoard;
+export const HUMAN = new Set([
   'main',
   'block',
   'counter',
@@ -31,7 +31,7 @@ const ZONES = ['opp-id', 'opp-row', 'opp-chars', 'mid', 'my-chars', 'my-row', 'h
  * Moves focus into the board's `zone` by Tab or Shift+Tab, whichever is shorter from where focus
  * is, as a keyboard user would (never Tabbing out of the page into the browser's own controls).
  */
-async function toZone(p: Pass, zone: string) {
+export async function toZone(p: Pass, zone: string) {
   const f = await p.focus();
   if (f.inBoard && f.zone === zone) return;
   // From <body> (focus lost) the browser resumes from where focus was, usually the decision panel.
@@ -44,7 +44,12 @@ async function toZone(p: Pass, zone: string) {
 }
 
 /** Arrows within the focused zone until `pred` holds; tries right, then left. */
-async function arrowTo(p: Pass, pred: (f: Focus) => boolean, what: string, selector?: string) {
+export async function arrowTo(
+  p: Pass,
+  pred: (f: Focus) => boolean,
+  what: string,
+  selector?: string,
+) {
   if (await p.until('ArrowRight', pred, 10)) return;
   if (await p.until('ArrowLeft', pred, 10)) return;
   if (selector) await p.assist(`arrows did not reach ${what}`, selector);
@@ -52,7 +57,7 @@ async function arrowTo(p: Pass, pred: (f: Focus) => boolean, what: string, selec
 }
 
 /** Focus into the decision panel: `P` from the board (the documented key), else the harness. */
-async function toDecision(p: Pass) {
+export async function toDecision(p: Pass) {
   let f = await p.focus();
   if (f.inDecision) return;
   if (f.inBoard) {
@@ -64,7 +69,7 @@ async function toDecision(p: Pass) {
 }
 
 /** Tab inside the decision panel to the control `pred` matches, then press `key` on it. */
-async function decide(
+export async function decide(
   p: Pass,
   pred: (f: Focus) => boolean,
   what: string,
@@ -88,7 +93,7 @@ async function decide(
 }
 
 /** Step pace: presses `.` until the player owes a decision (or the game ends). */
-async function untilMine(p: Pass, max = 40): Promise<string> {
+export async function untilMine(p: Pass, max = 40): Promise<string> {
   for (let i = 0; i < max; i++) {
     const k = await p.kind();
     if (HUMAN.has(k) || k === 'over') return k;
@@ -120,12 +125,12 @@ async function untilMine(p: Pass, max = 40): Promise<string> {
 /** Set once "." has been seen to do nothing in the decision panel (the reader took the key). */
 let deadDot = false;
 
-const gameOver = async (p: Pass) =>
+export const gameOver = async (p: Pass) =>
   (await p.live()).some((l) => /game over|you win|you lose/i.test(l.text)) ||
   (await p.kind()) === 'over';
 
 /** Answers whatever small decision is open in the plainest way (Skip, take the hit, first option). */
-async function answerPlainly(p: Pass, k: string) {
+export async function answerPlainly(p: Pass, k: string) {
   if (!HUMAN.has(k)) return;
   if (k === 'optional') return decide(p, (f) => f.id === 'skip-btn', 'Skip', '#skip-btn');
   if (k === 'trigger')

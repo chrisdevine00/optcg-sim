@@ -9,7 +9,12 @@ import { SpeechTap, type Heard } from './tap.ts';
 
 export interface Reader {
   readonly name: string;
-  /** Presses one key (Playwright key names: `Tab`, `Shift+Tab`, `ArrowRight`, `q`, `?`). */
+  /**
+   * Presses one key (Playwright key names: `Tab`, `Shift+Tab`, `ArrowRight`, `q`, `?`). Three
+   * pseudo-keys read with the reader's own navigation, as a person would: `Browse:Next` (the next
+   * line or item), `Browse:Heading` and `Browse:List` (the next heading or list). NVDA sends the
+   * browse-mode keys, VoiceOver its commands; the dry reader moves nothing.
+   */
   press(key: string): Promise<void>;
   /** Speech heard since `t`: every phrase, with times. */
   heardSince(t: number): Heard[];
@@ -24,6 +29,13 @@ const VK: Record<string, { vk: number; scan: number; shift?: boolean }> = {
   '?': { vk: 0xbf, scan: 53, shift: true },
   '/': { vk: 0xbf, scan: 53 },
   '+': { vk: 0xbb, scan: 13, shift: true },
+};
+
+/** NVDA browse-mode keys for the pseudo-keys of `Reader.press`. */
+const BROWSE_NVDA: Record<string, string> = {
+  'Browse:Next': 'ArrowDown',
+  'Browse:Heading': 'h',
+  'Browse:List': 'l',
 };
 
 const rawKey = (vk: number, scan: number) => ({
@@ -49,6 +61,7 @@ export class NvdaReader implements Reader {
    * most 10 seconds, and the tap keeps every phrase.
    */
   async press(key: string) {
+    key = BROWSE_NVDA[key] ?? key;
     const capture = !this.tapOk;
     const t0 = Date.now();
     const special = VK[key];
@@ -114,6 +127,12 @@ export class DryReader implements Reader {
   readonly name = 'dry (no screen reader)';
   constructor(private page: Page) {}
   async press(key: string) {
+    // No screen reader, no virtual cursor: the browse pseudo-keys move nothing (the page's own
+    // `h` and `l` keys must not fire either).
+    if (key.startsWith('Browse:')) {
+      await this.page.waitForTimeout(100);
+      return;
+    }
     await this.page.keyboard.press(key === ' ' ? 'Space' : key);
     await this.page.waitForTimeout(250);
   }
@@ -138,6 +157,12 @@ export class VoiceOverReader implements Reader {
   readonly name = 'VoiceOver';
   constructor(private vo: VoiceOver) {}
   async press(key: string) {
+    // VoiceOver's own navigation (Quick Nav is off): VO+Right, and the rotor-style find commands.
+    if (key === 'Browse:Next') return void (await this.vo.next());
+    if (key === 'Browse:Heading')
+      return void (await this.vo.perform(this.vo.keyboardCommands.findNextHeading));
+    if (key === 'Browse:List')
+      return void (await this.vo.perform(this.vo.keyboardCommands.findNextList));
     const map: Record<string, string> = {
       '?': 'Shift+ForwardSlash',
       '+': 'Shift+Equals',
