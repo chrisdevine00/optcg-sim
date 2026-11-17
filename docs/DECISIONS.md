@@ -2,6 +2,10 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-17 — M5b parked with the Warlord-vs-Pirate gate failing
+
+The owner asked to finish the current round and stop. Fix round 2 is merged (116542c); M5b is **not** marked done because the first nightly on the fixed code measured Warlord vs Pirate at 123/200 (61.5%, Wilson 54.6–68.0%), below PLAN §2's 65%. The gate is unchanged: lowering it needs its own decision with evidence, not a parking note. Kalgara seed 1 (M5b-14) stays failing, documented, with its two options below for whoever resumes. STATUS "M5b … PICK UP HERE" lists the steps to finish.
+
 ## 2026-11-17 — M5b fix round 2 (M5b-14, M5b-15, M5b-16, nightly timeouts)
 
 Evidence: the first nightly (run 44074243109) at 64 and 40 games, plus local diagnosis. Warlord vs Pirate there was 123/200 (61.5%, interval 54.6 to 68.0%), below the 65% gate; **not addressed in this round by instruction, the gate is unchanged and stays red.**
