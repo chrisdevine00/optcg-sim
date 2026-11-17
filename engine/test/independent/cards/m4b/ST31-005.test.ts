@@ -132,7 +132,7 @@ describe('ST31-005 Thousand Sunny: [Activate: Main] rest this Stage: give up to 
   });
 
   // DISAGREEMENTS-b.md B-1: "up to 1 rested DON!!" - the engine forces a recipient and gives the DON!!.
-  it.fails('CR 8-4-4-1: "up to 1": giving no DON!! is allowed (the Stage is still rested)', () => {
+  it('CR 8-4-4-1: "up to 1": giving no DON!! is allowed (the Stage is still rested)', () => {
     const g = stageGame();
     activate(g, g.find('p1', 'stage', SUNNY));
     chooseNone(g);

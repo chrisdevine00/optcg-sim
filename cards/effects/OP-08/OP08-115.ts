@@ -28,19 +28,19 @@ export const OP08_115: CardScript = {
                 },
               },
             },
-          ],
-        },
-        {
-          do: {
-            play: {
-              what: {
-                from: 'hand',
-                owner: 'you',
-                filter: { name: 'Upper Yard' },
-                pick: { upTo: 1 },
+            {
+              do: {
+                play: {
+                  what: {
+                    from: 'hand',
+                    owner: 'you',
+                    filter: { name: 'Upper Yard' },
+                    pick: { upTo: 1 },
+                  },
+                },
               },
             },
-          },
+          ],
         },
       ],
     },
@@ -55,6 +55,6 @@ export const OP08_115: CardScript = {
     },
   ],
   rulings: [
-    'Reading: the "If your Leader ..." condition governs only the +3000; "Then, play" is not gated on it (docs/research/m4b-wave2/kalgara.md)',
+    'M4b-06: "Then, play" is gated by the "If" (QA-OP14 OP14-111/112, QA-OP15 OP15-116, CR 4-10-1, 8-3-3): a Leader that is not {Shandian Warrior} plays nothing',
   ],
 };

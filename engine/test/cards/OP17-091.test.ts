@@ -42,9 +42,7 @@ describe('OP17-091 Brook', () => {
   it('[On Play]: with an empty opponent hand nothing happens', () => {
     const g = setup([GIANT], []);
     play(g, 'OP17-091');
-    // The engine still asks the opponent (a choice of 0 cards), so an empty hand is not revealed.
-    expect(expectDecision(g, 'choose', 'p2').max).toBe(0);
-    g.act({ type: 'done' });
+    // M4b-05: nothing to trash and the hand size is public, so there is no decision (effect-dsl 4.11).
     expectDecision(g, 'main', 'p1');
   });
 

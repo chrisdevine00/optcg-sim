@@ -37,7 +37,8 @@ export const ST10_010: CardScript = {
                 trashFromHand: {
                   from: 'hand',
                   owner: 'opponent',
-                  chooser: 'opponent',
+                  chooser: 'you',
+                  blind: true,
                   pick: {
                     exactly: 2,
                   },
@@ -50,6 +51,6 @@ export const ST10_010: CardScript = {
     },
   ],
   rulings: [
-    'reading: the opponent chooses the 2 cards (E-Q5); the 7-card condition is checked on resolution, after the DON!! -1 is paid',
+    'QA-ST10 ST10-010 (E-Q5): the player who activated it chooses the 2 cards face-down (here: at random), not the opponent; the 7-card condition is checked on resolution, after the DON!! -1 is paid',
   ],
 };

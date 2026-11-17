@@ -396,6 +396,11 @@ function select(
   if (!secret) {
     if (cands.length === 0) return bind(f, sel, []);
     if (exact && cands.length <= n) return bind(f, sel, cands);
+  } else if (cands.length === 0 && !sel.filter && !o.restrict) {
+    // The whole zone is empty, and a hand or deck size is public: no decision to hide (effect-dsl
+    // 4.11: "with 0 candidates there is no decision"). With a filter an empty result stays asked,
+    // so the opponent cannot tell a hand with no match from one with a match (CR 8-4-4-2).
+    return bind(f, sel, []);
   }
   const max = Math.min(n, cands.length);
   const dec: Omit<DecisionState, 'purpose' | 'source'> = {
@@ -1048,8 +1053,10 @@ function donField(d: Draft, p: PlayerId): number {
 
 /**
  * "Give up to N rested DON!! cards to ...". The DON!! come from the cost area (rested or active as
- * the card says) and stay with the card until the next Refresh (CR 6-2-3). "Up to" gives as many as
- * the area holds (adding fewer is never asked, as for `addDon`). With `each`, every target in the
+ * the card says) and stay with the card until the next Refresh (CR 6-2-3). "Up to" allows any
+ * number from 0 to N (ST01-011 Q&A, QA-GR, CR 4-8-1), asked with decisions the app already draws:
+ * with more than one DON!! available a mode choice of the count (0 to N), then the target; with
+ * one, the target choice itself may end with `done` (give none). With `each`, every target in the
  * selector gets up to N; when there are fewer DON!! than targets the player picks which targets.
  */
 function giveDon(
@@ -1061,18 +1068,8 @@ function giveDon(
   const c = ctxOf(d, f);
   const key = g.state === 'rested' ? 'donRested' : 'donActive';
   const per = num(c, g.n);
-  let sel = g.to;
-  if (g.each) {
-    const targets = pool(c, g.to).length;
-    const fits = per > 0 ? Math.floor(d.ro(you)[key] / per) : 0;
-    sel = fits >= targets ? g.to : { ...g.to, pick: { upTo: Math.max(0, fits) } };
-  }
-  const ids = select(d, f, sel, { role: 'target', verb: 'give DON!! to' });
-  if (ids === WAIT) return WAIT;
-  for (const id of ids) {
-    if (d.card(id).zone !== 'leader' && d.card(id).zone !== 'characters') continue;
-    const k = Math.min(per, d.ro(you)[key]);
-    if (k <= 0) break;
+  const give = (id: InstanceId, k: number) => {
+    if (d.card(id).zone !== 'leader' && d.card(id).zone !== 'characters') return;
     d.pl(you)[key] -= k;
     d.wcard(id).don += k;
     d.emit({
@@ -1084,6 +1081,61 @@ function giveDon(
       rested: g.state === 'rested',
       by: 'effect',
     });
+  };
+  if (g.each) {
+    const targets = pool(c, g.to).length;
+    const fits = per > 0 ? Math.floor(d.ro(you)[key] / per) : 0;
+    const sel: Selector = fits >= targets ? g.to : { ...g.to, pick: { upTo: Math.max(0, fits) } };
+    const ids = select(d, f, sel, { role: 'target', verb: 'give DON!! to' });
+    if (ids === WAIT) return WAIT;
+    for (const id of ids) {
+      const k = Math.min(per, d.ro(you)[key]);
+      if (k <= 0) break;
+      give(id, k);
+    }
+    return 'next';
+  }
+  const avail = Math.min(per, d.ro(you)[key]);
+  const wanted = f.tmp?.give;
+  if (wanted === undefined && (avail <= 0 || pool(c, g.to).length === 0)) return 'next';
+  let count = wanted ?? 1;
+  if (wanted === undefined && avail > 1) {
+    const got = take(f);
+    if (!Array.isArray(got)) {
+      // Most first: the first legal pick (and the AI's default) gives all.
+      const counts = Array.from({ length: avail + 1 }, (_, i) => avail - i);
+      return ask(d, f, {
+        kind: 'choose',
+        player: you,
+        prompt: `${nameOf(d, f)}: how many ${g.state} DON!! cards will you give (up to ${avail})?`,
+        min: 1,
+        max: 1,
+        candidates: counts.map((i) => ({ option: String(i) })) as never,
+        picked: [],
+        role: 'mode',
+        options: counts.map((i) => ({
+          id: String(i),
+          label: i === 0 ? 'None' : `${i} DON!!`,
+        })),
+      });
+    }
+    count = Number((got[0] as { option: string }).option);
+    if (count <= 0) return 'next';
+    f.tmp = { ...f.tmp, give: count };
+  }
+  // With a count chosen the target is owed; with one DON!! the player may still give none.
+  const pk = g.to.pick;
+  const n = !pk ? 1 : 'exactly' in pk ? pk.exactly : 'upTo' in pk ? pk.upTo : 1;
+  const sel: Selector =
+    avail > 1 || wanted !== undefined
+      ? { ...g.to, pick: { exactly: n } }
+      : { ...g.to, pick: { upTo: n } };
+  const ids = select(d, f, sel, { role: 'target', verb: 'give DON!! to' });
+  if (ids === WAIT) return WAIT;
+  for (const id of ids) {
+    const k = Math.min(count, d.ro(you)[key]);
+    if (k <= 0) break;
+    give(id, k);
   }
   return 'next';
 }
@@ -1100,7 +1152,9 @@ function move(
     return unsupported(d, f, `move from the deck top to ${to.zone}`);
   if (zones.length === 1 && zones[0] === 'deckTop') {
     // "Add up to 1 card from the top of your deck to the top of your Life cards."
-    const g = take(f);
+    // Only "up to" / "may" is optional (CR 8-1-2): `exactly` (or no pick) adds the card (OP05-098).
+    const mandatory = !what.pick || 'exactly' in what.pick;
+    const g = mandatory ? true : take(f);
     const deck = d.ro(rel(ctxOf(d, f), what.owner === 'opponent' ? 'opponent' : 'you')).deck;
     if (deck.length === 0) return 'next';
     if (g === undefined)
@@ -1140,8 +1194,12 @@ function move(
     return 'next';
   }
   let ids: InstanceId[];
-  if (to.zone === 'deck' && to.position === 'topOrBottom' && f.tmp?.sel) {
-    ids = f.tmp.sel; // already chosen; waiting for the top or bottom answer
+  if (
+    to.zone === 'deck' &&
+    (to.position === 'topOrBottom' || to.position === 'bottom') &&
+    f.tmp?.sel
+  ) {
+    ids = f.tmp.sel; // already chosen; waiting for the top or bottom answer, or the order
   } else {
     const picked = select(d, f, what, {
       role: 'target',
@@ -1197,6 +1255,36 @@ function move(
     return unsupported(d, f, `move from ${zones.join('/')} to ${to.zone}`);
   const dest = to.zone as 'hand' | 'deck' | 'trash';
   const group = ids.length > 1 ? d.s.nextMod++ : undefined;
+  // Several cards of one player placed at the bottom of their deck "in any order" (OP06-058): the
+  // owner orders them (official OP06 Q&A), and the other player must not learn the order. The
+  // cards leave in a fixed order, so the events say nothing; each is slotted above the ones owed
+  // below it (`rank`). With cards of both players there is one each: nothing to order.
+  let ranks: Map<InstanceId, number> | undefined;
+  if (dest === 'deck' && to.position === 'bottom' && ids.length > 1) {
+    const owner = d.card(ids[0]!).owner;
+    if (ids.every((id) => d.card(id).owner === owner)) {
+      const order = [...(f.tmp?.order ?? [])];
+      const g = take(f);
+      if (typeof g === 'string') order.push(g);
+      const left = ids.filter((id) => !order.includes(id));
+      if (left.length >= 2) {
+        f.tmp = { ...f.tmp, sel: ids, order };
+        return ask(d, f, {
+          kind: 'order',
+          player: owner,
+          prompt: `${nameOf(d, f)}: choose the next card to place at the bottom of your deck (it ends up above the ones after it).`,
+          candidates: left.slice().sort(),
+          role: 'order',
+          options: left
+            .slice()
+            .sort()
+            .map((id) => ({ id, label: d.s.defs[d.card(id).card]!.name })),
+        });
+      }
+      order.push(...left);
+      ranks = new Map(order.map((id, i) => [id, i]));
+    }
+  }
   for (const id of ids.slice().reverse()) {
     if (!FIELD.has(d.card(id).zone)) continue;
     pushRemove(
@@ -1206,6 +1294,7 @@ function move(
       { kind: 'effect', by: you },
       dest === 'deck' ? (to.position === 'top' ? 'top' : 'bottom') : undefined,
       group,
+      ranks?.get(id),
     );
   }
   return 'next';
@@ -1257,6 +1346,15 @@ function lookAtTop(
     }
     const cands = look.filter((id) => !tk.filter || matches(c, id, tk.filter)).sort();
     const n = 'upTo' in tk.pick ? tk.pick.upTo : 'exactly' in tk.pick ? tk.pick.exactly : 1;
+    if (look.length === 0) {
+      // Nothing was looked at (the deck is empty, which is public): nothing to choose (M4b-05,
+      // effect-dsl 4.11). With cards looked at but none eligible the choice is still asked, with
+      // max 0 (the UI answers `done`): skipping it would tell the opponent the top cards hold no
+      // match (CR 8-4-4-2, ADR 0005).
+      tmp.take = (tmp.take ?? 0) + 1;
+      f.tmp = tmp;
+      continue;
+    }
     f.tmp = tmp;
     return ask(d, f, {
       kind: 'choose',

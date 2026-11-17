@@ -14,6 +14,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import type { PlayerSpec } from '@optcg/engine';
+import { donOf } from '../kit.ts';
 import {
   abilities,
   accept,
@@ -56,19 +57,21 @@ describe('OP15-032 Brook [On Play]: rest up to 1 of your opponent’s cards', ()
     expect(choiceCards(g)).toEqual([LB.opp, CH.marco, 'ST31-005'].sort());
   });
 
-  // DISAGREEMENTS-b.md B-2: with DON!! in the opponent's cost area the engine offers a DON!! class as a target.
-  it.fails(
-    '"cards" is not "DON!! cards" (other texts say "Characters or DON!! cards" when they mean both): no DON!! class is offered',
-    () => {
-      const g = myTurn(
-        side(LB.greenKid, F.green, { hand: [BROOK], costArea: { active: 6, rested: 0 } }),
-        side(LB.opp, F.red, { characters: [CH.marco], costArea: { active: 3, rested: 0 } }),
-      );
-      act(g, { type: 'playCard', card: g.find('p1', 'hand', BROOK) });
-      expect(choiceCards(g)).toEqual([LB.opp, CH.marco].sort());
-      expect(donChoices(g)).toEqual([]);
-    },
-  );
+  // DISAGREEMENTS-b.md B-2: the engine was right (review M4b-13, rewritten). "Rest up to 1 of your
+  // opponent's cards" may rest an opponent's DON!! card: the official Q&A for the Issho and Mihawk
+  // "Rest up to 1 of your opponent's cards" texts lists Leader, Character, Stage and DON!! cards.
+  it('"cards" includes DON!! cards (official Q&A): an active DON!! in the opponent cost area can be rested', () => {
+    const g = myTurn(
+      side(LB.greenKid, F.green, { hand: [BROOK], costArea: { active: 6, rested: 0 } }),
+      side(LB.opp, F.red, { characters: [CH.marco], costArea: { active: 3, rested: 0 } }),
+    );
+    act(g, { type: 'playCard', card: g.find('p1', 'hand', BROOK) });
+    expect(choiceCards(g)).toEqual([LB.opp, CH.marco].sort());
+    expect(donChoices(g).length).toBeGreaterThan(0);
+    drive(g, 'p1', { picks: [['DON']], don: 'costActive' });
+    expect(g.card(g.leader('p2')).rested).toBe(false);
+    expect(donOf(g, 'p2')).toMatchObject({ active: 2, rested: 1 });
+  });
 
   it('rest the Leader', () => {
     const g = playGame();

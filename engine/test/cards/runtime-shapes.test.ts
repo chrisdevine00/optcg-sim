@@ -63,7 +63,7 @@ describe('the runtime refuses a deck-top move it does not implement (M4a-07)', (
     );
     g.state = withAbilities(g.state, BLUE, [fromDeckTop({ zone: 'life', position: 'top' })]);
     g.act({ type: 'activate', card: g.find('p1', 'characters', BLUE), ability: 'probe' });
-    g.act({ type: 'optional', accept: true });
+    // No `pick`: the move is mandatory (CR 8-1-2), nothing is asked.
     expect(g.eventsOfType('Anomaly')).toEqual([]);
     expect(g.zone('p1', 'life')).toHaveLength(3);
   });

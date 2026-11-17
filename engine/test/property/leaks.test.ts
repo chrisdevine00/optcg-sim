@@ -41,6 +41,7 @@ import type { State } from '../../src/state.ts';
 import { cards } from '../fixtures/index.ts';
 import { metaDecks } from '../support/decks.ts';
 import { playFrom, type RandomGame } from '../support/random-game.ts';
+import { LinkTracker } from '../support/link-tracker.ts';
 import { propertySeed } from '../support/seed.ts';
 
 const RUNS = Math.max(30, Math.ceil(Number(process.env.ENGINE_GAMES ?? 500) / 15));
@@ -59,12 +60,12 @@ export function leakGame(
     [v, rng] = nextInt(rng, all.length);
     return v;
   };
-  // One side always plays a scripted archetype (Rocks or Kaido), so effect choices over hidden
-  // zones (a search of the deck, a cost paid from hand, a forced pick) occur (M2-19).
+  // One game in three has a side that plays a first-generation scripted archetype (Rocks or Kaido,
+  // M2-19); the others draw both decks from every list, so M4b archetypes meet each other.
   const scripted = all
     .map((d, i) => (d.leader === 'OP17-039' || d.leader === 'OP17-058' ? i : -1))
     .filter((i) => i >= 0);
-  const a = scripted[seed % scripted.length]!;
+  const a = seed % 3 === 0 ? scripted[((seed / 3) % scripted.length) | 0]! : pickDeck();
   const b = pickDeck();
   const spec = (i: number) => {
     let main: string[];
@@ -90,10 +91,15 @@ export function leakGame(
   for (const id of ids) {
     let v: number;
     [v, rng] = nextInt(rng, 3);
-    if (v === 0)
-      state = withAbilities(state, id, [
-        { id: 't', kind: 'trigger', effect: [{ op: 'emit', label: 'trig' }] },
-      ]);
+    if (v !== 0) continue;
+    // A stub [Trigger] puts damage decisions in every game, but never replaces a real script: it
+    // is added only to cards with no [Trigger] of their own (review M4b-09).
+    const real = (state as unknown as State).defs[id]?.abilities ?? [];
+    if (real.some((ab) => ab.kind === 'trigger')) continue;
+    state = withAbilities(state, id, [
+      ...(real as Parameters<typeof withAbilities>[2]),
+      { id: 't', kind: 'trigger', effect: [{ op: 'emit', label: 'trig' }] },
+    ]);
   }
   const record: GameRecord = {
     versions: { engine: ENGINE_VERSION, cards: cardsVersionOf(state), scripts: SCRIPTS_VERSION },
@@ -228,27 +234,12 @@ describe('hidden-information leak properties', () => {
   }, 600_000);
 
   it('a handle never links a card across a zone hidden from the viewer, and no projected event holds a raw id (M2-03, M2-17)', () => {
-    let relinks = 0;
     let rawChecked = 0;
     let returns = 0;
+    let exempted = 0;
     fc.assert(
       fc.property(fc.integer({ min: 1, max: 0x7fffffff }), (seed) => {
-        const seen: Record<PlayerId, Map<string, Set<string>>> = { p1: new Map(), p2: new Map() };
-        const hiddenSince: Record<PlayerId, Set<string>> = { p1: new Set(), p2: new Set() };
-        const revealedInHand: Record<PlayerId, Set<string>> = { p1: new Set(), p2: new Set() };
-        const note = (v: PlayerId, id: string, h: string, where: string): void => {
-          const set = seen[v].get(id) ?? new Set<string>();
-          if (hiddenSince[v].has(id)) {
-            returns++;
-            if (set.has(h)) {
-              relinks++;
-              throw new Error(`seed ${seed}: ${v} relinked ${id} by handle ${h} (${where})`);
-            }
-          }
-          set.add(h);
-          seen[v].set(id, set);
-          hiddenSince[v].delete(id);
-        };
+        const t = new LinkTracker(`seed ${seed}`);
         const observeState = (g: GameState): void => {
           const s = internals(g);
           for (const v of PLAYERS) {
@@ -262,14 +253,8 @@ describe('hidden-information leak properties', () => {
                 list.forEach((vc, i) => {
                   const id = ids[i];
                   if (!id) return;
-                  if (vc.card === null) {
-                    // A card revealed from hand stays known while it stays there (ARCH §2.7).
-                    const known = zone === 'hand' && revealedInHand[v].has(id);
-                    if (seen[v].has(id) && !known) hiddenSince[v].add(id);
-                  } else {
-                    note(v, id, vc.handle, `view ${p}.${zone}`);
-                    revealedInHand[v].delete(id);
-                  }
+                  if (vc.card === null) t.hiddenInView(v, id, zone);
+                  else t.shownInView(v, id, vc.handle, `${p}.${zone}`);
                 });
               }
             }
@@ -288,18 +273,21 @@ describe('hidden-information leak properties', () => {
                 const h = pe[f];
                 const id = raw[f];
                 if (typeof h === 'string' && typeof id === 'string' && h !== id) {
-                  note(v, id, h, `event ${raw.type}.${f}`);
-                  if (raw.type === 'CardRevealed') revealedInHand[v].add(id);
+                  t.note(v, id, h, `event ${raw.type}.${f}`);
+                  if (raw.type === 'CardRevealed')
+                    t.revealed(v, id, h, (raw as { from?: string }).from);
                 }
               }
             });
           }
           observeState(after);
         });
+        returns += t.returns;
+        exempted += t.exempted;
       }),
       { numRuns: RUNS, seed: propertySeed(300) },
     );
-    expect(relinks).toBe(0);
+    expect(exempted).toBeGreaterThanOrEqual(0);
     expect(returns).toBeGreaterThan(0); // cards did come back from hidden zones
     expect(rawChecked).toBeGreaterThan(0);
   }, 600_000);

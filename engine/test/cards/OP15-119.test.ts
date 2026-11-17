@@ -1,7 +1,7 @@
 /** OP15-119 Monkey.D.Luffy: Rush with 6+ DON!!; reveals a Life card when the opponent activates an Event or [Blocker]. */
 import { describe, expect, it } from 'vitest';
 import { withAbilities, withKeywords } from '../../src/testing.ts';
-import { BLUE, expectDecision, game, PLAIN_BLUE, V } from './helpers.ts';
+import { accept, BLUE, decline, expectDecision, game, PLAIN_BLUE, V } from './helpers.ts';
 import { KAL } from './helpers-kalgara.ts';
 
 const LUFFY = 'OP15-119';
@@ -58,6 +58,7 @@ describe('OP15-119 Monkey.D.Luffy', () => {
     it('when the opponent activates an Event: +1000 per cost of the revealed Life card, until the end of the turn', () => {
       const g = eventGame([V.c5, V.c1, V.c1]);
       g.act({ type: 'playCard', card: g.find('p2', 'hand', EVENT) });
+      accept(g);
       expect(g.power(g.find('p1', 'characters', LUFFY))).toBe(7000 + 5000);
       const e = g.eventsOfType('CardRevealed').find((x) => x.from === 'life');
       expect(e?.card).toBe(V.c5);
@@ -68,6 +69,7 @@ describe('OP15-119 Monkey.D.Luffy', () => {
     it("works on the opponent's turn and the boost ends with that turn", () => {
       const g = eventGame([V.c3, V.c1, V.c1]);
       g.act({ type: 'playCard', card: g.find('p2', 'hand', EVENT) });
+      accept(g);
       expect(g.power(g.find('p1', 'characters', LUFFY))).toBe(10000);
       g.act({ type: 'endTurn' });
       expect(g.power(g.find('p1', 'characters', LUFFY))).toBe(7000);
@@ -100,10 +102,20 @@ describe('OP15-119 Monkey.D.Luffy', () => {
       g.act({ type: 'attack', attacker: g.leader('p1'), target: g.leader('p2') });
       expectDecision(g, 'block', 'p2');
       g.act({ type: 'block', blocker: g.find('p2', 'characters', BLUE) });
+      accept(g);
       expect(g.power(g.find('p1', 'characters', LUFFY))).toBe(7000 + 4000);
     });
 
-    it('with no Life cards nothing is revealed and the power does not change', () => {
+    it('M4b-07: "reveal up to 1" may be declined: nothing is revealed and Luffy is not boosted', () => {
+      const g = eventGame([V.c5, V.c1, V.c1]);
+      g.act({ type: 'playCard', card: g.find('p2', 'hand', EVENT) });
+      expectDecision(g, 'optional', 'p1');
+      decline(g);
+      expect(g.power(g.find('p1', 'characters', LUFFY))).toBe(7000);
+      expect(g.eventsOfType('CardRevealed').some((x) => x.from === 'life')).toBe(false);
+    });
+
+    it('with no Life cards nothing is offered, nothing is revealed and the power does not change', () => {
       const g = eventGame([]);
       g.act({ type: 'playCard', card: g.find('p2', 'hand', EVENT) });
       expect(g.power(g.find('p1', 'characters', LUFFY))).toBe(7000);

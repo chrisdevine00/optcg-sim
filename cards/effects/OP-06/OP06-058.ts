@@ -70,6 +70,6 @@ export const OP06_058: CardScript = {
     },
   ],
   rulings: [
-    'DECISIONS 2026-11-16: cards placed at a deck bottom "in any order" go in the order picked (no order decision)',
+    "M4b-08 (QA-OP06): when two of one player's Characters are placed, their owner decides the order (an `order` decision), and the other player cannot learn it",
   ],
 };

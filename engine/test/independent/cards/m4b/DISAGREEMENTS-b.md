@@ -41,3 +41,8 @@ engine.
   engine's reading is defensible. If a Q&A for OP15-032 exists, it settles this.
 - **Related, not tested:** OP15-035 Laboon's "rest 2 of your cards" may be paid with DON!! under the
   same reading. The Laboon tests keep every DON!! rested so they hold under either reading.
+
+## Rulings (M4b review, 2026-11-16; fixed in M4b fix round 1)
+
+- **B-1: the independent test was right** (same as A-2). Test flipped.
+- **B-2: the engine was right.** The official Issho and Mihawk Q&A: "Rest up to 1 of your opponent's cards" may rest the opponent's Leader, Character, Stage or DON!! card. The `it.fails` test was rewritten to assert that an active DON!! in the opponent's cost area is offered and can be rested.

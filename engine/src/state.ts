@@ -254,6 +254,13 @@ export type Frame =
       considered: string[];
       /** Removals made by one effect share a group: one replacement answers for all it covers. */
       group?: number;
+      /**
+       * Cards of one group going to a deck bottom in an order the owner chose (OP06-058): this
+       * card's place in it (0 = placed first, so above the rest), and the ranks of the group
+       * already placed. Cards move in a fixed order so the events leak nothing of the choice.
+       */
+      rank?: number;
+      placed?: number[];
     }
   | { f: 'loop' };
 
@@ -271,6 +278,8 @@ export interface Scratch {
   take?: number;
   order?: InstanceId[];
   top?: boolean;
+  /** `giveDon`: how many DON!! the player chose to give ("up to N" allows 0). */
+  give?: number;
 }
 
 /** An auto effect that has activated and waits to resolve (CR 8-6). */

@@ -1,9 +1,8 @@
 /** OP05-098 Enel (Leader). RL-42, QA-OP05 OP05-098 (four rows), QA-OP11 OP11-102. */
 import { describe, expect, it } from 'vitest';
 import {
-  accept,
   BLUE,
-  decline,
+  dec,
   endCounter,
   expectDecision,
   game,
@@ -37,7 +36,7 @@ describe('OP05-098 Enel', () => {
     hit(g, V.c7);
     // The damage put the Life card in hand; then Enel's effect.
     expect(hand(g, 'p1').sort()).toEqual([BLUE, PURPLE, V.c1].sort());
-    accept(g); // add the top card of the deck to Life
+    // Mandatory (CR 8-1-2): no "use this effect?" question, the card is added.
     expect(g.life('p1')).toBe(1);
     expect(ids(g, 'p1', 'life')).toEqual([PURPLE]);
     expectDecision(g, 'choose', 'p1');
@@ -47,11 +46,12 @@ describe('OP05-098 Enel', () => {
     expectDecision(g, 'main', 'p2');
   });
 
-  it('"Then": the hand card is trashed even if you decline to add the Life card', () => {
+  it('M4b-01: the add is mandatory (no "may"): it is not offered as optional, and the discard follows', () => {
     const g = position([BLUE], [V.c1]);
     hit(g, V.c7);
-    decline(g);
-    expect(g.life('p1')).toBe(0);
+    expect(dec(g)?.kind).not.toBe('optional');
+    expect(g.life('p1')).toBe(1);
+    expectDecision(g, 'choose', 'p1');
     pick(g, [g.find('p1', 'hand', V.c1)]);
     expect(ids(g, 'p1', 'trash')).toEqual([V.c1]);
   });
@@ -59,7 +59,6 @@ describe('OP05-098 Enel', () => {
   it('Once Per Turn: the second time Life reaches 0 in a turn nothing happens', () => {
     const g = position([BLUE], [PURPLE]);
     hit(g, V.c7);
-    accept(g);
     pick(g, [g.find('p1', 'hand', PURPLE)]);
     expect(g.life('p1')).toBe(1);
     // The next hit takes the new Life card: Life is 0 again, but the ability was used this turn.
@@ -81,7 +80,6 @@ describe('OP05-098 Enel', () => {
     expectDecision(g, 'trigger', 'p1');
     g.act({ type: 'trigger', activate: false });
     expect(hand(g, 'p1').sort()).toEqual([TRIG, V.c1].sort());
-    accept(g);
     expect(g.life('p1')).toBe(1);
     pick(g, [g.find('p1', 'hand', V.c1)]);
     expect(g.life('p1')).toBe(1);
@@ -91,7 +89,6 @@ describe('OP05-098 Enel', () => {
     const g = position([PURPLE], []);
     hit(g, V.c7);
     // The Life card is in hand now, so Enel's trash has a card to take: take it back out.
-    accept(g);
     expect(g.life('p1')).toBe(1);
     expectDecision(g, 'choose', 'p1');
     pick(g, [g.find('p1', 'hand', PURPLE)]);

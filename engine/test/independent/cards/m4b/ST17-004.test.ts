@@ -117,7 +117,7 @@ describe('ST17-004 Boa Hancock [On Play]: then give up to 1 rested DON!! to a Se
 
   // DISAGREEMENTS-d.md, entry 2: "up to 1 rested DON!!" allows giving none (CR 8-4-4-1); the engine
   // forces a target pick, so no outcome leaves every card without DON!!.
-  it.fails('CR 8-4-4-1: "up to 1" allows giving no DON!! at all', () => {
+  it('CR 8-4-4-1: "up to 1" allows giving no DON!! at all', () => {
     const g = game();
     playFromHand(g, HAN);
     const ends = outcomes(g, 'p1', (x) => `${holders(x)}|${x.card(x.leader('p1')).don}`, 14);

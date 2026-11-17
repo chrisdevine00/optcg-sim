@@ -103,20 +103,17 @@ describe('OP08-115 The Earth Will Not Lose!: [Counter] +3000 if Shandian Warrior
     expect(g.power(g.leader('p1'))).toBe(5000);
   });
 
-  // DISAGREEMENTS-a.md A-4: the engine still offers and plays [Upper Yard] after the failed "If".
-  it.fails(
-    'CR 8-3-3: a Leader without {Shandian Warrior}: the "Then, play [Upper Yard]" does not resolve either',
-    () => {
-      const g = counterStep(YL.sky, [UY]);
-      if (canCounterWith(g, g.find('p1', 'hand', EVENT))) {
-        useCounter(g, g.find('p1', 'hand', EVENT), g.leader('p1'));
-        chooseIfAsked(g, [g.leader('p1')]);
-        settleYes(g, 'p1');
-      }
-      expect(stage(g)).toEqual([]);
-      expect(hand(g)).toContain(UY);
-    },
-  );
+  // DISAGREEMENTS-a.md A-4 (fixed in M4b fix round 1): "Then" is gated by the failed "If".
+  it('CR 8-3-3: a Leader without {Shandian Warrior}: the "Then, play [Upper Yard]" does not resolve either', () => {
+    const g = counterStep(YL.sky, [UY]);
+    if (canCounterWith(g, g.find('p1', 'hand', EVENT))) {
+      useCounter(g, g.find('p1', 'hand', EVENT), g.leader('p1'));
+      chooseIfAsked(g, [g.leader('p1')]);
+      settleYes(g, 'p1');
+    }
+    expect(stage(g)).toEqual([]);
+    expect(hand(g)).toContain(UY);
+  });
 
   it('no [Upper Yard] in hand: the +3000 still applies and nothing is played', () => {
     const g = counterStep(YL.shandian, [SC.bobbin]);

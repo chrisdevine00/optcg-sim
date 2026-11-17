@@ -120,38 +120,33 @@ describe("OP17-095 Zoro: replacement for removal by the opponent's effect", () =
     expect(ids(g, 'p1', 'trash')).toHaveLength(4);
   });
 
-  // DISAGREEMENTS-c.md D-2: the engine asks once for a two-Character K.O. and one payment saves both.
-  it.fails(
-    'one effect removing two Characters with only 3 cards in the trash: after the first replacement the second is impossible (CR 8-1-3-4-5)',
-    () => {
-      const g = game([V.sai, V.marco, V.hajrudin]);
-      playCard(g, 'p2', C.elbaphEvent);
-      drive(g, 'p2', {
-        targets: [g.find('p1', 'characters', V.sunny), g.find('p1', 'characters', ID)],
-        don: 'costActive',
-      });
-      drive(g, 'p1', { accept: true });
-      // Exactly one of the two stays (its removal was replaced); the other could not be.
-      expect(ids(g, 'p1', 'characters')).toHaveLength(1);
-      expect(ids(g, 'p1', 'trash')).toHaveLength(1);
-      expect(deckCards(g, 'p1')).toHaveLength(18);
-    },
-  );
+  // DISAGREEMENTS-c.md D-2: the engine was right (review M4b-13, rewritten). One payment (the
+  // 3 cards placed at the bottom of the deck) covers every Character the one effect removes:
+  // OP17-095's own Q&A ("place 3 cards ... and if you do, neither Character leaves the field"),
+  // like OP15-035 and OP17-021.
+  it('one effect removing two Characters, 3 cards in the trash: one payment saves both (OP17-095 Q&A)', () => {
+    const g = game([V.sai, V.marco, V.hajrudin]);
+    playCard(g, 'p2', C.elbaphEvent);
+    drive(g, 'p2', {
+      targets: [g.find('p1', 'characters', V.sunny), g.find('p1', 'characters', ID)],
+      don: 'costActive',
+    });
+    drive(g, 'p1', { accept: true });
+    expect(ids(g, 'p1', 'characters')).toHaveLength(2);
+    expect(ids(g, 'p1', 'trash')).toHaveLength(0);
+    expect(deckCards(g, 'p1')).toHaveLength(18);
+  });
 
-  // DISAGREEMENTS-c.md D-2
-  it.fails(
-    'each Character is its own removal: with 6 cards in the trash both can be saved, paying 3 each',
-    () => {
-      const g = game([V.sai, V.marco, V.hajrudin, V.kingdew, V.thatch, V.littleOars]);
-      playCard(g, 'p2', C.elbaphEvent);
-      drive(g, 'p2', {
-        targets: [g.find('p1', 'characters', V.sunny), g.find('p1', 'characters', ID)],
-        don: 'costActive',
-      });
-      drive(g, 'p1', { accept: true });
-      expect(ids(g, 'p1', 'characters')).toHaveLength(2);
-      expect(ids(g, 'p1', 'trash')).toHaveLength(0);
-      expect(deckCards(g, 'p1')).toHaveLength(21);
-    },
-  );
+  it('one payment of 3 saves both even when the trash holds 6: the other 3 stay in the trash', () => {
+    const g = game([V.sai, V.marco, V.hajrudin, V.kingdew, V.thatch, V.littleOars]);
+    playCard(g, 'p2', C.elbaphEvent);
+    drive(g, 'p2', {
+      targets: [g.find('p1', 'characters', V.sunny), g.find('p1', 'characters', ID)],
+      don: 'costActive',
+    });
+    drive(g, 'p1', { accept: true });
+    expect(ids(g, 'p1', 'characters')).toHaveLength(2);
+    expect(ids(g, 'p1', 'trash')).toHaveLength(3);
+    expect(deckCards(g, 'p1')).toHaveLength(18);
+  });
 });

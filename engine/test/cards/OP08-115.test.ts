@@ -58,7 +58,7 @@ describe('OP08-115 The Earth Will Not Lose!', () => {
     expect(g.power(g.find('p1', 'characters', V.c1))).toBe(6000);
   });
 
-  it('without a {Shandian Warrior} Leader there is no +3000, but [Upper Yard] is still played', () => {
+  it('M4b-06: without a {Shandian Warrior} Leader the "If" fails: no +3000 and, as "Then" is gated, no [Upper Yard] either (QA-OP14 OP14-111, QA-OP15 OP15-116)', () => {
     const g = game(
       { leader: PLAIN_PURPLE, hand: [EARTH, UPPER_YARD], costArea: { active: 2, rested: 0 } },
       { leader: PLAIN_BLUE, characters: [V.c7] },
@@ -67,10 +67,10 @@ describe('OP08-115 The Earth Will Not Lose!', () => {
     g.act({ type: 'attack', attacker: g.find('p2', 'characters', V.c7), target: g.leader('p1') });
     g.act({ type: 'block', blocker: null });
     g.act({ type: 'activate', card: g.find('p1', 'hand', EARTH), ability: 'counter' });
-    expectDecision(g, 'choose', 'p1'); // the Stage pick only; the power target is not asked
-    pick(g, [g.find('p1', 'hand', UPPER_YARD)]);
+    expectDecision(g, 'counter', 'p1'); // nothing asked: neither step resolves
     expect(g.power(g.leader('p1'))).toBe(5000);
-    expect(g.zone('p1', 'stage').map((c) => c.card)).toEqual([UPPER_YARD]);
+    expect(g.zone('p1', 'stage')).toEqual([]);
+    expect(g.zone('p1', 'hand').map((c) => c.card)).toContain(UPPER_YARD);
   });
 
   it('[Trigger] draws 2 cards and trashes 1 card from your hand', () => {

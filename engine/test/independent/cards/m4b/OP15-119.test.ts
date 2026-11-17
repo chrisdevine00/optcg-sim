@@ -121,8 +121,8 @@ describe('OP15-119 Monkey.D.Luffy: when the opponent activates an Event or [Bloc
     expect(luffyPower(g)).toBe(7000);
   });
 
-  // DISAGREEMENTS-a.md A-3: the engine reveals automatically; "up to 1" cannot be taken as 0.
-  it.fails('CR 8-4-4-1: "reveal up to 1": revealing none leaves Luffy unboosted', () => {
+  // DISAGREEMENTS-a.md A-3 (fixed in M4b fix round 1): the reveal is optional.
+  it('CR 8-4-4-1: "reveal up to 1": revealing none leaves Luffy unboosted', () => {
     const g = attacking([VAN.hajrudin, RED, RED, RED]);
     act(g, { type: 'block', blocker: g.find('p2', 'characters', SC.blocker) });
     settleNo(g, 'p1');

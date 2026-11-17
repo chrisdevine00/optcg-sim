@@ -25,6 +25,9 @@ export const OP15_119: CardScript = {
         { event: 'eventActivated', by: 'opponent' },
         { event: 'blockerActivated', by: 'opponent' },
       ],
+      // "Reveal up to 1": the player may reveal none (M4b-07, CR 4-8-1), asked before the reveal.
+      optional: true,
+      conditions: [{ cmp: [{ life: 'you' }, '>=', 1] }],
       effect: [
         { do: { reveal: { from: 'lifeTop', n: 1, bind: 'revealed' } } },
         {
@@ -41,6 +44,7 @@ export const OP15_119: CardScript = {
   ],
   rulings: [
     'No [Your Turn] on the text: the trigger works on either turn; the power lasts until the end of that turn',
+    'M4b-07: "up to 1" may be 0: the activation is optional (CR 4-8-1, QA-GR); with no Life card it is not offered',
     'The revealed Life card stays where it is, face-down again; a card with no cost value counts as 0',
   ],
 };

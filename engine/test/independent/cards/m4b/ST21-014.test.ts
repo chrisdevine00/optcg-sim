@@ -102,7 +102,7 @@ describe('ST21-014 [When Attacking]: give up to 1 rested DON!! to your Leader or
   });
 
   // DISAGREEMENTS-b.md B-1: "up to 1 rested DON!!" - the engine forces a recipient and gives the DON!!.
-  it.fails('CR 8-4-4-1: "up to 1": giving nothing is allowed', () => {
+  it('CR 8-4-4-1: "up to 1": giving nothing is allowed', () => {
     const g = game();
     attackAndDrive(g, [[]]);
     expect(donOf(g, 'p1')).toMatchObject({ rested: 2, given: 0 });

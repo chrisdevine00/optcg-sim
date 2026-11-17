@@ -16,6 +16,7 @@ import {
   game,
   none,
   passBlock,
+  option,
   pick,
   PLAIN_BLUE,
   PLAIN_PURPLE,
@@ -192,6 +193,7 @@ describe('cost, playCost and giveDon', () => {
       ]),
     ]);
     run(g);
+    option(g, '2');
     pick(g, [g.leader('p1')]);
     expect(g.card(g.leader('p1')).don).toBe(2);
     expect(project(g.state, 'p1').don.p1.rested).toBe(1);

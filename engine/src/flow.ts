@@ -673,10 +673,12 @@ export function pushRemove(
   cause: Cause,
   position?: 'top' | 'bottom',
   group?: number,
+  rank?: number,
 ): void {
   const f: Frame = { f: 'remove', card, dest, cause, considered: [] };
   if (position) f.position = position;
   if (group !== undefined) f.group = group;
+  if (rank !== undefined) f.rank = rank;
   push(d, f);
 }
 
@@ -769,7 +771,18 @@ function runRemove(d: Draft, f: Extract<Frame, { f: 'remove' }>): void {
     return;
   }
   if (offerReplacement(d, f, 'remove')) return;
-  leaveField(d, f.card, f.dest, f.cause, f.position ? { position: f.position } : {});
+  const opts: { position?: 'top' | 'bottom'; above?: number } = f.position
+    ? { position: f.position }
+    : {};
+  if (f.rank !== undefined && f.position === 'bottom')
+    opts.above = (f.placed ?? []).filter((r) => r > f.rank!).length;
+  leaveField(d, f.card, f.dest, f.cause, opts);
+  if (f.rank !== undefined && f.group !== undefined) {
+    // Tell the rest of the group where this one went, so each lands above the ones owed below it.
+    for (const o of d.stack())
+      if (o.f === 'remove' && o !== f && o.group === f.group)
+        o.placed = [...(o.placed ?? []), f.rank];
+  }
   pop(d);
 }
 

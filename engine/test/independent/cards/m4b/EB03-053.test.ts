@@ -88,7 +88,7 @@ describe('EB03-053 Nami: [On Play] give a rested DON!! to the Leader, then take 
   });
 
   // DISAGREEMENTS-a.md A-2 (same shape): "up to 1 rested DON!!" cannot be given as 0.
-  it.fails('CR 8-4-4-1: "up to 1" rested DON!!: may give none', () => {
+  it('CR 8-4-4-1: "up to 1" rested DON!!: may give none', () => {
     const g = played();
     const reached = outcomes(g, 'p1', (b) => `${don(b).given}`);
     expect(reached.has('0')).toBe(true);

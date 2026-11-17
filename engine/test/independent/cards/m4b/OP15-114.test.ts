@@ -182,7 +182,7 @@ describe('OP15-114 Wyper: [Activate: Main] [Once Per Turn] give up to 1 rested D
   });
 
   // DISAGREEMENTS-a.md A-2: the engine insists on a recipient and gives the DON!!.
-  it.fails('CR 8-4-4-1: "up to 1" rested DON!!: may give nothing', () => {
+  it('CR 8-4-4-1: "up to 1" rested DON!!: may give nothing', () => {
     const g = board();
     activate(g, g.find('p1', 'characters', 'OP15-114'));
     const reached = outcomes(g, 'p1', (b) => String(don(b).given));

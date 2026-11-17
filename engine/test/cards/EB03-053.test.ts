@@ -21,6 +21,7 @@ describe('EB03-053 Nami', () => {
       { leader: PLAIN_BLUE, life: [V.c2, PURPLE, PURPLE] },
     );
     play(g, 'EB03-053');
+    pick(g, [g.leader('p1')]); // "up to 1" DON!!: the Leader is the only target
     // "up to 1" life card: accept.
     accept(g);
     expect(g.card(g.leader('p1')).don).toBe(1);
@@ -35,6 +36,7 @@ describe('EB03-053 Nami', () => {
       { leader: PLAIN_BLUE, life: [PURPLE, PURPLE] },
     );
     play(g, 'EB03-053');
+    pick(g, [g.leader('p1')]); // "up to 1" DON!!: the Leader is the only target
     expect(g.card(g.leader('p1')).don).toBe(1);
     expect(g.life('p2')).toBe(2);
     expectDecision(g, 'main', 'p1');
@@ -46,6 +48,7 @@ describe('EB03-053 Nami', () => {
       { leader: PLAIN_BLUE, life: [PURPLE, PURPLE, PURPLE] },
     );
     play(g, 'EB03-053');
+    pick(g, [g.leader('p1')]); // "up to 1" DON!!: the Leader is the only target
     // The 5 DON!! paid for Nami are rested and given to the Leader.
     accept(g);
     expect(g.life('p2')).toBe(2);
@@ -57,6 +60,7 @@ describe('EB03-053 Nami', () => {
       { leader: PLAIN_BLUE, life: [PURPLE, PURPLE, PURPLE] },
     );
     play(g, 'EB03-053');
+    pick(g, [g.leader('p1')]); // "up to 1" DON!!: the Leader is the only target
     decline(g);
     expect(g.life('p2')).toBe(3);
   });

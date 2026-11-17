@@ -8,7 +8,6 @@ import {
   expectDecision,
   game,
   hand,
-  none,
   payDon,
   pick,
   play,
@@ -67,8 +66,7 @@ describe('OP17-106 Charlotte Smoothie', () => {
     accept(g);
     payDon(g);
     accept(g);
-    expectDecision(g, 'choose', 'p2'); // "trash 0 cards": nothing to choose
-    none(g);
+    // M4b-05: the opponent's hand is empty (public), so no "trash 0 cards" decision is asked.
     expect(g.life('p1')).toBe(4);
     expectDecision(g, 'main', 'p1');
   });

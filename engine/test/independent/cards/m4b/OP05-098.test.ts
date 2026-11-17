@@ -78,14 +78,11 @@ describe('OP05-098 Enel: when your Life becomes 0 on the opponent’s turn, add 
   });
 
   // DISAGREEMENTS-a.md A-1: the engine asks "use this effect?" and lets p1 decline.
-  it.fails(
-    'CR 8-3-1-4: the effect has no "you may", so it is mandatory: p1 is not asked whether to use it',
-    () => {
-      const g = game([RED], [VAN.marco, VAN.sai]);
-      hit(g);
-      expect(kind(g)).not.toBe('optional');
-    },
-  );
+  it('CR 8-3-1-4: the effect has no "you may", so it is mandatory: p1 is not asked whether to use it', () => {
+    const g = game([RED], [VAN.marco, VAN.sai]);
+    hit(g);
+    expect(kind(g)).not.toBe('optional');
+  });
 
   it('with an otherwise empty hand, the only card (the one just taken from Life) is trashed', () => {
     const g = game([RED], []);

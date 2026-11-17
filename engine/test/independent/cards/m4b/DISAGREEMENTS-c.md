@@ -60,3 +60,8 @@ observed engine behaviour.
 - **OP15-088 / any "trash 3 from the top of your deck" cost:** paying it with exactly 3 cards left
   empties the deck and loses the game at once (CR 9-2-1-2). The engine agrees; the test
   documents it.
+
+## Rulings (M4b review, 2026-11-16; fixed in M4b fix round 1)
+
+- **D-1 (count): the independent tests were right** (same as A-2). OP15-058 asks 0 to 4, ST01-011 0 to 2. Tests flipped.
+- **D-2: the engine was right.** OP17-095's own Q&A ("place 3 cards ... and if you do, neither Character leaves the field"; likewise OP15-035 and OP17-021): one payment covers every Character the one effect removes. The two `it.fails` tests were rewritten to assert it.

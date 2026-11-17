@@ -54,3 +54,10 @@ script and drop `it.fails`, or change the test and delete the entry. Probed agai
   tests here assert the skip and pass. So the three scripts are inconsistent with one another.
 - **Confidence:** medium. Each card text has two sentences ("If ..., A. Then, B."), so the CR 8-3-3
   reading is open to doubt; but whichever reading is right, the three cards should agree.
+
+## Rulings (M4b review, 2026-11-16; fixed in M4b fix round 1)
+
+- **A-1: the independent test was right.** CR 8-1-2: only "may" and "can" are optional. OP05-098 is scripted `exactly: 1` and the deck-top to Life move honours mandatory picks. Test flipped.
+- **A-2: the independent test was right.** ST01-011 Q&A, QA-GR and CR 4-8-1: "up to N" DON!! may be given as any number from 0 to N. `giveDon` asks the count. Test flipped.
+- **A-3: the independent test was right.** CR 4-8-1: OP15-119's reveal is optional. The activation is asked before the reveal. Test flipped.
+- **A-4: the independent test was right.** A "Then" after a failed "If" does not resolve (official OP14-111, OP14-112, OP15-116 Q&As; CR 4-10-1, 8-3-3). OP08-115's play is inside the guard. Test flipped.

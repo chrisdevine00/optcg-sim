@@ -55,8 +55,8 @@ describe('ST01-011 Brook: [On Play] give up to 2 rested DON!! to your Leader or 
     for (const o of donChoices(g)) expect(o.from).not.toBe('costActive');
   });
 
-  // DISAGREEMENTS-c.md D-1: the engine always gives the maximum and always asks for a recipient.
-  it.fails('"up to 2": giving only 1 (or 0) DON!! is a legal choice (CR 8-4-4-1)', () => {
+  // DISAGREEMENTS-c.md D-1 (fixed in M4b fix round 1): the number given is the player's choice.
+  it('"up to 2": giving only 1 (or 0) DON!! is a legal choice (CR 8-4-4-1)', () => {
     const g = game(2, 2);
     playCard(g, 'p1', ID);
     const reached = outcomes(g, 'p1', (x) => String(donOf(x, 'p1').given));
@@ -77,6 +77,8 @@ describe('ST01-011 Brook: [On Play] give up to 2 rested DON!! to your Leader or 
     const g = game(2, 2);
     playCard(g, 'p1', ID);
     expect(kind(g)).toBe('choose');
+    g.act({ type: 'pick', choice: { option: '2' } }); // how many to give; then to whom
+    expect(kind(g)).toBe('choose');
     const names = offeredCards(g);
     const leaderOffered = g.legal().some((a) => a.type === 'pick' && a.choice === g.leader('p1'));
     expect(leaderOffered).toBe(true);
@@ -84,7 +86,7 @@ describe('ST01-011 Brook: [On Play] give up to 2 rested DON!! to your Leader or 
   });
 
   // DISAGREEMENTS-c.md D-1
-  it.fails('"up to 2": giving none at all is a legal choice (CR 8-4-4-1)', () => {
+  it('"up to 2": giving none at all is a legal choice (CR 8-4-4-1)', () => {
     const g = game(2, 2);
     playCard(g, 'p1', ID);
     const reached = outcomes(g, 'p1', (x) => String(donOf(x, 'p1').given));

@@ -33,7 +33,7 @@ export const OP05_098: CardScript = {
                 from: 'deckTop',
                 owner: 'you',
                 pick: {
-                  upTo: 1,
+                  exactly: 1,
                 },
               },
               to: {

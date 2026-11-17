@@ -99,7 +99,7 @@ describe('OP14-114 Ran [Activate: Main]: give up to 1 rested DON!! to a Kuja Pir
   });
 
   // DISAGREEMENTS-d.md, entry 2: "up to 1" allows giving no DON!! (CR 8-4-4-1).
-  it.fails('CR 8-4-4-1: "up to 1" allows giving no DON!! even with rested DON!! available', () => {
+  it('CR 8-4-4-1: "up to 1" allows giving no DON!! even with rested DON!! available', () => {
     const g = game(LD.kuja);
     activate(g, g.find('p1', 'characters', RAN));
     expect(g.legal().some((a) => a.type === 'done')).toBe(true);

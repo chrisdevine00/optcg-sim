@@ -836,8 +836,12 @@ function moveShape(c: Ctx, path: string, what: unknown, to: unknown): void {
     if (zones.length !== 1 || dz !== 'life' || pos !== 'top')
       return err(c, path, 'a move from the deck top is implemented only to the top of Life');
     const pk = what.pick as Record<string, unknown> | undefined;
-    if (!pk || pk.upTo !== 1)
-      err(c, `${path}.what.pick`, 'a move from the deck top needs { upTo: 1 }');
+    if (!pk || (pk.upTo !== 1 && pk.exactly !== 1))
+      err(
+        c,
+        `${path}.what.pick`,
+        'a move from the deck top needs { upTo: 1 } or { exactly: 1 } (exactly: mandatory, CR 8-1-2)',
+      );
     return;
   }
   if (zones.includes('lifeTop')) {

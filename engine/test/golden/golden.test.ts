@@ -6,6 +6,10 @@
  * engine change, or a new SCRIPTS_VERSION (added or changed effect scripts; random meta games run
  * them). With both versions unchanged, a different result is refused. Bump ENGINE_VERSION, then run
  *   UPDATE_GOLDEN=1 npx vitest run engine/test/golden && npx prettier --write engine/test/golden
+ *
+ * Known gap (review M4b-17): the guard accepts any SCRIPTS_VERSION change, so an engine change that
+ * lands together with a script change can be re-recorded without an ENGINE_VERSION bump. Bump
+ * ENGINE_VERSION by hand for every engine behaviour change, whatever else changed.
  */
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';

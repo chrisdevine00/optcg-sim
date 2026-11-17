@@ -9,7 +9,6 @@ import {
   game,
   hand,
   payDon,
-  pick,
   play,
   PLAIN_PURPLE,
   PURPLE,
@@ -32,22 +31,16 @@ describe('ST10-010 Trafalgar Law', () => {
     expect(g.card(g.find('p1', 'characters', 'ST10-010')).keywords).toContain('Blocker');
   });
 
-  it("[On Play] DON!! -1: with 7 or more cards in the opponent's hand, the opponent trashes 2 cards of their choice", () => {
+  it("[On Play] DON!! -1: with 7 or more cards in the opponent's hand, 2 are trashed face-down by the activating player (M4b-02, QA-ST10)", () => {
     const g = start(7);
     play(g, 'ST10-010');
     accept(g);
     payDon(g);
-    const d = expectDecision(g, 'choose', 'p2');
-    expect(d.min).toBe(2);
-    expect(d.max).toBe(2);
-    pick(g, [g.find('p2', 'hand', V.c1), g.find('p2', 'hand', V.c2)]);
+    // No decision for either player: the activating player chooses face-down (the engine picks at
+    // random), so the opponent is not asked and p1 is not shown the hand.
+    expectDecision(g, 'main', 'p1');
     expect(hand(g, 'p2')).toHaveLength(5);
-    expect(
-      g
-        .zone('p2', 'trash')
-        .map((c) => c.card)
-        .sort(),
-    ).toEqual([V.c1, V.c2].sort());
+    expect(g.zone('p2', 'trash')).toHaveLength(2);
     expect(don(g, 'p1').deck).toBe(6);
   });
 

@@ -49,3 +49,8 @@ group passes against the engine.
   could not be tested for that reason.
 - **The Block Step is always a decision** even when no Character can block (`block` with only the
   `blocker: null` option). The tests assert on `blockers(g)`, not on the decision kind.
+
+## Rulings (M4b review, 2026-11-16; fixed in M4b fix round 1)
+
+- **#1 (empty "exactly" choice): the independent test was right, harmless but a deviation.** A pick whose whole zone is empty and public (a hand or deck size is known) asks no decision; the OP17-091 and OP17-106 author tests were updated. A filtered pick over a non-empty hidden zone is still asked, so the other player cannot tell whether a match exists (CR 8-4-4-2, ADR 0005); the same holds for a look at the top cards where none is eligible (asked with max 0; the UI answers `done`).
+- **#2 (give none): the independent tests were right** (same as A-2). ST17-004 and OP14-114 flipped.

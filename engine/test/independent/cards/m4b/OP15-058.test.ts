@@ -83,13 +83,12 @@ describe('OP15-058 Enel: [Activate: Main] on your second turn or later', () => {
   it('"up to 1" recipient: the give may be skipped (choose none); the added DON!! stay in the cost area', () => {
     const g = game({ characters: [V.sai] });
     activate(g, g.leader('p1'));
-    drive(g, 'p1', { targets: [] });
+    drive(g, 'p1', { option: '0' }); // the count is asked first: none
     expect(donOf(g, 'p1')).toMatchObject({ deck: 0, active: 2, rested: 4, given: 0 });
   });
 
-  // DISAGREEMENTS-c.md D-1: the engine gives all rested DON!! (up to 4) to the recipient; the
-  // number is not a choice.
-  it.fails('"give up to 4": giving fewer than 4 is a legal choice (CR 8-4-4-1)', () => {
+  // DISAGREEMENTS-c.md D-1 (fixed in M4b fix round 1): the number given is the player's choice.
+  it('"give up to 4": giving fewer than 4 is a legal choice (CR 8-4-4-1)', () => {
     const g = game({ characters: [V.sai] });
     activate(g, g.leader('p1'));
     const reached = outcomes(g, 'p1', (x) => String(donOf(x, 'p1').given));

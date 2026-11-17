@@ -58,6 +58,8 @@ function zoneArray(ps: PlayerState, z: Zone): InstanceId[] | null {
 export interface MoveOptions {
   /** Ordered zones: 'top' (default for deck, life, trash) or 'bottom' (default for hand, field). */
   position?: 'top' | 'bottom';
+  /** With 'bottom': leave this many cards of the deck below it (placed earlier, same effect). */
+  above?: number;
   faceUp?: boolean;
   /** Why the card leaves the field; required when it does. */
   cause?: Cause;
@@ -132,6 +134,7 @@ export function moveCard(d: Draft, id: InstanceId, to: Zone, opts: MoveOptions =
     const pos =
       opts.position ?? (to === 'deck' || to === 'life' || to === 'trash' ? 'top' : 'bottom');
     if (pos === 'top') arr.unshift(nid);
+    else if (opts.above) arr.splice(Math.max(0, arr.length - opts.above), 0, nid);
     else arr.push(nid);
   }
 
