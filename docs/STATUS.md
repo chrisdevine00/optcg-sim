@@ -175,6 +175,9 @@
 - **CI repair (8167824):** `main`'s CI had failed at typecheck since 26b5c99 (2026-11-09): `app/test/a11y-harness.test.ts` pulled in the harness's type import of `@guidepup/guidepup`, which installs only in the a11y workflow. The harness now types the Guidepup objects locally; CI green again.
 - **Not waiting for:** S1 (folded in when it happens); the meta refresh (moved to after OP18 data, at M9).
 
+### M5b AI breadth: in progress (started 2026-11-17)
+- **Plan (DECISIONS 2026-11-17):** three playbook agents (Robin, Yellow Enel, Kalgara, Hancock; Luffy & Ace, R/G Luffy, Black Luffy; Sabo, Purple Enel, Rosinante), each playbook from its sourced guide with game-plan assertions; one search agent for Warlord and Emperor (ADR 0008), the tier gates and the nightly strength runs, plus M5a-10, L-03 and how many DON!! the AI gives. Then an adversarial review.
+
 ## Blockers
 
 Owner decisions needed (not blocking progress):
