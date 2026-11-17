@@ -14,6 +14,7 @@
  *   1 cost, 2 base power, 3 power, 4 keyword grants, 5 restrictions.
  * A game whose cards have no such permanent skips all of it.
  */
+import type { Continuous } from '@optcg/cards';
 import type { InstanceId } from './api.ts';
 import { computePerms } from './effects/layers.ts';
 import type { Modifier, State } from './state.ts';
@@ -148,6 +149,15 @@ function permsAt(s: State, stage: number, memo: LayerMemo, live: boolean) {
   }
   return m;
 }
+
+/**
+ * `isNegated` skips the permanent layer because no permanent can negate (no `negate` shape in
+ * `Continuous`). A permanent negate would make it wrong, so adding one is a compile error here:
+ * route negation through `computePerms` first, then remove this guard.
+ */
+type AllContinuousKeys = Continuous extends infer C ? (C extends unknown ? keyof C : never) : never;
+const NO_PERMANENT_NEGATE: 'negate' extends AllContinuousKeys ? never : true = true;
+void NO_PERMANENT_NEGATE;
 
 /** Is the card negated by a modifier (CR 8-2)? Cheap: no permanent layer is involved. */
 export function isNegated(s: State, id: InstanceId): boolean {

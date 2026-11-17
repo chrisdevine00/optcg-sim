@@ -40,6 +40,26 @@ Earlier figures (M2, before effects): median `reduce` about 3–4 µs, `project`
 (`npm run bench`, `engine/bench/reduce.bench.ts`). With effects, one action including its
 `legalActions` call costs about 6 µs on average in the simulation above.
 
+## M4b archetypes: two-turn simulations per second, before and after the derive fix (2026-11-16)
+
+`npm run bench:two-turn` now runs five matchups (override with `BENCH_MATCHUPS=A:B,...` leader ids):
+Rocks vs Kaido (the M4a one) and four M4b archetypes each against Rocks, same method as above
+(random playouts of two turns from real Main Phase positions of 40 seeded games, one worker, median
+of 3 runs). Machine: Apple M4 Pro, Node v25.9.0. Before: 3 s runs on `origin/main` 768f719; after:
+4 s runs with the fix (DECISIONS 2026-11-16 "M4b perf"). ADR 0008 target: at least 1,000.
+
+| Matchup | Before (sims/s) | After (sims/s) |
+| --- | --- | --- |
+| Rocks OP17-039 vs Kaido OP17-058 (no permanents) | 4,371 | 4,190 |
+| Sabo OP13-004 vs Rocks | 333 | 1,866 |
+| Luffy & Ace ST30-001 vs Rocks | 648 | 2,205 |
+| Enel OP15-058 vs Rocks | 1,101 | 2,840 |
+| Boa Hancock OP14-041 vs Rocks | 1,104 | 3,169 |
+
+Rocks vs Kaido is unchanged within run noise (about 4,100 to 4,700). The golden test's `meta-random-2`
+replay went from 4.7 s to 0.9 s, mostly from making its step loop linear; one replay is 12.7 ms
+(was 46 ms).
+
 ## M5a: Pirate strength, game plan and AI turn time (2026-10-29)
 
 ### Strength: Pirate vs Rookie (PLAN M5a exit: at least 75%)

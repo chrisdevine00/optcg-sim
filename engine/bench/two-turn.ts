@@ -5,6 +5,11 @@
  *
  *   npm run bench:two-turn            (defaults: 4 s per run, 3 runs)
  *   BENCH_SECONDS=10 BENCH_RUNS=5 npm run bench:two-turn
+ *   BENCH_MATCHUPS=OP13-004:OP17-039,OP15-058:OP17-058 npm run bench:two-turn
+ *
+ * Without BENCH_MATCHUPS, the M4a matchup (Rocks vs Kaido) and four M4b archetypes (each against
+ * Rocks): Sabo OP13-004, Luffy & Ace ST30-001, Enel OP15-058, Boa Hancock OP14-041. Each matchup
+ * is its own set of worker runs and its own median.
  *
  * Method:
  * 1. Start positions: 40 seeded random Rocks-vs-Kaido games (both seatings), keeping the state at
@@ -52,10 +57,10 @@ function pick(legal: Action[], rng: number): [Action, number] {
   return [options.at(-1)!, rng];
 }
 
-function startPositions(): GameState[] {
+function startPositions(leaderA: string, leaderB: string): GameState[] {
   const all = metaDecks();
-  const rocks = all.find((d) => d.leader === 'OP17-039')!;
-  const kaido = all.find((d) => d.leader === 'OP17-058')!;
+  const rocks = all.find((d) => d.leader === leaderA)!;
+  const kaido = all.find((d) => d.leader === leaderB)!;
   const out: GameState[] = [];
   for (let seed = 1; seed <= 40; seed++) {
     const [a, b] = seed % 2 ? [rocks, kaido] : [kaido, rocks];
@@ -78,8 +83,8 @@ function startPositions(): GameState[] {
   return out;
 }
 
-function run(seconds: number): Result {
-  const positions = startPositions();
+function run(seconds: number, a: string, b: string): Result {
+  const positions = startPositions(a, b);
   let rng = seedRng(12345);
   let sims = 0;
   let actions = 0;
@@ -104,29 +109,42 @@ function run(seconds: number): Result {
 }
 
 if (!isMainThread) {
-  parentPort!.postMessage(run((workerData as { seconds: number }).seconds));
+  {
+    const w = workerData as { seconds: number; a: string; b: string };
+    parentPort!.postMessage(run(w.seconds, w.a, w.b));
+  }
 } else {
   const seconds = Number(process.env.BENCH_SECONDS ?? 4);
   const runs = Number(process.env.BENCH_RUNS ?? 3);
-  const results: Result[] = [];
-  for (let i = 0; i < runs; i++) {
-    const r = await new Promise<Result>((resolve, reject) => {
-      const w = new Worker(new URL(import.meta.url), {
-        workerData: { seconds },
-        execArgv: ['--import', 'tsx'],
+  const matchups = (
+    process.env.BENCH_MATCHUPS ??
+    'OP17-039:OP17-058,OP13-004:OP17-039,ST30-001:OP17-039,OP15-058:OP17-039,OP14-041:OP17-039'
+  )
+    .split(',')
+    .map((m) => m.split(':') as [string, string]);
+  for (const [a, b] of matchups) {
+    const results: Result[] = [];
+    for (let i = 0; i < runs; i++) {
+      const r = await new Promise<Result>((resolve, reject) => {
+        const w = new Worker(new URL(import.meta.url), {
+          workerData: { seconds, a, b },
+          execArgv: ['--import', 'tsx'],
+        });
+        w.once('message', resolve);
+        w.once('error', reject);
       });
-      w.once('message', resolve);
-      w.once('error', reject);
-    });
-    results.push(r);
+      results.push(r);
+      console.log(
+        `${a} vs ${b} run ${i + 1}: ${r.sims} two-turn sims in ${(r.ms / 1000).toFixed(2)} s = ${Math.round(
+          (r.sims * 1000) / r.ms,
+        )}/s; ${Math.round((r.actions * 1000) / r.ms)} actions/s; ${(r.actions / r.sims).toFixed(
+          1,
+        )} actions per sim; ${r.positions} start positions`,
+      );
+    }
+    const rates = results.map((r) => (r.sims * 1000) / r.ms).sort((x, y) => x - y);
     console.log(
-      `run ${i + 1}: ${r.sims} two-turn sims in ${(r.ms / 1000).toFixed(2)} s = ${Math.round(
-        (r.sims * 1000) / r.ms,
-      )}/s; ${Math.round((r.actions * 1000) / r.ms)} actions/s; ${(r.actions / r.sims).toFixed(
-        1,
-      )} actions per sim; ${r.positions} start positions`,
+      `${a} vs ${b} median: ${Math.round(rates[Math.floor(rates.length / 2)]!)} two-turn sims/s`,
     );
   }
-  const rates = results.map((r) => (r.sims * 1000) / r.ms).sort((a, b) => a - b);
-  console.log(`median: ${Math.round(rates[Math.floor(rates.length / 2)]!)} two-turn sims/s`);
 }

@@ -8,7 +8,7 @@ import { isEffect } from '@optcg/cards';
 import type { InstanceId, PlayerId } from './api.ts';
 import type { Ability, AutoTiming, InternalStep } from './abilities.ts';
 import { hasTiming, isInternal } from './abilities.ts';
-import { deriveLive } from './derive.ts';
+import { deriveLive, isNegated } from './derive.ts';
 import { allHold, matches, payable, playCostOf, pool, type Ctx } from './effects/eval.ts';
 import { answerEffect, pushEffect, runEffect } from './effects/run.ts';
 import type { Draft } from './draft.ts';
@@ -794,7 +794,7 @@ export function collectReplacements(
     for (const id of [ps.leader, ...ps.characters, ...ps.stage]) {
       const def = s.defs[s.cards[id]!.card]!;
       if (!def.abilities.some((a) => a.kind === 'replacement')) continue;
-      if (deriveLive(s, id).negated) continue;
+      if (isNegated(s, id)) continue;
       const c: Ctx = { s, you: p, self: id, live: true };
       for (const ab of def.abilities) {
         if (ab.kind !== 'replacement') continue;
@@ -934,7 +934,7 @@ export function fire(
       if (!c) continue;
       const abilities = d.s.defs[c.card]!.abilities;
       if (!abilities.some((a) => a.kind === 'auto')) continue;
-      if (c.zone !== 'trash' && deriveLive(d.s, id).negated) continue;
+      if (c.zone !== 'trash' && isNegated(d.s, id)) continue;
       for (const ab of abilities) {
         if (ab.kind !== 'auto' || !ab.when.some((w) => match(w, id, p))) continue;
         if (ab.oncePerTurn && d.s.oncePerTurn.includes(`${id}/${ab.id}`)) continue;
@@ -1127,7 +1127,7 @@ function drainPending(d: Draft): boolean {
     src &&
     src.zone !== 'trash' &&
     src.zone !== 'resolving' &&
-    deriveLive(d.s, next!.card).negated
+    isNegated(d.s, next!.card)
   )
     return true;
   d.emit({

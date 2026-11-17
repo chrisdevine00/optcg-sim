@@ -11,6 +11,8 @@ import {
   deriveAt,
   deriveLive,
   isNegated,
+  LAST_STAGE,
+  newMemo,
   type Derived,
   type LayerMemo,
 } from '../derive.ts';
@@ -37,11 +39,32 @@ export interface Ctx {
   lay?: { upto: number; memo: LayerMemo };
 }
 
+/**
+ * A layer memo shared by the cards one read-only evaluation (`pool`, `matches`, `num`, `holds`)
+ * looks at on a draft. `deriveLive` computes without a cache because a draft changes between
+ * operations, but nothing is written while a selector or condition is being read, so every card
+ * it reads can share one computation of the permanent layers (perf: M4b, DECISIONS 2026-11-16).
+ */
+let scope: { s: State; memo: LayerMemo } | null = null;
+
+/** Run a read-only evaluation of `c`; draft reads inside it share one layer memo. */
+function scoped<T>(c: Ctx, f: () => T): T {
+  if (!c.live || c.lay || scope) return f();
+  scope = { s: c.s, memo: newMemo() };
+  try {
+    return f();
+  } finally {
+    scope = null;
+  }
+}
+
 export const dvOf = (c: Ctx, id: InstanceId): Derived =>
   c.lay
     ? deriveAt(c.s, id, c.lay.upto, c.lay.memo, c.live)
     : c.live
-      ? deriveLive(c.s, id)
+      ? scope && scope.s === c.s
+        ? deriveAt(c.s, id, LAST_STAGE, scope.memo, true)
+        : deriveLive(c.s, id)
       : derive(c.s, id);
 
 const ownersOf = (c: Ctx, owner: Selector['owner']): PlayerId[] =>
@@ -78,6 +101,10 @@ function zoneIds(c: Ctx, p: PlayerId, z: SZone): InstanceId[] {
 
 /** Every instance a selector's zones and filter admit, in canonical order (zone, then id). */
 export function pool(c: Ctx, sel: Selector): InstanceId[] {
+  return scoped(c, () => poolOf(c, sel));
+}
+
+function poolOf(c: Ctx, sel: Selector): InstanceId[] {
   const zones = Array.isArray(sel.from) ? sel.from : [sel.from];
   const out: InstanceId[] = [];
   for (const p of ownersOf(c, sel.owner)) {
@@ -104,6 +131,10 @@ function cmp(c: Ctx, v: number | null, k: Cmp): boolean {
 }
 
 export function matches(c: Ctx, id: InstanceId, f: Filter): boolean {
+  return scoped(c, () => matchesOf(c, id, f));
+}
+
+function matchesOf(c: Ctx, id: InstanceId, f: Filter): boolean {
   const card = c.s.cards[id];
   if (!card) return false;
   const def = c.s.defs[card.card]!;
@@ -145,6 +176,10 @@ export function givenDon(s: State, p: PlayerId): number {
 }
 
 export function num(c: Ctx, n: Num): number {
+  return scoped(c, () => numOf(c, n));
+}
+
+function numOf(c: Ctx, n: Num): number {
   if (typeof n === 'number') return n;
   const s = c.s;
   if ('count' in n) return pool(c, n.count).length;
@@ -174,6 +209,10 @@ export function num(c: Ctx, n: Num): number {
 }
 
 export function holds(c: Ctx, k: Condition): boolean {
+  return scoped(c, () => holdsOf(c, k));
+}
+
+function holdsOf(c: Ctx, k: Condition): boolean {
   const s = c.s;
   if ('yourTurn' in k) return s.active === c.you;
   if ('opponentsTurn' in k) return s.active !== c.you;

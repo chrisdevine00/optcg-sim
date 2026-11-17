@@ -45,6 +45,51 @@ function flatten(c: Ctx, apply: readonly Continuous[], out: Continuous[] = []): 
 
 const isSel = (t: Selector | string): t is Selector => typeof t === 'object';
 
+function stageOfApply(ap: Continuous): number {
+  if ('power' in ap) return STAGE_OF.power!;
+  if ('setBasePower' in ap) return STAGE_OF.setBasePower!;
+  if ('cost' in ap) return STAGE_OF.cost!;
+  if ('grant' in ap) return STAGE_OF.grant!;
+  if ('restrict' in ap) {
+    const { target, what } = ap.restrict;
+    return isSel(target) && typeof what === 'string' && what in RESTRICT_KIND
+      ? STAGE_OF.restrict!
+      : 0;
+  }
+  return 0;
+}
+
+/** Bit `1 << stage` for every stage an apply list (tiers included) can produce modifiers in. */
+function stageMask(apply: readonly Continuous[]): number {
+  let m = 0;
+  for (const ap of apply) {
+    if ('tiers' in ap) for (const t of ap.tiers) m |= stageMask(t.apply);
+    else {
+      const st = stageOfApply(ap);
+      if (st) m |= 1 << st;
+    }
+  }
+  return m;
+}
+
+interface PermInfo {
+  ab: Permanent;
+  mask: number;
+}
+
+/** A card definition's permanent abilities with the stages each can contribute to (static). */
+const permInfo = new WeakMap<object, readonly PermInfo[]>();
+function permsOf(def: { abilities: readonly Ability[] }): readonly PermInfo[] {
+  let v = permInfo.get(def);
+  if (!v) {
+    v = def.abilities
+      .filter((a): a is Permanent => a.kind === 'permanent')
+      .map((ab) => ({ ab, mask: stageMask(ab.apply) }));
+    permInfo.set(def, v);
+  }
+  return v;
+}
+
 /** The modifiers that stage `stage` of every live permanent effect produces, by target. */
 export function computePerms(
   s: State,
@@ -63,14 +108,18 @@ export function computePerms(
     const ps = s.players[p];
     for (const src of [ps.leader, ...ps.characters, ...ps.stage, ...ps.hand]) {
       const card = s.cards[src]!;
-      const abs = s.defs[card.card]!.abilities.filter(
-        (a): a is Permanent => a.kind === 'permanent',
-      );
+      const abs = permsOf(s.defs[card.card]!);
       if (abs.length === 0) continue;
       const zone = card.zone === 'hand' ? 'hand' : 'field';
-      if (zone === 'field' && deriveAt(s, src, 0, memo, live).negated) continue;
-      for (const ab of abs) {
+      let checkedNegation = false;
+      for (const { ab, mask } of abs) {
+        // Nothing to produce at this stage: reading the conditions has no effect, so skip them.
+        if (!(mask & (1 << stage))) continue;
         if ((ab.zone ?? 'field') !== zone) continue;
+        if (zone === 'field' && !checkedNegation) {
+          checkedNegation = true;
+          if (deriveAt(s, src, 0, memo, live).negated) break;
+        }
         const c: Ctx = { s, you: p, self: src, live, lay: { upto: stage - 1, memo } };
         if (!allHold(c, ab.conditions)) continue;
         const base = {

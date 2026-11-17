@@ -12,6 +12,7 @@ import { describe, expect, it } from 'vitest';
 import {
   appendAction,
   ENGINE_VERSION,
+  reduce,
   replay,
   startRecord,
   summaryHash,
@@ -47,18 +48,17 @@ const SEEDS: [string, number, 'random' | 'passive'][] = [
 
 /** Replay a record step by step, collecting what the golden pins. */
 function measure(record: GameRecord): Golden['expected'] {
+  // One pass: each action is applied once to the state before it (replaying from the start for
+  // every step was quadratic and took seconds on the meta goldens).
   let step = replay(record, cards(), 0);
   const events: GameEvent[] = [...step.events];
   let rec = startRecord(record.start, step.state);
-  const states = [step.state];
-  for (let i = 0; i < record.actions.length; i++) {
-    step = replay(record, cards(), i + 1);
-    states.push(step.state);
-    rec = appendAction(rec, record.actions[i]!, step.state);
+  for (const action of record.actions) {
+    step = reduce(step.state, action);
+    events.push(...step.events);
+    rec = appendAction(rec, action, step.state);
   }
-  const all = replay(record, cards());
-  events.length = 0;
-  events.push(...all.events);
+  const all = { state: step.state };
   const s = internals(all.state);
   return {
     hash: summaryHash(all.state),
@@ -110,8 +110,6 @@ describe('golden records', () => {
       // A behaviour change must bump ENGINE_VERSION, which fails here until goldens are re-recorded.
       expect(g.record.versions.engine).toBe(ENGINE_VERSION);
       expect(measure(g.record)).toEqual(g.expected);
-      // 30 s: the M4b meta goldens run the permanent layer on every derive; their replay time
-      // (about 4.6 s for meta-random-2 alone on 2026-11-16) is tracked as M4b perf work.
-    }, 30_000);
+    });
   }
 });
