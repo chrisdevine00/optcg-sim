@@ -21,7 +21,7 @@ jobs:
       # (at least 95%), vs a shallow Pirate over 100 (at least 60%), a non-prior-list row, the
       # shallow control and A/B runs, and the game-plan assertions over 40 Pirate-vs-Pirate games
       # with and without the biases (group 3: ai/test/game-plan-g3.test.ts, game-plan-g3-40.json). Reports: test-results/strength-*.json, game-plan-40.json.
-      - run: npm run test:strength
+      - run: npm run test:strength:pirate
         if: always()
       # M5b group-1 playbooks (Robin, Yellow Enel, Kalgara, Hancock): the game-plan assertions over
       # 64 Pirate-vs-Pirate games among the four decks, with and without the biases.
@@ -32,7 +32,7 @@ jobs:
       # at 1× vs Pirate): too slow per push.
       - run: npx playwright install --with-deps chromium
         if: always()
-      - run: npx playwright test app/e2e/game.spec.ts app/e2e/keyboard.spec.ts app/e2e/pirate.spec.ts
+      - run: npx playwright test app/e2e/game.spec.ts app/e2e/keyboard.spec.ts app/e2e/pirate.spec.ts app/e2e/warlord.spec.ts
         if: always()
         env:
           E2E_FULL: '1'
@@ -42,4 +42,25 @@ jobs:
         if: always()
         with:
           name: nightly-results
+          path: test-results/
+  # M5b strength (ADR 0008; review M5a-10): 200 iteration-budgeted games per pairing over twelve
+  # ordered deck pairs (all twelve archetypes), each seat in turn. Pirate vs Rookie at least 75%,
+  # Warlord vs Rookie at least 95%, Warlord vs Pirate at least 65%, Warlord vs a one-iteration
+  # Warlord at least 70% (and that Warlord under 65% against Pirate), plus Emperor vs Warlord.
+  # About two hours: its own job so it does not delay the others. Reports: test-results/m5b-*.json.
+  strength-m5b:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run test:strength:m5b
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: strength-m5b-results
           path: test-results/

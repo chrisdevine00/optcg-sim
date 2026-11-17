@@ -33,3 +33,8 @@
 ## Consequences
 - **Throughput comes first.** `reduce` and `derive` speed is a first-class engine requirement. `derive` is incremental.
 - **Benchmark gate.** The benchmark runs on the M4a scripted decks. If it finds fewer than 1,000 two-turn simulations per second in a worker, Warlord falls back to expectimax over the current turn's lines with sampled opponent responses, and this ADR is updated.
+
+## Addendum, 2026-11-17 (M5b: as built)
+- Built per this ADR in `ai/src/search/mcts.ts` and `warlord.ts`; the expectimax fallback was not needed. Details are in ARCHITECTURE §4.2 and DECISIONS 2026-11-17 "M5b Warlord and Emperor".
+- **Budgets.** One search at the start of Main (the worker does it during the turn-start animations), then no search while the plan holds; a re-search is 40% of the plan. Defence is a flat search. CI iteration budgets: Warlord 4,000 per plan and 300 per defence; Emperor 10,000 and 500.
+- **Deviation.** Emperor's iterative deepening caps the tree's depth in four stages of one budget (depth 3, 6, 12, then all), not a re-search from scratch at each depth: the statistics carry over, so the stages are a prefix of the same search.

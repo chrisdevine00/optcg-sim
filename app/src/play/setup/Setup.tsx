@@ -1,5 +1,5 @@
 /**
- * Game setup (flows F3a): your deck, the opponent (Pirate or Rookie AI, or a second player at this device),
+ * Game setup (flows F3a): your deck, the opponent (Warlord, Emperor, Pirate or Rookie AI, or a second player at this device),
  * who chooses first, and game options. Every choice has a default, so Start is one click away.
  * URL parameters prefill it for tests and shared links: `?p1=OP17-039&p2=OP17-058&opp=hotseat
  * &first=me&seed=42&speed=4&skip=1&scenario=defend&start=1`.
@@ -15,10 +15,12 @@ import { SCENARIOS } from './scenarios.ts';
  * fails when the two drift apart.
  */
 export const TURN_TIME_PIRATE = 'typically 1–8 s a turn at 1×, up to about 10 s for a long one';
+export const TURN_TIME_WARLORD = 'typically 5–8 s a turn at 1×, up to about 12 s for a long one';
+export const TURN_TIME_EMPEROR = 'typically 10–15 s a turn at 1×, up to about 17 s for a long one';
 export const TURN_TIME_ROOKIE = 'typically 1–8 s a turn at 1×, up to about 12 s for a long one';
 
 /** The opponent: an AI tier, or a second player at this device. */
-export type Opponent = 'pirate' | 'rookie' | 'hotseat';
+export type Opponent = 'warlord' | 'emperor' | 'pirate' | 'rookie' | 'hotseat';
 
 export interface SetupChoice {
   myDeck: string;
@@ -44,7 +46,14 @@ function fromUrl(): Partial<SetupChoice> & { start?: boolean } {
   if (p1) out.myDeck = (DECKS.find((d) => d.id === p1) ?? deckByLeader(p1))?.id;
   if (p2) out.theirDeck = (DECKS.find((d) => d.id === p2) ?? deckByLeader(p2))?.id;
   const opp = q.get('opp');
-  if (opp === 'hotseat' || opp === 'rookie' || opp === 'pirate') out.opponent = opp;
+  if (
+    opp === 'hotseat' ||
+    opp === 'rookie' ||
+    opp === 'pirate' ||
+    opp === 'warlord' ||
+    opp === 'emperor'
+  )
+    out.opponent = opp;
   const first = q.get('first');
   if (first === 'me' || first === 'opp' || first === 'roll') out.first = first;
   const seed = q.get('seed');
@@ -80,7 +89,7 @@ export function Setup({
   const [theirDeck, setTheirDeck] = useState(
     url.theirDeck ?? DECKS.find((d) => d.leader === 'OP17-058')?.id ?? DECKS[3]!.id,
   );
-  const [opponent, setOpponent] = useState<Opponent>(url.opponent ?? 'pirate');
+  const [opponent, setOpponent] = useState<Opponent>(url.opponent ?? 'warlord');
   const [first, setFirst] = useState<'roll' | 'me' | 'opp'>(url.first ?? 'roll');
   const [names, setNames] = useState<[string, string]>(['Player 1', 'Player 2']);
   const [autoSkip, setAutoSkip] = useState(url.autoSkip ?? true);
@@ -157,6 +166,37 @@ export function Setup({
         <fieldset className="setup-col">
           <legend>Opponent</legend>
           <div className="radio-list">
+            <label className="check">
+              <input
+                type="radio"
+                name="opp"
+                checked={opponent === 'warlord'}
+                onChange={() => setOpponent('warlord')}
+              />
+              <span>
+                <b>Warlord AI</b>{' '}
+                <span className="subtle">
+                  · plans each turn by trying thousands of lines against hands it guesses from your
+                  deck’s usual lists (it never sees your hidden cards), and explains each move ·{' '}
+                  {TURN_TIME_WARLORD}
+                </span>
+              </span>
+            </label>
+            <label className="check">
+              <input
+                type="radio"
+                name="opp"
+                checked={opponent === 'emperor'}
+                onChange={() => setOpponent('emperor')}
+              />
+              <span>
+                <b>Emperor AI</b>{' '}
+                <span className="subtle">
+                  · the Warlord’s search with more than twice the thinking time, for hard practice ·{' '}
+                  {TURN_TIME_EMPEROR}
+                </span>
+              </span>
+            </label>
             <label className="check">
               <input
                 type="radio"

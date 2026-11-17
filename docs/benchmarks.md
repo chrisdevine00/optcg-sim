@@ -179,3 +179,35 @@ The turn-time lines on the Setup screen are exported from `app/src/play/setup/Se
 
 - Pirate: typically 1–8 s a turn at 1×, up to about 10 s for a long one. From the Pacing section above: ordinary turns 1.0–7.5 s (a typical turn, at most 6 moves, must fit 8 s), the 15-move late-game turn 10.0 s.
 - Rookie: typically 1–8 s a turn at 1×, up to about 12 s for a long one. First measured 2026-11-05 (Chromium, production build, 1×, iteration budgets, the player ends each turn at once and takes every hit; `seed=31`, `seed=7` and `scenario=late`, 12 turns). Turns of 6 moves or fewer took 1.0–4.0 s; longer turns took 4.8–12.1 s (the longest, 17 moves, 12.1 s). Rookie plays more moves per turn than the Pirate because it has no plan, which is why its long turns run longer.
+
+## M5b: Warlord and Emperor (2026-11-17)
+
+### Strength (PLAN M5b exit), 200 games per pairing
+`npm run test:strength:m5b`; `ai/test/strength-warlord.test.ts`. Iteration budgets (Warlord 4,000 per plan and 300 per defence, Emperor 10,000 and 500), twelve ordered deck pairs from six disjoint archetype pairs covering all twelve archetypes (Rocks/Kaido, Robin/Sabo, Luffy & Ace/Enel OP15, Luffy OP17/Hancock, Rosinante/Enel OP05, Kalgara/Luffy OP13), each seat in turn, fixed seeds, Wilson 95% intervals. These runs used the playbooks as merged in this branch (the 12 playbooks arrived by rebase after the runs started; the figures are re-measured nightly with all of them).
+
+| Pairing | Wins | Rate | 95% interval | Gate |
+| --- | --- | --- | --- | --- |
+| Pirate vs Rookie | 200 / 200 | 100.0% | 98.1–100% | at least 75% |
+| Warlord vs Rookie | 200 / 200 | 100.0% | 98.1–100% | at least 95% |
+| Warlord vs Pirate | 133 / 200 | 66.5% | 59.7–72.7% | at least 65% |
+| Warlord vs a one-iteration Warlord | 165 / 200 | 82.5% | 76.6–87.1% | at least 70% (M5a-10) |
+| one-iteration Warlord vs Pirate | 55 / 200 | 27.5% | 21.8–34.1% | under 65% (M5a-10) |
+
+- **Warlord vs Pirate clears 65% by a thin margin:** the lower end of the interval is 59.7%. Per deck pair (A's deck first, wins of 16 to 18 games): Rocks/Kaido 17 of 18, Kaido/Rocks 6 of 18; Robin/Sabo 13, Sabo/Robin 10; Luffy & Ace/Enel 15 of 16, Enel/Luffy & Ace 7 of 16; Luffy OP17/Hancock 10, Hancock/Luffy OP17 12; Rosinante/Enel OP05 9, Enel OP05/Rosinante 16 of 16; Kalgara/Luffy OP13 15, Luffy OP13/Kalgara 3 of 16. The deck matchups are lopsided (one deck beats the other from both seats), so the pairs dilute the tier gap.
+- **Sensitivity.** In 96-game tuning runs on same-archetype pairs (two lists of one archetype, both orders, so no deck gap; `ai/bench/duel.ts`), Warlord beat Pirate 59% to 75% depending on settings (tuning runs, about ±9 points of noise, not gates). Rollouts that play Characters (`quickPlays`) gave 71.9% against 61.5% without at 1,500 iterations.
+- **The one-iteration Warlord loses to Pirate (27.5%) and to the full Warlord (17.5% for it).** M5a's crippled Pirate still won 80% against Rookie; these two gates catch a search that is too small.
+- **Emperor vs Warlord** (60 games at the 200-game budgets, before the gate was cut to 40 games): 30 of 60 (50.0%, 95% interval 37.7–62.3%). **Emperor's 2.5 times larger budget and iterative deepening gave no measurable gain**; Warlord at 1,500, 4,000 and 8,000 iterations also showed differences inside the noise in 96-game runs. The heuristic and the rollout policies limit strength, not the search budget. Emperor is "longer thinking", not measurably stronger; the work to make it so is in the next steps.
+- Per-push smoke (20 games): Pirate 20 of 20, Warlord 20 of 20 against Rookie, Warlord 13 of 20 against Pirate, Warlord 19 of 20 against the one-iteration Warlord, the one-iteration Warlord 4 of 20 against Pirate.
+
+### Search throughput and transpositions (review L-03)
+`npx tsx ai/bench/profile.ts` (10 real Main positions, 3,000 iterations each, 8 determinizations): about 9,000 iterations per second under load (112 microseconds per iteration, Node). `summaryHash` costs 21 microseconds per state (19% of an iteration if every state were keyed by it) and 28% of expanded states repeat a state reached by another move order, so a transposition table would save about 3% net: **not built for MCTS**. The profile of the lethal search is different: with `RATE_NODES=40000 node --cpu-prof ai/bench/rate.ts`, `summaryHash` is **63% of the lethal search's CPU time** (25% in the JSON string, 24% building the summary, 7% hashing). A cheaper key there would raise lethal throughput by up to 2.5 times and so cut L-03's Unknown rate; it needs a key with the same discrimination (instance ids canonicalised), checked against `summaryHash` over random games. Carried, not done.
+
+### Decision time against budgets (PROMPT.md: every tier within its budget plus 20%)
+`ai/test/budget.test.ts` runs each tier on the app's millisecond budgets over real positions: the 95th percentile of the plan (search budget plus the lethal check's cap) and of every other decision is within 1.2 times the budget for Pirate (500 and 250 ms), Warlord (2,500 plus 150 ms; 400 ms) and Emperor (6,000 plus 300 ms; 600 ms).
+
+### AI turn at 1× in the app (board.md §5.2)
+`app/e2e/warlord.spec.ts` (Chromium, production build, the player ends each turn at once). On iteration budgets: Warlord turns of 2 to 7 moves took 2.1 to 4.1 s, the wait on the worker at most 0.22 s; Emperor 2.2 to 4.5 s, the wait at most 0.53 s. On the app's millisecond budgets (nightly): Warlord turns of 2 to 7 moves took **5.3 to 7.5 s** with a worker wait of 2.2 to 3.5 s; Emperor **10.3 to 14.4 s** with a wait of 7.0 to 9.1 s. **board.md §5.2's 1.8 s of visible thinking for Warlord is not met** (it assumed the plan overlaps about 1.2 s of animation; the worker's wait is the plan plus each re-search, 25% of the plan, after an attack's result breaks it), but a typical Warlord turn still fits 8 s. A long Warlord turn (15 moves) is not measured: the late-game scenario ends in one Warlord turn.
+
+### Setup copy (M5b)
+- Warlord: typically 5–8 s a turn at 1×, up to about 12 s for a long one. Measured above (4 turns, 2 to 7 moves, 5.3 to 7.5 s); the long-turn figure is Pirate's 10.0 s for 15 moves plus the wait, not measured for Warlord.
+- Emperor: typically 10–15 s a turn at 1×, up to about 17 s for a long one. Measured above (3 turns, 10.3 to 14.4 s); the long-turn figure is an estimate.

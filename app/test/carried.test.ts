@@ -11,7 +11,12 @@ import type { Action } from '@optcg/engine';
 import { GameController } from '../src/play/game/controller.ts';
 import { readsHiddenZone } from '../src/play/game/veiled.tsx';
 import { SCENARIOS } from '../src/play/setup/scenarios.ts';
-import { TURN_TIME_PIRATE, TURN_TIME_ROOKIE } from '../src/play/setup/Setup.tsx';
+import {
+  TURN_TIME_EMPEROR,
+  TURN_TIME_PIRATE,
+  TURN_TIME_ROOKIE,
+  TURN_TIME_WARLORD,
+} from '../src/play/setup/Setup.tsx';
 import { cardMap } from './support.ts';
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -111,7 +116,9 @@ describe('M4a-18: an Event that cannot pay its optional cost', () => {
 
 describe('M5a-21: Setup turn-time copy matches docs/benchmarks.md', () => {
   const bench = readFileSync(new URL('../../docs/benchmarks.md', import.meta.url), 'utf8');
-  it('lists both lines under "Setup copy"', () => {
+  it('lists every line under "Setup copy"', () => {
+    expect(bench).toContain(TURN_TIME_WARLORD);
+    expect(bench).toContain(TURN_TIME_EMPEROR);
     expect(bench).toContain(TURN_TIME_PIRATE);
     expect(bench).toContain(TURN_TIME_ROOKIE);
   });

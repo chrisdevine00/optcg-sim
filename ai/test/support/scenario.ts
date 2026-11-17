@@ -35,8 +35,9 @@ export function start(spec: Spec): GameState {
 export function session(
   seat: PlayerId,
   state: GameState,
-  tier: 'pirate' | 'rookie' = 'pirate',
+  tier: 'pirate' | 'rookie' | 'warlord' | 'emperor' = 'pirate',
   biases = true,
+  extra: Partial<ConstructorParameters<typeof AiSession>[0]> = {},
 ): AiSession {
   const leader = queries.zone(state, seat, 'leader')[0]!.card;
   const opp = queries.zone(state, other(seat), 'leader')[0]!.card;
@@ -48,6 +49,7 @@ export function session(
     opponentLeader: opp,
     budgets: 'iterations',
     biases,
+    ...extra,
   });
 }
 

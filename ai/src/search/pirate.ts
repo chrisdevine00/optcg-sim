@@ -95,7 +95,7 @@ export interface PirateDecision {
   stats: { rollouts: number; actions: number; planned: boolean; value?: number };
 }
 
-interface Candidate {
+export interface Candidate {
   actions: Action[];
 }
 
@@ -118,9 +118,9 @@ const ZERO: Breakdown = {
   deck: 0,
   result: 0,
 };
-const other = (p: PlayerId): PlayerId => (p === 'p1' ? 'p2' : 'p1');
+export const other = (p: PlayerId): PlayerId => (p === 'p1' ? 'p2' : 'p1');
 const strip = ({ intentId: _i, ...a }: Action) => a;
-const same = (a: Action, b: Action) => JSON.stringify(strip(a)) === JSON.stringify(strip(b));
+export const same = (a: Action, b: Action) => JSON.stringify(strip(a)) === JSON.stringify(strip(b));
 
 // ------------------------------------------------------------------------------------------------
 // Budgets
@@ -155,7 +155,7 @@ function clockFor(b: Budget, ctx: SimContext, now: () => number): Clock {
 // ------------------------------------------------------------------------------------------------
 
 /** A determinized state's action in the view's handles, or null if it names a card with none. */
-function toView(a: Action, handles: Record<string, string>): Action | null {
+export function toView(a: Action, handles: Record<string, string>): Action | null {
   let missing = false;
   const json = JSON.stringify(a).replace(/\$[a-z0-9]{7}/g, (id) => {
     const h = handles[id];
@@ -190,7 +190,7 @@ export function fingerprint(v: PlayerView): string {
 // Scoring
 // ------------------------------------------------------------------------------------------------
 
-function simContext(view: PlayerView, setup: PirateSetup): SimContext {
+export function simContext(view: PlayerView, setup: PirateSetup): SimContext {
   const first =
     view.turn.number % 2 === 1
       ? view.turn.activePlayer === view.player
@@ -210,7 +210,7 @@ function simContext(view: PlayerView, setup: PirateSetup): SimContext {
 }
 
 /** Apply a candidate's actions in one state, resolving follow-ups between them. */
-function play(
+export function play(
   s0: GameState,
   c: Candidate,
   me: PlayerId,
@@ -339,7 +339,7 @@ function realThreat(
 }
 
 /** Does `activateBefore`'s discount pay for this hand card now (see the playbook type)? */
-function discountPays(
+export function discountPays(
   s: GameState,
   me: PlayerId,
   h: { card: string; cost: number | null },
@@ -361,7 +361,7 @@ function ownTurnOf(s: GameState, ctx: SimContext): number {
   return ownTurn(queries.turn(s).number, ctx.evalCtx.first);
 }
 
-function mainBias(root: GameState, me: PlayerId, ctx: SimContext, setup: PirateSetup) {
+export function mainBias(root: GameState, me: PlayerId, ctx: SimContext, setup: PirateSetup) {
   const pb = setup.playbook;
   const own = ownTurnOf(root, ctx);
   const leader = queries.zone(root, me, 'leader')[0]!;
@@ -421,11 +421,14 @@ function mainBias(root: GameState, me: PlayerId, ctx: SimContext, setup: PirateS
             queries.card(root, x.card).card === bias.source;
           const discountLegal = legal.some(mine);
           const inCandidate = c.actions.some(mine);
-          const used = queries
-            .usedThisTurn(root)
-            .some(
-              (u) => queries.card(root, u.card).card === bias.source && u.ability === bias.ability,
-            );
+          const used = queries.usedThisTurn(root).some((u) => {
+            // The user may have left play since (a new object, CR 3-1-6): then it is not here.
+            try {
+              return queries.card(root, u.card).card === bias.source && u.ability === bias.ability;
+            } catch {
+              return false;
+            }
+          });
           if (mine(a)) {
             // Worth it only while a card it pays for is in hand (see `discountPays`).
             const target = queries
@@ -538,7 +541,7 @@ function mainBias(root: GameState, me: PlayerId, ctx: SimContext, setup: PirateS
  * fewer than `min` active DON!! is not offered (the Leader's DON!! rest needs active DON!!; the
  * guide's plan is to defend with it, not to pour every DON!! into one swing).
  */
-function holdDon(
+export function holdDon(
   cands: Candidate[],
   root: GameState,
   me: PlayerId,
@@ -647,7 +650,7 @@ function groupTwoBias(
   }
 }
 
-function otherBias(root: GameState, me: PlayerId, setup: PirateSetup) {
+export function otherBias(root: GameState, me: PlayerId, setup: PirateSetup) {
   const pb = setup.playbook;
   const dec = queries.decision(root)!;
   const src = dec.source;
@@ -810,7 +813,12 @@ function scriptMentions(cardId: string, words: string[]): boolean {
  * no [When Attacking] effect.
  */
 /** Is `a` an `activateBefore` ability that no card in hand needs now? */
-function unneededDiscount(s: GameState, me: PlayerId, a: Action, setup: PirateSetup): boolean {
+export function unneededDiscount(
+  s: GameState,
+  me: PlayerId,
+  a: Action,
+  setup: PirateSetup,
+): boolean {
   if (a.type !== 'activate') return false;
   for (const bias of setup.playbook?.biases ?? []) {
     if (
@@ -823,7 +831,7 @@ function unneededDiscount(s: GameState, me: PlayerId, a: Action, setup: PirateSe
   return false;
 }
 
-function mainCandidates(s: GameState, me: PlayerId, setup: PirateSetup): Candidate[] {
+export function mainCandidates(s: GameState, me: PlayerId, setup: PirateSetup): Candidate[] {
   const acts = legalActions(s).filter((a) => a.type !== 'concede');
   const don = queries.don(s, me).active;
   const attackers = new Set(acts.flatMap((a) => (a.type === 'attack' ? [a.attacker] : [])));
@@ -873,7 +881,7 @@ function mainCandidates(s: GameState, me: PlayerId, setup: PirateSetup): Candida
 }
 
 /** "Take it" and the whole defences that stop the attack: fewest cards, and least Counter spent. */
-function counterCandidates(s: GameState, me: PlayerId, setup: PirateSetup): Candidate[] {
+export function counterCandidates(s: GameState, me: PlayerId, setup: PirateSetup): Candidate[] {
   const acts = legalActions(s).filter((a) => a.type !== 'concede');
   const done = acts.find((a) => a.type === 'endCounter');
   const out: Candidate[] = done ? [{ actions: [done] }] : [];
@@ -1029,12 +1037,12 @@ function wentFirst(view: PlayerView): boolean {
     : view.turn.activePlayer !== view.player;
 }
 
-function whyContext(view: PlayerView, setup: PirateSetup): WhyContext {
+export function whyContext(view: PlayerView, setup: PirateSetup): WhyContext {
   return { cards: setup.cards, playbook: setup.playbook, first: wentFirst(view) };
 }
 
 /** A view action in a determinized state's canonical ids. */
-function fromView(a: Action, handles: Record<string, string>): Action {
+export function fromView(a: Action, handles: Record<string, string>): Action {
   const back = new Map(Object.entries(handles).map(([id, h]) => [h, id]));
   const map = (v: unknown): unknown => {
     if (typeof v === 'string') {
@@ -1132,7 +1140,7 @@ function mulligan(view: PlayerView, setup: PirateSetup): PirateDecision {
 }
 
 /** Is this battle lethal for `me` if nothing stops it (0 Life, Leader target, attack lands)? */
-function lethalOnMe(s: GameState, me: PlayerId): boolean {
+export function lethalOnMe(s: GameState, me: PlayerId): boolean {
   const n = battleNumbers(s);
   return (
     !!n &&
@@ -1144,7 +1152,7 @@ function lethalOnMe(s: GameState, me: PlayerId): boolean {
 }
 
 /** The Counter this hand can add now (Character Counters, and [Counter] Events it can pay for). */
-function handCounter(s: GameState, me: PlayerId, setup: PirateSetup): number {
+export function handCounter(s: GameState, me: PlayerId, setup: PirateSetup): number {
   const active = queries.don(s, me).active;
   let t = 0;
   for (const c of queries.zone(s, me, 'hand')) {

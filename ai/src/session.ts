@@ -17,6 +17,15 @@ import {
   type PirateMemory,
   type PirateSetup,
 } from './search/pirate.ts';
+import {
+  decide as warlordDecide,
+  newMemory,
+  planTurn as warlordPlan,
+  reset as warlordReset,
+  type WarlordBudgets,
+  type WarlordMemory,
+  type WarlordSetup,
+} from './search/warlord.ts';
 import type { AiTier } from './tiers.ts';
 import type { Weights } from './search/heuristic.ts';
 
@@ -28,7 +37,28 @@ export const BUDGETS = {
     iterations: { turn: { iterations: 900 }, defence: { iterations: 120 } },
     ms: { turn: { ms: 500 }, defence: { ms: 250 } },
   },
-} as const satisfies Record<string, Record<'iterations' | 'ms', { turn: Budget; defence: Budget }>>;
+  /**
+   * Warlord: the plan at the start of Main about 2.5 s, any other decision 0.4 s (ADR 0008); a
+   * re-search when the plan breaks 40% of the plan. Iterations are CI's: about 2.5 s at the rate
+   * `docs/benchmarks.md` measures. Emperor: 6 s and iterative deepening.
+   */
+  warlord: {
+    iterations: {
+      turn: { iterations: 4000 },
+      defence: { iterations: 300 },
+      lethal: { nodes: 6000 },
+    },
+    ms: { turn: { ms: 2500 }, defence: { ms: 400 }, lethal: { ms: 150 } },
+  },
+  emperor: {
+    iterations: {
+      turn: { iterations: 10000 },
+      defence: { iterations: 500 },
+      lethal: { nodes: 12000 },
+    },
+    ms: { turn: { ms: 6000 }, defence: { ms: 600 }, lethal: { ms: 300 } },
+  },
+} as const satisfies Record<string, Record<'iterations' | 'ms', WarlordBudgets>>;
 
 export interface SessionOptions {
   tier: AiTier;
@@ -39,8 +69,12 @@ export interface SessionOptions {
   /** The AI's Leader and the opponent's (both public). */
   leader: string;
   opponentLeader: string;
-  budgets?: 'iterations' | 'ms' | { turn: Budget; defence: Budget };
-  /** Determinized states per decision (default 4). */
+  budgets?: 'iterations' | 'ms' | WarlordBudgets;
+  /** Tests and A/B runs only: Warlord's rollouts play Characters (default true). */
+  quickPlays?: boolean;
+  /** Tests and A/B runs only: the leaf look-ahead of Warlord and Emperor (default 2). */
+  horizon?: 1 | 2;
+  /** Determinized states per decision (default 4; Warlord 8, Emperor 12). */
   k?: number;
   now?: () => number;
   /** Tests only: see each ranking (PirateSetup.debug). */
@@ -76,9 +110,11 @@ function priorWithout(p: Prior | null, date: string | undefined): Prior | null {
 
 export class AiSession {
   readonly tier: AiTier;
-  private readonly setup: PirateSetup;
-  private readonly budgets: { turn: Budget; defence: Budget };
+  private readonly setup: WarlordSetup;
+  private readonly budgets: WarlordBudgets;
   private readonly memory: PirateMemory = { plan: null, defence: null };
+  private readonly wmem: WarlordMemory = newMemory();
+  private readonly searching: boolean;
   private readonly cards: ReadonlyMap<string, Card>;
   private readonly onFallback: (error: unknown) => void;
 
@@ -89,7 +125,10 @@ export class AiSession {
       opts.onFallback ??
       ((e) => console.error('[ai] search failed, playing the rookie policy instead:', e));
     const b = opts.budgets ?? 'iterations';
-    this.budgets = typeof b === 'string' ? BUDGETS.pirate[b] : b;
+    const table =
+      this.tier === 'warlord' || this.tier === 'emperor' ? BUDGETS[this.tier] : BUDGETS.pirate;
+    this.budgets = typeof b === 'string' ? table[b] : b;
+    this.searching = this.tier === 'warlord' || this.tier === 'emperor';
     this.setup = {
       ownDeck: opts.ownDeck,
       cards: opts.cards,
@@ -99,7 +138,10 @@ export class AiSession {
       ...(opts.weights ? { weights: opts.weights } : {}),
       ...(opts.searchless ? { searchless: true } : {}),
       ...(opts.shallow ? { shallow: true } : {}),
-      k: opts.k ?? 4,
+      k: opts.k ?? (this.tier === 'emperor' ? 12 : this.tier === 'warlord' ? 8 : 4),
+      ...(this.tier === 'emperor' ? { deepening: true } : {}),
+      ...(opts.horizon ? { horizon: opts.horizon } : {}),
+      quickPlays: opts.quickPlays ?? true,
       now: opts.now ?? (() => performance.now()),
       ...(opts.debug ? { debug: opts.debug } : {}),
     };
@@ -114,6 +156,16 @@ export class AiSession {
     )
       return { steps: 0, rollouts: 0 };
     try {
+      if (this.searching) {
+        const r = warlordPlan(
+          view,
+          this.setup,
+          budget ? { ...this.budgets, turn: budget } : this.budgets,
+          seed,
+          this.wmem,
+        );
+        return { steps: r.lethal ? this.wmem.queue.length : 1, rollouts: r.rollouts };
+      }
       const { plan, stats } = planTurn(view, this.setup, budget ?? this.budgets.turn, seed);
       this.memory.plan = plan;
       return { steps: plan.steps.length, rollouts: stats.rollouts };
@@ -132,6 +184,7 @@ export class AiSession {
       };
     }
     try {
+      if (this.searching) return warlordDecide(view, this.wmem, this.setup, this.budgets, seed);
       return decide(view, this.memory, this.setup, this.budgets, seed);
     } catch (e) {
       // A public reference to a hidden card (never observed): answer from the view alone,
@@ -167,5 +220,6 @@ export class AiSession {
   reset(): void {
     this.memory.plan = null;
     this.memory.defence = null;
+    warlordReset(this.wmem);
   }
 }

@@ -93,8 +93,16 @@ function maxDefence(s0: GameState, attacker: PlayerId): { value: number; blockab
       blockable = true;
       return;
     }
-    const atk = queries.card(s, b.attacker).power ?? 0;
-    const tgt = queries.card(s, b.target).power ?? 0;
+    // An answer can send the attacker or the target away (it becomes a new object, CR 3-1-6): the
+    // battle is over for this walk (found by Warlord's games, M5b).
+    let atk: number;
+    let tgt: number;
+    try {
+      atk = queries.card(s, b.attacker).power ?? 0;
+      tgt = queries.card(s, b.target).power ?? 0;
+    } catch {
+      return;
+    }
     best = Math.max(best, tgt - tgt0 + (atk0 - atk));
     if (dec.player === attacker) return;
     const seen = new Set<string>();

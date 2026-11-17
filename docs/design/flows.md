@@ -182,7 +182,7 @@ The tutorial has the eight steps from PROMPT Learning layer §1. Each step is on
 
 1. **State:** Setup screen, three columns at 1280×720 (your deck, opponent, game options); stacked on tablet.
    - **Your deck:** the last deck used, or a saved deck, or an archetype list from the meta explorer. Each shows leader art, name, colours, and scripting coverage ("50 of 50 cards automated").
-   - **Opponent:** an archetype from the meta explorer (it brings its playbook) or one of your saved decks (the AI then uses the generic playbook, labelled as such). Tier: Rookie, Pirate (default), Warlord, Emperor, each with a one-line description and its typical turn time.
+   - **Opponent:** an archetype from the meta explorer (it brings its playbook) or one of your saved decks (the AI then uses the generic playbook, labelled as such). Tier: Rookie, Pirate, Warlord (default), Emperor, each with a one-line description and its typical turn time.
    - **Game options:** mode (Practice default, Strict, Hotseat, Open hands), who goes first (**Roll for it** default · I go first · I go second · AI chooses; "Rock-paper-scissors" is a setting under Game), coach verbosity.
    **Keys:** Tab between columns; arrows within a list; Enter opens a picker; S starts.
    **SR (polite):** "Setup. Your deck: Rocks. Opponent: Kaido, Pirate. Start button."

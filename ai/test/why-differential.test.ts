@@ -133,9 +133,13 @@ function humanAction(s: GameState, r: number): [Action, number] {
   return [legal.find((x) => x.type === 'endTurn') ?? legal[0]!, rng];
 }
 
-const session = (deck: { leader: string; main: string[] }, opp: string) =>
+const session = (
+  deck: { leader: string; main: string[] },
+  opp: string,
+  tier: 'pirate' | 'warlord' | 'emperor',
+) =>
   new AiSession({
-    tier: 'pirate',
+    tier,
     ownDeck: deck.main,
     cards: cardMap(),
     leader: deck.leader,
@@ -143,98 +147,101 @@ const session = (deck: { leader: string; main: string[] }, opp: string) =>
     budgets: { turn: { iterations: 60 }, defence: { iterations: 20 } },
   });
 
-describe('"Why?" reads the same whatever the AI holds (review M5a-01)', () => {
-  it('the explanation of each AI decision, when the actions agree', () => {
-    const diffs: string[] = [];
-    const kinds = new Map<string, number>();
-    for (let n = 0; n < SEEDS * 3; n++) {
-      const seed = Math.floor(n / 3) + 1;
-      const mode = (['all', 'life', 'deck'] as const)[n % 3]!;
-      const ai: PlayerId = seed % 4 < 2 ? 'p1' : 'p2';
-      const p = pair(seed, ai, mode);
-      const { aiDeck, humanDeck, human } = p;
-      let { A, B, rng } = p;
-      const sA = session(aiDeck, humanDeck.leader);
-      const sB = session(aiDeck, humanDeck.leader);
-      for (let step = 0; step < 500; step++) {
-        const hA = project(A, human);
-        if (JSON.stringify(hA) !== JSON.stringify(project(B, human))) break;
-        if (hA.result || !hA.decision) break;
-        let act: Action;
-        if (hA.decision.player === ai) {
-          const vA = projectForSearch(A, ai);
-          const vB = projectForSearch(B, ai);
-          const dA = sA.decide(vA, seed * 977 + step);
-          const dB = sB.decide(vB, seed * 977 + step);
-          if (strip(dA.action) === strip(dB.action) && revealsNothing(dA.action)) {
-            const k = vA.decision!.kind;
-            kinds.set(k, (kinds.get(k) ?? 0) + 1);
-            if (
-              JSON.stringify(dA.explanation) !== JSON.stringify(dB.explanation) &&
-              diffs.length < 5
-            )
-              diffs.push(
-                `seed ${seed} step ${step} ${k}: ${dA.explanation.claim} / ${JSON.stringify(dA.explanation.evidence.map((e) => e.text))}\n   vs ${dB.explanation.claim} / ${JSON.stringify(dB.explanation.evidence.map((e) => e.text))}`,
-              );
-          }
-          const i = vA.actions.findIndex((x) => strip(x) === strip(dA.action));
-          act = legalActions(A)[i]!;
-        } else [act, rng] = humanAction(A, rng);
-        try {
-          A = reduce(A, act).state;
-          B = reduce(B, act).state;
-        } catch {
-          break;
-        }
-      }
-    }
-    console.log('KINDS', JSON.stringify([...kinds]));
-    // Every kind of window came up.
-    for (const k of ['main', 'counter', 'trigger', 'block', 'optional', 'choose'])
-      expect(kinds.get(k) ?? 0, `${k} decisions compared`).toBeGreaterThan(4);
-    expect(diffs).toEqual([]);
-  });
-
-  it('the explanation of every AI action that reveals nothing, at every AI decision', () => {
-    const diffs: string[] = [];
-    let compared = 0;
-    for (let n = 0; n < SEEDS * 3; n++) {
-      const seed = Math.floor(n / 3) + 1;
-      const mode = (['all', 'life', 'deck'] as const)[n % 3]!;
-      const ai: PlayerId = seed % 4 < 2 ? 'p1' : 'p2';
-      const p = pair(seed, ai, mode);
-      const { aiDeck, humanDeck, human } = p;
-      let { A, B, rng } = p;
-      const s = session(aiDeck, humanDeck.leader);
-      for (let step = 0; step < 300; step++) {
-        const hA = project(A, human);
-        if (JSON.stringify(hA) !== JSON.stringify(project(B, human))) break;
-        if (hA.result || !hA.decision) break;
-        if (hA.decision.player === ai) {
-          const vA = projectForSearch(A, ai);
-          const vB = projectForSearch(B, ai);
-          const inB = new Set(vB.actions.map(strip));
-          for (const a of vA.actions)
-            if (a.type !== 'concede' && revealsNothing(a) && inB.has(strip(a))) {
-              compared++;
-              const eA = JSON.stringify(s.explain(vA, a, 3));
-              const eB = JSON.stringify(s.explain(vB, a, 3));
-              if (eA !== eB && diffs.length < 5)
-                diffs.push(`seed ${seed} step ${step} ${strip(a)}:\n ${eA}\n ${eB}`);
+describe.each(['pirate', 'warlord', 'emperor'] as const)(
+  '"Why?" reads the same whatever the AI holds (review M5a-01), %s',
+  (tier) => {
+    it('the explanation of each AI decision, when the actions agree', () => {
+      const diffs: string[] = [];
+      const kinds = new Map<string, number>();
+      for (let n = 0; n < SEEDS * 3; n++) {
+        const seed = Math.floor(n / 3) + 1;
+        const mode = (['all', 'life', 'deck'] as const)[n % 3]!;
+        const ai: PlayerId = seed % 4 < 2 ? 'p1' : 'p2';
+        const p = pair(seed, ai, mode);
+        const { aiDeck, humanDeck, human } = p;
+        let { A, B, rng } = p;
+        const sA = session(aiDeck, humanDeck.leader, tier);
+        const sB = session(aiDeck, humanDeck.leader, tier);
+        for (let step = 0; step < 500; step++) {
+          const hA = project(A, human);
+          if (JSON.stringify(hA) !== JSON.stringify(project(B, human))) break;
+          if (hA.result || !hA.decision) break;
+          let act: Action;
+          if (hA.decision.player === ai) {
+            const vA = projectForSearch(A, ai);
+            const vB = projectForSearch(B, ai);
+            const dA = sA.decide(vA, seed * 977 + step);
+            const dB = sB.decide(vB, seed * 977 + step);
+            if (strip(dA.action) === strip(dB.action) && revealsNothing(dA.action)) {
+              const k = vA.decision!.kind;
+              kinds.set(k, (kinds.get(k) ?? 0) + 1);
+              if (
+                JSON.stringify(dA.explanation) !== JSON.stringify(dB.explanation) &&
+                diffs.length < 5
+              )
+                diffs.push(
+                  `seed ${seed} step ${step} ${k}: ${dA.explanation.claim} / ${JSON.stringify(dA.explanation.evidence.map((e) => e.text))}\n   vs ${dB.explanation.claim} / ${JSON.stringify(dB.explanation.evidence.map((e) => e.text))}`,
+                );
             }
-        }
-        let act: Action;
-        [act, rng] = humanAction(A, rng);
-        try {
-          A = reduce(A, act).state;
-          B = reduce(B, act).state;
-        } catch {
-          break;
+            const i = vA.actions.findIndex((x) => strip(x) === strip(dA.action));
+            act = legalActions(A)[i]!;
+          } else [act, rng] = humanAction(A, rng);
+          try {
+            A = reduce(A, act).state;
+            B = reduce(B, act).state;
+          } catch {
+            break;
+          }
         }
       }
-    }
-    console.log('COMPARED', compared);
-    expect(compared).toBeGreaterThan(200);
-    expect(diffs).toEqual([]);
-  });
-});
+      console.log('KINDS', JSON.stringify([...kinds]));
+      // Every kind of window came up.
+      for (const k of ['main', 'counter', 'trigger', 'block', 'optional', 'choose'])
+        expect(kinds.get(k) ?? 0, `${k} decisions compared`).toBeGreaterThan(4);
+      expect(diffs).toEqual([]);
+    });
+
+    it('the explanation of every AI action that reveals nothing, at every AI decision', () => {
+      const diffs: string[] = [];
+      let compared = 0;
+      for (let n = 0; n < SEEDS * 3; n++) {
+        const seed = Math.floor(n / 3) + 1;
+        const mode = (['all', 'life', 'deck'] as const)[n % 3]!;
+        const ai: PlayerId = seed % 4 < 2 ? 'p1' : 'p2';
+        const p = pair(seed, ai, mode);
+        const { aiDeck, humanDeck, human } = p;
+        let { A, B, rng } = p;
+        const s = session(aiDeck, humanDeck.leader, tier);
+        for (let step = 0; step < 300; step++) {
+          const hA = project(A, human);
+          if (JSON.stringify(hA) !== JSON.stringify(project(B, human))) break;
+          if (hA.result || !hA.decision) break;
+          if (hA.decision.player === ai) {
+            const vA = projectForSearch(A, ai);
+            const vB = projectForSearch(B, ai);
+            const inB = new Set(vB.actions.map(strip));
+            for (const a of vA.actions)
+              if (a.type !== 'concede' && revealsNothing(a) && inB.has(strip(a))) {
+                compared++;
+                const eA = JSON.stringify(s.explain(vA, a, 3));
+                const eB = JSON.stringify(s.explain(vB, a, 3));
+                if (eA !== eB && diffs.length < 5)
+                  diffs.push(`seed ${seed} step ${step} ${strip(a)}:\n ${eA}\n ${eB}`);
+              }
+          }
+          let act: Action;
+          [act, rng] = humanAction(A, rng);
+          try {
+            A = reduce(A, act).state;
+            B = reduce(B, act).state;
+          } catch {
+            break;
+          }
+        }
+      }
+      console.log('COMPARED', compared);
+      expect(compared).toBeGreaterThan(200);
+      expect(diffs).toEqual([]);
+    });
+  },
+);

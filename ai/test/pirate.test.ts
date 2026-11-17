@@ -15,8 +15,8 @@ import {
 } from '@optcg/engine';
 import { internals } from '../../engine/src/testing.ts';
 import { canSee } from '../../engine/src/project.ts';
-import { AiSession, BUDGETS } from '../src/index.ts';
-import { cardMap, metaDecks } from './support.ts';
+import { BUDGETS } from '../src/index.ts';
+import { metaDecks } from './support.ts';
 import { playMatch, type DecisionRecord } from './support/match.ts';
 import { lifeOf, listOf, session, start } from './support/scenario.ts';
 
@@ -117,52 +117,8 @@ describe('Pirate', () => {
     expect(max).toBeLessThanOrEqual(BUDGETS.pirate.iterations.turn.iterations + 120);
   });
 
-  it('stays within a wall-clock budget by at most 20% (p95)', () => {
-    const { rocks, kaido } = decks();
-    const positions: {
-      view: ReturnType<typeof projectForSearch>;
-      leader: string;
-      opp: string;
-      deck: string[];
-    }[] = [];
-    playMatch({
-      seed: 89,
-      decks: { p1: rocks, p2: kaido },
-      tiers: { p1: 'pirate', p2: 'rookie' },
-      onDecision: (d) => {
-        if (
-          d.tier === 'pirate' &&
-          d.view.decision?.kind === 'main' &&
-          !d.planned &&
-          positions.length < 16
-        )
-          positions.push({
-            view: projectForSearch(d.before, 'p1'),
-            leader: ROCKS,
-            opp: KAIDO,
-            deck: rocks.main,
-          });
-      },
-    });
-    const ms = 120;
-    const times: number[] = [];
-    for (const p of positions) {
-      const s = new AiSession({
-        tier: 'pirate',
-        ownDeck: p.deck,
-        cards: cardMap(),
-        leader: p.leader,
-        opponentLeader: p.opp,
-        budgets: { turn: { ms }, defence: { ms } },
-      });
-      const t0 = performance.now();
-      s.decide(p.view, 3);
-      times.push(performance.now() - t0);
-    }
-    times.sort((a, b) => a - b);
-    const p95 = times[Math.floor(times.length * 0.95)] ?? times[times.length - 1]!;
-    expect(p95).toBeLessThanOrEqual(ms * 1.2);
-  });
+  // The wall-clock budget check lives in budget.test.ts, on the app's real budgets for every tier
+  // (a 120 ms budget left 24 ms of slack, under CI scheduling noise; review item, M5b).
 
   it('only ever runs full-state engine calls under src/search (lint enforces it too)', () => {
     const dir = new URL('../src/', import.meta.url);

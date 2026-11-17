@@ -31,6 +31,13 @@ export interface SimContext {
   cards: ReadonlyMap<string, Card>;
   evalCtx: EvalContext;
   stats: { rollouts: number; actions: number };
+  /**
+   * Warlord and Emperor: the quick Main policy also plays Characters before it attacks (greedy by
+   * cost), for both seats, so a rollout carries a whole turn's development and the position it
+   * ends in is not missing the cards either side would have played. Pirate's rollouts leave plays
+   * to its planner and keep this off.
+   */
+  quickPlays?: boolean;
 }
 
 /** A rollout stops after this many actions (games cap at 2,000; a turn is far fewer). */
@@ -148,7 +155,7 @@ export function quickAction(s: GameState, ctx: SimContext): Action {
     case 'mulligan':
       return acts.find((a) => a.type === 'mulligan' && !a.redraw) ?? first;
     case 'main':
-      return finisher(s, p, acts);
+      return finisher(s, p, acts, s0ctx(ctx));
     case 'block': {
       const n = battleNumbers(s);
       const none = acts.find((a) => a.type === 'block' && a.blocker === null) ?? first;
@@ -183,7 +190,30 @@ export function quickAction(s: GameState, ctx: SimContext): Action {
   return first;
 }
 
-function finisher(s: GameState, p: PlayerId, acts: Action[]): Action {
+const s0ctx = (ctx: SimContext): SimContext | null => (ctx.quickPlays ? ctx : null);
+
+/** The Character this seat would play now: the costliest it can afford (a quick, greedy rule). */
+function quickPlay(s: GameState, acts: Action[], ctx: SimContext): Action | null {
+  let best: Action | null = null;
+  let bestCost = -1;
+  for (const a of acts) {
+    if (a.type !== 'playCard') continue;
+    const c = queries.card(s, a.card);
+    if (ctx.cards.get(c.card)?.category !== 'Character') continue;
+    const cost = c.cost ?? 0;
+    if (cost > bestCost) {
+      best = a;
+      bestCost = cost;
+    }
+  }
+  return best;
+}
+
+function finisher(s: GameState, p: PlayerId, acts: Action[], plays: SimContext | null): Action {
+  if (plays) {
+    const play = quickPlay(s, acts, plays);
+    if (play) return play;
+  }
   const end = acts.find((a) => a.type === 'endTurn')!;
   const oppLeader = queries.zone(s, other(p), 'leader')[0]!.instance;
   const attacks = acts.filter(

@@ -1188,12 +1188,12 @@ export function Game({
               oppActivity={
                 view.turn.activePlayer !== me
                   ? ctl.thinking
-                    ? `${names.player[opp]} is thinking…`
+                    ? `${names.player[opp]} is thinking…${ctl.config.tier === 'emperor' ? ' The Emperor thinks longer.' : ''}`
                     : ctl.activity
                   : ''
               }
               oppThinking={ctl.thinking}
-              oppTier={ctl.config.tier === 'pirate' ? 'Pirate' : 'Rookie'}
+              oppTier={ctl.config.tier[0]!.toUpperCase() + ctl.config.tier.slice(1)}
               arrow={arrow}
               banner={banner}
               label={boardLabel}

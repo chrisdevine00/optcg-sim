@@ -200,7 +200,8 @@ The AI runs in a dedicated Web Worker with a typed protocol:
   - the playbook as a prior on move order;
   - the heuristic as the evaluation at the end of the opponent's next turn;
   - progressive widening over DON!! allocation.
-  - Fallback if it is too weak: expectimax over the current turn's lines.
+  - Fallback if it is too weak: expectimax over the current turn's lines (not needed: M5b gates, `docs/benchmarks.md`).
+  - **As built (M5b, `ai/src/search/mcts.ts`, `warlord.ts`).** A node is a macro move (a play or activation with its first prompt answered, or an attack after giving it 0..N DON!!); statistics are kept per determinization, and a value is measured against the root's mean under the same determinization (a control variate). After each move the determinizations that no longer match the AI's view are dropped and the same tree goes on (tree reuse; a re-search only when some are dropped). The lethal check (`public` mode) runs first and a proven line is played with no search. Other decisions are a flat UCB search over the answers. Emperor adds iterative deepening (tree-depth caps over four stages of the budget). Rollouts play Characters for both seats (`SimContext.quickPlays`; Pirate's keep it off).
 
 ### 4.3 Determinization
 

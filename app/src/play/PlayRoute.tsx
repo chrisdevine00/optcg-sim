@@ -56,7 +56,7 @@ async function startGame(choice: SetupChoice): Promise<GameController> {
     mode: choice.opponent === 'hotseat' ? 'hotseat' : 'ai',
     human: 'p1',
     names,
-    tier: choice.opponent === 'rookie' ? 'rookie' : 'pirate',
+    tier: choice.opponent === 'hotseat' ? 'pirate' : choice.opponent,
     autoSkip: choice.autoSkip,
     alwaysSkip: choice.alwaysSkip,
     speed: choice.speed,
