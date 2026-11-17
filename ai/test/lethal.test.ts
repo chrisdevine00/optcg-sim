@@ -46,10 +46,14 @@ import {
 } from '../src/index.ts';
 import { counterProfile } from '../src/search/lethal/profile.ts';
 import { cardMap, lookup } from './support.ts';
+import { asVanilla } from './support/vanilla.ts';
 import { docExample } from './support/doc.ts';
 import { lifeOf, listOf, start } from './support/scenario.ts';
 
 vi.setConfig({ testTimeout: 120_000 });
+
+// M4b scripted these fixture cards; see support/vanilla.ts.
+asVanilla('OP13-001', 'OP13-027', 'OP13-118');
 
 const ROCKS = 'OP17-039';
 const KAIDO = 'OP17-058';

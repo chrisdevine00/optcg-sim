@@ -135,6 +135,32 @@ import { P_088 } from './P/P-088.ts';
 import { P_093 } from './P/P-093.ts';
 import { OP12_108 } from './OP-12/OP12-108.ts';
 import { OP17_059 } from './OP-17/OP17-059.ts';
+// M4b wave 2: Sabo and Black Luffy
+import { EB04_007 } from './EB-04/EB04-007.ts';
+import { OP13_004 } from './OP-13/OP13-004.ts';
+import { OP14_096 } from './OP-14/OP14-096.ts';
+import { OP15_088 } from './OP-15/OP15-088.ts';
+import { OP15_092 } from './OP-15/OP15-092.ts';
+import { OP17_079 } from './OP-17/OP17-079.ts';
+import { OP17_080 } from './OP-17/OP17-080.ts';
+import { OP17_081 } from './OP-17/OP17-081.ts';
+import { OP17_082 } from './OP-17/OP17-082.ts';
+import { OP17_083 } from './OP-17/OP17-083.ts';
+import { OP17_084 } from './OP-17/OP17-084.ts';
+import { OP17_086 } from './OP-17/OP17-086.ts';
+import { OP17_087 } from './OP-17/OP17-087.ts';
+import { OP17_089 } from './OP-17/OP17-089.ts';
+import { OP17_090 } from './OP-17/OP17-090.ts';
+import { OP17_091 } from './OP-17/OP17-091.ts';
+import { OP17_093 } from './OP-17/OP17-093.ts';
+import { OP17_094 } from './OP-17/OP17-094.ts';
+import { OP17_095 } from './OP-17/OP17-095.ts';
+import { OP17_096 } from './OP-17/OP17-096.ts';
+import { OP17_098 } from './OP-17/OP17-098.ts';
+import { OP17_119 } from './OP-17/OP17-119.ts';
+import { ST01_011 } from './ST-01/ST01-011.ts';
+import { ST14_017 } from './ST-14/ST14-017.ts';
+import { RGL_PENEL } from './rgluffy-penel.ts';
 
 const ALL: readonly CardScript[] = [
   EB01_056,
@@ -266,6 +292,32 @@ const ALL: readonly CardScript[] = [
   P_093,
   OP12_108,
   OP17_059,
+  // M4b wave 2: Sabo and Black Luffy
+  EB04_007,
+  OP13_004,
+  OP14_096,
+  OP15_088,
+  OP15_092,
+  OP17_079,
+  OP17_080,
+  OP17_081,
+  OP17_082,
+  OP17_083,
+  OP17_084,
+  OP17_086,
+  OP17_087,
+  OP17_089,
+  OP17_090,
+  OP17_091,
+  OP17_093,
+  OP17_094,
+  OP17_095,
+  OP17_096,
+  OP17_098,
+  OP17_119,
+  ST01_011,
+  ST14_017,
+  ...RGL_PENEL,
 ];
 
 export const SCRIPTS: Readonly<Record<string, CardScript>> = Object.fromEntries(

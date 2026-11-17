@@ -22,10 +22,14 @@ import {
 } from '@optcg/engine';
 import { lethal, priorCardIds } from '../src/index.ts';
 import { cardMap, lookup } from './support.ts';
+import { asVanilla } from './support/vanilla.ts';
 import { refuteLine } from './support/refute.ts';
 import { listOf } from './support/scenario.ts';
 
 vi.setConfig({ testTimeout: 1_200_000 });
+
+// M4b scripted these fixture cards; see support/vanilla.ts.
+asVanilla('OP13-001', 'OP13-027', 'OP13-118');
 
 const cards = cardMap();
 const N = Number(process.env.LETHAL_POSITIONS ?? 14);

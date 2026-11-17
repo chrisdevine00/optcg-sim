@@ -32,10 +32,14 @@ import {
   type LethalFlag,
 } from '../src/index.ts';
 import { cardMap, lookup } from './support.ts';
+import { asVanilla } from './support/vanilla.ts';
 import { docExample } from './support/doc.ts';
 import { lifeOf, listOf } from './support/scenario.ts';
 
 vi.setConfig({ testTimeout: 120_000 });
+
+// M4b scripted these fixture cards; see support/vanilla.ts.
+asVanilla('OP13-001', 'OP13-027', 'OP13-118');
 
 const cards = cardMap();
 const ROCKS = 'OP17-039';

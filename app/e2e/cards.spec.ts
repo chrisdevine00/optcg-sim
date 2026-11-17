@@ -125,9 +125,9 @@ test.describe('card browser', () => {
     await expect(page).toHaveURL(/card=OP17-087/);
     await expect(page).toHaveTitle('Nico Robin (OP17-087) · Cards · OPTCG Sim');
     await expect(dialog.getByText('✓ Verified')).toBeVisible();
-    // M4a: some cards are scripted, so an unscripted one carries the per-card warning.
-    await expect(dialog.getByText('⚠ Effect not automated', { exact: true })).toBeVisible();
-    await expect(dialog.getByText(/In a game this card plays for its stats/)).toBeVisible();
+    // M4b: OP17-087 is scripted, so it carries no "not automated" warning (Atmos below does).
+    await expect(dialog.getByText('⚠ Effect not automated', { exact: true })).toHaveCount(0);
+    await expect(dialog.getByText(/In a game this card plays for its stats/)).toHaveCount(0);
     await expect(dialog.getByLabel('Card text')).toContainText('−3000 power during this turn');
     await dialog.getByText(/Repairs to the upstream data/).click();
     await expect(dialog.locator('.fixes li', { hasText: 'Corrected by hand' })).toContainText(
@@ -140,7 +140,11 @@ test.describe('card browser', () => {
     await expect(page).toHaveURL(/\/cards\?q=OP17-087$/);
     // A link to a card opens it, and Previous/Next walk the results (M1-15).
     await page.goto('./cards?set=OP-17&card=OP17-002');
-    await expect(page.getByRole('dialog', { name: 'Atmos' })).toBeVisible();
+    const atmos = page.getByRole('dialog', { name: 'Atmos' });
+    await expect(atmos).toBeVisible();
+    // An unscripted card with an effect carries the per-card warning.
+    await expect(atmos.getByText('⚠ Effect not automated', { exact: true })).toBeVisible();
+    await expect(atmos.getByText(/In a game this card plays for its stats/)).toBeVisible();
     await page.keyboard.press('PageDown');
     await expect(page.getByRole('dialog', { name: 'Izo' })).toBeVisible();
     await page.getByRole('button', { name: '◂ Previous' }).click();

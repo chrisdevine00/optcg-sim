@@ -101,6 +101,7 @@ describe('OP12-061 Donquixote Rosinante', () => {
       discount(g);
       expect(don(g, 'p1')).toMatchObject({ active: 8, deck: 2 });
       play(g, LAW4);
+      decline(g); // ST10-010's own [On Play] DON!! −1 (scripted in M4b wave 2)
       expect(don(g, 'p1').active).toBe(6); // paid 2, not 4
       play(g, LAW5);
       expect(don(g, 'p1').active).toBe(1); // paid the full 5

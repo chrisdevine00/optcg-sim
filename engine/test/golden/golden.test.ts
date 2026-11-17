@@ -110,6 +110,8 @@ describe('golden records', () => {
       // A behaviour change must bump ENGINE_VERSION, which fails here until goldens are re-recorded.
       expect(g.record.versions.engine).toBe(ENGINE_VERSION);
       expect(measure(g.record)).toEqual(g.expected);
-    });
+      // 30 s: the M4b meta goldens run the permanent layer on every derive; their replay time
+      // (about 4.6 s for meta-random-2 alone on 2026-11-16) is tracked as M4b perf work.
+    }, 30_000);
   }
 });

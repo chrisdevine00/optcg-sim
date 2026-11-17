@@ -29,6 +29,7 @@ import {
   allHold,
   cannotDrawByEffect,
   costIsSecret,
+  dvOf,
   hiddenPool,
   holds,
   matches,
@@ -412,7 +413,8 @@ function select(
   if (secret && !sel.filter && zones.length === 1 && zones[0] === 'hand' && !o.restrict)
     dec.publicCount = true;
   if ('upTo' in pk && (pk.totalCost || pk.distinctNames)) {
-    dec.limits = { costs: cands.map((id) => d.s.defs[d.s.cards[id]!.card]!.cost ?? 0) };
+    // "Total cost" is the current cost (CR 2-7-6): +12 cost cards are far over any budget.
+    dec.limits = { costs: cands.map((id) => dvOf(c, id).cost ?? 0) };
     if (pk.totalCost && 'lte' in pk.totalCost) dec.limits.total = num(c, pk.totalCost.lte);
     if (pk.distinctNames) dec.limits.names = cands.map((id) => d.s.defs[d.s.cards[id]!.card]!.name);
   }
