@@ -2,6 +2,10 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-16 — Golden records: a new SCRIPTS_VERSION also justifies a re-record
+
+Context: the golden random games (`engine/test/golden/`) draw from the meta decks, so every newly scripted meta card can change how they play out. The re-record guard refused any changed result at an unchanged ENGINE_VERSION, which would have forced an engine bump per wave 2 merge for changes that are not engine changes. Records already carry `versions.scripts` (the script hash), and `isCurrent` (`engine/src/record.ts`) already treats a scripts change as a new version. Decision: the guard refuses a changed result only when both the engine version and the scripts version are unchanged. ENGINE_VERSION is still bumped for engine changes (the wave 2 Sabo merge does, for its `totalCost` fix). Rejected: bumping ENGINE_VERSION per merge (the version would stop meaning "the engine changed"), and dropping the random meta goldens (they are the only goldens that exercise scripts).
+
 ## 2026-11-16 — M4b wave 1: the effect runtime is complete for the 143 meta cards; permanent effects are a staged derive layer
 
 Context: wave 1 of M4b (the entry below). The audit (`docs/research/m4b-runtime-audit.md`) found 34 shapes the 143 unscripted meta cards need that the M4a runtime did not run (it ran only what the 37 Rocks and Kaido scripts use). All 34 are now implemented, each with a planted test in `engine/test/cards/m4b/` on a vanilla card (not one of the 143), and each piece was reverted in turn (a one-line reversion per shape) and the new tests failed for every one except the Event-play branch of the `playCost` spend, which no test covers. Semantic choices, newest concerns first:

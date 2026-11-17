@@ -4,7 +4,7 @@
     "versions": {
       "engine": "0.5.2",
       "cards": "cards-18b71006dd93f400",
-      "scripts": "scripts-0487e705ef100d0c"
+      "scripts": "scripts-0efa2322d2ab0b0a"
     },
     "start": {
       "setup": {

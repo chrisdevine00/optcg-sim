@@ -80,6 +80,36 @@ import { OP15_114 } from './OP-15/OP15-114.ts';
 import { OP15_119 } from './OP-15/OP15-119.ts';
 import { OP05_114 } from './OP-05/OP05-114.ts';
 import { OP05_115 } from './OP-05/OP05-115.ts';
+// M4b wave 2: Hancock (OP14-041) and Rosinante (OP12-061) archetypes.
+import { OP14_041 } from './OP-14/OP14-041.ts';
+import { OP06_058 } from './OP-06/OP06-058.ts';
+import { OP06_106 } from './OP-06/OP06-106.ts';
+import { OP06_115 } from './OP-06/OP06-115.ts';
+import { OP07_057 } from './OP-07/OP07-057.ts';
+import { OP11_054 } from './OP-11/OP11-054.ts';
+import { OP14_104 } from './OP-14/OP14-104.ts';
+import { OP14_105 } from './OP-14/OP14-105.ts';
+import { OP14_107 } from './OP-14/OP14-107.ts';
+import { OP14_108 } from './OP-14/OP14-108.ts';
+import { OP14_112 } from './OP-14/OP14-112.ts';
+import { OP14_114 } from './OP-14/OP14-114.ts';
+import { OP14_118 } from './OP-14/OP14-118.ts';
+import { OP15_113 } from './OP-15/OP15-113.ts';
+import { OP16_113 } from './OP-16/OP16-113.ts';
+import { ST17_004 } from './ST-17/ST17-004.ts';
+import { OP12_061 } from './OP-12/OP12-061.ts';
+import { EB04_038 } from './EB-04/EB04-038.ts';
+import { OP10_114 } from './OP-10/OP10-114.ts';
+import { OP12_115 } from './OP-12/OP12-115.ts';
+import { OP16_064 } from './OP-16/OP16-064.ts';
+import { OP16_065 } from './OP-16/OP16-065.ts';
+import { OP16_067 } from './OP-16/OP16-067.ts';
+import { OP16_077 } from './OP-16/OP16-077.ts';
+import { OP16_078 } from './OP-16/OP16-078.ts';
+import { P_088 } from './P/P-088.ts';
+import { P_093 } from './P/P-093.ts';
+import { OP12_108 } from './OP-12/OP12-108.ts';
+import { OP17_059 } from './OP-17/OP17-059.ts';
 
 const ALL: readonly CardScript[] = [
   EB01_056,
@@ -156,6 +186,36 @@ const ALL: readonly CardScript[] = [
   OP15_119,
   OP05_114,
   OP05_115,
+  // M4b wave 2: Hancock and Rosinante.
+  OP14_041,
+  OP06_058,
+  OP06_106,
+  OP06_115,
+  OP07_057,
+  OP11_054,
+  OP14_104,
+  OP14_105,
+  OP14_107,
+  OP14_108,
+  OP14_112,
+  OP14_114,
+  OP14_118,
+  OP15_113,
+  OP16_113,
+  ST17_004,
+  OP12_061,
+  EB04_038,
+  OP10_114,
+  OP12_115,
+  OP16_064,
+  OP16_065,
+  OP16_067,
+  OP16_077,
+  OP16_078,
+  P_088,
+  P_093,
+  OP12_108,
+  OP17_059,
 ];
 
 export const SCRIPTS: Readonly<Record<string, CardScript>> = Object.fromEntries(

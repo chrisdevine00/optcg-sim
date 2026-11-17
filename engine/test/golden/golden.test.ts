@@ -2,8 +2,9 @@
  * Golden records (ADR 0004): recorded games whose replay must reproduce the stored summary hash,
  * every per-turn snapshot hash and the event-type sequence (M2-15).
  *
- * Re-recording needs an ENGINE_VERSION bump (M2-07): a golden whose engine version equals the
- * current one may not be re-recorded with a different result. Bump ENGINE_VERSION, then run
+ * Re-recording a different result needs a version change (M2-07): an ENGINE_VERSION bump for an
+ * engine change, or a new SCRIPTS_VERSION (added or changed effect scripts; random meta games run
+ * them). With both versions unchanged, a different result is refused. Bump ENGINE_VERSION, then run
  *   UPDATE_GOLDEN=1 npx vitest run engine/test/golden && npx prettier --write engine/test/golden
  */
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
@@ -80,9 +81,15 @@ if (process.env.UPDATE_GOLDEN) {
     const expected = measure(g.record);
     if (existsSync(file)) {
       const old = JSON.parse(readFileSync(file, 'utf8')) as Golden;
-      if (old.record.versions.engine === ENGINE_VERSION && old.expected.hash !== expected.hash)
+      // A changed game needs a new version: ENGINE_VERSION for an engine change, SCRIPTS_VERSION
+      // (automatic, the script hash) for added or changed scripts (DECISIONS 2026-11-16).
+      if (
+        old.record.versions.engine === ENGINE_VERSION &&
+        old.record.versions.scripts === g.record.versions.scripts &&
+        old.expected.hash !== expected.hash
+      )
         throw new Error(
-          `${name}: the game changed but ENGINE_VERSION is still ${ENGINE_VERSION}. Bump it first.`,
+          `${name}: the game changed but ENGINE_VERSION is still ${ENGINE_VERSION} and the scripts are unchanged. Bump ENGINE_VERSION first.`,
         );
     }
     const golden: Golden = {

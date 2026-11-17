@@ -36,7 +36,10 @@ const ANY_TAG =
   /\[(?:On Play|Main|Counter|Activate:\s*Main|When Attacking|On Your Opponent's Attack|On Block|On K\.O\.|End of Your)/;
 
 function unitsOf(text: string): string[] {
-  return text
+  // A keyword tag written right before a header ("[Blocker] [On Play] ...", EB04-038) would stop the
+  // split (the lookbehind keeps "[Activate: Main] [Once Per Turn]" together), so drop keyword tags.
+  const plain = text.replace(/\[(?:Blocker|Rush|Double Attack|Banish|Unblockable)\]\s*/g, '');
+  return plain
     .split(SPLIT)
     .map((u) => u.trim())
     .filter(Boolean);
