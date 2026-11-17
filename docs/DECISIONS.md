@@ -2,6 +2,14 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-16 — M4b starts without waiting for S1; the meta refresh moves after OP18; the runtime is built first, then the archetypes in parallel
+
+Context: on resume, the next items are owner session S1 (the owner's, not schedulable by the run) and M4b. PLAN §1 makes M4b depend on S1, and risk 6 says "refresh before M4b". 143 of the 182 meta-list cards still need scripts (10 archetypes; Rocks and Kaido are done). Decisions:
+
+- **M4b goes ahead before S1.** S1's findings are about the board and learning layer, which M4b does not touch (it adds scripts and runtime shapes). Findings are folded in when S1 happens. Rejected: idling until the owner is available.
+- **The meta refresh is moved to after OP18 (released 2026-11-20) has data, and is done at M9 as planned.** The 36 sourced lists are 19 days old (the 60-day staleness flag is not near), EB05 has under three weeks of results, and OP18 lands in four days, so a refresh now would be redone within a month. M4b's done criterion is defined by the 182 gated cards. Rejected: refreshing now (wasted twice) and chasing OP18 mid-milestone (the plan forbids it).
+- **Order: one runtime wave, then archetype waves.** A single agent audits all 143 cards against `IMPLEMENTED` (`cards/src/dsl-validate.ts`) and effect-dsl.md Appendix A and §5.1, then implements every missing shape in the engine with planted tests. Then archetype agents script cards in parallel worktrees, touching only `cards/effects/` and their own tests, with each card assigned to exactly one agent (first archetype by rank that lists it). Black-box tests come from separate agents, as in M4a. Rejected: archetype agents extending the runtime in parallel (every one of them would edit `engine/src/effects/run.ts`, and conflicting runtime semantics are worse than merge conflicts).
+
 ## 2026-11-09 — L screen-reader fix round 3: L stays on the board until the line, polite lines are spaced, the optional effect is described, and a mute NVDA invalidates the run
 
 Context: the L NVDA pass r3 (`docs/design/a11y-passes/l-nvda-chrome-r3.md`, `-firefox-r3.md`). Chrome passed by the rule with three severity 2 findings (L-SR16, L-SR20, L-SR21). Firefox heard nothing at all: the speech tap joined, delivered no phrase, nothing flagged it, and step 6 failed on a harness key.
