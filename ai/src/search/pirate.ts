@@ -37,7 +37,7 @@ import { ownTurn, type Playbook } from '../playbook.ts';
 import { playOnlyIfMet } from './conditions.ts';
 import { evaluate, total, type Breakdown, type Weights } from './heuristic.ts';
 import { determinizations } from './sample.ts';
-import { explainAction, type WhyContext } from './why.ts';
+import { explainAction, playConditionHolds, type WhyContext } from './why.ts';
 import { apply, battleNumbers, quickAction, rolloutValue, settle, type SimContext } from './sim.ts';
 
 export type Budget = { iterations: number } | { ms: number };
@@ -330,11 +330,14 @@ function mainBias(root: GameState, me: PlayerId, ctx: SimContext, setup: PirateS
   const leaderCanAttack = legal.some((a) => a.type === 'attack' && a.attacker === leader.instance);
   const oppChars = queries.zone(root, other(me), 'characters');
   const chars = queries.zone(root, me, 'characters');
+  const donActive = queries.don(root, me).active;
+  const ctxG2 = groupTwoFacts(root, me, own, setup);
   return (c: Candidate): number => {
     if (!pb) return 0;
     let b = 0;
     for (const a of c.actions) {
       for (const bias of pb.biases) {
+        b += groupTwoBias(bias, a, c, root, me, own, leader, donActive, ctxG2, setup);
         if (bias.kind === 'attackWith' && a.type === 'attack' && own >= bias.fromOwnTurn) {
           const who = bias.card === 'leader' ? leader.instance : null;
           if (who ? a.attacker === who : queries.card(root, a.attacker).card === bias.card)
@@ -412,6 +415,120 @@ function mainBias(root: GameState, me: PlayerId, ctx: SimContext, setup: PirateS
   };
 }
 
+/**
+ * `keepActiveDon` also holds DON!! back from giving: a Leader attack or a give that would leave
+ * fewer than `min` active DON!! is not offered (the Leader's DON!! rest needs active DON!!; the
+ * guide's plan is to defend with it, not to pour every DON!! into one swing).
+ */
+function holdDon(
+  cands: Candidate[],
+  root: GameState,
+  me: PlayerId,
+  ctx: SimContext,
+  setup: PirateSetup,
+): Candidate[] {
+  const hold = setup.playbook?.biases.find((b) => b.kind === 'keepActiveDon');
+  if (!hold || hold.kind !== 'keepActiveDon' || ownTurnOf(root, ctx) < hold.fromOwnTurn)
+    return cands;
+  const active = queries.don(root, me).active;
+  const kept = cands.filter((c) => {
+    const gives = c.actions.filter((a) => a.type === 'giveDon');
+    return gives.length === 0 || active - gives.length >= hold.min;
+  });
+  return kept.length ? kept : cands;
+}
+
+/** What the group-2 biases read from the root state, once per planning step. */
+interface GroupTwoFacts {
+  leaderAttacked: boolean;
+  counterReserve: number;
+  /** Active DON!! `keepActiveDon` holds back this turn (0 before its turn). */
+  holdMin: number;
+}
+
+function groupTwoFacts(
+  root: GameState,
+  me: PlayerId,
+  own: number,
+  setup: PirateSetup,
+): GroupTwoFacts {
+  const leader = queries.zone(root, me, 'leader')[0]!;
+  // The cheapest [Counter] Event in hand the AI could still pay for: DON!! it keeps back.
+  const don = queries.don(root, me).active;
+  const costs = queries
+    .zone(root, me, 'hand')
+    .filter((c) => {
+      const card = setup.cards.get(c.card);
+      return card?.category === 'Event' && counterValueOf(card) > 0 && (c.cost ?? 0) <= don;
+    })
+    .map((c) => c.cost ?? 0);
+  const hold = setup.playbook?.biases.find((b) => b.kind === 'keepActiveDon');
+  return {
+    leaderAttacked: leader.rested,
+    counterReserve: costs.length ? Math.min(...costs) : 0,
+    holdMin: hold?.kind === 'keepActiveDon' && own >= hold.fromOwnTurn ? hold.min : 0,
+  };
+}
+
+/** The group-2 bias kinds (Luffy & Ace, OP13-001, OP17-079). */
+function groupTwoBias(
+  bias: Playbook['biases'][number],
+  a: Action,
+  c: Candidate,
+  root: GameState,
+  me: PlayerId,
+  own: number,
+  leader: { instance: string; don: number },
+  donActive: number,
+  f: GroupTwoFacts,
+  setup: PirateSetup,
+): number {
+  switch (bias.kind) {
+    case 'playOnlyWhen': {
+      if (a.type !== 'playCard' || !bias.cards.includes(queries.card(root, a.card).card)) return 0;
+      const late = bias.beforeLeaderAttack && f.leaderAttacked;
+      return late || !playConditionHolds(bias.when, root, me) ? -bias.penalty : 0;
+    }
+    case 'avoidBasePower': {
+      if (a.type !== 'playCard') return 0;
+      const card = queries.card(root, a.card);
+      return setup.cards.get(card.card)?.category === 'Character' &&
+        (card.power ?? 0) >= bias.minPower
+        ? -bias.penalty
+        : 0;
+    }
+    case 'leaderDon': {
+      if (own < bias.fromOwnTurn || leader.don > 0) return 0;
+      if (a.type === 'giveDon' && a.target === leader.instance) return bias.bonus;
+      // Only when a DON!! could be given without breaking the hold (keepActiveDon).
+      if (a.type === 'endTurn' && donActive - 1 >= f.holdMin) return -bias.bonus;
+      return 0;
+    }
+    case 'keepActiveDon': {
+      if (own < bias.fromOwnTurn) return 0;
+      if (a.type === 'endTurn')
+        return donActive < bias.min || donActive > bias.max ? -bias.penalty : 0;
+      if (a.type === 'playCard') {
+        const card = queries.card(root, a.card);
+        // A card that sets DON!! active again does not spend the DON!! the Leader's rest needs.
+        if (scriptMentions(card.card, ['setActive'])) return 0;
+        return donActive - (card.cost ?? 0) < bias.min && donActive >= bias.min ? -bias.penalty : 0;
+      }
+      return 0;
+    }
+    case 'spareDon': {
+      if (a.type !== 'attack' || a.attacker !== leader.instance) return 0;
+      if (own < bias.fromOwnTurn || own > bias.toOwnTurn) return 0;
+      const spare = donActive - f.counterReserve;
+      if (spare <= 0) return 0;
+      const given = c.actions.filter((x) => x.type === 'giveDon').length;
+      return given > spare ? -bias.bonus : (bias.bonus * given) / spare;
+    }
+    default:
+      return 0;
+  }
+}
+
 function otherBias(root: GameState, me: PlayerId, setup: PirateSetup) {
   const pb = setup.playbook;
   const dec = queries.decision(root)!;
@@ -475,6 +592,16 @@ function otherBias(root: GameState, me: PlayerId, setup: PirateSetup) {
             b += bias.penalty;
         }
       }
+      if (
+        bias.kind === 'preferPick' &&
+        dec.kind === 'choose' &&
+        src.card === bias.source &&
+        src.ability === bias.ability &&
+        a.type === 'pick' &&
+        typeof a.choice === 'string' &&
+        bias.cards.includes(queries.card(root, a.choice).card)
+      )
+        b += bias.bonus;
       if (
         bias.kind === 'targetHighestPower' &&
         dec.kind === 'choose' &&
@@ -651,7 +778,7 @@ export function planTurn(
     if (!dec || dec.kind !== 'main' || dec.player !== me || queries.result(root)) break;
     const fp = n === 0 ? fingerprint(view) : fingerprint(project(root, me));
     if (n > 0 && states.some((s) => fingerprint(project(s, me)) !== fp)) break;
-    const cands = mainCandidates(root, me);
+    const cands = holdDon(mainCandidates(root, me), root, me, ctx, setup);
     const ranked = score(
       states,
       cands,

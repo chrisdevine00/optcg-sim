@@ -1,0 +1,134 @@
+{
+  "leaderId": "OP17-079",
+  "archetypeId": "OP17-079-luffy-black",
+  "aiName": "Black Luffy",
+  "asOf": "2026-11-17",
+  "guide": "docs/content/archetypes/OP17-079.md",
+  "notes": [
+    "Written from the guide's 'Game plan by turn' and 'Playbook seeds'.",
+    "Every number here is an inference (review M5a-09): the guide gives the direction, not the value. weights, faceBias, counterAggression, cardValue and bias sizes were set by reasoning and have not been tuned on their own.",
+    "Bias sizes were chosen so the planted game-plan tests pass; ai/test/game-plan-g2.test.ts runs every seed with the biases off too, and lists the seeds that pass only because a bias encodes the guide's line.",
+    "Citations ('cite', 'citeSource') are what 'Why?' shows when a move follows the line; only biases whose condition is public carry one.",
+    "goFirst false: strategy-concepts §10 [S17] says the general default is to go second, and the guide gives no seat advice for this board deck.",
+    "cardValue: the Giants (cost-12+ Characters) the guide builds the deck around, and Luffy OP17-093 (Rush, replays a Giant) [SH-BLU].",
+    "weights.board 1.15 and faceBias 0.95/1.0/1.05: 'a board deck of cheap Blockers that also attack' [SH-BLU]; inference.",
+    "mulligan: the guide's keepable hand (inference): Rodo or Gerd plus Usopp, Sanji, Zoro or Nami OP17-086.",
+    "seed 2 is two biases: a play only while a cost-12+ Character is out, and the attack with Luffy that turn."
+  ],
+  "goFirst": false,
+  "digTargets": ["OP17-094", "OP17-081", "OP17-093", "OP17-119"],
+  "winConditions": ["OP17-093", "OP17-119", "OP17-098"],
+  "cardValue": {
+    "OP17-094": 0.5,
+    "OP17-081": 0.5,
+    "OP17-089": 0.4,
+    "OP17-119": 0.5,
+    "OP17-093": 0.4,
+    "OP17-095": 0.2
+  },
+  "weights": {
+    "board": 1.15
+  },
+  "faceBias": {
+    "early": 0.95,
+    "mid": 1.0,
+    "late": 1.05
+  },
+  "counterAggression": 1.0,
+  "mulligan": {
+    "pieces": [
+      {
+        "name": "giant",
+        "label": "Rodo or Gerd",
+        "cards": ["OP17-094", "OP17-081"],
+        "min": 1
+      },
+      {
+        "name": "support",
+        "label": "Usopp, Sanji, Zoro or Nami",
+        "cards": ["OP17-080", "OP17-082", "OP17-095", "OP17-086"],
+        "min": 1
+      }
+    ],
+    "secondShort": 0,
+    "requireGoingFirst": [],
+    "source": "SH-BLU; OP17-079 guide (keepable hand, inference)"
+  },
+  "biases": [
+    {
+      "seed": 1,
+      "kind": "play",
+      "cards": ["OP17-094", "OP17-081", "OP17-089", "OP17-119"],
+      "byOwnTurn": 2,
+      "bonus": 1.0,
+      "cite": "Its guide: land a cheap Giant early; it is a Blocker at once and switches on every cost-12 card.",
+      "citeSource": "SH-BLU"
+    },
+    {
+      "seed": 2,
+      "kind": "playOnlyWhen",
+      "cards": ["OP17-093"],
+      "when": {
+        "kind": "ownCostAtLeast",
+        "cost": 12
+      },
+      "penalty": 25.0,
+      "cite": "Its guide: this Luffy has Rush only with a cost-12+ Character out, so he waits for one.",
+      "citeSource": "SH-BLU"
+    },
+    {
+      "seed": 2,
+      "kind": "attackWith",
+      "card": "OP17-093",
+      "fromOwnTurn": 1,
+      "bonus": 1.0,
+      "cite": "Its guide: this Luffy attacks the turn he lands.",
+      "citeSource": "SH-BLU"
+    },
+    {
+      "seed": 3,
+      "kind": "preferPick",
+      "source": "OP17-093",
+      "ability": "on-play",
+      "cards": ["OP17-094", "OP17-081"],
+      "bonus": 1.0,
+      "cite": "Its guide: Luffy's On Play replays a cheap Giant from the trash.",
+      "citeSource": "SH-BLU"
+    },
+    {
+      "seed": 4,
+      "kind": "play",
+      "cards": ["OP17-094", "OP17-081", "OP17-089", "OP17-119"],
+      "fromOwnTurn": 3,
+      "bonus": 0.6,
+      "cite": "Its guide: keep more than one Giant out.",
+      "citeSource": "SH-BLU"
+    }
+  ],
+  "assertions": [
+    {
+      "seed": 1,
+      "text": "Has a cost-12+ Character on the field by the end of T2.",
+      "threshold": 0.7,
+      "source": "SH-BLU (threshold is inference)"
+    },
+    {
+      "seed": 2,
+      "text": "Plays Luffy OP17-093 only while a cost-12+ Character is on the field, and attacks with him that turn.",
+      "threshold": 0.8,
+      "source": "SH-BLU"
+    },
+    {
+      "seed": 3,
+      "text": "Uses Luffy's On Play to replay a Rodo or Gerd when one is in the trash.",
+      "threshold": 0.8,
+      "source": "SH-BLU"
+    },
+    {
+      "seed": 4,
+      "text": "Keeps two or more cost-12+ Characters on the field from T4.",
+      "threshold": 0.6,
+      "source": "SH-BLU (threshold is inference)"
+    }
+  ]
+}

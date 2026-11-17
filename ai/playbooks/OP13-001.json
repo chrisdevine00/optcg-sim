@@ -1,0 +1,141 @@
+{
+  "leaderId": "OP13-001",
+  "archetypeId": "OP13-001-luffy-rg",
+  "aiName": "Luffy",
+  "asOf": "2026-11-17",
+  "guide": "docs/content/archetypes/OP13-001.md",
+  "notes": [
+    "Written from the guide's 'Game plan by turn' and 'Playbook seeds'.",
+    "Every number here is an inference (review M5a-09): the guide gives the direction, not the value. weights, faceBias, counterAggression, cardValue and bias sizes were set by reasoning and have not been tuned on their own.",
+    "Bias sizes were chosen so the planted game-plan tests pass; ai/test/game-plan-g2.test.ts runs every seed with the biases off too, and lists the seeds that pass only because a bias encodes the guide's line.",
+    "Citations ('cite', 'citeSource') are what 'Why?' shows when a move follows the line; only biases whose condition is public carry one.",
+    "goFirst false: strategy-concepts §10 [S17], 'go second with counter-heavy and late-game decks'; the guide's Leader defends rather than attacks and wants DON!! active on their turn. The guide gives no seat advice of its own.",
+    "weights.don 1.2: the guide's engine is a dense package of cards that set DON!! active [SH-RGL]; DON!! next turn counts a little more.",
+    "counterAggression 1.05 and faceBias 0.95/1.0/1.05: 'a Straw Hat Crew midrange deck whose leader defends rather than attacks' [SH-RGL]; inference.",
+    "cardValue: the restand cards (Sanji, Usopp, Nami OP14-031) and the closers named in 'Defining cards'.",
+    "mulligan: the guide's keepable hand (inference): a T1 searcher, a restand piece and a couple of +1000/+2000 Counter cards; going second one piece short is fine (Usopp and Sanji without a searcher); going first the searcher is required ('be stricter' [SH-MUL]).",
+    "seed 4 (Charlestone) has no bias of its own if search alone holds it; see the test file for which seeds pass without biases."
+  ],
+  "goFirst": false,
+  "digTargets": ["OP13-027", "OP14-022", "OP14-031", "OP13-118"],
+  "winConditions": ["EB04-007", "OP13-118", "OP17-022"],
+  "cardValue": {
+    "OP13-027": 0.5,
+    "OP14-022": 0.5,
+    "OP14-031": 0.5,
+    "OP13-118": 0.3,
+    "EB04-007": 0.3,
+    "ST31-005": 0.3
+  },
+  "weights": {
+    "don": 1.2
+  },
+  "faceBias": {
+    "early": 0.95,
+    "mid": 1.0,
+    "late": 1.05
+  },
+  "counterAggression": 1.05,
+  "mulligan": {
+    "pieces": [
+      {
+        "name": "searcher",
+        "label": "a T1 searcher (Nami, Bonney or Thousand Sunny)",
+        "cards": ["OP01-016", "EB02-017", "EB04-002", "ST31-005"],
+        "min": 1
+      },
+      {
+        "name": "restand",
+        "label": "a restand piece (Usopp, Sanji or Nami OP14-031)",
+        "cards": ["OP14-022", "OP13-027", "OP14-031"],
+        "min": 1
+      },
+      {
+        "name": "counters",
+        "label": "a couple of +1000/+2000 Counter cards",
+        "min": 2
+      }
+    ],
+    "secondShort": 1,
+    "requireGoingFirst": ["searcher"],
+    "source": "SH-RGL, SH-MUL; OP13-001 guide (keepable hand, inference)"
+  },
+  "biases": [
+    {
+      "seed": 1,
+      "kind": "leaderDon",
+      "fromOwnTurn": 2,
+      "bonus": 1.0,
+      "cite": "Its guide: give 1 DON!! to the Leader before passing, or the [DON!! x1] defence does nothing on their turn.",
+      "citeSource": "SH-RGL"
+    },
+    {
+      "seed": 2,
+      "kind": "avoidPlay",
+      "card": "OP13-118",
+      "whileInHand": "OP13-027",
+      "fromOwnTurn": 1,
+      "penalty": 3.0
+    },
+    {
+      "seed": 3,
+      "kind": "keepActiveDon",
+      "fromOwnTurn": 3,
+      "min": 1,
+      "max": 5,
+      "penalty": 25.0,
+      "cite": "Its guide: end the turn with up to 5 active DON!!, the most the Leader can use.",
+      "citeSource": "SH-RGL"
+    },
+    {
+      "seed": 5,
+      "kind": "play",
+      "cards": ["OP01-016", "EB02-017", "EB04-002"],
+      "byOwnTurn": 2,
+      "bonus": 2.0,
+      "cite": "Its guide: search on turns 1 and 2 with a 1-cost searcher or Stage.",
+      "citeSource": "SH-RGL"
+    },
+    {
+      "seed": 5,
+      "kind": "play",
+      "cards": ["ST31-005"],
+      "byOwnTurn": 2,
+      "bonus": 3.0,
+      "cite": "Its guide: search on turns 1 and 2 with a 1-cost searcher or Stage.",
+      "citeSource": "SH-RGL"
+    }
+  ],
+  "assertions": [
+    {
+      "seed": 1,
+      "text": "Ends every turn from T2 with at least 1 DON!! given to the Leader.",
+      "threshold": 0.9,
+      "source": "SH-RGL"
+    },
+    {
+      "seed": 2,
+      "text": "When Sanji OP13-027 and Luffy OP13-118 are both played in one turn, Sanji is played first.",
+      "threshold": 1.0,
+      "source": "SH-RGL, card text"
+    },
+    {
+      "seed": 3,
+      "text": "Ends each turn from T3 with between 1 and 5 active DON!! in the cost area.",
+      "threshold": 0.8,
+      "source": "SH-RGL"
+    },
+    {
+      "seed": 4,
+      "text": "Does not also play Charlestone when the Leader's DON!! rest alone already beats the attacker.",
+      "threshold": 0.8,
+      "source": "SH-RGL"
+    },
+    {
+      "seed": 5,
+      "text": "Plays a searcher (Nami, Bonney or Thousand Sunny) on T1 when one is in hand.",
+      "threshold": 0.9,
+      "source": "SH-RGL"
+    }
+  ]
+}

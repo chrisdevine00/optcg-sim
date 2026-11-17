@@ -11,6 +11,9 @@ import enel from '../playbooks/OP05-098.json';
 import kalgara from '../playbooks/OP08-098.json';
 import robin from '../playbooks/OP09-062.json';
 import hancock from '../playbooks/OP14-041.json';
+import luffyAce from '../playbooks/ST30-001.json';
+import luffyRedGreen from '../playbooks/OP13-001.json';
+import luffyBlack from '../playbooks/OP17-079.json';
 
 /** The heuristic terms a playbook can scale (see `search/heuristic.ts`). */
 export type WeightKey = 'life' | 'hand' | 'counter' | 'board' | 'don' | 'threat';
@@ -157,7 +160,56 @@ export type Bias = BiasCite &
         penalty: number;
         seed: number;
       }
+    /**
+     * Group 2 additions (Luffy & Ace, OP13-001, OP17-079). `playOnlyWhen`: in the Main Phase play
+     * one of `cards` only while `when` holds (a penalty otherwise). With `beforeLeaderAttack` it
+     * also wants the play before the Leader has attacked this turn.
+     */
+    | {
+        kind: 'playOnlyWhen';
+        cards: string[];
+        when: PlayCondition;
+        beforeLeaderAttack?: boolean;
+        penalty: number;
+        seed: number;
+      }
+    /** Never play a Character whose base power is `minPower` or more. */
+    | { kind: 'avoidBasePower'; minPower: number; penalty: number; seed: number }
+    /** From own turn `fromOwnTurn`, give the Leader a DON!! each turn before passing. */
+    | { kind: 'leaderDon'; fromOwnTurn: number; bonus: number; seed: number }
+    /** From own turn `fromOwnTurn`, pass the turn with `min` to `max` active DON!!. */
+    | {
+        kind: 'keepActiveDon';
+        fromOwnTurn: number;
+        min: number;
+        max: number;
+        penalty: number;
+        seed: number;
+      }
+    /**
+     * Own turns `fromOwnTurn` to `toOwnTurn`: a Leader attack takes every active DON!! that no
+     * [Counter] Event in hand needs (more power raises the Counter the defender needs).
+     */
+    | { kind: 'spareDon'; fromOwnTurn: number; toOwnTurn: number; bonus: number; seed: number }
+    /** In this ability's target choice, prefer a card from `cards`. */
+    | {
+        kind: 'preferPick';
+        source: string;
+        ability: string;
+        cards: string[];
+        bonus: number;
+        seed: number;
+      }
   );
+
+/** When a `playOnlyWhen` card may be played (public conditions only). */
+export type PlayCondition =
+  /** The opponent has a rested Character with cost `maxCost` or less. */
+  | { kind: 'oppRestedCharacter'; maxCost: number }
+  /** The opponent has an active Character or an active DON!!. */
+  | { kind: 'oppActive' }
+  /** The AI has a Character whose cost is `cost` or more. */
+  | { kind: 'ownCostAtLeast'; cost: number };
 
 /** A measurable game-plan assertion (ARCHITECTURE §4.6), checked by the tests. */
 export interface Assertion {
@@ -225,7 +277,17 @@ export interface Playbook {
   leaderTrick?: LeaderTrickCopy & { source: string; ability: string };
 }
 
-const ALL = [rocks, kaido, robin, enel, kalgara, hancock] as unknown as Playbook[];
+const ALL = [
+  rocks,
+  kaido,
+  robin,
+  enel,
+  kalgara,
+  hancock,
+  luffyAce,
+  luffyRedGreen,
+  luffyBlack,
+] as unknown as Playbook[];
 
 export const PLAYBOOKS: ReadonlyMap<string, Playbook> = new Map(ALL.map((p) => [p.leaderId, p]));
 

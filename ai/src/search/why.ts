@@ -29,7 +29,7 @@ import {
   type CardFact,
 } from '../explain.ts';
 import { biggestCounter, eventCounterOf } from '../knowledge.ts';
-import { ownTurn, type Bias, type Playbook } from '../playbook.ts';
+import { ownTurn, type Bias, type PlayCondition, type Playbook } from '../playbook.ts';
 import { playOnlyIfMet } from './conditions.ts';
 import { battleNumbers } from './sim.ts';
 
@@ -132,6 +132,24 @@ function abilityNumbers(cardId: string, ability: string): { amount: number; donC
   walk(a?.effect);
   const donCost = (a?.cost ?? []).reduce((t, c) => t + (c.donMinus ?? 0), 0);
   return { amount, donCost };
+}
+
+/** Is a playOnlyWhen condition true? Public facts only (the opponent's board and DON!!). */
+export function playConditionHolds(when: PlayCondition, root: GameState, me: PlayerId): boolean {
+  const foe = other(me);
+  switch (when.kind) {
+    case 'oppRestedCharacter':
+      return queries
+        .zone(root, foe, 'characters')
+        .some((c) => c.rested && (c.cost ?? 0) <= when.maxCost);
+    case 'oppActive':
+      return (
+        queries.zone(root, foe, 'characters').some((c) => !c.rested) ||
+        queries.don(root, foe).active > 0
+      );
+    case 'ownCostAtLeast':
+      return queries.zone(root, me, 'characters').some((c) => (c.cost ?? 0) >= when.cost);
+  }
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -262,6 +280,49 @@ export function citation(s: GameState, a: Action, me: PlayerId, ctx: WhyContext)
       case 'avoidPlay':
         // Its condition (a card held in hand) is hidden: never cited.
         break;
+      case 'playOnlyWhen':
+        // Public: the opponent's board and DON!!, the AI's own board.
+        if (
+          a.type === 'playCard' &&
+          b.cards.includes(queries.card(s, a.card).card) &&
+          playConditionHolds(b.when, s, me) &&
+          !(b.beforeLeaderAttack && leader.rested)
+        )
+          return citeOf(b);
+        break;
+      case 'leaderDon':
+        if (a.type === 'giveDon' && a.target === leader.instance && own >= b.fromOwnTurn)
+          return citeOf(b);
+        break;
+      case 'keepActiveDon':
+        if (a.type === 'endTurn' && own >= b.fromOwnTurn) {
+          const active = queries.don(s, me).active;
+          if (active >= b.min && active <= b.max) return citeOf(b);
+        }
+        break;
+      case 'spareDon':
+        if (
+          a.type === 'attack' &&
+          a.attacker === leader.instance &&
+          own >= b.fromOwnTurn &&
+          own <= b.toOwnTurn &&
+          queries.don(s, me).active === 0
+        )
+          return citeOf(b);
+        break;
+      case 'preferPick':
+        if (
+          a.type === 'pick' &&
+          typeof a.choice === 'string' &&
+          src?.card === b.source &&
+          src.ability === b.ability &&
+          b.cards.includes(queries.card(s, a.choice).card)
+        )
+          return citeOf(b);
+        break;
+      case 'avoidBasePower':
+        // A play it did not make: nothing to cite.
+        break;
     }
   }
   return null;
@@ -298,7 +359,11 @@ function explainMain(s: GameState, a: Action, me: PlayerId, ctx: WhyContext): Ex
           claim: `It played ${name(a.card)}.`,
           evidence: [
             {
-              text: `${main?.label ?? 'Its [Main] effect'}. It cost ${cost} DON!!; ${after} stayed active.`,
+              // A long effect label leaves no room for the DON!! sentence (copy rule: 30 words).
+              text:
+                (main?.label ?? '').split(/\s+/).length > 22
+                  ? `${main!.label}. It cost ${cost} DON!!.`
+                  : `${main?.label ?? 'Its [Main] effect'}. It cost ${cost} DON!!; ${after} stayed active.`,
               figures: { cost, donAfter: after },
             },
           ],

@@ -1,0 +1,179 @@
+{
+  "leaderId": "ST30-001",
+  "archetypeId": "ST30-001-luffy-ace",
+  "aiName": "Luffy & Ace",
+  "asOf": "2026-11-17",
+  "guide": "docs/content/archetypes/ST30-001.md",
+  "notes": [
+    "Written from the guide's 'Game plan by turn' and 'Playbook seeds'.",
+    "Every number here is an inference (review M5a-09): the guide gives the direction, not the value. weights, faceBias, counterAggression, cardValue and bias sizes were set by reasoning and have not been tuned on their own.",
+    "Bias sizes were chosen so the planted game-plan tests pass; ai/test/game-plan-g2.test.ts runs every seed with the biases off too, and lists the seeds that pass only because a bias encodes the guide's line.",
+    "Citations ('cite', 'citeSource') are what 'Why?' shows when a move follows the line; only biases whose condition is public carry one.",
+    "goFirst false: the guide's Mulligan section gives the T3 combo odds as higher going second (94% vs 88%) and the sixth DON!! pays for ST30-012's Rush [SH-LA].",
+    "faceBias 1.05/1.1/1.1: 'a red/green Straw Hat aggro deck' [SH-LA]; inference: slightly more weight on the opponent's Life.",
+    "cardValue: the guide's 'keep the Luffys on board, since at 9000 on defence they make the opponent spend real resources to clear them' [SH-LA]; Thousand Sunny's DON!! giving.",
+    "mulligan: the guide's keepable hand (inference): a searcher or Thousand Sunny plus Sanji or a Luffy, or two searchers. Sanji counts as a searcher for the first piece (the guide: take Sanji first).",
+    "seed 4 never triggers in the sourced lists (no Character has 7000 base power); the bias keeps it that way if a flex card does.",
+    "seeds 5 and 6: the guide's own reading of the two Events' [Main] modes (card text, inference). Both are penalties on a [Main] play when the condition is false, so the Event is kept for its Counter use."
+  ],
+  "goFirst": false,
+  "digTargets": ["ST31-001", "ST21-014", "ST30-012"],
+  "winConditions": ["ST21-014", "ST30-012", "ST31-001"],
+  "cardValue": {
+    "ST21-014": 0.5,
+    "ST30-012": 0.4,
+    "OP12-015": 0.3,
+    "ST31-005": 0.3,
+    "ST31-001": 0.2
+  },
+  "weights": {},
+  "faceBias": {
+    "early": 1.05,
+    "mid": 1.1,
+    "late": 1.1
+  },
+  "counterAggression": 1.0,
+  "mulligan": {
+    "pieces": [
+      {
+        "name": "searcher",
+        "label": "a 1-cost searcher, Thousand Sunny or Sanji",
+        "cards": ["OP01-016", "EB02-017", "EB04-002", "ST31-005", "ST31-001"],
+        "min": 1
+      },
+      {
+        "name": "follow-up",
+        "label": "Sanji, a Luffy or a second searcher",
+        "cards": [
+          "OP01-016",
+          "EB02-017",
+          "EB04-002",
+          "ST31-005",
+          "ST31-001",
+          "ST21-014",
+          "ST30-012",
+          "OP12-015"
+        ],
+        "min": 1
+      }
+    ],
+    "secondShort": 0,
+    "requireGoingFirst": [],
+    "source": "ST30-001 guide (keepable hand, inference built on SH-LA)"
+  },
+  "biases": [
+    {
+      "seed": 1,
+      "kind": "play",
+      "cards": ["OP01-016", "EB02-017", "EB04-002"],
+      "byOwnTurn": 2,
+      "bonus": 2.0,
+      "cite": "Its guide: play a 1-cost searcher or Stage on turns 1 and 2, to find the engine.",
+      "citeSource": "SH-LA"
+    },
+    {
+      "seed": 1,
+      "kind": "play",
+      "cards": ["ST31-005"],
+      "byOwnTurn": 2,
+      "bonus": 3.0,
+      "cite": "Its guide: play a 1-cost searcher or Stage on turns 1 and 2, to find the engine.",
+      "citeSource": "SH-LA"
+    },
+    {
+      "seed": 3,
+      "kind": "attackWith",
+      "card": "leader",
+      "fromOwnTurn": 2,
+      "bonus": 1.0,
+      "cite": "Its guide: the Leader attacks at 6000 even with no DON!!, and takes every spare DON!!.",
+      "citeSource": "SH-LA"
+    },
+    {
+      "seed": 2,
+      "kind": "play",
+      "cards": ["ST31-001"],
+      "fromOwnTurn": 3,
+      "bonus": 3.0,
+      "cite": "Its guide: turn 3 is the Sanji turn: draw, then play a free Rush Character.",
+      "citeSource": "SH-LA"
+    },
+    {
+      "seed": 3,
+      "kind": "spareDon",
+      "fromOwnTurn": 2,
+      "toOwnTurn": 4,
+      "bonus": 0.6,
+      "cite": "Its guide: give the Leader every DON!! not needed for a play or a Counter Event; each +1000 raises the Counter the defender needs.",
+      "citeSource": "ST30-001 guide (inference)"
+    },
+    {
+      "seed": 4,
+      "kind": "avoidBasePower",
+      "minPower": 7000,
+      "penalty": 5.0
+    },
+    {
+      "seed": 5,
+      "kind": "playOnlyWhen",
+      "cards": ["OP13-040"],
+      "when": {
+        "kind": "oppRestedCharacter",
+        "maxCost": 7
+      },
+      "penalty": 3.0,
+      "cite": "Its guide: this Event keeps rested Characters from untapping, so it waits for a rested board.",
+      "citeSource": "SH-LA"
+    },
+    {
+      "seed": 6,
+      "kind": "playOnlyWhen",
+      "cards": ["OP12-037"],
+      "when": {
+        "kind": "oppActive"
+      },
+      "beforeLeaderAttack": true,
+      "penalty": 3.0,
+      "cite": "Its guide: this Event rests active Characters or DON!!, so it comes before the attacks, against an active board.",
+      "citeSource": "ST30-001 guide (inference from card text)"
+    }
+  ],
+  "assertions": [
+    {
+      "seed": 1,
+      "text": "Plays a 1-cost searcher or Thousand Sunny on T1 when holding one.",
+      "threshold": 0.9,
+      "source": "SH-LA"
+    },
+    {
+      "seed": 2,
+      "text": "Plays Sanji into a free Luffy on T3 when Sanji and a target are in hand.",
+      "threshold": 0.8,
+      "source": "SH-LA"
+    },
+    {
+      "seed": 3,
+      "text": "On Leader attacks from T2 to T4, gives every active DON!! not used for a play or held for a Counter Event.",
+      "threshold": 0.8,
+      "source": "ST30-001 guide (inference)"
+    },
+    {
+      "seed": 4,
+      "text": "Never plays a Character with 7000 or more base power.",
+      "threshold": 1.0,
+      "source": "SH-LA, card text"
+    },
+    {
+      "seed": 5,
+      "text": "Casts I Know You're Strong's [Main] only against a rested Character with cost 7 or less.",
+      "threshold": 1.0,
+      "source": "SH-LA, card text"
+    },
+    {
+      "seed": 6,
+      "text": "Casts Demon Aura's [Main] only against an active Character or active DON!!, before its Leader attacks.",
+      "threshold": 1.0,
+      "source": "ST30-001 guide (inference from card text)"
+    }
+  ]
+}
