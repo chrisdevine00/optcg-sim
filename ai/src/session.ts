@@ -55,6 +55,9 @@ export interface SessionOptions {
   searchless?: boolean;
   /** Tests only: score moves without rollouts (a strength baseline). */
   shallow?: boolean;
+  /** Called when the search threw something unexpected and the rookie policy answered instead
+   *  (default: console.error). Review M4b-04. */
+  onFallback?: (error: unknown) => void;
 }
 
 export interface SessionDecision extends Decided {
@@ -77,10 +80,14 @@ export class AiSession {
   private readonly budgets: { turn: Budget; defence: Budget };
   private readonly memory: PirateMemory = { plan: null, defence: null };
   private readonly cards: ReadonlyMap<string, Card>;
+  private readonly onFallback: (error: unknown) => void;
 
   constructor(opts: SessionOptions) {
     this.tier = opts.tier;
     this.cards = opts.cards;
+    this.onFallback =
+      opts.onFallback ??
+      ((e) => console.error('[ai] search failed, playing the rookie policy instead:', e));
     const b = opts.budgets ?? 'iterations';
     this.budgets = typeof b === 'string' ? BUDGETS.pirate[b] : b;
     this.setup = {
@@ -111,8 +118,8 @@ export class AiSession {
       this.memory.plan = plan;
       return { steps: plan.steps.length, rollouts: stats.rollouts };
     } catch (e) {
-      if (e instanceof CannotDeterminize) return { steps: 0, rollouts: 0 };
-      throw e;
+      if (!(e instanceof CannotDeterminize)) this.onFallback(e);
+      return { steps: 0, rollouts: 0 };
     }
   }
 
@@ -128,8 +135,9 @@ export class AiSession {
       return decide(view, this.memory, this.setup, this.budgets, seed);
     } catch (e) {
       // A public reference to a hidden card (never observed): answer from the view alone,
-      // defending lethal, with a Pirate's own wording (review M5a-15).
-      if (!(e instanceof CannotDeterminize)) throw e;
+      // defending lethal, with a Pirate's own wording (review M5a-15). Any other error also
+      // falls back to the rookie policy rather than stalling the game (review M4b-04).
+      if (!(e instanceof CannotDeterminize)) this.onFallback?.(e);
       const d = rookie(view, { seed, counterOf });
       return {
         ...d,

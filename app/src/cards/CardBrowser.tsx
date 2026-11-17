@@ -359,6 +359,7 @@ export default function CardBrowser() {
             {cov.all.total === 1 ? 'card here plays' : 'cards here play'} fully:{' '}
             {cov.all.scripted.toLocaleString('en')} with a scripted effect,{' '}
             {cov.all.noScriptNeeded.toLocaleString('en')} with no effect to script.
+            {filters.automatedOnly && ' Automated only is on, so the list shows just those.'}
             {cov.meta.total > 0 && (
               <>
                 {' '}

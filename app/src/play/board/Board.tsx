@@ -289,18 +289,33 @@ export function Board(b: BoardProps) {
         </button>
       ) : (
         <button key="life" type="button" className="z life" style={rect(R.life)} {...item(zk, i++)}>
-          <span className="sr-only">{`${W} Life, ${n(lifeN, 'card')}, face down`}</span>
+          <span className="sr-only">{lifeName(W, z.life, b.cards)}</span>
           <span className="vis" aria-hidden="true">
-            {Array.from({ length: lifeN }, (_, k) => {
+            {z.life.map((lc, k) => {
               const top = mine ? 4 + k * lifeStep : R.life.h - 4 - lifeBackH - k * lifeStep;
-              return (
-                <CardBack
-                  key={k}
-                  className="land"
-                  style={{ left: 4, top, width: R.life.w - 8, height: lifeBackH, zIndex: 10 - k }}
-                />
+              const style = {
+                left: 4,
+                top,
+                width: R.life.w - 8,
+                height: lifeBackH,
+                // A face-up card is public information: it is never covered by a back.
+                zIndex: (lc.card ? 20 : 10) - k,
+              };
+              const def = lc.card ? b.cards.get(lc.card) : undefined;
+              // A face-up Life card is public: draw it as itself, never as a back (review M4b-10).
+              return lc.card ? (
+                <span key={k} className="lface land" style={style} data-faceup="">
+                  <span className="lface-name">{def?.name ?? lc.card}</span>
+                </span>
+              ) : (
+                <CardBack key={k} className="land" style={style} />
               );
             })}
+            {z.life.some((lc) => lc.card) && (
+              <span className="plate life-up" aria-hidden="true">
+                {z.life.filter((lc) => lc.card).length} <small>face-up</small>
+              </span>
+            )}
             <span className="plate life-count top" aria-hidden="true">
               {lifeN} <small>Life</small>
             </span>
@@ -606,6 +621,19 @@ function TrashFace({ def, stacked }: { def: Card; stacked: boolean }) {
       <CardFaceLazy def={def} />
     </span>
   );
+}
+
+/** "Your Life, 3 cards, 1 face-up: Nami" (board.md §3.2): face-up Life cards are public. */
+export function lifeName(
+  who: string,
+  life: readonly ViewCard[],
+  cards: ReadonlyMap<string, Card>,
+): string {
+  const up = life.filter((c) => c.card);
+  const base = `${who} Life, ${n(life.length, 'card')}`;
+  if (up.length === 0) return `${base}, face down`;
+  const names = up.map((c) => cards.get(c.card!)?.name ?? c.card!).join(', ');
+  return `${base}, ${up.length} face-up: ${names}`;
 }
 
 function CardFaceLazy({ def }: { def: Card }) {

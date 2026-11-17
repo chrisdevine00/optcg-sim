@@ -4,7 +4,8 @@
  *
  * The participant is always p1. Every card on the board is a scripted card from the Rocks or Kaido
  * lists (cards/effects/), so its printed text is what it does. Life and deck fillers that the task
- * never reaches are vanilla (EB04-007 has no [Trigger]), so no Life card surprises the participant.
+ * never reaches are EB04-007, a scripted card with no [Trigger]: it is never drawn or played, and a
+ * Life card of it never surprises the participant.
  */
 import type { ScenarioSpec } from '@optcg/engine';
 

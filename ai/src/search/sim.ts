@@ -92,8 +92,16 @@ function keepValue(c: CardView, ctx: SimContext): number {
 export function battleNumbers(s: GameState) {
   const b = queries.battle(s);
   if (!b) return null;
-  const attacker = queries.card(s, b.attacker);
-  const target = queries.card(s, b.target);
+  // A battle can still name a card that has just been K.O.'d (its [On K.O.] prompt arrives
+  // first): then there are no numbers to read (review M4b-04).
+  let attacker: ReturnType<typeof queries.card>;
+  let target: ReturnType<typeof queries.card>;
+  try {
+    attacker = queries.card(s, b.attacker);
+    target = queries.card(s, b.target);
+  } catch {
+    return null;
+  }
   const attack = attacker.power ?? 0;
   const defence = target.power ?? 0;
   return { b, attacker, target, attack, defence, need: attack - defence + 1000 };

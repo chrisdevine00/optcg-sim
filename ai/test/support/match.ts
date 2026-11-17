@@ -43,7 +43,14 @@ export interface MatchOptions {
       Partial<
         Pick<
           import('../../src/session.ts').SessionOptions,
-          'budgets' | 'k' | 'biases' | 'priorWithout' | 'weights' | 'searchless' | 'shallow'
+          | 'budgets'
+          | 'k'
+          | 'onFallback'
+          | 'biases'
+          | 'priorWithout'
+          | 'weights'
+          | 'searchless'
+          | 'shallow'
         >
       >
     >

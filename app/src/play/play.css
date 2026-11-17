@@ -423,6 +423,36 @@
   right: auto;
   bottom: auto;
 }
+/* A face-up Life card: public, so drawn as itself (name on a light face), not as a back */
+.lface {
+  position: absolute;
+  box-sizing: border-box;
+  border-radius: 4px;
+  border: 2px solid var(--color-accent);
+  background: #f1ebdd;
+  color: #1a1a1a;
+  box-shadow: var(--elev-1);
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+}
+.lface-name {
+  display: block;
+  padding: 1px 4px;
+  font: 700 12px/1.1 var(--font-ui);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.plate.life-up {
+  left: 2px;
+  bottom: 2px;
+  z-index: 30;
+}
+.z.life .plate.life-count {
+  z-index: 30;
+}
 .plate.life-count.bottom {
   right: 2px;
   bottom: 2px;

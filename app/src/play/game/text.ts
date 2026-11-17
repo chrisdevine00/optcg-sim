@@ -63,6 +63,43 @@ const lifeDelta = (ctx: Ctx, p: PlayerId, d: number): string => {
 };
 
 /**
+ * What a `ModifierAdded` event does, in a few words ("cannot attack"). Every engine modifier kind
+ * has words: a kind added later fails `app/test/effects-log.test.ts` until it does.
+ */
+export function modifierWords(e: GameEvent): string {
+  const amount = Number(e.amount);
+  const signed = `${amount > 0 ? '+' : ''}${num(amount)}`;
+  switch (e.kind) {
+    case 'grant':
+      return `gains [${String(e.keyword)}]`;
+    case 'negate':
+      return 'effects negated';
+    case 'cannotAttack':
+      return 'cannot attack';
+    case 'basePower':
+      return `base power ${num(amount)}`;
+    case 'cost':
+      return `cost ${signed}`;
+    case 'cannotDraw':
+      return 'cannot draw with effects';
+    case 'cannotPlay':
+      return 'cannot play some cards';
+    case 'playCost':
+      return `next card played costs ${signed}`;
+    case 'skipRefresh':
+      return 'stays rested next Refresh Phase';
+    case 'cannotBeKOd':
+      return 'cannot be K.O.’d';
+    case 'noBlocker':
+      return 'cannot be blocked by [Blocker]';
+    case 'cannotBeRemoved':
+      return 'cannot be removed by opponent’s effects';
+    default:
+      return `gets an effect (${String(e.kind)})`;
+  }
+}
+
+/**
  * Turn one move's projected events into log lines (one per move, plus turn headers). `life` is
  * the running Life count, updated in place.
  */
@@ -102,6 +139,9 @@ export function describeMove(
   let drewNames: string[] = [];
   let donPlaced = 0;
   let effectDraws = 0;
+  const koed: string[] = [];
+  const trashed: Partial<Record<PlayerId, string[]>> = {};
+  const putBack: Partial<Record<PlayerId, number>> = {};
   let turnPlayer: PlayerId | null = null;
   for (const e of events) {
     const p = e.player as PlayerId | undefined;
@@ -148,9 +188,22 @@ export function describeMove(
           else bits.push(`Life card trashed · ${lifeDelta(ctx, owner, -1)}`);
           lineActor = owner;
         } else if (to === 'life') {
-          ctx.life[e.owner as PlayerId] += 1;
-          if (e.reason === 'effect')
-            bits.push(`Add a card to ${whose(ctx.names, e.owner as PlayerId)} Life`);
+          const owner = e.owner as PlayerId;
+          const before = ctx.life[owner];
+          ctx.life[owner] += 1;
+          // From an effect: "add to Life" and the Life cards a look put there (OP17 Elbaph).
+          if (e.reason === 'effect' || e.reason === 'search')
+            bits.push(
+              `Add a card to ${whose(ctx.names, owner)} Life · ${whose(ctx.names, owner)} Life ${before} → ${ctx.life[owner]}`,
+            );
+        } else if (
+          (from === 'characters' || from === 'stage') &&
+          to === 'trash' &&
+          typeof e.card === 'string' &&
+          koed.includes(e.card)
+        ) {
+          // The K.O. line already says it (review M4b-16): no second "trashed" line.
+          koed.splice(koed.indexOf(e.card), 1);
         } else if ((from === 'characters' || from === 'stage') && e.cause) {
           // Removed by an effect (bounce, bottom of deck, trash); K.O.s have their own line.
           const c = e.cause as { kind: string };
@@ -174,6 +227,15 @@ export function describeMove(
           );
         } else if (from === 'trash' && to === 'hand' && typeof e.card === 'string') {
           bits.push(`Add ${name(e.card)} from the trash to hand`);
+        } else if (from === 'deck' && to === 'trash') {
+          // "Trash the rest" after a look: face up, so public. Named from the event's own card.
+          const o = e.owner as PlayerId;
+          (trashed[o] ??= []).push(typeof e.card === 'string' ? name(e.card) : 'a card');
+        } else if (from === 'deck' && to === 'deck') {
+          // The cards of a look put back: hidden, so counted, never named. The event does not say
+          // top or bottom, so neither does the line.
+          const o = e.owner as PlayerId;
+          putBack[o] = (putBack[o] ?? 0) + 1;
         } else if (from === 'deck' && to === 'hand' && e.reason === 'search') {
           bits.push(`Add ${typeof e.card === 'string' ? name(e.card) : 'a card'} to hand`);
         } else if (from === 'deck' && to === 'hand') {
@@ -205,7 +267,9 @@ export function describeMove(
         break;
       case 'CardRevealed':
         // A played card is named by its play line; other reveals are news to the opponent.
-        if (e.reason && e.reason !== 'play' && typeof e.card === 'string')
+        if (e.reason === 'faceUp' && typeof e.card === 'string')
+          bits.push(`Turn ${whose(ctx.names, p!)} Life card face-up: ${name(e.card)}`);
+        else if (e.reason && e.reason !== 'play' && typeof e.card === 'string')
           bits.push(`Reveal ${name(e.card)}${e.reason === 'cost' ? ' (cost)' : ''}`);
         break;
       case 'CardsLooked':
@@ -236,16 +300,7 @@ export function describeMove(
         break;
       case 'ModifierAdded':
         if (e.byEffect && typeof e.card === 'string') {
-          const what =
-            e.kind === 'grant'
-              ? `gains [${String(e.keyword)}]`
-              : e.kind === 'negate'
-                ? 'effects negated'
-                : e.kind === 'cannotAttack'
-                  ? 'cannot attack'
-                  : e.kind === 'basePower'
-                    ? `base power ${num(Number(e.amount))}`
-                    : '';
+          const what = modifierWords(e);
           if (what) bits.push(`${name(e.card)} ${what}`);
         }
         break;
@@ -308,6 +363,7 @@ export function describeMove(
         if (Number(e.amount) > 1) bits.push(`${String(e.amount)} damage`);
         break;
       case 'KO':
+        if (typeof e.card === 'string') koed.push(e.card);
         bits.push(`K.O. · ${whose(ctx.names, e.owner as PlayerId, true)} ${name(e.card)}`);
         break;
       case 'TriggerRevealed':
@@ -335,6 +391,16 @@ export function describeMove(
     }
   }
   if (effectDraws) bits.push(`Draw ${effectDraws}`);
+  for (const [o, list] of Object.entries(trashed))
+    bits.push(
+      list.length === 1
+        ? `Trash ${list[0]} from the top of ${whose(ctx.names, o as PlayerId)} deck`
+        : `Trash ${list.length} from the top of ${whose(ctx.names, o as PlayerId)} deck: ${list.join(', ')}`,
+    );
+  for (const [o, n] of Object.entries(putBack))
+    bits.push(
+      `Put ${n === 1 ? '1 card' : `${n} cards`} back in ${whose(ctx.names, o as PlayerId)} deck`,
+    );
   for (const [card, n] of donGiven) {
     linked.push(card);
     bits.unshift(`Give ${n} DON!! to ${cardName(ctx.cards, card)}`);

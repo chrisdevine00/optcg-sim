@@ -4,7 +4,7 @@
  * send view actions to it; it never decides legality.
  */
 import type { Card } from '@optcg/cards';
-import { priorCardIds, type AiTier, type Explanation, type GameInfo } from '@optcg/ai';
+import { priorCardIds, rookie, type AiTier, type Explanation, type GameInfo } from '@optcg/ai';
 import type { Action, PlayerId, PlayerView, ProjectedView, SearchView } from '@optcg/engine';
 import {
   GameSession,
@@ -780,9 +780,18 @@ export class GameController {
         explanation = r.explanation;
       } catch (e) {
         if (e instanceof Error && e.message === 'cancelled') throw new Cancelled();
-        // A failed request still owes a move: the only one, if it is forced.
-        if (options.length !== 1) throw e;
-        action = options[0]!;
+        // A failed request still owes a move: the only one if it is forced, else the rookie
+        // policy on the seat's own view, so the game never stalls on a worker error (M4b-04).
+        if (options.length === 1) action = options[0]!;
+        else {
+          console.error('[ai] the worker failed; playing the rookie policy for this move:', e);
+          const fb = rookie(this.session.view(d), {
+            seed: this.seedAt(this.session.actionCount),
+            counterOf: () => null,
+          });
+          action = fb.action;
+          explanation = fb.explanation;
+        }
       } finally {
         for (const t of timers) clearTimeout(t);
         this.aiRequest = null;

@@ -1668,6 +1668,15 @@ function optionChoice(g: G): Content | null {
   };
 }
 
+/**
+ * Is a closing `done` owed after `picked` picks, with `max` still allowed? Yes while more could be
+ * picked, and always when none can be (a look with no eligible card: "Choose none"), so the board
+ * can never be stuck (review M4b-05).
+ */
+export function needsDone(picked: number, max: number): boolean {
+  return picked < max || max === 0;
+}
+
 function chooseContent(g: G): Content {
   const options = optionChoice(g);
   if (options) return options;
@@ -1693,6 +1702,10 @@ function chooseContent(g: G): Content {
       .filter((c) => c.card && !g.legal.picks.has(c.handle))
       .map((c) => c.handle);
   });
+  // A look at the top of a deck: every card looked at is shown, the ones the effect does not allow
+  // marked as not choosable (review M4b-11). Only this player sees them (`view.looking`).
+  const looked = (g.view.looking ?? []).filter((c) => c.card && !g.legal.picks.has(c.handle));
+  const notChoosable = [...ineligible, ...looked.map((c) => c.handle)];
   // The make-room title and note belong to the rule's own choice only (review M3-35).
   const makingRoom = d.purpose === 'characterLimit';
   const playing = g.ctl.pendingPlay;
@@ -1703,7 +1716,7 @@ function chooseContent(g: G): Content {
       .filter(([h]) => chosen.includes(h))
       .map(([, a]) => a);
     const seq: Action[] = [...order];
-    if (chosen.length < max) seq.push({ type: 'done', player: g.me });
+    if (needsDone(chosen.length, max)) seq.push({ type: 'done', player: g.me });
     g.ctl.actSequence(seq);
     g.setPicks([]);
   };
@@ -1747,7 +1760,7 @@ function chooseContent(g: G): Content {
               </button>
             );
           })}
-          {ineligible.map((h) => {
+          {notChoosable.map((h) => {
             const c = g.cardOf(h);
             return (
               <button key={h} type="button" className="opt" aria-disabled="true">
