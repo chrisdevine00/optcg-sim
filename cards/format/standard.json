@@ -910,6 +910,6 @@
     "OP15-096 has no block on the official site; the booster formula gives 4 (rulings.md RL-37).",
     "The OP07-115 + EB04-058 banned pair has no effective date on the pages read.",
     "Whether the banned list also applies to Extra Regulation is not stated on restriction.html; this file applies it to both.",
-    "EB-05 (2026-10-30) and OP-18 (2026-11-20) are not in optcgapi yet; they enter through cards:update when upstream has them."
+    "EB-05 (61 cards) was imported from optcgapi on 2026-11-17 with no cited block: its Standard legality is \"unknown\" until its printed block icon is read from the official series page and added to blocksByProduct. OP-18 (release 2026-11-20) was not in optcgapi on 2026-11-17; it enters through cards:update when upstream has it."
   ]
 }

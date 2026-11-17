@@ -1,10 +1,10 @@
 {
   "source": "optcgapi.com (normalized; see cards/README.md)",
   "sourceUrl": "https://optcgapi.com",
-  "fetchedAt": "2026-10-28T13:47:58.418Z",
-  "generatedAt": "2026-10-29T00:00:23.312Z",
-  "cardCount": 2799,
-  "printingCount": 5079,
+  "fetchedAt": "2026-11-17T16:20:56.544Z",
+  "generatedAt": "2026-11-17T16:21:23.115Z",
+  "cardCount": 2860,
+  "printingCount": 5175,
   "newestSet": "OP-17",
   "verifiedCount": 183,
   "sets": [
@@ -154,6 +154,13 @@
       "kind": "extra",
       "cardCount": 61,
       "block": 4
+    },
+    {
+      "code": "EB-05",
+      "name": "Extra Booster: One Piece Heroines Edition Vol. 2",
+      "kind": "extra",
+      "cardCount": 61,
+      "block": null
     },
     {
       "code": "PRB-01",
@@ -430,13 +437,13 @@
     }
   ],
   "repairs": {
-    "types split": 1386,
-    "trigger: split from effect": 484,
-    "name suffix stripped": 606,
+    "types split": 1413,
+    "trigger: split from effect": 495,
+    "name suffix stripped": 612,
     "printings disagreeing": 140,
     "self-directed sign flagged (E-Q8)": 11,
-    "sign: DON!! cost": 68,
-    "sign: opponent's power/cost": 80,
+    "sign: DON!! cost": 70,
+    "sign: opponent's power/cost": 81,
     "cleanup: errata'd note": 63,
     "cleanup: NULL text": 120,
     "attribute junk dropped": 22,

@@ -65,7 +65,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-001/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-002",
@@ -133,7 +133,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-002/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-003",
@@ -201,7 +201,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-003/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-004",
@@ -270,7 +270,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-004/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-005",
@@ -346,7 +346,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-005/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-006",
@@ -500,7 +500,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-006/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-007",
@@ -557,7 +557,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-007/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-008",
@@ -617,7 +617,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-008/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-009",
@@ -666,7 +666,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-009/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-010",
@@ -723,7 +723,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-010/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-011",
@@ -772,7 +772,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-011/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-012",
@@ -821,7 +821,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-012/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-013",
@@ -908,7 +908,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-013/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-014",
@@ -975,7 +975,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-014/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-015",
@@ -1082,7 +1082,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-015/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-016",
@@ -1166,6 +1166,16 @@
      "label": "Parallel"
     },
     {
+     "artworkId": "OP01-016_p10",
+     "imageUrls": {
+      "full": "OP01-016_p10_A6UJ7ZU.jpg"
+     },
+     "source": "optcgapi",
+     "product": "EB-05",
+     "rarity": "R",
+     "label": "SP"
+    },
+    {
      "artworkId": "OP01-016_p2",
      "imageUrls": {
       "full": "OP01-016_p2.jpg"
@@ -1235,7 +1245,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-016/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-017",
@@ -1321,7 +1331,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-017/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-018",
@@ -1385,7 +1395,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-018/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-019",
@@ -1443,7 +1453,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-019/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-020",
@@ -1499,7 +1509,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-020/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-021",
@@ -1598,7 +1608,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-021/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-022",
@@ -1647,7 +1657,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-022/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-023",
@@ -1703,7 +1713,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-023/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-024",
@@ -1782,7 +1792,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-024/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-025",
@@ -1862,7 +1872,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-025/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-026",
@@ -1917,7 +1927,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-026/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-027",
@@ -1972,7 +1982,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-027/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-028",
@@ -2026,7 +2036,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-028/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-029",
@@ -2119,7 +2129,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-029/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-030",
@@ -2183,7 +2193,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-030/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-031",
@@ -2243,7 +2253,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-031/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-032",
@@ -2293,7 +2303,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-032/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-033",
@@ -2429,7 +2439,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-033/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-034",
@@ -2498,7 +2508,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-034/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-035",
@@ -2605,7 +2615,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-035/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-036",
@@ -2661,7 +2671,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-036/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-037",
@@ -2712,7 +2722,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-037/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-038",
@@ -2769,7 +2779,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-038/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-039",
@@ -2879,7 +2889,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-039/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-040",
@@ -2946,7 +2956,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-040/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-041",
@@ -3062,7 +3072,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-041/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-042",
@@ -3112,7 +3122,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-042/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-043",
@@ -3168,7 +3178,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-043/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-044",
@@ -3224,7 +3234,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-044/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-045",
@@ -3280,7 +3290,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-045/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-046",
@@ -3330,7 +3340,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-046/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-047",
@@ -3426,7 +3436,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-047/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-048",
@@ -3494,7 +3504,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-048/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-049",
@@ -3551,7 +3561,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-049/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-050",
@@ -3607,7 +3617,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-050/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-051",
@@ -3703,7 +3713,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-051/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-052",
@@ -3813,7 +3823,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-052/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-053",
@@ -3869,7 +3879,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-053/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-054",
@@ -3927,7 +3937,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-054/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-055",
@@ -4001,7 +4011,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-055/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-056",
@@ -4056,7 +4066,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-056/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-057",
@@ -4121,7 +4131,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-057/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-058",
@@ -4176,7 +4186,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-058/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-059",
@@ -4230,7 +4240,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-059/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-060",
@@ -4299,7 +4309,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-060/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-061",
@@ -4367,7 +4377,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-061/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-062",
@@ -4428,7 +4438,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-062/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-063",
@@ -4485,7 +4495,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-063/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-064",
@@ -4551,7 +4561,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-064/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-065",
@@ -4609,7 +4619,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-065/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-066",
@@ -4665,7 +4675,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-066/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-067",
@@ -4725,7 +4735,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-067/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-068",
@@ -4775,7 +4785,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-068/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-069",
@@ -4832,7 +4842,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-069/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-070",
@@ -4928,7 +4938,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-070/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-071",
@@ -4985,7 +4995,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-071/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-072",
@@ -5035,7 +5045,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-072/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-073",
@@ -5124,7 +5134,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-073/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-074",
@@ -5181,7 +5191,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-074/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-075",
@@ -5231,7 +5241,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-075/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-076",
@@ -5287,7 +5297,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-076/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-077",
@@ -5396,7 +5406,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-077/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-078",
@@ -5486,7 +5496,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-078/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-079",
@@ -5552,7 +5562,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-079/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-080",
@@ -5601,7 +5611,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-080/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-081",
@@ -5657,7 +5667,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-081/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-082",
@@ -5707,7 +5717,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-082/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-083",
@@ -5757,7 +5767,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-083/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-084",
@@ -5824,7 +5834,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-084/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-085",
@@ -5881,7 +5891,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-085/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-086",
@@ -5936,7 +5946,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-086/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-087",
@@ -5990,7 +6000,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-087/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-088",
@@ -6045,7 +6055,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-088/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-089",
@@ -6100,7 +6110,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-089/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-090",
@@ -6154,7 +6164,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-090/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-091",
@@ -6213,7 +6223,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-091/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-092",
@@ -6269,7 +6279,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-092/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-093",
@@ -6335,7 +6345,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-093/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-094",
@@ -6405,7 +6415,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-094/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-095",
@@ -6454,7 +6464,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-095/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-096",
@@ -6520,7 +6530,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-096/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-097",
@@ -6586,7 +6596,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-097/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-098",
@@ -6643,7 +6653,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-098/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-099",
@@ -6693,7 +6703,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-099/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-100",
@@ -6753,7 +6763,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-100/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-101",
@@ -6839,7 +6849,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-101/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-102",
@@ -6898,7 +6908,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-102/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-103",
@@ -6955,7 +6965,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-103/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-104",
@@ -7005,7 +7015,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-104/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-105",
@@ -7055,7 +7065,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-105/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-106",
@@ -7112,7 +7122,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-106/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-107",
@@ -7169,7 +7179,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-107/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-108",
@@ -7237,7 +7247,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-108/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-109",
@@ -7296,7 +7306,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-109/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-110",
@@ -7353,7 +7363,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-110/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-111",
@@ -7402,7 +7412,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-111/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-112",
@@ -7451,7 +7461,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-112/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-113",
@@ -7508,7 +7518,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-113/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-114",
@@ -7599,7 +7609,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-114/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-115",
@@ -7654,7 +7664,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-115/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-116",
@@ -7709,7 +7719,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-116/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-117",
@@ -7764,7 +7774,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-117/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-118",
@@ -7818,7 +7828,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-118/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-119",
@@ -7873,7 +7883,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-119/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-120",
@@ -7983,7 +7993,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-120/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   },
   {
    "id": "OP01-121",
@@ -8082,7 +8092,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP01-121/",
-   "fetchedAt": "2026-10-28T13:47:17.000Z"
+   "fetchedAt": "2026-11-17T16:20:49.872Z"
   }
  ]
 }
