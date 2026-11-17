@@ -4,7 +4,27 @@
  * speech; `DryReader` sends keys with Playwright and hears nothing, for checking the harness.
  */
 import type { Page } from '@playwright/test';
-import type { NVDA, VoiceOver } from '@guidepup/guidepup';
+
+/**
+ * The parts of Guidepup's `NVDA` and `VoiceOver` this file uses, typed here so the harness unit
+ * test (`app/test/a11y-harness.test.ts`, in the root typecheck) does not need `@guidepup/guidepup`,
+ * which installs only in the a11y workflow. Guidepup's own objects satisfy these structurally.
+ */
+interface CaptureOptions {
+  capture?: boolean;
+}
+export interface NvdaLike {
+  perform(command: object, options?: CaptureOptions): Promise<unknown>;
+  press(key: string, options?: CaptureOptions): Promise<unknown>;
+  spokenPhraseLog(): Promise<readonly string[]>;
+}
+export interface VoiceOverLike {
+  next(): Promise<unknown>;
+  perform(command: object): Promise<unknown>;
+  press(key: string, options?: CaptureOptions): Promise<unknown>;
+  spokenPhraseLog(): Promise<readonly string[]>;
+  keyboardCommands: { findNextHeading: object; findNextList: object };
+}
 import { SpeechTap, type Heard } from './tap.ts';
 
 export interface Reader {
@@ -59,7 +79,7 @@ export class NvdaReader implements Reader {
   private tapOk = false;
   /** Set by the probe: a known phrase reached the tap. Until then Guidepup's capture stays on. */
   private proven = false;
-  constructor(private nvda: NVDA) {}
+  constructor(private nvda: NvdaLike) {}
 
   async start() {
     this.tapOk = await this.tap.start();
@@ -215,7 +235,7 @@ export class VoiceOverReader implements Reader {
   tapDead() {
     return null;
   }
-  constructor(private vo: VoiceOver) {}
+  constructor(private vo: VoiceOverLike) {}
   async press(key: string) {
     // VoiceOver's own navigation (Quick Nav is off): VO+Right, and the rotor-style find commands.
     if (key === 'Browse:Next') return void (await this.vo.next());
