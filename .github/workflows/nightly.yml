@@ -51,14 +51,14 @@ jobs:
   # twelve ordered deck pairs (all twelve archetypes), each seat in turn. Pirate vs Rookie at least
   # 75%, Warlord vs Rookie at least 95%, Warlord vs Pirate at least 65%, Warlord vs a one-iteration
   # Warlord at least 70% (and that Warlord under 65% against Pirate), plus Emperor vs Warlord.
-  # One job per series so none needs the sum of them: nominal time from the measured cost per game
-  # on a laptop (Pirate vs Rookie 0.75 s, Warlord vs Rookie 10.4 s, Warlord vs Pirate 25.5 s, 200
-  # games each; docs/benchmarks.md), doubled for a hosted runner, is 10, 70, 170, 100 and 80
-  # minutes. Per-test timeouts in ai/test/strength-warlord.test.ts match; the job cap adds margin.
+  # One job per series so none needs the sum of them. Times measured on the hosted runner by the
+  # first nightly (run 44074243109, 200 games each): Pirate vs Rookie 5 min, Warlord vs Rookie
+  # about 126, Warlord vs Pirate about 123, the two controls about 142 together. Per-test timeouts
+  # in ai/test/strength-warlord.test.ts are 2.5x those; every job gets the hosted maximum, 360.
   # Reports: test-results/m5b-*.json (each prints its Wilson interval).
   strength-m5b:
     runs-on: ubuntu-latest
-    timeout-minutes: 200
+    timeout-minutes: 360
     strategy:
       fail-fast: false
       matrix:
@@ -66,7 +66,8 @@ jobs:
           - { name: pirate-vs-rookie, filter: 'Pirate beats Rookie', extra: '0' }
           - { name: warlord-vs-rookie, filter: 'Warlord beats Rookie', extra: '0' }
           - { name: warlord-vs-pirate, filter: 'Warlord beats Pirate', extra: '0' }
-          - { name: controls, filter: 'one-iteration', extra: '0' }
+          - { name: control-full, filter: 'beats a one-iteration', extra: '0' }
+          - { name: control-tiny, filter: 'fails the Pirate gate', extra: '0' }
           - { name: emperor, filter: 'Emperor', extra: '1' }
     steps:
       - uses: actions/checkout@v4

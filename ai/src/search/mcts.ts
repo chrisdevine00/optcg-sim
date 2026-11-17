@@ -136,7 +136,7 @@ function withPrompts(
     }
   };
   grow(s1, [a], 0);
-  return out.length ? out : [{ actions: [a] }];
+  return out.length ? out.slice(0, MAX_MACROS) : [{ actions: [a] }];
 }
 
 /**

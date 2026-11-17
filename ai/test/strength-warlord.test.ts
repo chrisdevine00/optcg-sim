@@ -42,19 +42,21 @@ import { quantile, wilson } from './support/stats.ts';
 import { metaDecks } from './support.ts';
 
 /**
- * Per-test timeouts, from the measured cost per game (review M5b-4; laptop under load: Pirate vs
- * Rookie 0.75 s, Warlord vs Rookie 10.4 s, Warlord vs Pirate 25.5 s) times 200 games, doubled for
- * a slower runner. Per push (12 games) the default is ample. Each nightly series is its own CI job
- * (`strength-m5b` matrix), so no job needs the sum of these.
+ * Per-test timeouts, 2.5 times the wall time measured on the CI runner by the first nightly
+ * (run 44074243109, 200 games each: Warlord vs Rookie about 126 min, Warlord vs Pirate about 123,
+ * the two controls about 142 together; the laptop-based estimates of the fix round were 2x too
+ * small and every series timed out after printing its result). Pirate vs Rookie took 5 minutes.
+ * Emperor has no CI measurement yet: 240 minutes. Per push (12 games) the default is ample. Each
+ * nightly series is its own CI job (`strength-m5b` matrix, 360-minute cap, the hosted maximum).
  */
 const MIN = 60_000;
 const TIMEOUT = {
-  pirateVsRookie: FULL_TIMEOUT(10),
-  warlordVsRookie: FULL_TIMEOUT(70),
-  warlordVsPirate: FULL_TIMEOUT(170),
-  controlFull: FULL_TIMEOUT(80),
-  controlTiny: FULL_TIMEOUT(20),
-  emperor: FULL_TIMEOUT(80),
+  pirateVsRookie: FULL_TIMEOUT(30),
+  warlordVsRookie: FULL_TIMEOUT(315),
+  warlordVsPirate: FULL_TIMEOUT(310),
+  controlFull: FULL_TIMEOUT(250),
+  controlTiny: FULL_TIMEOUT(100),
+  emperor: FULL_TIMEOUT(240),
 };
 function FULL_TIMEOUT(minutes: number): number {
   return Math.max(10 * MIN, minutes * MIN);

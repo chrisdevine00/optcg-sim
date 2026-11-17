@@ -490,6 +490,10 @@ export function decide(
   const options = view.actions.filter((a) => a.type !== 'concede');
   if (options.length === 0) throw new Error('Warlord was asked to decide with no legal action.');
   // The rest of a macro move or a proven line comes first, even when it is the only legal move.
+  // A queue left over from another turn is never used: a macro's bundled answer that its effect
+  // never asked for would otherwise answer a later prompt that happens to offer the same handle
+  // (review M5b-15: Kaido's -2000 on the opponent's turn was aimed by a stale pick).
+  if (mem.queue.length > 0 && mem.turn !== view.turn.number) mem.queue = [];
   const queued = takeQueue(view, options, mem, setup, seed);
   if (queued) return queued;
   // Mulligan, who goes first, forced moves and the searchless baseline: one rule for every tier.

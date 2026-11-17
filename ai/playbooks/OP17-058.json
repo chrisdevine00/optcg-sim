@@ -59,7 +59,7 @@
       "kind": "useOnAttacker",
       "source": "OP17-058",
       "ability": "shrink",
-      "bonus": 1.5,
+      "bonus": 4.0,
       "cite": "Its guide: use the Leader's −2000 on your attacking Character when it changes the battle.",
       "citeHold": "Its guide: hold the Leader's −2000 for the turn it changes an outcome.",
       "citeSource": "SH-KAI"

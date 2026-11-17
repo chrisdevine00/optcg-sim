@@ -300,9 +300,10 @@ for (const [tier, biases] of PLANTED) {
       const { steps } = play(s, 'p1', { biases });
       const luffy = played(steps, 'OP13-118');
       const sanji = played(steps, 'OP13-027');
-      if (luffy.length > 0 && sanji.length > 0)
-        expect(steps.indexOf(sanji[0]!)).toBeLessThan(steps.indexOf(luffy[0]!));
+      // Both are played here (checked, so the order check cannot be skipped).
+      expect(luffy.length).toBe(1);
       expect(sanji.length).toBe(1);
+      expect(steps.indexOf(sanji[0]!)).toBeLessThan(steps.indexOf(luffy[0]!));
     });
 
     t('seed 3: ends T3 with 1 to 5 active DON!!', () => {
@@ -567,15 +568,11 @@ describe.each(PLAN_TIERS)('%s: group-2 bias kinds, mechanics (synthetic playbook
         mine: { hand: ['ST31-004'] },
       });
     const edit = (pb: Playbook) => {
-      // The Warlord's tree values this body (to the end of the opponent's next turn) about 2 units
-      // above not playing it, the Pirate's one-turn search less: the "want" is sized to each tier
-      // so that the want minus the 5-point penalty is below the search's own value either way.
-      pb.biases.push({
-        kind: 'play',
-        cards: ['ST31-004'],
-        bonus: tier === 'pirate' ? 4 : 1,
-        seed: 4,
-      });
+      // The same synthetic playbook for every tier: a want (10) above anything search itself sees in
+      // the body (the Warlord's tree values it about 2 units above not playing it), against a
+      // penalty (20) that must still win. Not tuned per tier (review M5b-16).
+      pb.biases.push({ kind: 'play', cards: ['ST31-004'], bonus: 10, seed: 4 });
+      for (const b of pb.biases) if (b.kind === 'avoidBasePower') b.penalty = 20;
     };
     withPlaybook(LA, edit, () => expect(played(play(pos(), 'p1').steps, 'ST31-004')).toEqual([]));
     withPlaybook(
