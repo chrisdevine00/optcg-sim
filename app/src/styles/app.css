@@ -560,6 +560,15 @@ kbd {
 .keys {
   margin-left: auto;
 }
+.coverage {
+  margin: 0;
+  padding: var(--space-1) var(--space-4) var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+.coverage b {
+  color: var(--color-text);
+}
 .filters-toggle {
   display: none;
 }

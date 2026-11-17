@@ -27,7 +27,13 @@ export {
   type StandardFormat,
 } from './format.ts';
 export { ATTRIBUTES, CATEGORIES, COLORS, KEYWORDS, validateCard } from './validate.ts';
-export { automation, type Automation } from './coverage.ts';
+export {
+  automation,
+  coverage,
+  playsFully,
+  type Automation,
+  type CoverageCount,
+} from './coverage.ts';
 export type {
   Ability,
   ActivateAbility,

@@ -6,9 +6,17 @@ import {
   useState,
   type KeyboardEvent,
 } from 'react';
-import { automation, type Card } from '@optcg/cards';
-import { SCRIPTED_ANY } from './scripts.ts';
+import { automation, type Automation, type Card } from '@optcg/cards';
+import { SCRIPTED, SCRIPTED_ANY } from './scripts.ts';
 import { CardFace, cardLabel } from '../art/index.ts';
+
+/** Spoken with a tile's name: only what is worth hearing, never a claim for a card with no effect. */
+const AUTO_NAME: Record<Automation, string> = {
+  scripted: 'effect automated',
+  'not-automated': 'effect not automated',
+  vanilla: '',
+  keywords: '',
+};
 
 const GAP_X = 16;
 const GAP_Y = 16;
@@ -155,7 +163,7 @@ export function ResultsGrid({ cards, active, onActive, onOpen }: Props) {
           const c = i % cols;
           const extra = [
             card.verified ? 'in the meta decklists, verified' : '',
-            SCRIPTED_ANY ? automation(card) : '',
+            SCRIPTED_ANY ? AUTO_NAME[automation(card, SCRIPTED)] : '',
           ].filter(Boolean);
           return (
             <div

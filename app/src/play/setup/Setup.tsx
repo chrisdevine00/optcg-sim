@@ -5,8 +5,9 @@
  * &first=me&seed=42&speed=4&skip=1&scenario=defend&start=1`.
  */
 import { useEffect, useState } from 'react';
+import type { Card } from '@optcg/cards';
 import type { Speed } from '../game/controller.ts';
-import { ARCHETYPES, automationLine, deckById, DECKS, deckByLeader } from './decks.ts';
+import { ARCHETYPES, automationLine, deckById, DECKS, deckByLeader, loadCards } from './decks.ts';
 import { SCENARIOS } from './scenarios.ts';
 
 /**
@@ -87,6 +88,24 @@ export function Setup({
   const [seed, setSeed] = useState(url.seed !== undefined ? String(url.seed) : '');
   const speed = url.speed ?? 1;
 
+  // Card data for the two chosen decks, so the automation copy can tell cards with no effect from
+  // cards whose effect is not scripted. The line appears once the sets have loaded.
+  const [deckCards, setDeckCards] = useState<ReadonlyMap<string, Card>>(new Map());
+  useEffect(() => {
+    let live = true;
+    const ids = [myDeck, theirDeck].flatMap((id) => {
+      const d = deckById(id);
+      return d ? [d.spec.leader, ...d.spec.main] : [];
+    });
+    loadCards(ids).then(
+      (m) => live && setDeckCards(m),
+      () => undefined,
+    );
+    return () => {
+      live = false;
+    };
+  }, [myDeck, theirDeck]);
+
   const choice = (): SetupChoice => ({
     myDeck,
     theirDeck,
@@ -117,7 +136,9 @@ export function Setup({
         {[myDeck, theirDeck].map((id, i) => {
           const d = deckById(id);
           const seat = hot ? `${names[i]}’s deck` : i === 0 ? 'Your deck' : 'The AI’s deck';
-          return d ? <li key={i}>{automationLine(d, seat)}</li> : null;
+          return d && [d.spec.leader, ...d.spec.main].every((c) => deckCards.has(c)) ? (
+            <li key={i}>{automationLine(d, seat, deckCards)}</li>
+          ) : null;
         })}
       </ul>
       <form

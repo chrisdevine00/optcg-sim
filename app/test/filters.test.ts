@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import type { SetFile } from '@optcg/cards';
+import { SCRIPTED_IDS, automation, playsFully, type SetFile } from '@optcg/cards';
 import {
   allTypes,
   emptyFilters,
@@ -83,6 +83,7 @@ describe('card browser filters', () => {
       colors: ['Red' as const],
       cost: '3' as const,
       verifiedOnly: true,
+      automatedOnly: true,
       sort: 'power' as const,
       descending: true,
     };
@@ -101,5 +102,37 @@ describe('card browser filters', () => {
 
   it('collects type suggestions', () => {
     expect(allTypes(cards)).toContain('Straw Hat Crew');
+  });
+
+  it('"Automated only" keeps scripted, vanilla and keywords-only cards, and drops the rest', () => {
+    const all = run({});
+    const only = run({ automatedOnly: true });
+    expect(only.length).toBeGreaterThan(0);
+    expect(only.length).toBeLessThan(all.length);
+    expect(only.every((c) => playsFully(automation(c, SCRIPTED_IDS)))).toBe(true);
+    const dropped = all.filter((c) => !only.includes(c));
+    expect(dropped.every((c) => automation(c, SCRIPTED_IDS) === 'not-automated')).toBe(true);
+    expect(only.some((c) => SCRIPTED_IDS.has(c.id))).toBe(true);
+    expect(only.some((c) => automation(c, SCRIPTED_IDS) === 'vanilla')).toBe(true);
+    // Other filters still apply on top.
+    expect(
+      run({ automatedOnly: true, categories: ['Event'] }).every((c) => c.category === 'Event'),
+    ).toBe(true);
+  });
+
+  it('puts "Automated only" in the URL as auto=1 and nowhere when off', () => {
+    const p = filtersToQuery({ ...emptyFilters('OP-17'), automatedOnly: true }, 'OP-17');
+    expect(p.get('auto')).toBe('1');
+    expect(filtersFromQuery(new URLSearchParams('auto=1'), 'OP-17').automatedOnly).toBe(true);
+    expect(filtersFromQuery(new URLSearchParams(''), 'OP-17').automatedOnly).toBe(false);
+  });
+});
+
+describe('META_IDS (M4b coverage scope)', () => {
+  it('is the 182 meta-list card numbers, not the verified set', async () => {
+    const { META_IDS } = await import('../src/cards/meta.ts');
+    expect(META_IDS.size).toBe(182);
+    expect(META_IDS.has('OP17-039')).toBe(true);
+    expect(META_IDS.has('OP05-022')).toBe(false); // verified, but in no list
   });
 });

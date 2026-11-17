@@ -376,4 +376,74 @@ test.describe('card browser', () => {
     await page.getByRole('button', { name: 'Retry' }).click();
     await expect(status(page)).toHaveText(`${op17.length} cards in ${NEWEST}`);
   });
+
+  // M4b: coverage shown in the browser.
+  for (const [w, h] of [
+    [1280, 720],
+    [1920, 1080],
+  ] as const) {
+    test(`coverage readout, Automated only and the inspector chip at ${w}x${h}`, async ({
+      page,
+    }) => {
+      await serveArt(page);
+      await page.setViewportSize({ width: w, height: h });
+      await page.goto('./cards');
+      await expect(status(page)).toHaveText(`${op17.length} cards in ${NEWEST}`);
+      const cov = page.getByTestId('coverage');
+      await expect(cov).toContainText(`of ${op17.length} cards here play fully`);
+      await expect(cov).toContainText('with a scripted effect');
+      await expect(cov).toContainText('with no effect to script');
+      await expect(cov).not.toContainText(/automated/i);
+      await expect(cov).toContainText(/Meta-list cards: (all \d+|\d+ of \d+) play fully/);
+      await page.screenshot({ path: `.cache/m4b/browser-${w}x${h}.png` });
+      await expectNoAxeViolations(page);
+
+      // The filter narrows the grid but the readout still describes the scope.
+      const before = Number((await status(page).innerText()).match(/^(\d+)/)![1]);
+      await page.getByRole('checkbox', { name: 'Automated only' }).check();
+      await expect(page).toHaveURL(/auto=1/);
+      await expect(
+        page.getByRole('button', { name: 'Remove filter Automated only' }),
+      ).toBeVisible();
+      await expect(status(page)).not.toHaveText(`${before} cards in ${NEWEST}`);
+      const after = Number((await status(page).innerText()).match(/^(\d+)/)![1]);
+      expect(after).toBeLessThan(before);
+      expect(after).toBeGreaterThan(0);
+      await expect(cov).toContainText(`of ${before} cards here play fully`);
+      await expect(cov).toContainText(`${after} of ${before} cards here play fully`);
+      await page.screenshot({ path: `.cache/m4b/browser-automated-only-${w}x${h}.png` });
+      await expectNoAxeViolations(page);
+
+      // The URL restores it.
+      await page.reload();
+      await expect(page.getByRole('checkbox', { name: 'Automated only' })).toBeChecked();
+      await expect(status(page)).toHaveText(`${after} cards in ${NEWEST}`);
+      await page.getByRole('checkbox', { name: 'Automated only' }).uncheck();
+      await expect(status(page)).toHaveText(`${before} cards in ${NEWEST}`);
+
+      // A scripted card says so in words; a card with no effect says that instead.
+      await page.goto('./cards?q=OP17-039');
+      await tile(page, 'OP17-039').click();
+      const dlg = page.getByRole('dialog');
+      await expect(dlg.getByText('✓ Effect automated')).toBeVisible();
+      await expect(dlg.getByText('Effect not automated')).toHaveCount(0);
+      await page.screenshot({ path: `.cache/m4b/inspector-scripted-${w}x${h}.png` });
+      await expectNoAxeViolations(page);
+      await page.goto('./cards?q=OP08-099');
+      await tile(page, 'OP08-099').click();
+      await expect(page.getByRole('dialog').getByText('No effect to automate')).toBeVisible();
+      await page.screenshot({ path: `.cache/m4b/inspector-vanilla-${w}x${h}.png` });
+      await expectNoAxeViolations(page);
+    });
+  }
+
+  // M4b: the Setup copy counts a card with no effect text as playing fully, not as scripted.
+  test('Setup counts vanilla cards as fully playing, in plain words', async ({ page }) => {
+    await page.goto('./play?p1=OP08-098&p2=OP08-098');
+    const line = page.getByTestId('automation').getByRole('listitem').first();
+    await expect(line).toContainText('different cards play fully');
+    await expect(line).toContainText('with no effect to script');
+    await expect(line).not.toContainText(/automated|the others play/i);
+    await expectNoAxeViolations(page);
+  });
 });

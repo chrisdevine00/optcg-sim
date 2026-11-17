@@ -1,8 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
-import { COLORS, CATEGORIES, KEYWORDS, setCodeOf, type Card, type SetFile } from '@optcg/cards';
+import {
+  COLORS,
+  CATEGORIES,
+  KEYWORDS,
+  coverage,
+  setCodeOf,
+  type Card,
+  type SetFile,
+} from '@optcg/cards';
 import { loadSet, manifest } from '@optcg/cards/browser';
 import { retryArt, useArtStatus } from '../art/index.ts';
 import { Inspector } from './Inspector.tsx';
+import { META_IDS } from './meta.ts';
+import { SCRIPTED } from './scripts.ts';
 import { ResultsGrid } from './ResultsGrid.tsx';
 import {
   allTypes,
@@ -105,6 +115,19 @@ export default function CardBrowser() {
   const failedHere = wanted.filter((c) => failed.has(c));
   const pool = useMemo(() => wanted.flatMap((c) => loaded.get(c)?.cards ?? []), [wanted, loaded]);
   const results = useMemo(() => filterCards(pool, effective, setOrder), [pool, effective]);
+  // Coverage of the scope as filtered, whether or not "Automated only" is on, so the readout stays true.
+  const cov = useMemo(() => {
+    const scope = filters.automatedOnly
+      ? filterCards(pool, { ...effective, automatedOnly: false }, setOrder)
+      : results;
+    return {
+      all: coverage(scope, SCRIPTED),
+      meta: coverage(
+        scope.filter((c) => META_IDS.has(c.id)),
+        SCRIPTED,
+      ),
+    };
+  }, [pool, effective, results, filters.automatedOnly]);
   const allSetsCount = useMemo(
     () =>
       query && scopeSet !== 'all'
@@ -243,6 +266,9 @@ export default function CardBrowser() {
     ...(filters.verifiedOnly
       ? [{ label: 'In meta decklists', clear: () => patch({ verifiedOnly: false }) }]
       : []),
+    ...(filters.automatedOnly
+      ? [{ label: 'Automated only', clear: () => patch({ automatedOnly: false }) }]
+      : []),
   ];
   const clearAll = () =>
     patch({
@@ -327,6 +353,26 @@ export default function CardBrowser() {
             <kbd>/</kbd> search · <kbd>↓</kbd> to results · <kbd>Enter</kbd> inspect
           </span>
         </div>
+        {pending === 0 && failedHere.length === 0 && cov.all.total > 0 && (
+          <p className="coverage" data-testid="coverage">
+            <b>{cov.all.fully.toLocaleString('en')}</b> of {cov.all.total.toLocaleString('en')}{' '}
+            {cov.all.total === 1 ? 'card here plays' : 'cards here play'} fully:{' '}
+            {cov.all.scripted.toLocaleString('en')} with a scripted effect,{' '}
+            {cov.all.noScriptNeeded.toLocaleString('en')} with no effect to script.
+            {cov.meta.total > 0 && (
+              <>
+                {' '}
+                Meta-list cards:{' '}
+                {cov.meta.fully === cov.meta.total
+                  ? cov.meta.total === 1
+                    ? 'the 1 plays fully'
+                    : `all ${cov.meta.total} play fully`
+                  : `${cov.meta.fully} of ${cov.meta.total} play fully`}
+                .
+              </>
+            )}
+          </p>
+        )}
         {chips.length > 0 && (
           <div className="chips-bar" role="group" aria-label="Active filters">
             {chips.map((c) => (
@@ -564,6 +610,20 @@ export default function CardBrowser() {
           />
           In meta decklists (verified)
         </label>
+        <>
+          <label className="check">
+            <input
+              type="checkbox"
+              checked={filters.automatedOnly}
+              aria-describedby="f-auto-hint"
+              onChange={(e) => patch({ automatedOnly: e.target.checked })}
+            />
+            Automated only
+          </label>
+          <p className="hint" id="f-auto-hint">
+            Hides cards whose effect does not happen in play. Cards with no effect text stay.
+          </p>
+        </>
         <button
           type="button"
           className="btn small filters-done"

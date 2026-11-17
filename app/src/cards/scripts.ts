@@ -1,6 +1,7 @@
 /**
- * Effect scripts available to the app (M4a): the registry's card numbers. Cards outside it play
- * for their stats and verified keywords, with an "effect not automated" badge (effect-dsl E-D8).
+ * Effect scripts available to the app: the registry's card numbers (M4b: every meta-list card with an
+ * effect is scripted). Cards outside it play for their stats and verified keywords, with an "effect not
+ * automated" badge (effect-dsl E-D8); vanilla and keywords-only cards need no script.
  */
 import { SCRIPTED_IDS } from '@optcg/cards';
 

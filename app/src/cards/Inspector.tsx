@@ -219,6 +219,15 @@ export function Inspector({ card, position, onPrev, onNext, onClose }: Props) {
             {SCRIPTED_ANY && auto === 'not-automated' && (
               <span className="chip warning">⚠ Effect not automated</span>
             )}
+            {SCRIPTED_ANY && auto === 'scripted' && (
+              <span className="chip outline">✓ Effect automated</span>
+            )}
+            {SCRIPTED_ANY && auto === 'keywords' && (
+              <span className="chip outline">✓ Keywords only, plays fully</span>
+            )}
+            {SCRIPTED_ANY && auto === 'vanilla' && (
+              <span className="chip outline">No effect to automate</span>
+            )}
             {!SCRIPTED_ANY && (auto === 'not-automated' || auto === 'keywords') && (
               <span className="chip outline">Effect not automated</span>
             )}

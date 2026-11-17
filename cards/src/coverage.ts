@@ -23,3 +23,32 @@ export function automation(card: Card, scripted: ReadonlySet<string> = new Set()
   }
   return 'not-automated';
 }
+
+/** Whether a card plays fully in a game: its effect is scripted, or it has no effect to script. */
+export const playsFully = (a: Automation): boolean => a !== 'not-automated';
+
+export interface CoverageCount {
+  total: number;
+  /** Cards with an effect script. */
+  scripted: number;
+  /** Cards with no effect text, or only printed keywords: nothing to script. */
+  noScriptNeeded: number;
+  /** Cards whose effect does not happen in play. */
+  notAutomated: number;
+  /** `scripted + noScriptNeeded`. */
+  fully: number;
+}
+
+/** Counts cards by how fully they play (the browser readout and the Setup copy share this). */
+export function coverage(cards: Iterable<Card>, scripted: ReadonlySet<string>): CoverageCount {
+  const n = { total: 0, scripted: 0, noScriptNeeded: 0, notAutomated: 0, fully: 0 };
+  for (const c of cards) {
+    const a = automation(c, scripted);
+    n.total++;
+    if (a === 'scripted') n.scripted++;
+    else if (a === 'not-automated') n.notAutomated++;
+    else n.noScriptNeeded++;
+  }
+  n.fully = n.scripted + n.noScriptNeeded;
+  return n;
+}

@@ -7,7 +7,10 @@ import {
   type Color,
   type Keyword,
   type Legality,
+  automation,
+  playsFully,
 } from '@optcg/cards';
+import { SCRIPTED } from './scripts.ts';
 
 export type CostFilter = '' | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10+';
 export type SortKey = 'best' | 'id' | 'cost' | 'power' | 'name';
@@ -24,6 +27,8 @@ export interface Filters {
   keyword: '' | Keyword | 'Trigger';
   legality: '' | Legality['status'];
   verifiedOnly: boolean;
+  /** Only cards that play fully: an effect script, or no effect to script (M4b). */
+  automatedOnly: boolean;
   sort: SortKey;
   descending: boolean;
 }
@@ -38,6 +43,7 @@ export const emptyFilters = (set: string): Filters => ({
   keyword: '',
   legality: '',
   verifiedOnly: false,
+  automatedOnly: false,
   sort: 'best',
   descending: false,
 });
@@ -86,6 +92,7 @@ export function matches(c: Card, f: Filters): boolean {
   }
   if (f.legality && c.legality.standard.status !== f.legality) return false;
   if (f.verifiedOnly && !c.verified) return false;
+  if (f.automatedOnly && !playsFully(automation(c, SCRIPTED))) return false;
   const q = f.query.trim().toLowerCase();
   if (q) {
     const h = haystack(c);
@@ -160,6 +167,7 @@ export function filtersToQuery(f: Filters, defaultSet: string): URLSearchParams 
   if (f.keyword) p.set('keyword', f.keyword);
   if (f.legality) p.set('legality', f.legality);
   if (f.verifiedOnly) p.set('meta', '1');
+  if (f.automatedOnly) p.set('auto', '1');
   if (f.sort !== DEFAULTS.sort) p.set('sort', f.sort);
   if (f.descending) p.set('desc', '1');
   return p;
@@ -186,6 +194,7 @@ export function filtersFromQuery(
     keyword: one('keyword', [...KEYWORDS, 'Trigger'] as const, ''),
     legality: one('legality', ['legal', 'banned', 'restricted', 'rotated', 'unknown'] as const, ''),
     verifiedOnly: p.get('meta') === '1',
+    automatedOnly: p.get('auto') === '1',
     sort: one('sort', ['best', 'id', 'cost', 'power', 'name'] as const, 'best'),
     descending: p.get('desc') === '1',
   };
