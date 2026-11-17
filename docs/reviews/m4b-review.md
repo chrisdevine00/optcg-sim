@@ -109,3 +109,51 @@ Counts: severity 4: 0; severity 3: 5; severity 2: 8; severity 1: 5 items (M4b-14
 - Log wording for `playCost`, `skipRefresh`, `cannotBeKOd` was read from code, not seen. AI path of the zero-candidate choose and app handling of the worker `error` message untested. No 1080p full game ran (harness timeouts); 1080p screenshots come from scenarios.
 - Random-game robustness: 3,600 games (all 144 pairings, 25 each, random and passive policy, invariants after every action): 0 crashes, 0 Anomalies, 0 stuck decisions, 0 capped. Soundness: 450 scripted positions with no `asVanilla`: 0 unsound proofs, 0 unsound bound refutations.
 - Artifacts: probes and screenshots under `.cache/m4b-review/` (gitignored).
+
+## Re-review 1
+
+**Date:** 2026-11-16. **Build:** `origin/main` at `4dca69e` (f2cbe42 AI and app, 4dca69e engine and cards), rebased into the review worktree, `npm ci`. No repository code changed.
+
+**Verdict: PASS.** No open severity 3 or 4. Two severity 2 items and five severity 1 items remain (below), none of which blocks the milestone.
+
+### Checks run
+- `npx vitest run` (all workspaces): 465 files passed, 3,923 tests passed, 2 expected fail (both pre-existing, EB04-040 and an older entry; none from M4b). Typecheck and eslint were clean at the first review and the diff is test, engine, AI and app code only; the full vitest and full Playwright e2e (196 passed, 0 failed, 720p and 1080p) are green.
+- Revert checks (I reverted the fix, ran the tests, restored it):
+  - M4b-01 (`OP05-098` back to `upTo: 1`): 6 tests fail. Reverting `engine/src/effects/run.ts` to 248a6d3 (all engine fixes at once): 43 tests fail, covering the M4b-01, -03, -05 and -08 tests, ST01-011, OP15-058, EB03-053, the independent DON!! tests, and two goldens.
+  - M4b-02: reverting only `chooser` changes nothing, because `blind: true` overrides it (`run.ts:388`); reverting `blind` fails the ST10-010 test. So the guard is real, and `chooser: 'you'` is redundant but harmless.
+  - M4b-04 (`ai/src/search/sim.ts` back to 248a6d3): 2 failures in `pirate-robust.test.ts` (the seed 1 OP17-079 v OP14-041 repro and the `battleNumbers` unit test).
+  - M4b-05, M4b-03 and M4b-08 are covered by the `run.ts` revert above; the app half of M4b-05 was checked in the browser.
+- Pirate sweep (my own probe): 132 full Pirate v Pirate games, every ordered pairing of the 12 leaders, seeds 7000+, `onFallback` counted: 0 crashes, 0 fallbacks, 0 capped. The earlier failing pairs now finish. The fallback cannot hide a bug in tests: `pirate-robust` fails on any `onFallback`, and the production path logs `console.error`.
+- Lethal soundness with scripts, no `asVanilla` (the same probe as the first review, 2 batches of 150 positions over all leaders, 20,000 nodes): 0 unsound public proofs, 0 unsound bound refutations (135 checked), 0 unsound actual proofs (99 proven), 0 solver crashes (9 scenario-sampler rejections for OP15-058 with over 6 DON!!, my sampler's fault as before). The `giveDon` change did not break the solver.
+- Properties at `ENGINE_GAMES=10000`: `leaks.test.ts`, `skeleton-diff.test.ts` and the new `link-tracker.test.ts`: all pass. The old failure is gone. The exemption is narrow: `link-tracker.test.ts` plants five real relinks that still fail (a hand card returning under the same handle, a second use after the exemption is spent, an older handle, a hand-revealed card, another card). `leaks.test.ts` now pairs M4b decks with each other and no longer replaces real scripts with the stub trigger.
+- App (sub-review in Chromium, 1280×720 and 1920×1080; evidence under `.cache/m4b-review/app/rr1-*`): no console errors, no page errors.
+
+### Status per finding
+| Finding | Status |
+| --- | --- |
+| M4b-01 Enel optional | Fixed, revert-checked. |
+| M4b-02 ST10-010 chooser | Fixed, revert-checked (guard is `blind`). |
+| M4b-03 give up to N DON!! | Fixed, revert-checked. Count choose (N..0, "None") then target; with one DON!! the target `choose` ends with `done`. Browser: ST01-011 and OP15-058 play, keyboard works, "None" returns to main. Rookie AI completes it; the Pirate AI completes Enel's Activate. I could not confirm that either AI ever answers above 0 (not a correctness issue: the default pick gives all, as before). ST31-005 was not exercised in the browser (same code path). |
+| M4b-04 Pirate crash | Fixed, revert-checked, 132-game sweep clean. |
+| M4b-05 look with no eligible card | Fixed: Saul with 0 eligible completes in hotseat, vs Pirate, and when the Pirate plays it. The engine still asks max 0 when cards were looked at, deliberately (skipping would tell the opponent no card matches, CR 8-4-4-2); an empty deck or empty zone with no filter is now skipped. I agree with that choice. |
+| M4b-06 OP08-115 "Then" | Fixed (script, test). |
+| M4b-07 OP15-119 reveal | Fixed: Use/Skip prompt after a veil in hotseat, not offered at 0 Life. |
+| M4b-08 OP06-058 order | Fixed: the owner gets an `order` decision; p1 does not see the order (test: events and views identical for both answers; hotseat curtain checked). |
+| M4b-09 nightly leak property | Fixed, 10,000-game run green, exemption narrow with planted leaks. |
+| M4b-10 face-up Life | Fixed in substance: tiles drawn, sr-only text correct ("3 cards, 1 face-up: Nami"), face-down names not in the DOM. Reopened as M4b-19 (severity 2) for the design below. |
+| M4b-11 look panel | Fixed: ineligible cards listed and marked "can't be chosen"; trashed cards logged. |
+| M4b-12 log wording | Fixed for cost, cannotDraw, cannotPlay, skipRefresh, playCost, look-to-Life, add-to-Life, face-up Life, deck-to-trash. The duplicate "K.O. ... trashed" is gone. Nits in M4b-20. |
+| M4b-13 wrong `it.fails` tests | Fixed: B-2 and D-2 rewritten to assert the engine; the DISAGREEMENTS files say so. |
+| M4b-14 koed printed values | Open, severity 1, unchanged (no meta impact). |
+| M4b-15 unpayable/empty choose inconsistencies | Partly fixed (empty zone, no filter, now skipped); the rest of the inconsistency stays, severity 1. |
+| M4b-16 duplicate K.O., readout copy, stale comments | K.O. duplicate and the EB04-007 comments fixed; "463 of 2,799 here" copy with "Automated only" on unchanged, severity 1. |
+| M4b-17 golden guard | Accepted as noted; goldens re-recorded for the new engine and scripts versions. |
+| M4b-18 API gaps | Open by design, severity 1. |
+
+### New and remaining items
+- **M4b-19 (2) Face-up Life tile (app).** `Board.tsx` draws a bright cream block (#f1ebdd) with a 12px name, no art, cost or power. It clashes with the dark UI and with principles.md section 6 (art is the hero). "Charlotte Smoothie" and "Sweet 3 Generals" are clipped (`scrollWidth > clientWidth`). With two or more face-up Life cards only the top name is readable (the next is overlapped to a sliver; sr-only text lists both). The tile cannot be inspected: hover shows no inspector, click and Enter and "i" do nothing, so the Counter, Trigger and cost of a public card are unreachable. Fix: use the card art (a thumbnail or a cropped art strip), make the tile inspectable like any other card, and fan the stack so each name stays readable. The information is correct and public; this is presentation and access.
+- **M4b-20 (1) Log and tile nits.** The cannotDraw line names the Leader ("Enel cannot draw with effects") instead of the player; the OP13-118 restriction shows only the ability label in hotseat; the cannotBeKOd and cannotBeRemoved wording is unverified (no line appeared for OP15-118); the "N Life" plate covers part of the face-up tile name.
+- Severity 2 open: M4b-19 (it also covers the inspect gap) and the unverified 2: none other. Counting the clipping/stack readability and the inspect gap as two separate items, 2 open at severity 2. Severity 1 open: M4b-14, M4b-15 (remainder), M4b-16 (readout copy), M4b-18, M4b-20.
+
+### Not verified in this round
+- ST31-005 and EB03-053 [On K.O.] in the browser; whether either AI ever gives more than 0 DON!!; the cannotBeKOd/cannotBeRemoved log wording; 1080p full games (scenario screenshots only).
