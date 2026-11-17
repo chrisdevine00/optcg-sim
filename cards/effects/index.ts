@@ -9,6 +9,9 @@ import type { CardScript } from '../src/dsl.ts';
 import { EB01_056 } from './EB-01/EB01-056.ts';
 import { EB01_059 } from './EB-01/EB01-059.ts';
 import { EB02_052 } from './EB-02/EB02-052.ts';
+import { EB02_017 } from './EB-02/EB02-017.ts';
+import { EB02_021 } from './EB-02/EB02-021.ts';
+import { EB04_002 } from './EB-04/EB04-002.ts';
 import { EB04_030 } from './EB-04/EB04-030.ts';
 import { EB04_031 } from './EB-04/EB04-031.ts';
 import { EB04_032 } from './EB-04/EB04-032.ts';
@@ -16,6 +19,10 @@ import { EB04_040 } from './EB-04/EB04-040.ts';
 import { EB04_058 } from './EB-04/EB04-058.ts';
 import { EB04_059 } from './EB-04/EB04-059.ts';
 import { OP05_098 } from './OP-05/OP05-098.ts';
+import { OP01_016 } from './OP-01/OP01-016.ts';
+import { OP01_055 } from './OP-01/OP01-055.ts';
+import { OP04_016 } from './OP-04/OP04-016.ts';
+import { OP06_017 } from './OP-06/OP06-017.ts';
 import { OP07_076 } from './OP-07/OP07-076.ts';
 import { OP07_077 } from './OP-07/OP07-077.ts';
 import { OP08_051 } from './OP-08/OP08-051.ts';
@@ -30,6 +37,18 @@ import { OP15_069 } from './OP-15/OP15-069.ts';
 import { OP15_078 } from './OP-15/OP15-078.ts';
 import { OP16_117 } from './OP-16/OP16-117.ts';
 import { OP16_119 } from './OP-16/OP16-119.ts';
+import { OP11_012 } from './OP-11/OP11-012.ts';
+import { OP12_006 } from './OP-12/OP12-006.ts';
+import { OP12_015 } from './OP-12/OP12-015.ts';
+import { OP12_018 } from './OP-12/OP12-018.ts';
+import { OP12_037 } from './OP-12/OP12-037.ts';
+import { OP12_038 } from './OP-12/OP12-038.ts';
+import { OP13_037 } from './OP-13/OP13-037.ts';
+import { OP13_040 } from './OP-13/OP13-040.ts';
+import { OP14_019 } from './OP-14/OP14-019.ts';
+import { OP14_031 } from './OP-14/OP14-031.ts';
+import { OP15_032 } from './OP-15/OP15-032.ts';
+import { OP17_017 } from './OP-17/OP17-017.ts';
 import { OP17_039 } from './OP-17/OP17-039.ts';
 import { OP17_040 } from './OP-17/OP17-040.ts';
 import { OP17_042 } from './OP-17/OP17-042.ts';
@@ -65,6 +84,12 @@ import { OP17_113 } from './OP-17/OP17-113.ts';
 import { OP17_114 } from './OP-17/OP17-114.ts';
 import { OP17_118 } from './OP-17/OP17-118.ts';
 import { ST34_003 } from './ST-34/ST34-003.ts';
+import { ST21_014 } from './ST-21/ST21-014.ts';
+import { ST21_017 } from './ST-21/ST21-017.ts';
+import { ST30_001 } from './ST-30/ST30-001.ts';
+import { ST30_012 } from './ST-30/ST30-012.ts';
+import { ST31_001 } from './ST-31/ST31-001.ts';
+import { ST31_005 } from './ST-31/ST31-005.ts';
 import { ST34_004 } from './ST-34/ST34-004.ts';
 import { OP08_098 } from './OP-08/OP08-098.ts';
 import { EB03_053 } from './EB-03/EB03-053.ts';
@@ -115,6 +140,9 @@ const ALL: readonly CardScript[] = [
   EB01_056,
   EB01_059,
   EB02_052,
+  EB02_017,
+  EB02_021,
+  EB04_002,
   EB04_030,
   EB04_031,
   EB04_032,
@@ -122,6 +150,10 @@ const ALL: readonly CardScript[] = [
   EB04_058,
   EB04_059,
   OP05_098,
+  OP01_016,
+  OP01_055,
+  OP04_016,
+  OP06_017,
   OP07_076,
   OP07_077,
   OP08_051,
@@ -136,6 +168,18 @@ const ALL: readonly CardScript[] = [
   OP15_078,
   OP16_117,
   OP16_119,
+  OP11_012,
+  OP12_006,
+  OP12_015,
+  OP12_018,
+  OP12_037,
+  OP12_038,
+  OP13_037,
+  OP13_040,
+  OP14_019,
+  OP14_031,
+  OP15_032,
+  OP17_017,
   OP17_039,
   OP17_040,
   OP17_042,
@@ -171,6 +215,12 @@ const ALL: readonly CardScript[] = [
   OP17_114,
   OP17_118,
   ST34_003,
+  ST21_014,
+  ST21_017,
+  ST30_001,
+  ST30_012,
+  ST31_001,
+  ST31_005,
   ST34_004,
   OP08_098,
   EB03_053,
