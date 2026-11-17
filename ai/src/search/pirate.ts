@@ -34,6 +34,7 @@ import type { Explanation } from '../explanation.ts';
 import { explainMove } from '../explain.ts';
 import { counterValueOf, type Prior } from '../knowledge.ts';
 import { ownTurn, type Playbook } from '../playbook.ts';
+import { playOnlyIfMet } from './conditions.ts';
 import { evaluate, total, type Breakdown, type Weights } from './heuristic.ts';
 import { determinizations } from './sample.ts';
 import { explainAction, type WhyContext } from './why.ts';
@@ -328,6 +329,7 @@ function mainBias(root: GameState, me: PlayerId, ctx: SimContext, setup: PirateS
   const legal = legalActions(root);
   const leaderCanAttack = legal.some((a) => a.type === 'attack' && a.attacker === leader.instance);
   const oppChars = queries.zone(root, other(me), 'characters');
+  const chars = queries.zone(root, me, 'characters');
   return (c: Candidate): number => {
     if (!pb) return 0;
     let b = 0;
@@ -336,6 +338,15 @@ function mainBias(root: GameState, me: PlayerId, ctx: SimContext, setup: PirateS
         if (bias.kind === 'attackWith' && a.type === 'attack' && own >= bias.fromOwnTurn) {
           const who = bias.card === 'leader' ? leader.instance : null;
           if (who ? a.attacker === who : queries.card(root, a.attacker).card === bias.card)
+            b += bias.bonus;
+        }
+        if (bias.kind === 'attackWithPower' && a.type === 'attack' && own >= bias.fromOwnTurn) {
+          const at = chars.find((x) => x.instance === a.attacker);
+          if (
+            at &&
+            (at.power ?? 0) >= bias.minPower &&
+            (!bias.withTrigger || setup.cards.get(at.card)?.triggerText)
+          )
             b += bias.bonus;
         }
         if (
@@ -354,11 +365,23 @@ function mainBias(root: GameState, me: PlayerId, ctx: SimContext, setup: PirateS
                 : -bias.penalty;
           }
         }
+        if (
+          bias.kind === 'playBeforeLeaderAttack' &&
+          a.type === 'attack' &&
+          a.attacker === leader.instance
+        ) {
+          // The card is in hand and the DON!! left after this move's gifts still pays for it.
+          const card = queries.zone(root, me, 'hand').find((c) => c.card === bias.card);
+          const given = c.actions.filter((x) => x.type === 'giveDon').length;
+          if (card && queries.don(root, me).active - given >= (card.cost ?? 0)) b -= bias.penalty;
+        }
         if (a.type !== 'playCard') continue;
         const id = queries.card(root, a.card).card;
         if (bias.kind === 'play' && bias.cards.includes(id)) {
           if ((bias.fromOwnTurn ?? 0) <= own && own <= (bias.byOwnTurn ?? 99)) b += bias.bonus;
         }
+        if (bias.kind === 'playOnlyIf' && bias.card === id && !playOnlyIfMet(root, me, bias.when))
+          b -= bias.penalty;
         if (
           bias.kind === 'avoidPlay' &&
           bias.card === id &&
@@ -373,6 +396,18 @@ function mainBias(root: GameState, me: PlayerId, ctx: SimContext, setup: PirateS
         }
       }
     }
+    // One bonus for a move that gives DON!! to the named card, while it holds fewer than `upTo`.
+    for (const bias of pb.biases)
+      if (bias.kind === 'giveDon' && own >= bias.fromOwnTurn) {
+        const gives = c.actions.some((x) => {
+          if (x.type !== 'giveDon') return false;
+          const t = queries.card(root, x.target);
+          const hit =
+            bias.target === 'leader' ? x.target === leader.instance : t.card === bias.target;
+          return hit && (t.don ?? 0) < (bias.upTo ?? 1);
+        });
+        if (gives) b += bias.bonus;
+      }
     return b;
   };
 }
@@ -394,7 +429,13 @@ function otherBias(root: GameState, me: PlayerId, setup: PirateSetup) {
         src.card === bias.source &&
         src.ability === bias.ability
       ) {
-        if (a.type === 'optional' && a.accept && hand >= bias.minHand) b += bias.bonus;
+        if (
+          a.type === 'optional' &&
+          a.accept &&
+          hand >= bias.minHand &&
+          (bias.donDeckAtLeast === undefined || queries.don(root, me).deck >= bias.donDeckAtLeast)
+        )
+          b += bias.bonus;
       }
       if (
         bias.kind === 'useOnAttacker' &&
@@ -445,11 +486,24 @@ function otherBias(root: GameState, me: PlayerId, setup: PirateSetup) {
             (x): x is Extract<Action, { type: 'pick' }> =>
               x.type === 'pick' && typeof x.choice === 'string',
           );
-          const powers = picks.map((x) => queries.card(root, x.choice as string).power ?? 0);
-          const mine = queries.card(root, a.choice).power ?? 0;
-          if (mine === Math.max(...powers)) b += bias.bonus;
+          const key = (id: string) => {
+            const c = queries.card(root, id);
+            return (bias.by === 'cost' ? c.cost : c.power) ?? 0;
+          };
+          const best = Math.max(...picks.map((x) => key(x.choice as string)));
+          if (key(a.choice) === best) b += bias.bonus;
         }
       }
+      if (
+        bias.kind === 'pickWithTrigger' &&
+        dec.kind === 'choose' &&
+        src.card === bias.source &&
+        src.ability === bias.ability &&
+        a.type === 'pick' &&
+        typeof a.choice === 'string' &&
+        setup.cards.get(queries.card(root, a.choice).card)?.triggerText
+      )
+        b += bias.bonus;
     }
     return b;
   };

@@ -7,6 +7,10 @@
  */
 import rocks from '../playbooks/OP17-039.json';
 import kaido from '../playbooks/OP17-058.json';
+import enel from '../playbooks/OP05-098.json';
+import kalgara from '../playbooks/OP08-098.json';
+import robin from '../playbooks/OP09-062.json';
+import hancock from '../playbooks/OP14-041.json';
 
 /** The heuristic terms a playbook can scale (see `search/heuristic.ts`). */
 export type WeightKey = 'life' | 'hand' | 'counter' | 'board' | 'don' | 'threat';
@@ -35,12 +39,32 @@ export type Bias = BiasCite &
         bonus: number;
         seed: number;
       }
+    /**
+     * One of the AI's Characters with at least `minPower` power attacks (`withTrigger`: only a card
+     * with a [Trigger]), from own turn `fromOwnTurn`. The power is the derived power, so a bonus
+     * that needs Linlin on the field (4000 becomes 8000) holds only while she is there.
+     */
+    | {
+        kind: 'attackWithPower';
+        minPower: number;
+        withTrigger?: boolean;
+        fromOwnTurn: number;
+        bonus: number;
+        seed: number;
+      }
     /** Accept this optional ability ("you may") while the AI holds at least `minHand` cards. */
     | {
         kind: 'acceptOptional';
         source: string;
         ability: string;
         minHand: number;
+        /** Only while the AI's DON!! deck still has at least this many cards (Robin's pitch, RL-50). */
+        donDeckAtLeast?: number;
+        /**
+         * Only while a card with a [Trigger] is in hand (Hiyori's swap puts one on Life). The
+         * condition is a hidden card, so a move that follows it is never cited.
+         */
+        triggerInHand?: boolean;
         bonus: number;
         seed: number;
       }
@@ -62,8 +86,61 @@ export type Bias = BiasCite &
         penalty: number;
         seed: number;
       }
-    /** In this ability's target choice, prefer the opponent's Character with the highest power. */
-    | { kind: 'targetHighestPower'; source: string; ability: string; bonus: number; seed: number }
+    /**
+     * In this ability's target choice, prefer the candidate with the highest power (the opponent's
+     * Character, usually) or, with `by: 'cost'`, the highest cost (the AI's own free play).
+     */
+    | {
+        kind: 'targetHighestPower';
+        source: string;
+        ability: string;
+        by?: 'power' | 'cost';
+        bonus: number;
+        seed: number;
+      }
+    /**
+     * Give DON!! to the AI's Leader (`target: 'leader'`) or to a card with this id, from own turn
+     * `fromOwnTurn`: one `bonus` for a move that gives any, however many, while the card holds
+     * fewer than `upTo` given DON!! (default 1): the bonus is for getting one there, not for
+     * piling them on.
+     */
+    | {
+        kind: 'giveDon';
+        target: 'leader' | string;
+        fromOwnTurn: number;
+        upTo?: number;
+        bonus: number;
+        seed: number;
+      }
+    /**
+     * Play `card` only when `when` holds (every condition given): otherwise a `penalty`. Both
+     * conditions read public facts (the AI's own field, the opponent's Life), so a play that meets
+     * them can be cited. `never: true` is "only to win": the penalty is always paid, and a move that
+     * wins outscores it (a win is worth 1000).
+     */
+    | {
+        kind: 'playOnlyIf';
+        card: string;
+        when: {
+          /** At least `min` Characters of these ids on the AI's field. */
+          ownBoard?: { cards: string[]; min: number };
+          /** The opponent has at most this many Life cards. */
+          oppLifeAtMost?: number;
+          never?: boolean;
+        };
+        penalty: number;
+        seed: number;
+      }
+    /**
+     * Do not attack with the Leader while `card` is in hand and affordable with the DON!! the attack
+     * would leave: play it first (Kalgara: Sweet 3 Generals' −3000 goes on before Wyper's sweep).
+     */
+    | { kind: 'playBeforeLeaderAttack'; card: string; penalty: number; seed: number }
+    /**
+     * In this ability's choice from the AI's own hand, prefer a card with a [Trigger] (Hiyori puts a
+     * known Trigger card on top of Life). Never cited: the pick is a hidden card.
+     */
+    | { kind: 'pickWithTrigger'; source: string; ability: string; bonus: number; seed: number }
     /**
      * On the opponent's attack, use this once-per-turn ability on their attacking Character when it
      * changes the battle (the attacker falls below the defender, or the Counter needed falls).
@@ -148,7 +225,7 @@ export interface Playbook {
   leaderTrick?: LeaderTrickCopy & { source: string; ability: string };
 }
 
-const ALL = [rocks, kaido] as unknown as Playbook[];
+const ALL = [rocks, kaido, robin, enel, kalgara, hancock] as unknown as Playbook[];
 
 export const PLAYBOOKS: ReadonlyMap<string, Playbook> = new Map(ALL.map((p) => [p.leaderId, p]));
 

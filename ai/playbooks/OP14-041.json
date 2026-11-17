@@ -1,0 +1,129 @@
+{
+  "leaderId": "OP14-041",
+  "archetypeId": "OP14-041-boa-hancock",
+  "aiName": "Hancock",
+  "asOf": "2026-10-28",
+  "guide": "docs/content/archetypes/OP14-041.md",
+  "notes": [
+    "Written from the guide's 'Game plan by turn' and 'Playbook seeds'.",
+    "goFirst false: the guide gives no seat advice; the general default is to go second (strategy-concepts §10 [S17]).",
+    "cardValue: ongoing effects named in the guide's Defining cards (Gorgon Sisters' DON!! spread, Ran's DON!! gift, Borsalino's Blocker and Life refill, the 9-cost Hancock's Life swing). The sizes are inferences.",
+    "weights.hand 1.1: 'turns the opponent's attacks into card draw' [SH-HAN] (the leader draws when a Character is played on their turn); inference.",
+    "counterAggression 0.9: 'its Life Triggers play Kuja Pirates Characters for free' [SH-HAN], so a hit gives the deck a body and a draw; inference: it counters slightly less readily than the default.",
+    "faceBias 1.0/1.0/1.1: the plan closes with the 9-cost Hancock once they are at 3 or less Life [SH-HAN]; inference: slightly more weight on the opponent's Life late.",
+    "Every number here is an inference (review M5a-09): the guide gives the direction, not the value.",
+    "Seed 1 is the giveDon bias on the Leader: 'leave one DON!! on Hancock before passing' [SH-HAN] switches on her K.O. effect for their turn.",
+    "Seed 2 (activate every Life Trigger that plays a Character) has no bias: the planted test and the self-play check whether search alone does it.",
+    "Seed 3 is playOnlyIf with oppLifeAtMost 3: Shakuyaku's draw 2 / trash 2 needs them at 3 or less Life [CARD][SH-HAN].",
+    "Seed 4 is two biases on Hiyori's On Play: accept it while a Trigger card is in hand (triggerInHand), and pickWithTrigger for the card [SH-HAN]. Neither is cited: both read a hidden card.",
+    "Mulligan: the guide's sourced baseline is 'mulligan for Pudding or Zoro; a hand with neither is the one to send back' [SH-HAN]; the Trigger Character piece is the guide's keepable-hand inference. The seat allowance is 0: the sourced rule does not name one.",
+    "Citations ('cite', 'citeSource') are what 'Why?' shows when a move follows the line; only biases whose condition is public carry one."
+  ],
+  "goFirst": false,
+  "digTargets": ["OP17-109", "OP15-113", "OP14-112", "OP14-105"],
+  "winConditions": ["OP14-112"],
+  "cardValue": {
+    "OP14-112": 0.6,
+    "OP14-105": 0.4,
+    "OP14-114": 0.3,
+    "EB04-058": 0.4
+  },
+  "weights": {
+    "hand": 1.1
+  },
+  "faceBias": {
+    "early": 1.0,
+    "mid": 1.0,
+    "late": 1.1
+  },
+  "counterAggression": 0.9,
+  "mulligan": {
+    "pieces": [
+      {
+        "name": "engine",
+        "label": "Charlotte Pudding or Roronoa Zoro",
+        "cards": ["OP17-109", "OP15-113"],
+        "min": 1
+      },
+      {
+        "name": "trigger",
+        "label": "a Trigger Character to feed Pudding or plant with Hiyori",
+        "cards": [
+          "OP16-113",
+          "OP14-105",
+          "OP14-107",
+          "OP14-114",
+          "OP14-104",
+          "OP14-112",
+          "OP14-108"
+        ],
+        "min": 1
+      }
+    ],
+    "secondShort": 0,
+    "requireGoingFirst": [],
+    "source": "SH-HAN (Pudding or Zoro); OP14-041 guide (keepable hand, inference)"
+  },
+  "biases": [
+    {
+      "seed": 1,
+      "kind": "giveDon",
+      "target": "leader",
+      "fromOwnTurn": 2,
+      "bonus": 2.5,
+      "cite": "Its guide: leave one DON!! on Hancock before passing, so a K.O. of a 5000-power Kuja on their turn pulls a Life card.",
+      "citeSource": "SH-HAN"
+    },
+    {
+      "seed": 3,
+      "kind": "playOnlyIf",
+      "card": "OP14-107",
+      "when": { "oppLifeAtMost": 3 },
+      "penalty": 1.5,
+      "cite": "Its guide: Shakuyaku draws 2 once they are at 3 Life or less.",
+      "citeSource": "SH-HAN"
+    },
+    {
+      "seed": 4,
+      "kind": "acceptOptional",
+      "source": "OP06-106",
+      "ability": "on-play",
+      "minHand": 1,
+      "triggerInHand": true,
+      "bonus": 2.0
+    },
+    {
+      "seed": 4,
+      "kind": "pickWithTrigger",
+      "source": "OP06-106",
+      "ability": "on-play",
+      "bonus": 1.0
+    }
+  ],
+  "assertions": [
+    {
+      "seed": 1,
+      "text": "Ends each turn from T2 with at least 1 DON!! given to the Leader.",
+      "threshold": 0.8,
+      "source": "SH-HAN step 2 (threshold is inference)"
+    },
+    {
+      "seed": 2,
+      "text": "Activates every Life Trigger that plays a Character when it is revealed on the opponent's turn.",
+      "threshold": 0.95,
+      "source": "SH-HAN engine (threshold is inference)"
+    },
+    {
+      "seed": 3,
+      "text": "Plays Shakuyaku from hand only when the opponent has 3 or less Life.",
+      "threshold": 0.8,
+      "source": "card text and SH-HAN step 5"
+    },
+    {
+      "seed": 4,
+      "text": "Uses Kouzuki Hiyori to put a Trigger card on top of its Life whenever a Trigger card is in hand.",
+      "threshold": 0.8,
+      "source": "SH-HAN step 3"
+    }
+  ]
+}

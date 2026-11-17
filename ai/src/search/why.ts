@@ -30,6 +30,7 @@ import {
 } from '../explain.ts';
 import { biggestCounter, eventCounterOf } from '../knowledge.ts';
 import { ownTurn, type Bias, type Playbook } from '../playbook.ts';
+import { playOnlyIfMet } from './conditions.ts';
 import { battleNumbers } from './sim.ts';
 
 export interface WhyContext {
@@ -170,7 +171,9 @@ export function citation(s: GameState, a: Action, me: PlayerId, ctx: WhyContext)
           a.accept &&
           src?.card === b.source &&
           src.ability === b.ability &&
-          queries.zone(s, me, 'hand').length >= b.minHand
+          queries.zone(s, me, 'hand').length >= b.minHand &&
+          (b.donDeckAtLeast === undefined || queries.don(s, me).deck >= b.donDeckAtLeast) &&
+          !b.triggerInHand // a card held in hand: never cited
         )
           return citeOf(b);
         break;
@@ -191,8 +194,13 @@ export function citation(s: GameState, a: Action, me: PlayerId, ctx: WhyContext)
               (x): x is Extract<Action, { type: 'pick' }> =>
                 x.type === 'pick' && typeof x.choice === 'string',
             )
-            .map((x) => queries.card(s, x.choice as string).power ?? 0);
-          if ((queries.card(s, a.choice).power ?? 0) === Math.max(...powers)) return citeOf(b);
+            .map((x) => {
+              const c = queries.card(s, x.choice as string);
+              return (b.by === 'cost' ? c.cost : c.power) ?? 0;
+            });
+          const mine = queries.card(s, a.choice);
+          if (((b.by === 'cost' ? mine.cost : mine.power) ?? 0) === Math.max(...powers))
+            return citeOf(b);
         }
         break;
       case 'useOnAttacker':
@@ -213,6 +221,43 @@ export function citation(s: GameState, a: Action, me: PlayerId, ctx: WhyContext)
         // Public: the card is revealed by its play, and the Leader is rested from its attack.
         if (a.type === 'playCard' && queries.card(s, a.card).card === b.card && leader.rested)
           return citeOf(b);
+        break;
+      case 'attackWithPower': {
+        if (a.type !== 'attack' || own < b.fromOwnTurn) break;
+        const at = queries.zone(s, me, 'characters').find((x) => x.instance === a.attacker);
+        if (
+          at &&
+          (at.power ?? 0) >= b.minPower &&
+          (!b.withTrigger || ctx.cards.get(at.card)?.triggerText)
+        )
+          return citeOf(b);
+        break;
+      }
+      case 'giveDon':
+        if (
+          a.type === 'giveDon' &&
+          own >= b.fromOwnTurn &&
+          (b.target === 'leader'
+            ? a.target === leader.instance
+            : queries.card(s, a.target).card === b.target)
+        )
+          return citeOf(b);
+        break;
+      case 'playOnlyIf':
+        // Public: the card is revealed by its play, and the conditions read the field and Life.
+        if (
+          a.type === 'playCard' &&
+          queries.card(s, a.card).card === b.card &&
+          playOnlyIfMet(s, me, b.when)
+        )
+          return citeOf(b);
+        break;
+      case 'playBeforeLeaderAttack':
+        if (a.type === 'playCard' && queries.card(s, a.card).card === b.card && !leader.rested)
+          return citeOf(b);
+        break;
+      case 'pickWithTrigger':
+        // The pick is a hidden card (it goes face-down to Life): never cited.
         break;
       case 'avoidPlay':
         // Its condition (a card held in hand) is hidden: never cited.

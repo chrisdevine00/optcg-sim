@@ -1,0 +1,130 @@
+{
+  "leaderId": "OP05-098",
+  "archetypeId": "OP05-098-enel",
+  "aiName": "Enel",
+  "asOf": "2026-10-28",
+  "guide": "docs/content/archetypes/OP05-098.md",
+  "notes": [
+    "Written from the guide's 'Game plan by turn' and 'Playbook seeds'.",
+    "goFirst false: the guide gives no seat advice; the general default is to go second (strategy-concepts §10 [S17]).",
+    "cardValue: ongoing effects named in the guide's Defining cards (Linlin's 8000 base power for every 4000-base Trigger Character, Borsalino's Blocker and Life refill, Sweet 3 Generals and Smoothie's Life refills). The sizes are inferences.",
+    "counterAggression 0.85: 'a Life-gain deck that takes damage on purpose and buys it back' [SH-YEN], and the leader refills at 0 on the opponent's turn [CARD]; inference: a hit costs this deck less than the default heuristic says, so it counters slightly less readily.",
+    "faceBias 1.0/1.0/1.1: the plan closes late with Linlin's 8000-power bodies and Enel EB02-052 [SH-YEN]; inference: slightly more weight on the opponent's Life from T5.",
+    "Every number here is an inference (review M5a-09): the guide gives the direction, not the value.",
+    "Linlin's cardValue is only 0.3 here, because her ongoing effect is worth nothing on an empty field (the planted test showed search ranking her 2.6 above the next play on an empty board, so the seed 2 penalty is 3.0).",
+    "Seed 2 is the one bias that gates a play on the board: Linlin only with two or more 4000-base Trigger Characters in play ([SH-YEN] step 5). The Characters counted are the guide's Trigger bodies at 4000 base power in the lists (Pudding, Oven, Daifuku, Smoothie, Sweet 3 Generals, Perospero, Mont-d'or).",
+    "Seed 3: Sweet 3 Generals' and Smoothie's 'rest 2 DON!!' is a 'you may' cost on their On Play, so paying it is an optional-effect choice.",
+    "The guide notes (RL-42) that the leader's refill needs no card in hand, so no bias keeps a card back for it; the mulligan keeps defence (counter cards) because the trash costs a counter [guide, inference].",
+    "Citations ('cite', 'citeSource') are what 'Why?' shows when a move follows the line; every condition here is public."
+  ],
+  "goFirst": false,
+  "digTargets": ["OP17-109", "OP17-112", "OP17-114", "OP17-106"],
+  "winConditions": ["OP17-112", "EB02-052"],
+  "cardValue": {
+    "OP17-112": 0.3,
+    "EB04-058": 0.4,
+    "OP17-114": 0.4,
+    "OP17-106": 0.3
+  },
+  "weights": {
+    "hand": 1.1
+  },
+  "faceBias": {
+    "early": 1.0,
+    "mid": 1.0,
+    "late": 1.1
+  },
+  "counterAggression": 0.85,
+  "mulligan": {
+    "pieces": [
+      {
+        "name": "engine",
+        "label": "Charlotte Pudding or Streusen to find her",
+        "cards": ["OP17-109", "OP17-113"],
+        "min": 1
+      },
+      {
+        "name": "counters",
+        "label": "two counter cards",
+        "min": 2
+      }
+    ],
+    "secondShort": 1,
+    "requireGoingFirst": [],
+    "source": "OP05-098 guide (keepable hand, inference; no sourced rule)"
+  },
+  "biases": [
+    {
+      "seed": 1,
+      "kind": "acceptOptional",
+      "source": "OP17-109",
+      "ability": "on-play",
+      "minHand": 1,
+      "bonus": 1.0,
+      "cite": "Its guide: Pudding trashes a Trigger card to draw 3.",
+      "citeSource": "SH-YEN"
+    },
+    {
+      "seed": 2,
+      "kind": "playOnlyIf",
+      "card": "OP17-112",
+      "when": {
+        "ownBoard": {
+          "cards": [
+            "OP17-109",
+            "OP17-102",
+            "OP17-107",
+            "OP17-106",
+            "OP17-114",
+            "OP17-110",
+            "OP17-111"
+          ],
+          "min": 2
+        }
+      },
+      "penalty": 3.0,
+      "cite": "Its guide: play Charlotte Linlin on a full board, so every 4000-power Trigger Character becomes an 8000-power attacker.",
+      "citeSource": "SH-YEN"
+    },
+    {
+      "seed": 3,
+      "kind": "acceptOptional",
+      "source": "OP17-114",
+      "ability": "on-play",
+      "minHand": 0,
+      "bonus": 1.0,
+      "cite": "Its guide: refill Life on your own turn with Sweet 3 Generals, resting 2 DON!!.",
+      "citeSource": "SH-YEN"
+    },
+    {
+      "seed": 3,
+      "kind": "acceptOptional",
+      "source": "OP17-106",
+      "ability": "on-play",
+      "minHand": 0,
+      "bonus": 1.0,
+      "cite": "Its guide: refill Life on your own turn with Smoothie, resting 2 DON!!.",
+      "citeSource": "SH-YEN"
+    }
+  ],
+  "assertions": [
+    {
+      "seed": 1,
+      "text": "Pays Charlotte Pudding's 'trash a Trigger card' cost when a Trigger card is in hand.",
+      "threshold": 0.85,
+      "source": "SH-YEN"
+    },
+    {
+      "seed": 2,
+      "text": "Plays OP17-112 with at least two 4000-base Trigger Characters on the field.",
+      "threshold": 0.6,
+      "source": "SH-YEN (threshold is inference)"
+    },
+    {
+      "seed": 3,
+      "text": "Pays the rest-2-DON!! cost of Sweet 3 Generals or Smoothie when it has the DON!!.",
+      "threshold": 0.8,
+      "source": "inference from SH-YEN step 3"
+    }
+  ]
+}

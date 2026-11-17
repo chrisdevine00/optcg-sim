@@ -1,0 +1,153 @@
+{
+  "leaderId": "OP08-098",
+  "archetypeId": "OP08-098-kalgara",
+  "aiName": "Kalgara",
+  "asOf": "2026-10-28",
+  "guide": "docs/content/archetypes/OP08-098.md",
+  "notes": [
+    "Written from the guide's 'Game plan by turn' and 'Playbook seeds'.",
+    "goFirst false: the guide's going-second line is 'the extra DON!! lets the leader drop Wyper OP08-110 on T2' (inference); the general default is to go second (strategy-concepts §10 [S17]).",
+    "cardValue: ongoing effects named in the guide's Defining cards (OP12-099's draw engine, Wyper OP15-114's sweep and DON!! gift, Borsalino's Blocker and Life refill, Sweet 3 Generals). The sizes are inferences.",
+    "weights.hand 1.1: the deck's engine is cards (OP12-099 draws when Life moves, OP15-101 searches) [SH-KAL]; inference.",
+    "counterAggression 1.1: 'every free play costs a Life card' and 'a fast opponent can punish a turn spent playing for value' [guide, inference]; inference: the Life it has left counts for slightly more.",
+    "faceBias 1.0/1.0/1.0: the guide gives no stage-dependent race plan; the default is kept.",
+    "Every number here is an inference (review M5a-09): the guide gives the direction, not the value.",
+    "Seed 1 has two parts: the Leader attacks, and it gets a DON!! first, because [DON!! x1] needs one for the free play (the giveDon bias rewards a move that gives the Leader any).",
+    "Seed 2 uses targetHighestPower with by 'cost': the free play is the highest-cost legal Shandian Warrior in hand [SH-KAL: 'play the best Shandian Warrior'; guide's reading, inference].",
+    "Seed 4 uses playBeforeLeaderAttack: Sweet 3 Generals goes on before the Leader's attack drops Wyper OP15-114, so −3000 and −2000 land on the same Characters. It does not model the guide's DON!! checks (the stack needs 9 DON!! going first at T4/T5); search sees what the DON!! allow.",
+    "Seed 5 uses playOnlyIf with 'never': Kingdom Come is never played unless the move wins (a win scores 1000 and outweighs the penalty). The guide says 'keep Kingdom Come for a turn you expect to win'.",
+    "Citations ('cite', 'citeSource') are what 'Why?' shows when a move follows the line; every condition here is public."
+  ],
+  "goFirst": false,
+  "digTargets": ["OP15-101", "OP12-099", "OP15-114", "OP05-117"],
+  "winConditions": ["OP15-114", "OP12-099"],
+  "cardValue": {
+    "OP12-099": 0.5,
+    "OP15-114": 0.4,
+    "EB04-058": 0.4,
+    "OP17-114": 0.3,
+    "OP05-117": 0.3
+  },
+  "weights": {
+    "hand": 1.1
+  },
+  "faceBias": {
+    "early": 1.0,
+    "mid": 1.0,
+    "late": 1.0
+  },
+  "counterAggression": 1.1,
+  "mulligan": {
+    "pieces": [
+      {
+        "name": "setup",
+        "label": "a setup card (Upper Yard, Nami, Wyper or Kalgara)",
+        "cards": ["OP05-117", "OP15-108", "OP08-110", "OP15-101"],
+        "min": 1
+      },
+      {
+        "name": "shandian",
+        "label": "a Shandian Warrior the Leader can play by turn 3",
+        "cards": [
+          "OP15-101",
+          "OP08-110",
+          "OP15-114",
+          "OP12-099",
+          "OP12-114",
+          "OP08-099",
+          "OP15-112"
+        ],
+        "min": 1
+      }
+    ],
+    "secondShort": 1,
+    "requireGoingFirst": [],
+    "source": "OP08-098 guide (keepable hand, inference; no sourced rule)"
+  },
+  "biases": [
+    {
+      "seed": 1,
+      "kind": "attackWith",
+      "card": "leader",
+      "fromOwnTurn": 2,
+      "bonus": 1.0,
+      "cite": "Its guide: attack with the Leader from turn 2 with a DON!! given, to play a Shandian Warrior for free.",
+      "citeSource": "SH-KAL"
+    },
+    {
+      "seed": 1,
+      "kind": "giveDon",
+      "target": "leader",
+      "fromOwnTurn": 2,
+      "bonus": 1.0,
+      "cite": "Its guide: give the Leader a DON!!, so its attack plays a Shandian Warrior for free.",
+      "citeSource": "SH-KAL"
+    },
+    {
+      "seed": 2,
+      "kind": "targetHighestPower",
+      "source": "OP08-098",
+      "ability": "when-attacking",
+      "by": "cost",
+      "bonus": 1.0,
+      "cite": "Its guide: play the best Shandian Warrior at or under your DON!! count.",
+      "citeSource": "SH-KAL"
+    },
+    {
+      "seed": 3,
+      "kind": "play",
+      "cards": ["OP05-117"],
+      "byOwnTurn": 2,
+      "bonus": 2.0,
+      "cite": "Its guide: set up early with Upper Yard, which looks at 5 for a Sky Island card.",
+      "citeSource": "SH-KAL"
+    },
+    {
+      "seed": 4,
+      "kind": "playBeforeLeaderAttack",
+      "card": "OP17-114",
+      "penalty": 1.5,
+      "cite": "Its guide: Sweet 3 Generals first, then let the Leader's attack drop Wyper, so −3000 and −2000 land on the same Characters.",
+      "citeSource": "SH-KAL"
+    },
+    {
+      "seed": 5,
+      "kind": "playOnlyIf",
+      "card": "EB01-059",
+      "when": { "never": true },
+      "penalty": 5.0
+    }
+  ],
+  "assertions": [
+    {
+      "seed": 1,
+      "text": "From T2, with a Shandian Warrior in hand that the DON!! on its field can pay for, the Leader attacks with at least 1 DON!! given and uses the free play.",
+      "threshold": 0.9,
+      "source": "SH-KAL step 3"
+    },
+    {
+      "seed": 2,
+      "text": "The free play is the highest-cost legal Shandian Warrior in hand.",
+      "threshold": 0.75,
+      "source": "inference from SH-KAL ('play the best Shandian Warrior')"
+    },
+    {
+      "seed": 3,
+      "text": "Has Upper Yard on the field by the end of T2 when it holds one.",
+      "threshold": 0.6,
+      "source": "SH-KAL step 1 (threshold is inference)"
+    },
+    {
+      "seed": 4,
+      "text": "When Sweet 3 Generals and Wyper OP15-114 both resolve in one turn, Sweet 3 Generals resolves first.",
+      "threshold": 0.8,
+      "source": "SH-KAL step 5"
+    },
+    {
+      "seed": 5,
+      "text": "Plays EB01-059 Kingdom Come only on turns where it wins.",
+      "threshold": 1.0,
+      "source": "SH-KAL step 6"
+    }
+  ]
+}

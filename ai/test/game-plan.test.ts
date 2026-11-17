@@ -89,7 +89,7 @@ const played = (steps: ReturnType<typeof play>['steps'], card: string) =>
 describe('the playbooks are the guides’ seeds', () => {
   it('every playbook seed has an assertion with a threshold', () => {
     for (const pb of PLAYBOOKS.values()) {
-      expect(pb.assertions.map((a) => a.seed)).toEqual([1, 2, 3, 4, 5]);
+      expect(pb.assertions.map((a) => a.seed)).toEqual(pb.assertions.map((_, i) => i + 1));
       for (const a of pb.assertions) expect(a.threshold).toBeGreaterThan(0);
     }
   });

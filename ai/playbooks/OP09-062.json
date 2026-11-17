@@ -1,0 +1,168 @@
+{
+  "leaderId": "OP09-062",
+  "archetypeId": "OP09-062-robin",
+  "aiName": "Robin",
+  "asOf": "2026-10-28",
+  "guide": "docs/content/archetypes/OP09-062.md",
+  "notes": [
+    "Written from the guide's 'Game plan by turn' and 'Playbook seeds'.",
+    "goFirst false: the guide says 'going second is the big swing for this deck: two ramps reach 10 DON!! on T4' [SH-ROB]; Shonen's simulation has Linlin castable by T4 in 55% of games going second against 22% going first.",
+    "cardValue: ongoing effects named in the guide's Defining cards (Linlin's 8000 base power for every 4000-base Trigger Character, Yamato's Blocker and ramp, Sweet 3 Generals' Life refill). The sizes are inferences.",
+    "weights.don 1.3: the deck is a ramp deck whose leader adds a rested DON!! per attack [SH-ROB]; inference: next turn's DON!! counts for more here than in the default heuristic.",
+    "counterAggression 0.9: 'roughly 29 of the 50 cards carry a [Trigger], so taking hits also develops the board' [SH-ROB]; inference: a hit costs this deck a little less than the default, so it counters slightly less readily.",
+    "faceBias 1.0/1.0/1.1: the guide's plan builds for turns and attacks with the 8000-power bodies from the Linlin turn onward [SH-ROB]; inference: slightly more weight on the opponent's Life late. Every number here is an inference (review M5a-09).",
+    "Seed 5 (two 8000-power Trigger attackers on the Linlin turn) is the guide's own inference. The planted position showed search alone leaves the 8000-power bodies home, so it has an attackWithPower bias: a Character with a [Trigger] and 8000 power or more (derived, so only while Linlin is on the field) attacks.",
+    "The Pudding bias has two parts: the play (turn 3 at the latest) and paying her cost (trash a Trigger card to draw 3).",
+    "The pitch bias carries donDeckAtLeast 1: with the DON!! deck empty the pitch is legal but adds nothing (RL-50), so it is not rewarded.",
+    "Citations ('cite', 'citeSource') are what 'Why?' shows when a move follows the line; every condition here is public (a play, an attack, a trashed card).",
+    "Bias sizes were raised from 1.0 after the first Pirate-vs-Pirate run: 2.0 for the Leader attack and 2.5 for the pitch (at 1.0 the pitch was declined in 17% of attacks and the Leader stayed home in 12% of qualifying turns), and 3.0 for Yamato (at 2.0 the AI played Pudding on T2 instead, in 4 of 6 misses; the guide plays Yamato on T2 and Pudding on T3)."
+  ],
+  "goFirst": false,
+  "digTargets": ["OP17-112", "OP17-109", "OP17-074", "OP17-113"],
+  "winConditions": ["OP17-112"],
+  "cardValue": {
+    "OP17-112": 0.8,
+    "OP17-074": 0.4,
+    "OP17-114": 0.4,
+    "OP17-109": 0.2
+  },
+  "weights": {
+    "don": 1.3
+  },
+  "faceBias": {
+    "early": 1.0,
+    "mid": 1.0,
+    "late": 1.1
+  },
+  "counterAggression": 0.9,
+  "mulligan": {
+    "pieces": [
+      {
+        "name": "early",
+        "label": "a card costing 3 or less for turns 1–2",
+        "cards": ["OP17-113", "ST34-003", "OP17-074", "OP17-109", "OP17-107", "OP17-111"],
+        "min": 1
+      },
+      {
+        "name": "pitch",
+        "label": "a card with a [Trigger] to pitch to the Leader",
+        "cards": [
+          "OP17-107",
+          "OP17-102",
+          "OP17-106",
+          "OP17-114",
+          "OP17-109",
+          "OP16-119",
+          "OP12-112",
+          "OP17-110",
+          "OP17-111",
+          "OP16-117"
+        ],
+        "min": 1
+      }
+    ],
+    "secondShort": 1,
+    "requireGoingFirst": ["early"],
+    "source": "SH-ROB; OP09-062 guide (keepable hand, inference)"
+  },
+  "biases": [
+    {
+      "seed": 1,
+      "kind": "attackWith",
+      "card": "leader",
+      "fromOwnTurn": 2,
+      "bonus": 2.0,
+      "cite": "Its guide: attack with the Leader every turn from turn 2 and pitch a Trigger card to add a DON!!.",
+      "citeSource": "SH-ROB"
+    },
+    {
+      "seed": 1,
+      "kind": "acceptOptional",
+      "source": "OP09-062",
+      "ability": "when-attacking",
+      "minHand": 1,
+      "donDeckAtLeast": 1,
+      "bonus": 2.5,
+      "cite": "Its guide: pitch a Trigger card on every Leader attack, so it ramps twice in one turn.",
+      "citeSource": "SH-ROB"
+    },
+    {
+      "seed": 2,
+      "kind": "play",
+      "cards": ["OP17-074"],
+      "fromOwnTurn": 1,
+      "bonus": 3.0,
+      "cite": "Its guide: play Yamato the first turn it is affordable; she adds a rested DON!!.",
+      "citeSource": "SH-ROB"
+    },
+    {
+      "seed": 3,
+      "kind": "play",
+      "cards": ["OP17-109"],
+      "byOwnTurn": 3,
+      "bonus": 1.0,
+      "cite": "Its guide: fire Charlotte Pudding on turn 3 over almost anything else.",
+      "citeSource": "SH-ROB"
+    },
+    {
+      "seed": 3,
+      "kind": "acceptOptional",
+      "source": "OP17-109",
+      "ability": "on-play",
+      "minHand": 1,
+      "bonus": 1.0,
+      "cite": "Its guide: Pudding trashes a Trigger card to draw 3.",
+      "citeSource": "SH-ROB"
+    },
+    {
+      "seed": 4,
+      "kind": "play",
+      "cards": ["OP17-112"],
+      "bonus": 2.0,
+      "cite": "Its guide: the deck races to 10 DON!! for Charlotte Linlin, which turns its 4000-power Trigger Characters into 8000-power attackers.",
+      "citeSource": "SH-ROB"
+    },
+    {
+      "seed": 5,
+      "kind": "attackWithPower",
+      "minPower": 8000,
+      "withTrigger": true,
+      "fromOwnTurn": 1,
+      "bonus": 2.0,
+      "cite": "Its guide: once Linlin is out, attack with the 8000-power Trigger Characters.",
+      "citeSource": "SH-ROB"
+    }
+  ],
+  "assertions": [
+    {
+      "seed": 1,
+      "text": "Leader attacks and pitches a Trigger card every turn from T2 when it holds one and its DON!! deck is not empty.",
+      "threshold": 0.9,
+      "source": "SH-ROB"
+    },
+    {
+      "seed": 2,
+      "text": "Plays Yamato the first turn it is affordable when she is in hand.",
+      "threshold": 0.8,
+      "source": "SH-ROB"
+    },
+    {
+      "seed": 3,
+      "text": "Plays Charlotte Pudding with her draw-3 cost paid by T3 when she is in hand by then.",
+      "threshold": 0.8,
+      "source": "SH-ROB"
+    },
+    {
+      "seed": 4,
+      "text": "Casts OP17-112 Charlotte Linlin by T5.",
+      "threshold": 0.5,
+      "source": "SH-ROB (Shonen's simulated floor is 56% going first and 60% going second)"
+    },
+    {
+      "seed": 5,
+      "text": "Attacks with at least two 8000-power Trigger Characters on the Linlin turn when two or more are able to attack.",
+      "threshold": 0.7,
+      "source": "inference"
+    }
+  ]
+}

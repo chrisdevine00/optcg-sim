@@ -23,6 +23,11 @@ jobs:
       # with and without the biases. Reports: test-results/strength-*.json, game-plan-40.json.
       - run: npm run test:strength
         if: always()
+      # M5b group-1 playbooks (Robin, Yellow Enel, Kalgara, Hancock): the game-plan assertions over
+      # 64 Pirate-vs-Pirate games among the four decks, with and without the biases.
+      # Report: test-results/game-plan-g1-64.json.
+      - run: npm run test:plan-g1
+        if: always()
       # Full games from turn 1 through the UI (vs Rookie, hotseat, keyboard only, and AI turn pacing
       # at 1× vs Pirate): too slow per push.
       - run: npx playwright install --with-deps chromium
