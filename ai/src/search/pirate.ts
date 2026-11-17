@@ -317,6 +317,46 @@ function score(
 // Playbook biases (ai/playbooks/*.json)
 // ------------------------------------------------------------------------------------------------
 
+/** Can this Character attack this turn (active, not "cannot attack", not summoning-sick unless Rush)? */
+function canAttackNow(
+  c: { rested: boolean; cannotAttack?: boolean; played?: number; keywords: string[]; zone: string },
+  turn: number,
+): boolean {
+  return (
+    c.zone === 'characters' &&
+    !c.rested &&
+    !c.cannotAttack &&
+    ((c.played ?? -1) < turn || c.keywords.includes('Rush'))
+  );
+}
+
+/** A Character `avoidTarget` removal is for: above `maxCost` and, if given, within its `reach`. */
+function realThreat(
+  c: { cost: number | null; power: number | null },
+  bias: { maxCost: number; reach?: number },
+): boolean {
+  return (c.cost ?? 0) > bias.maxCost && (bias.reach === undefined || (c.power ?? 0) <= bias.reach);
+}
+
+/** Does `activateBefore`'s discount pay for this hand card now (see the playbook type)? */
+function discountPays(
+  s: GameState,
+  me: PlayerId,
+  h: { card: string; cost: number | null },
+  bias: { cards: string[]; refundCards: string[]; minCost: number },
+): boolean {
+  const cost = h.cost ?? 0;
+  if (!bias.cards.includes(h.card) || cost < bias.minCost) return false;
+  const d = queries.don(s, me);
+  const o = queries.don(s, other(me));
+  if (d.active < cost - 1) return false; // not affordable even with it
+  const only = cost > d.active;
+  const refunds =
+    bias.refundCards.includes(h.card) &&
+    d.active + d.rested + d.given - 1 <= o.active + o.rested + o.given;
+  return only || refunds;
+}
+
 function ownTurnOf(s: GameState, ctx: SimContext): number {
   return ownTurn(queries.turn(s).number, ctx.evalCtx.first);
 }
@@ -332,16 +372,94 @@ function mainBias(root: GameState, me: PlayerId, ctx: SimContext, setup: PirateS
   const chars = queries.zone(root, me, 'characters');
   const donActive = queries.don(root, me).active;
   const ctxG2 = groupTwoFacts(root, me, own, setup);
+  const myChars = queries.zone(root, me, 'characters');
+  const readyAttackers = new Set(legal.flatMap((a) => (a.type === 'attack' ? [a.attacker] : [])))
+    .size;
   return (c: Candidate): number => {
     if (!pb) return 0;
     let b = 0;
+    let gaveLeader = false;
     for (const a of c.actions) {
       for (const bias of pb.biases) {
         b += groupTwoBias(bias, a, c, root, me, own, leader, donActive, ctxG2, setup);
+        if (
+          bias.kind === 'activate' &&
+          a.type === 'activate' &&
+          a.ability === bias.ability &&
+          own >= bias.fromOwnTurn &&
+          queries.card(root, a.card).card === bias.card
+        )
+          b += bias.bonus;
+        // Sabo: one DON!! on the Leader lifts every body (+1000), so it pays once a cost-12
+        // Character is out and the team is ready to swing.
+        if (
+          bias.kind === 'giveDonLeader' &&
+          a.type === 'giveDon' &&
+          a.target === leader.instance &&
+          !gaveLeader &&
+          readyAttackers >= bias.minAttackers &&
+          myChars.some((ch) => (ch.cost ?? 0) >= bias.minCost)
+        ) {
+          gaveLeader = true;
+          b += bias.bonus;
+        }
+        // Hold removal for real threats: an Event of this kind is not played while every
+        // opposing Character costs `maxCost` or less.
+        if (
+          bias.kind === 'avoidTarget' &&
+          a.type === 'playCard' &&
+          oppChars.length > 0 &&
+          !oppChars.some((ch) => realThreat(ch, bias)) &&
+          queries.card(root, a.card).card === bias.source &&
+          setup.cards.get(bias.source)?.category === 'Event'
+        )
+          b -= bias.penalty;
+        if (bias.kind === 'activateBefore') {
+          const mine = (x: Action) =>
+            x.type === 'activate' &&
+            x.ability === bias.ability &&
+            queries.card(root, x.card).card === bias.source;
+          const discountLegal = legal.some(mine);
+          const inCandidate = c.actions.some(mine);
+          const used = queries
+            .usedThisTurn(root)
+            .some(
+              (u) => queries.card(root, u.card).card === bias.source && u.ability === bias.ability,
+            );
+          if (mine(a)) {
+            // Worth it only while a card it pays for is in hand (see `discountPays`).
+            const target = queries
+              .zone(root, me, 'hand')
+              .some((h) => discountPays(root, me, h, bias));
+            // A DON!! -1 for nothing is a loss, though rollouts score it up to +2.3 over ending the turn.
+            b += target ? bias.bonus : -4;
+          }
+          if (
+            a.type === 'playCard' &&
+            bias.cards.includes(queries.card(root, a.card).card) &&
+            (queries.card(root, a.card).cost ?? 0) >= bias.minCost
+          ) {
+            if (
+              discountLegal &&
+              !inCandidate &&
+              discountPays(root, me, queries.card(root, a.card), bias)
+            )
+              b -= bias.penalty;
+            if (used) b += bias.bonus;
+          }
+        }
         if (bias.kind === 'attackWith' && a.type === 'attack' && own >= bias.fromOwnTurn) {
           const who = bias.card === 'leader' ? leader.instance : null;
-          if (who ? a.attacker === who : queries.card(root, a.attacker).card === bias.card)
-            b += bias.bonus;
+          const at = queries.card(root, a.attacker);
+          const loaded =
+            at.don +
+            c.actions.filter((x) => x.type === 'giveDon' && x.target === a.attacker).length;
+          const is = who
+            ? a.attacker === who
+            : bias.card === '*'
+              ? at.zone === 'characters'
+              : at.card === bias.card;
+          if (is && loaded >= (bias.minDon ?? 0)) b += bias.bonus;
         }
         if (bias.kind === 'attackWithPower' && a.type === 'attack' && own >= bias.fromOwnTurn) {
           const at = chars.find((x) => x.instance === a.attacker);
@@ -535,6 +653,8 @@ function otherBias(root: GameState, me: PlayerId, setup: PirateSetup) {
   const src = dec.source;
   const battle = battleNumbers(root);
   const hand = queries.zone(root, me, 'hand').length;
+  const life = queries.zone(root, me, 'life').length;
+  const turnNo = queries.turn(root).number;
   return (c: Candidate): number => {
     if (!pb || !src) return 0;
     const a = c.actions[0]!;
@@ -550,9 +670,46 @@ function otherBias(root: GameState, me: PlayerId, setup: PirateSetup) {
           a.type === 'optional' &&
           a.accept &&
           hand >= bias.minHand &&
-          (bias.donDeckAtLeast === undefined || queries.don(root, me).deck >= bias.donDeckAtLeast)
+          (bias.donDeckAtLeast === undefined ||
+            queries.don(root, me).deck >= bias.donDeckAtLeast) &&
+          life >= (bias.minLife ?? 0)
         )
           b += bias.bonus;
+      }
+      if (
+        bias.kind === 'targetCanAttack' &&
+        dec.kind === 'choose' &&
+        src.card === bias.source &&
+        src.ability === bias.ability &&
+        a.type === 'pick' &&
+        typeof a.choice === 'string'
+      ) {
+        const ch = queries.card(root, a.choice);
+        if (ch.owner === me && canAttackNow(ch, turnNo)) b += bias.bonus;
+      }
+      // The same for a removal's optional cost (Sakazuki's DON!! -1): not paid for a cheap body.
+      if (
+        bias.kind === 'avoidTarget' &&
+        dec.kind === 'optional' &&
+        src.card === bias.source &&
+        src.ability === bias.ability &&
+        a.type === 'optional' &&
+        a.accept
+      ) {
+        const foes = queries.zone(root, other(me), 'characters');
+        if (foes.length > 0 && !foes.some((ch) => realThreat(ch, bias))) b -= bias.penalty;
+      }
+      if (
+        bias.kind === 'avoidTarget' &&
+        dec.kind === 'choose' &&
+        src.card === bias.source &&
+        src.ability === bias.ability &&
+        a.type === 'pick' &&
+        typeof a.choice === 'string'
+      ) {
+        const ch = queries.card(root, a.choice);
+        if (ch.owner !== me && ch.zone === 'characters' && (ch.cost ?? 0) <= bias.maxCost)
+          b -= bias.penalty;
       }
       if (
         bias.kind === 'useOnAttacker' &&
@@ -652,7 +809,21 @@ function scriptMentions(cardId: string, words: string[]): boolean {
  * turn (unless its text counts given DON!!), and an attack that fails for certain from a card with
  * no [When Attacking] effect.
  */
-function mainCandidates(s: GameState, me: PlayerId): Candidate[] {
+/** Is `a` an `activateBefore` ability that no card in hand needs now? */
+function unneededDiscount(s: GameState, me: PlayerId, a: Action, setup: PirateSetup): boolean {
+  if (a.type !== 'activate') return false;
+  for (const bias of setup.playbook?.biases ?? []) {
+    if (
+      bias.kind === 'activateBefore' &&
+      a.ability === bias.ability &&
+      queries.card(s, a.card).card === bias.source
+    )
+      return !queries.zone(s, me, 'hand').some((h) => discountPays(s, me, h, bias));
+  }
+  return false;
+}
+
+function mainCandidates(s: GameState, me: PlayerId, setup: PirateSetup): Candidate[] {
   const acts = legalActions(s).filter((a) => a.type !== 'concede');
   const don = queries.don(s, me).active;
   const attackers = new Set(acts.flatMap((a) => (a.type === 'attack' ? [a.attacker] : [])));
@@ -675,7 +846,28 @@ function mainCandidates(s: GameState, me: PlayerId): Candidate[] {
       const t = queries.card(s, a.target);
       if (attackers.has(a.target) || scriptMentions(t.card, ['donGiven']))
         out.push({ actions: [a] });
+    } else if (unneededDiscount(s, me, a, setup)) {
+      // Left out: a DON!! -1 no card in hand needs ends up in rollouts as a free extra turn.
     } else out.push({ actions: [a] });
+  }
+  // "Use the ability, then play the card" as one move (Rosinante's discount, then the Law): the
+  // card is often not playable until the ability has resolved, and one rollout cannot tell the
+  // search that the second half is the point (playbook `activateBefore`).
+  for (const bias of setup.playbook?.biases ?? []) {
+    if (bias.kind !== 'activateBefore') continue;
+    const act = acts.find(
+      (a) =>
+        a.type === 'activate' &&
+        a.ability === bias.ability &&
+        queries.card(s, a.card).card === bias.source,
+    );
+    if (!act) continue;
+    const seen = new Set<string>();
+    for (const h of queries.zone(s, me, 'hand')) {
+      if (!discountPays(s, me, h, bias) || seen.has(h.card)) continue;
+      seen.add(h.card);
+      out.push({ actions: [act, { type: 'playCard', card: h.instance, player: me }] });
+    }
   }
   return out.length ? out : acts.map((a) => ({ actions: [a] }));
 }
@@ -778,7 +970,7 @@ export function planTurn(
     if (!dec || dec.kind !== 'main' || dec.player !== me || queries.result(root)) break;
     const fp = n === 0 ? fingerprint(view) : fingerprint(project(root, me));
     if (n > 0 && states.some((s) => fingerprint(project(s, me)) !== fp)) break;
-    const cands = holdDon(mainCandidates(root, me), root, me, ctx, setup);
+    const cands = holdDon(mainCandidates(root, me, setup), root, me, ctx, setup);
     const ranked = score(
       states,
       cands,
@@ -1122,6 +1314,10 @@ export function decide(
     false,
     otherBias(root, me, setup),
     !!setup.shallow,
+  );
+  setup.debug?.(
+    'other',
+    ranked.map((r) => ({ actions: r.c.actions, mean: r.mean, n: r.n, breakdown: r.breakdown })),
   );
   const chosen = ranked[0]?.c ?? cands[0]!;
   const first = chosen.actions[0]!;

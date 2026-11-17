@@ -176,11 +176,14 @@ export function citation(s: GameState, a: Action, me: PlayerId, ctx: WhyContext)
     switch (b.kind) {
       case 'attackWith':
         if (a.type === 'attack' && own >= b.fromOwnTurn) {
+          const at = queries.card(s, a.attacker);
           const by =
             b.card === 'leader'
               ? a.attacker === leader.instance
-              : queries.card(s, a.attacker).card === b.card;
-          if (by) return citeOf(b);
+              : b.card === '*'
+                ? at.zone === 'characters'
+                : at.card === b.card;
+          if (by && at.don >= (b.minDon ?? 0)) return citeOf(b);
         }
         break;
       case 'acceptOptional':
@@ -190,6 +193,7 @@ export function citation(s: GameState, a: Action, me: PlayerId, ctx: WhyContext)
           src?.card === b.source &&
           src.ability === b.ability &&
           queries.zone(s, me, 'hand').length >= b.minHand &&
+          queries.zone(s, me, 'life').length >= (b.minLife ?? 0) &&
           (b.donDeckAtLeast === undefined || queries.don(s, me).deck >= b.donDeckAtLeast) &&
           !b.triggerInHand // a card held in hand: never cited
         )
@@ -322,6 +326,76 @@ export function citation(s: GameState, a: Action, me: PlayerId, ctx: WhyContext)
         break;
       case 'avoidBasePower':
         // A play it did not make: nothing to cite.
+        break;
+      case 'activate':
+        if (
+          a.type === 'activate' &&
+          a.ability === b.ability &&
+          own >= b.fromOwnTurn &&
+          queries.card(s, a.card).card === b.card
+        )
+          return citeOf(b);
+        break;
+      case 'giveDonLeader':
+        if (
+          a.type === 'giveDon' &&
+          a.target === leader.instance &&
+          queries.zone(s, me, 'characters').some((c) => (c.cost ?? 0) >= b.minCost) &&
+          new Set(legalActions(s).flatMap((x) => (x.type === 'attack' ? [x.attacker] : []))).size >=
+            b.minAttackers
+        )
+          return citeOf(b);
+        break;
+      case 'targetCanAttack':
+        if (
+          a.type === 'pick' &&
+          typeof a.choice === 'string' &&
+          src?.card === b.source &&
+          src.ability === b.ability
+        ) {
+          const c = queries.card(s, a.choice);
+          const turn = queries.turn(s).number;
+          if (
+            c.owner === me &&
+            c.zone === 'characters' &&
+            !c.rested &&
+            !c.cannotAttack &&
+            ((c.played ?? -1) < turn || c.keywords.includes('Rush'))
+          )
+            return citeOf(b);
+        }
+        break;
+      case 'activateBefore':
+        // Its reason when activated (a card held in hand) is hidden; the card played after it is
+        // public, and the ability shows in the turn's used list.
+        if (
+          a.type === 'playCard' &&
+          b.cards.includes(queries.card(s, a.card).card) &&
+          (queries.card(s, a.card).cost ?? 0) >= b.minCost &&
+          queries
+            .usedThisTurn(s)
+            .some((u) => queries.card(s, u.card).card === b.source && u.ability === b.ability)
+        )
+          return citeOf(b);
+        break;
+      case 'avoidTarget':
+        if (
+          a.type === 'pick' &&
+          typeof a.choice === 'string' &&
+          src?.card === b.source &&
+          src.ability === b.ability
+        ) {
+          const cost = (id: string) => queries.card(s, id).cost ?? 0;
+          const picks = legalActions(s).filter(
+            (x): x is Extract<Action, { type: 'pick' }> =>
+              x.type === 'pick' && typeof x.choice === 'string',
+          );
+          if (
+            cost(a.choice) > b.maxCost &&
+            picks.some((x) => cost(x.choice as string) <= b.maxCost)
+          )
+            return citeOf(b);
+        }
         break;
     }
   }

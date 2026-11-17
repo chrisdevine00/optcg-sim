@@ -14,6 +14,9 @@ import hancock from '../playbooks/OP14-041.json';
 import luffyAce from '../playbooks/ST30-001.json';
 import luffyRedGreen from '../playbooks/OP13-001.json';
 import luffyBlack from '../playbooks/OP17-079.json';
+import sabo from '../playbooks/OP13-004.json';
+import purpleEnel from '../playbooks/OP15-058.json';
+import rosinante from '../playbooks/OP12-061.json';
 
 /** The heuristic terms a playbook can scale (see `search/heuristic.ts`). */
 export type WeightKey = 'life' | 'hand' | 'counter' | 'board' | 'don' | 'threat';
@@ -37,8 +40,11 @@ export type Bias = BiasCite &
   (
     | {
         kind: 'attackWith';
-        card: 'leader' | string;
+        /** `leader`, a card id, or `*` for any Character. */
+        card: 'leader' | '*' | string;
         fromOwnTurn: number;
+        /** Only an attacker carrying at least this many given DON!! (with the DON!! given in the same move). */
+        minDon?: number;
         bonus: number;
         seed: number;
       }
@@ -68,6 +74,8 @@ export type Bias = BiasCite &
          * condition is a hidden card, so a move that follows it is never cited.
          */
         triggerInHand?: boolean;
+        /** Only while the AI holds at least this many Life cards (a cost paid in Life). */
+        minLife?: number;
         bonus: number;
         seed: number;
       }
@@ -200,6 +208,55 @@ export type Bias = BiasCite &
         bonus: number;
         seed: number;
       }
+    /** Use this ability of the AI's own (a Leader's [Activate: Main]) in its main phase, from own turn `fromOwnTurn`. */
+    | {
+        kind: 'activate';
+        card: string;
+        ability: string;
+        fromOwnTurn: number;
+        bonus: number;
+        seed: number;
+      }
+    /** In this ability's target choice, prefer one of the AI's Characters that can attack this turn. */
+    | { kind: 'targetCanAttack'; source: string; ability: string; bonus: number; seed: number }
+    /**
+     * Give DON!! to the Leader while the AI has a Character of cost `minCost` or more and at least
+     * `minAttackers` ready attackers (Sabo: the Leader's +1000 to everyone needs one DON!! on it).
+     */
+    | { kind: 'giveDonLeader'; minCost: number; minAttackers: number; bonus: number; seed: number }
+    /**
+     * Use this once-per-turn ability before playing one of `cards` from hand with a printed cost
+     * of `minCost` or more (Rosinante: the discount, then the Law), but only when it pays: the card
+     * is in `refundCards` and its DON!! condition (own DON!! at or below the opponent's) will hold
+     * after DON!! -1, or the card is playable this turn only with the discount. `bonus` for the
+     * ability then, `penalty` for playing that card first; otherwise no bias.
+     */
+    | {
+        kind: 'activateBefore';
+        source: string;
+        ability: string;
+        cards: string[];
+        /** Cards whose On Play refunds the DON!! -1 when own DON!! <= the opponent's. */
+        refundCards: string[];
+        minCost: number;
+        bonus: number;
+        penalty: number;
+        seed: number;
+      }
+    /**
+     * Hold removal for real threats: in this ability's target choice, avoid opposing Characters of
+     * cost `maxCost` or less, and do not play the Event (or pay the optional cost) while no
+     * opposing Character above `maxCost` is within the removal's `reach` (a power it can answer).
+     */
+    | {
+        kind: 'avoidTarget';
+        source: string;
+        ability: string;
+        maxCost: number;
+        reach?: number;
+        penalty: number;
+        seed: number;
+      }
   );
 
 /** When a `playOnlyWhen` card may be played (public conditions only). */
@@ -282,6 +339,9 @@ const ALL = [
   kaido,
   robin,
   enel,
+  purpleEnel,
+  sabo,
+  rosinante,
   kalgara,
   hancock,
   luffyAce,

@@ -1,0 +1,155 @@
+{
+  "leaderId": "OP12-061",
+  "archetypeId": "OP12-061-rosinante",
+  "aiName": "Rosinante",
+  "asOf": "2026-11-17",
+  "guide": "docs/content/archetypes/OP12-061.md",
+  "notes": [
+    "Written from the guide's 'Game plan by turn' and 'Playbook seeds'.",
+    "goFirst: strategy-concepts §10 [S17] 'go second with removal, late-game and counter-heavy decks' and the general default is to go second; the guide calls the deck midrange and gives no seat advice (inference). Seat does not decide the DON!! condition of P-093 and EB04-038 ('as few DON!! as your opponent or fewer' [CARD]): at the start of its own turn each side has one more DON!! than the other's last turn left it, so only the leader's DON!! -1 brings the count level.",
+    "cardValue: Laws are the deck's plan and the leader protects them [SH-ROS][CARD]; EB04-038 counts as a [Trafalgar Law] and a [Donquixote Rosinante], so the discount and the shield both reach it [CARD]; Borsalino refills Life [CARD]. Every number is an inference.",
+    "weights.don 0.9: the plan spends DON!! -1 on the discount and on On Plays, and two Laws refund it [CARD]; inference: a spent DON!! costs a little less.",
+    "counterAggression 1.05: each shield costs a Life card from a 4-Life leader (guide, weak to Life pressure, inference).",
+    "faceBias 0.95/1.0/1.1: a midrange deck that closes with removal and Laws [SH-ROS]; inference.",
+    "mulligan: the guide gives no sourced baseline. Its inference: a 1-cost searcher plus a 4-cost Law or EB04-038 (going first); going second 'a hand with a Law and no searcher is fine', so one piece may be short; no searcher and no Law goes back.",
+    "seed 1: 'activateBefore' (new bias kind): the leader's DON!! -1 discount before a Law of cost 4 or more, only when it refunds itself (P-093, EB04-038, condition met after DON!! -1) or is the only way to play the Law [SH-ROS step 3][CARD]; an unconditional discount lost games (DECISIONS 2026-11-17); not cited when activated (its reason, a Law in hand, is hidden), cited when the Law is played after it. seed 2: 'play' on the Laws by T3. seed 3: 'acceptOptional' with 'minLife' 2 on the shield. seed 4: 'avoidTarget' (new bias kind) on Sakazuki, Gum-Gum Lightning and Divine Departure. seed 5: no bias of its own; the discount's DON!! -1 (seed 1) brings the count level with the opponent's, which is what the guide says it is for [CARD].",
+    "Citations are what 'Why?' shows when a move follows the line; every bias here has a public condition."
+  ],
+  "goFirst": false,
+  "digTargets": ["EB04-038", "OP12-108", "OP16-065", "P-093"],
+  "winConditions": ["EB04-038", "OP16-065"],
+  "cardValue": {
+    "EB04-038": 0.8,
+    "P-093": 0.5,
+    "ST10-010": 0.4,
+    "EB04-058": 0.4,
+    "OP16-065": 0.5,
+    "OP16-078": 0.2
+  },
+  "weights": {
+    "don": 0.9
+  },
+  "faceBias": {
+    "early": 0.95,
+    "mid": 1.0,
+    "late": 1.1
+  },
+  "counterAggression": 1.05,
+  "mulligan": {
+    "pieces": [
+      {
+        "name": "searcher",
+        "label": "a 1-cost searcher",
+        "cards": ["OP16-064", "OP12-108", "OP16-078", "OP16-067"],
+        "min": 1
+      },
+      {
+        "name": "law",
+        "label": "a 4-cost Law or Rosinante & Law",
+        "cards": ["EB04-038", "P-093", "ST10-010", "P-088"],
+        "min": 1
+      }
+    ],
+    "secondShort": 1,
+    "requireGoingFirst": [],
+    "source": "OP12-061 guide (keepable hand, inference)"
+  },
+  "biases": [
+    {
+      "seed": 1,
+      "kind": "activateBefore",
+      "source": "OP12-061",
+      "ability": "law-discount",
+      "cards": ["EB04-038", "P-093", "ST10-010", "P-088"],
+      "minCost": 4,
+      "bonus": 1.0,
+      "penalty": 1.5,
+      "cite": "Its guide: use the leader's DON!! -1 first when it refunds itself or is the only way to play the Law, then play the Law for 2 less.",
+      "citeSource": "SH-ROS",
+      "refundCards": ["P-093", "EB04-038"]
+    },
+    {
+      "seed": 2,
+      "kind": "play",
+      "cards": ["EB04-038", "P-093", "ST10-010", "P-088"],
+      "byOwnTurn": 3,
+      "bonus": 0.8,
+      "cite": "Its guide: a Law on the board early, with the leader's discount.",
+      "citeSource": "OP12-061 guide (inference from card text)"
+    },
+    {
+      "seed": 3,
+      "kind": "acceptOptional",
+      "source": "OP12-061",
+      "ability": "law-shield",
+      "minHand": 0,
+      "minLife": 2,
+      "bonus": 5.5,
+      "cite": "Its guide: a Law is K.O.'d twice over: the leader's Life-to-hand shield comes first.",
+      "citeSource": "OP12-061 guide (inference)"
+    },
+    {
+      "seed": 4,
+      "kind": "avoidTarget",
+      "source": "OP16-065",
+      "ability": "on-play",
+      "maxCost": 2,
+      "penalty": 2.0,
+      "cite": "Its guide: hold Purple removal for real threats, not cost-2 plays.",
+      "citeSource": "SH-ROS"
+    },
+    {
+      "seed": 4,
+      "kind": "avoidTarget",
+      "source": "OP09-077",
+      "ability": "main",
+      "maxCost": 2,
+      "penalty": 2.0,
+      "cite": "Its guide: hold Purple removal for real threats, not cost-2 plays.",
+      "citeSource": "SH-ROS",
+      "reach": 6000
+    },
+    {
+      "seed": 4,
+      "kind": "avoidTarget",
+      "source": "OP13-076",
+      "ability": "main",
+      "maxCost": 2,
+      "penalty": 2.0,
+      "cite": "Its guide: hold Purple removal for real threats, not cost-2 plays.",
+      "citeSource": "SH-ROS"
+    }
+  ],
+  "assertions": [
+    {
+      "seed": 1,
+      "text": "Uses the leader's discount before a [Trafalgar Law]-named card of cost 4 or more when the discount refunds itself (the Law's DON!! condition will be met after DON!! -1: P-093, EB04-038) or is the only way to play that Law this turn; otherwise plays it without the discount. At least 90% of such plays.",
+      "threshold": 0.9,
+      "source": "SH-ROS step 3; leader text [CARD]; inference from card text and measured self-play (DECISIONS 2026-11-17)"
+    },
+    {
+      "seed": 2,
+      "text": "Has at least one [Trafalgar Law] Character on the field by the end of T3 in at least 60% of games.",
+      "threshold": 0.6,
+      "source": "inference from card text"
+    },
+    {
+      "seed": 3,
+      "text": "Uses the leader's replacement when a Law would be K.O.'d and Life is 2 or more in at least 90% of eligible K.O.s.",
+      "threshold": 0.9,
+      "source": "inference"
+    },
+    {
+      "seed": 4,
+      "text": "At most 20% of Sakazuki, Gum-Gum Lightning and Divine Departure targets are Characters with cost 2 or less.",
+      "threshold": 0.8,
+      "source": "SH-ROS 'Hold Purple removal for real threats'"
+    },
+    {
+      "seed": 5,
+      "text": "P-093 and EB04-038 are played with their DON!! condition (own DON!! at or below the opponent's) met in at least 70% of plays, judged when the leader's DON!! -1 can level the count (the turn began at most one DON!! above the opponent's).",
+      "threshold": 0.7,
+      "source": "inference"
+    }
+  ]
+}

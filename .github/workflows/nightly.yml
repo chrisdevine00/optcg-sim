@@ -20,7 +20,7 @@ jobs:
       # M5a strength (ADR 0008; review M5a-10): Pirate vs Rookie over 200 iteration-budgeted games
       # (at least 95%), vs a shallow Pirate over 100 (at least 60%), a non-prior-list row, the
       # shallow control and A/B runs, and the game-plan assertions over 40 Pirate-vs-Pirate games
-      # with and without the biases. Reports: test-results/strength-*.json, game-plan-40.json.
+      # with and without the biases (group 3: ai/test/game-plan-g3.test.ts, game-plan-g3-40.json). Reports: test-results/strength-*.json, game-plan-40.json.
       - run: npm run test:strength
         if: always()
       # M5b group-1 playbooks (Robin, Yellow Enel, Kalgara, Hancock): the game-plan assertions over

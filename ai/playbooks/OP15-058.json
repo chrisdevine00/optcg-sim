@@ -1,0 +1,162 @@
+{
+  "leaderId": "OP15-058",
+  "archetypeId": "OP15-058-enel-purple",
+  "aiName": "Enel",
+  "asOf": "2026-11-17",
+  "guide": "docs/content/archetypes/OP15-058.md",
+  "notes": [
+    "Written from the guide's 'Game plan by turn' and 'Playbook seeds'.",
+    "goFirst: strategy-concepts §10 [S17] 'the general default is to go second'; the guide gives no seat advice, only a DON!! table for both seats [SH-PEN] (inference).",
+    "weights.don 0.6: 'You spend DON!! to draw, and get it back for free' [SH-PEN]; almost every card pays DON!! -1 or -2 and the DON!! Phase and the leader refill it, so a spent DON!! is cheap. Inference: the DON!! term counts for less. weights.hand 1.1: 'how many cards can I draw before I commit' [SH-PEN].",
+    "cardValue: Enel OP15-118 is the finisher (immune to opposing effects with 6 or less DON!!, +2000) [CARD][SH-ENC]; Holly gives Double Attack to every Ohm [CARD][SH-PEN]; Shura always has Rush under this leader [CARD]. Every number is an inference.",
+    "faceBias 1.0/1.05/1.15: a tempo deck whose plan ends with the 14000 finisher [SH-ENC]; inference: more weight on the opponent's Life late.",
+    "mulligan: the sourced rule 'hands with no 1-cost Character' [SH-PEN] goes back, going first or second; the guide's 'another 1-drop, a 0-cost event, Law or Holly' keepable hand is an inference and is not used to redraw.",
+    "seed 1/2: 'activate' (the leader's surge from T2), 'targetCanAttack' (its DON!! go to a Character that can attack) and 'attackWith' on any Character carrying 3 or more given DON!! (the loaded Character swings).",
+    "seed 3: 'play' bias on the 1-cost Characters by T1 [SH-PEN]. seed 4: 'acceptOptional' on the DON!! -1 draw of Ohm, Shura and Satori [SH-PEN]. seed 5: 'attackWith' OP15-118 [SH-ENC].",
+    "Citations are what 'Why?' shows when a move follows the line; every bias here has a public condition."
+  ],
+  "goFirst": false,
+  "digTargets": ["OP15-118", "OP15-061", "OP15-067", "OP15-071"],
+  "winConditions": ["OP15-118"],
+  "cardValue": {
+    "OP15-118": 1.0,
+    "OP15-071": 0.6,
+    "OP15-061": 0.3,
+    "OP15-067": 0.3,
+    "ST10-010": 0.3
+  },
+  "weights": {
+    "don": 0.6,
+    "hand": 1.1
+  },
+  "faceBias": {
+    "early": 1.0,
+    "mid": 1.05,
+    "late": 1.15
+  },
+  "counterAggression": 1.0,
+  "mulligan": {
+    "pieces": [
+      {
+        "name": "early",
+        "label": "a 1-cost Character",
+        "cards": ["OP15-061", "OP15-067", "OP15-066", "OP12-071"],
+        "min": 1
+      }
+    ],
+    "secondShort": 0,
+    "requireGoingFirst": [],
+    "source": "SH-PEN; OP15-058 guide (mulligan)"
+  },
+  "biases": [
+    {
+      "seed": 1,
+      "kind": "activate",
+      "card": "OP15-058",
+      "ability": "enel-surge",
+      "fromOwnTurn": 2,
+      "bonus": 1.5,
+      "cite": "Its guide: from the second turn the leader tops you up to six DON!! and loads up to 4 onto one Character.",
+      "citeSource": "SH-PEN"
+    },
+    {
+      "seed": 2,
+      "kind": "targetCanAttack",
+      "source": "OP15-058",
+      "ability": "enel-surge",
+      "bonus": 1.0,
+      "cite": "Its guide: the leader's rested DON!! go onto the Character that swings this turn.",
+      "citeSource": "SH-ENC"
+    },
+    {
+      "seed": 2,
+      "kind": "attackWith",
+      "card": "*",
+      "minDon": 3,
+      "fromOwnTurn": 2,
+      "bonus": 1.0,
+      "cite": "Its guide: the Character the leader loaded with DON!! is the one that swings.",
+      "citeSource": "SH-ENC"
+    },
+    {
+      "seed": 3,
+      "kind": "play",
+      "cards": ["OP15-061", "OP15-067", "OP15-066", "OP12-071"],
+      "byOwnTurn": 1,
+      "bonus": 1.0,
+      "cite": "Its guide: open with a 1-cost Character on turn 1.",
+      "citeSource": "SH-PEN"
+    },
+    {
+      "seed": 4,
+      "kind": "acceptOptional",
+      "source": "OP15-061",
+      "ability": "on-play",
+      "minHand": 0,
+      "bonus": 1.0,
+      "cite": "Its guide: you spend DON!! to draw, and get it back for free.",
+      "citeSource": "SH-PEN"
+    },
+    {
+      "seed": 4,
+      "kind": "acceptOptional",
+      "source": "OP15-067",
+      "ability": "on-play",
+      "minHand": 0,
+      "bonus": 1.0,
+      "cite": "Its guide: you spend DON!! to draw, and get it back for free.",
+      "citeSource": "SH-PEN"
+    },
+    {
+      "seed": 4,
+      "kind": "acceptOptional",
+      "source": "OP15-066",
+      "ability": "on-play",
+      "minHand": 0,
+      "bonus": 1.0,
+      "cite": "Its guide: you spend DON!! to draw, and get it back for free.",
+      "citeSource": "SH-PEN"
+    },
+    {
+      "seed": 5,
+      "kind": "attackWith",
+      "card": "OP15-118",
+      "fromOwnTurn": 1,
+      "bonus": 1.0,
+      "cite": "Its guide: the finisher attacks every turn, 14000 with the leader's DON!!.",
+      "citeSource": "SH-ENC"
+    }
+  ],
+  "assertions": [
+    {
+      "seed": 1,
+      "text": "Activates the leader on every turn from T2 in at least 95% of turns where it is legal.",
+      "threshold": 0.95,
+      "source": "leader text [CARD]; SH-PEN"
+    },
+    {
+      "seed": 2,
+      "text": "Gives the leader's rested DON!! to a Character that attacks in the same turn in at least 80% of activations where such a Character exists.",
+      "threshold": 0.8,
+      "source": "inference from [CARD], SH-ENC"
+    },
+    {
+      "seed": 3,
+      "text": "Plays a 1-cost Character on T1 when one is in hand in at least 90% of games.",
+      "threshold": 0.9,
+      "source": "SH-PEN"
+    },
+    {
+      "seed": 4,
+      "text": "Pays the DON!! -1 draw cost on Ohm, Shura and Satori in at least 80% of plays.",
+      "threshold": 0.8,
+      "source": "SH-PEN"
+    },
+    {
+      "seed": 5,
+      "text": "Attacks with OP15-118 Enel on every turn after the turn it is played, while it is on the field and active, in at least 80% of such turns.",
+      "threshold": 0.8,
+      "source": "inference from SH-ENC"
+    }
+  ]
+}
