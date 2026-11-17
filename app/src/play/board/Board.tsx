@@ -172,9 +172,20 @@ export function Board(b: BoardProps) {
     const aTop = roomy ? 8 : 5;
     const rTop = aTop + th + (roomy ? 10 : 7);
     const gTop = rTop + tw + (roomy ? 10 : 7);
-    const lifeBackH = Math.round(L.card.w * 0.92);
-    const lifeStep =
-      lifeN > 1 ? Math.min(L.card.w * 0.1, (R.life.h - 8 - lifeBackH) / (lifeN - 1)) : 0;
+    // With a face-up card in the stack the tiles are card-sized, and the face-up cards fan on
+    // their own wider step so each one's top strip (its name) stays readable; the backs stay in
+    // a tight stack beneath them (review M4b-19).
+    const upN = z.life.filter((lc) => lc.card).length;
+    const anyUp = upN > 0;
+    const lifeBackH = anyUp ? L.card.w : Math.round(L.card.w * 0.92);
+    const stepFor = (n: number, want: number) =>
+      n > 1 ? Math.min(want, (R.life.h - 8 - lifeBackH) / (n - 1)) : 0;
+    const lifeStep = stepFor(lifeN, L.card.w * 0.1);
+    const upStep = stepFor(upN, L.card.w * 0.34);
+    const stackTop = (j: number, step: number) =>
+      mine ? 4 + j * step : R.life.h - 4 - lifeBackH - j * step;
+    const lifeTop = (k: number) => stackTop(k, lifeStep);
+    const upSeen = (k: number) => z.life.slice(0, k).filter((lc) => lc.card).length;
     const items: ReactNode[] = [];
     items.push(
       <button
@@ -291,38 +302,83 @@ export function Board(b: BoardProps) {
         <button key="life" type="button" className="z life" style={rect(R.life)} {...item(zk, i++)}>
           <span className="sr-only">{lifeName(W, z.life, b.cards)}</span>
           <span className="vis" aria-hidden="true">
-            {z.life.map((lc, k) => {
-              const top = mine ? 4 + k * lifeStep : R.life.h - 4 - lifeBackH - k * lifeStep;
-              const style = {
-                left: 4,
-                top,
-                width: R.life.w - 8,
-                height: lifeBackH,
-                // A face-up card is public information: it is never covered by a back.
-                zIndex: (lc.card ? 20 : 10) - k,
-              };
-              const def = lc.card ? b.cards.get(lc.card) : undefined;
-              // A face-up Life card is public: draw it as itself, never as a back (review M4b-10).
-              return lc.card ? (
-                <span key={k} className="lface land" style={style} data-faceup="">
-                  <span className="lface-name">{def?.name ?? lc.card}</span>
-                </span>
-              ) : (
-                <CardBack key={k} className="land" style={style} />
-              );
-            })}
-            {z.life.some((lc) => lc.card) && (
-              <span className="plate life-up" aria-hidden="true">
-                {z.life.filter((lc) => lc.card).length} <small>face-up</small>
-              </span>
+            {z.life.map((lc, k) =>
+              lc.card ? null : (
+                <CardBack
+                  key={k}
+                  className="land"
+                  style={{
+                    left: 4,
+                    top: lifeTop(k),
+                    width: R.life.w - 8,
+                    height: lifeBackH,
+                    zIndex: 10 - k,
+                  }}
+                />
+              ),
             )}
-            <span className="plate life-count top" aria-hidden="true">
+            <span className="plate life-count bottom" aria-hidden="true">
               {lifeN} <small>Life</small>
             </span>
           </span>
         </button>
       ),
     );
+    // Face-up Life cards are public: each is its own inspectable card (hover, focus, "I", the
+    // card menu) drawn over the stack with its art. Face-down ones stay inside the Life button.
+    z.life.forEach((lc, k) => {
+      if (!lc.card) return;
+      const def = b.cards.get(lc.card);
+      const d = b.deco(lc.handle);
+      const label = cardAccessibleName(lc, {
+        cards: b.cards,
+        owner: W,
+        zone: 'life',
+        ownersTurn: ownersTurn(p),
+        extra: d.glyph ? [GLYPHS[d.glyph][1]] : [],
+      });
+      const u = upSeen(k);
+      const top = R.life.y + stackTop(u, upStep);
+      const idx = i++;
+      // Lower on the screen is higher in the stack, so every card shows its top strip.
+      const rank = mine ? u : upN - u;
+      pos.set(lc.handle, { x: R.life.x, y: top, w: R.life.w, h: lifeBackH });
+      items.push(
+        <BoardCard
+          key={lc.handle}
+          view={lc}
+          def={def}
+          box={{ x: R.life.x, y: top, w: R.life.w, h: lifeBackH }}
+          size={L.card}
+          roomy={roomy}
+          label={label}
+          zone="life"
+          turned
+          className="lface"
+          style={{ ['--rank' as string]: rank }}
+          donLive={ownersTurn(p)}
+          glyph={d.glyph ?? null}
+          legal={d.legal ?? false}
+          selected={d.selected ?? false}
+          dim={d.dim ?? false}
+          tabIndex={tab(zk, idx)}
+          dataZone={zk}
+          dataItem={idx}
+          onClick={(e) => b.onCard(lc.handle, e)}
+          onKeyDown={(e) => b.onCardKey(lc.handle, e)}
+          onFocus={() => {
+            b.onRove(zk, idx);
+            b.onPreview(lc.handle, 'focus');
+          }}
+          onPointerEnter={() => b.onPreview(lc.handle, 'hover')}
+          onPointerLeave={() => b.onPreview(null, 'hover')}
+        >
+          <span className="lface-name" aria-hidden="true">
+            {def?.name ?? lc.card}
+          </span>
+        </BoardCard>,
+      );
+    });
     if (leader) items.push(card(leader, R.leader, 'leader', p, zk, i++));
     items.push(
       stage ? (

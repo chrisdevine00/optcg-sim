@@ -71,7 +71,8 @@ test.describe('M4b fix round 1: Life, look panel and log', () => {
         page.locator('[data-zone="my-row"].z.life .sr-only, .z.life .sr-only').nth(1),
       ).toContainText(/Life, 3 cards, 1 face-up: Nami/);
       await expect(theirs.locator('.sr-only')).toContainText(/Life, 2 cards, 1 face-up: /);
-      await expect(mine.locator('.lface')).toHaveCount(1);
+      await expect(page.locator('[data-zone="my-row"].lface')).toHaveCount(1);
+      void mine;
       // A hidden Life card never names itself.
       await expect(theirs.locator('.sr-only')).not.toContainText('Roronoa Zoro');
       await page.screenshot({ path: `.cache/m4b-fix/faceup-life-${w}x${h}.png` });

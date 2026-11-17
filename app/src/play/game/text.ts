@@ -299,7 +299,15 @@ export function describeMove(
           bits.push(`${name(e.card)} ${Number(e.amount) > 0 ? '+' : ''}${num(Number(e.amount))}`);
         break;
       case 'ModifierAdded':
-        if (e.byEffect && typeof e.card === 'string') {
+        if (e.byEffect && e.kind === 'cannotDraw' && lineActor) {
+          // The restriction is on the player, not the Leader that carries it (review M4b-20).
+          const who = ctx.names.hotseat
+            ? ctx.names.player[lineActor]
+            : lineActor === ctx.names.me
+              ? 'You'
+              : 'Opponent';
+          bits.push(`${who} cannot draw with effects`);
+        } else if (e.byEffect && typeof e.card === 'string') {
           const what = modifierWords(e);
           if (what) bits.push(`${name(e.card)} ${what}`);
         }
@@ -531,7 +539,7 @@ export function cardAccessibleName(
   opts: {
     cards: CardMap;
     owner: string;
-    zone: 'leader' | 'characters' | 'stage' | 'hand' | 'trash';
+    zone: 'leader' | 'characters' | 'stage' | 'hand' | 'trash' | 'life';
     ownersTurn: boolean;
     extra?: string[];
   },
@@ -541,7 +549,14 @@ export function cardAccessibleName(
   const nm = card?.name.replace(/(\p{L})\.(\p{L})/gu, '$1. $2') ?? 'Face-down card';
   const bits: string[] = [];
   bits.push(opts.zone === 'leader' ? `${opts.owner} Leader, ${nm}` : `${opts.owner} ${nm}`);
-  if (opts.zone === 'hand') {
+  if (opts.zone === 'life') {
+    // A face-up Life card is public: its cost, Counter and Trigger are readable (M4b-19).
+    bits.push('face-up Life card');
+    if (card) bits.push(card.category === 'Event' ? 'Event' : card.category);
+    if (c.cost !== null) bits.push(`cost ${c.cost}`);
+    if (card?.counter) bits.push(`Counter +${card.counter}`);
+    if (c.power !== null && card?.category !== 'Event') bits.push(`${num(c.power)} power`);
+  } else if (opts.zone === 'hand') {
     if (card) bits.push(card.category === 'Event' ? 'Event' : card.category);
     if (c.cost !== null) bits.push(`cost ${c.cost}`);
     if (card?.counter) bits.push(`Counter +${card.counter}`);

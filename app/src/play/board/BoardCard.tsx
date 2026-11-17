@@ -44,7 +44,11 @@ export interface BoardCardProps {
   size: { w: number; h: number };
   roomy: boolean;
   label: string;
-  zone: 'leader' | 'characters' | 'stage' | 'hand' | 'trash' | 'mulligan';
+  zone: 'leader' | 'characters' | 'stage' | 'hand' | 'trash' | 'mulligan' | 'life';
+  /** Drawn landscape (a Life stack card) without being rested: no "Rested" chip. */
+  turned?: boolean;
+  className?: string;
+  style?: CSSProperties;
   /** Given DON!! add power on the owner's turn only (CR 6-5-5-2); off-turn badges are outlined. */
   donLive?: boolean;
   glyph?: Glyph | null;
@@ -72,9 +76,15 @@ export interface BoardCardProps {
 
 export function BoardCard(p: BoardCardProps) {
   const { view: c, def, size, box } = p;
-  const rested = c.rested && p.zone !== 'hand' && p.zone !== 'trash' && p.zone !== 'mulligan';
-  const bw = rested ? size.h : size.w;
-  const bh = rested ? size.w : size.h;
+  const rested =
+    c.rested &&
+    p.zone !== 'hand' &&
+    p.zone !== 'trash' &&
+    p.zone !== 'mulligan' &&
+    p.zone !== 'life';
+  const turned = rested || !!p.turned;
+  const bw = turned ? size.h : size.w;
+  const bh = turned ? size.w : size.h;
   const x = box.x + (box.w - bw) / 2;
   const y = box.y + (box.h - bh) / 2;
   const basePower = def?.power ?? null;
@@ -108,6 +118,7 @@ export function BoardCard(p: BoardCardProps) {
     .join(' · ');
   const chipTone = chips[0]?.tone ?? '';
   const style: CSSProperties = {
+    ...p.style,
     left: x,
     top: y,
     width: bw,
@@ -122,6 +133,8 @@ export function BoardCard(p: BoardCardProps) {
     'bc',
     `bc-${p.zone}`,
     rested ? 'rested' : '',
+    p.turned ? 'turned' : '',
+    p.className ?? '',
     p.legal ? 'legal' : '',
     p.selected ? 'selected' : '',
     p.dim ? 'dim' : '',
