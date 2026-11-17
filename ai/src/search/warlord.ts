@@ -50,7 +50,7 @@ export interface WarlordBudgets {
   turn: Budget;
   /** Any other decision. */
   defence: Budget;
-  /** A re-search when the plan breaks (default: 40% of `turn`). */
+  /** A re-search when the plan breaks (default: 25% of `turn`). */
   replan?: Budget;
   /** The lethal check at the start of a plan: nodes (CI) or milliseconds (app). */
   lethal?: { nodes: number } | { ms: number };

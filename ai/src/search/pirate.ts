@@ -97,6 +97,11 @@ export interface PirateDecision {
 
 export interface Candidate {
   actions: Action[];
+  /**
+   * Warlord macro moves only: the playbook's pick-type bias (`otherBias`) for the prompt answer
+   * bundled into `actions`, so a macro's prior is `mainBias` of the move plus this (review M5b-1).
+   */
+  pickBias?: number;
 }
 
 interface Scored {
@@ -344,13 +349,18 @@ export function discountPays(
   me: PlayerId,
   h: { card: string; cost: number | null },
   bias: { cards: string[]; refundCards: string[]; minCost: number },
+  /**
+   * Count DON!! given this turn as still in the cost area (the tree: a discount that only becomes
+   * "the only way" because the plan first gave DON!! away is not needed; play the card first).
+   */
+  turnStart = false,
 ): boolean {
   const cost = h.cost ?? 0;
   if (!bias.cards.includes(h.card) || cost < bias.minCost) return false;
   const d = queries.don(s, me);
   const o = queries.don(s, other(me));
   if (d.active < cost - 1) return false; // not affordable even with it
-  const only = cost > d.active;
+  const only = cost > d.active + (turnStart ? d.given : 0);
   const refunds =
     bias.refundCards.includes(h.card) &&
     d.active + d.rested + d.given - 1 <= o.active + o.rested + o.given;
@@ -818,6 +828,7 @@ export function unneededDiscount(
   me: PlayerId,
   a: Action,
   setup: PirateSetup,
+  turnStart = false,
 ): boolean {
   if (a.type !== 'activate') return false;
   for (const bias of setup.playbook?.biases ?? []) {
@@ -826,7 +837,7 @@ export function unneededDiscount(
       a.ability === bias.ability &&
       queries.card(s, a.card).card === bias.source
     )
-      return !queries.zone(s, me, 'hand').some((h) => discountPays(s, me, h, bias));
+      return !queries.zone(s, me, 'hand').some((h) => discountPays(s, me, h, bias, turnStart));
   }
   return false;
 }

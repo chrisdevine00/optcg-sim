@@ -19,6 +19,7 @@ import { describe, expect, it } from 'vitest';
 import type { DeckSpec, PlayerId } from '@optcg/engine';
 import { BUDGETS, type SessionOptions } from '../src/index.ts';
 import { playMatch, type MatchOptions } from './support/match.ts';
+import { PLAN_TIER } from './support/scenario.ts';
 import { mergeTallies, PlanTally, type Tally } from './support/plan-tally.ts';
 import { metaDecks } from './support.ts';
 
@@ -226,12 +227,12 @@ describe('Pirate strength (PLAN M5a; review M5a-10)', () => {
         const { rocks, kaido } = decks();
         for (let g = 0; g < PLAN_GAMES; g++) {
           const bySeat = g % 2 === 0 ? { p1: rocks, p2: kaido } : { p1: kaido, p2: rocks };
-          const t1 = new PlanTally('p1', 'pirate', bySeat.p1.leader);
-          const t2 = new PlanTally('p2', 'pirate', bySeat.p2.leader);
+          const t1 = new PlanTally('p1', PLAN_TIER, bySeat.p1.leader);
+          const t2 = new PlanTally('p2', PLAN_TIER, bySeat.p2.leader);
           const r = playMatch({
             seed: 30_000 + g,
             decks: bySeat,
-            tiers: { p1: 'pirate', p2: 'pirate' },
+            tiers: { p1: PLAN_TIER, p2: PLAN_TIER },
             seats: { p1: { biases }, p2: { biases } },
             onDecision: (d) => {
               t1.observe(d);
@@ -258,14 +259,19 @@ describe('Pirate strength (PLAN M5a; review M5a-10)', () => {
         };
       };
       const withBias = run(true);
-      const noBias = run(false);
-      report(`game-plan-${PLAN_GAMES}`, { date: new Date().toISOString(), withBias, noBias });
+      // The biases-off report is for the Pirate; the Warlord's nightly run is the biases-on tally.
+      const noBias = PLAN_TIER === 'pirate' ? run(false) : null;
+      report(`game-plan-${PLAN_GAMES}${PLAN_TIER === 'pirate' ? '' : `-${PLAN_TIER}`}`, {
+        date: new Date().toISOString(),
+        withBias,
+        noBias,
+      });
       for (const t of withBias.plan)
         if (t.total >= 10)
           expect(t.rate!, `${t.leader} seed ${t.seed}: ${t.text}`).toBeGreaterThanOrEqual(
             t.threshold,
           );
     },
-    3_600_000,
+    PLAN_TIER === 'pirate' ? 3_600_000 : 10_800_000,
   );
 });

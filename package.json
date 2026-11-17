@@ -24,6 +24,7 @@
     "test:strength:pirate": "STRENGTH_GAMES=200 SHALLOW_GAMES=100 PLAN_GAMES=40 AB_GAMES=40 EXTRA=1 vitest run ai/test/strength.test.ts ai/test/game-plan-g2.test.ts ai/test/game-plan-g3.test.ts",
     "test:plan-g1": "PLAN_GAMES_G1=64 vitest run ai/test/game-plan-g1.test.ts",
     "test:strength:m5b": "STRENGTH_GAMES=200 EXTRA=1 vitest run ai/test/strength-warlord.test.ts",
+    "test:plan-warlord": "PLAN_TIER=warlord PLAN_GAMES=${PLAN_GAMES:-40} PLAN_GAMES_G1=${PLAN_GAMES_G1:-64} vitest run ai/test/strength.test.ts ai/test/game-plan-g1.test.ts ai/test/game-plan-g2.test.ts ai/test/game-plan-g3.test.ts -t 'game-plan assertions|game plans'",
     "bench": "vitest bench --run",
     "bench:two-turn": "tsx engine/bench/two-turn.ts",
     "test:e2e": "playwright test",

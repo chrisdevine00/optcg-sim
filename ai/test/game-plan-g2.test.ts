@@ -8,10 +8,21 @@
  * seeds are measured over Pirate-vs-Pirate games in the nightly run (PLAN_GAMES, below).
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { queries, reduce, type Action, type GameState } from '@optcg/engine';
 import { PLAYBOOKS, type Bias, type Playbook } from '../src/index.ts';
-import { cardOf, lifeOf, listOf, play, start, type Spec } from './support/scenario.ts';
+import {
+  PLAN_TIER,
+  PLAN_TIERS,
+  setTier,
+  type Tier,
+  cardOf,
+  lifeOf,
+  listOf,
+  play,
+  start,
+  type Spec,
+} from './support/scenario.ts';
 import { mergeTallies, type Tally } from './support/plan-tally.ts';
 import { PlanTallyG2 } from './support/plan-tally-g2.ts';
 import { playMatch } from './support/match.ts';
@@ -112,6 +123,7 @@ const BIAS_ONLY = new Set<string>([
   // Group 2, OP13-001: a defensive Leader the heuristic does not see defending with.
   'seed 1: ends T2 with a DON!! given to the Leader',
   'seed 2: plays Sanji before Luffy OP13-118 when it plays both',
+  'seed 2: with the Leader rested, Sanji then Luffy',
   'seed 5: plays a searcher on T1',
   'seed 5: plays Thousand Sunny on T1',
   // Group 2, OP17-079: Luffy is a body whether or not a Giant is out.
@@ -119,10 +131,19 @@ const BIAS_ONLY = new Set<string>([
   'seed 2: plays Luffy with a Giant out, and attacks with him',
 ]);
 
-for (const biases of [true, false]) {
-  const label = biases ? 'with the playbook biases' : 'search alone (biases off)';
+/** Planted runs: every tier with the biases on; Pirate also with search alone (BIAS_ONLY). */
+const PLANTED: [Tier, boolean][] = [
+  ...PLAN_TIERS.map((t): [Tier, boolean] => [t, true]),
+  ['pirate', false],
+];
+
+for (const [tier, biases] of PLANTED) {
+  const label = `${tier}, ${biases ? 'with the playbook biases' : 'search alone (biases off)'}`;
   const t = (name: string, fn: () => void) =>
-    (!biases && BIAS_ONLY.has(name) ? it.fails : it)(name, fn);
+    (!biases && BIAS_ONLY.has(name) ? it.fails : it)(name, () => {
+      setTier(tier);
+      return fn();
+    });
 
   describe(`Luffy & Ace (ST30-001) game plan, planted, ${label}`, () => {
     const la = (pos: Omit<Pos, 'me' | 'leader' | 'first'>): GameState =>
@@ -259,6 +280,28 @@ for (const biases of [true, false]) {
         expect(sanji.length, 'Sanji comes with Luffy').toBe(1);
         expect(steps.indexOf(sanji[0]!)).toBeLessThan(steps.indexOf(luffy[0]!));
       }
+      // The Pirate plays Sanji here. The Warlord's tree finds a better-scoring line in this
+      // position (7 DON!! on the Leader and a swing, no Character), which the guide's seed does
+      // not forbid: the seed is the order when both are played, so for the Warlord this position
+      // asserts that order only, and the companion test below forces both plays.
+      if (tier === 'pirate') expect(sanji.length).toBe(1);
+    });
+
+    t('seed 2: with the Leader rested, Sanji then Luffy', () => {
+      // The Leader cannot swing, so there is no DON!! pump to prefer: the Warlord plays Sanji (5),
+      // which sets 2 DON!! active, then Luffy (6), and Sanji must come first.
+      const s = rg({
+        me: 'p1',
+        first: 'p1',
+        turn: 9,
+        don: 9,
+        mine: { leader: { card: 'OP13-001', rested: true }, hand: ['OP13-118', 'OP13-027'] },
+      });
+      const { steps } = play(s, 'p1', { biases });
+      const luffy = played(steps, 'OP13-118');
+      const sanji = played(steps, 'OP13-027');
+      if (luffy.length > 0 && sanji.length > 0)
+        expect(steps.indexOf(sanji[0]!)).toBeLessThan(steps.indexOf(luffy[0]!));
       expect(sanji.length).toBe(1);
     });
 
@@ -471,7 +514,9 @@ function withPlaybook<T>(leader: string, edit: (pb: Playbook) => void, fn: () =>
   }
 }
 
-describe('group-2 bias kinds, mechanics (synthetic playbooks)', () => {
+describe.each(PLAN_TIERS)('%s: group-2 bias kinds, mechanics (synthetic playbooks)', (tier) => {
+  beforeAll(() => setTier(tier));
+  afterAll(() => setTier('pirate'));
   /** A bonus that makes search want the card whatever its text does. */
   const want = (cards: string[]): Bias => ({ kind: 'play', cards, bonus: 8, seed: 1 });
   const without = (kind: Bias['kind']) => (pb: Playbook) => {
@@ -522,7 +567,15 @@ describe('group-2 bias kinds, mechanics (synthetic playbooks)', () => {
         mine: { hand: ['ST31-004'] },
       });
     const edit = (pb: Playbook) => {
-      pb.biases.push({ kind: 'play', cards: ['ST31-004'], bonus: 4, seed: 4 });
+      // The Warlord's tree values this body (to the end of the opponent's next turn) about 2 units
+      // above not playing it, the Pirate's one-turn search less: the "want" is sized to each tier
+      // so that the want minus the 5-point penalty is below the search's own value either way.
+      pb.biases.push({
+        kind: 'play',
+        cards: ['ST31-004'],
+        bonus: tier === 'pirate' ? 4 : 1,
+        seed: 4,
+      });
     };
     withPlaybook(LA, edit, () => expect(played(play(pos(), 'p1').steps, 'ST31-004')).toEqual([]));
     withPlaybook(
@@ -609,12 +662,12 @@ describe('group-2 game-plan assertions over Pirate-vs-Pirate games (nightly)', (
           const a = deck(mine[g % 3]!);
           const b = deck(pool[(g + Math.floor(g / 3)) % pool.length]!);
           const decks = g % 2 === 0 ? { p1: a, p2: b } : { p1: b, p2: a };
-          const t1 = new PlanTallyG2('p1', 'pirate', decks.p1.leader);
-          const t2 = new PlanTallyG2('p2', 'pirate', decks.p2.leader);
+          const t1 = new PlanTallyG2('p1', PLAN_TIER, decks.p1.leader);
+          const t2 = new PlanTallyG2('p2', PLAN_TIER, decks.p2.leader);
           const r = playMatch({
             seed: 50_000 + g,
             decks,
-            tiers: { p1: 'pirate', p2: 'pirate' },
+            tiers: { p1: PLAN_TIER, p2: PLAN_TIER },
             seats: { p1: { biases }, p2: { biases } },
             onDecision: (d) => {
               t1.observe(d);
@@ -634,10 +687,11 @@ describe('group-2 game-plan assertions over Pirate-vs-Pirate games (nightly)', (
         };
       };
       const withBias = run(true);
-      const noBias = run(false);
+      // The biases-off report is for the Pirate; the Warlord's nightly run is the biases-on tally.
+      const noBias = PLAN_TIER === 'pirate' ? run(false) : null;
       mkdirSync('test-results', { recursive: true });
       writeFileSync(
-        `test-results/game-plan-g2-${PLAN_GAMES}.json`,
+        `test-results/game-plan-g2-${PLAN_GAMES}${PLAN_TIER === 'pirate' ? '' : `-${PLAN_TIER}`}.json`,
         JSON.stringify({ date: new Date().toISOString(), withBias, noBias }, null, 2),
       );
       console.log('game-plan-g2', JSON.stringify({ withBias, noBias }));
@@ -647,6 +701,6 @@ describe('group-2 game-plan assertions over Pirate-vs-Pirate games (nightly)', (
             t.threshold,
           );
     },
-    3_600_000,
+    PLAN_TIER === 'pirate' ? 3_600_000 : 10_800_000,
   );
 });

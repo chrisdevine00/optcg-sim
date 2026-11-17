@@ -4,6 +4,17 @@
  * Meta Explorer guide and the AI never disagree. A playbook biases the heuristic (weight multipliers,
  * card values, face-versus-board by stage) and the move choice (biases), and lists the game-plan
  * assertions the tests check.
+ *
+ * **Bias sizes and vetoes (review M5b-8).** A bias is added to a move's score in heuristic card
+ * units, and the search squashes values with `tanh(v / 12)`, so a bonus or penalty of 0.5 to 5 is
+ * a preference that search can outweigh, while **a penalty of 25 is a deliberate veto**: it takes
+ * 0.97 of the squashed range, so only a winning line (worth 1000) overrides it. Two kinds are
+ * written that way on purpose, `keepActiveDon` (OP13-001: the Leader defends with the DON!! it
+ * keeps) and `playOnlyWhen` (OP17-079: Luffy OP17-093 is a body only with a Giant out); smaller
+ * penalties did not bind (DECISIONS 2026-11-17, "Group 2"). Any other penalty above about 10 is a
+ * veto too and needs the same justification. The penalty is paid by paths that spend it inside
+ * the tree, and not by rollouts after it, so a veto on `endTurn` binds the plans that end the
+ * turn in the tree.
  */
 import rocks from '../playbooks/OP17-039.json';
 import kaido from '../playbooks/OP17-058.json';
@@ -185,7 +196,10 @@ export type Bias = BiasCite &
     | { kind: 'avoidBasePower'; minPower: number; penalty: number; seed: number }
     /** From own turn `fromOwnTurn`, give the Leader a DON!! each turn before passing. */
     | { kind: 'leaderDon'; fromOwnTurn: number; bonus: number; seed: number }
-    /** From own turn `fromOwnTurn`, pass the turn with `min` to `max` active DON!!. */
+    /**
+     * From own turn `fromOwnTurn`, pass the turn with `min` to `max` active DON!!. The `penalty` is
+     * a rule, not a preference: OP13-001 uses 25, a veto (see the file comment).
+     */
     | {
         kind: 'keepActiveDon';
         fromOwnTurn: number;

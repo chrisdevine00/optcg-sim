@@ -1,17 +1,35 @@
 /**
- * Strength gates for Warlord and Emperor (PLAN M5b exit, ADR 0008; review M5a-10).
+ * Strength gates for Warlord and Emperor (PLAN M5b exit, ADR 0008; review M5a-10, M5b-2, 3, 9, 11).
  *
  * Twelve ordered deck pairs from six disjoint archetype pairs that cover all twelve archetypes
  * (the first is Rocks and Kaido, the M5a pair), each seat in turn, deterministic seeds and
- * iteration budgets, so a run plays the same games on every machine.
+ * iteration budgets, so a run plays the same games on every machine. Game `g` plays ordered pair
+ * `g % 12` (so the 12 per-push games cover all twelve) and takes the seat `(g + floor(g / 12)) % 2`
+ * (so a deck advantage cancels over 24 games).
  *
- * Gates that can fail (per push: 20 games; nightly `STRENGTH_GAMES=200`):
- * - **Pirate vs Rookie:** at least 75% (PLAN M5b).
- * - **Warlord vs Rookie:** at least 90% per push, 95% nightly (PLAN M5b).
- * - **Warlord vs Pirate:** at least 55% per push (a smoke: 20 games cannot show 65%), 65% nightly.
+ * **Per push (`STRENGTH_GAMES`, default 12, about 1.5 minutes):** Pirate vs Rookie at least 75%;
+ * Warlord vs Rookie at least 10 of 12. A gross break (a search that throws, plays illegally or
+ * does nothing useful) fails here; a 12-game series cannot separate two close tiers, so the
+ * Pirate and control gates are nightly only.
+ *
+ * **Nightly (`STRENGTH_GAMES=200`, `npm run test:strength:m5b`):**
+ * - Pirate vs Rookie at least 75%; Warlord vs Rookie at least 95% (PLAN M5b).
+ * - **Warlord vs Pirate at least 65%** (PLAN M5b). A point estimate on fixed seeds, as the PLAN
+ *   states it: it is reproducible, and the Wilson interval is printed and reported beside it
+ *   (133 of 200 is 66.5%, interval 59.7 to 72.7%: a pass by 3 games is not proof of 65%).
  * - **A search that is too small must fail (M5a-10).** Warlord at full budget beats Warlord at one
  *   iteration per decision, and the one-iteration Warlord does not pass the Pirate gate. Rookie is
  *   too weak to tell these apart, which is why M5a's gates could not catch a crippled search.
+ *
+ * **What these gates measure.** The iteration budgets are a CI proxy with a fixed count (4,000 per
+ * Warlord plan, 10,000 per Emperor plan), not the app's 2.5 s and 6 s: in the app's millisecond
+ * mode the same time buys about 2,000 to 78,000 iterations (median 31,000) for Warlord and
+ * 5,000 to 170,000 for Emperor (review M5b-2). The gates are a reproducible lower bound of the
+ * shipped Warlord; the Emperor result describes the CI proxy, not the shipped Emperor.
+ *
+ * **No silent fallbacks.** Every seat throws on an unexpected search error, and the gate counts
+ * `CannotDeterminize` fallbacks (a hidden-card reference the search could not guess, so the
+ * Rookie policy answered) and fails on any (M5b-11).
  *
  * Nightly reports (`EXTRA=1`): Emperor vs Warlord. Results go to `test-results/`.
  */
@@ -23,9 +41,27 @@ import { playMatch } from './support/match.ts';
 import { quantile, wilson } from './support/stats.ts';
 import { metaDecks } from './support.ts';
 
-vi.setConfig({ testTimeout: 3_600_000 });
+/**
+ * Per-test timeouts, from the measured cost per game (review M5b-4; laptop under load: Pirate vs
+ * Rookie 0.75 s, Warlord vs Rookie 10.4 s, Warlord vs Pirate 25.5 s) times 200 games, doubled for
+ * a slower runner. Per push (12 games) the default is ample. Each nightly series is its own CI job
+ * (`strength-m5b` matrix), so no job needs the sum of these.
+ */
+const MIN = 60_000;
+const TIMEOUT = {
+  pirateVsRookie: FULL_TIMEOUT(10),
+  warlordVsRookie: FULL_TIMEOUT(70),
+  warlordVsPirate: FULL_TIMEOUT(170),
+  controlFull: FULL_TIMEOUT(80),
+  controlTiny: FULL_TIMEOUT(20),
+  emperor: FULL_TIMEOUT(80),
+};
+function FULL_TIMEOUT(minutes: number): number {
+  return Math.max(10 * MIN, minutes * MIN);
+}
+vi.setConfig({ testTimeout: 10 * MIN });
 
-const GAMES = Number(process.env.STRENGTH_GAMES ?? 20);
+const GAMES = Number(process.env.STRENGTH_GAMES ?? 12);
 const FULL = GAMES >= 200;
 const EXTRA = process.env.EXTRA === '1';
 
@@ -69,6 +105,8 @@ export interface Series {
   bySeat: Record<PlayerId, { wins: number; games: number }>;
   turnMs: number[];
   decisionMs: number[];
+  /** Decisions where the search could not guess a hidden card and the Rookie policy answered. */
+  cannotDeterminize: number;
 }
 
 export function series(games: number, seedBase: number, a: Side, b: Side): Series {
@@ -84,11 +122,15 @@ export function series(games: number, seedBase: number, a: Side, b: Side): Serie
     bySeat: { p1: { wins: 0, games: 0 }, p2: { wins: 0, games: 0 } },
     turnMs: [],
     decisionMs: [],
+    cannotDeterminize: 0,
+  };
+  const count = (): void => {
+    out.cannotDeterminize++;
   };
   for (let g = 0; g < games; g++) {
-    const aSeat: PlayerId = g % 2 === 0 ? 'p1' : 'p2';
+    const aSeat: PlayerId = (g + Math.floor(g / ORDERED.length)) % 2 === 0 ? 'p1' : 'p2';
     const bSeat: PlayerId = aSeat === 'p1' ? 'p2' : 'p1';
-    const [la, lb] = ORDERED[(g >> 1) % ORDERED.length]!;
+    const [la, lb] = ORDERED[g % ORDERED.length]!;
     const mine = deck(la);
     const theirs = deck(lb);
     const r = playMatch({
@@ -97,8 +139,8 @@ export function series(games: number, seedBase: number, a: Side, b: Side): Serie
       tiers: { [aSeat]: a.tier, [bSeat]: b.tier } as Record<PlayerId, AiTier>,
       // A search that throws must fail the gate, not quietly play the Rookie policy (M4b-04).
       seats: {
-        [aSeat]: { ...a.opts, onFallback: noFallback },
-        [bSeat]: { ...b.opts, onFallback: noFallback },
+        [aSeat]: { ...a.opts, onFallback: noFallback, onCannotDeterminize: count },
+        [bSeat]: { ...b.opts, onFallback: noFallback, onCannotDeterminize: count },
       },
     });
     const won = !!r.result && 'winner' in r.result && r.result.winner === aSeat;
@@ -129,6 +171,7 @@ function report(name: string, s: Series, extra: object = {}): void {
     draws: s.draws,
     winRate: s.winRate,
     ci95: s.ci95,
+    cannotDeterminize: s.cannotDeterminize,
     byPair: s.byPair,
     bySeat: s.bySeat,
     turnMs: {
@@ -141,42 +184,70 @@ function report(name: string, s: Series, extra: object = {}): void {
     ...extra,
   };
   writeFileSync(`test-results/${name}.json`, JSON.stringify(data, null, 2));
+  const [lo, hi] = s.ci95;
+  console.log(
+    `${name}: ${s.wins}/${s.games} (${(s.winRate * 100).toFixed(1)}%, Wilson 95% ${(lo * 100).toFixed(1)} to ${(hi * 100).toFixed(1)}%), cannotDeterminize ${s.cannotDeterminize}`,
+  );
   console.log(name, JSON.stringify(data));
+  expect(s.cannotDeterminize, `${name}: CannotDeterminize fallbacks`).toBe(0);
 }
 
 describe('Strength gates, Pirate, Warlord and Emperor (PLAN M5b; review M5a-10)', () => {
-  it(`Pirate beats Rookie in at least 75% of ${GAMES} games`, () => {
-    const s = series(GAMES, 110_000, { tier: 'pirate' }, { tier: 'rookie' });
-    report(`m5b-pirate-vs-rookie-${GAMES}`, s);
-    expect(s.winRate).toBeGreaterThanOrEqual(0.75);
-  });
+  it(
+    `Pirate beats Rookie in at least 75% of ${GAMES} games`,
+    () => {
+      const s = series(GAMES, 110_000, { tier: 'pirate' }, { tier: 'rookie' });
+      report(`m5b-pirate-vs-rookie-${GAMES}`, s);
+      expect(s.winRate).toBeGreaterThanOrEqual(0.75);
+    },
+    TIMEOUT.pirateVsRookie,
+  );
 
-  it(`Warlord beats Rookie in at least ${FULL ? 95 : 90}% of ${GAMES} games`, () => {
-    const s = series(GAMES, 120_000, { tier: 'warlord' }, { tier: 'rookie' });
-    report(`m5b-warlord-vs-rookie-${GAMES}`, s);
-    expect(s.winRate).toBeGreaterThanOrEqual(FULL ? 0.95 : 0.9);
-  });
+  // Per push: 12 games, one per ordered pair, at least 10 (a Rookie winning 3 games is a break).
+  it(
+    `Warlord beats Rookie in at least ${FULL ? '95%' : '10 of 12'} of ${GAMES} games`,
+    () => {
+      const s = series(GAMES, 120_000, { tier: 'warlord' }, { tier: 'rookie' });
+      report(`m5b-warlord-vs-rookie-${GAMES}`, s);
+      expect(s.winRate).toBeGreaterThanOrEqual(FULL ? 0.95 : 10 / 12 - 1e-9);
+    },
+    TIMEOUT.warlordVsRookie,
+  );
 
-  it(`Warlord beats Pirate in at least ${FULL ? 65 : 55}% of ${GAMES} games`, () => {
-    const s = series(GAMES, 130_000, { tier: 'warlord' }, { tier: 'pirate' });
-    report(`m5b-warlord-vs-pirate-${GAMES}`, s);
-    expect(s.winRate).toBeGreaterThanOrEqual(FULL ? 0.65 : 0.55);
-  });
+  // Nightly only from here: 25 s a game (Warlord vs Pirate), and a short series cannot show 65%.
+  it.runIf(FULL)(
+    `Warlord beats Pirate in at least 65% of ${GAMES} games`,
+    () => {
+      const s = series(GAMES, 130_000, { tier: 'warlord' }, { tier: 'pirate' });
+      report(`m5b-warlord-vs-pirate-${GAMES}`, s);
+      expect(s.winRate).toBeGreaterThanOrEqual(0.65);
+    },
+    TIMEOUT.warlordVsPirate,
+  );
 
-  it(`Warlord at full budget beats a one-iteration Warlord (M5a-10) in at least ${FULL ? 70 : 60}% of ${GAMES} games`, () => {
-    const s = series(GAMES, 140_000, { tier: 'warlord' }, { tier: 'warlord', opts: TINY });
-    report(`m5b-warlord-vs-tiny-${GAMES}`, s);
-    expect(s.winRate).toBeGreaterThanOrEqual(FULL ? 0.7 : 0.6);
-  });
+  it.runIf(FULL)(
+    `Warlord at full budget beats a one-iteration Warlord (M5a-10) in at least 70% of ${GAMES} games`,
+    () => {
+      const s = series(GAMES, 140_000, { tier: 'warlord' }, { tier: 'warlord', opts: TINY });
+      report(`m5b-warlord-vs-tiny-${GAMES}`, s);
+      expect(s.winRate).toBeGreaterThanOrEqual(0.7);
+    },
+    TIMEOUT.controlFull,
+  );
 
-  it(`a one-iteration Warlord fails the Pirate gate (M5a-10): under ${FULL ? 65 : 55}% of ${GAMES} games`, () => {
-    const s = series(GAMES, 150_000, { tier: 'warlord', opts: TINY }, { tier: 'pirate' });
-    report(`m5b-tiny-vs-pirate-${GAMES}`, s);
-    expect(s.winRate).toBeLessThan(FULL ? 0.65 : 0.55);
-  });
+  it.runIf(FULL)(
+    `a one-iteration Warlord fails the Pirate gate (M5a-10): under 65% of ${GAMES} games`,
+    () => {
+      const s = series(GAMES, 150_000, { tier: 'warlord', opts: TINY }, { tier: 'pirate' });
+      report(`m5b-tiny-vs-pirate-${GAMES}`, s);
+      expect(s.winRate).toBeLessThan(0.65);
+    },
+    TIMEOUT.controlTiny,
+  );
 
-  // A report, not a gate: Emperor's extra time showed no measurable gain over Warlord (docs/benchmarks.md),
-  // so the only assertion is that it is not broken (not clearly worse than Warlord).
+  // A report, not a gate: Emperor's extra time showed no measurable gain over Warlord
+  // (docs/benchmarks.md), so the only assertion is that it is not broken (not clearly worse). It
+  // runs on the CI iteration budgets, so it does not describe the shipped Emperor (review M5b-2, 6).
   it.runIf(EXTRA)(
     'nightly report: Emperor against Warlord',
     () => {
@@ -185,6 +256,6 @@ describe('Strength gates, Pirate, Warlord and Emperor (PLAN M5b; review M5a-10)'
       report(`m5b-emperor-vs-warlord-${n}`, s);
       expect(s.winRate).toBeGreaterThanOrEqual(0.35);
     },
-    14_400_000,
+    TIMEOUT.emperor,
   );
 });

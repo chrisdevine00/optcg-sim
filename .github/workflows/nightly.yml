@@ -4,9 +4,13 @@ on:
     - cron: '17 3 * * *'
   workflow_dispatch:
 jobs:
+  # Review M5b-4: this job now also runs the Pirate game-plan tallies (groups 1 to 3, with and
+  # without the biases) and four nightly Playwright specs on top of the property run that took 15
+  # to 30 minutes before M5b. Estimate: property 30, Pirate series and tallies about 25, Playwright
+  # about 25, bench 5: about 85 minutes, so a 150-minute cap. Calibrate it from the first dispatch.
   property:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 150
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -43,14 +47,27 @@ jobs:
         with:
           name: nightly-results
           path: test-results/
-  # M5b strength (ADR 0008; review M5a-10): 200 iteration-budgeted games per pairing over twelve
-  # ordered deck pairs (all twelve archetypes), each seat in turn. Pirate vs Rookie at least 75%,
-  # Warlord vs Rookie at least 95%, Warlord vs Pirate at least 65%, Warlord vs a one-iteration
+  # M5b strength (ADR 0008; review M5a-10, M5b-4): 200 iteration-budgeted games per series over
+  # twelve ordered deck pairs (all twelve archetypes), each seat in turn. Pirate vs Rookie at least
+  # 75%, Warlord vs Rookie at least 95%, Warlord vs Pirate at least 65%, Warlord vs a one-iteration
   # Warlord at least 70% (and that Warlord under 65% against Pirate), plus Emperor vs Warlord.
-  # About two hours: its own job so it does not delay the others. Reports: test-results/m5b-*.json.
+  # One job per series so none needs the sum of them: nominal time from the measured cost per game
+  # on a laptop (Pirate vs Rookie 0.75 s, Warlord vs Rookie 10.4 s, Warlord vs Pirate 25.5 s, 200
+  # games each; docs/benchmarks.md), doubled for a hosted runner, is 10, 70, 170, 100 and 80
+  # minutes. Per-test timeouts in ai/test/strength-warlord.test.ts match; the job cap adds margin.
+  # Reports: test-results/m5b-*.json (each prints its Wilson interval).
   strength-m5b:
     runs-on: ubuntu-latest
-    timeout-minutes: 300
+    timeout-minutes: 200
+    strategy:
+      fail-fast: false
+      matrix:
+        series:
+          - { name: pirate-vs-rookie, filter: 'Pirate beats Rookie', extra: '0' }
+          - { name: warlord-vs-rookie, filter: 'Warlord beats Rookie', extra: '0' }
+          - { name: warlord-vs-pirate, filter: 'Warlord beats Pirate', extra: '0' }
+          - { name: controls, filter: 'one-iteration', extra: '0' }
+          - { name: emperor, filter: 'Emperor', extra: '1' }
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -58,9 +75,40 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npm run test:strength:m5b
+      - run: npx vitest run ai/test/strength-warlord.test.ts -t "${{ matrix.series.filter }}"
+        env:
+          STRENGTH_GAMES: '200'
+          EXTRA: ${{ matrix.series.extra }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: strength-m5b-results
+          name: strength-m5b-${{ matrix.series.name }}
+          path: test-results/
+  # The Warlord's own game-plan tallies (review M5b-1): the group assertions over Warlord-vs-Warlord
+  # games, biases on (40 games for Rocks/Kaido and groups 2 and 3, 64 for group 1). About 25 s a
+  # game on a laptop: 17 to 27 minutes nominal per file, so four jobs with a 150-minute cap.
+  # Reports: test-results/game-plan*-warlord.json.
+  plan-warlord:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        file: [strength, game-plan-g1, game-plan-g2, game-plan-g3]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx vitest run ai/test/${{ matrix.file }}.test.ts -t 'game-plan assertions|game plans'
+        env:
+          PLAN_TIER: warlord
+          PLAN_GAMES: '40'
+          PLAN_GAMES_G1: '64'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: plan-warlord-${{ matrix.file }}
           path: test-results/

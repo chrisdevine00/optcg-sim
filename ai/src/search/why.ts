@@ -585,7 +585,7 @@ function explainMain(s: GameState, a: Action, me: PlayerId, ctx: WhyContext): Ex
           },
         ],
         line: [{ kind: 'endTurn', text: 'End the turn.' }],
-        outcome: 'Its turn is over.',
+        outcome: `You go next, and it has ${don} DON!! and ${plural(hand, 'card')} to answer your attacks with.`,
         concept: 'don-efficiency',
       });
     }
@@ -657,6 +657,9 @@ function explainAnswer(s: GameState, a: Action, me: PlayerId, ctx: WhyContext): 
     const voiced = src.label ? aiVoice(src.label) : null;
     const effect = voiced ? `${voiced.charAt(0).toLowerCase()}${voiced.slice(1)}` : null;
     // "Did not use" is true whether it chose to or could not pay a hidden cost (review M5a-01).
+    // What declining leaves it with is public: its DON!! and the size of its hand (M5b-13).
+    const keptDon = queries.don(s, me).active;
+    const keptHand = queries.zone(s, me, 'hand').length;
     return explainMove({
       claim: a.accept ? `It used ${own}'s effect.` : `It did not use ${own}'s effect.`,
       evidence: effect ? [{ text: `The effect: ${effect}.`, figures: {} }] : [],
@@ -673,7 +676,7 @@ function explainAnswer(s: GameState, a: Action, me: PlayerId, ctx: WhyContext): 
         ? effect
           ? `It chose to ${effect}.`
           : 'The effect resolves.'
-        : 'The effect is not used.',
+        : `It keeps ${keptDon} DON!! active and ${plural(keptHand, 'card')} in hand.`,
       concept: src.instance === myLeader.instance ? 'leader-identity' : 'tempo',
       cite,
     });

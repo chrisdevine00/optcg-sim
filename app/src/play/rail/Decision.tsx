@@ -544,7 +544,10 @@ function waitingContent(g: G, tall: boolean, rewind: NonNullable<Foot['secondary
           {ctl.thinking || ctl.considering ? <span className="bar" aria-hidden="true" /> : null}
           {status}
         </p>
-        {ctl.activity && !view.battle && <p className="subtle">Last: {ctl.activity}</p>}
+        {/* Not while the AI is thinking: the status line above says so, and "Last: X is thinking…" echoed it (review M5b-13). */}
+        {ctl.activity && !view.battle && !ctl.thinking && (
+          <p className="subtle">Last: {ctl.activity}</p>
+        )}
         {aiTurn && !names.hotseat && speed}
       </div>
     ),

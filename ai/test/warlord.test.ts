@@ -27,7 +27,17 @@ import { simContext, type PirateSetup } from '../src/search/pirate.ts';
 import { determinizations } from '../src/search/sample.ts';
 import { cardMap, metaDecks } from './support.ts';
 import { playMatch, type DecisionRecord } from './support/match.ts';
-import { lifeOf, listOf, session, start, plainAnswer, type Spec } from './support/scenario.ts';
+import {
+  cardOf,
+  lifeOf,
+  listOf,
+  play,
+  plainAnswer,
+  session,
+  setTier,
+  start,
+  type Spec,
+} from './support/scenario.ts';
 import { asVanilla } from './support/vanilla.ts';
 
 vi.setConfig({ testTimeout: 120_000 });
@@ -314,28 +324,28 @@ describe('Warlord: budgets', () => {
     expect(s.planTurn(view, 3, { iterations: 50 }).rollouts).toBe(50);
   });
 
-  it('stays within a wall-clock budget by at most 20% (p95), plan and defence', () => {
+  it('spends the turn budget on a first Main decision and no more than the defence budget elsewhere', () => {
+    // Counted in iterations, so it cannot flake on a loaded machine. The wall-clock check against
+    // the app's real millisecond budgets is `budget.test.ts` (one check, not two).
     const samples = sampleGame('warlord', 89, 1).slice(0, 40);
     const budgets = {
-      turn: { ms: 120 },
-      defence: { ms: 60 },
-      lethal: { ms: 10 },
+      turn: { iterations: 60 },
+      defence: { iterations: 25 },
+      lethal: { nodes: 2000 },
     };
     const turn: number[] = [];
     const defence: number[] = [];
     for (const d of samples) {
       const s = session('p1', d.before, 'warlord', true, { budgets });
-      const t0 = performance.now();
-      s.decide(projectForSearch(d.before, 'p1'), 3);
-      const ms = performance.now() - t0;
-      if (d.view.decision?.kind === 'main') turn.push(ms);
-      else defence.push(ms);
+      const r = s.decide(projectForSearch(d.before, 'p1'), 3).stats.rollouts;
+      if (d.view.decision?.kind === 'main') turn.push(r);
+      else defence.push(r);
     }
-    const p95 = (xs: number[]) => xs.sort((a, b) => a - b)[Math.floor(xs.length * 0.95)] ?? 0;
-    // A turn's first decision with no plan made ahead: the lethal check, then the whole budget.
     expect(turn.length).toBeGreaterThan(3);
-    expect(p95(turn)).toBeLessThanOrEqual((budgets.turn.ms + budgets.lethal.ms) * 1.2 + 15);
-    if (defence.length > 3) expect(p95(defence)).toBeLessThanOrEqual(budgets.defence.ms * 1.2 + 15);
+    // A first decision with no plan made ahead: the whole budget, or none when lethal was proven.
+    for (const r of turn) expect([0, budgets.turn.iterations]).toContain(r);
+    expect(turn.some((r) => r === budgets.turn.iterations)).toBe(true);
+    for (const r of defence) expect(r).toBeLessThanOrEqual(budgets.defence.iterations);
   });
 
   it('scales: Emperor spends more than Warlord, in iterations and in milliseconds', () => {
@@ -453,5 +463,60 @@ describe('Warlord: the tree', () => {
       .map((a) => (typeof a.choice === 'object' && 'option' in a.choice ? a.choice.option : ''));
     expect(counts).toContain('0');
     expect(new Set(counts).size).toBeGreaterThanOrEqual(2);
+  });
+
+  it('gives fewer than all its DON!! when a later play needs them, and all when nothing does (M5b-10)', () => {
+    // Kyo (4000) attacks a rested 6000 Character: 2 DON!! win the fight. With 4 active DON!! and a
+    // second Kyo (cost 2) in hand, giving all 4 forfeits the play; with an empty hand it gives all.
+    const turn = (hand: string[]) =>
+      start({
+        seed: 7,
+        turn: 5,
+        activePlayer: 'p1',
+        firstPlayer: 'p1',
+        p1: {
+          leader: ROCKS,
+          life: lifeOf(5, 'OP17-050'),
+          costArea: { active: 4, rested: 0 },
+          characters: ['OP17-045'],
+          decklist: listOf(ROCKS),
+          hand,
+        },
+        p2: {
+          leader: KAIDO,
+          hand: [],
+          characters: [{ card: 'OP17-060', rested: true }],
+          life: lifeOf(5, 'OP17-074'),
+          costArea: { active: 6, rested: 0 },
+          decklist: listOf(KAIDO),
+        },
+      });
+    /** DON!! given before each attack, and whether the hand card was played. */
+    const run = (hand: string[]) => {
+      setTier('warlord');
+      const { steps } = play(turn(hand), 'p1', { biases: true });
+      const given: number[] = [];
+      let n = 0;
+      let played = false;
+      for (const x of steps) {
+        if (x.player !== 'p1') continue;
+        if (x.action.type === 'giveDon') n++;
+        if (x.action.type === 'attack') {
+          given.push(n);
+          n = 0;
+        }
+        if (x.action.type === 'playCard' && cardOf(x.view, x.action.card) === 'OP17-045')
+          played = true;
+      }
+      setTier('pirate');
+      return { given, played };
+    };
+    const withCard = run(['OP17-045']);
+    expect(withCard.played).toBe(true);
+    expect(Math.max(...withCard.given)).toBeLessThan(4);
+    expect(withCard.given.reduce((a, b) => a + b, 0)).toBeLessThanOrEqual(2);
+    const without = run([]);
+    expect(without.played).toBe(false);
+    expect(Math.max(...without.given)).toBe(4);
   });
 });

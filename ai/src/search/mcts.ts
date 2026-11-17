@@ -41,6 +41,7 @@ import {
   fingerprint,
   holdDon,
   mainBias,
+  otherBias,
   same,
   unneededDiscount,
   type Budget,
@@ -77,12 +78,27 @@ function scriptMentions(cardId: string, words: string[]): boolean {
   return words.some((w) => json.includes(w));
 }
 
+/** Prompts bundled into one macro move, and the macros one play or activation may expand to. */
+const MAX_PROMPTS = 3;
+const MAX_MACROS = 12;
+
 /**
- * The first prompt a play or activation raises, as one macro per answer: every count of a "give
- * up to N DON!!" (so the search can give fewer, review M4b-03: a DON!! kept may pay a later cost),
- * and up to three targets of another choice (the quick policy's pick first).
+ * The prompts a play or activation raises, as one macro per combination of answers: every count of
+ * a "give up to N DON!!" (so the search can give fewer, review M4b-03: a DON!! kept may pay a later
+ * cost), up to three targets of another choice, and the same again for a second and third prompt
+ * (a mode, then a target), so the tree plans on past the whole effect and not past its first
+ * question only. Each answer is scored with the playbook's pick biases (`otherBias`:
+ * targetHighestPower, preferPick, targetCanAttack, pickWithTrigger, avoidTarget...) and a macro's
+ * prior is `mainBias` of the move plus the sum of its answers' biases (review M5b-1). The quick
+ * policy's pick breaks ties.
  */
-function withPrompts(s: GameState, a: Action, me: PlayerId, ctx: SimContext): Candidate[] {
+function withPrompts(
+  s: GameState,
+  a: Action,
+  me: PlayerId,
+  ctx: SimContext,
+  setup: PirateSetup,
+): Candidate[] {
   if (a.type !== 'playCard' && !(a.type === 'activate' && a.ability !== 'counter'))
     return [{ actions: [a] }];
   let s1: GameState;
@@ -91,16 +107,36 @@ function withPrompts(s: GameState, a: Action, me: PlayerId, ctx: SimContext): Ca
   } catch {
     return [{ actions: [a] }];
   }
-  const d = queries.decision(s1);
-  if (!d || d.player !== me || d.kind !== 'choose') return [{ actions: [a] }];
-  const picks = legalActions(s1).filter(
-    (x): x is Extract<Action, { type: 'pick' }> => x.type === 'pick',
-  );
-  if (picks.length < 2) return [{ actions: [a] }];
-  const q = quickAction(s1, ctx);
-  const ordered = [q, ...picks.filter((p) => !same(p, q))];
-  const cap = d.purpose === 'mode' ? 12 : 3;
-  return ordered.slice(0, cap).map((p) => ({ actions: [a, p] }));
+  const out: Candidate[] = [];
+  const grow = (st: GameState, acts: Action[], bias: number): void => {
+    const d = queries.decision(st);
+    const picks =
+      d && d.player === me && d.kind === 'choose' && acts.length <= MAX_PROMPTS
+        ? legalActions(st).filter((x): x is Extract<Action, { type: 'pick' }> => x.type === 'pick')
+        : [];
+    if (picks.length < 2 || out.length >= MAX_MACROS) {
+      out.push({ actions: acts, ...(bias ? { pickBias: bias } : {}) });
+      return;
+    }
+    const q = quickAction(st, ctx);
+    const pickBias = otherBias(st, me, setup);
+    const scored = [q, ...picks.filter((p) => !same(p, q))].map((p) => ({
+      p,
+      b: pickBias({ actions: [p] }),
+    }));
+    scored.sort((x, y) => y.b - x.b); // stable: no bias, the quick policy's order
+    for (const { p, b } of scored.slice(0, d!.purpose === 'mode' ? 12 : 3)) {
+      let st2: GameState;
+      try {
+        st2 = apply(st, p, ctx);
+      } catch {
+        continue;
+      }
+      grow(st2, [...acts, p], bias + b);
+    }
+  };
+  grow(s1, [a], 0);
+  return out.length ? out : [{ actions: [a] }];
 }
 
 /**
@@ -133,9 +169,9 @@ export function treeCandidates(
       const t = queries.card(s, a.target);
       if (attackers.has(a.target) || scriptMentions(t.card, ['donGiven']))
         out.push({ actions: [a] });
-    } else if (unneededDiscount(s, me, a, setup)) {
+    } else if (unneededDiscount(s, me, a, setup, true)) {
       // Left out (playbook `activateBefore`): a DON!! -1 no card in hand needs.
-    } else out.push(...withPrompts(s, a, me, ctx));
+    } else out.push(...withPrompts(s, a, me, ctx, setup));
   }
   // "Use the ability, then play the card" as one move (playbook `activateBefore`).
   for (const bias of setup.playbook?.biases ?? []) {
@@ -149,7 +185,7 @@ export function treeCandidates(
     if (!act) continue;
     const seen = new Set<string>();
     for (const h of queries.zone(s, me, 'hand')) {
-      if (!discountPays(s, me, h, bias) || seen.has(h.card)) continue;
+      if (!discountPays(s, me, h, bias, true) || seen.has(h.card)) continue;
       seen.add(h.card);
       out.push({ actions: [act, { type: 'playCard', card: h.instance, player: me }] });
     }
@@ -348,7 +384,9 @@ export class Mcts {
     const have = nd.info[d];
     if (have) return have;
     const cands = treeCandidates(s, this.me, this.ctx, this.setup);
-    const bias = mainBias(s, this.me, this.ctx, this.setup);
+    const main = mainBias(s, this.me, this.ctx, this.setup);
+    // A macro's bias = the move's own (mainBias) + its bundled prompt answer's (otherBias).
+    const bias = (c: Candidate): number => main(c) + (c.pickBias ?? 0);
     const don = queries.don(s, this.me).active;
     const prior = cands.map((c) => bias(c) * 4 + structural(s, c, don));
     const order = cands.map((_, i) => i).sort((x, y) => prior[y]! - prior[x]! || x - y);

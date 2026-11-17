@@ -15,7 +15,7 @@ import { SCENARIOS } from './scenarios.ts';
  * fails when the two drift apart.
  */
 export const TURN_TIME_PIRATE = 'typically 1–8 s a turn at 1×, up to about 10 s for a long one';
-export const TURN_TIME_WARLORD = 'typically 5–8 s a turn at 1×, up to about 12 s for a long one';
+export const TURN_TIME_WARLORD = 'typically 4–8 s a turn at 1×, up to about 11 s for a long one';
 export const TURN_TIME_EMPEROR = 'typically 10–15 s a turn at 1×, up to about 17 s for a long one';
 export const TURN_TIME_ROOKIE = 'typically 1–8 s a turn at 1×, up to about 12 s for a long one';
 
@@ -192,8 +192,8 @@ export function Setup({
               <span>
                 <b>Emperor AI</b>{' '}
                 <span className="subtle">
-                  · the Warlord’s search with more than twice the thinking time, for hard practice ·{' '}
-                  {TURN_TIME_EMPEROR}
+                  · the Warlord’s search with more than twice the thinking time; not measured to
+                  play stronger · {TURN_TIME_EMPEROR}
                 </span>
               </span>
             </label>

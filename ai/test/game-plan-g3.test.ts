@@ -13,7 +13,18 @@ import { PLAYBOOKS } from '../src/index.ts';
 import { playMatch } from './support/match.ts';
 import { mergeTallies, type Tally } from './support/plan-tally.ts';
 import { G3_LEADERS, PlanTallyG3 } from './support/plan-tally-g3.ts';
-import { cardOf, lifeOf, listOf, play, start, type Spec } from './support/scenario.ts';
+import {
+  PLAN_TIER,
+  PLAN_TIERS,
+  setTier,
+  type Tier,
+  cardOf,
+  lifeOf,
+  listOf,
+  play,
+  start,
+  type Spec,
+} from './support/scenario.ts';
 import { metaDecks } from './support.ts';
 
 // Searching tests: CI runners are several times slower than a desktop.
@@ -123,10 +134,19 @@ const BIAS_ONLY = new Set<string>([
   'seed 5: P-093 is played with its DON!! condition met (own count at or below theirs)',
 ]);
 
-for (const biases of [true, false]) {
-  const label = biases ? 'with the playbook biases' : 'search alone (biases off)';
+/** Planted runs: every tier with the biases on; Pirate also with search alone (BIAS_ONLY). */
+const PLANTED: [Tier, boolean][] = [
+  ...PLAN_TIERS.map((t): [Tier, boolean] => [t, true]),
+  ['pirate', false],
+];
+
+for (const [tier, biases] of PLANTED) {
+  const label = `${tier}, ${biases ? 'with the playbook biases' : 'search alone (biases off)'}`;
   const t = (name: string, fn: () => void) =>
-    (!biases && BIAS_ONLY.has(name) ? it.fails : it)(name, fn);
+    (!biases && BIAS_ONLY.has(name) ? it.fails : it)(name, () => {
+      setTier(tier);
+      return fn();
+    });
 
   describe(`Sabo (OP13-004) game plan, planted, ${label}`, () => {
     t('seed 1: lands Saul on T3 rather than a row of cheap bodies', () => {
@@ -359,8 +379,8 @@ describe('group 3 game plans over Pirate-vs-Pirate games', () => {
           const [x, y] = PAIRS[g % PAIRS.length]!;
           const swap = Math.floor(g / PAIRS.length) % 2 === 1;
           const bySeat = swap ? { p1: deck(y), p2: deck(x) } : { p1: deck(x), p2: deck(y) };
-          const t1 = new PlanTallyG3('p1', 'pirate', bySeat.p1.leader);
-          const t2 = new PlanTallyG3('p2', 'pirate', bySeat.p2.leader);
+          const t1 = new PlanTallyG3('p1', PLAN_TIER, bySeat.p1.leader);
+          const t2 = new PlanTallyG3('p2', PLAN_TIER, bySeat.p2.leader);
           // The search's last ranking, read by the tally of the decision it belongs to.
           let ranking: { actions: Action[]; mean: number }[] | null = null;
           const r = playMatch({
@@ -369,7 +389,7 @@ describe('group 3 game plans over Pirate-vs-Pirate games', () => {
               ranking = ranked;
             },
             decks: bySeat,
-            tiers: { p1: 'pirate', p2: 'pirate' },
+            tiers: { p1: PLAN_TIER, p2: PLAN_TIER },
             seats: { p1: { biases }, p2: { biases } },
             onDecision: (d) => {
               t1.observe(d, ranking);
@@ -399,10 +419,11 @@ describe('group 3 game plans over Pirate-vs-Pirate games', () => {
         };
       };
       const withBias = run(true);
-      const noBias = run(false);
+      // The biases-off report is for the Pirate; the Warlord's nightly run is the biases-on tally.
+      const noBias = PLAN_TIER === 'pirate' ? run(false) : null;
       mkdirSync('test-results', { recursive: true });
       writeFileSync(
-        `test-results/game-plan-g3-${PLAN_GAMES}.json`,
+        `test-results/game-plan-g3-${PLAN_GAMES}${PLAN_TIER === 'pirate' ? '' : `-${PLAN_TIER}`}.json`,
         JSON.stringify({ date: new Date().toISOString(), withBias, noBias }, null, 2),
       );
       for (const t of withBias.plan)
@@ -411,6 +432,6 @@ describe('group 3 game plans over Pirate-vs-Pirate games', () => {
             t.threshold,
           );
     },
-    3_600_000,
+    PLAN_TIER === 'pirate' ? 3_600_000 : 10_800_000,
   );
 });

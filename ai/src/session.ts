@@ -38,9 +38,12 @@ export const BUDGETS = {
     ms: { turn: { ms: 500 }, defence: { ms: 250 } },
   },
   /**
-   * Warlord: the plan at the start of Main about 2.5 s, any other decision 0.4 s (ADR 0008); a
-   * re-search when the plan breaks 40% of the plan. Iterations are CI's: about 2.5 s at the rate
-   * `docs/benchmarks.md` measures. Emperor: 6 s and iterative deepening.
+   * Warlord: the plan at the start of Main 2.5 s, any other decision 0.4 s (ADR 0008); a re-search
+   * when the plan breaks 25% of the plan. The `iterations` table is a **CI proxy with a fixed,
+   * reproducible count, not "2.5 s"**: in the app's millisecond mode the same 2.5 s buys roughly
+   * 2,000 to 78,000 iterations (median about 31,000; review M5b-2), so the gates measure a lower
+   * bound of the shipped player. Emperor: 6 s of plan and iterative deepening (depth caps over
+   * one budget).
    */
   warlord: {
     iterations: {
@@ -92,6 +95,9 @@ export interface SessionOptions {
   /** Called when the search threw something unexpected and the rookie policy answered instead
    *  (default: console.error). Review M4b-04. */
   onFallback?: (error: unknown) => void;
+  /** Called each time the search could not determinize a public reference to a hidden card and the
+   *  rookie policy answered (review M5b-11). The strength gates count these and fail on any. */
+  onCannotDeterminize?: (error: unknown) => void;
 }
 
 export interface SessionDecision extends Decided {
@@ -117,10 +123,12 @@ export class AiSession {
   private readonly searching: boolean;
   private readonly cards: ReadonlyMap<string, Card>;
   private readonly onFallback: (error: unknown) => void;
+  private readonly onCannotDeterminize: ((error: unknown) => void) | undefined;
 
   constructor(opts: SessionOptions) {
     this.tier = opts.tier;
     this.cards = opts.cards;
+    this.onCannotDeterminize = opts.onCannotDeterminize;
     this.onFallback =
       opts.onFallback ??
       ((e) => console.error('[ai] search failed, playing the rookie policy instead:', e));
@@ -170,7 +178,8 @@ export class AiSession {
       this.memory.plan = plan;
       return { steps: plan.steps.length, rollouts: stats.rollouts };
     } catch (e) {
-      if (!(e instanceof CannotDeterminize)) this.onFallback(e);
+      if (e instanceof CannotDeterminize) this.onCannotDeterminize?.(e);
+      else this.onFallback(e);
       return { steps: 0, rollouts: 0 };
     }
   }
@@ -190,7 +199,8 @@ export class AiSession {
       // A public reference to a hidden card (never observed): answer from the view alone,
       // defending lethal, with a Pirate's own wording (review M5a-15). Any other error also
       // falls back to the rookie policy rather than stalling the game (review M4b-04).
-      if (!(e instanceof CannotDeterminize)) this.onFallback?.(e);
+      if (e instanceof CannotDeterminize) this.onCannotDeterminize?.(e);
+      else this.onFallback?.(e);
       const d = rookie(view, { seed, counterOf });
       return {
         ...d,

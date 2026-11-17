@@ -26,6 +26,27 @@ export function listOf(leader: string): string[] {
   return metaDecks().find((d) => d.leader === leader)!.main;
 }
 
+export type Tier = 'pirate' | 'rookie' | 'warlord' | 'emperor';
+
+/**
+ * The tiers a planted game-plan assertion runs for, on every push: the Pirate (the playbooks'
+ * reference) and the Warlord, the default tier (review M5b-1). Search-alone (biases off) runs and
+ * the self-play tallies use Pirate per push; the Warlord's tallies run nightly.
+ */
+export const PLAN_TIERS: readonly Tier[] = ['pirate', 'warlord'];
+
+/**
+ * The tier of the self-play tallies (`PLAN_GAMES*`): Pirate per push when run at all, and the
+ * Warlord nightly (`PLAN_TIER=warlord`, `npm run test:plan-warlord`).
+ */
+export const PLAN_TIER: Tier = (process.env.PLAN_TIER as Tier | undefined) ?? 'pirate';
+
+/** The tier `play()` and `session()` use unless told otherwise; planted tests set it per test. */
+let currentTier: Tier = 'pirate';
+export const setTier = (t: Tier): void => {
+  currentTier = t;
+};
+
 export type Spec = Omit<ScenarioSpec, 'cards'>;
 
 export function start(spec: Spec): GameState {
@@ -35,7 +56,7 @@ export function start(spec: Spec): GameState {
 export function session(
   seat: PlayerId,
   state: GameState,
-  tier: 'pirate' | 'rookie' | 'warlord' | 'emperor' = 'pirate',
+  tier: Tier = currentTier,
   biases = true,
   extra: Partial<ConstructorParameters<typeof AiSession>[0]> = {},
 ): AiSession {
@@ -97,7 +118,7 @@ export function play(
 ): { steps: Step[]; state: GameState } {
   const s0turn = queries.turn(state0).number;
   const stop = opts.stop ?? ((s) => queries.turn(s).number > s0turn);
-  const me = opts.ai ?? session(ai, state0, 'pirate', opts.biases ?? true);
+  const me = opts.ai ?? session(ai, state0, currentTier, opts.biases ?? true);
   let state = state0;
   const steps: Step[] = [];
   for (let i = 0; i < (opts.max ?? 300); i++) {

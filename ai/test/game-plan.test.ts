@@ -8,7 +8,17 @@
 import { describe, expect, it, vi } from 'vitest';
 import { queries, reduce, type Action, type GameState } from '@optcg/engine';
 import { PLAYBOOKS } from '../src/index.ts';
-import { cardOf, lifeOf, listOf, play, start, type Spec } from './support/scenario.ts';
+import {
+  PLAN_TIERS,
+  setTier,
+  type Tier,
+  cardOf,
+  lifeOf,
+  listOf,
+  play,
+  start,
+  type Spec,
+} from './support/scenario.ts';
 
 // Searching tests: CI runners are several times slower than a desktop.
 vi.setConfig({ testTimeout: 60_000 });
@@ -107,10 +117,19 @@ const BIAS_ONLY = new Set<string>([
   'seed 4: plays Ulti & Page One only after its Leader attacks and applies the −2000',
 ]);
 
-for (const biases of [true, false]) {
-  const label = biases ? 'with the playbook biases' : 'search alone (biases off)';
+/** Planted runs: every tier with the biases on; Pirate also with search alone (BIAS_ONLY). */
+const PLANTED: [Tier, boolean][] = [
+  ...PLAN_TIERS.map((t): [Tier, boolean] => [t, true]),
+  ['pirate', false],
+];
+
+for (const [tier, biases] of PLANTED) {
+  const label = `${tier}, ${biases ? 'with the playbook biases' : 'search alone (biases off)'}`;
   const t = (name: string, fn: () => void) =>
-    (!biases && BIAS_ONLY.has(name) ? it.fails : it)(name, fn);
+    (!biases && BIAS_ONLY.has(name) ? it.fails : it)(name, () => {
+      setTier(tier);
+      return fn();
+    });
   describe(`Rocks.D.Xebec (OP17-039) game plan, planted, ${label}`, () => {
     t('seed 1: the Leader attacks on T2 (the first turn it may battle)', () => {
       const s = rocksTurn(3, 3, {
