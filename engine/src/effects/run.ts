@@ -22,16 +22,19 @@ import {
   rest,
   setActive,
 } from '../ops/index.ts';
+import type { Dest, Restriction } from '@optcg/cards';
 import { other, type DecisionState, type Duration, type Frame, type Got } from '../state.ts';
 import { program, type Instr } from './compile.ts';
 import {
   allHold,
+  cannotDrawByEffect,
   costIsSecret,
   hiddenPool,
   holds,
   matches,
   num,
   payable,
+  playBlocked,
   pool,
   rel,
   reservedActive,
@@ -43,7 +46,7 @@ const WAIT = Symbol('wait');
 type Out = 'next' | 'jump' | typeof WAIT | 'stop';
 
 export function ctxOf(d: Draft, f: EffectFrame): Ctx {
-  return { s: d.s, you: f.controller, self: f.card, b: f.b, did: f.did, live: true };
+  return { s: d.s, you: f.controller, self: f.card, b: f.b, did: f.did, n: f.n, live: true };
 }
 
 /** Push an effect frame for an ability (an activation, a pending auto, a payload). */
@@ -139,6 +142,7 @@ export function runEffect(d: Draft, f: EffectFrame): void {
     f.ip += 1;
     delete f.ph;
     delete f.tmp;
+    delete f.acted;
   } else if (out === 'stop') {
     pop(d);
   }
@@ -164,6 +168,14 @@ export function costText(costs: readonly Cost[] | undefined): string {
     }
     if ('restSelf' in k) return 'rest this card';
     if ('trashSelf' in k) return 'trash this card';
+    if ('lifeToHand' in k) return `add ${k.lifeToHand.n} of your Life cards to your hand`;
+    if ('turnLifeFaceUp' in k) return `turn ${k.turnLifeFaceUp} of your Life cards face-up`;
+    if ('mill' in k) return `trash ${k.mill} cards from the top of your deck`;
+    if ('rest' in k) {
+      const n = k.rest.pick && 'exactly' in k.rest.pick ? k.rest.pick.exactly : 1;
+      return `rest ${n} of your cards`;
+    }
+    if ('move' in k) return 'move cards';
     return '';
   });
   return words.filter(Boolean).join(' and ');
@@ -227,8 +239,12 @@ function exec(d: Draft, f: EffectFrame, ins: Instr, ab: Ability): Out {
     case 'op':
       runInternal(d, f, ins.a);
       return 'next';
-    case 'do':
-      return action(d, f, ins.a);
+    case 'do': {
+      const out = action(d, f, ins.a);
+      // "If you do" after an action (not a "you may"): the action did something (OP08-098).
+      if (out === 'next' && ins.label && f.acted) f.did = [...(f.did ?? []), ins.label];
+      return out;
+    }
     case 'jf':
       if (holds(ctxOf(d, f), ins.c)) return 'next';
       f.ip = ins.to;
@@ -300,6 +316,32 @@ function exec(d: Draft, f: EffectFrame, ins: Instr, ab: Ability): Out {
       ];
       f.ip = ins.to;
       return 'jump';
+    case 'fe': {
+      const count = num(ctxOf(d, f), ins.n);
+      if (count <= 0) {
+        f.ip = ins.to;
+        return 'jump';
+      }
+      f.loops = [...(f.loops ?? []), { start: f.ip + 1, left: count }];
+      return 'next';
+    }
+    case 'feEnd': {
+      const loops = [...(f.loops ?? [])];
+      const lp = loops[loops.length - 1];
+      if (!lp) return 'next';
+      if (lp.left > 1) {
+        loops[loops.length - 1] = { start: lp.start, left: lp.left - 1 };
+        f.loops = loops;
+        f.ip = ins.start;
+        delete f.ph;
+        delete f.tmp;
+        return 'jump';
+      }
+      loops.pop();
+      if (loops.length) f.loops = loops;
+      else delete f.loops;
+      return 'next';
+    }
     case 'end':
       return 'stop';
   }
@@ -394,6 +436,7 @@ function describe(sel: Selector, mine: boolean): string {
     hand: 'cards in hand',
     trash: 'cards in trash',
     deckTop: 'top card of the deck',
+    donCostArea: 'DON!! cards',
     self: 'this card',
   };
   return `of ${whose}${zones.map((z) => words[z] ?? z).join(' or ')}`.replace(
@@ -446,8 +489,172 @@ function payCost(d: Draft, f: EffectFrame, k: Cost, reserve: number): Out {
     leaveField(d, f.card, 'trash', { kind: 'cost', by: f.controller });
     return 'next';
   }
+  if ('lifeToHand' in k) return lifeToHandCost(d, f, k.lifeToHand);
+  if ('turnLifeFaceUp' in k) {
+    for (let i = 0; i < k.turnLifeFaceUp; i++) {
+      const top = d.ro(f.controller).life[i];
+      if (top === undefined || d.card(top).faceUp) return anomaly(d, f, 'turnLifeFaceUp');
+      turnFaceUp(d, top, f.controller);
+    }
+    return 'next';
+  }
+  if ('mill' in k) {
+    if (d.ro(f.controller).deck.length < k.mill) return anomaly(d, f, 'mill');
+    for (let i = 0; i < k.mill; i++)
+      moveCard(d, d.ro(f.controller).deck[0]!, 'trash', {
+        revealed: true,
+        extra: { reason: 'cost' },
+      });
+    return 'next';
+  }
+  if ('rest' in k) {
+    const got = selectRest(d, f, k.rest, 'cost', reserve);
+    if (got === WAIT) return WAIT;
+    for (const id of got.ids) rest(d, id, 'cost');
+    if (got.don > 0) payDon(d, f.controller, got.don);
+    return 'next';
+  }
+  if ('move' in k) {
+    const ids = select(d, f, k.move, { role: 'cost', verb: 'move' });
+    if (ids === WAIT) return WAIT;
+    placeCards(d, ids, k.to, 'cost');
+    return 'next';
+  }
   void c;
   return anomaly(d, f, Object.keys(k)[0] ?? 'cost');
+}
+
+/** "Add N cards from the top (or top or bottom) of your Life cards to your hand" (CR 8-3-1; not damage). */
+function lifeToHandCost(
+  d: Draft,
+  f: EffectFrame,
+  spec: { from: 'top' | 'topOrBottom'; n: number },
+): Out {
+  const p = f.controller;
+  let done = f.ph ?? 0;
+  while (done < spec.n) {
+    const life = d.ro(p).life;
+    if (life.length === 0) return anomaly(d, f, 'lifeToHand');
+    let bottom = false;
+    if (spec.from === 'topOrBottom' && life.length > 1) {
+      const g = take(f);
+      if (!Array.isArray(g)) {
+        f.ph = done;
+        return ask(d, f, {
+          kind: 'choose',
+          player: p,
+          prompt: `${nameOf(d, f)}: add the top or the bottom card of your Life cards to your hand?`,
+          min: 1,
+          max: 1,
+          candidates: [{ option: 'top' }, { option: 'bottom' }] as never,
+          picked: [],
+          role: 'mode',
+          options: [
+            { id: 'top', label: 'Top Life card' },
+            { id: 'bottom', label: 'Bottom Life card' },
+          ],
+        });
+      }
+      bottom = (g[0] as { option: string }).option === 'bottom';
+    }
+    moveCard(d, bottom ? life[life.length - 1]! : life[0]!, 'hand', { extra: { reason: 'life' } });
+    done++;
+  }
+  return 'next';
+}
+
+/** Turn a face-down Life card face-up: now public, under a fresh handle (CR 3-2-6-1 areas). */
+function turnFaceUp(d: Draft, id: InstanceId, player: PlayerId): void {
+  const w = d.wcard(id);
+  w.faceUp = true;
+  w.key = d.newKey();
+  d.emit({
+    type: 'CardRevealed',
+    instance: id,
+    card: w.card,
+    player,
+    from: 'life',
+    reason: 'faceUp',
+  });
+}
+
+/** Put cards in a destination, in the order given (hand and trash take the default order). */
+function placeCards(d: Draft, ids: InstanceId[], to: Dest, reason: string): void {
+  for (const id of ids) {
+    const opts: {
+      revealed: boolean;
+      extra: Record<string, unknown>;
+      position?: 'top' | 'bottom';
+      faceUp?: boolean;
+    } = {
+      revealed: to.zone !== 'life' && to.zone !== 'deck',
+      extra: { reason },
+    };
+    if (to.zone === 'deck' || to.zone === 'life')
+      opts.position = to.position === 'bottom' ? 'bottom' : 'top';
+    if (to.zone === 'life') opts.faceUp = to.faceUp === true;
+    moveCard(d, id, to.zone, opts);
+  }
+}
+
+/**
+ * A choice among cards and DON!! cards in the cost area ("Rest up to a total of 2 of your
+ * opponent's Characters or DON!! cards", "rest 2 of your cards", "rest any number of your DON!!").
+ * Only active cards can be rested (CR 1-3-2-1). DON!! are chosen by class, as in a DON!! cost (E-D4).
+ * `reserve` active DON!! stay for later costs. Returns the cards and how many DON!! were picked.
+ */
+function selectRest(
+  d: Draft,
+  f: EffectFrame,
+  sel: Selector,
+  role: 'cost' | 'target',
+  reserve = 0,
+): { ids: InstanceId[]; don: number } | typeof WAIT {
+  const c = ctxOf(d, f);
+  const zones = Array.isArray(sel.from) ? sel.from : [sel.from];
+  const withDon = zones.includes('donCostArea');
+  const donOwner = rel(c, sel.owner === 'opponent' ? 'opponent' : 'you');
+  const split = (picks: (InstanceId | DonClass | { option: string })[]) => {
+    const ids = picks.filter((x): x is InstanceId => typeof x === 'string');
+    const don = picks.length - ids.length;
+    if (sel.bind) {
+      f.b = { ...f.b, [sel.bind]: ids };
+      f.n = { ...f.n, [sel.bind]: picks.length };
+    }
+    return { ids, don };
+  };
+  const g = take(f);
+  if (Array.isArray(g)) return split(g);
+  const cards = pool(c, { ...sel, from: zones.filter((z) => z !== 'donCostArea') as never }).filter(
+    (id) => !d.card(id).rested,
+  );
+  const don = withDon
+    ? Math.max(0, d.ro(donOwner).donActive - (donOwner === f.controller ? reserve : 0))
+    : 0;
+  const total = cards.length + don;
+  const pk = sel.pick;
+  const exact = !!pk && 'exactly' in pk;
+  const want = !pk ? total : 'exactly' in pk ? pk.exactly : 'upTo' in pk ? pk.upTo : total;
+  const max = Math.min(want, total);
+  if (max === 0) return split([]);
+  if (exact && total <= want) {
+    return split([
+      ...cards,
+      ...Array.from({ length: don }, () => ({ from: 'costActive' }) as DonClass),
+    ]);
+  }
+  const dec: Omit<DecisionState, 'purpose' | 'source'> = {
+    kind: 'choose',
+    player: rel(c, sel.chooser ?? 'you'),
+    prompt: `${nameOf(d, f)}: rest ${exact ? max : `up to ${want}`} ${describe(sel, true)}.`,
+    min: exact ? max : 0,
+    max,
+    candidates: [...cards, ...(don > 0 ? [{ from: 'costActive' } as DonClass] : [])],
+    picked: [],
+    role,
+  };
+  if (don > 0) dec.counts = [...cards.map(() => 1), don];
+  return ask(d, f, dec);
 }
 
 /** CR 8-3-1-3-1: a cost that cannot be paid in full: the effect does not resolve. */
@@ -541,23 +748,37 @@ function duration(d: Draft, f: EffectFrame, du: DslDuration): Duration {
 
 const FIELD = new Set(['leader', 'characters', 'stage']);
 
+const RESTRICT_KIND = {
+  cannotAttack: 'cannotAttack',
+  cannotActivateBlockerAgainstIt: 'noBlocker',
+  cannotBeRemovedByOpponentEffects: 'cannotBeRemoved',
+  cannotBeKOd: 'cannotBeKOd',
+  cannotDrawByOwnEffects: undefined,
+} as const;
+
 function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
   const c = ctxOf(d, f);
   const you = f.controller;
   if ('draw' in a) {
     if (a.upTo) return unsupported(d, f, 'draw up to');
-    draw(d, rel(c, a.player ?? 'you'), num(c, a.draw));
+    const who = rel(c, a.player ?? 'you');
+    // "You cannot draw cards using your own effects" (OP12-099) stops a draw the player's effect
+    // makes for themselves; a rule draw (the Draw Phase) is not an effect.
+    if (who === you && cannotDrawByEffect(d.s, you)) return 'next';
+    draw(d, who, num(c, a.draw));
     return 'next';
   }
   if ('trashFromHand' in a) {
     const ids = select(d, f, a.trashFromHand, { role: 'target', verb: 'trash' });
     if (ids === WAIT) return WAIT;
     for (const id of ids) moveCard(d, id, 'trash', { revealed: true, extra: { reason: 'effect' } });
+    if (ids.length) f.acted = true;
     return 'next';
   }
   if ('lookAtTop' in a) return lookAtTop(d, f, a.lookAtTop);
   if ('reveal' in a) {
-    const top = d.ro(you).deck[0];
+    const fromLife = a.reveal.from === 'lifeTop';
+    const top = fromLife ? d.ro(you).life[0] : d.ro(you).deck[0];
     if (top === undefined) {
       f.b = { ...f.b, [a.reveal.bind]: [] };
       return 'next';
@@ -569,7 +790,7 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
       instance: top,
       card: d.card(top).card,
       player: you,
-      from: 'deck',
+      from: fromLife ? 'life' : 'deck',
       reason: 'effect',
     });
     markKnown(d, top, ['p1', 'p2']);
@@ -578,23 +799,26 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
   }
   if ('move' in a) return move(d, f, a.move.what, a.move.to);
   if ('play' in a) {
-    if (a.play.rested) return unsupported(d, f, 'play rested');
     const ids = select(d, f, a.play.what, {
       role: 'target',
       verb: 'play',
-      // Only Characters and Stages are played; Events are activated (CR 2-7-3).
+      // Only Characters and Stages are played; Events are activated (CR 2-7-3). A card an effect
+      // bars you from playing ("you cannot play Character cards with a base cost of 5 or more")
+      // cannot be chosen.
       restrict: (id) => {
         const cat = d.s.defs[d.card(id).card]!.category;
-        return cat === 'Character' || cat === 'Stage';
+        return (cat === 'Character' || cat === 'Stage') && !playBlocked(d.s, you, id);
       },
     });
     if (ids === WAIT) return WAIT;
     // Several cards played by one effect: their [On Play]s activate as one event, so the
     // player orders them (M4a-04), whatever order the cards are placed in.
     const batch = ids.length > 1 ? d.s.nextMod++ : undefined;
+    if (ids.length) f.acted = true;
     for (const id of ids.slice().reverse()) {
       const pf: Frame = { f: 'play', card: id, player: you, step: 'pay', free: true };
       if (batch !== undefined) pf.batch = batch;
+      if (a.play.rested) pf.rested = true;
       push(d, pf);
     }
     return 'next';
@@ -603,13 +827,82 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
     const ids = select(d, f, a.ko, { role: 'target', verb: 'K.O.' });
     if (ids === WAIT) return WAIT;
     const group = ids.length > 1 ? d.s.nextMod++ : undefined;
+    if (ids.length) f.acted = true;
     for (const id of ids.slice().reverse()) pushKo(d, id, { kind: 'effect', by: you }, group);
     return 'next';
   }
   if ('rest' in a) {
+    const zones = Array.isArray(a.rest.from) ? a.rest.from : [a.rest.from];
+    if (zones.includes('donCostArea')) {
+      // Cards and DON!! together; DON!! rest by class (E-D4). Only active DON!! can be rested.
+      const got = selectRest(d, f, a.rest, 'target');
+      if (got === WAIT) return WAIT;
+      for (const id of got.ids) if (FIELD.has(d.card(id).zone)) rest(d, id, 'effect');
+      if (got.don > 0) {
+        const p = rel(c, a.rest.owner === 'opponent' ? 'opponent' : 'you');
+        const k = Math.min(got.don, d.ro(p).donActive);
+        if (k > 0) payDon(d, p, k);
+      }
+      return 'next';
+    }
     const ids = select(d, f, a.rest, { role: 'target', verb: 'rest' });
     if (ids === WAIT) return WAIT;
-    for (const id of ids) if (FIELD.has(d.card(id).zone)) rest(d, id, 'effect');
+    for (const id of ids) if (FIELD.has(d.card(id).zone) && rest(d, id, 'effect')) f.acted = true;
+    return 'next';
+  }
+  if ('skipRefresh' in a) {
+    const ids = select(d, f, a.skipRefresh, { role: 'target', verb: 'choose' });
+    if (ids === WAIT) return WAIT;
+    for (const id of ids) {
+      if (!FIELD.has(d.card(id).zone)) continue;
+      addModifier(d, {
+        kind: 'skipRefresh',
+        target: id,
+        amount: 0,
+        duration: { kind: 'afterRefresh', player: d.card(id).owner },
+        controller: you,
+        source: f.card,
+      });
+    }
+    return 'next';
+  }
+  if ('cost' in a) {
+    const ids = select(d, f, a.cost.target, { role: 'target', verb: 'choose' });
+    if (ids === WAIT) return WAIT;
+    const du = duration(d, f, a.cost.duration);
+    const amount = num(c, a.cost.amount);
+    for (const id of ids)
+      if (FIELD.has(d.card(id).zone))
+        addModifier(d, {
+          kind: 'cost',
+          target: id,
+          amount,
+          duration: du,
+          controller: you,
+          source: f.card,
+        });
+    return 'next';
+  }
+  if ('playCost' in a) {
+    // "The next time you play [Trafalgar Law] ... from your hand during this turn, the cost will be
+    // reduced by 2": a one-shot change on the Leader, spent by the play it applies to (E-Q2).
+    addModifier(d, {
+      kind: 'playCost',
+      target: d.ro(you).leader,
+      amount: a.playCost.amount,
+      filter: a.playCost.next,
+      uses: a.playCost.uses,
+      duration: { kind: 'thisTurn', turn: d.s.turn },
+      controller: you,
+      source: f.card,
+    });
+    return 'next';
+  }
+  if ('giveDon' in a) return giveDon(d, f, a.giveDon);
+  if ('trashLifeUntil' in a) {
+    // "Trash cards from the top of your Life cards until you have 1 Life card."
+    while (d.ro(you).life.length > a.trashLifeUntil)
+      moveCard(d, d.ro(you).life[0]!, 'trash', { revealed: true, extra: { reason: 'life' } });
     return 'next';
   }
   if ('setActive' in a) {
@@ -635,7 +928,7 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
     }
     const ids = select(d, f, sel, { role: 'target', verb: 'set active' });
     if (ids === WAIT) return WAIT;
-    for (const id of ids) setActive(d, id);
+    for (const id of ids) if (setActive(d, id)) f.acted = true;
     return 'next';
   }
   if ('power' in a || 'setBasePower' in a || 'grant' in a || 'negate' in a || 'restrict' in a) {
@@ -649,7 +942,23 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
             : 'negate' in a
               ? a.negate
               : a.restrict;
-    if (typeof spec.target === 'string') return unsupported(d, f, 'restriction on a player');
+    if (typeof spec.target === 'string') {
+      // A restriction on a player is a modifier on their Leader (see `playBlocked`).
+      const what = (a as { restrict: { what: Restriction } }).restrict.what;
+      const leader = d.ro(rel(c, spec.target)).leader;
+      const base = {
+        target: leader,
+        duration: duration(d, f, spec.duration),
+        controller: you,
+        source: f.card,
+      };
+      if (what === 'cannotDrawByOwnEffects')
+        addModifier(d, { ...base, kind: 'cannotDraw', amount: 0 });
+      else if (typeof what === 'object')
+        addModifier(d, { ...base, kind: 'cannotPlay', amount: 0, filter: what.cannotPlay });
+      else return unsupported(d, f, `restriction ${what} on a player`);
+      return 'next';
+    }
     const ids = select(d, f, spec.target, { role: 'target', verb: 'choose' });
     if (ids === WAIT) return WAIT;
     const du = duration(d, f, spec.duration);
@@ -662,7 +971,12 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
       else if ('grant' in a)
         addModifier(d, { ...base, kind: 'grant', amount: 0, keyword: a.grant.keyword });
       else if ('negate' in a) addModifier(d, { ...base, kind: 'negate', amount: 0 });
-      else addModifier(d, { ...base, kind: 'cannotAttack', amount: 0 });
+      else {
+        const what = (a as { restrict: { what: Restriction } }).restrict.what;
+        const kind = typeof what === 'string' ? RESTRICT_KIND[what] : undefined;
+        if (!kind) return unsupported(d, f, `restriction ${JSON.stringify(what)}`);
+        addModifier(d, { ...base, kind, amount: 0 });
+      }
     }
     return 'next';
   }
@@ -695,6 +1009,13 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
   if ('activate' in a) {
     // "[Trigger] Activate this card's [Main] effect" (QA-OP03 OP03-074: its own costs are paid).
     const def = d.s.defs[f.cardId]!;
+    if (a.activate.ability === 'onPlay') {
+      // "Activate this card's [On Play] effect" (OP13-113): its conditions are checked when it
+      // resolves and an optional cost is asked, as for any activation.
+      const onPlay = def.abilities.find((x) => x.kind === 'auto' && x.when.includes('onPlay'));
+      if (onPlay) pushEffect(d, f.card, f.cardId, onPlay, you, 'effect');
+      return 'next';
+    }
     const main = def.abilities.find((x) => hasTiming(x, 'main'));
     if (main && main.kind === 'activate' && payable(c, main.cost))
       pushEffect(d, f.card, f.cardId, main, you, 'effect');
@@ -721,6 +1042,48 @@ function donField(d: Draft, p: PlayerId): number {
   let n = ps.donActive + ps.donRested;
   for (const id of [ps.leader, ...ps.characters]) n += d.card(id).don;
   return n;
+}
+
+/**
+ * "Give up to N rested DON!! cards to ...". The DON!! come from the cost area (rested or active as
+ * the card says) and stay with the card until the next Refresh (CR 6-2-3). "Up to" gives as many as
+ * the area holds (adding fewer is never asked, as for `addDon`). With `each`, every target in the
+ * selector gets up to N; when there are fewer DON!! than targets the player picks which targets.
+ */
+function giveDon(
+  d: Draft,
+  f: EffectFrame,
+  g: Extract<EffectAction, { giveDon: unknown }>['giveDon'],
+): Out {
+  const you = f.controller;
+  const c = ctxOf(d, f);
+  const key = g.state === 'rested' ? 'donRested' : 'donActive';
+  const per = num(c, g.n);
+  let sel = g.to;
+  if (g.each) {
+    const targets = pool(c, g.to).length;
+    const fits = per > 0 ? Math.floor(d.ro(you)[key] / per) : 0;
+    sel = fits >= targets ? g.to : { ...g.to, pick: { upTo: Math.max(0, fits) } };
+  }
+  const ids = select(d, f, sel, { role: 'target', verb: 'give DON!! to' });
+  if (ids === WAIT) return WAIT;
+  for (const id of ids) {
+    if (d.card(id).zone !== 'leader' && d.card(id).zone !== 'characters') continue;
+    const k = Math.min(per, d.ro(you)[key]);
+    if (k <= 0) break;
+    d.pl(you)[key] -= k;
+    d.wcard(id).don += k;
+    d.emit({
+      type: 'DonGiven',
+      player: you,
+      target: id,
+      card: d.card(id).card,
+      count: k,
+      rested: g.state === 'rested',
+      by: 'effect',
+    });
+  }
+  return 'next';
 }
 
 function move(
@@ -753,11 +1116,71 @@ function move(
       });
     return 'next';
   }
-  const ids = select(d, f, what, {
-    role: 'target',
-    verb: to.zone === 'hand' ? 'return' : 'choose',
-  });
-  if (ids === WAIT) return WAIT;
+  if (zones.length === 1 && zones[0] === 'lifeTop') {
+    // "Add up to 1 card from the top of your opponent's Life cards to the owner's hand." Not damage:
+    // no [Trigger] (QA-GR). "Up to" may be declined, and it reveals nothing, so it is asked.
+    const owner = rel(ctxOf(d, f), what.owner === 'opponent' ? 'opponent' : 'you');
+    const life = d.ro(owner).life;
+    if (life.length === 0) return 'next';
+    const mandatory = !what.pick || 'exactly' in what.pick;
+    const g = mandatory ? true : take(f);
+    if (g === undefined)
+      return ask(d, f, {
+        kind: 'optional',
+        player: you,
+        prompt: `${nameOf(d, f)}: add the top card of ${owner === you ? 'your' : "your opponent's"} Life cards to ${owner === you ? 'your' : 'their'} hand?`,
+        role: 'use',
+      });
+    if (g === true) {
+      moveCard(d, life[0]!, 'hand', { extra: { reason: 'life' } });
+      f.acted = true;
+    }
+    return 'next';
+  }
+  let ids: InstanceId[];
+  if (to.zone === 'deck' && to.position === 'topOrBottom' && f.tmp?.sel) {
+    ids = f.tmp.sel; // already chosen; waiting for the top or bottom answer
+  } else {
+    const picked = select(d, f, what, {
+      role: 'target',
+      verb: to.zone === 'hand' ? 'return' : 'choose',
+    });
+    if (picked === WAIT) return WAIT;
+    ids = picked;
+  }
+  if (ids.length) f.acted = true;
+  if (to.zone === 'deck' && to.position === 'topOrBottom') {
+    // "Place 2 cards from your hand at the top or bottom of your deck in any order" (OP11-054):
+    // one choice for all of them, then they go in the order picked.
+    if (ids.length === 0) return 'next';
+    const g = take(f);
+    if (!Array.isArray(g)) {
+      f.tmp = { ...f.tmp, sel: ids };
+      return ask(d, f, {
+        kind: 'choose',
+        player: you,
+        prompt: `${nameOf(d, f)}: place the ${ids.length} cards at the top or the bottom of your deck?`,
+        min: 1,
+        max: 1,
+        candidates: [{ option: 'top' }, { option: 'bottom' }] as never,
+        picked: [],
+        role: 'mode',
+        options: [
+          { id: 'top', label: 'Top of the deck' },
+          { id: 'bottom', label: 'Bottom of the deck' },
+        ],
+      });
+    }
+    const top = (g[0] as { option: string }).option === 'top';
+    for (const id of top ? ids.slice().reverse() : ids)
+      moveCard(d, id, 'deck', { position: top ? 'top' : 'bottom', extra: { reason: 'effect' } });
+    return 'next';
+  }
+  if (to.zone === 'life') {
+    // Hand or trash to the top of Life (OP06-106; OP14-104 face-up).
+    placeCards(d, ids, to as Dest, 'effect');
+    return 'next';
+  }
   if (zones.every((z) => z === 'trash' || z === 'hand')) {
     for (const id of ids)
       moveCard(d, id, to.zone as 'hand', {
@@ -820,7 +1243,9 @@ function lookAtTop(
             player: f.controller,
             reason: 'search',
           });
-        moveCard(d, id, 'hand', { revealed: tk.reveal === true, extra: { reason: 'search' } });
+        if (tk.to === 'lifeTop')
+          moveCard(d, id, 'life', { position: 'top', faceUp: false, extra: { reason: 'search' } });
+        else moveCard(d, id, 'hand', { revealed: tk.reveal === true, extra: { reason: 'search' } });
       }
       look = look.filter((id) => !(g as InstanceId[]).includes(id));
       f.look = look;
@@ -834,7 +1259,7 @@ function lookAtTop(
     return ask(d, f, {
       kind: 'choose',
       player: f.controller,
-      prompt: `${nameOf(d, f)}: choose up to ${n} of the cards you are looking at to add to your hand.`,
+      prompt: `${nameOf(d, f)}: choose up to ${n} of the cards you are looking at to add to your ${tk.to === 'lifeTop' ? 'Life cards' : 'hand'}.`,
       min: 0,
       max: Math.min(n, cands.length),
       candidates: cands,
@@ -842,6 +1267,12 @@ function lookAtTop(
       role: 'target',
       secret: true,
     });
+  }
+  if (spec.rest === 'trash') {
+    // "Then, trash the rest" (OP17-080): face up, public.
+    for (const id of look) moveCard(d, id, 'trash', { revealed: true, extra: { reason: 'look' } });
+    delete f.look;
+    return 'next';
   }
   // The rest: optionally top or bottom (OP17-050: all together, QA-OP17), in an order chosen.
   if (spec.rest === 'topOrBottomAnyOrder' && tmp.top === undefined && look.length > 0) {

@@ -9,7 +9,7 @@ import type { InstanceId, PlayerId } from './api.ts';
 import type { Ability, AutoTiming, InternalStep } from './abilities.ts';
 import { hasTiming, isInternal } from './abilities.ts';
 import { deriveLive } from './derive.ts';
-import { allHold, payable, pool, type Ctx } from './effects/eval.ts';
+import { allHold, matches, payable, playCostOf, pool, type Ctx } from './effects/eval.ts';
 import { answerEffect, pushEffect, runEffect } from './effects/run.ts';
 import type { Draft } from './draft.ts';
 import { OPENING_HAND } from './defs.ts';
@@ -18,6 +18,7 @@ import {
   draw,
   endGame,
   expireModifiers,
+  hooks,
   leaveField,
   markDamagedAtZero,
   moveCard,
@@ -218,6 +219,12 @@ function runTurn(d: Draft, f: Extract<Frame, { f: 'turn' }>): void {
       // 6-2-3 then 6-2-4.
       returnGivenDon(d, p);
       untapAll(d, p);
+      // "Will not become active in your next Refresh Phase" has done its job (6-2-4).
+      expireModifiers(
+        d,
+        (m) => m.duration.kind === 'afterRefresh' && m.duration.player === p,
+        '6-2-4',
+      );
       f.step = 'draw';
       return;
     case 'draw':
@@ -313,6 +320,7 @@ export function beginEndPhase(d: Draft): void {
 // ---------------------------------------------------------------------------------------------
 
 function runPlay(d: Draft, f: Extract<Frame, { f: 'play' }>): void {
+  const s = d.s;
   const c = d.card(f.card);
   const def = d.s.defs[c.card]!;
   const ps = d.ro(f.player);
@@ -327,20 +335,27 @@ function runPlay(d: Draft, f: Extract<Frame, { f: 'play' }>): void {
         reason: 'play',
       });
       if (def.category === 'Event') {
-        const cost = deriveLive(d.s, f.card).cost ?? 0;
-        payCost(d, f.player, cost);
+        const pc = playCostOf(d.s, f.player, f.card, true);
+        payCost(d, f.player, pc.cost);
+        spendPlayCost(d, pc.used);
         // CR 8-4-2: trash the Event, then carry out its effect: [Main] in the Main Phase, [Counter]
         // in the Counter Step (CR 7-1-3-1-2). Its activation costs are paid by the effect frame.
         const nid = moveCard(d, f.card, 'trash', { revealed: true, extra: { reason: 'event' } });
         const timing = f.counter ? 'counter' : 'main';
         d.emit({ type: 'EventActivated', instance: nid, card: c.card, player: f.player, timing });
+        // "When your opponent activates an Event" (OP11-012, OP15-119).
+        fireActor(d, 'eventActivated', f.player);
         pop(d);
         const ab = def.abilities.find((a) => hasTiming(a, timing));
         if (ab) pushEffect(d, nid, c.card, ab, f.player, 'effect');
         return;
       }
       // A card played by an effect is played without paying its cost.
-      if (!f.free) payCost(d, f.player, deriveLive(d.s, f.card).cost ?? 0);
+      if (!f.free) {
+        const pc = playCostOf(d.s, f.player, f.card, true);
+        payCost(d, f.player, pc.cost);
+        spendPlayCost(d, pc.used);
+      }
       if (def.category === 'Character' && ps.characters.length >= MAX_CHARACTERS) {
         // CR 3-7-6-1: trash 1 of your Characters, then play (rule processing, not a K.O.).
         f.step = 'make-room';
@@ -371,6 +386,7 @@ function runPlay(d: Draft, f: Extract<Frame, { f: 'play' }>): void {
       moveCard(d, f.card, to, { revealed: true, extra: { reason: 'play' } });
       const w = d.wcard(f.card);
       w.played = d.s.turn;
+      if (f.rested) w.rested = true;
       d.emit({ type: 'CardPlayed', instance: f.card, card: c.card, player: f.player, zone: to });
       f.step = 'done';
       fire(
@@ -381,12 +397,34 @@ function runPlay(d: Draft, f: Extract<Frame, { f: 'play' }>): void {
         'onPlay',
         f.batch,
       );
+      // "When you play a Character" (OP14-041): the cards on both fields that watch for it.
+      fire(
+        d,
+        [s.active, other(s.active)],
+        (q) => fieldCards(d, q),
+        (w, card, p) =>
+          typeof w === 'object' &&
+          w.event === 'cardPlayed' &&
+          (w.by === 'you') === (p === f.player) &&
+          (!w.filter || matches({ s: d.s, you: p, self: card, live: true }, f.card, w.filter)),
+        'cardPlayed',
+      );
       return;
     }
     case 'done':
       pop(d);
       return;
   }
+}
+
+/** A one-shot play-cost change is spent by the play it applied to (OP12-061). */
+function spendPlayCost(d: Draft, used: number[]): void {
+  if (used.length === 0) return;
+  d.s.mods = d.mods().flatMap((m) => {
+    if (!used.includes(m.id)) return [m];
+    const left = (m.uses ?? 1) - 1;
+    return left > 0 ? [{ ...m, uses: left }] : [];
+  });
 }
 
 function payCost(d: Draft, p: PlayerId, cost: number): void {
@@ -677,7 +715,7 @@ function runKo(d: Draft, f: Extract<Frame, { f: 'ko' }>): void {
     return;
   }
   const dv = deriveLive(d.s, f.card);
-  if (dv.cannotBeKOd) {
+  if (dv.cannotBeKOd || (dv.removalProof && byOpponentEffect(f.cause, c.owner))) {
     d.emit({ type: 'KOPrevented', instance: f.card, card: c.card });
     pop(d);
     return;
@@ -698,11 +736,35 @@ function runKo(d: Draft, f: Extract<Frame, { f: 'ko' }>): void {
       (w) => w === 'onKO',
       'onKO',
     );
+  // "When one of your Characters is K.O.'d" (OP14-041): the filter reads the card as it now is in
+  // the trash, which has its printed values (a last-known snapshot would only matter for a card
+  // whose power was set by an effect; no meta card reads that).
+  fire(
+    d,
+    [d.s.active, other(d.s.active)],
+    (q) => fieldCards(d, q),
+    (w, card, p) =>
+      typeof w === 'object' &&
+      w.event === 'koed' &&
+      p === owner &&
+      matches({ s: d.s, you: p, self: card, live: true }, nid, w.filter),
+    'koed',
+  );
+}
+
+/** Is this removal an effect of the card's owner's opponent (a protected card ignores it)? */
+function byOpponentEffect(cause: Cause, owner: PlayerId): boolean {
+  return cause.kind === 'effect' && cause.by !== owner;
 }
 
 function runRemove(d: Draft, f: Extract<Frame, { f: 'remove' }>): void {
   const c = d.s.cards[f.card];
   if (!c || (c.zone !== 'characters' && c.zone !== 'stage')) {
+    pop(d);
+    return;
+  }
+  if (deriveLive(d.s, f.card).removalProof && byOpponentEffect(f.cause, c.owner)) {
+    d.emit({ type: 'KOPrevented', instance: f.card, card: c.card, removal: true });
     pop(d);
     return;
   }
@@ -892,6 +954,42 @@ export function fire(
   }
   if (added) d.s.pending = [...d.s.pending, ...added];
 }
+
+/**
+ * "When you / your opponent activates an Event or [Blocker]": `by` in the ability is relative to
+ * its own controller, `actor` is who did it. The turn player's watchers queue first (CR 8-6-1).
+ */
+export function fireActor(
+  d: Draft,
+  event: 'eventActivated' | 'blockerActivated',
+  actor: PlayerId,
+): void {
+  fire(
+    d,
+    [d.s.active, other(d.s.active)],
+    (q) => fieldCards(d, q),
+    (w, _card, p) =>
+      typeof w === 'object' && w.event === event && (w.by === 'you') === (p === actor),
+    event,
+  );
+}
+
+// A card left a Life area (damage, an effect, a cost): "when a card is removed from your or your
+// opponent's Life cards" (OP12-099) and "when your number of Life cards becomes 0" (OP05-098).
+hooks.lifeRemoved = (d, owner) => {
+  const zero = d.ro(owner).life.length === 0;
+  fire(
+    d,
+    [d.s.active, other(d.s.active)],
+    (q) => fieldCards(d, q),
+    (w, _card, p) =>
+      typeof w === 'object' &&
+      ((w.event === 'lifeRemoved' &&
+        (w.owner === 'any' || (w.owner === 'you') === (p === owner))) ||
+        (zero && w.event === 'lifeBecameZero' && (w.owner === 'you') === (p === owner))),
+    'lifeRemoved',
+  );
+};
 
 /** Named-timing shorthand (CR 10-2). */
 export function fireFor(

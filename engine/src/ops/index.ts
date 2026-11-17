@@ -13,6 +13,12 @@ import type { Draft } from '../draft.ts';
 import { shuffle } from '../rng.ts';
 import { other, type Cause, type Modifier, type PlayerState, type Zone } from '../state.ts';
 
+/**
+ * Callbacks the interpreter registers (flow.ts), so an operation can raise an event without this
+ * module importing the frames that own the pending queue.
+ */
+export const hooks: { lifeRemoved?: (d: Draft, owner: PlayerId) => void } = {};
+
 const FIELD: ReadonlySet<Zone> = new Set(['leader', 'characters', 'stage']);
 /** Zones some player cannot see: a card moving in gets a fresh projection key (ARCHITECTURE §2.7). */
 const HIDDEN: ReadonlySet<Zone> = new Set(['deck', 'hand', 'life']);
@@ -148,6 +154,7 @@ export function moveCard(d: Draft, id: InstanceId, to: Zone, opts: MoveOptions =
   if (opts.extra) Object.assign(e, opts.extra);
   d.emit(e);
   if (from === 'deck') touchDeck(d, owner);
+  if (from === 'life') hooks.lifeRemoved?.(d, owner);
   return nid;
 }
 
@@ -305,6 +312,8 @@ export function returnGivenDon(d: Draft, p: PlayerId): void {
 export function untapAll(d: Draft, p: PlayerId): void {
   const ps = d.ro(p);
   for (const id of [ps.leader, ...ps.characters, ...ps.stage]) {
+    // "Will not become active in your next Refresh Phase" (OP13-040, EB02-021).
+    if (d.s.mods.some((m) => m.kind === 'skipRefresh' && m.target === id)) continue;
     if (d.card(id).rested) d.wcard(id).rested = false;
   }
   if (ps.donRested > 0) {

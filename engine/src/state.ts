@@ -17,6 +17,7 @@ import type {
 } from './api.ts';
 import type { RngState } from './rng.ts';
 import type { Ability } from './abilities.ts';
+import type { Filter } from '@optcg/cards';
 
 /** Where a card instance is. `resolving` is the no-area slot of a [Trigger] card (CR 10-1-5-3). */
 export type Zone = ZoneName | 'resolving';
@@ -35,6 +36,11 @@ export interface Def {
   attributes: string[];
   keywords: string[];
   hasTrigger: boolean;
+  /**
+   * Names the card is also treated as having under the rules of this game (`rules.alsoNamed`,
+   * EB04-038). Absent for almost every card.
+   */
+  alsoNamed?: string[];
   /**
    * Abilities the engine can run: the card's script (`cards/effects`), or none. Tests may inject
    * abilities through `engine/src/testing.ts` to exercise the hooks (ADR 0013).
@@ -88,7 +94,9 @@ export interface PlayerState {
  * - `untilStartOfNextTurn`: Refresh 6-2-1 of `player`'s next turn;
  * - `untilEndOfOpponentsNextEndPhase`: 6-6-1-2 (2) of the first turn after `after` in which
  *   `player`'s opponent is the turn player ("until the end of your opponent's next End Phase/turn");
- * - `whileSource`: while instance `source` stays where it is.
+ * - `whileSource`: while instance `source` stays where it is;
+ * - `afterRefresh`: after the Refresh Phase's untap (6-2-4) of `player`'s next turn ("will not become
+ *   active in your next Refresh Phase").
  */
 export type Duration =
   | { kind: 'battle' }
@@ -96,7 +104,8 @@ export type Duration =
   | { kind: 'thisTurn'; turn: number }
   | { kind: 'untilStartOfNextTurn'; player: PlayerId }
   | { kind: 'untilEndOfOpponentsNextEndPhase'; player: PlayerId; after: number }
-  | { kind: 'whileSource'; source: InstanceId };
+  | { kind: 'whileSource'; source: InstanceId }
+  | { kind: 'afterRefresh'; player: PlayerId };
 
 export type ModKind =
   | 'power'
@@ -107,7 +116,19 @@ export type ModKind =
   /** "cannot attack" (OP17-054, OP17-065). */
   | 'cannotAttack'
   /** "negate the effect of" (CR 8-2): the card's abilities and keyword effects do nothing. */
-  | 'negate';
+  | 'negate'
+  /** "your opponent cannot activate [Blocker]" when this card attacks (ST21-003, OP07-057). */
+  | 'noBlocker'
+  /** "will not become active in your next Refresh Phase" (OP13-040, EB02-021). */
+  | 'skipRefresh'
+  /** "cannot be removed from the field by your opponent's effects" (OP15-118). */
+  | 'cannotBeRemoved'
+  /** On a player's Leader: that player cannot draw cards using their own effects (OP12-099). */
+  | 'cannotDraw'
+  /** On a player's Leader: that player cannot play cards matching `filter` (OP13-118). */
+  | 'cannotPlay'
+  /** On a player's Leader: the next play from hand matching `filter` costs `amount` more (OP12-061). */
+  | 'playCost';
 
 export interface Modifier {
   id: number;
@@ -117,6 +138,10 @@ export interface Modifier {
   amount: number;
   /** For `grant`: the keyword. */
   keyword?: string;
+  /** For `cannotPlay` and `playCost`: which cards. */
+  filter?: Filter;
+  /** For `playCost`: plays it may still change the cost of. */
+  uses?: number;
   duration: Duration;
   /** Whose effect created it: decides turn-player-first expiry order. */
   controller: PlayerId;
@@ -164,6 +189,8 @@ export type Frame =
       free?: true;
       /** An Event activated in the Counter Step for its [Counter] (CR 7-1-3-1-2). */
       counter?: true;
+      /** "Play ... rested": the card is placed rested. */
+      rested?: true;
       /**
        * Cards placed by one effect's `play` share a pending batch, so their [On Play]s are one
        * event and their controller orders them (M4a-04, CR 8-6-1).
@@ -203,6 +230,12 @@ export type Frame =
       b?: Record<string, InstanceId[]>;
       /** Labels of `may` steps that were accepted. */
       did?: string[];
+      /** Numeric bindings (DON!! rested "this way"), by name. */
+      n?: Record<string, number>;
+      /** The action just run did something ("if you do" after a `do`, OP08-098). */
+      acted?: true;
+      /** Open `forEach` loops, innermost last: where the body starts and the runs still to do. */
+      loops?: { start: number; left: number }[];
       /** The answer to the decision this frame is waiting on. */
       got?: Got;
       /** Progress inside a multi-decision instruction, and its scratch data. */

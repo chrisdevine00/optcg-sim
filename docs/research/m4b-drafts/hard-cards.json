@@ -1,0 +1,2197 @@
+[
+  {
+    "_note": "Scratch drafts of the hardest of the 143 cards, written to check that the shape set is sufficient. textHash and verified are placeholders: wave 2 writes the real scripts (cards/effects/<SET>/<ID>.ts) from the verified text. Each draft passes validateScript (cards/test/m4b-drafts.test.ts). Where the card text is ambiguous the draft says so.",
+    "cardId": "OP13-001",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "abilities": [
+      {
+        "id": "opp-attack-boost",
+        "kind": "auto",
+        "when": [
+          "onOpponentAttack"
+        ],
+        "conditions": [
+          {
+            "donGiven": 1
+          }
+        ],
+        "effect": [
+          {
+            "if": {
+              "cmp": [
+                {
+                  "donOnField": "you",
+                  "state": "active"
+                },
+                "<=",
+                5
+              ]
+            },
+            "then": [
+              {
+                "may": [
+                  {
+                    "do": {
+                      "rest": {
+                        "from": "donCostArea",
+                        "owner": "you",
+                        "pick": {
+                          "any": true
+                        },
+                        "bind": "rested"
+                      }
+                    }
+                  }
+                ],
+                "label": "rest"
+              },
+              {
+                "ifDid": "rest",
+                "then": [
+                  {
+                    "do": {
+                      "power": {
+                        "target": {
+                          "from": [
+                            "leader",
+                            "characters"
+                          ],
+                          "owner": "you",
+                          "pick": {
+                            "upTo": 1
+                          },
+                          "filter": {
+                            "any": [
+                              {
+                                "isSelf": true
+                              },
+                              {
+                                "all": [
+                                  {
+                                    "category": [
+                                      "Character"
+                                    ]
+                                  },
+                                  {
+                                    "type": "Straw Hat Crew"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        },
+                        "amount": {
+                          "mul": [
+                            {
+                              "refCount": "rested"
+                            },
+                            2000
+                          ]
+                        },
+                        "duration": "battle"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "OP12-061",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "abilities": [
+      {
+        "id": "law-shield",
+        "kind": "replacement",
+        "oncePerTurn": true,
+        "optional": true,
+        "replaces": {
+          "ko": {
+            "from": "characters",
+            "owner": "you",
+            "filter": {
+              "name": "Trafalgar Law"
+            }
+          }
+        },
+        "instead": [
+          {
+            "lifeToHand": {
+              "from": "top",
+              "n": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "law-discount",
+        "kind": "activate",
+        "when": "activateMain",
+        "oncePerTurn": true,
+        "cost": [
+          {
+            "donMinus": 1
+          }
+        ],
+        "effect": [
+          {
+            "do": {
+              "playCost": {
+                "next": {
+                  "all": [
+                    {
+                      "category": [
+                        "Character"
+                      ]
+                    },
+                    {
+                      "name": "Trafalgar Law"
+                    },
+                    {
+                      "cost": {
+                        "gte": 4
+                      }
+                    }
+                  ]
+                },
+                "from": "hand",
+                "amount": -2,
+                "window": "thisTurn",
+                "uses": 1
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "OP15-058",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "rules": [
+      {
+        "donDeckSize": 6
+      }
+    ],
+    "abilities": [
+      {
+        "id": "enel-surge",
+        "kind": "activate",
+        "when": "activateMain",
+        "oncePerTurn": true,
+        "effect": [
+          {
+            "if": {
+              "cmp": [
+                {
+                  "turnIndex": "you"
+                },
+                ">=",
+                2
+              ]
+            },
+            "then": [
+              {
+                "do": {
+                  "addDon": [
+                    {
+                      "n": 1,
+                      "state": "active",
+                      "upTo": true
+                    },
+                    {
+                      "n": 4,
+                      "state": "rested",
+                      "upTo": true
+                    }
+                  ]
+                }
+              },
+              {
+                "do": {
+                  "giveDon": {
+                    "n": 4,
+                    "state": "rested",
+                    "to": {
+                      "from": "characters",
+                      "owner": "you",
+                      "pick": {
+                        "upTo": 1
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "EB04-038",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "keywords": [
+      "Blocker"
+    ],
+    "rules": [
+      {
+        "alsoNamed": [
+          "Trafalgar Law",
+          "Donquixote Rosinante"
+        ]
+      }
+    ],
+    "abilities": [
+      {
+        "id": "on-play",
+        "kind": "auto",
+        "when": [
+          "onPlay"
+        ],
+        "effect": [
+          {
+            "if": {
+              "cmp": [
+                {
+                  "donOnField": "you"
+                },
+                "<=",
+                {
+                  "donOnField": "opponent"
+                }
+              ]
+            },
+            "then": [
+              {
+                "do": {
+                  "draw": 1
+                }
+              },
+              {
+                "do": {
+                  "addDon": [
+                    {
+                      "n": 1,
+                      "state": "active",
+                      "upTo": true
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "OP17-112",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "abilities": [
+      {
+        "id": "eight-thousand",
+        "kind": "permanent",
+        "conditions": [
+          {
+            "yourTurn": true
+          }
+        ],
+        "apply": [
+          {
+            "setBasePower": {
+              "target": {
+                "from": "characters",
+                "owner": "you",
+                "filter": {
+                  "all": [
+                    {
+                      "hasTrigger": true
+                    },
+                    {
+                      "basePower": {
+                        "eq": 4000
+                      }
+                    }
+                  ]
+                }
+              },
+              "value": 8000
+            }
+          }
+        ]
+      },
+      {
+        "id": "on-play",
+        "kind": "auto",
+        "when": [
+          "onPlay"
+        ],
+        "effect": [
+          {
+            "do": {
+              "draw": 1
+            }
+          },
+          {
+            "chooseOne": [
+              [
+                {
+                  "do": {
+                    "move": {
+                      "what": {
+                        "from": "deckTop",
+                        "owner": "you",
+                        "pick": {
+                          "upTo": 1
+                        }
+                      },
+                      "to": {
+                        "zone": "life",
+                        "position": "top"
+                      }
+                    }
+                  }
+                }
+              ],
+              [
+                {
+                  "do": {
+                    "move": {
+                      "what": {
+                        "from": "lifeTop",
+                        "owner": "opponent",
+                        "pick": {
+                          "upTo": 1
+                        }
+                      },
+                      "to": {
+                        "zone": "hand"
+                      }
+                    }
+                  }
+                }
+              ]
+            ],
+            "labels": [
+              "Add the top card of your deck to your Life",
+              "Add the top of your opponent's Life to their hand"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "OP15-071",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "abilities": [
+      {
+        "id": "double",
+        "kind": "permanent",
+        "apply": [
+          {
+            "grant": {
+              "target": {
+                "from": "characters",
+                "owner": "you",
+                "filter": {
+                  "any": [
+                    {
+                      "name": "Ohm"
+                    },
+                    {
+                      "isSelf": true
+                    }
+                  ]
+                }
+              },
+              "keyword": "Double Attack"
+            }
+          }
+        ]
+      },
+      {
+        "id": "six-thousand",
+        "kind": "permanent",
+        "conditions": [
+          {
+            "opponentsTurn": true
+          }
+        ],
+        "apply": [
+          {
+            "setBasePower": {
+              "target": {
+                "from": "characters",
+                "owner": "you",
+                "filter": {
+                  "any": [
+                    {
+                      "name": "Ohm"
+                    },
+                    {
+                      "isSelf": true
+                    }
+                  ]
+                }
+              },
+              "value": 6000
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "OP15-092",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "abilities": [
+      {
+        "id": "trash-tiers",
+        "kind": "permanent",
+        "apply": [
+          {
+            "tiers": [
+              {
+                "when": {
+                  "cmp": [
+                    {
+                      "trash": "you"
+                    },
+                    ">=",
+                    10
+                  ]
+                },
+                "apply": [
+                  {
+                    "setBasePower": {
+                      "target": {
+                        "from": "self",
+                        "owner": "you"
+                      },
+                      "value": 9000
+                    }
+                  },
+                  {
+                    "cost": {
+                      "target": {
+                        "from": "self",
+                        "owner": "you"
+                      },
+                      "amount": 10
+                    }
+                  }
+                ]
+              },
+              {
+                "when": {
+                  "all": [
+                    {
+                      "cmp": [
+                        {
+                          "trash": "you"
+                        },
+                        ">=",
+                        20
+                      ]
+                    },
+                    {
+                      "opponentsTurn": true
+                    }
+                  ]
+                },
+                "apply": [
+                  {
+                    "setBasePower": {
+                      "target": {
+                        "from": "leader",
+                        "owner": "you"
+                      },
+                      "value": 7000
+                    }
+                  }
+                ]
+              },
+              {
+                "when": {
+                  "cmp": [
+                    {
+                      "trash": "you"
+                    },
+                    ">=",
+                    30
+                  ]
+                },
+                "apply": [
+                  {
+                    "power": {
+                      "target": {
+                        "from": "self",
+                        "owner": "you"
+                      },
+                      "amount": 1000
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "OP14-041",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "abilities": [
+      {
+        "id": "draw-on-play",
+        "kind": "auto",
+        "when": [
+          {
+            "event": "cardPlayed",
+            "by": "you",
+            "filter": {
+              "category": [
+                "Character"
+              ]
+            }
+          }
+        ],
+        "conditions": [
+          {
+            "opponentsTurn": true
+          }
+        ],
+        "effect": [
+          {
+            "do": {
+              "draw": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "ko-life",
+        "kind": "auto",
+        "oncePerTurn": true,
+        "conditions": [
+          {
+            "donGiven": 1
+          }
+        ],
+        "when": [
+          {
+            "event": "koed",
+            "filter": {
+              "all": [
+                {
+                  "any": [
+                    {
+                      "type": "Amazon Lily"
+                    },
+                    {
+                      "type": "Kuja Pirates"
+                    }
+                  ]
+                },
+                {
+                  "basePower": {
+                    "gte": 5000
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "effect": [
+          {
+            "do": {
+              "move": {
+                "what": {
+                  "from": "lifeTop",
+                  "owner": "opponent",
+                  "pick": {
+                    "upTo": 1
+                  }
+                },
+                "to": {
+                  "zone": "hand"
+                }
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "OP05-098",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "abilities": [
+      {
+        "id": "life-zero",
+        "kind": "auto",
+        "oncePerTurn": true,
+        "conditions": [
+          {
+            "opponentsTurn": true
+          }
+        ],
+        "when": [
+          {
+            "event": "lifeBecameZero",
+            "owner": "you"
+          }
+        ],
+        "effect": [
+          {
+            "do": {
+              "move": {
+                "what": {
+                  "from": "deckTop",
+                  "owner": "you",
+                  "pick": {
+                    "upTo": 1
+                  }
+                },
+                "to": {
+                  "zone": "life",
+                  "position": "top"
+                }
+              }
+            }
+          },
+          {
+            "do": {
+              "trashFromHand": {
+                "from": "hand",
+                "owner": "you",
+                "pick": {
+                  "exactly": 1
+                }
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "OP12-099",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "abilities": [
+      {
+        "id": "life-draw",
+        "kind": "auto",
+        "conditions": [
+          {
+            "yourTurn": true
+          }
+        ],
+        "when": [
+          {
+            "event": "lifeRemoved",
+            "owner": "any"
+          }
+        ],
+        "effect": [
+          {
+            "do": {
+              "draw": 1
+            }
+          },
+          {
+            "do": {
+              "restrict": {
+                "target": "you",
+                "what": "cannotDrawByOwnEffects",
+                "duration": "thisTurn"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "OP15-119",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "abilities": [
+      {
+        "id": "rush",
+        "kind": "permanent",
+        "conditions": [
+          {
+            "cmp": [
+              {
+                "donOnField": "you"
+              },
+              ">=",
+              6
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "grant": {
+              "target": {
+                "from": "self",
+                "owner": "you"
+              },
+              "keyword": "Rush"
+            }
+          }
+        ]
+      },
+      {
+        "id": "reveal-boost",
+        "kind": "auto",
+        "when": [
+          {
+            "event": "eventActivated",
+            "by": "opponent"
+          },
+          {
+            "event": "blockerActivated",
+            "by": "opponent"
+          }
+        ],
+        "effect": [
+          {
+            "do": {
+              "reveal": {
+                "from": "lifeTop",
+                "n": 1,
+                "bind": "revealed"
+              }
+            }
+          },
+          {
+            "do": {
+              "power": {
+                "target": {
+                  "from": "self",
+                  "owner": "you"
+                },
+                "amount": {
+                  "mul": [
+                    {
+                      "refStat": "revealed",
+                      "stat": "cost"
+                    },
+                    1000
+                  ]
+                },
+                "duration": "thisTurn"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "OP14-104",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "abilities": [
+      {
+        "id": "on-play",
+        "kind": "auto",
+        "when": [
+          "onPlay"
+        ],
+        "effect": [
+          {
+            "do": {
+              "select": {
+                "from": "trash",
+                "owner": "you",
+                "filter": {
+                  "all": [
+                    {
+                      "category": [
+                        "Character"
+                      ]
+                    },
+                    {
+                      "type": "Thriller Bark Pirates"
+                    },
+                    {
+                      "cost": {
+                        "lte": 4
+                      }
+                    }
+                  ]
+                },
+                "pick": {
+                  "upTo": 1
+                },
+                "bind": "target"
+              }
+            }
+          },
+          {
+            "chooseOne": [
+              [
+                {
+                  "do": {
+                    "play": {
+                      "what": {
+                        "from": "trash",
+                        "owner": "you",
+                        "filter": {
+                          "ref": "target"
+                        }
+                      }
+                    }
+                  }
+                }
+              ],
+              [
+                {
+                  "do": {
+                    "move": {
+                      "what": {
+                        "from": "trash",
+                        "owner": "you",
+                        "filter": {
+                          "ref": "target"
+                        }
+                      },
+                      "to": {
+                        "zone": "life",
+                        "position": "top",
+                        "faceUp": true
+                      }
+                    }
+                  }
+                }
+              ]
+            ],
+            "labels": [
+              "Play it",
+              "Add it to the top of your Life cards face-up"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "trigger",
+        "kind": "trigger",
+        "effect": [
+          {
+            "do": {
+              "play": {
+                "what": {
+                  "from": "trash",
+                  "owner": "you",
+                  "filter": {
+                    "all": [
+                      {
+                        "category": [
+                          "Character"
+                        ]
+                      },
+                      {
+                        "cost": {
+                          "lte": 4
+                        }
+                      }
+                    ]
+                  },
+                  "pick": {
+                    "upTo": 1
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "OP17-095",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "abilities": [
+      {
+        "id": "elbaph-power",
+        "kind": "permanent",
+        "conditions": [
+          {
+            "exists": {
+              "from": "characters",
+              "owner": "any",
+              "filter": {
+                "cost": {
+                  "gte": 12
+                }
+              }
+            }
+          }
+        ],
+        "apply": [
+          {
+            "power": {
+              "target": {
+                "from": "self",
+                "owner": "you"
+              },
+              "amount": 3000
+            }
+          }
+        ]
+      },
+      {
+        "id": "trash-shield",
+        "kind": "replacement",
+        "optional": true,
+        "replaces": {
+          "leaveField": {
+            "from": "characters",
+            "owner": "you"
+          },
+          "cause": "opponentEffect"
+        },
+        "instead": [
+          {
+            "move": {
+              "from": "trash",
+              "owner": "you",
+              "pick": {
+                "exactly": 3
+              }
+            },
+            "to": {
+              "zone": "deck",
+              "position": "bottom"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "OP15-035",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "abilities": [
+      {
+        "id": "rest-shield",
+        "kind": "replacement",
+        "optional": true,
+        "replaces": {
+          "leaveField": {
+            "from": "characters",
+            "owner": "you",
+            "filter": {
+              "basePower": {
+                "lte": 7000
+              }
+            }
+          },
+          "cause": "opponentEffect"
+        },
+        "instead": [
+          {
+            "rest": {
+              "from": [
+                "leader",
+                "characters",
+                "stage",
+                "donCostArea"
+              ],
+              "owner": "you",
+              "pick": {
+                "exactly": 2
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "OP17-023",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "abilities": [
+      {
+        "id": "rest-shield",
+        "kind": "replacement",
+        "optional": true,
+        "replaces": {
+          "ko": {
+            "from": "characters",
+            "owner": "you",
+            "filter": {
+              "any": [
+                {
+                  "type": "East Blue"
+                },
+                {
+                  "type": "Straw Hat Crew"
+                }
+              ]
+            }
+          }
+        },
+        "instead": [
+          {
+            "restSelf": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "EB04-059",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "abilities": [
+      {
+        "id": "main",
+        "kind": "activate",
+        "when": "main",
+        "cost": [
+          {
+            "turnLifeFaceUp": 1
+          }
+        ],
+        "costOptional": true,
+        "effect": [
+          {
+            "if": {
+              "cmp": [
+                {
+                  "count": {
+                    "from": "characters",
+                    "owner": "you"
+                  }
+                },
+                "<",
+                {
+                  "count": {
+                    "from": "characters",
+                    "owner": "opponent"
+                  }
+                }
+              ]
+            },
+            "then": [
+              {
+                "do": {
+                  "select": {
+                    "from": "characters",
+                    "owner": "opponent",
+                    "filter": {
+                      "cost": {
+                        "lte": 6
+                      }
+                    },
+                    "pick": {
+                      "upTo": 1
+                    },
+                    "bind": "a"
+                  }
+                }
+              },
+              {
+                "do": {
+                  "select": {
+                    "from": "characters",
+                    "owner": "opponent",
+                    "filter": {
+                      "all": [
+                        {
+                          "cost": {
+                            "lte": 5
+                          }
+                        },
+                        {
+                          "not": {
+                            "ref": "a"
+                          }
+                        }
+                      ]
+                    },
+                    "pick": {
+                      "upTo": 1
+                    },
+                    "bind": "b"
+                  }
+                }
+              },
+              {
+                "do": {
+                  "ko": {
+                    "from": "characters",
+                    "owner": "opponent",
+                    "filter": {
+                      "ref": "a"
+                    }
+                  }
+                }
+              },
+              {
+                "do": {
+                  "ko": {
+                    "from": "characters",
+                    "owner": "opponent",
+                    "filter": {
+                      "ref": "b"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "trigger",
+        "kind": "trigger",
+        "effect": [
+          {
+            "do": {
+              "draw": 2
+            }
+          },
+          {
+            "do": {
+              "trashFromHand": {
+                "from": "hand",
+                "owner": "you",
+                "pick": {
+                  "exactly": 1
+                }
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "OP12-037",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "abilities": [
+      {
+        "id": "main",
+        "kind": "activate",
+        "when": "main",
+        "cost": [
+          {
+            "restDon": 3
+          }
+        ],
+        "costOptional": true,
+        "effect": [
+          {
+            "do": {
+              "rest": {
+                "from": [
+                  "characters",
+                  "donCostArea"
+                ],
+                "owner": "opponent",
+                "pick": {
+                  "upTo": 2
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "counter",
+        "kind": "activate",
+        "when": "counter",
+        "effect": [
+          {
+            "do": {
+              "power": {
+                "target": {
+                  "from": "leader",
+                  "owner": "you"
+                },
+                "amount": 3000,
+                "duration": "battle"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "ST31-004",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "abilities": [
+      {
+        "id": "rush",
+        "kind": "permanent",
+        "conditions": [
+          {
+            "cmp": [
+              {
+                "donGiven": "you"
+              },
+              ">=",
+              3
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "grant": {
+              "target": {
+                "from": "self",
+                "owner": "you"
+              },
+              "keyword": "Rush"
+            }
+          }
+        ]
+      },
+      {
+        "id": "on-play",
+        "kind": "auto",
+        "when": [
+          "onPlay"
+        ],
+        "effect": [
+          {
+            "forEach": {
+              "count": {
+                "from": "field",
+                "owner": "you",
+                "filter": {
+                  "type": "Straw Hat Crew"
+                }
+              }
+            },
+            "do": [
+              {
+                "do": {
+                  "power": {
+                    "target": {
+                      "from": "characters",
+                      "owner": "opponent",
+                      "pick": {
+                        "upTo": 1
+                      }
+                    },
+                    "amount": -1000,
+                    "duration": "thisTurn"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "OP14-105",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "abilities": [
+      {
+        "id": "give",
+        "kind": "activate",
+        "when": "activateMain",
+        "oncePerTurn": true,
+        "cost": [
+          {
+            "reveal": {
+              "from": "hand",
+              "owner": "you",
+              "filter": {
+                "any": [
+                  {
+                    "type": "Amazon Lily"
+                  },
+                  {
+                    "type": "Kuja Pirates"
+                  }
+                ]
+              },
+              "pick": {
+                "exactly": 3
+              }
+            }
+          }
+        ],
+        "effect": [
+          {
+            "do": {
+              "giveDon": {
+                "n": 1,
+                "state": "rested",
+                "each": true,
+                "to": {
+                  "from": [
+                    "leader",
+                    "characters"
+                  ],
+                  "owner": "you"
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "trigger",
+        "kind": "trigger",
+        "effect": [
+          {
+            "if": {
+              "leader": {
+                "type": "Kuja Pirates"
+              }
+            },
+            "then": [
+              {
+                "do": {
+                  "play": {
+                    "what": {
+                      "from": "self",
+                      "owner": "you"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "OP17-079",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "abilities": [
+      {
+        "id": "giant-blockers",
+        "kind": "permanent",
+        "apply": [
+          {
+            "grant": {
+              "target": {
+                "from": "characters",
+                "owner": "you",
+                "filter": {
+                  "cost": {
+                    "gte": 12
+                  }
+                }
+              },
+              "keyword": "Blocker"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "OP15-118",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "abilities": [
+      {
+        "id": "protected",
+        "kind": "permanent",
+        "conditions": [
+          {
+            "cmp": [
+              {
+                "donOnField": "you"
+              },
+              "<=",
+              6
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "restrict": {
+              "target": {
+                "from": "self",
+                "owner": "you"
+              },
+              "what": "cannotBeRemovedByOpponentEffects"
+            }
+          },
+          {
+            "power": {
+              "target": {
+                "from": "self",
+                "owner": "you"
+              },
+              "amount": 2000
+            }
+          }
+        ]
+      },
+      {
+        "id": "on-play",
+        "kind": "auto",
+        "when": [
+          "onPlay"
+        ],
+        "cost": [
+          {
+            "donMinus": 1
+          }
+        ],
+        "effect": [
+          {
+            "do": {
+              "lookAtTop": {
+                "n": 5,
+                "take": [
+                  {
+                    "pick": {
+                      "upTo": 1
+                    },
+                    "to": "hand"
+                  }
+                ],
+                "rest": "bottomAnyOrder"
+              }
+            }
+          },
+          {
+            "do": {
+              "trashFromHand": {
+                "from": "hand",
+                "owner": "you",
+                "pick": {
+                  "exactly": 1
+                }
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "OP13-118",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "keywords": [
+      "Double Attack"
+    ],
+    "abilities": [
+      {
+        "id": "on-play",
+        "kind": "auto",
+        "when": [
+          "onPlay"
+        ],
+        "effect": [
+          {
+            "if": {
+              "leader": {
+                "multicolor": true
+              }
+            },
+            "then": [
+              {
+                "do": {
+                  "setActive": {
+                    "from": "donCostArea",
+                    "owner": "you",
+                    "pick": {
+                      "upTo": 4
+                    }
+                  }
+                }
+              },
+              {
+                "do": {
+                  "restrict": {
+                    "target": "you",
+                    "what": {
+                      "cannotPlay": {
+                        "all": [
+                          {
+                            "category": [
+                              "Character"
+                            ]
+                          },
+                          {
+                            "baseCost": {
+                              "gte": 5
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "duration": "thisTurn"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "OP08-098",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "abilities": [
+      {
+        "id": "when-attacking",
+        "kind": "auto",
+        "when": [
+          "whenAttacking"
+        ],
+        "conditions": [
+          {
+            "donGiven": 1
+          }
+        ],
+        "effect": [
+          {
+            "do": {
+              "play": {
+                "what": {
+                  "from": "hand",
+                  "owner": "you",
+                  "filter": {
+                    "all": [
+                      {
+                        "category": [
+                          "Character"
+                        ]
+                      },
+                      {
+                        "type": "Shandian Warrior"
+                      },
+                      {
+                        "cost": {
+                          "lte": {
+                            "donOnField": "you"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "pick": {
+                    "upTo": 1
+                  }
+                }
+              }
+            },
+            "label": "played"
+          },
+          {
+            "ifDid": "played",
+            "then": [
+              {
+                "do": {
+                  "move": {
+                    "what": {
+                      "from": "lifeTop",
+                      "owner": "you",
+                      "pick": {
+                        "exactly": 1
+                      }
+                    },
+                    "to": {
+                      "zone": "hand"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "OP07-064",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "keywords": [
+      "Blocker"
+    ],
+    "abilities": [
+      {
+        "id": "cheaper",
+        "kind": "permanent",
+        "zone": "hand",
+        "conditions": [
+          {
+            "cmp": [
+              {
+                "donOnField": "you"
+              },
+              "<=",
+              {
+                "sum": [
+                  {
+                    "donOnField": "opponent"
+                  },
+                  -2
+                ]
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "cost": {
+              "target": {
+                "from": "self",
+                "owner": "you"
+              },
+              "amount": -3
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "OP11-054",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "keywords": [
+      "Blocker"
+    ],
+    "abilities": [
+      {
+        "id": "on-play",
+        "kind": "auto",
+        "when": [
+          "onPlay"
+        ],
+        "effect": [
+          {
+            "if": {
+              "leader": {
+                "multicolor": true
+              }
+            },
+            "then": [
+              {
+                "do": {
+                  "draw": 3
+                }
+              },
+              {
+                "do": {
+                  "move": {
+                    "what": {
+                      "from": "hand",
+                      "owner": "you",
+                      "pick": {
+                        "exactly": 2
+                      }
+                    },
+                    "to": {
+                      "zone": "deck",
+                      "position": "topOrBottom"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "ST21-003",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "abilities": [
+      {
+        "id": "on-play",
+        "kind": "auto",
+        "when": [
+          "onPlay"
+        ],
+        "effect": [
+          {
+            "do": {
+              "select": {
+                "from": "characters",
+                "owner": "you",
+                "filter": {
+                  "all": [
+                    {
+                      "type": "Straw Hat Crew"
+                    },
+                    {
+                      "power": {
+                        "gte": 6000
+                      }
+                    }
+                  ]
+                },
+                "pick": {
+                  "upTo": 1
+                },
+                "bind": "chosen"
+              }
+            }
+          },
+          {
+            "do": {
+              "restrict": {
+                "target": {
+                  "from": "characters",
+                  "owner": "you",
+                  "filter": {
+                    "ref": "chosen"
+                  }
+                },
+                "what": "cannotActivateBlockerAgainstIt",
+                "duration": "thisTurn"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "OP13-040",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "abilities": [
+      {
+        "id": "main",
+        "kind": "activate",
+        "when": "main",
+        "cost": [
+          {
+            "restDon": 2
+          }
+        ],
+        "costOptional": true,
+        "effect": [
+          {
+            "do": {
+              "skipRefresh": {
+                "from": "characters",
+                "owner": "opponent",
+                "filter": {
+                  "all": [
+                    {
+                      "state": "rested"
+                    },
+                    {
+                      "cost": {
+                        "lte": 7
+                      }
+                    }
+                  ]
+                },
+                "pick": {
+                  "upTo": 2
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "counter",
+        "kind": "activate",
+        "when": "counter",
+        "effect": [
+          {
+            "do": {
+              "power": {
+                "target": {
+                  "from": "leader",
+                  "owner": "you"
+                },
+                "amount": 3000,
+                "duration": "battle"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "OP15-088",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "abilities": [
+      {
+        "id": "tall",
+        "kind": "permanent",
+        "apply": [
+          {
+            "cost": {
+              "target": {
+                "from": "self",
+                "owner": "you"
+              },
+              "amount": 6
+            }
+          }
+        ]
+      },
+      {
+        "id": "on-play",
+        "kind": "auto",
+        "when": [
+          "onPlay"
+        ],
+        "cost": [
+          {
+            "mill": 3
+          }
+        ],
+        "effect": [
+          {
+            "do": {
+              "play": {
+                "what": {
+                  "from": "trash",
+                  "owner": "you",
+                  "filter": {
+                    "all": [
+                      {
+                        "category": [
+                          "Character"
+                        ]
+                      },
+                      {
+                        "type": "Straw Hat Crew"
+                      },
+                      {
+                        "cost": {
+                          "lte": 2
+                        }
+                      }
+                    ]
+                  },
+                  "pick": {
+                    "upTo": 1
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "OP14-114",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "abilities": [
+      {
+        "id": "give",
+        "kind": "activate",
+        "when": "activateMain",
+        "oncePerTurn": true,
+        "effect": [
+          {
+            "do": {
+              "giveDon": {
+                "n": 1,
+                "state": "rested",
+                "to": {
+                  "from": [
+                    "leader",
+                    "characters"
+                  ],
+                  "owner": "you",
+                  "filter": {
+                    "type": "Kuja Pirates"
+                  },
+                  "pick": {
+                    "upTo": 1
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "trigger",
+        "kind": "trigger",
+        "effect": [
+          {
+            "if": {
+              "leader": {
+                "type": "Kuja Pirates"
+              }
+            },
+            "then": [
+              {
+                "do": {
+                  "play": {
+                    "what": {
+                      "from": "self",
+                      "owner": "you"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "OP13-113",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "abilities": [
+      {
+        "id": "on-play",
+        "kind": "auto",
+        "when": [
+          "onPlay"
+        ],
+        "effect": [
+          {
+            "do": {
+              "lookAtTop": {
+                "n": 4,
+                "take": [
+                  {
+                    "pick": {
+                      "upTo": 1
+                    },
+                    "filter": {
+                      "all": [
+                        {
+                          "hasTrigger": true
+                        },
+                        {
+                          "not": {
+                            "name": "Lilith"
+                          }
+                        }
+                      ]
+                    },
+                    "reveal": true,
+                    "to": "hand"
+                  }
+                ],
+                "rest": "bottomAnyOrder"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "trigger",
+        "kind": "trigger",
+        "effect": [
+          {
+            "do": {
+              "activate": {
+                "ability": "onPlay",
+                "of": "self"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cardId": "OP17-119",
+    "textHash": "draft",
+    "verified": {
+      "source": "draft",
+      "date": "2026-11-16"
+    },
+    "abilities": [
+      {
+        "id": "tall",
+        "kind": "permanent",
+        "apply": [
+          {
+            "cost": {
+              "target": {
+                "from": "self",
+                "owner": "you"
+              },
+              "amount": 12
+            }
+          }
+        ]
+      },
+      {
+        "id": "opp-turn-power",
+        "kind": "permanent",
+        "conditions": [
+          {
+            "opponentsTurn": true
+          }
+        ],
+        "apply": [
+          {
+            "power": {
+              "target": {
+                "from": "self",
+                "owner": "you"
+              },
+              "amount": 3000
+            }
+          }
+        ]
+      },
+      {
+        "id": "on-play",
+        "kind": "auto",
+        "when": [
+          "onPlay"
+        ],
+        "effect": [
+          {
+            "do": {
+              "ko": {
+                "from": "characters",
+                "owner": "opponent",
+                "pick": {
+                  "upTo": 5,
+                  "totalCost": {
+                    "lte": 4
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

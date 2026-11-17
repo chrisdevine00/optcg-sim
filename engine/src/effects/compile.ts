@@ -3,7 +3,7 @@
  * only an instruction pointer (ARCHITECTURE §2.4: frames are plain data). Control flow becomes
  * jumps. Programs are cached per ability object; scripts are immutable data.
  */
-import type { Condition, Cost, EffectAction, P } from '@optcg/cards';
+import type { Condition, Cost, EffectAction, Num, P } from '@optcg/cards';
 import { isEffect } from '@optcg/cards';
 import type { Ability, EStep, InternalStep } from '../abilities.ts';
 import { isInternal } from '../abilities.ts';
@@ -12,7 +12,8 @@ export type Instr =
   | { k: 'pay'; cost: Cost }
   /** Costs are paid: the effect proper starts here (CR 8-4-1 (4)). */
   | { k: 'paid' }
-  | { k: 'do'; a: EffectAction }
+  /** `label`: "if you do" can read whether this action did something (OP08-098). */
+  | { k: 'do'; a: EffectAction; label?: string }
   | { k: 'op'; a: InternalStep }
   /** Jump to `to` unless the condition holds. */
   | { k: 'jf'; c: Condition; to: number }
@@ -23,6 +24,10 @@ export type Instr =
   | { k: 'mode'; chooser: P; labels: string[]; neutral?: string[]; to: number[] }
   /** Register a delayed body starting at the next instruction; continue at `to`. */
   | { k: 'delay'; to: number }
+  /** `forEach`: count `n` now; run the body that many times, or jump to `to` for none. */
+  | { k: 'fe'; n: Num; to: number }
+  /** End of a `forEach` body: run it again (from `start`) while runs are left. */
+  | { k: 'feEnd'; start: number }
   | { k: 'end' };
 
 const cache = new WeakMap<object, Instr[]>();
@@ -66,7 +71,9 @@ function step(out: Instr[], st: EStep): void {
     return;
   }
   if ('do' in st && !('forEach' in st) && !('delayed' in st)) {
-    out.push({ k: 'do', a: st.do });
+    const i: Instr = { k: 'do', a: st.do };
+    if ('label' in st && st.label) i.label = st.label;
+    out.push(i);
     return;
   }
   if ('if' in st) {
@@ -112,6 +119,15 @@ function step(out: Instr[], st: EStep): void {
       ends.push(j);
     }
     for (const j of ends) if (j.k === 'jmp') j.to = out.length;
+    return;
+  }
+  if ('forEach' in st) {
+    const fe: Instr = { k: 'fe', n: st.forEach, to: -1 };
+    out.push(fe);
+    const start = out.length;
+    steps(out, st.do);
+    out.push({ k: 'feEnd', start });
+    fe.to = out.length;
     return;
   }
   if ('delayed' in st) {

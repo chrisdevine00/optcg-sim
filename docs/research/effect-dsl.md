@@ -728,6 +728,24 @@ export type ReplaceEvent =
 - `lookTop(5).reveal(upTo(1, type('Navy'))).toHand().restBottom()`.
 The builders are sugar only. The test compares a script with its builder form, so neither drifts.
 
+### 4.15 Runtime notes (M4b wave 1, 2026-11-16)
+
+The runtime now implements every shape the 143 unscripted meta cards need (`docs/research/m4b-runtime-audit.md`; DECISIONS 2026-11-16). Where it refines the grammar above:
+
+- **Permanents are staged** (§4.9): cost, base power, power, keyword grants, restrictions; a stage reads only the stages below it. `tiers` entries are cumulative. A hand-zone `cost` or `counter` applies to the card itself.
+- **`do` steps take a `label`** (§4.10): `{ do: Action, label }` records the label when the action did something (a card was played, K.O.'d, moved, rested or set active), so `{ ifDid }` after "Play up to 1 ... If you do, ..." (OP08-098) is false when nothing happened. A `may` label still means "accepted".
+- **Restrictions on a player** (`restrict` with `target: P`): `cannotDrawByOwnEffects` and `{ cannotPlay: Filter }`. `cannotActivateBlockerAgainstIt` on a bound card is not [Unblockable].
+- **Costs** (§4.5): `lifeToHand` (n = 1), `turnLifeFaceUp` (the top card must be face-down), `mill`, `rest` (a selector over active cards; `donCostArea` in `from` adds the cost area's active DON!!), `move` (from a hand or trash). All are all-or-nothing and offered only when payable. A replacement payload (`instead`) may be any of them.
+- **`rest` action over `donCostArea`**: cards and DON!! are one decision (`pick: { any: true }` for "any number"); a `bind` also stores the number rested, read by `{ refCount }`.
+- **`move`**: `from: 'lifeTop'` (the top Life card to its owner's hand: `pick: { upTo: 1 }` asks, `exactly` does not); hand or trash to the top of Life (`faceUp` optional); hand or trash to the deck with `position: 'topOrBottom'` (one choice for all). Cards placed at a deck's bottom go in the order picked.
+- **`lookAtTop`**: `take.to: 'lifeTop'`, `rest: 'trash'`, and a take of more than one card.
+- **`giveDon`**: gives min(n, DON!! available), never fewer by choice; `each` gives every target up to n, asking which targets when DON!! run short.
+- **`play`**: `from: 'trash'` and `from: 'self'` ([Trigger] "Play this card"); `rested: true`; a card barred by `cannotPlay` cannot be chosen.
+- **`activate: { ability: 'onPlay' }`** runs the card's own [On Play] (its conditions and optional cost apply).
+- **Events**: `cardPlayed`, `eventActivated`, `blockerActivated` (`by` is relative to the watcher), `lifeRemoved`, `lifeBecameZero`, `koed` (the filter reads the K.O.'d card with printed values). Autos on the turn player's cards queue first.
+- **`rules`** in a script: `alsoNamed` (a name filter matches the alias) and `donDeckSize`.
+- **Not implemented** (no meta card needs them): `draw` with `upTo`, pick `groups` (write two `select`s with `not: { ref }`), `lki`, opponent's-deck `lookAtTop`, `rest: 'topAnyOrder'`, `anyNumberInDeck`, `deckRestriction`, the `mill` action, a permanent `playCost` or `cannotPlay`.
+
 ## 5. The smallest vocabulary that covers all 182 meta cards
 
 Derived by reading every meta card (text in `.cache/track-e/meta-cards.txt`) against §4. Names here are the script keys from §4.14 (`power`, `cost`, `negate`, `grant`). §3 and Appendix A use the tagger's family labels for the same things (`powerMod`, `costMod`, `negateEffects`, `grantKeyword`). The per-card mapping is Appendix A. Two meta cards (OP12-114 Wyper, OP08-099 Kalgara) are vanillas and need nothing.

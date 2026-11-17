@@ -22,11 +22,15 @@ export const MAX_COPIES = 4;
 export const OPENING_HAND = 5;
 
 export function donDeckSizeFor(leader: CardId): number {
+  // A script's `rules: [{ donDeckSize }]` and the table above say the same thing; either is read.
+  const fromScript = SCRIPTS[leader]?.rules?.find((r) => 'donDeckSize' in r);
+  if (fromScript && 'donDeckSize' in fromScript) return fromScript.donDeckSize;
   return RULES_CLAUSES[leader]?.donDeckSize ?? STANDARD_DON;
 }
 
 export function toDef(card: Card): Def {
-  return {
+  const alsoNamed = SCRIPTS[card.id]?.rules?.flatMap((r) => ('alsoNamed' in r ? r.alsoNamed : []));
+  const def: Def = {
     id: card.id,
     name: card.name,
     category: card.category,
@@ -42,6 +46,9 @@ export function toDef(card: Card): Def {
     // Effect scripts (cards/effects, E-D1); an unscripted card plays for its stats (E-D7, E-D8).
     abilities: (SCRIPTS[card.id]?.abilities ?? []) as Ability[],
   };
+  // "Under the rules of this game, also treat this card's name as ..." (EB04-038).
+  if (alsoNamed?.length) def.alsoNamed = alsoNamed;
+  return def;
 }
 
 export class DefTable {

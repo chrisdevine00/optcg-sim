@@ -7,16 +7,17 @@
  * Scripts live in `cards/effects/<SET>/<CARD-ID>.ts`, one `CardScript` per card number, and are
  * validated by `validateScript` (`dsl-validate.ts`) in CI (E-D1).
  *
- * The vocabulary below is the full §4.14 sketch. The runtime implements the part that the scripted
- * archetypes need; `validateScript` rejects anything the runtime does not implement yet, so a script
- * can never silently do nothing (see `IMPLEMENTED` in `dsl-validate.ts`).
+ * The vocabulary below is the full §4.14 sketch. The runtime implements the part the meta needs
+ * (M4a: Rocks and Kaido; M4b wave 1: the other 143 meta cards, effect-dsl.md §4.15);
+ * `validateScript` rejects anything the runtime does not implement, so a script can never silently
+ * do nothing (see `IMPLEMENTED` in `dsl-validate.ts`).
  */
 import type { CardCategory, Color, Keyword } from './schema.ts';
 
 export type { Keyword };
 /** Relative players: `you` controls the ability's source; `opponent` is the other player. */
 export type P = 'you' | 'opponent';
-/** Names a `may` step for `ifDid`. */
+/** Names a `may` step, or a `do` step that did something, for `ifDid` ("If you do"). */
 export type Label = string;
 /** Names a bound selection (`bind`), read back with `{ ref }`. */
 export type Name = string;

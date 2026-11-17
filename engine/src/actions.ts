@@ -8,7 +8,15 @@
 import type { Action, InstanceId, Intent, OptionChoice, PlayerId, Reason } from './api.ts';
 import { hasTiming, optionalCost, type Ability } from './abilities.ts';
 import { derive } from './derive.ts';
-import { attackLock, counterOf, payable, type Ctx } from './effects/eval.ts';
+import {
+  allHold,
+  attackLock,
+  counterOf,
+  payable,
+  playBlocked,
+  playCostOf,
+  type Ctx,
+} from './effects/eval.ts';
 import { answerEffect, pushEffect } from './effects/run.ts';
 import type { Draft } from './draft.ts';
 import { OPENING_HAND } from './defs.ts';
@@ -18,6 +26,7 @@ import {
   answerTrigger,
   applyReplacement,
   beginEndPhase,
+  fireActor,
   fireFor,
   hasScriptedTrigger,
   choosePending,
@@ -54,7 +63,7 @@ const ctx = (s: State, p: PlayerId, self: InstanceId): Ctx => ({ s, you: p, self
 
 /** Can `p` activate this Event's [Main] or [Counter] from hand: its cost plus its activation costs? */
 function eventPayable(s: State, p: PlayerId, card: InstanceId, ab: Ability): boolean {
-  const cost = derive(s, card).cost ?? 0;
+  const cost = playCostOf(s, p, card).cost;
   // A "you may" activation cost can always be skipped (CR 8-3-1-4): only the card's own cost must
   // be payable to play it; the activation cost is asked afterwards (B-1).
   const costs = ab.kind === 'activate' && !optionalCost(ab) ? ab.cost : undefined;
@@ -154,7 +163,9 @@ export function check(s: State, player: PlayerId, a: Intent | null): Reason | nu
         );
       if (main && !eventPayable(s, player, a.card, main))
         return r("You can't pay this Event's cost and activation cost together.", 'CR 8-3-1-3');
-      const cost = derive(s, a.card).cost ?? 0;
+      if (playBlocked(s, player, a.card))
+        return r('An effect says you cannot play this card right now.', 'CR 1-3-3');
+      const cost = playCostOf(s, player, a.card).cost;
       if (cost > ps.donActive)
         return r(
           `You need ${cost} active DON!! to play this card; you have ${ps.donActive}.`,
@@ -190,6 +201,8 @@ export function check(s: State, player: PlayerId, a: Intent | null): Reason | nu
       if (derive(s, a.card).negated) return r("This card's effects are negated.", 'CR 8-2-1-1');
       if (ab.oncePerTurn && s.oncePerTurn.includes(`${a.card}/${ab.id}`))
         return r('[Once Per Turn]: already used this turn.', 'CR 10-2-13-1');
+      if (!allHold(ctx(s, player, a.card), ab.conditions))
+        return r("This effect's condition is not met.", 'CR 8-3-2-3');
       if (ab.kind === 'activate' && !payable(ctx(s, player, a.card), ab.cost))
         return r("You can't pay this effect's cost.", 'CR 8-3-1-3');
       return null;
@@ -209,6 +222,8 @@ export function check(s: State, player: PlayerId, a: Intent | null): Reason | nu
       if (c.rested) return r("A rested card can't block.", 'CR 10-1-4-1');
       if (derive(s, b.attacker).keywords.includes('Unblockable'))
         return r('This attacker has [Unblockable]: [Blocker] cannot be activated.', 'CR 10-1-7-1');
+      if (derive(s, b.attacker).noBlocker)
+        return r('An effect says [Blocker] cannot be activated against this attack.', 'CR 1-3-3');
       return null;
     }
     case 'counter': {
@@ -575,6 +590,8 @@ export function apply(d: Draft, a: Action): void {
           player: p,
         });
         fireFor(d, [p], 'onBlock', () => [a.blocker!]);
+        // "When your opponent activates [Blocker]" (OP15-119).
+        fireActor(d, 'blockerActivated', p);
       } else {
         d.emit({ type: 'NoBlock', player: p });
       }

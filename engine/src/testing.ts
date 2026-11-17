@@ -42,6 +42,13 @@ export function withKeywords(state: GameState, cardId: CardId, keywords: string[
   return gs({ ...s, defs: { ...s.defs, [cardId]: { ...def, keywords } } });
 }
 
+/** A copy of `state` in which this card id is also named `names` ("under the rules of this game"). */
+export function withAlsoNamed(state: GameState, cardId: CardId, names: string[]): GameState {
+  const s = st(state);
+  const def = s.defs[cardId]!;
+  return gs({ ...s, defs: { ...s.defs, [cardId]: { ...def, alsoNamed: names } } });
+}
+
 export interface ModSpec {
   kind: ModKind;
   target: InstanceId;

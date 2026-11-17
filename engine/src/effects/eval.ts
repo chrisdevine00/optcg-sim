@@ -6,7 +6,14 @@
 import type { Cmp, Condition, Cost, Filter, Num, Selector, Zone as SZone } from '@optcg/cards';
 import type { InstanceId, PlayerId } from '../api.ts';
 import type { Ability } from '../abilities.ts';
-import { derive, deriveLive, type Derived } from '../derive.ts';
+import {
+  derive,
+  deriveAt,
+  deriveLive,
+  isNegated,
+  type Derived,
+  type LayerMemo,
+} from '../derive.ts';
 import { other, type State } from '../state.ts';
 
 export interface Ctx {
@@ -19,12 +26,23 @@ export interface Ctx {
   b?: Record<string, InstanceId[]> | undefined;
   /** Accepted `may` labels. */
   did?: string[] | undefined;
+  /** Numeric bindings, by name (DON!! rested "this way"). */
+  n?: Record<string, number> | undefined;
   /** The state is a draft being written: derive without the memo. */
   live?: boolean;
+  /**
+   * Set while a permanent effect's own conditions and targets are read (effects/layers.ts): values
+   * come from the layers below `upto`, so a layer never reads itself.
+   */
+  lay?: { upto: number; memo: LayerMemo };
 }
 
 export const dvOf = (c: Ctx, id: InstanceId): Derived =>
-  c.live ? deriveLive(c.s, id) : derive(c.s, id);
+  c.lay
+    ? deriveAt(c.s, id, c.lay.upto, c.lay.memo, c.live)
+    : c.live
+      ? deriveLive(c.s, id)
+      : derive(c.s, id);
 
 const ownersOf = (c: Ctx, owner: Selector['owner']): PlayerId[] =>
   owner === 'you' ? [c.you] : owner === 'opponent' ? [other(c.you)] : [c.you, other(c.you)];
@@ -97,7 +115,7 @@ export function matches(c: Ctx, id: InstanceId, f: Filter): boolean {
   if ('hasCounter' in f) return (def.counter ?? 0) > 0 === f.hasCounter;
   if ('type' in f) return def.types.includes(f.type);
   if ('typeIncludes' in f) return def.types.some((t) => t.includes(f.typeIncludes));
-  if ('name' in f) return def.name === f.name;
+  if ('name' in f) return def.name === f.name || (def.alsoNamed?.includes(f.name) ?? false);
   if ('color' in f) return def.colors.includes(f.color);
   if ('multicolor' in f) return def.colors.length > 1;
   if ('hasTrigger' in f) return def.hasTrigger === f.hasTrigger;
@@ -143,7 +161,8 @@ export function num(c: Ctx, n: Num): number {
     const p = rel(c, n.turnIndex);
     return p === s.first ? Math.ceil(s.turn / 2) : Math.floor(s.turn / 2);
   }
-  if ('refCount' in n) return (c.b?.[n.refCount] ?? []).filter((id) => s.cards[id]).length;
+  if ('refCount' in n)
+    return c.n?.[n.refCount] ?? (c.b?.[n.refCount] ?? []).filter((id) => s.cards[id]).length;
   if ('refStat' in n) {
     const id = (c.b?.[n.refStat] ?? []).find((x) => s.cards[x]);
     if (!id) return 0;
@@ -207,6 +226,9 @@ export function payable(c: Ctx, costs: readonly Cost[] | undefined, o: PayOption
   if (!costs || costs.length === 0) return true;
   let returns = 0;
   let rests = 0;
+  let lifeNeeds = 0;
+  let millNeeds = 0;
+  const restNeeds: { sel: Selector; n: number }[] = [];
   const handNeeds: { sel: Selector; n: number }[] = [];
   for (const k of costs) {
     if ('donMinus' in k) returns += k.donMinus;
@@ -216,6 +238,20 @@ export function payable(c: Ctx, costs: readonly Cost[] | undefined, o: PayOption
       const sel = 'trash' in k ? k.trash : k.reveal;
       const n = sel.pick && 'exactly' in sel.pick ? sel.pick.exactly : 1;
       handNeeds.push({ sel, n });
+    } else if ('lifeToHand' in k) lifeNeeds += k.lifeToHand.n;
+    else if ('turnLifeFaceUp' in k) {
+      // The top Life card is turned: it must be there and face-down.
+      const top = ps.life.slice(0, k.turnLifeFaceUp);
+      if (top.length < k.turnLifeFaceUp || top.some((id) => s.cards[id]!.faceUp)) return false;
+    } else if ('mill' in k) millNeeds += k.mill;
+    else if ('rest' in k)
+      restNeeds.push({
+        sel: k.rest,
+        n: k.rest.pick && 'exactly' in k.rest.pick ? k.rest.pick.exactly : 1,
+      });
+    else if ('move' in k) {
+      const n = k.move.pick && 'exactly' in k.move.pick ? k.move.pick.exactly : 1;
+      if (pool(c, k.move).length < n) return false;
     } else if ('restSelf' in k) {
       const me = s.cards[c.self];
       if (!me || me.rested || !['leader', 'characters', 'stage'].includes(me.zone)) return false;
@@ -224,8 +260,18 @@ export function payable(c: Ctx, costs: readonly Cost[] | undefined, o: PayOption
       if (!me || !['characters', 'stage'].includes(me.zone)) return false;
     } else return false; // not implemented: never payable
   }
+  if (ps.life.length < lifeNeeds || ps.deck.length < millNeeds) return false;
   const active = ps.donActive - play;
   if (rests > active) return false;
+  for (const { sel, n } of restNeeds) {
+    // Only an active card can be rested (CR 1-3-2-1); DON!! in the cost area count when named.
+    const zones = Array.isArray(sel.from) ? sel.from : [sel.from];
+    const cards = pool(c, { ...sel, from: zones.filter((z) => z !== 'donCostArea') }).filter(
+      (id) => !s.cards[id]!.rested,
+    );
+    const don = zones.includes('donCostArea') ? Math.max(0, active - rests) : 0;
+    if (cards.length + don < n) return false;
+  }
   if (returns > donOnField(s, c.you) - rests) return false;
   // Hand costs: enough matching cards, other than the card being played.
   const used = new Set<InstanceId>();
@@ -267,12 +313,12 @@ function permanents(s: State, id: InstanceId): Extract<Ability, { kind: 'permane
 const ON_FIELD = new Set(['leader', 'characters', 'stage']);
 
 /** Field cards of `p` whose permanent effects are valid now (not negated, CR 8-2). */
-function liveSources(s: State, p: PlayerId, live: boolean): InstanceId[] {
+function liveSources(s: State, p: PlayerId, _live: boolean): InstanceId[] {
   const ps = s.players[p];
   return [ps.leader, ...ps.characters, ...ps.stage].filter((id) => {
     const card = s.cards[id]!;
     if (!s.defs[card.card]!.abilities.some((a) => a.kind === 'permanent')) return false;
-    return !(live ? deriveLive(s, id) : derive(s, id)).negated;
+    return !isNegated(s, id);
   });
 }
 
@@ -325,4 +371,52 @@ export function attackLock(s: State, attacker: PlayerId, live = false): Instance
     }
   }
   return out;
+}
+
+// ---------------------------------------------------------------------------------------------
+// Restrictions and discounts on a player (M4b wave 1)
+//
+// A restriction on a player ("you cannot play Character cards with a base cost of 5 or more during
+// this turn", "you cannot draw cards using your own effects") and a pending one-shot discount ("the
+// next time you play [Trafalgar Law] ... the cost will be reduced by 2") are modifiers on that
+// player's Leader, which never leaves the field, so they expire with the same durations as any other.
+// ---------------------------------------------------------------------------------------------
+
+function leaderMods(s: State, p: PlayerId, kind: 'cannotDraw' | 'cannotPlay' | 'playCost') {
+  const leader = s.players[p].leader;
+  return s.mods.filter((m) => m.kind === kind && m.target === leader);
+}
+
+/** "Cannot draw cards using your own effects" is in force for `p`. */
+export const cannotDrawByEffect = (s: State, p: PlayerId): boolean =>
+  leaderMods(s, p, 'cannotDraw').length > 0;
+
+/** Is `p` barred from playing this card (a `cannotPlay` filter matches it)? Plays by any means. */
+export function playBlocked(s: State, p: PlayerId, card: InstanceId): boolean {
+  const leader = s.players[p].leader;
+  return leaderMods(s, p, 'cannotPlay').some(
+    (m) => m.filter && matches({ s, you: p, self: leader, live: true }, card, m.filter),
+  );
+}
+
+/**
+ * What `p` pays to play this card from hand: its current cost, changed by the pending one-shot
+ * discounts that match it. `used` are the discounts that applied (they are spent when it is paid).
+ */
+export function playCostOf(
+  s: State,
+  p: PlayerId,
+  card: InstanceId,
+  live = false,
+): { cost: number; used: number[] } {
+  const base = (live ? deriveLive(s, card) : derive(s, card)).cost ?? 0;
+  const leader = s.players[p].leader;
+  let delta = 0;
+  const used: number[] = [];
+  for (const m of leaderMods(s, p, 'playCost')) {
+    if (m.filter && !matches({ s, you: p, self: leader, live }, card, m.filter)) continue;
+    delta += m.amount;
+    used.push(m.id);
+  }
+  return { cost: Math.max(0, base + delta), used };
 }

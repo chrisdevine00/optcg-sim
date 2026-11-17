@@ -90,10 +90,10 @@ describe('validateScript', () => {
   });
 
   it('rejects vocabulary the runtime does not implement yet, and $-prefixed or duplicate ids', () => {
-    const forEach = variant((s) => {
-      (s.abilities[0] as { effect: unknown[] }).effect.push({ forEach: 1, do: [] });
+    const drawUpTo = variant((s) => {
+      (s.abilities[0] as { effect: unknown[] }).effect.push({ do: { draw: 2, upTo: true } });
     });
-    expect(validateScript(forEach).join()).toMatch(/not implemented/);
+    expect(validateScript(drawUpTo).join()).toMatch(/not implemented/);
     const dollar = variant((s) => (s.abilities[0]!.id = '$abc1234'));
     expect(validateScript(dollar).join()).toMatch(/must match/);
     const dup = variant((s) => s.abilities.push(structuredClone(s.abilities[0]!)));
@@ -149,12 +149,50 @@ describe('validateScript rejects shapes the runtime would get wrong (M4a-07)', (
       },
     ],
     [
-      'trash to Life',
+      'Characters to Life',
       {
         do: {
-          move: { what: { from: 'trash', owner: 'you', pick: { upTo: 1 } }, to: { zone: 'life' } },
+          move: {
+            what: { from: 'characters', owner: 'you', pick: { upTo: 1 } },
+            to: { zone: 'life' },
+          },
         },
       },
+    ],
+    [
+      'the top Life card to the trash',
+      {
+        do: {
+          move: {
+            what: { from: 'lifeTop', owner: 'you', pick: { upTo: 1 } },
+            to: { zone: 'trash' },
+          },
+        },
+      },
+    ],
+    [
+      'a Life zone outside a move',
+      { do: { ko: { from: 'lifeTop', owner: 'opponent', pick: { upTo: 1 } } } },
+    ],
+    [
+      'a restriction on a player that is not a player restriction',
+      { do: { restrict: { target: 'opponent', what: 'cannotAttack', duration: 'thisTurn' } } },
+    ],
+    [
+      'a pick by groups',
+      {
+        do: {
+          ko: {
+            from: 'characters',
+            owner: 'opponent',
+            pick: { groups: [{ filter: { cost: { lte: 1 } }, upTo: 1 }] },
+          },
+        },
+      },
+    ],
+    [
+      'play from the opponent-visible Life',
+      { do: { play: { what: { from: 'lifeTop', owner: 'you', pick: { upTo: 1 } } } } },
     ],
     [
       'mixed hand and Characters',
@@ -166,18 +204,6 @@ describe('validateScript rejects shapes the runtime would get wrong (M4a-07)', (
           },
         },
       },
-    ],
-    [
-      'a restriction on a player',
-      { do: { restrict: { target: 'opponent', what: 'cannotAttack', duration: 'thisTurn' } } },
-    ],
-    [
-      'play rested',
-      { do: { play: { what: { from: 'hand', owner: 'you', pick: { upTo: 1 } }, rested: true } } },
-    ],
-    [
-      'play from the trash',
-      { do: { play: { what: { from: 'trash', owner: 'you', pick: { upTo: 1 } } } } },
     ],
     ['draw up to', { do: { draw: 2, upTo: true } }],
     ['K.O. a Leader', { do: { ko: { from: 'leader', owner: 'opponent' } } }],

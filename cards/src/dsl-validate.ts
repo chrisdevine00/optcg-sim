@@ -28,6 +28,12 @@ export const IMPLEMENTED = {
     'startOfGame',
     'event:attack',
     'event:donReturned',
+    'event:cardPlayed',
+    'event:eventActivated',
+    'event:blockerActivated',
+    'event:lifeRemoved',
+    'event:lifeBecameZero',
+    'event:koed',
   ],
   zones: [
     'leader',
@@ -39,10 +45,25 @@ export const IMPLEMENTED = {
     'deckTop',
     'self',
     'donCostArea',
+    // Only as the source of a `move` (the top Life card to a hand): see `selector`.
+    'lifeTop',
   ],
-  picks: ['upTo', 'exactly'],
-  costs: ['donMinus', 'restDon', 'trash', 'reveal', 'restSelf', 'trashSelf', 'returnDon'],
-  steps: ['do', 'if', 'may', 'ifDid', 'chooseOne', 'delayed'],
+  picks: ['upTo', 'exactly', 'any'],
+  costs: [
+    'donMinus',
+    'restDon',
+    'trash',
+    'reveal',
+    'restSelf',
+    'trashSelf',
+    'returnDon',
+    'lifeToHand',
+    'turnLifeFaceUp',
+    'mill',
+    'rest',
+    'move',
+  ],
+  steps: ['do', 'if', 'may', 'ifDid', 'chooseOne', 'delayed', 'forEach'],
   actions: [
     'draw',
     'trashFromHand',
@@ -62,9 +83,29 @@ export const IMPLEMENTED = {
     'restrict',
     'activate',
     'select',
+    'cost',
+    'playCost',
+    'giveDon',
+    'skipRefresh',
+    'trashLifeUntil',
   ],
-  continuous: ['counter', 'lockAttackTarget'],
-  restrictions: ['cannotAttack'],
+  continuous: [
+    'counter',
+    'lockAttackTarget',
+    'power',
+    'setBasePower',
+    'cost',
+    'grant',
+    'restrict',
+    'tiers',
+  ],
+  restrictions: [
+    'cannotAttack',
+    'cannotActivateBlockerAgainstIt',
+    'cannotDrawByOwnEffects',
+    'cannotBeRemovedByOpponentEffects',
+    'cannotBeKOd',
+  ],
   nums: [
     'count',
     'life',
@@ -87,6 +128,8 @@ interface Ctx {
   bound: Set<string>;
   labels: Set<string>;
   inCost: boolean;
+  /** A selector may name the top Life card (only a `move` can read it). */
+  lifeOk?: boolean;
 }
 
 const isObj = (v: unknown): v is Obj => !!v && typeof v === 'object' && !Array.isArray(v);
@@ -328,6 +371,8 @@ function selector(c: Ctx, path: string, v: unknown): void {
     enumOf(c, `${path}.from`, z, ZONES);
     if (typeof z === 'string' && ZONES.includes(z) && !has(IMPLEMENTED.zones, z))
       err(c, `${path}.from`, `zone ${z} is not implemented in the runtime yet`);
+    if (z === 'lifeTop' && !c.lifeOk)
+      err(c, `${path}.from`, 'lifeTop can only be the source of a move to a hand');
   }
   enumOf(c, `${path}.owner`, v.owner, [...P, 'any']);
   if (v.filter !== undefined) filter(c, `${path}.filter`, v.filter);
@@ -458,17 +503,34 @@ function cost(c: Ctx, path: string, v: unknown): void {
     case 'rest':
       selector(c, p, o[k]);
       if (isObj(o[k]) && !(o[k] as Obj).pick) err(c, p, 'a cost selector needs a pick');
+      if (k === 'rest')
+        zonesIn(
+          c,
+          p,
+          o[k],
+          [...FIELD_ZONES, 'donCostArea'],
+          'a rest cost rests cards on the field or DON!! in the cost area',
+        );
       return;
     case 'restSelf':
     case 'trashSelf':
       if (o[k] !== true) err(c, p, 'expected true');
       return;
-    case 'lifeToHand':
+    case 'lifeToHand': {
       fields(c, p, o[k], ['from', 'n']);
+      const spec = o[k];
+      if (!isObj(spec)) return;
+      enumOf(c, `${p}.from`, spec.from, ['top', 'topOrBottom']);
+      int(c, `${p}.n`, spec.n);
+      if (spec.n !== 1) err(c, `${p}.n`, 'only n = 1 is implemented');
       return;
+    }
     case 'move':
       selector(c, p, o.move);
-      return dest(c, `${path}.to`, o.to);
+      if (isObj(o.move) && !(o.move as Obj).pick) err(c, p, 'a cost selector needs a pick');
+      zonesIn(c, p, o.move, ['hand', 'trash'], 'a cost moves cards from a hand or trash only');
+      dest(c, `${path}.to`, o.to);
+      return moveShape(c, p, o.move, o.to);
   }
 }
 
@@ -494,6 +556,10 @@ function step(c: Ctx, path: string, v: unknown): void {
   if (!has(IMPLEMENTED.steps, k)) err(c, path, `step ${k} is not implemented in the runtime yet`);
   switch (k) {
     case 'do':
+      if (o.label !== undefined) {
+        str(c, `${path}.label`, o.label);
+        if (typeof o.label === 'string') c.labels.add(o.label);
+      }
       return action(c, `${path}.do`, o.do);
     case 'if':
       condition(c, `${path}.if`, o.if);
@@ -590,7 +656,13 @@ function action(c: Ctx, path: string, v: unknown): void {
       return zonesIn(c, p, x, ['characters'], "only Characters are K.O.'d (CR 10-2-1)");
     case 'rest':
       selector(c, p, x);
-      return zonesIn(c, p, x, FIELD_ZONES, 'the runtime rests cards on the field only');
+      return zonesIn(
+        c,
+        p,
+        x,
+        [...FIELD_ZONES, 'donCostArea'],
+        'the runtime rests cards on the field, or DON!! in the cost area',
+      );
     case 'setActive':
       selector(c, p, x);
       return zonesIn(
@@ -620,15 +692,15 @@ function action(c: Ctx, path: string, v: unknown): void {
         if (!isObj(t)) return;
         pick(c, `${q}.pick`, t.pick);
         if (t.filter !== undefined) filter(c, `${q}.filter`, t.filter);
-        enumOf(c, `${q}.to`, t.to, ['hand']);
+        enumOf(c, `${q}.to`, t.to, ['hand', 'lifeTop']);
         if (t.reveal !== undefined && t.reveal !== true) err(c, `${q}.reveal`, 'expected true');
       });
-      return enumOf(c, `${p}.rest`, x.rest, ['bottomAnyOrder', 'topOrBottomAnyOrder']);
+      return enumOf(c, `${p}.rest`, x.rest, ['bottomAnyOrder', 'topOrBottomAnyOrder', 'trash']);
     }
     case 'reveal':
       fields(c, p, x, ['from', 'n', 'bind']);
       if (!isObj(x)) return;
-      enumOf(c, `${p}.from`, x.from, ['deckTop']);
+      enumOf(c, `${p}.from`, x.from, ['deckTop', 'lifeTop']);
       if (x.n !== 1) err(c, `${p}.n`, 'only n = 1 is implemented');
       str(c, `${p}.bind`, x.bind);
       if (typeof x.bind === 'string') c.bound.add(x.bind);
@@ -636,7 +708,9 @@ function action(c: Ctx, path: string, v: unknown): void {
     case 'move':
       fields(c, p, x, ['what', 'to']);
       if (!isObj(x)) return;
+      c.lifeOk = true;
       selector(c, `${p}.what`, x.what);
+      c.lifeOk = false;
       dest(c, `${p}.to`, x.to);
       return moveShape(c, p, x.what, x.to);
     case 'trashLifeUntil':
@@ -645,8 +719,14 @@ function action(c: Ctx, path: string, v: unknown): void {
       fields(c, p, x, ['what'], ['rested']);
       if (!isObj(x)) return;
       selector(c, `${p}.what`, x.what);
-      zonesIn(c, `${p}.what`, x.what, ['hand'], 'the runtime plays cards from hand only');
-      if (x.rested !== undefined) err(c, `${p}.rested`, 'playing rested is not implemented yet');
+      zonesIn(
+        c,
+        `${p}.what`,
+        x.what,
+        ['hand', 'trash', 'self'],
+        'the runtime plays cards from hand, trash or "this card" ([Trigger]) only',
+      );
+      if (x.rested !== undefined && x.rested !== true) err(c, `${p}.rested`, 'expected true');
       return;
     case 'power':
     case 'cost':
@@ -664,9 +744,25 @@ function action(c: Ctx, path: string, v: unknown): void {
       num(c, `${p}.value`, x.value);
       return enumOf(c, `${p}.duration`, x.duration, DURATIONS);
     case 'playCost':
-      return fields(c, p, x, ['next', 'from', 'amount', 'window', 'uses']);
+      fields(c, p, x, ['next', 'from', 'amount', 'window', 'uses']);
+      if (!isObj(x)) return;
+      filter(c, `${p}.next`, x.next);
+      enumOf(c, `${p}.from`, x.from, ['hand']);
+      int(c, `${p}.amount`, x.amount);
+      enumOf(c, `${p}.window`, x.window, ['thisTurn']);
+      if (x.uses !== 1) err(c, `${p}.uses`, 'only uses = 1 is implemented');
+      return;
     case 'giveDon':
-      return fields(c, p, x, ['n', 'state', 'to'], ['each']);
+      fields(c, p, x, ['n', 'state', 'to'], ['each']);
+      if (!isObj(x)) return;
+      num(c, `${p}.n`, x.n);
+      enumOf(c, `${p}.state`, x.state, ['rested', 'active']);
+      selector(c, `${p}.to`, x.to);
+      zonesIn(c, `${p}.to`, x.to, ['leader', 'characters'], 'DON!! go to a Leader or Character');
+      if (x.each !== undefined && x.each !== true) err(c, `${p}.each`, 'expected true');
+      if (x.each === true && isObj(x.to) && (x.to as Obj).pick)
+        err(c, `${p}.to`, 'with each, the selector has no pick (every match gets DON!!)');
+      return;
     case 'addDon':
       return arr(c, p, x, (y, q) => {
         fields(c, q, y, ['n', 'state'], ['upTo']);
@@ -694,9 +790,12 @@ function action(c: Ctx, path: string, v: unknown): void {
     case 'restrict':
       fields(c, p, x, ['target', 'what', 'duration']);
       if (!isObj(x)) return;
-      if (typeof x.target === 'string')
-        err(c, `${p}.target`, 'a restriction on a player is not implemented in the runtime yet');
-      else {
+      if (typeof x.target === 'string') {
+        enumOf(c, `${p}.target`, x.target, P);
+        const w = x.what;
+        if (w !== 'cannotDrawByOwnEffects' && !(isObj(w) && 'cannotPlay' in w))
+          err(c, `${p}.what`, 'a restriction on a player is cannotDrawByOwnEffects or cannotPlay');
+      } else {
         selector(c, `${p}.target`, x.target);
         zonesIn(c, `${p}.target`, x.target, FIELD_ZONES, 'modifiers apply to cards on the field');
       }
@@ -705,7 +804,7 @@ function action(c: Ctx, path: string, v: unknown): void {
     case 'activate':
       fields(c, p, x, ['ability', 'of']);
       if (!isObj(x)) return;
-      enumOf(c, `${p}.ability`, x.ability, ['main']);
+      enumOf(c, `${p}.ability`, x.ability, ['main', 'onPlay']);
       return enumOf(c, `${p}.of`, x.of, ['self']);
   }
 }
@@ -741,13 +840,37 @@ function moveShape(c: Ctx, path: string, what: unknown, to: unknown): void {
       err(c, `${path}.what.pick`, 'a move from the deck top needs { upTo: 1 }');
     return;
   }
-  if (to.faceUp !== undefined) err(c, `${path}.to.faceUp`, 'faceUp applies only to Life');
+  if (zones.includes('lifeTop')) {
+    if (zones.length !== 1 || dz !== 'hand' || pos !== undefined || to.faceUp !== undefined)
+      return err(c, path, "a move from the top of Life is implemented only to the owner's hand");
+    const pk = what.pick as Record<string, unknown> | undefined;
+    if (!pk || (pk.upTo !== 1 && pk.exactly !== 1))
+      err(
+        c,
+        `${path}.what.pick`,
+        'a move from the top of Life needs { upTo: 1 } or { exactly: 1 }',
+      );
+    return;
+  }
+  if (to.faceUp !== undefined && dz !== 'life')
+    err(c, `${path}.to.faceUp`, 'faceUp applies only to Life');
   if (!all(['hand', 'trash']) && !all(['characters', 'stage']))
     return err(c, `${path}.what.from`, `moving from ${zones.join(', ')} is not implemented yet`);
-  if (dz === 'life')
-    return err(c, `${path}.to`, 'moving into Life from here is not implemented yet');
-  if (dz === 'deck' && pos !== 'top' && pos !== 'bottom')
-    err(c, `${path}.to.position`, 'a move to the deck needs position "top" or "bottom"');
+  if (dz === 'life') {
+    if (!all(['hand', 'trash']))
+      return err(c, `${path}.to`, 'only a hand or trash card moves into Life');
+    if (pos !== undefined && pos !== 'top')
+      err(c, `${path}.to.position`, 'a card enters Life at the top');
+    return;
+  }
+  if (dz === 'deck' && pos !== 'top' && pos !== 'bottom' && pos !== 'topOrBottom')
+    err(
+      c,
+      `${path}.to.position`,
+      'a move to the deck needs position "top", "bottom" or "topOrBottom"',
+    );
+  if (pos === 'topOrBottom' && !all(['hand', 'trash']))
+    err(c, `${path}.to.position`, 'topOrBottom is implemented for cards from a hand or trash');
   if (dz !== 'deck' && pos !== undefined)
     err(c, `${path}.to.position`, 'position applies only to the deck');
 }
@@ -766,7 +889,8 @@ function restriction(c: Ctx, path: string, v: unknown): void {
       err(c, path, `restriction ${v} is not implemented in the runtime yet`);
     return;
   }
-  err(c, path, 'restriction cannotPlay is not implemented in the runtime yet');
+  fields(c, path, v, ['cannotPlay']);
+  if (isObj(v)) filter(c, `${path}.cannotPlay`, v.cannotPlay);
 }
 
 function continuous(c: Ctx, path: string, v: unknown): void {
@@ -786,16 +910,72 @@ function continuous(c: Ctx, path: string, v: unknown): void {
   const p = `${path}.${k}`;
   if (!has(IMPLEMENTED.continuous, k))
     return err(c, path, `permanent ${k} is not implemented in the runtime yet`);
-  if (k === 'counter') {
-    fields(c, p, x, ['target', 'value'], ['onlyIfNone']);
-    if (!isObj(x)) return;
-    selector(c, `${p}.target`, x.target);
-    return int(c, `${p}.value`, x.value);
+  switch (k) {
+    case 'counter':
+      fields(c, p, x, ['target', 'value'], ['onlyIfNone']);
+      if (!isObj(x)) return;
+      selector(c, `${p}.target`, x.target);
+      return int(c, `${p}.value`, x.value);
+    case 'lockAttackTarget':
+      fields(c, p, x, ['attacker', 'only']);
+      if (!isObj(x)) return;
+      enumOf(c, `${p}.attacker`, x.attacker, P);
+      return selector(c, `${p}.only`, x.only);
+    case 'power':
+    case 'cost':
+      fields(c, p, x, ['target', 'amount']);
+      if (!isObj(x)) return;
+      selector(c, `${p}.target`, x.target);
+      zonesIn(
+        c,
+        `${p}.target`,
+        x.target,
+        FIELD_ZONES,
+        'a permanent changes cards on the field (or this card)',
+      );
+      return num(c, `${p}.amount`, x.amount);
+    case 'setBasePower':
+      fields(c, p, x, ['target', 'value']);
+      if (!isObj(x)) return;
+      selector(c, `${p}.target`, x.target);
+      zonesIn(c, `${p}.target`, x.target, FIELD_ZONES, 'a permanent changes cards on the field');
+      return num(c, `${p}.value`, x.value);
+    case 'grant':
+      fields(c, p, x, ['target', 'keyword']);
+      if (!isObj(x)) return;
+      selector(c, `${p}.target`, x.target);
+      zonesIn(c, `${p}.target`, x.target, FIELD_ZONES, 'a permanent changes cards on the field');
+      return enumOf(c, `${p}.keyword`, x.keyword, KEYWORDS);
+    case 'restrict':
+      fields(c, p, x, ['target', 'what']);
+      if (!isObj(x)) return;
+      if (typeof x.target === 'string')
+        err(c, `${p}.target`, 'a permanent restricts cards, not players');
+      else {
+        selector(c, `${p}.target`, x.target);
+        zonesIn(
+          c,
+          `${p}.target`,
+          x.target,
+          FIELD_ZONES,
+          'a permanent restricts cards on the field',
+        );
+      }
+      if (typeof x.what !== 'string')
+        err(c, `${p}.what`, 'a permanent restriction is a plain restriction');
+      else restriction(c, `${p}.what`, x.what);
+      return;
+    case 'tiers':
+      return arr(c, p, x, (t, q) => {
+        fields(c, q, t, ['when', 'apply']);
+        if (!isObj(t)) return;
+        condition(c, `${q}.when`, t.when);
+        arr(c, `${q}.apply`, t.apply, (y, r) => {
+          if (isObj(y) && 'tiers' in y) err(c, r, 'tiers do not nest');
+          else continuous(c, r, y);
+        });
+      });
   }
-  fields(c, p, x, ['attacker', 'only']);
-  if (!isObj(x)) return;
-  enumOf(c, `${p}.attacker`, x.attacker, P);
-  selector(c, `${p}.only`, x.only);
 }
 
 function timing(c: Ctx, path: string, v: unknown): void {
@@ -810,6 +990,16 @@ function timing(c: Ctx, path: string, v: unknown): void {
       err(c, path, 'an attack event needs an attacker or a target');
     if (v.attacker !== undefined) selector(c, `${path}.attacker`, v.attacker);
     if (v.target !== undefined) selector(c, `${path}.target`, v.target);
+  } else if (v.event === 'cardPlayed') {
+    enumOf(c, `${path}.by`, v.by, P);
+    if (v.filter !== undefined) filter(c, `${path}.filter`, v.filter);
+  } else if (v.event === 'eventActivated' || v.event === 'blockerActivated') {
+    enumOf(c, `${path}.by`, v.by, P);
+  } else if (v.event === 'koed') {
+    if (v.filter === undefined) err(c, path, 'a koed event needs a filter');
+    else filter(c, `${path}.filter`, v.filter);
+  } else if (v.event === 'lifeRemoved') {
+    enumOf(c, `${path}.owner`, v.owner, [...P, 'any']);
   } else {
     enumOf(c, `${path}.owner`, v.owner, P);
   }
@@ -906,7 +1096,15 @@ export function validateScript(script: unknown): string[] {
   fields(c, `${path}.verified`, script.verified, ['source', 'date'], ['note']);
   if (script.keywords !== undefined)
     arr(c, `${path}.keywords`, script.keywords, (k, p) => enumOf(c, p, k, KEYWORDS));
-  if (script.rules !== undefined) err(c, `${path}.rules`, 'rules clauses are not implemented yet');
+  if (script.rules !== undefined)
+    arr(c, `${path}.rules`, script.rules, (r, p) => {
+      const k = oneOf(c, p, r, ['donDeckSize', 'alsoNamed', 'anyNumberInDeck', 'deckRestriction']);
+      if (!k) return;
+      if (k === 'donDeckSize') int(c, `${p}.donDeckSize`, (r as Obj).donDeckSize);
+      else if (k === 'alsoNamed')
+        arr(c, `${p}.alsoNamed`, (r as Obj).alsoNamed, (n, q) => str(c, q, n));
+      else err(c, p, `rules clause ${k} is not implemented in the runtime yet`);
+    });
   if (script.rulings !== undefined)
     arr(c, `${path}.rulings`, script.rulings, (r, p) => str(c, p, r));
   const ids = new Set<string>();
