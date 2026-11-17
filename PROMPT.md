@@ -34,10 +34,10 @@ The first user is one person: an OPTCG player who knows the basic rules, owns ph
 ### Done when
 
 - A new visitor can finish the tutorial in under 20 minutes and then play a complete game against the AI with no instructions from anyone.
-- Every card in at least 10 current top-tier archetype lists is fully scripted; every other English-release card is browsable with art and text, and the deck builder shows a scripting-coverage percentage for any list.
+- Every card legal in the current Standard format is fully scripted, each with a test; rotated cards are browsable and play for their stats with the 'effect not automated' badge. New sets reach the app through a reviewed update PR. The deck builder shows a scripting-coverage percentage for any list.
 - The strongest AI tier beats the random-legal-move tier at least 95% of the time and plays each loaded meta deck according to that deck's game plan, not a generic heuristic.
 - Game Review correctly flags a planted missed-lethal scenario and a planted wasted-counter scenario in the test suite, and explains each in plain language.
-- The Meta Explorer shows the current English-format archetypes with an as-of date, sourced tournament lists, and matchup notes, and can be refreshed by one command.
+- The Meta Explorer shows the current English-format archetypes with an as-of date, sourced tournament lists, and matchup notes, and is refreshed by a scheduled job that opens a PR for review.
 - A full game vs AI is playable with keyboard alone, passes WCAG 2.2 AA contrast, and holds 60 fps on a 2020 laptop.
 - The app is a static build deployed to the hosting target chosen in Phase 2, and `docs/STATUS.md` says so.
 
@@ -276,6 +276,7 @@ Card data is fetched once by a script and committed as JSON; card art is never c
 3. Write `cards/data/cards.json` plus one file per set, and `cards/data/manifest.json` with the source, date, card count, and newest set.
 4. Print a diff report against the previous snapshot: new cards, changed text (errata), removed cards. Changed effect text on a scripted card fails CI until a human or you re-verify the script.
 5. New sets enter only through this script. Never hand-edit `cards.json`.
+6. A scheduled CI job runs this and `meta:update` and opens a PR; nothing reaches `main` without review.
 
 ### Art at runtime
 
@@ -313,7 +314,7 @@ Run the analysis over the replay in the worker and produce a turn timeline with 
 
 ### 4. Meta Explorer
 
-A browsable grid of the current English-format archetypes from Track G: tier, meta share, as-of date, leader card art. Each archetype opens to its guide (game plan, key cards and why, mulligan guide, matchups, weaknesses), its three sourced lists, and two buttons: "play this deck" and "play against this deck" (which loads the AI with that archetype's playbook). A matchup grid view shows every archetype against every other with the one-line plan. `npm run meta:update` re-fetches tournament data and flags guides whose lists are older than 60 days.
+A browsable grid of the current English-format archetypes from Track G: tier, meta share, as-of date, leader card art. Each archetype opens to its guide (game plan, key cards and why, mulligan guide, matchups, weaknesses), its three sourced lists, and two buttons: "play this deck" and "play against this deck" (which loads the AI with that archetype's playbook). A matchup grid view shows every archetype against every other with the one-line plan. `npm run meta:update` (built in M6b) re-fetches tournament data and flags guides whose lists are older than 60 days; a scheduled job runs it and opens a PR.
 
 ### 5. Drills
 
@@ -371,9 +372,10 @@ Build in this order. Each milestone ends with a green test suite, a STATUS.md up
 | M4 Effects | DSL runtime; scripts for every card in the 10 to 12 meta lists, then by meta frequency; coverage report in deck builder | 100% of meta-list cards scripted with a test each; coverage number shown |
 | M5 AI | Worker, Rookie and Pirate, then Warlord, playbooks for all archetypes, explanations | Strength thresholds pass in CI; AI vs AI full game runs under budget |
 | M6 Deck builder | Build, validate, import and export (text list and Limitless-style formats), alt-art choice, coverage, load into game | Round-trips a tournament list without loss; validation matches the rules |
+| M6b Card pool and live updates | Every Standard-legal card scripted and tested, set by set; `meta:update`; a scheduled job that opens update PRs for card data and the meta; app update prompt; AI default playbook for any leader | Every Standard-legal card plays fully (a block on hold for rotation excepted and listed); a real update PR has been through the new-set runbook; an old saved record stays live after an unrelated card is scripted |
 | M7 Tutorial and coach | Guided tutorial, hint, why, lethal detector, DON!! overlay, blunder warning, tempo meter | A new user finishes the tutorial in under 20 minutes in a moderated Playwright run; coach never interrupts unprompted |
 | M8 Review | Analysis mode, flags, timeline, restore-and-replay, local save | Planted missed-lethal and wasted-counter scenarios are flagged correctly with sensible explanations |
-| M9 Meta and drills | Meta Explorer, matchup grid, `meta:update`, four drills, rules reference, progress | Guides render with as-of dates and sources; each drill has at least 20 items; progress persists and exports |
+| M9 Meta and drills | Meta Explorer, matchup grid, four drills, rules reference, progress | Guides render with as-of dates and sources; each drill has at least 20 items; progress persists and exports |
 | M10 Polish and release | Performance pass, accessibility audit, reduced motion, offline, About page, deploy | Lighthouse performance and accessibility at or above 90; WCAG 2.2 AA; deployed URL in STATUS.md |
 
 After M10, continue with a backlog file `docs/BACKLOG.md` ordered by value: sealed mode, more AI depth, more archetypes, Japanese-format toggle, replay sharing by URL, and anything the owner adds.

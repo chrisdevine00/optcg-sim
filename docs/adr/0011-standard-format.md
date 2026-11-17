@@ -13,3 +13,6 @@ No format enforcement (lets the player practise with decks they cannot bring to 
 
 ## Consequences
 `cards:update` must capture block numbers, or `standard.json` must supply them; Track B reports which.
+
+## Addendum, 2026-11-17 (ADR 0014)
+Regulation and block changes stay hand-cited edits to `standard.json`. The scheduled update PR only flags them: new products with no `blocksByProduct` entry (legality `unknown` until a human adds a cited block) and a rotation warning within 60 days of `regulation.to`. Block 2 scripting is held until the rotation after 2027-03-31 is announced.

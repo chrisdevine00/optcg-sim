@@ -20,3 +20,6 @@ Parsing the official card list in bulk (its terms forbid reproduction; PROMPT.md
 - If Bandai grants permission, the official parser documented in the research becomes the primary in one module.
 - Hotlinking optcgapi images sends our players' image traffic to a hobbyist's paid server. The service-worker cache keeps repeat traffic low, and the owner may contact the maintainer as a courtesy.
 - The card schema gains `block`, `verified`, `textFixes` and printing-level `artworkId`s (`OP17-005_p1`). That schema change lands in M1.
+
+## Addendum, 2026-11-17 (ADR 0014)
+A scheduled bulk fetch is allowed: `update.yml` may call the optcgapi.com bulk endpoints weekly, with the 3 s delay, and its output goes only to a pull request for review. The official site is still never fetched, and no other workflow calls an external data API.

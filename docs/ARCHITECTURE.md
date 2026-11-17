@@ -24,7 +24,7 @@ cards/   card JSON (generated), overrides, effect scripts (data), DSL types, for
 | `ai` | Rookie/Pirate/Warlord/Emperor, heuristic, playbooks, determinization, turn planning, lethal search, analysis, the `Explanation` builder | UI, DOM (worker globals only in `worker.ts`) |
 | `app` | Everything visible; session store; persistence; service worker; content rendering | Rules. It never decides legality; it renders `legalActions` and `whyNot` |
 
-Node scripts (`cards:update`, `meta:update`) live in `cards/scripts/` and `scripts/` and may use the network; nothing under any `src/` fetches at build time.
+Node scripts (`cards:update`, `meta:update`) live in `cards/scripts/` and `scripts/` and may use the network; nothing under any `src/` fetches at build time. From M6b the scheduled `update.yml` workflow runs them (section 3, "Update pipeline").
 
 ## 2. Engine
 
@@ -101,6 +101,8 @@ Effect scripts (vocabulary from Track E) are data in `cards/effects/`. The engin
 - New turn-player effects queue behind effects the opponent already has pending.
 - Effects triggered during damage processing wait until damage processing finishes. [Trigger] is the exception: it pauses damage processing.
 
+**Lazy script loading (planned for M6b-0, not built).** About 2,000 scripts would break the 300 KB initial-JS budget, so scripts load lazily per set: `cards/effects/<SET>/index.ts` exports that set's scripts, and a registry of card IDs maps each ID to its set chunk. The engine requests a game's sets before `createGame`; the registry itself is small enough to stay in the initial bundle.
+
 **Unscripted cards** play for their stats. Their printed keywords ([Blocker], [Rush] and so on) still work when the verified override lists them (E-D7). Their text carries an "effect not automated" badge, and they lower the coverage number. An unscripted Event cannot be activated; `whyNot` says "effect not automated yet". An unscripted [Trigger] is not offered, so the Life card goes to hand (E-D8). [Once Per Turn] is keyed by instance and ability ID (E-D9). The DSL is specified in `docs/research/effect-dsl.md`; scripts are typed data validated by a schema in CI (E-D1).
 
 ### 2.5 Derived values
@@ -161,9 +163,9 @@ Events drive animation, the game log, the screen-reader live region and the revi
 
 ### 2.9 Records, scenarios, versions, hashes
 
-- **Record.** `GameRecord = { versions: { engine, cards, scripts }, start: { setup } | { scenario }, actions[], snapshots[] }`. `scripts` is a hash of the effect scripts in use. `snapshots` holds a projected-for-both summary at each turn boundary.
+- **Record.** `GameRecord = { versions: { engine, cards, scripts }, start: { setup } | { scenario }, actions[], snapshots[] }`. `scripts` is a hash of the effect scripts in use (**planned for M6b-0, not built:** `versions.scripts: Record<cardId, hash>`, one hash per card in the game, so scripting an unrelated card does not invalidate old records). `snapshots` holds a projected-for-both summary at each turn boundary.
 - **Actions.** Actions name instance IDs and option kinds, not indexes into a list, so a record stays meaningful when the list of options changes.
-- **Version mismatch.** When an old record's versions differ from the current build, the app does not replay it live. It opens the record **read-only from its snapshots**: the timeline and flags are still viewable, and "restore and replay from here" is disabled with an explanation. Golden test records are re-recorded deliberately whenever versions change.
+- **Version mismatch.** When an old record's versions differ from the current build, the app does not replay it live. (Planned for M6b-0: with per-card script hashes, a record goes read-only only if a card in that game changed; a legacy record with a single string hash opens read-only.) It opens the record **read-only from its snapshots**: the timeline and flags are still viewable, and "restore and replay from here" is disabled with an explanation. Golden test records are re-recorded deliberately whenever versions change.
 - **Scenarios.** `ScenarioSpec` describes a position: zones by card ID, states, given DON!!, Life, turn and phase, the decision owner, and an RNG seed for the rest. It is validated by `checkInvariants`, and filled-in decks are sampled from an optional decklist. The tutorial, rules "show me", drills, puzzles, card tests and independent rule tests all start from scenarios.
 - **Semantic hash.** `summaryHash` hashes a canonical summary: card IDs per zone in order (with hidden zones in instance order), card states, given DON!!, Life, modifiers by kind and amount, turn, phase, decision kind, result and the RNG state. Internal refactors that do not change the game do not change the hash.
 
@@ -175,6 +177,38 @@ Events drive animation, the game log, the screen-reader live region and the revi
 - **Effect scripts.** `cards/effects/<SET>/<CARD-ID>.ts`, one typed data object per card, plus a coverage index.
 - **Format data.** `cards/format/standard.json` is hand-kept and cited: blocks per product, block exceptions, banned cards and banned pairs, each with effective dates and source URLs.
 - **Schema additions (M1).** `block`, `verified`, `textFixes` and printing-level `artworkId`s (`OP17-005_p1`). The four-copy limit groups by card number (digest correction 13).
+
+### Update pipeline (planned for M6b-5; not built)
+
+New sets and meta changes reach the app through reviewed pull requests (ADR 0014). Nothing reaches `main` without review.
+
+**`.github/workflows/update.yml`** runs weekly and on manual dispatch, as two jobs. Each opens or updates its own PR on a fixed branch.
+- **`cards` job** runs `cards:update --refresh`, then `cards:measure`. The PR body lists:
+  - new, changed and removed cards;
+  - new products with no `blocksByProduct` entry (legality `unknown` until a human adds a cited block);
+  - new repairs;
+  - scripted cards whose text changed (these fail the PR's CI until re-verified);
+  - Standard coverage before and after;
+  - a rotation warning within 60 days of `regulation.to`.
+- **`meta` job** runs `meta:update` (Limitless API), which produces a candidate `meta-lists.json` and a per-card play-frequency table. The PR body lists:
+  - new and dropped archetypes;
+  - guides older than 60 days;
+  - meta cards not yet scripted (these feed the next scripting batch);
+  - leaders with no playbook.
+
+The workflow fetches at most weekly, with a 3 s delay between requests, and never fetches the official site (ADR 0007). Regulation and block changes stay hand-cited `standard.json` edits; the update PR only flags them (ADR 0011).
+
+**`docs/runbooks/new-set.md`** is run by agents, locally, after the data PR merges:
+a. Add the cited block in `standard.json`.
+b. Run `cards:audit -- --set <SET>`.
+c. Engine wave.
+d. Parallel scripting.
+e. Independent tests.
+f. Review.
+g. Fix round.
+h. Open a "Scripts: <SET>" PR.
+
+There is no `script-set.yml`: running the runbook in CI with an API key is a later decision.
 
 ## 4. AI
 
@@ -206,7 +240,7 @@ The AI runs in a dedicated Web Worker with a typed protocol:
 ### 4.3 Determinization
 
 The AI never samples from the human's actual decklist.
-- **Opponent's unknown cards:** sampled from an archetype prior, built from the three sourced lists for the opponent's leader, weighted by recency. For a leader with no sourced lists, the prior is legal cards of the leader's colors weighted by meta frequency. Cards already seen are removed.
+- **Opponent's unknown cards:** sampled from an archetype prior, built from the three sourced lists for the opponent's leader, weighted by recency. For a leader with no sourced lists, the prior is legal cards of the leader's colors weighted by meta frequency (planned for M6b-7: `priorFor` is never null, fed by the play-frequency table that `meta:update` writes; until then the fallback is not built). Cards already seen are removed.
 - **AI's own hidden zones:** its deck order and its Life cards are also secret from it (CR 3-2, 3-10), so they are sampled too.
 - **Knowledge:** a deck top the AI has looked at stays fixed in every sample until a shuffle.
 - **Mechanism (M5a):** the store sends the AI seat's `SearchView`, `projectForSearch(state, p)`: the view plus a skeleton of the state with every card hidden from `p` stripped and ids made canonical from public structure. `determinize(view, fill, cards, seed)` in `ai/src/search/` names the hidden cards and rebuilds a full state; a skeleton whose public parts point at a hidden card is `opaque` and is refused. The leak property covers the skeleton (DECISIONS, 2026-10-29).
@@ -254,6 +288,8 @@ Each archetype has a playbook at `ai/playbooks/<leader-id>.json`. It holds:
 - win conditions;
 - **game-plan assertions**: measurable expectations such as "Rocks attacks with its leader every turn from turn 3 onward" and "Kaido uses its leader's DON!! −1 on the opponent's attacker when it is legal".
 
+**Default playbook (planned for M6b-7, not built).** `ai/playbooks/default.json` is used for any leader without its own file, so `playbookFor` (`ai/src/playbook.ts`) never returns null. A new archetype that a meta PR flags becomes a content task: guide, playbook and assertions.
+
 Strength tests check those assertions statistically, so "plays according to the deck's game plan" is tested. The Meta Explorer guide is written from the same file.
 
 ## 5. App
@@ -266,6 +302,7 @@ Strength tests check those assertions statistically, so "plays according to the 
 - **Routing.** Path routes under `/optcg-sim/`, with `404.html` = `index.html` on GitHub Pages.
 - **Persistence (local only).** IndexedDB holds records, reviews, drill results, progress and a per-step tutorial timing log. `localStorage` holds settings. Export and import everything as one JSON file. No accounts, servers or analytics.
 - **Images.** One module (`app/src/art/`) with one base URL per source. The fallback chain is primary → secondary → text card, lazy-loaded at slot size. A service worker caches images with a **bounded** Cache API store (LRU, 300 entries). Opaque responses carry quota padding, so the store is capped rather than unbounded. Above the cap, images fall back to the browser's HTTP cache.
+- **App updates (planned for M6b-6, not built).** The service worker also precaches the app shell and the per-set data and script chunks, and shows an update prompt when a new build is waiting. The prompt never appears mid-game and the app never reloads by itself. `version.json` reports "cards through <set>" and the meta's as-of date, so the About page and a bug report can say what data a build holds.
 - **Content.** Markdown with front matter, compiled at build time (ADR 0010).
 - **Bundle budget.** Initial JS under 300 KB gzipped. The card JSON, deck builder, review and meta explorer load as lazy chunks.
 

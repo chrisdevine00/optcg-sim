@@ -2,6 +2,20 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-17 — Full Standard card pool and live updates (M6b)
+
+Context: only 180 of 2,799 cards have scripts (the 182 meta-list cards), the snapshot ends at OP-17, `cards:update` is manual, `meta:update` (planned for M9) does not exist, PLAN section 8 said CI never calls a card or tournament API, and every new script makes all saved records read-only because `SCRIPTS_VERSION` is one global hash. The owner decided, and approved the PROMPT.md wording (amendment A1):
+
+- **Pool:** every Standard-legal card is fully scripted, each with a test (about 1,815 more). Rotated cards stay browsable and play for their stats with the badge.
+- **Updates:** a scheduled weekly `update.yml` opens PRs for card data and the meta; scripting new cards is agent-run locally from `docs/runbooks/new-set.md`, with review per batch. Nothing reaches `main` without review. This reverses PLAN section 8 (ADR 0014; addenda to ADR 0007 and ADR 0011).
+- **Order:** M5b, then M6, then the new M6b (card pool and live updates), then M7 to M10. `meta:update` moves from M9 to M6b-0 because scripting order needs its play-frequency data.
+- **Scripting order:** block 5, then 4, then 3; within each set, leaders first, then cards by Limitless play frequency. **Block 2 is held** until the rotation after 2027-03-31 is announced (it may rotate out), and M6b's "100% of Standard" excludes it while held.
+- **OP-18 and EB-05:** imported now, separately and stats-only (a data commit, no scripts); they become the first scripting batch. Result 2026-11-17: EB-05 imported (61 cards, Standard legality unknown until its block is cited); OP-18 not yet in optcgapi (release 2026-11-20).
+- **`script-set.yml` is deferred:** the runbook runs locally only; running it in CI with an API key is a later decision.
+- **A1 approved and applied** to PROMPT.md (Done-when bullets, M6b in the Phase 5 table, `meta:update` out of M9, pipeline step 6). PLAN gains row 17b (1,000–1,100 agent-hours, reconciled from the plan's first 650–1,000 because its itemised steps alone came to 1,005–1,115; total 1,718–1,818; re-baseline after M6b-0), risks 9 and 10, and the M6b section.
+
+Open check before building: the Limitless API terms (key or attribution) and both sites' robots.txt (ADR 0014). Alternatives rejected: scripting meta decks only; auto-merging update PRs; scripting in scheduled CI now; scripting block 2 before the rotation is announced; hand-run updates only.
+
 ## 2026-11-17 — M5b parked with the Warlord-vs-Pirate gate failing
 
 The owner asked to finish the current round and stop. Fix round 2 is merged (116542c); M5b is **not** marked done because the first nightly on the fixed code measured Warlord vs Pirate at 123/200 (61.5%, Wilson 54.6–68.0%), below PLAN §2's 65%. The gate is unchanged: lowering it needs its own decision with evidence, not a parking note. Kalgara seed 1 (M5b-14) stays failing, documented, with its two options below for whoever resumes. STATUS "M5b … PICK UP HERE" lists the steps to finish.

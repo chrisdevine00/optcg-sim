@@ -3,6 +3,10 @@
 Unresolved ambiguities with the current best answer. Remove an entry when it is settled and the decision is logged in DECISIONS.md.
 
 
+## PROMPT.md amendments
+
+- A1. **Approved and applied 2026-11-17.** Full Standard card pool and live updates (new milestone M6b). PROMPT.md changes: the "Done when" bullet on scripting (every Standard-legal card fully scripted; rotated cards browsable and play for their stats; new sets through a reviewed update PR), the Meta Explorer bullet (refreshed by a scheduled job that opens a PR for review), M6b added after M6 in the Phase 5 table, `meta:update` moved from M9 to M6b, and step 6 added to the `cards:update` pipeline. The owner approved the wording. Recorded in DECISIONS.md, 2026-11-17 "Full Standard card pool and live updates (M6b)"; reasoning in ADR 0014. Open check carried by ADR 0014: the Limitless API terms and both sites' robots.txt, before the update job is built.
+
 ## Rules (from Tracks A and F; answers and sources in docs/research/rulings.md section J)
 
 Settled by Track F from official sources: R1 (reveal → pay → trash 1 → place), R2 (effect-plays into a full area use the same trash procedure), R4, R5, R6, R7, R8, R9 (a Leader can block: OP05-022), R10, R11 (moot), R12, R14 (permanent-effect layering), S3, S4, B4. The engine encodes each as `engine/test/rulings/RL-xx.test.ts`.

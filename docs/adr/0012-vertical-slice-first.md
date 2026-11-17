@@ -23,3 +23,6 @@ Rocks (blue, the top legal deck) and Kaido (purple, DON!! minus) were chosen for
 ## Consequences
 - M4 and M5 are split in two, and STATUS.md reports them as M4a/M4b and M5a/M5b.
 - The 10,000-game property test and the full strength matrix reach their final form in the breadth pass.
+
+## Addendum, 2026-11-17 (ADR 0014)
+The breadth pass gains M6b (card pool and live updates) between M6 and M7.

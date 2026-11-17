@@ -13,3 +13,4 @@ NLP or regex parsing of text into scripts (silent errors in a product whose valu
 
 ## Consequences
 Coverage grows by hand at a measurable rate; the PLAN risk register tracks velocity.
+Scope is the Standard-legal pool (ADR 0014); rotated cards stay browsable and play for their stats with the badge.
