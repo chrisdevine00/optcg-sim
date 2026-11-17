@@ -1,0 +1,27 @@
+# M4b wave 2: Kalgara (OP08-098), readings chosen
+
+14 cards scripted, all from the verified card text in `cards/data`. Tests: `engine/test/cards/<ID>.test.ts`, shared constants in `engine/test/cards/helpers-kalgara.ts`. No engine change.
+
+## Readings (card, reading chosen, alternatives, source)
+
+| Card | Reading chosen | Alternative | Source |
+| --- | --- | --- | --- |
+| OP08-115 The Earth Will Not Lose! [Counter] | "If your Leader has {Shandian Warrior}, up to 1 ... +3000. Then, play up to 1 [Upper Yard] from your hand." The condition governs only the +3000; the play is not gated on it. (Script: `if` step, then an unconditional `play`.) | The whole [Counter] gated on the Leader type. Same outcome in every Kalgara deck (the Leader is always a {Shandian Warrior}); differs only with a non-Shandian Leader. | Wording; effect-dsl §4.10 note; no Q&A found |
+| OP05-115 Amaru [Main] | "Then, if you have 1 or less Life cards, rest ..." is checked whether or not a +3000 target was chosen ("up to 1" may pick none). | "Then" only after a target was chosen (`ifDid`). | Wording; same class as OP09-078 / OP15-074 in the runtime audit §7 |
+| EB03-053 Nami [On Play] | "Then, if your opponent has 3 or more Life cards" is checked whether or not a DON!! card was given. Giving the DON!! is not optional by choice: `giveDon` gives min(1, rested DON!! available). The Life card goes to its owner's hand (the opponent's), "up to 1" asks yes or no. | Gate on the give having happened. | Wording; DSL §4.15 `giveDon` |
+| OP08-098 Kalgara (Leader) | `donGiven: 1` is the [DON!! x1] condition; "DON!! cards on your field" is `donOnField` (cost area plus given). "If you do" is a `label` on the `play` step, true only when a Character was actually played. Life card taken with `pick: exactly 1` (the text says "add 1 card", not "up to"). At 0 Life nothing is taken and the game continues. | A `may` around the play (would add a prompt the card does not have). | RL-48 / QA-OP08 OP08-098; audit §7 |
+| OP12-099 Kalgara | `lifeRemoved owner: 'any'` with a `yourTurn` condition; "draw 1, then cannot draw by your own effects this turn" is draw plus `restrict cannotDrawByOwnEffects thisTurn`. Not Once Per Turn on the card: a second removal in the turn draws nothing because the draw is barred (the first draw is mandatory). Draw Phase draws are not effects. | Adding `oncePerTurn` (not printed). | Audit G10, G28, §7 |
+| OP15-119 Luffy | Second ability fires on `eventActivated` or `blockerActivated` by the opponent, on either turn (no [Your Turn]/[Opponent's Turn] printed). "Reveal up to 1 card from the top of Life" is read as a reveal of the top card (nothing to choose); with no Life nothing is revealed and the power does not change. The revealed card stays in Life, face-down. +1000 per cost lasts this turn. | An "up to" choice to not reveal (a reveal has no downside, so no loss of strategy). | Audit G9, G21 |
+| OP15-114 Wyper [On Play] | Cost is "turn 1 card from the top of Life face-up": needs a face-down top card. The -2000 and the K.O. of power 0 or less are one effect: both are skipped when the cost is declined. The K.O. reads current power (after -2000 and every other modifier). | Separate sentence ungated (it is "Then"-joined inside the same effect, so no). | Audit G14, G25 |
+| OP15-114 Wyper [Activate: Main] | "Give up to 1 rested DON!! card to 1 of your {Sky Island} Leader or Character": the target is chosen (`pick: exactly 1`) when a rested DON!! exists; with none rested nothing is given (the activation still spends Once Per Turn). | Offer the activation only with a rested DON!!. | DSL §4.15 `giveDon` |
+| OP15-101 Kalgara | "up to a total of 2 [Mont Blanc Noland] or {Shandian Warrior}" is one `upTo: 2` pick over an `any` filter (name or type), never 2 of each. The "you may trash" cost is an auto cost (optional by construction). | Two takes of up to 2 each (rejected: "a total"). | Wording |
+| OP05-114 El Thor [Counter] | "that card gains an additional +2000" uses `bind` on the first target and a second `power` step on the same card. The condition is the opponent's Life, evaluated after the first step. | Re-choosing the target (rejected: "that card"). | Wording |
+| OP05-115 Amaru and OP08-115 [Trigger] with a "you may" cost | A `trigger` ability with a `cost` offers no second prompt: activating the Trigger is the choice, then the cost is chosen. Not activating leaves the card in the hand. When the cost cannot be paid, `trigger activate: true` is not legal. | A separate optional prompt after activating (the runtime has none for triggers). | Observed in `engine/test/cards/OP05-115.test.ts` |
+| OP05-117 / OP15-108 | The bracketed [Sky Island] in OP05-117 is the type (no card is named that); OP15-108 prints {Sky Island}. Both use the type filter. | A name filter for OP05-117 (would match nothing). | Card data |
+| OP08-110 Wyper [On Play] | "Then, place the rest at the bottom ... and play up to 1 [Upper Yard] from your hand": the play comes after the look resolves; it may play the card just added or another [Upper Yard] already in hand. | None. | Wording |
+
+## Not changed / limits seen
+
+- Bottom order of the cards put back is the order the runtime asks for (DECISIONS 2026-11-16); the tests settle any `order` decision generically.
+- `OP15-119` has no Once Per Turn on the text; each opponent Event or Blocker activation boosts again.
+- Nothing unexpressible; no card left unscripted.

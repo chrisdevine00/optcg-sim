@@ -43,6 +43,20 @@ import { OP17_076 } from './OP-17/OP17-076.ts';
 import { OP17_077 } from './OP-17/OP17-077.ts';
 import { OP17_118 } from './OP-17/OP17-118.ts';
 import { ST34_004 } from './ST-34/ST34-004.ts';
+import { OP08_098 } from './OP-08/OP08-098.ts';
+import { EB03_053 } from './EB-03/EB03-053.ts';
+import { OP05_117 } from './OP-05/OP05-117.ts';
+import { OP08_109 } from './OP-08/OP08-109.ts';
+import { OP08_110 } from './OP-08/OP08-110.ts';
+import { OP08_115 } from './OP-08/OP08-115.ts';
+import { OP12_099 } from './OP-12/OP12-099.ts';
+import { OP15_101 } from './OP-15/OP15-101.ts';
+import { OP15_108 } from './OP-15/OP15-108.ts';
+import { OP15_112 } from './OP-15/OP15-112.ts';
+import { OP15_114 } from './OP-15/OP15-114.ts';
+import { OP15_119 } from './OP-15/OP15-119.ts';
+import { OP05_114 } from './OP-05/OP05-114.ts';
+import { OP05_115 } from './OP-05/OP05-115.ts';
 
 const ALL: readonly CardScript[] = [
   EB04_030,
@@ -82,6 +96,20 @@ const ALL: readonly CardScript[] = [
   OP17_077,
   OP17_118,
   ST34_004,
+  OP08_098,
+  EB03_053,
+  OP05_117,
+  OP08_109,
+  OP08_110,
+  OP08_115,
+  OP12_099,
+  OP15_101,
+  OP15_108,
+  OP15_112,
+  OP15_114,
+  OP15_119,
+  OP05_114,
+  OP05_115,
 ];
 
 export const SCRIPTS: Readonly<Record<string, CardScript>> = Object.fromEntries(
