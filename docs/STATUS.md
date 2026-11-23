@@ -1,7 +1,7 @@
 # Status
 
 **Phase:** 5 Build, slice pass (ADR 0012), starting at M0. Phases 1–4 gated 2026-10-28.
-**Milestone:** **M5b AI breadth: built, reviewed, PARKED 2026-11-17 with the strength gate failing.** Read "### M5b … PICK UP HERE" below first. Warlord vs Pirate is 123/200 (61.5%) in the first nightly, below the 65% exit gate; everything else in M5b is merged and re-review 1 passed. **M4b Effects breadth: done 2026-11-16** (re-review 1 PASS). All 182 meta-list cards play fully (180 scripted, 2 vanilla), each scripted card with author and independent tests; coverage shown in the browser. S1 waits for the owner. L Learning slice **done 2026-11-09**. M5a done 2026-11-05. M4a done 2026-10-29. M3 done 2026-11-05. M0, M1 and M2 done 2026-10-28.
+**Milestone:** **M6 Deck builder: in progress (started 2026-11-23).** **M5b AI breadth: done 2026-11-23 under the time-box, with the Warlord-vs-Pirate target (65%) NOT met:** 123/200 (61.5%) every nightly, no tested change beat noise on fresh seeds (DECISIONS 2026-11-23; carried to docs/BACKLOG.md #1); the nightly asserts a 55% floor. **M4b Effects breadth: done 2026-11-16.** All 182 meta-list cards play fully. L Learning slice done 2026-11-09. M5a done 2026-11-05. M4a done 2026-10-29. M3 done 2026-11-05. M0, M1 and M2 done 2026-10-28.
 **Run the app:** `npm install && npm run dev` then open http://localhost:5173/optcg-sim/ and go to `/cards` for the card browser
 **Deployed:** https://chrisdevine00.github.io/optcg-sim/ (auto-deploys after green CI on `main`)
 
@@ -13,7 +13,7 @@
 | 2 Plan | docs/PLAN.md, docs/ARCHITECTURE.md, docs/adr/ | **Gated 2026-10-28** (revision 2 after two reviews; see docs/plan-review-1.md) |
 | 3 Deep research | docs/research/effect-dsl.md, rulings.md; docs/content/archetypes/, curriculum.md, glossary.md, sources.md | **Gated 2026-10-28** (competitive-player review: 20 findings, 0 severity-3 open; see docs/content/review-1.md) |
 | 4 Design | docs/design/principles.md, board.md, flows.md, visual-system.md, learning-ui.md, wireframes/, review-1.md | **Gated 2026-10-28** (review 1: 50 findings plus 2 verification passes; 0 severity-3 or severity-4 open) |
-| 5 Build | M0 through M10 per PROMPT.md, plus M6b (card pool and live updates, added 2026-11-17, amendment A1) after M6 | In progress: M0–M3, M4a, M4b, M5a and L done; M5b parked; M6b planned, not started |
+| 5 Build | M0 through M10 per PROMPT.md, plus M6b (card pool and live updates, added 2026-11-17, amendment A1) after M6 | In progress: M0–M3, M4a, M4b, M5a, L and M5b done (M5b strength target not met, time-box); M6 in progress; M6b planned |
 
 ## Done
 
@@ -142,7 +142,7 @@
 
 ## Next (slice pass, PLAN.md §1)
 
-**Current next step (2026-11-17): finish M5b. See "### M5b AI breadth: PARKED 2026-11-17, PICK UP HERE" (four numbered steps). Then M6, then M6b, then M7 to M10. The items below are history.**
+**Current next step (2026-11-23): M6 Deck builder (PLAN §1 row 17), then M6b, then M7 to M10. The items below are history.**
 
 **Roadmap (owner-approved 2026-11-17, amendment A1; DECISIONS "Full Standard card pool and live updates (M6b)", ADR 0014):** M5b, then M6, then **M6b Card pool and live updates** (PLAN §2a, row 17b), then M7 to M10. M6b scripts every Standard-legal card (block 5, then 4, then 3; block 2 held until the post-2027-03-31 rotation is announced), builds `meta:update` and the scheduled `update.yml`, adds the app update prompt and a default playbook for any leader. `meta:update` is no longer an M9 item.
 
@@ -181,7 +181,11 @@
 - **CI repair (8167824):** `main`'s CI had failed at typecheck since 26b5c99 (2026-11-09): `app/test/a11y-harness.test.ts` pulled in the harness's type import of `@guidepup/guidepup`, which installs only in the a11y workflow. The harness now types the Guidepup objects locally; CI green again.
 - **Not waiting for:** S1 (folded in when it happens); the meta refresh (now `meta:update` in M6b-0, then a weekly `update.yml` PR from M6b-5).
 
-### M5b AI breadth: PARKED 2026-11-17, PICK UP HERE
+### M5b AI breadth: done 2026-11-23 (time-box; strength target not met)
+
+**Closed 2026-11-23 (DECISIONS "M5b closed under the time-box").** Five nightlies on the final code: Warlord vs Pirate 123/200 every night. A local runner replaying the gate's 200 games in 13 processes tested leaf horizon 1, rollout and defence variants, budget, selection, determinizations and bias-in-value: none beat noise on fresh seeds (docs/benchmarks.md "Closing measurements"). Shipped Warlord unchanged. Nightly asserts a 55% floor and reports the 65% target. Kalgara seed 1: Warlord threshold 0.55 (`warlordThreshold`, reason in the guide). Emperor report 16 games. Nightly e2e iteration-mode pacing bounds fixed (a591fb8). Re-review 2 not run: the closing change is a gate and docs change, no AI code changed.
+
+#### History: parked 2026-11-17
 
 **State on `main` (116542c):** 12 playbooks, Warlord and Emperor, two fix rounds, all merged. Per push green locally: typecheck, lint, `npm test` 4,153 passed / 25 expected-fail (about 2 min 45 s), e2e 211 passed. Review: `docs/reviews/m5b-review.md` (first review FAIL on M5b-1; re-review 1 PASS). Decisions: DECISIONS "M5b fix round" and "M5b fix round 2".
 

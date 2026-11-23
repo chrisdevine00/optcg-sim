@@ -199,6 +199,25 @@ The turn-time lines on the Setup screen are exported from `app/src/play/setup/Se
 - **Emperor vs Warlord** (60 games at the 200-game budgets, before the gate was cut to 40 games): 30 of 60 (50.0%, 95% interval 37.7–62.3%). **Emperor's 2.5 times larger budget and iterative deepening gave no measurable gain**; Warlord at 1,500, 4,000 and 8,000 iterations also showed differences inside the noise in 96-game runs. The heuristic and the rollout policies limit strength, not the search budget. Emperor is "longer thinking", not measurably stronger; the work to make it so is in the next steps.
 - Per-push smoke at the time of the first M5b merge (20 games): Pirate 20 of 20, Warlord 20 of 20 against Rookie, Warlord 13 of 20 against Pirate, Warlord 19 of 20 against the one-iteration Warlord, the one-iteration Warlord 4 of 20 against Pirate. **Since the M5b fix round** the per-push smoke is 12 games, one per ordered deck pair, Pirate and Warlord against Rookie only; Warlord against Pirate and the controls are nightly (DECISIONS 2026-11-17 "M5b fix round").
 
+### Closing measurements (2026-11-23, time-box; DECISIONS 2026-11-23)
+The gate's exact 200 games (seeds 130,000+) on a local 13-process runner, Warlord wins against Pirate; "fresh" is 200 games on seeds 530,000+.
+
+| Variant | Gate seeds | Fresh seeds |
+| --- | --- | --- |
+| Shipped Warlord | 123 (61.5%) | 123 (61.5%) |
+| Pirate vs Pirate (deck baseline) | 96 (48.0%) | |
+| Leaf horizon 1 | 130 (65.0%) | |
+| Horizon 1, 2× turn budget | 130 | |
+| Horizon 1, choose by mean | 132 | |
+| Horizon 1, no Character plays in rollouts | 134 | |
+| Horizon 1, Pirate's defence | 134 | |
+| Horizon 1, 3× defence budget | 122 | |
+| Horizon 1, no rollout plays, Pirate's defence | 127 | 119 (59.5%) |
+| No playbook bias in leaf values (partial) | 47/76 vs 45/76 | 52/82 vs 51/82 |
+| 16 determinizations (partial) | 60/95 vs 58/95 | 56/92 vs 56/92 |
+
+Nightly on CI (five runs, 2026-11-19 to 23): 123/200 each night. **The PLAN target (65%) is not met**; the nightly asserts a 55% regression floor. Every variant is within noise; strength does not move with budget.
+
 ### Search throughput and transpositions (review L-03)
 `npx tsx ai/bench/profile.ts` (10 real Main positions, 3,000 iterations each, 8 determinizations): about 9,000 iterations per second under load (112 microseconds per iteration, Node). `summaryHash` costs 21 microseconds per state (19% of an iteration if every state were keyed by it) and 28% of expanded states repeat a state reached by another move order, so a transposition table would save about 3% net: **not built for MCTS**. The profile of the lethal search is different: with `RATE_NODES=40000 node --cpu-prof ai/bench/rate.ts`, `summaryHash` is **63% of the lethal search's CPU time** (25% in the JSON string, 24% building the summary, 7% hashing). A cheaper key there would raise lethal throughput by up to 2.5 times and so cut L-03's Unknown rate; it needs a key with the same discrimination (instance ids canonicalised), checked against `summaryHash` over random games. Carried, not done.
 

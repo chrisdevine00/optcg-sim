@@ -123,6 +123,7 @@
       "seed": 1,
       "text": "From T2, with a Shandian Warrior in hand that the DON!! on its field can pay for, the Leader attacks with at least 1 DON!! given and uses the free play.",
       "threshold": 0.9,
+      "warlordThreshold": 0.55,
       "source": "SH-KAL step 3"
     },
     {

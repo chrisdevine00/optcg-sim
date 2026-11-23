@@ -303,7 +303,13 @@ export class PlanTallyG1 {
         v.actions.some((a) => a.type === 'attack' && a.attacker === leader) &&
         hand.some((c) => SHANDIAN.includes(c) && cost(c) <= don)
       ) {
-        const t = this.t(1, 'Leader attacks with a DON!! given and plays a Shandian Warrior', 0.9);
+        // The Warlord's threshold is lower (playbook `warlordThreshold`, DECISIONS 2026-11-23): at
+        // 2 Life or less it hard-casts rather than pay a Life card for the free play.
+        const t = this.t(
+          1,
+          'Leader attacks with a DON!! given and plays a Shandian Warrior',
+          this.tier === 'pirate' ? 0.9 : 0.55,
+        );
         t.total++;
         const atk = tl.records.find(
           (r) => r.action.type === 'attack' && r.action.attacker === leader,

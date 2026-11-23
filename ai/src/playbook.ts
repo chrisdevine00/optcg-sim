@@ -289,6 +289,8 @@ export interface Assertion {
   text: string;
   /** The share of qualifying situations that must satisfy it. */
   threshold: number;
+  /** Warlord and Emperor only, where their search measurably plays the seed less (documented in the guide). */
+  warlordThreshold?: number;
   source: string;
 }
 
