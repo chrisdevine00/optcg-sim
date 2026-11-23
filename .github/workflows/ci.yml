@@ -8,6 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # test:ci diffs against the base to pick the changed cards' tests
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -15,7 +17,10 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
-      - run: npm test
+      # Per-card tests of unchanged cards run nightly (M6b-0); the rest of npm test runs here.
+      - run: npm run test:ci
+        env:
+          CARD_TESTS_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
   # Playwright in 3 shards, side by side (review M4a: keep CI near 6 minutes). Turn-1 full games
   # run nightly (E2E_FULL=1); per push the same flows play from a late-game position.
   e2e:

@@ -142,7 +142,7 @@
 
 ## Next (slice pass, PLAN.md §1)
 
-**Current next step (2026-11-23): finish M6b-0 (per-push card tests for changed cards only, full card suite nightly; then re-baseline the M6b estimate from the measured backlog), then M6b-1 runtime audit of the Standard pool. Then M7 to M10. The items below are history.**
+**Current next step (2026-11-23): finish M6b-0 (re-baseline the M6b estimate from the measured backlog), then M6b-1 runtime audit of the Standard pool. Then M7 to M10. The items below are history.**
 
 **Roadmap (owner-approved 2026-11-17, amendment A1; DECISIONS "Full Standard card pool and live updates (M6b)", ADR 0014):** M5b, then M6, then **M6b Card pool and live updates** (PLAN §2a, row 17b), then M7 to M10. M6b scripts every Standard-legal card (block 5, then 4, then 3; block 2 held until the post-2027-03-31 rotation is announced), builds `meta:update` and the scheduled `update.yml`, adds the app update prompt and a default playbook for any leader. `meta:update` is no longer an M9 item.
 
@@ -190,7 +190,7 @@
 - [x] Per-game scripts version in records (`scriptsVersionOf`; M4b-17 closed as far as it can be; done criterion "an old record stays live after an unrelated card is scripted" has its test).
 - [x] Per-set script chunks (`cards:effects-index`, `loadScripts`, engine refuses unloaded scripts).
 - [x] Test decks pinned (`ai/test/fixtures/strength-decks.json`).
-- [ ] Per-push card tests for changed cards only; full card suite nightly.
+- [x] Per-push card tests for changed cards only (`npm run test:ci`, `cards/scripts/card-tests.ts`; a change to the engine, card data, the loader or a shared kit runs them all); `npm test` in full nightly.
 - [ ] Re-baseline the M6b estimate from the measured backlog (PLAN amendment A1 asks for it at the end of M6b-0).
 - Also: Deploy workflow split into build and deploy jobs (the Pages artifact race failed three deploys on 2026-11-23).
 

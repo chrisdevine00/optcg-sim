@@ -17,6 +17,7 @@
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
     "test": "vitest run",
+    "test:ci": "tsx scripts/test-ci.ts",
     "test:watch": "vitest",
     "test:nightly": "ENGINE_GAMES=10000 vitest run engine/test/property engine/test/golden --reporter=default --reporter=json --outputFile.json=test-results/nightly.json",
     "test:lethal": "LETHAL_GAMES=24 LETHAL_NODES=60000 LETHAL_POSITIONS=160 LETHAL_HANDS=4 vitest run ai/test/lethal-games.test.ts ai/test/lethal-sound.test.ts",
