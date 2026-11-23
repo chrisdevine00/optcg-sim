@@ -103,6 +103,20 @@ describe('parseDeckText', () => {
     expect(p.lines[1]!.message).toBe('Unknown card ID OP17-999.');
     expect(p.main).toHaveLength(4);
   });
+  it('a name may follow the ID ("4 OP17-040 Edward.Newgate")', () => {
+    const p = parseDeckText(`4 OP17-040 ${nameOf('OP17-040')}`, lookup);
+    expect(p.lines[0]).toMatchObject({ status: 'ok', id: 'OP17-040', count: 4 });
+  });
+  it('an unknown ID whose name matches a card suggests that card (same product first)', () => {
+    const byName = (n: string) => [...byId.values()].filter((c) => c.name === n);
+    const name = nameOf('OP17-049');
+    const p = parseDeckText(`4 OP17-999 ${name}`, lookup, byName);
+    expect(p.lines[0]).toMatchObject({ status: 'unknownCard', suggestion: 'OP17-049' });
+    expect(p.lines[0]!.message).toBe(
+      `Unknown card ID OP17-999. The name matches OP17-049 ${name}.`,
+    );
+    expect(p.main).toEqual([]);
+  });
   it('a name that does not match the ID warns and uses the ID', () => {
     const p = parseDeckText(`4 Not ${nameOf('OP17-040')} OP17-040`, lookup);
     expect(p.lines[0]!.status).toBe('nameMismatch');

@@ -6,6 +6,7 @@ import { Home } from './routes/Home.tsx';
 
 const CardBrowser = lazy(() => import('./cards/CardBrowser.tsx'));
 const PlayRoute = lazy(() => import('./play/PlayRoute.tsx'));
+const DecksRoute = lazy(() => import('./decks/DecksRoute.tsx'));
 
 export function App() {
   const path = usePath();
@@ -39,6 +40,10 @@ export function App() {
       {path === '/cards' ? (
         <Suspense fallback={<main className="page" id="main" aria-busy="true" />}>
           <CardBrowser />
+        </Suspense>
+      ) : path === '/decks' || path.startsWith('/decks/') ? (
+        <Suspense fallback={<main className="page" id="main" aria-busy="true" />}>
+          <DecksRoute />
         </Suspense>
       ) : path === '/' ? (
         <Home />

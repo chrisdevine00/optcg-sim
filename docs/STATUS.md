@@ -181,6 +181,14 @@
 - **CI repair (8167824):** `main`'s CI had failed at typecheck since 26b5c99 (2026-11-09): `app/test/a11y-harness.test.ts` pulled in the harness's type import of `@guidepup/guidepup`, which installs only in the a11y workflow. The harness now types the Guidepup objects locally; CI green again.
 - **Not waiting for:** S1 (folded in when it happens); the meta refresh (now `meta:update` in M6b-0, then a weekly `update.yml` PR from M6b-5).
 
+### M6 Deck builder: in progress (started 2026-11-23)
+
+PLAN done criteria: all 36 meta lists round-trip without loss; validator tests match the rules and `standard.json`; any Standard-legal card can be added and saved; a non-meta-leader deck can be played against the AI. Decisions: DECISIONS 2026-11-23 "M6 deck builder".
+
+- **Built:** `engine/src/deck.ts` `deckIssues` (CR 5-1-2 + Standard/Extra legality, typed issues; `validateDeck` shares it); `cards/src/decklist.ts` parse/export (`4xID`, `4 ID`, `4 Name ID`, `4 ID Name`, JSON; suggestions for unknown IDs); `/decks` list and `/decks/<id>` builder (browser filtered to the Leader's colours and the format, live check rows with rule references, coverage by copies and names, cost-grouped list, alt art per card, import with a line report and fixes, export in four formats, autosave in `localStorage`); Setup lists saved decks and blocks Start with the reasons; "Decks" in the nav.
+- **Tests:** `engine/test/rules/deck-format.test.ts` (50: each of the 36 lists legal, every CR rule, banned, rotated, unknown legality as a warning, banned pair, restricted, Leader legality), `cards/test/decklist.test.ts` (48: 36 lists round-trip in every format and JSON), `app/test/decks.test.ts` (7), `ai/test/non-meta.test.ts` (5: Pirate and Warlord games against and with a non-meta Leader), `app/e2e/decks.spec.ts` (5 per resolution). `npm test` 4,263 passed; Playwright 219 passed before the 320 px header fix, which then passed.
+- **Next:** independent review (`docs/reviews/m6-review.md`), fix round, screenshots reviewed, mark done.
+
 ### M5b AI breadth: done 2026-11-23 (time-box; strength target not met)
 
 **Closed 2026-11-23 (DECISIONS "M5b closed under the time-box").** Five nightlies on the final code: Warlord vs Pirate 123/200 every night. A local runner replaying the gate's 200 games in 13 processes tested leaf horizon 1, rollout and defence variants, budget, selection, determinizations and bias-in-value: none beat noise on fresh seeds (docs/benchmarks.md "Closing measurements"). Shipped Warlord unchanged. Nightly asserts a 55% floor and reports the 65% target. Kalgara seed 1: Warlord threshold 0.55 (`warlordThreshold`, reason in the guide). Emperor report 16 games. Nightly e2e iteration-mode pacing bounds fixed (a591fb8). Re-review 2 not run: the closing change is a gate and docs change, no AI code changed.

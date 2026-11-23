@@ -24,6 +24,8 @@ export interface ParsedLine {
   /** The name the line gave (limitless format), when there is one. */
   name?: string;
   message?: string;
+  /** For an unknown card ID: the card number its name matches (same product first). */
+  suggestion?: string;
 }
 
 export interface ParsedDeck {
@@ -35,7 +37,7 @@ export interface ParsedDeck {
 }
 
 const LINE =
-  /^\s*(\d+)(?:\s*[xX×](?=\s|[A-Z]+\d*-\d{3}))?\s*(?:(.*?)\s+)?\(?([A-Z]+\d*-\d{3})(?:_[A-Za-z]+\d*)?\)?\s*$/;
+  /^\s*(\d+)(?:\s*[xX×](?=\s|[A-Z]+\d*-\d{3}))?\s*(?:(.*?)\s+)?\(?([A-Z]+\d*-\d{3})(?:_[A-Za-z]+\d*)?\)?(?:\s+(.+?))?\s*$/;
 const BLANK = /^\s*(?:$|#|\/\/|leader:?\s*$|main(?: deck)?:?\s*$|deck:?\s*$)/i;
 
 const norm = (s: string) =>
@@ -44,8 +46,15 @@ const norm = (s: string) =>
     .normalize('NFKD')
     .replace(/[^a-z0-9]/g, '');
 
-/** Parse a deck list. `lookup` resolves card numbers (unknown numbers are reported, not added). */
-export function parseDeckText(text: string, lookup: (id: string) => Card | undefined): ParsedDeck {
+/**
+ * Parse a deck list. `lookup` resolves card numbers (unknown numbers are reported, not added).
+ * `byName`, when given, lets an unknown number suggest the card its line's name matches.
+ */
+export function parseDeckText(
+  text: string,
+  lookup: (id: string) => Card | undefined,
+  byName?: (name: string) => Card[],
+): ParsedDeck {
   const trimmed = text.trim();
   if (trimmed.startsWith('{')) return parseJson(trimmed, lookup);
   const out: ParsedDeck = { leader: null, main: [], lines: [] };
@@ -63,12 +72,20 @@ export function parseDeckText(text: string, lookup: (id: string) => Card | undef
       return;
     }
     const count = Number(m[1]);
-    const name = m[2]?.trim() || undefined;
+    const name = (m[2] ?? m[4])?.trim() || undefined;
     const id = m[3]!.toUpperCase();
     const card = lookup(id);
     const base = { line, text: raw, id, count, ...(name ? { name } : {}) };
     if (!card) {
-      out.lines.push({ ...base, status: 'unknownCard', message: `Unknown card ID ${id}.` });
+      const guess = name && byName ? suggest(id, name, byName) : undefined;
+      out.lines.push({
+        ...base,
+        status: 'unknownCard',
+        message: guess
+          ? `Unknown card ID ${id}. The name matches ${guess.id} ${guess.name}.`
+          : `Unknown card ID ${id}.`,
+        ...(guess ? { suggestion: guess.id } : {}),
+      });
       return;
     }
     if (card.category === 'Leader' && count === 1) {
@@ -94,6 +111,14 @@ export function parseDeckText(text: string, lookup: (id: string) => Card | undef
     else out.lines.push({ ...base, status: 'ok' });
   });
   return out;
+}
+
+/** The card a mistyped number most likely means: same name, same product first, newest number. */
+function suggest(id: string, name: string, byName: (name: string) => Card[]): Card | undefined {
+  const want = norm(name);
+  const same = byName(name).filter((c) => norm(c.name) === want);
+  const prefix = id.split('-')[0];
+  return same.find((c) => c.id.split('-')[0] === prefix) ?? same[0];
 }
 
 function parseJson(text: string, lookup: (id: string) => Card | undefined): ParsedDeck {

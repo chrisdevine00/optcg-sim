@@ -7,7 +7,19 @@
 import { useEffect, useState } from 'react';
 import type { Card } from '@optcg/cards';
 import type { Speed } from '../game/controller.ts';
-import { ARCHETYPES, automationLine, deckById, DECKS, deckByLeader, loadCards } from './decks.ts';
+import { deckErrors } from '@optcg/engine';
+import { Link } from '../../router.tsx';
+import {
+  ARCHETYPES,
+  automationLine,
+  deckById,
+  deckFormat,
+  DECKS,
+  deckByLeader,
+  loadCards,
+  SAVED,
+  savedOptions,
+} from './decks.ts';
 import { SCENARIOS } from './scenarios.ts';
 
 /**
@@ -43,8 +55,8 @@ function fromUrl(): Partial<SetupChoice> & { start?: boolean } {
   const out: Partial<SetupChoice> & { start?: boolean } = {};
   const p1 = q.get('p1');
   const p2 = q.get('p2');
-  if (p1) out.myDeck = (DECKS.find((d) => d.id === p1) ?? deckByLeader(p1))?.id;
-  if (p2) out.theirDeck = (DECKS.find((d) => d.id === p2) ?? deckByLeader(p2))?.id;
+  if (p1) out.myDeck = (deckById(p1) ?? deckByLeader(p1))?.id;
+  if (p2) out.theirDeck = (deckById(p2) ?? deckByLeader(p2))?.id;
   const opp = q.get('opp');
   if (
     opp === 'hotseat' ||
@@ -115,6 +127,17 @@ export function Setup({
     };
   }, [myDeck, theirDeck]);
 
+  // One validation source with the builder and game start (flows F3a step 2, F17 step 7).
+  const problems = [myDeck, theirDeck].flatMap((id, i) => {
+    const d = deckById(id);
+    if (!d) return [`${i === 0 ? 'Your' : 'The other'} deck was not found.`];
+    // Checked once the cards have loaded; a card the data does not know fails at game start.
+    if (![d.spec.leader, ...d.spec.main].every((c) => deckCards.has(c))) return [];
+    return deckErrors(d.spec, (c) => deckCards.get(c), deckFormat(id)).map(
+      (e) => `${d.name}: ${e.message}`,
+    );
+  });
+
   const choice = (): SetupChoice => ({
     myDeck,
     theirDeck,
@@ -140,7 +163,10 @@ export function Setup({
   return (
     <main className="page setup" id="main">
       <h1>New game</h1>
-      <p className="lede">Pick two of the twelve meta decks, an opponent and who goes first.</p>
+      <p className="lede">
+        Pick two decks (the twelve meta decks, or your own from Decks), an opponent and who goes
+        first.
+      </p>
       <ul className="lede automation" data-testid="automation">
         {[myDeck, theirDeck].map((id, i) => {
           const d = deckById(id);
@@ -326,6 +352,16 @@ export function Setup({
               onChange={(e) => setSeed(e.target.value.replace(/\D/g, ''))}
             />
           </label>
+          {problems.length > 0 && (
+            <div className="notice warning-notice" role="alert" data-testid="deck-problems">
+              <p>Fix the deck first:</p>
+              <ul>
+                {problems.slice(0, 4).map((p) => (
+                  <li key={p}>{p}</li>
+                ))}
+              </ul>
+            </div>
+          )}
           {error && (
             <p className="notice warning-notice" role="alert">
               Couldn’t start the game: {error}
@@ -335,7 +371,7 @@ export function Setup({
             type="submit"
             className="btn primary big start"
             aria-busy={loading}
-            disabled={loading}
+            disabled={loading || problems.length > 0}
           >
             {loading ? 'Loading cards…' : 'Start game'}
           </button>
@@ -358,7 +394,10 @@ function DeckPicker({
   onChange: (id: string) => void;
   compact?: boolean;
 }) {
-  const current = DECKS.find((d) => d.id === value)!;
+  const saved = savedOptions();
+  const current = deckById(value) ?? DECKS[0]!;
+  const inGroup =
+    current.archetype === SAVED ? saved : DECKS.filter((d) => d.archetype === current.archetype);
   return (
     <fieldset className={`setup-col deck-picker ${compact ? 'compact' : ''}`}>
       <legend>{legend}</legend>
@@ -367,9 +406,16 @@ function DeckPicker({
         <select
           className="input"
           value={current.archetype}
-          onChange={(e) => onChange(DECKS.find((d) => d.archetype === e.target.value)!.id)}
+          onChange={(e) =>
+            onChange(
+              e.target.value === SAVED
+                ? saved[0]!.id
+                : DECKS.find((d) => d.archetype === e.target.value)!.id,
+            )
+          }
           name={`${name}-archetype`}
         >
+          {saved.length > 0 && <option value={SAVED}>Your decks ({saved.length})</option>}
           {ARCHETYPES.map((a) => (
             <option key={a.id} value={a.id}>
               {a.name} ({a.leaderId}) · {a.colors.map((c) => COLOR_WORD[c] ?? c).join('/')}
@@ -385,18 +431,22 @@ function DeckPicker({
           onChange={(e) => onChange(e.target.value)}
           name={`${name}-list`}
         >
-          {DECKS.filter((d) => d.archetype === current.archetype).map((d, i) => (
+          {inGroup.map((d, i) => (
             <option key={d.id} value={d.id}>
-              List {i + 1}: {d.source}
+              {d.archetype === SAVED ? `${d.name} · ${d.leader}` : `List ${i + 1}: ${d.source}`}
             </option>
           ))}
         </select>
       </label>
       <p className="subtle small">
-        50 cards · {current.name} ·{' '}
-        <a href={current.url} target="_blank" rel="noreferrer">
-          source decklist
-        </a>
+        {current.spec.main.length} cards · {current.name} ·{' '}
+        {current.archetype === SAVED ? (
+          <Link to={`/decks/${current.id.replace(/^saved:/, '')}`}>edit in the deck builder</Link>
+        ) : (
+          <a href={current.url} target="_blank" rel="noreferrer">
+            source decklist
+          </a>
+        )}
       </p>
     </fieldset>
   );

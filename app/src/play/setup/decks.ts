@@ -8,6 +8,7 @@ import { loadSet } from '@optcg/cards/browser';
 import type { DeckSpec } from '@optcg/engine';
 import { SCRIPTED } from '../../cards/scripts.ts';
 import meta from '../../../../docs/research/meta-lists.json';
+import { savedDeck, savedDecks, type SavedDeck } from '../../decks/store.ts';
 
 export interface DeckOption {
   id: string;
@@ -55,7 +56,36 @@ export const DECKS: DeckOption[] = ARCHETYPES.flatMap((a) =>
   })),
 );
 
-export const deckById = (id: string) => DECKS.find((d) => d.id === id);
+/** The archetype value of saved decks in Setup's pickers. */
+export const SAVED = 'saved';
+
+function savedOption(d: SavedDeck | undefined): DeckOption | undefined {
+  if (!d?.leader) return undefined;
+  return {
+    id: d.id,
+    archetype: SAVED,
+    leader: d.leader,
+    name: d.name,
+    colors: [],
+    source: `Your deck · ${d.main.length} cards · ${d.format === 'standard' ? 'Standard' : 'Extra Regulation'}`,
+    url: '',
+    spec: { leader: d.leader, main: d.main.slice() },
+  };
+}
+
+/** Saved decks with a Leader, newest first (M6). */
+export const savedOptions = (): DeckOption[] =>
+  [...savedDecks()]
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+    .flatMap((d) => savedOption(d) ?? []);
+
+/** A meta list (`OP17-039-rocks#1`) or a saved deck (`saved:...`). */
+export const deckById = (id: string): DeckOption | undefined =>
+  DECKS.find((d) => d.id === id) ??
+  (id.startsWith('saved:') ? savedOption(savedDeck(id)) : undefined);
+
+/** The format a deck is checked in: a saved deck's own, Standard for the meta lists. */
+export const deckFormat = (id: string): 'standard' | 'extra' => savedDeck(id)?.format ?? 'standard';
 
 export interface DeckCoverage {
   /** Different card numbers in the deck, Leader included. */
