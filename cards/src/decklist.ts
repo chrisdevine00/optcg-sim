@@ -36,9 +36,18 @@ export interface ParsedDeck {
   lines: ParsedLine[];
 }
 
+/** `count`, an optional `x`, an optional name, the card number (any case, alt-art suffix), an optional name. */
 const LINE =
-  /^\s*(\d+)(?:\s*[xX×](?=\s|[A-Z]+\d*-\d{3}))?\s*(?:(.*?)\s+)?\(?([A-Z]+\d*-\d{3})(?:_[A-Za-z]+\d*)?\)?(?:\s+(.+?))?\s*$/;
-const BLANK = /^\s*(?:$|#|\/\/|leader:?\s*$|main(?: deck)?:?\s*$|deck:?\s*$)/i;
+  /^\s*(?:(\d+)(?:\s*[xX×](?=\s|[A-Za-z]+\d*-\d{3}))?\s*)?(?:(.*?)\s+)?\(?([A-Za-z]+\d*-\d{3})(?:_[A-Za-z]+\d*)?\)?(?:\s+(.+?))?\s*$/;
+/** Blank lines, comments and the section headings deck sites print ("Characters (12)", "Events:"). */
+const BLANK =
+  /^\s*(?:$|#|\/\/|(?:leader|characters?|events?|stages?|main(?: deck)?|deck(?: list)?|don!*)\s*(?:\(\d+\))?\s*:?\s*$)/i;
+/** A "Leader:" prefix before a card line. */
+const LEADER_PREFIX = /^\s*leader\s*:?\s+/i;
+/** A trailing comment after the card. */
+const COMMENT = /\s+(?:#|\/\/).*$/;
+/** No line can add more cards than a deck holds (review M6-10: a huge count froze the tab). */
+const MAX_LINE_COUNT = 50;
 
 const norm = (s: string) =>
   s
@@ -61,7 +70,8 @@ export function parseDeckText(
   text.split(/\r?\n/).forEach((raw, i) => {
     const line = i + 1;
     if (BLANK.test(raw)) return;
-    const m = LINE.exec(raw);
+    const body = raw.replace(COMMENT, '').replace(LEADER_PREFIX, '');
+    const m = LINE.exec(body);
     if (!m) {
       out.lines.push({
         line,
@@ -71,7 +81,16 @@ export function parseDeckText(
       });
       return;
     }
-    const count = Number(m[1]);
+    const count = m[1] === undefined ? 1 : Number(m[1]);
+    if (count < 1 || count > MAX_LINE_COUNT) {
+      out.lines.push({
+        line,
+        text: raw,
+        status: 'syntax',
+        message: `${count} copies: a line can add 1 to ${MAX_LINE_COUNT}.`,
+      });
+      return;
+    }
     const name = (m[2] ?? m[4])?.trim() || undefined;
     const id = m[3]!.toUpperCase();
     const card = lookup(id);
@@ -134,7 +153,7 @@ function parseJson(text: string, lookup: (id: string) => Card | undefined): Pars
   }
   const d = data as { leader?: unknown; main?: unknown };
   const lines: ParsedLine[] = [];
-  const leader = typeof d.leader === 'string' ? d.leader.replace(/_.*$/, '') : null;
+  const leader = typeof d.leader === 'string' ? d.leader.replace(/_.*$/, '').toUpperCase() : null;
   if (leader && !lookup(leader))
     lines.push({
       line: 1,
@@ -143,7 +162,8 @@ function parseJson(text: string, lookup: (id: string) => Card | undefined): Pars
       message: `Unknown card ID ${leader}.`,
     });
   const main: string[] = [];
-  const add = (id: string, count: number) => {
+  const add = (id: string, n: number) => {
+    const count = Number.isFinite(n) ? Math.max(0, Math.min(MAX_LINE_COUNT, Math.floor(n))) : 0;
     const base = id.replace(/_.*$/, '').toUpperCase();
     if (!lookup(base)) {
       lines.push({

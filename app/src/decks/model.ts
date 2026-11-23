@@ -6,6 +6,21 @@ import { automation, playsFully, type Card } from '@optcg/cards';
 import { deckIssues, type DeckFormat, type DeckIssue, type DeckIssueCode } from '@optcg/engine';
 import { SCRIPTED } from '../cards/scripts.ts';
 import type { SavedDeck } from './store.ts';
+import standard from '../../../cards/format/standard.json';
+
+/** From the format file, for the check rows' wording (F17 step 2; review M6-12). */
+const FMT = standard as unknown as {
+  regulation: { allowedBlocks: (number | string)[] };
+  banned: { effective: string | null }[];
+};
+const NUMERIC_BLOCKS = FMT.regulation.allowedBlocks.filter(
+  (b): b is number => typeof b === 'number',
+);
+const BLOCKS = `${Math.min(...NUMERIC_BLOCKS)}–${Math.max(...NUMERIC_BLOCKS)}`;
+const BAN_LIST = FMT.banned
+  .map((b) => b.effective ?? '')
+  .sort()
+  .at(-1);
 
 export const DECK_SIZE = 50;
 export const MAX_COPIES = 4;
@@ -47,13 +62,14 @@ const ROWS: { label: (d: SavedDeck) => string; rule: string; codes: DeckIssueCod
   { label: () => `Max ${MAX_COPIES} per card number`, rule: 'CR 5-1-2-3', codes: ['copies'] },
   { label: () => 'Colours match Leader', rule: 'CR 5-1-2-2', codes: ['color'] },
   {
-    label: () => 'No banned cards or pairs',
-    rule: 'standard.json',
+    label: () => `No banned cards or pairs${BAN_LIST ? ` (list from ${BAN_LIST})` : ''}`,
+    rule: 'official ban list',
     codes: ['banned', 'bannedPair', 'restricted'],
   },
   {
-    label: (d) => (d.format === 'standard' ? 'Standard blocks' : 'Extra Regulation (all blocks)'),
-    rule: 'standard.json',
+    label: (d) =>
+      d.format === 'standard' ? `Standard blocks ${BLOCKS}` : 'Extra Regulation (all blocks)',
+    rule: 'official format rules',
     codes: ['rotated', 'legalityUnknown'],
   },
 ];
@@ -65,7 +81,7 @@ export function checkRows(d: SavedDeck, issues: readonly DeckIssue[]): CheckRow[
     const errors = mine.filter((i) => i.severity === 'error');
     return {
       label: r.label(d),
-      rule: mine[0]?.rule ?? r.rule,
+      rule: r.rule,
       ok: errors.length === 0,
       detail: mine.map((i) => i.message),
       cards: [...new Set(mine.flatMap((i) => i.cards))],

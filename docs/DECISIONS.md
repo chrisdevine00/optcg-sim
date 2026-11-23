@@ -2,6 +2,13 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-23 — M6 fix round 1 (review docs/reviews/m6-review.md, FAIL on M6-1 and M6-2)
+
+- **M6-1 (sev 3):** the deck store reads storage on every write (read-modify-write by id) and listens for other tabs at module load, so a stale tab can no longer overwrite another tab's deck; Setup and game start read a saved deck fresh from storage. After a failed write the store keeps building on its in-memory copy.
+- **M6-2 (sev 3):** no builder action drops focus to the page. A tile's − uses `aria-disabled` at 0 copies; removing a card's last copy from the deck list focuses the list heading; choosing or changing the Leader focuses search; closing Import or Export returns focus to its button; Import opens on the paste box. A "Skip to the deck" link jumps past the grid.
+- **Severity 2 fixed:** M6-4 (Setup waits for card data and checks unknown cards with the same message as the builder; an unknown set no longer fails the others), M6-5 (stored decks are repaired or dropped one by one), M6-6 (a failed save is shown), M6-7 ("Show more" inside the grid's scroll; short "Choose" label; the deck pane keeps 70vh below 960 px), M6-8 (each deck's problems under its picker in Setup, a summary by Start), M6-9 (lowercase IDs, headings such as "Characters (12)", a bare ID or "Leader: ID" line, trailing comments), M6-10 (a line count over 50 is refused), M6-12 (row wording from the format file: "Standard blocks 2–5", "list from 2026-10-12"; no file names shown), M6-13 (inline delete confirmation, not `window.confirm`), M6-16 (Esc keeps the pasted list for the next open).
+- **Carried, with targets:** M6-3 (arrow keys in the grid, Tab between panes, F17's Enter/Backspace and `A` for art) and M6-14 (colour and set filters, DON!! deck size, group by category) → M10 accessibility and polish pass; none is in the M6 done criteria, and the skip link plus +/− keys cover the keyboard path. Severity 1 items M6-11, 15, 17 to 21 → M10.
+
 ## 2026-11-23 — M6 deck builder: one validator, saved decks, formats
 
 Context: M6 (PLAN row 17) needs a deck builder whose checks agree with Setup and game start (flows F17 step 7), lossless import and export, and saved decks any Standard card can enter.

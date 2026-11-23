@@ -42,6 +42,7 @@ import {
   createDeck,
   deleteDeck,
   saveDeck,
+  saveError,
   savedDecks,
   subscribeDecks,
   type SavedDeck,
@@ -205,7 +206,19 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
   const [dialog, setDialog] = useState<'import' | 'export' | null>(null);
   const [said, setSaid] = useState('');
   const search = useRef<HTMLInputElement>(null);
+  const listTitle = useRef<HTMLHeadingElement>(null);
+  const importBtn = useRef<HTMLButtonElement>(null);
+  const exportBtn = useRef<HTMLButtonElement>(null);
+  const [draft, setDraft] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const deleteBtn = useRef<HTMLButtonElement>(null);
+  const confirmBtn = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (confirmDelete) confirmBtn.current?.focus();
+  }, [confirmDelete]);
   const update = (next: SavedDeck) => saveDeck(next);
+  /** Focus after React has re-rendered (the control that had it may be gone; review M6-2). */
+  const focusSoon = (el: () => HTMLElement | null) => requestAnimationFrame(() => el()?.focus());
   const patch = (p: Partial<BrowserFilters>) => {
     setF((x) => ({ ...x, ...p }));
     setShown(PAGE);
@@ -249,20 +262,34 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
     update(next);
     setSaid(changeLine('Added', c, c.id, next));
   };
-  const remove = (cid: string) => {
+  const remove = (cid: string, fromList = false) => {
+    if (countOf(deck.main, cid) === 0) return;
     const next = removeCopy(deck, cid);
     update(next);
     setSaid(changeLine('Removed', cards.get(cid), cid, next));
+    // The last copy's row leaves the deck list: focus its heading, not the page.
+    if (fromList && countOf(next.main, cid) === 0) focusSoon(() => listTitle.current);
   };
   const chooseLeader = (c: Card) => {
     update({ ...deck, leader: c.id });
     setSaid(`Leader: ${c.name}. The browser now shows cards in its colours.`);
+    focusSoon(() => search.current);
   };
+  const closeDialog = () => {
+    const opener = dialog === 'export' ? exportBtn : importBtn;
+    setDialog(null);
+    focusSoon(() => opener.current);
+  };
+  const error = saveError();
 
   useEffect(() => {
     const onKey = (e: globalThis.KeyboardEvent) => {
       const t = e.target as HTMLElement;
-      if (e.key === '/' && !/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) {
+      if (
+        e.key === '/' &&
+        !/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) &&
+        !document.querySelector('dialog[open]')
+      ) {
         e.preventDefault();
         search.current?.focus();
       }
@@ -294,6 +321,17 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
   return (
     <main className="builder" id="main">
       <section className="builder-browse" aria-label="Card browser">
+        <a
+          className="skip-link"
+          href="#deck-name"
+          onClick={(e) => {
+            // Past the card grid's controls to the deck (review M6-2: 67 Tab stops otherwise).
+            e.preventDefault();
+            document.getElementById('deck-name')?.focus();
+          }}
+        >
+          Skip to the deck
+        </a>
         <div className="builder-search">
           <label className="sr-only" htmlFor="deck-search">
             Search cards
@@ -366,63 +404,70 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
             Automated only
           </Toggle>
         </div>
-        <ul className="builder-grid" aria-label={leader ? 'Cards' : 'Leaders'}>
-          {results.slice(0, shown).map((c) => {
-            const n = countOf(deck.main, c.id);
-            const over = n > MAX_COPIES;
-            return (
-              <li
-                key={c.id}
-                className={`btile${n ? ' in-deck' : ''}${flagged.has(c.id) ? ' bad' : ''}`}
-                onKeyDown={(e) => tileKeys(e, c)}
-              >
-                <span className="btile-face" title={`${c.name} ${c.id}`}>
-                  <CardFace card={c} artwork={artworkFor(c, deck)} tile />
-                </span>
-                <span className="btile-name subtle num">{c.id}</span>
-                {leader ? (
-                  <span className="btile-ctl">
-                    <button
-                      type="button"
-                      className="iconbtn"
-                      aria-label={`Remove one ${c.name} ${c.id}`}
-                      disabled={n === 0}
-                      onClick={() => remove(c.id)}
-                    >
-                      −
-                    </button>
-                    <span className={`num ${over ? 'danger' : ''}`}>
-                      {over ? '✕ ' : ''}
-                      {n}/{MAX_COPIES}
-                    </span>
-                    <button
-                      type="button"
-                      className="iconbtn"
-                      aria-label={`Add one ${c.name} ${c.id}`}
-                      onClick={() => add(c)}
-                    >
-                      +
-                    </button>
+        <div className="builder-scroll">
+          <ul className="builder-grid" aria-label={leader ? 'Cards' : 'Leaders'}>
+            {results.slice(0, shown).map((c) => {
+              const n = countOf(deck.main, c.id);
+              const over = n > MAX_COPIES;
+              return (
+                <li
+                  key={c.id}
+                  className={`btile${n ? ' in-deck' : ''}${flagged.has(c.id) ? ' bad' : ''}`}
+                  onKeyDown={(e) => tileKeys(e, c)}
+                >
+                  <span className="btile-face" title={`${c.name} ${c.id}`}>
+                    <CardFace card={c} artwork={artworkFor(c, deck)} tile />
                   </span>
-                ) : (
-                  <button
-                    type="button"
-                    className="btn small"
-                    aria-label={`Choose ${c.name} ${c.id} as Leader`}
-                    onClick={() => chooseLeader(c)}
-                  >
-                    Choose
-                  </button>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-        {results.length > shown && (
-          <button type="button" className="btn show-more" onClick={() => setShown((s) => s + PAGE)}>
-            Show {Math.min(PAGE, results.length - shown)} more ({shown} of {results.length} shown)
-          </button>
-        )}
+                  <span className="btile-name subtle num">{c.id}</span>
+                  {leader ? (
+                    <span className="btile-ctl">
+                      <button
+                        type="button"
+                        className="iconbtn"
+                        aria-label={`Remove one ${c.name} ${c.id}`}
+                        // Not `disabled`: a disabled button drops keyboard focus (review M6-2).
+                        aria-disabled={n === 0 ? true : undefined}
+                        onClick={() => remove(c.id)}
+                      >
+                        −
+                      </button>
+                      <span className={`num ${over ? 'danger' : ''}`}>
+                        {over ? '✕ ' : ''}
+                        {n}/{MAX_COPIES}
+                      </span>
+                      <button
+                        type="button"
+                        className="iconbtn"
+                        aria-label={`Add one ${c.name} ${c.id}`}
+                        onClick={() => add(c)}
+                      >
+                        +
+                      </button>
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      className="btn small"
+                      aria-label={`Choose ${c.name} ${c.id} as Leader`}
+                      onClick={() => chooseLeader(c)}
+                    >
+                      Choose
+                    </button>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+          {results.length > shown && (
+            <button
+              type="button"
+              className="btn show-more"
+              onClick={() => setShown((s) => s + PAGE)}
+            >
+              Show {Math.min(PAGE, results.length - shown)} more ({shown} of {results.length} shown)
+            </button>
+          )}
+        </div>
       </section>
 
       <section className="builder-deck" aria-label="Deck">
@@ -448,7 +493,11 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
               <button
                 type="button"
                 className="linkbtn small"
-                onClick={() => update({ ...deck, leader: null })}
+                onClick={() => {
+                  update({ ...deck, leader: null });
+                  setSaid('Choose a new Leader: the browser shows Leaders.');
+                  focusSoon(() => search.current);
+                }}
               >
                 Change Leader
               </button>
@@ -467,10 +516,16 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
             </select>
           </div>
           <div className="builder-deck-actions">
-            <button type="button" className="btn small" onClick={() => setDialog('import')}>
+            <button
+              ref={importBtn}
+              type="button"
+              className="btn small"
+              onClick={() => setDialog('import')}
+            >
               Import
             </button>
             <button
+              ref={exportBtn}
               type="button"
               className="btn small"
               disabled={!deck.leader}
@@ -478,21 +533,49 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
             >
               Export
             </button>
-            <button
-              type="button"
-              className="btn small"
-              onClick={() => {
-                if (window.confirm(`Delete “${deck.name}”? This cannot be undone.`)) {
-                  deleteDeck(deck.id);
-                  navigate('/decks');
-                }
-              }}
-            >
-              Delete
-            </button>
+            {confirmDelete ? (
+              <span className="delete-confirm" role="group" aria-label="Delete this deck?">
+                <span className="small">Delete “{deck.name}”? This cannot be undone.</span>
+                <button
+                  type="button"
+                  className="btn small danger-btn"
+                  ref={confirmBtn}
+                  onClick={() => {
+                    deleteDeck(deck.id);
+                    navigate('/decks');
+                  }}
+                >
+                  Delete deck
+                </button>
+                <button
+                  type="button"
+                  className="btn small"
+                  onClick={() => {
+                    setConfirmDelete(false);
+                    focusSoon(() => deleteBtn.current);
+                  }}
+                >
+                  Keep it
+                </button>
+              </span>
+            ) : (
+              <button
+                ref={deleteBtn}
+                type="button"
+                className="btn small"
+                onClick={() => setConfirmDelete(true)}
+              >
+                Delete
+              </button>
+            )}
           </div>
         </div>
 
+        {error && (
+          <p className="notice warning-notice deck-save-error" role="alert">
+            {error}
+          </p>
+        )}
         <div className="builder-deck-scroll">
           {leader && (
             <ul className="checks" aria-label="Deck checks">
@@ -532,6 +615,9 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
               </details>
             )}
           </div>
+          <h2 className="deck-list-title" ref={listTitle} tabIndex={-1}>
+            Deck list · {deck.main.length} cards
+          </h2>
           {groups.map((g) => (
             <section key={g.label} className="deck-group" aria-label={g.label}>
               <h3>{g.label}</h3>
@@ -548,7 +634,7 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
                       type="button"
                       className="iconbtn"
                       aria-label={`Remove one ${r.card?.name ?? r.id}`}
-                      onClick={() => remove(r.id)}
+                      onClick={() => remove(r.id, true)}
                     >
                       −
                     </button>
@@ -597,10 +683,13 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
           cards={cards}
           leader={deck.leader}
           format={deck.format}
-          onClose={() => setDialog(null)}
+          draft={draft}
+          onDraft={setDraft}
+          onClose={closeDialog}
           onImport={(d) => {
             update({ ...deck, leader: d.leader, main: d.main });
-            setDialog(null);
+            closeDialog();
+            setDraft('');
             setSaid(`Imported ${d.main.length} cards.`);
           }}
         />
@@ -610,7 +699,7 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
           name={deck.name}
           deck={{ leader: deck.leader, main: deck.main }}
           cards={cards}
-          onClose={() => setDialog(null)}
+          onClose={closeDialog}
         />
       )}
     </main>

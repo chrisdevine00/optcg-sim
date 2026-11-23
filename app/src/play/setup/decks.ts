@@ -145,9 +145,21 @@ export const deckByLeader = (leader: string) => DECKS.find((d) => d.leader === l
 /** Every card in these decks, loaded from their sets. */
 export async function loadCards(ids: Iterable<string>): Promise<Map<string, Card>> {
   const wanted = new Set(ids);
-  const sets = new Set([...wanted].map(setCodeOf));
-  const files = await Promise.all([...sets].map((s) => loadSet(s)));
+  const sets = new Set(
+    [...wanted].flatMap((id) => {
+      try {
+        return [setCodeOf(id)];
+      } catch {
+        return []; // Not a card number: reported as an unknown card by the deck check.
+      }
+    }),
+  );
+  // A set that does not exist (a mistyped number in a saved deck) leaves its cards unknown, so
+  // the deck check names them; it does not fail the others (review M6-4).
+  const files = await Promise.allSettled([...sets].map((s) => loadSet(s)));
   const out = new Map<string, Card>();
-  for (const f of files) for (const c of f.cards) if (wanted.has(c.id)) out.set(c.id, c);
+  for (const f of files)
+    if (f.status === 'fulfilled')
+      for (const c of f.value.cards) if (wanted.has(c.id)) out.set(c.id, c);
   return out;
 }

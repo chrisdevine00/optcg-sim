@@ -20,44 +20,80 @@ export interface SavedDeck {
 const KEY = 'optcg.decks.v1';
 const listeners = new Set<() => void>();
 let cache: SavedDeck[] | null = null;
+/** The last write that failed (storage full or blocked), for the builder to say so (M6-6). */
+let lastError: string | null = null;
 
-function read(): SavedDeck[] {
-  if (cache) return cache;
+const FORMATS = new Set(['standard', 'extra']);
+const isId = (x: unknown): x is string => typeof x === 'string' && x.length > 0;
+
+/** One stored deck, repaired where it can be and dropped where it cannot (M6-5). */
+function clean(x: unknown): SavedDeck | null {
+  if (!x || typeof x !== 'object') return null;
+  const d = x as Partial<SavedDeck>;
+  if (!isId(d.id) || !d.id.startsWith('saved:')) return null;
+  return {
+    id: d.id,
+    name: typeof d.name === 'string' ? d.name : 'Untitled deck',
+    leader: isId(d.leader) ? d.leader : null,
+    main: Array.isArray(d.main) ? d.main.filter(isId) : [],
+    format: FORMATS.has(d.format as string) ? (d.format as SavedDeck['format']) : 'standard',
+    art:
+      d.art && typeof d.art === 'object'
+        ? Object.fromEntries(Object.entries(d.art).filter(([, v]) => isId(v)))
+        : {},
+    updatedAt: typeof d.updatedAt === 'string' ? d.updatedAt : new Date(0).toISOString(),
+  };
+}
+
+/** Always from storage, so another tab's writes are never overwritten by a stale copy (M6-1). */
+function load(): SavedDeck[] {
   try {
     const raw = window.localStorage.getItem(KEY);
-    const all = raw ? (JSON.parse(raw) as SavedDeck[]) : [];
-    cache = Array.isArray(all) ? all.filter((d) => d && typeof d.id === 'string') : [];
+    const all: unknown = raw ? JSON.parse(raw) : [];
+    return Array.isArray(all) ? all.flatMap((x) => clean(x) ?? []) : [];
   } catch {
-    cache = [];
+    return cache ?? [];
   }
+}
+
+function read(): SavedDeck[] {
+  cache ??= load();
   return cache;
 }
 
-function write(all: SavedDeck[]): void {
-  cache = all;
+/** Read-modify-write against storage, by id. */
+function modify(change: (all: SavedDeck[]) => SavedDeck[]): void {
+  // After a failed write, storage lacks this tab's edits: build on the in-memory copy.
+  const next = change(lastError ? read() : load());
+  cache = next;
   try {
-    window.localStorage.setItem(KEY, JSON.stringify(all));
-  } catch {
-    // Storage full or blocked: the decks stay for this session only.
+    window.localStorage.setItem(KEY, JSON.stringify(next));
+    lastError = null;
+  } catch (e) {
+    lastError = `Your decks could not be saved in this browser (${e instanceof Error ? e.name : 'storage error'}). Changes last until you close the tab.`;
   }
   for (const fn of listeners) fn();
 }
 
+// Another tab changed the decks: drop the copy and tell every reader, subscribed or not.
+if (typeof window !== 'undefined')
+  window.addEventListener('storage', (e) => {
+    if (e.key !== KEY && e.key !== null) return;
+    cache = null;
+    for (const fn of listeners) fn();
+  });
+
+export const saveError = (): string | null => lastError;
+
 export const savedDecks = (): readonly SavedDeck[] => read();
 
-export const savedDeck = (id: string): SavedDeck | undefined => read().find((d) => d.id === id);
+/** Fresh from storage: Setup and game start see what the builder saved, even from another tab. */
+export const savedDeck = (id: string): SavedDeck | undefined => load().find((d) => d.id === id);
 
 export function subscribeDecks(fn: () => void): () => void {
   listeners.add(fn);
-  const onStorage = (e: StorageEvent) => {
-    if (e.key !== KEY) return;
-    cache = null;
-    fn();
-  };
-  window.addEventListener('storage', onStorage);
   return () => {
     listeners.delete(fn);
-    window.removeEventListener('storage', onStorage);
   };
 }
 
@@ -73,19 +109,19 @@ export function createDeck(init: Partial<Omit<SavedDeck, 'id' | 'updatedAt'>> = 
     art: init.art ?? {},
     updatedAt: new Date().toISOString(),
   };
-  write([...read(), d]);
+  modify((all) => [...all, d]);
   return d;
 }
 
 export function saveDeck(d: SavedDeck): void {
   const next = { ...d, updatedAt: new Date().toISOString() };
-  const all = read();
-  const i = all.findIndex((x) => x.id === d.id);
-  write(i >= 0 ? all.map((x, k) => (k === i ? next : x)) : [...all, next]);
+  modify((all) =>
+    all.some((x) => x.id === d.id) ? all.map((x) => (x.id === d.id ? next : x)) : [...all, next],
+  );
 }
 
 export function deleteDeck(id: string): void {
-  write(read().filter((d) => d.id !== id));
+  modify((all) => all.filter((d) => d.id !== id));
 }
 
 /** Tests only: forget the in-memory copy. */

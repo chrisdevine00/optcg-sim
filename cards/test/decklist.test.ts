@@ -103,6 +103,36 @@ describe('parseDeckText', () => {
     expect(p.lines[1]!.message).toBe('Unknown card ID OP17-999.');
     expect(p.main).toHaveLength(4);
   });
+  it('lowercase IDs, headings, a bare ID, a "Leader:" prefix and comments (review M6-9)', () => {
+    const p = parseDeckText(
+      [
+        'Leader (1)',
+        'Leader: op17-039',
+        'Characters (12)',
+        '4xop17-040',
+        '4 OP17-045 // two-of next time',
+        'Events:',
+        'OP17-055',
+      ].join('\n'),
+      lookup,
+    );
+    expect(p.lines.every((l) => l.status === 'ok' || l.status === 'leader')).toBe(true);
+    expect(p.leader).toBe('OP17-039');
+    expect(groupDeck(p.main)).toEqual([
+      { id: 'OP17-040', count: 4 },
+      { id: 'OP17-045', count: 4 },
+      { id: 'OP17-055', count: 1 },
+    ]);
+    expect(parseDeckText('{"leader":"op17-039","main":[]}', lookup).leader).toBe('OP17-039');
+  });
+  it('a count over 50 is refused at once, not expanded (review M6-10)', () => {
+    const t0 = Date.now();
+    const p = parseDeckText('99999999 OP17-040', lookup);
+    expect(Date.now() - t0).toBeLessThan(50);
+    expect(p.main).toEqual([]);
+    expect(p.lines[0]).toMatchObject({ status: 'syntax' });
+    expect(p.lines[0]!.message).toMatch(/1 to 50/);
+  });
   it('a name may follow the ID ("4 OP17-040 Edward.Newgate")', () => {
     const p = parseDeckText(`4 OP17-040 ${nameOf('OP17-040')}`, lookup);
     expect(p.lines[0]).toMatchObject({ status: 'ok', id: 'OP17-040', count: 4 });

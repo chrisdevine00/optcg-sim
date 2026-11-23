@@ -112,6 +112,8 @@ export function Setup({
   // Card data for the two chosen decks, so the automation copy can tell cards with no effect from
   // cards whose effect is not scripted. The line appears once the sets have loaded.
   const [deckCards, setDeckCards] = useState<ReadonlyMap<string, Card>>(new Map());
+  /** The pair of decks whose cards are loaded (Start waits for it; review M6-4). */
+  const [readyFor, setReadyFor] = useState('');
   useEffect(() => {
     let live = true;
     const ids = [myDeck, theirDeck].flatMap((id) => {
@@ -119,23 +121,30 @@ export function Setup({
       return d ? [d.spec.leader, ...d.spec.main] : [];
     });
     loadCards(ids).then(
-      (m) => live && setDeckCards(m),
-      () => undefined,
+      (m) => {
+        if (!live) return;
+        setDeckCards(m);
+        setReadyFor(`${myDeck}|${theirDeck}`);
+      },
+      () => live && setReadyFor(`${myDeck}|${theirDeck}`),
     );
     return () => {
       live = false;
     };
   }, [myDeck, theirDeck]);
 
-  // One validation source with the builder and game start (flows F3a step 2, F17 step 7).
-  const problems = [myDeck, theirDeck].flatMap((id, i) => {
+  // One validation source with the builder and game start (flows F3a step 2, F17 step 7). Once the
+  // cards are loaded, a card the data does not know is "Unknown card" here too (review M6-4).
+  const cardsReady = readyFor === `${myDeck}|${theirDeck}`;
+  const problems = (['mine', 'theirs'] as const).flatMap((seat) => {
+    const id = seat === 'mine' ? myDeck : theirDeck;
     const d = deckById(id);
-    if (!d) return [`${i === 0 ? 'Your' : 'The other'} deck was not found.`];
-    // Checked once the cards have loaded; a card the data does not know fails at game start.
-    if (![d.spec.leader, ...d.spec.main].every((c) => deckCards.has(c))) return [];
-    return deckErrors(d.spec, (c) => deckCards.get(c), deckFormat(id)).map(
-      (e) => `${d.name}: ${e.message}`,
-    );
+    if (!d) return [{ seat, text: 'This deck was not found (deleted in another tab?).' }];
+    if (!cardsReady) return [];
+    return deckErrors(d.spec, (c) => deckCards.get(c), deckFormat(id)).map((e) => ({
+      seat,
+      text: e.message,
+    }));
   });
 
   const choice = (): SetupChoice => ({
@@ -188,6 +197,7 @@ export function Setup({
           name="mine"
           value={myDeck}
           onChange={setMyDeck}
+          problems={problems.filter((p) => p.seat === 'mine').map((p) => p.text)}
         />
         <fieldset className="setup-col">
           <legend>Opponent</legend>
@@ -293,6 +303,7 @@ export function Setup({
             name="theirs"
             value={theirDeck}
             onChange={setTheirDeck}
+            problems={problems.filter((p) => p.seat === 'theirs').map((p) => p.text)}
             compact
           />
         </fieldset>
@@ -353,14 +364,13 @@ export function Setup({
             />
           </label>
           {problems.length > 0 && (
-            <div className="notice warning-notice" role="alert" data-testid="deck-problems">
-              <p>Fix the deck first:</p>
-              <ul>
-                {problems.slice(0, 4).map((p) => (
-                  <li key={p}>{p}</li>
-                ))}
-              </ul>
-            </div>
+            <p className="notice warning-notice" role="alert" data-testid="deck-problems">
+              Start is off until{' '}
+              {problems.some((p) => p.seat === 'mine') && problems.some((p) => p.seat === 'theirs')
+                ? 'both decks are fixed'
+                : 'the deck is fixed'}
+              : {problems.length} problem{problems.length === 1 ? '' : 's'}, listed under the deck.
+            </p>
           )}
           {error && (
             <p className="notice warning-notice" role="alert">
@@ -371,9 +381,9 @@ export function Setup({
             type="submit"
             className="btn primary big start"
             aria-busy={loading}
-            disabled={loading || problems.length > 0}
+            disabled={loading || !cardsReady || problems.length > 0}
           >
-            {loading ? 'Loading cards…' : 'Start game'}
+            {loading || !cardsReady ? 'Loading cards…' : 'Start game'}
           </button>
         </fieldset>
       </form>
@@ -386,12 +396,15 @@ function DeckPicker({
   name,
   value,
   onChange,
+  problems,
   compact = false,
 }: {
   legend: string;
   name: string;
   value: string;
   onChange: (id: string) => void;
+  /** This deck's check failures, shown under the picker (review M6-8). */
+  problems: string[];
   compact?: boolean;
 }) {
   const saved = savedOptions();
@@ -448,6 +461,20 @@ function DeckPicker({
           </a>
         )}
       </p>
+      {problems.length > 0 && (
+        <div className="deck-problems" data-testid={`deck-problems-${name}`}>
+          <p>
+            {problems.length} problem{problems.length === 1 ? '' : 's'}: fix{' '}
+            {problems.length === 1 ? 'it' : 'them'} in the deck builder.
+          </p>
+          <ul>
+            {problems.slice(0, 5).map((p, i) => (
+              <li key={i}>{p}</li>
+            ))}
+            {problems.length > 5 && <li>and {problems.length - 5} more</li>}
+          </ul>
+        </div>
+      )}
     </fieldset>
   );
 }

@@ -12,9 +12,14 @@ export function ImportDialog({
   cards,
   leader,
   format,
+  draft,
+  onDraft,
   onImport,
   onClose,
 }: {
+  /** The text from the last time the dialog was open: Esc never loses a pasted list (M6-16). */
+  draft: string;
+  onDraft: (text: string) => void;
   cards: ReadonlyMap<string, Card>;
   /** The deck's current Leader: used when the list has none. */
   leader: string | null;
@@ -23,11 +28,17 @@ export function ImportDialog({
   onClose: () => void;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
-  const [text, setText] = useState('');
+  const [text, setTextState] = useState(draft);
+  const setText = (t: string) => {
+    setTextState(t);
+    onDraft(t);
+  };
   useEffect(() => {
     const d = ref.current!;
     // No close() on cleanup: StrictMode's second run would fire `close` and unmount the dialog.
     if (!d.open) d.showModal();
+    // The paste box is where the dialog starts (M6-16); showModal would pick Close.
+    d.querySelector<HTMLTextAreaElement>('#import-text')?.focus();
   }, []);
 
   const lookup = (id: string) => cards.get(id);
