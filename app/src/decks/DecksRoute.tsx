@@ -534,12 +534,20 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
               Export
             </button>
             {confirmDelete ? (
-              <span className="delete-confirm" role="group" aria-label="Delete this deck?">
+              <span
+                className="delete-confirm"
+                role="group"
+                aria-label="Delete this deck?"
+                onKeyDown={(e) => {
+                  if (e.key !== 'Escape') return;
+                  setConfirmDelete(false);
+                  focusSoon(() => deleteBtn.current);
+                }}
+              >
                 <span className="small">Delete “{deck.name}”? This cannot be undone.</span>
                 <button
                   type="button"
                   className="btn small danger-btn"
-                  ref={confirmBtn}
                   onClick={() => {
                     deleteDeck(deck.id);
                     navigate('/decks');
@@ -548,6 +556,7 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
                   Delete deck
                 </button>
                 <button
+                  ref={confirmBtn}
                   type="button"
                   className="btn small"
                   onClick={() => {

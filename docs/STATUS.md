@@ -1,7 +1,7 @@
 # Status
 
 **Phase:** 5 Build, slice pass (ADR 0012), starting at M0. Phases 1–4 gated 2026-10-28.
-**Milestone:** **M6 Deck builder: in progress (started 2026-11-23).** **M5b AI breadth: done 2026-11-23 under the time-box, with the Warlord-vs-Pirate target (65%) NOT met:** 123/200 (61.5%) every nightly, no tested change beat noise on fresh seeds (DECISIONS 2026-11-23; carried to docs/BACKLOG.md #1); the nightly asserts a 55% floor. **M4b Effects breadth: done 2026-11-16.** All 182 meta-list cards play fully. L Learning slice done 2026-11-09. M5a done 2026-11-05. M4a done 2026-10-29. M3 done 2026-11-05. M0, M1 and M2 done 2026-10-28.
+**Milestone:** **M6 Deck builder: done 2026-11-23** (review FAIL, fix round, re-review 1 PASS). **Next: M6b Card pool and live updates** (PLAN §2a, row 17b). **M5b AI breadth: done 2026-11-23 under the time-box, with the Warlord-vs-Pirate target (65%) NOT met:** 123/200 (61.5%) every nightly, no tested change beat noise on fresh seeds (DECISIONS 2026-11-23; carried to docs/BACKLOG.md #1); the nightly asserts a 55% floor. **M4b Effects breadth: done 2026-11-16.** All 182 meta-list cards play fully. L Learning slice done 2026-11-09. M5a done 2026-11-05. M4a done 2026-10-29. M3 done 2026-11-05. M0, M1 and M2 done 2026-10-28.
 **Run the app:** `npm install && npm run dev` then open http://localhost:5173/optcg-sim/ and go to `/cards` for the card browser
 **Deployed:** https://chrisdevine00.github.io/optcg-sim/ (auto-deploys after green CI on `main`)
 
@@ -13,7 +13,7 @@
 | 2 Plan | docs/PLAN.md, docs/ARCHITECTURE.md, docs/adr/ | **Gated 2026-10-28** (revision 2 after two reviews; see docs/plan-review-1.md) |
 | 3 Deep research | docs/research/effect-dsl.md, rulings.md; docs/content/archetypes/, curriculum.md, glossary.md, sources.md | **Gated 2026-10-28** (competitive-player review: 20 findings, 0 severity-3 open; see docs/content/review-1.md) |
 | 4 Design | docs/design/principles.md, board.md, flows.md, visual-system.md, learning-ui.md, wireframes/, review-1.md | **Gated 2026-10-28** (review 1: 50 findings plus 2 verification passes; 0 severity-3 or severity-4 open) |
-| 5 Build | M0 through M10 per PROMPT.md, plus M6b (card pool and live updates, added 2026-11-17, amendment A1) after M6 | In progress: M0–M3, M4a, M4b, M5a, L and M5b done (M5b strength target not met, time-box); M6 in progress; M6b planned |
+| 5 Build | M0 through M10 per PROMPT.md, plus M6b (card pool and live updates, added 2026-11-17, amendment A1) after M6 | In progress: M0–M3, M4a, M4b, M5a, L, M5b (strength target not met, time-box) and M6 done; M6b next |
 
 ## Done
 
@@ -142,7 +142,7 @@
 
 ## Next (slice pass, PLAN.md §1)
 
-**Current next step (2026-11-23): M6 Deck builder (PLAN §1 row 17), then M6b, then M7 to M10. The items below are history.**
+**Current next step (2026-11-23): M6b Card pool and live updates (PLAN §2a, row 17b; start with M6b-0: `meta:update` and the measured backlog, after checking the Limitless API terms and both sites' robots.txt, ADR 0014). Then M7 to M10. The items below are history.**
 
 **Roadmap (owner-approved 2026-11-17, amendment A1; DECISIONS "Full Standard card pool and live updates (M6b)", ADR 0014):** M5b, then M6, then **M6b Card pool and live updates** (PLAN §2a, row 17b), then M7 to M10. M6b scripts every Standard-legal card (block 5, then 4, then 3; block 2 held until the post-2027-03-31 rotation is announced), builds `meta:update` and the scheduled `update.yml`, adds the app update prompt and a default playbook for any leader. `meta:update` is no longer an M9 item.
 
@@ -181,13 +181,14 @@
 - **CI repair (8167824):** `main`'s CI had failed at typecheck since 26b5c99 (2026-11-09): `app/test/a11y-harness.test.ts` pulled in the harness's type import of `@guidepup/guidepup`, which installs only in the a11y workflow. The harness now types the Guidepup objects locally; CI green again.
 - **Not waiting for:** S1 (folded in when it happens); the meta refresh (now `meta:update` in M6b-0, then a weekly `update.yml` PR from M6b-5).
 
-### M6 Deck builder: in progress (started 2026-11-23)
+### M6 Deck builder: done 2026-11-23
 
 PLAN done criteria: all 36 meta lists round-trip without loss; validator tests match the rules and `standard.json`; any Standard-legal card can be added and saved; a non-meta-leader deck can be played against the AI. Decisions: DECISIONS 2026-11-23 "M6 deck builder".
 
 - **Built:** `engine/src/deck.ts` `deckIssues` (CR 5-1-2 + Standard/Extra legality, typed issues; `validateDeck` shares it); `cards/src/decklist.ts` parse/export (`4xID`, `4 ID`, `4 Name ID`, `4 ID Name`, JSON; suggestions for unknown IDs); `/decks` list and `/decks/<id>` builder (browser filtered to the Leader's colours and the format, live check rows with rule references, coverage by copies and names, cost-grouped list, alt art per card, import with a line report and fixes, export in four formats, autosave in `localStorage`); Setup lists saved decks and blocks Start with the reasons; "Decks" in the nav.
 - **Tests:** `engine/test/rules/deck-format.test.ts` (50: each of the 36 lists legal, every CR rule, banned, rotated, unknown legality as a warning, banned pair, restricted, Leader legality), `cards/test/decklist.test.ts` (48: 36 lists round-trip in every format and JSON), `app/test/decks.test.ts` (7), `ai/test/non-meta.test.ts` (5: Pirate and Warlord games against and with a non-meta Leader), `app/e2e/decks.spec.ts` (5 per resolution). `npm test` 4,263 passed; Playwright 219 passed before the 320 px header fix, which then passed.
-- **Next:** independent review (`docs/reviews/m6-review.md`), fix round, screenshots reviewed, mark done.
+- **Review (`docs/reviews/m6-review.md`): FAIL** on M6-1 (cross-tab deck loss) and M6-2 (focus dropped to the page), plus 12 severity 2 items. **Fix round 1** (245c300; DECISIONS "M6 fix round 1") fixed both and M6-4 to 10, 12, 13, 16. **Re-review 1: PASS**, no severity 3 or 4; its N-1 (a trailing count read as 1 copy) and N-3 (delete confirmation and Esc) fixed after. Carried to M10 with BACKLOG #2: M6-3, M6-14, N-2, N-4 and severity 1 items.
+- **Done criteria:** all 36 meta lists round-trip in every format (tests); validator tests match CR 5-1-2 and `standard.json`; any Standard-legal card can be added and is saved (autosave; e2e reload test); a non-meta-Leader deck plays against Pirate and Warlord both ways (`ai/test/non-meta.test.ts`). Screenshots of every builder screen at 1280×720 and 1920×1080 reviewed by the reviewer and by me.
 
 ### M5b AI breadth: done 2026-11-23 (time-box; strength target not met)
 

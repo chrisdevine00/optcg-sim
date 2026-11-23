@@ -44,6 +44,8 @@ const BLANK =
   /^\s*(?:$|#|\/\/|(?:leader|characters?|events?|stages?|main(?: deck)?|deck(?: list)?|don!*)\s*(?:\(\d+\))?\s*:?\s*$)/i;
 /** A "Leader:" prefix before a card line. */
 const LEADER_PREFIX = /^\s*leader\s*:?\s+/i;
+/** A count after the card number ("OP01-016 x4", "OP01-016 4"; review N-1). */
+const TRAILING_COUNT = /^\s*\(?([A-Za-z]+\d*-\d{3}(?:_[A-Za-z]+\d*)?)\)?\s*(?:[xX×]\s*)?(\d+)\s*$/;
 /** A trailing comment after the card. */
 const COMMENT = /\s+(?:#|\/\/).*$/;
 /** No line can add more cards than a deck holds (review M6-10: a huge count froze the tab). */
@@ -70,7 +72,10 @@ export function parseDeckText(
   text.split(/\r?\n/).forEach((raw, i) => {
     const line = i + 1;
     if (BLANK.test(raw)) return;
-    const body = raw.replace(COMMENT, '').replace(LEADER_PREFIX, '');
+    const body = raw
+      .replace(COMMENT, '')
+      .replace(LEADER_PREFIX, '')
+      .replace(TRAILING_COUNT, '$2 $1');
     const m = LINE.exec(body);
     if (!m) {
       out.lines.push({

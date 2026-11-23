@@ -104,3 +104,48 @@ Tile controls are 24x24 px (meets WCAG 2.2 AA minimum, below comfortable for the
 ## Verdict: FAIL
 
 Severity 3: M6-1 (stale cache overwrites saved decks across tabs) and M6-2 (focus lost to body after the core add/remove, Choose Leader and dialog-close actions). Fix those two, and ideally M6-4, M6-5, M6-7 and M6-8, then re-review. The done-row criteria themselves (36 lists round-trip, validator matches rules and `standard.json`, any Standard-legal card addable and savable, non-meta Leader playable against the AI) are met.
+
+## Re-review 1 (fix round 1, commit 245c300)
+
+Method: read the diff 61b346d..245c300, re-ran my earlier probes (parser, round trip of all 36 lists in every format, Playwright for focus, tabs, malformed storage, Setup, storage failure), and looked at the new 1280x720 screenshots.
+
+### Status of each finding
+
+| Finding | Status | Evidence |
+|---|---|---|
+| M6-1 stale cache overwrites decks | **Fixed** | Same two-tab repro: tab 1 now lists "FromTab2" and stores `['FromTab2','New deck']`. `modify` re-reads storage, the `storage` listener is registered at module load, `savedDeck` reads fresh. After a failed write the in-memory copy is used, which is right. |
+| M6-2 focus lost | **Fixed** | Tile `−` at 0 keeps focus (aria-disabled); last copy in the deck list focuses "Deck list · N cards"; Choose and Change Leader focus the search box; Import Esc returns to Import, Export Esc to Export; Import opens on the textarea; a "Skip to the deck" link exists. |
+| M6-3 arrows, Tab between panes | Carried to M10 (still severity 2) | Tab stops from search to the deck pane went from 67 to 127, because disabled `−` buttons are now focusable; the skip link is the only mitigation. |
+| M6-4 Setup with unknown card | **Fixed** | Saved deck with `OP99-001`: Start disabled, one problem shown; Start reads "Loading cards…" until the pair is loaded (`readyFor`). |
+| M6-5 malformed storage blanks app | **Fixed** | `[{"id":"saved:bad","name":"x"}]` renders the list; entries are repaired or dropped. |
+| M6-6 silent failed save | **Fixed** | With `setItem` throwing, the builder shows "Your decks could not be saved in this browser (QuotaExceededError)...". |
+| M6-7 layout | **Fixed** at 1280x720 | "Show more" no longer covers controls; "Choose" label fits (screenshot 02). Not re-checked at 1920 or below 960 px beyond the code change. |
+| M6-8 Setup problem placement | **Fixed** | Problems sit under the seat's picker, with a summary by Start (screenshot 08). |
+| M6-9 parser inputs | **Fixed, with a regression** (N-1) | Lowercase IDs, `Characters (12)`, `Deck list`, `Main Deck (50)`, `Leader: ID`, bare ID, trailing `#`/`//` comments all parse. The BLANK heading regex is anchored to the whole line, so no real card line is swallowed (checked `4 Nami OP01-016`, `1 Leader OP17-039`, `Nami OP01-016`). |
+| M6-10 huge count | **Fixed** | `51 OP17-040` and `0 OP17-040` are blocking syntax lines; JSON counts are clamped to 0..50. |
+| M6-11 JSON silent drops | Carried (severity 1) | `count: "x"` still clamps to 0 without a report. |
+| M6-12 check-row wording | **Fixed** | "Standard blocks 2–5", "(list from 2026-10-12)"; the source label is "(official ban list)". No file names. |
+| M6-13 native confirm | **Fixed** | Inline confirm "Delete “T”? This cannot be undone. Delete deck / Keep it". See N-3. |
+| M6-14 missing F17 items | Carried to M10 | See the deferral judgement. |
+| M6-15, 17 to 21 | Carried (severity 1) | M6-17 duplicate key is gone (problems are now per seat). |
+| M6-16 dialog focus and Esc text | **Fixed** | Textarea has initial focus; focus returns to the opener on close. |
+
+All 36 meta lists still round-trip in the three text formats and JSON (probe: 36 lists, 0 bad). The 32 tests in the three M6 test files were not re-run by me; the e2e file grew by about 100 lines.
+
+### New findings
+
+**N-1 (severity 2) A trailing count imports as one copy.** `cards/src/decklist.ts:40` (count is now optional). `OP01-016 x4`, `OP01-016 4` and `OP01-016 x 4` previously failed as "Not a card line"; they now import **1 copy** with only a "name doesn't match" warning (`"x4" doesn't match OP01-016 (Nami): using the ID`), and the line shows as a warning, not a problem, so the Import button is enabled. The deck then reads 46 cards or similar and the user must work out why. Several sites print `ID xN`. Fix: parse a trailing `x?N` (or `(N)`) after the ID as the count when no leading count exists, or treat a name made only of digits and `x` as a blocking line "Put the count first: 4xOP01-016".
+
+**N-2 (severity 1) Tab stops grew to 127 between search and deck pane** (see M6-3 row). The skip link works, but a keyboard user going back from the deck to search has no skip link. Add "Skip to the card browser" in the deck pane.
+
+**N-3 (severity 1) Inline delete confirmation.** Esc does not dismiss it (focus stays on "Delete deck", the destructive button; a second Enter deletes). Put initial focus on "Keep it", and let Esc cancel.
+
+**N-4 (severity 1) Setup copy.** For an invalid saved deck the automation line still says "all 15 different cards are scripted...", which reads as approval beside the problem list. If card loading fails entirely, `readyFor` is still set and every card is reported "Unknown card", which misdescribes a network failure. Show a "Couldn't load card data" message instead.
+
+### Deferral of M6-3 and M6-14 to M10
+
+Acceptable for the M6 done row. That row names four things (36 lists round-trip, validator matches rules and `standard.json`, any Standard-legal card can be added and saved, a non-meta-leader deck plays against the AI), and none depends on arrow-key navigation, colour and set filters, DON!! deck size or grouping by category. The remaining keyboard path is usable: every control is reachable, +/- work on a focused tile, focus is never lost, and there is a skip link. Conditions: record both items in `docs/BACKLOG.md` with M10 as the owner (the DECISIONS entry names them but BACKLOG is where the plan looks), and note that F17 step 1 (arrows, `A`, Enter/Backspace) is a stated flow requirement, so M10's accessibility review must not close without it. Fix N-1 before M6 is marked done, because it silently changes quantities; it is a one-line regex change plus a test.
+
+### Verdict: PASS
+
+No severity 3 or 4 findings remain. Both original severity 3 items are fixed and verified. N-1 is severity 2 and should be fixed before the milestone is closed, but it does not fail the done criteria.

@@ -212,12 +212,16 @@ test.describe('M6: deck builder', () => {
       await expect(page.getByRole('button', { name: 'Start game' })).toBeDisabled();
     });
 
-    test('M6-13: delete asks inline, Keep it returns focus, Delete deck removes it', async ({
+    test('M6-13: delete asks inline; Keep it and Esc return focus; Delete deck removes it', async ({
       page,
     }) => {
       await importDeck(page, ROCKS);
       await page.getByRole('button', { name: 'Delete', exact: true }).click();
-      await expect(page.getByRole('button', { name: 'Delete deck' })).toBeFocused();
+      // Focus starts on the safe choice; Esc cancels (review N-3).
+      await expect(page.getByRole('button', { name: 'Keep it' })).toBeFocused();
+      await page.keyboard.press('Escape');
+      await expect(page.getByRole('button', { name: 'Delete', exact: true })).toBeFocused();
+      await page.getByRole('button', { name: 'Delete', exact: true }).click();
       await page.getByRole('button', { name: 'Keep it' }).click();
       await expect(page.getByRole('button', { name: 'Delete', exact: true })).toBeFocused();
       await page.getByRole('button', { name: 'Delete', exact: true }).click();

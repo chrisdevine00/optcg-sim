@@ -125,6 +125,13 @@ describe('parseDeckText', () => {
     ]);
     expect(parseDeckText('{"leader":"op17-039","main":[]}', lookup).leader).toBe('OP17-039');
   });
+  it('a count after the card number is read as the count (review N-1)', () => {
+    for (const line of ['OP17-040 x4', 'OP17-040 4', 'OP17-040 x 4', 'op17-040 ×4'])
+      expect(parseDeckText(line, lookup), line).toMatchObject({
+        main: Array(4).fill('OP17-040'),
+        lines: [{ status: 'ok', count: 4 }],
+      });
+  });
   it('a count over 50 is refused at once, not expanded (review M6-10)', () => {
     const t0 = Date.now();
     const p = parseDeckText('99999999 OP17-040', lookup);
