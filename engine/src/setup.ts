@@ -13,7 +13,8 @@ import type {
   ScenarioSpec,
   Step,
 } from './api.ts';
-import { DECK_SIZE, DefTable, MAX_COPIES, donDeckSizeFor } from './defs.ts';
+import { deckIssues } from './deck.ts';
+import { DefTable, donDeckSizeFor } from './defs.ts';
 import { Draft } from './draft.ts';
 import { advance, MAX_CHARACTERS } from './flow.ts';
 import { checkInvariants } from './invariants.ts';
@@ -102,43 +103,12 @@ function addCard(
 // Deck validation (CR 5-1-2)
 // ---------------------------------------------------------------------------------------------
 
-/** Problems with a deck under the CR deck-construction rules; empty when legal. */
+/**
+ * Problems with a deck under the CR deck-construction rules; empty when legal. The same checks as
+ * `deckIssues(deck, lookup, 'free')` (one source for the builder, Setup and game start).
+ */
 export function validateDeck(deck: DeckSpec, defs: DefTable): string[] {
-  const errors: string[] = [];
-  let leader;
-  try {
-    leader = defs.get(deck.leader);
-  } catch {
-    return [`Unknown Leader card ${deck.leader}`];
-  }
-  if (leader.category !== 'Leader') errors.push(`${deck.leader} is not a Leader card (CR 5-1-2).`);
-  if (deck.main.length !== DECK_SIZE)
-    errors.push(
-      `The deck has ${deck.main.length} cards; it must have exactly ${DECK_SIZE} (CR 5-1-2).`,
-    );
-  const counts = new Map<CardId, number>();
-  for (const id of deck.main) {
-    let def;
-    try {
-      def = defs.get(id);
-    } catch {
-      errors.push(`Unknown card ${id}`);
-      continue;
-    }
-    counts.set(id, (counts.get(id) ?? 0) + 1);
-    if (def.category === 'Leader')
-      errors.push(
-        `${id} is a Leader; the deck holds only Characters, Events and Stages (CR 5-1-2-1).`,
-      );
-    const off = def.colors.filter((c) => !leader.colors.includes(c));
-    if (off.length)
-      errors.push(`${id} has a color (${off.join(', ')}) the Leader does not have (CR 5-1-2-2).`);
-  }
-  for (const [id, n] of counts) {
-    if (n > MAX_COPIES)
-      errors.push(`${n} copies of ${id}; the limit is ${MAX_COPIES} per card number (CR 5-1-2-3).`);
-  }
-  return [...new Set(errors)];
+  return deckIssues(deck, defs.lookup, 'free').map((i) => `${i.message} (${i.rule})`);
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -150,6 +120,8 @@ export function createGame(setup: GameSetup): Step {
   for (const p of PLAYERS) {
     const errors = validateDeck(setup.decks[p], defs);
     if (errors.length) throw new InvalidSetup(`${p} deck: ${errors.join(' ')}`);
+    // Copy every definition the deck uses into state (ARCHITECTURE §2.1).
+    for (const id of [setup.decks[p].leader, ...setup.decks[p].main]) defs.get(id);
   }
   const s = baseState(setup.seed, defs);
   const d = new Draft(s);

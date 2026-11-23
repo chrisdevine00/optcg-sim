@@ -34,3 +34,10 @@ export {
   type RecordWithSnapshots,
 } from './record.ts';
 export { InvalidSetup, validateDeck } from './setup.ts';
+export {
+  deckErrors,
+  deckIssues,
+  type DeckFormat,
+  type DeckIssue,
+  type DeckIssueCode,
+} from './deck.ts';

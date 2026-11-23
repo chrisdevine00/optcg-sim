@@ -69,3 +69,12 @@ export { textHash } from './dsl.ts';
 export { abilityReadsHiddenZone } from './hidden.ts';
 export { IMPLEMENTED, isEffect, validateScript } from './dsl-validate.ts';
 export { SCRIPTS, SCRIPTED_IDS } from '../effects/index.ts';
+export {
+  exportDeckJson,
+  exportDeckText,
+  groupDeck,
+  parseDeckText,
+  type DeckTextFormat,
+  type ParsedDeck,
+  type ParsedLine,
+} from './decklist.ts';

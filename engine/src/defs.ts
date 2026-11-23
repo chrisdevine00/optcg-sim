@@ -53,7 +53,7 @@ export function toDef(card: Card): Def {
 
 export class DefTable {
   readonly defs: Record<CardId, Def> = {};
-  constructor(private readonly lookup: CardLookup) {}
+  constructor(readonly lookup: CardLookup) {}
 
   get(id: CardId): Def {
     let d = this.defs[id];
