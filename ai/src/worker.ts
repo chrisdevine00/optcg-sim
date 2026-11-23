@@ -4,13 +4,15 @@
  * request runs at a time; `cancel` drops the answer of a request that is no longer wanted. The
  * session (and its turn plan) lives here, so planning can run while the board animates.
  */
-import type { Card } from '@optcg/cards';
+import { loadScripts, type Card } from '@optcg/cards';
 import { chooseAction } from './choose.ts';
 import { answerLethal, insertByPriority } from './search/lethal/request.ts';
 import type { AiRequest, AiResponse, GameInfo } from './protocol.ts';
 import { AiSession } from './session.ts';
 
 const cards = new Map<string, Card>();
+/** Scripts of the cards received so far (they load per set, M6b-0); work waits for them. */
+let ready: Promise<void> = Promise.resolve();
 const cancelled = new Set<number>();
 let game: GameInfo | null = null;
 let session: AiSession | null = null;
@@ -78,13 +80,16 @@ function run(req: Work): void {
 }
 
 function drain(): void {
-  const req = queue.shift();
-  if (!req) {
-    running = false;
-    return;
-  }
-  if (!cancelled.delete(req.id)) run(req);
-  setTimeout(drain, 0);
+  // Each item waits for the scripts of every card received before it (they load per set, M6b-0).
+  void ready.then(() => {
+    const req = queue.shift();
+    if (!req) {
+      running = false;
+      return;
+    }
+    if (!cancelled.delete(req.id)) run(req);
+    setTimeout(drain, 0);
+  });
 }
 
 self.onmessage = (e: MessageEvent<AiRequest>) => {
@@ -92,11 +97,13 @@ self.onmessage = (e: MessageEvent<AiRequest>) => {
   switch (req.type) {
     case 'init':
       for (const c of req.cards) cards.set(c.id, c);
+      ready = Promise.all([ready, loadScripts(req.cards.map((c) => c.id))]).then(() => undefined);
       game = req.game ?? null;
       session = null;
       return;
     case 'cards':
       for (const c of req.cards) cards.set(c.id, c);
+      ready = Promise.all([ready, loadScripts(req.cards.map((c) => c.id))]).then(() => undefined);
       return;
     case 'cancel':
       cancelled.add(req.id);

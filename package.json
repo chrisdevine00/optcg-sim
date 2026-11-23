@@ -33,6 +33,7 @@
     "cards:measure": "tsx cards/scripts/measure-effects.ts",
     "cards:report": "tsx cards/scripts/coverage-report.ts",
     "cards:verify-meta": "tsx cards/scripts/verify-meta.ts",
+    "cards:effects-index": "tsx cards/scripts/effects-index.ts",
     "check:bundle": "tsx scripts/bundle-budget.ts"
   },
   "engines": {

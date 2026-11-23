@@ -23,6 +23,7 @@
  *    simulations, actions and elapsed time. `legalActions` is called once per action, as a search
  *    would; nothing is cached across simulations.
  */
+import '../../test-setup/scripts.ts'; // every effect script (they load per set; M6b-0)
 import { isMainThread, parentPort, Worker, workerData } from 'node:worker_threads';
 import {
   createGame,

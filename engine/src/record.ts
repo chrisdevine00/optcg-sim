@@ -25,8 +25,6 @@ import type { State } from './state.ts';
  * game's own scripts changed (golden.test.ts, review M4b-17).
  */
 export const ENGINE_VERSION = '0.5.4';
-/** Hash of every effect script in this build (informational; records use `scriptsVersionOf`). */
-export const SCRIPTS_VERSION = 'scripts-' + hashString(JSON.stringify(SCRIPTS)).slice(0, 16);
 
 export class RecordVersionMismatch extends Error {
   constructor(

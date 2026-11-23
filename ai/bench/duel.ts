@@ -4,6 +4,7 @@
  * (keys: turn, defence, k, horizon, shallow) and pairs is `LEADER/LEADER,...` (A's deck first).
  * Prints A's wins with a Wilson interval, per-seat and per-deck splits, and decision times.
  */
+import '../../test-setup/scripts.ts'; // every effect script (they load per set; M6b-0)
 import type { DeckSpec, PlayerId } from '@optcg/engine';
 import { BUDGETS, type AiTier, type SessionOptions } from '../src/index.ts';
 import { TUNE } from '../src/search/mcts.ts';

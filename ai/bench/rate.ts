@@ -9,6 +9,7 @@
  *   RATE_NODES=40000 ...                # a deterministic node cap instead of the clock
  *   RATE_OUT=file.json ...              # every position's row, for diffing two runs
  */
+import '../../test-setup/scripts.ts'; // every effect script (they load per set; M6b-0)
 import { writeFileSync } from 'node:fs';
 import { projectForSearch, queries } from '@optcg/engine';
 import { lethal } from '../src/index.ts';

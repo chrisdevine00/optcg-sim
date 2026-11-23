@@ -4,10 +4,15 @@
  * which changes what the solver and its bound see. A test file that needs the plain fixture calls
  * `asVanilla(id, ...)` before building any game: the script is removed for that test file only
  * (vitest isolates each file's modules), so the test keeps pinning what it was written to pin.
+ * The card leaves `SCRIPTED_IDS` too, so it counts as unscripted rather than as not yet loaded.
  */
-import { SCRIPTS } from '@optcg/cards';
+import { SCRIPTED_IDS, SCRIPTS } from '@optcg/cards';
 
 export function asVanilla(...ids: string[]): void {
   const scripts = SCRIPTS as Record<string, unknown>;
-  for (const id of ids) Reflect.deleteProperty(scripts, id);
+  for (const id of ids) {
+    Reflect.deleteProperty(scripts, id);
+    // Unscripted, not merely unloaded: the engine refuses a scripted card whose script is missing.
+    (SCRIPTED_IDS as Set<string>).delete(id);
+  }
 }

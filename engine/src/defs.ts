@@ -2,7 +2,7 @@
  * Card definitions copied into state, so `reduce(state, action)` needs no lookup (ARCHITECTURE §2.1:
  * card data is injected at game start and the state stays self-contained plain JSON).
  */
-import { SCRIPTS, type Card } from '@optcg/cards';
+import { SCRIPTS, scriptReady, type Card } from '@optcg/cards';
 import type { Ability } from './abilities.ts';
 import type { CardId, CardLookup } from './api.ts';
 import type { Def } from './state.ts';
@@ -21,7 +21,19 @@ export const DECK_SIZE = 50;
 export const MAX_COPIES = 4;
 export const OPENING_HAND = 5;
 
+/**
+ * Scripts load per set (M6b-0): a scripted card whose script is not loaded would silently play as
+ * vanilla, so building it is an error. Callers `await loadScripts(ids)` before starting a game.
+ */
+function requireScript(id: CardId): void {
+  if (!scriptReady(id))
+    throw new Error(
+      `The effect script of ${id} is not loaded: await loadScripts() before the game.`,
+    );
+}
+
 export function donDeckSizeFor(leader: CardId): number {
+  requireScript(leader);
   // A script's `rules: [{ donDeckSize }]` and the table above say the same thing; either is read.
   const fromScript = SCRIPTS[leader]?.rules?.find((r) => 'donDeckSize' in r);
   if (fromScript && 'donDeckSize' in fromScript) return fromScript.donDeckSize;
@@ -29,6 +41,7 @@ export function donDeckSizeFor(leader: CardId): number {
 }
 
 export function toDef(card: Card): Def {
+  requireScript(card.id);
   const alsoNamed = SCRIPTS[card.id]?.rules?.flatMap((r) => ('alsoNamed' in r ? r.alsoNamed : []));
   const def: Def = {
     id: card.id,

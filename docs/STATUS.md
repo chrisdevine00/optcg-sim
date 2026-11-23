@@ -1,7 +1,7 @@
 # Status
 
 **Phase:** 5 Build, slice pass (ADR 0012), starting at M0. Phases 1–4 gated 2026-10-28.
-**Milestone:** **M6 Deck builder: done 2026-11-23** (review FAIL, fix round, re-review 1 PASS). **Next: M6b Card pool and live updates** (PLAN §2a, row 17b). **M5b AI breadth: done 2026-11-23 under the time-box, with the Warlord-vs-Pirate target (65%) NOT met:** 123/200 (61.5%) every nightly, no tested change beat noise on fresh seeds (DECISIONS 2026-11-23; carried to docs/BACKLOG.md #1); the nightly asserts a 55% floor. **M4b Effects breadth: done 2026-11-16.** All 182 meta-list cards play fully. L Learning slice done 2026-11-09. M5a done 2026-11-05. M4a done 2026-10-29. M3 done 2026-11-05. M0, M1 and M2 done 2026-10-28.
+**Milestone:** **M6b Card pool and live updates: in progress** (PLAN §2a, row 17b), at M6b-0 infrastructure. **M6 Deck builder: done 2026-11-23** (review FAIL, fix round, re-review 1 PASS). **M5b AI breadth: done 2026-11-23 under the time-box, with the Warlord-vs-Pirate target (65%) NOT met:** 123/200 (61.5%) every nightly, no tested change beat noise on fresh seeds (DECISIONS 2026-11-23; carried to docs/BACKLOG.md #1); the nightly asserts a 55% floor. **M4b Effects breadth: done 2026-11-16.** All 182 meta-list cards play fully. L Learning slice done 2026-11-09. M5a done 2026-11-05. M4a done 2026-10-29. M3 done 2026-11-05. M0, M1 and M2 done 2026-10-28.
 **Run the app:** `npm install && npm run dev` then open http://localhost:5173/optcg-sim/ and go to `/cards` for the card browser
 **Deployed:** https://chrisdevine00.github.io/optcg-sim/ (auto-deploys after green CI on `main`)
 
@@ -13,7 +13,7 @@
 | 2 Plan | docs/PLAN.md, docs/ARCHITECTURE.md, docs/adr/ | **Gated 2026-10-28** (revision 2 after two reviews; see docs/plan-review-1.md) |
 | 3 Deep research | docs/research/effect-dsl.md, rulings.md; docs/content/archetypes/, curriculum.md, glossary.md, sources.md | **Gated 2026-10-28** (competitive-player review: 20 findings, 0 severity-3 open; see docs/content/review-1.md) |
 | 4 Design | docs/design/principles.md, board.md, flows.md, visual-system.md, learning-ui.md, wireframes/, review-1.md | **Gated 2026-10-28** (review 1: 50 findings plus 2 verification passes; 0 severity-3 or severity-4 open) |
-| 5 Build | M0 through M10 per PROMPT.md, plus M6b (card pool and live updates, added 2026-11-17, amendment A1) after M6 | In progress: M0–M3, M4a, M4b, M5a, L, M5b (strength target not met, time-box) and M6 done; M6b next |
+| 5 Build | M0 through M10 per PROMPT.md, plus M6b (card pool and live updates, added 2026-11-17, amendment A1) after M6 | In progress: M0–M3, M4a, M4b, M5a, L, M5b (strength target not met, time-box) and M6 done; M6b in progress (M6b-0) |
 
 ## Done
 
@@ -142,7 +142,7 @@
 
 ## Next (slice pass, PLAN.md §1)
 
-**Current next step (2026-11-23): M6b Card pool and live updates (PLAN §2a, row 17b; start with M6b-0: `meta:update` and the measured backlog, after checking the Limitless API terms and both sites' robots.txt, ADR 0014). Then M7 to M10. The items below are history.**
+**Current next step (2026-11-23): finish M6b-0 (per-push card tests for changed cards only, full card suite nightly; then re-baseline the M6b estimate from the measured backlog), then M6b-1 runtime audit of the Standard pool. Then M7 to M10. The items below are history.**
 
 **Roadmap (owner-approved 2026-11-17, amendment A1; DECISIONS "Full Standard card pool and live updates (M6b)", ADR 0014):** M5b, then M6, then **M6b Card pool and live updates** (PLAN §2a, row 17b), then M7 to M10. M6b scripts every Standard-legal card (block 5, then 4, then 3; block 2 held until the post-2027-03-31 rotation is announced), builds `meta:update` and the scheduled `update.yml`, adds the app update prompt and a default playbook for any leader. `meta:update` is no longer an M9 item.
 
@@ -180,6 +180,19 @@
 - **Not verified by anyone:** whether the AI ever chooses to give fewer than all DON!! (it takes the first, largest option); ST31-005 and EB03-053 [On K.O.] in the browser; full 1080p games.
 - **CI repair (8167824):** `main`'s CI had failed at typecheck since 26b5c99 (2026-11-09): `app/test/a11y-harness.test.ts` pulled in the harness's type import of `@guidepup/guidepup`, which installs only in the a11y workflow. The harness now types the Guidepup objects locally; CI green again.
 - **Not waiting for:** S1 (folded in when it happens); the meta refresh (now `meta:update` in M6b-0, then a weekly `update.yml` PR from M6b-5).
+
+### M6b Card pool and live updates: in progress (started 2026-11-23)
+
+**M6b-0 infrastructure** (PLAN §2a step 1; DECISIONS 2026-11-23 "M6b-0" ×2):
+- [x] ADR 0014 check: Limitless API needs no key for tournament data; docs and terms allow scheduled reads; robots.txt allows (optcgapi, play and docs.limitlesstcg have none). Limit 50 requests per 5 min, so 7 s apart.
+- [x] `npm run meta:update` (`scripts/meta-update.ts`, `cards/scripts/meta.ts`): candidate `meta-lists.json`, `cards/data/play-frequency.json` (committed: 34 events, 2,024 decklists), report. Candidate not applied by hand; first reviewed update PR in M6b-5. First run: same 12 Leaders; 45 meta-list cards unscripted (new lists use them); OP09-081 Teach close to the top 12; 4 promos missing from the card source (P-108, P-116, P-135, P-153); OP-18 events skipped until OP-18 is in the snapshot.
+- [x] Tagger port: `npm run cards:measure` / `cards:report`, `cards/data/coverage-report.json`. **Standard coverage 351 of 2,011 (17.5%)**: block 5 31.3%, block 4 17.6%, block 3 17.1%, block 2 (held) 11.2%; 246 unknown legality; backlog 1,660 cards.
+- [x] Per-game scripts version in records (`scriptsVersionOf`; M4b-17 closed as far as it can be; done criterion "an old record stays live after an unrelated card is scripted" has its test).
+- [x] Per-set script chunks (`cards:effects-index`, `loadScripts`, engine refuses unloaded scripts).
+- [x] Test decks pinned (`ai/test/fixtures/strength-decks.json`).
+- [ ] Per-push card tests for changed cards only; full card suite nightly.
+- [ ] Re-baseline the M6b estimate from the measured backlog (PLAN amendment A1 asks for it at the end of M6b-0).
+- Also: Deploy workflow split into build and deploy jobs (the Pages artifact race failed three deploys on 2026-11-23).
 
 ### M6 Deck builder: done 2026-11-23
 

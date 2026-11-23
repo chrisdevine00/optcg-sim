@@ -24,7 +24,6 @@ export type { ProjectedView } from './project.ts';
 export type { AutoSkipOptions } from './game.ts';
 export {
   ENGINE_VERSION,
-  SCRIPTS_VERSION,
   RecordVersionMismatch,
   replayable,
   cardsVersionOf,

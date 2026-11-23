@@ -3,7 +3,7 @@
  * card data a game needs, loaded per set on demand.
  */
 import type { Card, Color } from '@optcg/cards';
-import { coverage, setCodeOf } from '@optcg/cards';
+import { coverage, loadScripts, setCodeOf } from '@optcg/cards';
 import { loadSet } from '@optcg/cards/browser';
 import type { DeckSpec } from '@optcg/engine';
 import { SCRIPTED } from '../../cards/scripts.ts';
@@ -156,7 +156,11 @@ export async function loadCards(ids: Iterable<string>): Promise<Map<string, Card
   );
   // A set that does not exist (a mistyped number in a saved deck) leaves its cards unknown, so
   // the deck check names them; it does not fail the others (review M6-4).
-  const files = await Promise.allSettled([...sets].map((s) => loadSet(s)));
+  // Effect scripts load per set too (M6b-0): every card a game may build needs its script.
+  const [files] = await Promise.all([
+    Promise.allSettled([...sets].map((s) => loadSet(s))),
+    loadScripts(wanted),
+  ]);
   const out = new Map<string, Card>();
   for (const f of files)
     if (f.status === 'fulfilled')

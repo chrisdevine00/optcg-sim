@@ -6,6 +6,7 @@
  *
  * `npx tsx ai/bench/profile.ts [positions] [iterations]`; add `node --cpu-prof` for a profile.
  */
+import '../../test-setup/scripts.ts'; // every effect script (they load per set; M6b-0)
 import { projectForSearch, summaryHash } from '@optcg/engine';
 import { AiSession } from '../src/index.ts';
 import { Mcts, type TreeNode } from '../src/search/mcts.ts';

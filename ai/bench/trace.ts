@@ -1,6 +1,7 @@
 /**
  * Print one game's decisions for a tier (debugging aid): `npx tsx ai/bench/trace.ts tier seed [leaderA leaderB]`.
  */
+import '../../test-setup/scripts.ts'; // every effect script (they load per set; M6b-0)
 import type { AiTier } from '../src/index.ts';
 import { cardMap, metaDecks } from '../test/support.ts';
 import { playMatch } from '../test/support/match.ts';
