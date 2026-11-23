@@ -6,7 +6,7 @@ import {
   checkInvariants,
   createFromScenario,
   ENGINE_VERSION,
-  SCRIPTS_VERSION,
+  scriptsVersionOf,
   legalActions,
   reduce,
   replay,
@@ -22,6 +22,7 @@ import { cards, scenario } from '../fixtures/index.ts';
 import { KAIDO, LUFFY, op, PUR_1, PUR_1B, RED_1, RED_5, times } from '../support/game.ts';
 import { pickAction, playRandomGame } from '../support/random-game.ts';
 import { queries, seedRng } from '../../src/index.ts';
+import { SCRIPTS } from '@optcg/cards';
 
 describe('replay', () => {
   it('replays a record to the same summary hash, and to any prefix', () => {
@@ -54,6 +55,31 @@ describe('replay', () => {
     expect(() => replay(g.record, changed)).toThrow(RecordVersionMismatch);
   });
 
+  it('M6b: an old record stays live after an unrelated card is scripted, not after its own card changes', () => {
+    const g = playRandomGame({ seed: 5 });
+    const inGame = new Set(Object.keys(internals(replay(g.record, cards()).state).defs));
+    const unrelated = Object.keys(SCRIPTS).find((id) => !inGame.has(id))!;
+    const own = [...inGame].find((id) => SCRIPTS[id])!;
+    expect(unrelated && own).toBeTruthy();
+    const table = SCRIPTS as Record<string, unknown>;
+    const keep = { unrelated: table[unrelated], own: table[own] };
+    const FRESH = 'OP99-999';
+    try {
+      // Scripting a card not in the game, or changing one, leaves the record live.
+      table[FRESH] = keep.unrelated;
+      table[unrelated] = { abilities: [] };
+      expect(summaryHash(replay(g.record, cards()).state)).toBeTruthy();
+      // Changing a script of a card in the game does not.
+      table[own] = { abilities: [] };
+      expect(() => replay(g.record, cards())).toThrow(RecordVersionMismatch);
+    } finally {
+      delete table['OP99-999'];
+      table[unrelated] = keep.unrelated;
+      table[own] = keep.own;
+    }
+    expect(summaryHash(replay(g.record, cards()).state)).toBeTruthy();
+  });
+
   it('records can start from a scenario', () => {
     const spec: Omit<ScenarioSpec, 'cards'> = {
       seed: 3,
@@ -65,7 +91,11 @@ describe('replay', () => {
     };
     let state = createFromScenario({ ...spec, cards: cards() }).state;
     const record: GameRecord = {
-      versions: { engine: ENGINE_VERSION, cards: cardsVersionOf(state), scripts: SCRIPTS_VERSION },
+      versions: {
+        engine: ENGINE_VERSION,
+        cards: cardsVersionOf(state),
+        scripts: scriptsVersionOf(state),
+      },
       start: { scenario: spec },
       actions: [],
     };

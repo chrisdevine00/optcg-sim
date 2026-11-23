@@ -28,6 +28,7 @@ export {
   RecordVersionMismatch,
   replayable,
   cardsVersionOf,
+  scriptsVersionOf,
   startRecord,
   appendAction,
   type TurnSnapshot,

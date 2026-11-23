@@ -1,4 +1,4 @@
-/** Real tournament lists from docs/research/meta-lists.json, as engine deck specs. */
+/** Real tournament lists, pinned in ai/test/fixtures/strength-decks.json (from docs/research/meta-lists.json), as engine deck specs. */
 import { readFileSync } from 'node:fs';
 import type { DeckSpec } from '../../src/index.ts';
 
@@ -20,7 +20,10 @@ let decks: NamedDeck[] | undefined;
 export function metaDecks(): NamedDeck[] {
   if (!decks) {
     const file = JSON.parse(
-      readFileSync(new URL('../../../docs/research/meta-lists.json', import.meta.url), 'utf8'),
+      readFileSync(
+        new URL('../../../ai/test/fixtures/strength-decks.json', import.meta.url),
+        'utf8',
+      ),
     ) as MetaFile;
     decks = file.archetypes.flatMap((a) =>
       a.lists.map((l, i) => ({

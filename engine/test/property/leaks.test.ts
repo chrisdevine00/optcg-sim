@@ -23,7 +23,7 @@ import {
   projectEvents,
   projectForSearch,
   reduce,
-  SCRIPTS_VERSION,
+  scriptsVersionOf,
   nextInt,
   seedRng,
   shuffle,
@@ -102,7 +102,11 @@ export function leakGame(
     ]);
   }
   const record: GameRecord = {
-    versions: { engine: ENGINE_VERSION, cards: cardsVersionOf(state), scripts: SCRIPTS_VERSION },
+    versions: {
+      engine: ENGINE_VERSION,
+      cards: cardsVersionOf(state),
+      scripts: scriptsVersionOf(state),
+    },
     start: { scenario },
     actions: [],
   };

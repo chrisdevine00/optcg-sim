@@ -70,8 +70,11 @@ const legalRedLeader = () => {
   return l.id;
 };
 
-describe('deckIssues: the 36 meta lists', () => {
-  it('there are 36 sourced lists', () => expect(lists).toHaveLength(36));
+describe('deckIssues: every meta list (36 at M6; meta:update may change the count)', () => {
+  it('every archetype has 1 to 3 sourced lists', () => {
+    for (const a of meta.archetypes) expect(a.lists.length, a.id).toBeGreaterThanOrEqual(1);
+    for (const a of meta.archetypes) expect(a.lists.length, a.id).toBeLessThanOrEqual(3);
+  });
   for (const l of lists)
     it(`${l.name} is Standard-legal with no issue`, () => {
       expect(deckIssues(l.deck, all, 'standard')).toEqual([]);

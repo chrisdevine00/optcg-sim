@@ -19,11 +19,13 @@ import type { State } from './state.ts';
 
 /**
  * Bump `ENGINE_VERSION` whenever a change alters how any recorded game plays out. Golden records are
- * re-recorded deliberately when it changes. `SCRIPTS_VERSION` is the effect-script hash. A golden
- * re-record is also allowed on a SCRIPTS_VERSION change alone (golden.test.ts, review M4b-17), so
- * bump this by hand for any engine change even when scripts changed in the same commit.
+ * re-recorded deliberately when it changes. A record's scripts version is per game
+ * (`scriptsVersionOf`: the scripts of the cards in that game, PLAN M6b-0), so scripting an unrelated
+ * card leaves old records live; a golden re-record is allowed without an engine bump only when that
+ * game's own scripts changed (golden.test.ts, review M4b-17).
  */
 export const ENGINE_VERSION = '0.5.4';
+/** Hash of every effect script in this build (informational; records use `scriptsVersionOf`). */
 export const SCRIPTS_VERSION = 'scripts-' + hashString(JSON.stringify(SCRIPTS)).slice(0, 16);
 
 export class RecordVersionMismatch extends Error {
@@ -33,17 +35,32 @@ export class RecordVersionMismatch extends Error {
   ) {
     super(
       `Record was made with engine ${record.engine} / scripts ${record.scripts} / cards ` +
-        `${record.cards}; this build is engine ${ENGINE_VERSION} / scripts ${SCRIPTS_VERSION}` +
-        (current ? ` / cards ${current.cards}` : '') +
+        `${record.cards}; this build is engine ${ENGINE_VERSION}` +
+        (current ? ` / scripts ${current.scripts} / cards ${current.cards}` : '') +
         '. Open it read-only from its snapshots.',
     );
     this.name = 'RecordVersionMismatch';
   }
 }
 
-/** True when this build's engine and scripts match the record (the cards are checked in replay). */
+/**
+ * True when this build's engine matches the record. The scripts and card data of the game's own
+ * cards are checked in replay, once the game's cards are known.
+ */
 export function replayable(record: GameRecord): boolean {
-  return record.versions.engine === ENGINE_VERSION && record.versions.scripts === SCRIPTS_VERSION;
+  return record.versions.engine === ENGINE_VERSION;
+}
+
+/**
+ * The scripts version of a game: a hash of the effect script (or its absence) of every card number
+ * in it. Scripting or changing an unrelated card does not change it (PLAN M6b-0, risk 7).
+ */
+export function scriptsVersionOf(state: GameState): string {
+  const s = state as unknown as State;
+  const scripts = Object.keys(s.defs)
+    .sort()
+    .map((id) => [id, SCRIPTS[id] ?? null]);
+  return 'scripts-' + hashString(JSON.stringify(scripts)).slice(0, 16);
 }
 
 /**
@@ -86,7 +103,11 @@ function snapshot(state: GameState, actionIndex: number): TurnSnapshot {
 /** Start a record from the state that `createGame` or `createFromScenario` returned. */
 export function startRecord(start: GameRecord['start'], initial: GameState): RecordWithSnapshots {
   return {
-    versions: { engine: ENGINE_VERSION, cards: cardsVersionOf(initial), scripts: SCRIPTS_VERSION },
+    versions: {
+      engine: ENGINE_VERSION,
+      cards: cardsVersionOf(initial),
+      scripts: scriptsVersionOf(initial),
+    },
     start,
     actions: [],
     snapshots: [snapshot(initial, 0)],
@@ -126,9 +147,13 @@ export function replayWith(
     'setup' in record.start
       ? fns.createGame({ ...record.start.setup, cards })
       : fns.createFromScenario({ ...record.start.scenario, cards });
-  const current = cardsVersionOf(step.state);
-  if (current !== record.versions.cards)
-    throw new RecordVersionMismatch(record.versions, { ...record.versions, cards: current });
+  const current = {
+    ...record.versions,
+    cards: cardsVersionOf(step.state),
+    scripts: scriptsVersionOf(step.state),
+  };
+  if (current.cards !== record.versions.cards || current.scripts !== record.versions.scripts)
+    throw new RecordVersionMismatch(record.versions, current);
   const events = [...step.events];
   const n = Math.min(upTo ?? record.actions.length, record.actions.length);
   for (let i = 0; i < n; i++) {

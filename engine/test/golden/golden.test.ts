@@ -3,13 +3,14 @@
  * every per-turn snapshot hash and the event-type sequence (M2-15).
  *
  * Re-recording a different result needs a version change (M2-07): an ENGINE_VERSION bump for an
- * engine change, or a new SCRIPTS_VERSION (added or changed effect scripts; random meta games run
- * them). With both versions unchanged, a different result is refused. Bump ENGINE_VERSION, then run
+ * engine change, or a new scripts version for that game (`scriptsVersionOf`: a script of a card in
+ * the game was added or changed). With both unchanged, a different result is refused. Bump
+ * ENGINE_VERSION, then run
  *   UPDATE_GOLDEN=1 npx vitest run engine/test/golden && npx prettier --write engine/test/golden
  *
- * Known gap (review M4b-17): the guard accepts any SCRIPTS_VERSION change, so an engine change that
- * lands together with a script change can be re-recorded without an ENGINE_VERSION bump. Bump
- * ENGINE_VERSION by hand for every engine behaviour change, whatever else changed.
+ * Review M4b-17: the scripts version is per game since M6b-0, so scripting an unrelated card no
+ * longer opens the guard. An engine change landing with a script change to a card in the same game
+ * can still be re-recorded without a bump: bump ENGINE_VERSION for every engine behaviour change.
  */
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -85,8 +86,8 @@ if (process.env.UPDATE_GOLDEN) {
     const expected = measure(g.record);
     if (existsSync(file)) {
       const old = JSON.parse(readFileSync(file, 'utf8')) as Golden;
-      // A changed game needs a new version: ENGINE_VERSION for an engine change, SCRIPTS_VERSION
-      // (automatic, the script hash) for added or changed scripts (DECISIONS 2026-11-16).
+      // A changed game needs a new version: ENGINE_VERSION for an engine change, or a new scripts
+      // version for this game (automatic: the hash of its cards' scripts; DECISIONS 2026-11-23).
       if (
         old.record.versions.engine === ENGINE_VERSION &&
         old.record.versions.scripts === g.record.versions.scripts &&

@@ -28,7 +28,7 @@ interface MetaFile {
 
 export function metaDecks(): DeckSpec[] {
   const file = JSON.parse(
-    readFileSync(new URL('../../docs/research/meta-lists.json', import.meta.url), 'utf8'),
+    readFileSync(new URL('./fixtures/strength-decks.json', import.meta.url), 'utf8'),
   ) as MetaFile;
   return file.archetypes.flatMap((a) =>
     a.lists.map((l) => ({

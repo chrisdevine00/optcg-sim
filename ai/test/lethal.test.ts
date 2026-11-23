@@ -497,7 +497,7 @@ describe('lethal: planted positions with known answers', () => {
 /** The sourced lists of a leader, newest first, as card-id counts. */
 function metaLists(leader: string): { id: string; count: number }[][] {
   const file = JSON.parse(
-    readFileSync(new URL('../../docs/research/meta-lists.json', import.meta.url), 'utf8'),
+    readFileSync(new URL('./fixtures/strength-decks.json', import.meta.url), 'utf8'),
   ) as {
     archetypes: {
       leaderId: string;

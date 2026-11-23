@@ -62,7 +62,7 @@ function decks() {
 /** The date of an archetype's first sourced list (the strength games' list). */
 function firstListDate(leader: string): string {
   const meta = JSON.parse(
-    readFileSync(new URL('../../docs/research/meta-lists.json', import.meta.url), 'utf8'),
+    readFileSync(new URL('./fixtures/strength-decks.json', import.meta.url), 'utf8'),
   ) as { archetypes: { leaderId: string; lists: { date: string }[] }[] };
   return meta.archetypes.find((a) => a.leaderId === leader)!.lists[0]!.date;
 }

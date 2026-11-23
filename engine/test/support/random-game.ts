@@ -18,7 +18,7 @@ import {
   type PlayerId,
   ENGINE_VERSION,
   cardsVersionOf,
-  SCRIPTS_VERSION,
+  scriptsVersionOf,
 } from '../../src/index.ts';
 import { cards } from '../fixtures/index.ts';
 import { metaDecks } from './decks.ts';
@@ -94,7 +94,11 @@ export function playRandomGame(opts: RandomGameOptions): RandomGame {
   const setup = { seed: opts.seed, decks };
   const state = createGame({ ...setup, cards: cards() }).state;
   const record: GameRecord = {
-    versions: { engine: ENGINE_VERSION, cards: cardsVersionOf(state), scripts: SCRIPTS_VERSION },
+    versions: {
+      engine: ENGINE_VERSION,
+      cards: cardsVersionOf(state),
+      scripts: scriptsVersionOf(state),
+    },
     start: { setup },
     actions: [],
   };

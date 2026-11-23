@@ -40,8 +40,9 @@ const lists = meta.archetypes.flatMap((a) =>
 );
 const FORMATS: DeckTextFormat[] = ['compact', 'count', 'limitless'];
 
-describe('round trip: all 36 meta lists, every format (PROMPT M6)', () => {
-  it('there are 36 lists', () => expect(lists).toHaveLength(36));
+describe('round trip: every meta list (36 at M6), every format (PROMPT M6)', () => {
+  it('every archetype has a list', () =>
+    expect(new Set(lists.map((l) => l.name.split(' #')[0])).size).toBe(meta.archetypes.length));
   for (const l of lists)
     it(`${l.name}`, () => {
       for (const f of FORMATS) {
