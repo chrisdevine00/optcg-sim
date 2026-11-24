@@ -54,7 +54,7 @@ describeEightKCost({
 });
 
 describe('OP16-010 Namule: [On Play] K.O. a 2000-base-power-or-less Character', () => {
-  it('K.O.s the chosen Character, which goes to the opponent\'s trash', () => {
+  it("K.O.s the chosen Character, which goes to the opponent's trash", () => {
     const g = pay([OV.dadan2]);
     pickInst(g, [at(g, 'p2', 'characters', OV.dadan2)]);
     expect(charIds(g, 'p2')).toEqual([]);
@@ -118,7 +118,7 @@ describe('OP16-010 Namule: [On Play] K.O. a 2000-base-power-or-less Character', 
     expect(choices(g)).not.toContain(g.leader('p2'));
   });
 
-  it('with no qualifying Character the revealed cost is paid and nothing is K.O.\'d', () => {
+  it("with no qualifying Character the revealed cost is paid and nothing is K.O.'d", () => {
     const g = pay([OV.hajrudin6]);
     expect(atMain(g)).toBe(true);
     expect(charIds(g, 'p2')).toEqual([OV.hajrudin6]);

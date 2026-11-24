@@ -104,7 +104,7 @@ describe('OP16-015 Monkey.D.Luffy: -2 cost in hand', () => {
   });
 });
 
-describe('OP16-015 Monkey.D.Luffy: [On Your Opponent\'s Attack] trash an 8000 Character: base power 7000', () => {
+describe("OP16-015 Monkey.D.Luffy: [On Your Opponent's Attack] trash an 8000 Character: base power 7000", () => {
   it('is offered when the opponent attacks; paying sets the Leader and Luffy to base 7000', () => {
     const g = attacked();
     need(g, 'optional', 'p1');

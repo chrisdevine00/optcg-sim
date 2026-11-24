@@ -140,7 +140,7 @@ describe('OP16-020 [Counter] trash 1 card: +3000 power during this battle', () =
     expect(g.power(g.leader('p1'))).toBe(5000);
   });
 
-  it('targets are only my Leader and Characters, not the opponent\'s', () => {
+  it("targets are only my Leader and Characters, not the opponent's", () => {
     const g = counterStep([OV.thatch]);
     useIt(g, OV.thatch);
     need(g, 'choose');

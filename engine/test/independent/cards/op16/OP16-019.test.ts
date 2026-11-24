@@ -52,7 +52,7 @@ function start(inHand: string[], chars: string[] = [], active = 10) {
   return g;
 }
 
-describe('OP16-019 Let\'s Show \'Em What We\'re Made Of!!: [Main] play up to 2 Whitebeard Pirates 8000-power Characters', () => {
+describe("OP16-019 Let's Show 'Em What We're Made Of!!: [Main] play up to 2 Whitebeard Pirates 8000-power Characters", () => {
   it('costs 9: not playable with 8 active DON!!, playable with 9', () => {
     const low = mine(OL.ace, { hand: [EVENT, OV.thatch], costArea: { active: 8, rested: 2 } });
     expect(canPlayCard(low, low.find('p1', 'hand', EVENT))).toBe(false);
@@ -60,7 +60,7 @@ describe('OP16-019 Let\'s Show \'Em What We\'re Made Of!!: [Main] play up to 2 W
     expect(canPlayCard(ok, ok.find('p1', 'hand', EVENT))).toBe(true);
   });
 
-  it('plays both chosen Characters free of cost (only the Event\'s 9 is paid)', () => {
+  it("plays both chosen Characters free of cost (only the Event's 9 is paid)", () => {
     const g = start([OV.thatch, OV.ramba]);
     need(g, 'choose', 'p1');
     choose(g, [g.find('p1', 'hand', OV.thatch), g.find('p1', 'hand', OV.ramba)]);
@@ -124,7 +124,9 @@ describe('OP16-019 Let\'s Show \'Em What We\'re Made Of!!: [Main] play up to 2 W
     playCard(g, EVENT);
     choose(g, [g.find('p1', 'hand', OV.thatch)]);
     expect(restedChar(g, 'p1', OV.thatch)).toBe(false);
-    expect(canHit(g, at(g, 'p1', 'characters', OV.thatch), at(g, 'p2', 'characters', OV.sai4))).toBe(false);
+    expect(
+      canHit(g, at(g, 'p1', 'characters', OV.thatch), at(g, 'p2', 'characters', OV.sai4)),
+    ).toBe(false);
   });
 });
 
@@ -164,7 +166,7 @@ describe('OP16-019 [Trigger] Your Leader gains +1000 power during this turn', ()
     expect(g.power(g.leader('p1'))).toBe(5000);
   });
 
-  it('must not: the opponent\'s Leader gets nothing', () => {
+  it("must not: the opponent's Leader gets nothing", () => {
     const g = triggered();
     activateTrigger(g);
     expect(g.power(g.leader('p2'))).toBe(5000);

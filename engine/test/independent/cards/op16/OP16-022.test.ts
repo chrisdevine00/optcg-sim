@@ -27,7 +27,11 @@ const ID_MULTI = 'OP16-046'; // Jinbe: Blue, cost 5, 6000, {Fish-Man}/{The Sun P
 const NOT_ID = OV.sai4; // Sai: Red, cost 2, 4000, {Happosui Army}
 
 function field(chars: string[], active = 3, rested = 7, p2chars: string[] = []) {
-  return mine(OL.impel, { characters: chars, costArea: { active, rested } }, { characters: p2chars });
+  return mine(
+    OL.impel,
+    { characters: chars, costArea: { active, rested } },
+    { characters: p2chars },
+  );
 }
 
 describe('OP16-022 Monkey.D.Luffy: [Activate: Main] set up to 2 DON!! as active', () => {
@@ -80,7 +84,7 @@ describe('OP16-022 Monkey.D.Luffy: [Activate: Main] set up to 2 DON!! as active'
     expect(don(g, 'p1')).toMatchObject({ active: 3, rested: 7 });
   });
 
-  it('only my Characters count: an opponent\'s non-{Impel Down} Character does not stop it', () => {
+  it("only my Characters count: an opponent's non-{Impel Down} Character does not stop it", () => {
     const g = field([ID1], 3, 7, [OV.hajrudin6]);
     tryActivate(g, g.leader('p1'));
     expect(don(g, 'p1')).toMatchObject({ active: 5, rested: 5 });
@@ -108,9 +112,12 @@ describe('OP16-022 Monkey.D.Luffy: [Activate: Main] set up to 2 DON!! as active'
 
   // M6b-Q21 (answered): with NO Characters on the field "the only Characters ... are {Impel Down}
   // Characters" is false (E-Q4 / QA-OP17 OP17-118 precedent), so nothing is set active.
-  it.fails('M6b-Q21: with no Characters at all the condition is false and no DON!! is set active', () => {
-    const g = field([]);
-    tryActivate(g, g.leader('p1'));
-    expect(don(g, 'p1')).toMatchObject({ active: 3, rested: 7 });
-  });
+  it.fails(
+    'M6b-Q21: with no Characters at all the condition is false and no DON!! is set active',
+    () => {
+      const g = field([]);
+      tryActivate(g, g.leader('p1'));
+      expect(don(g, 'p1')).toMatchObject({ active: 3, rested: 7 });
+    },
+  );
 });

@@ -64,15 +64,15 @@ function koKomachiyo(inHand: string[] = []) {
   return g;
 }
 
-describe('OP16-014 Marco: replacement, K.O. this Character instead of another one removed by an opponent\'s effect', () => {
-  it('offers the replacement to me when the opponent\'s effect would K.O. another Character', () => {
+describe("OP16-014 Marco: replacement, K.O. this Character instead of another one removed by an opponent's effect", () => {
+  it("offers the replacement to me when the opponent's effect would K.O. another Character", () => {
     const g = koKomachiyo();
     expect(decider(g)).toBe('p1');
     expect(kind(g)).toBe('optional');
     expect(decision(g)?.purpose).toBe('replacement');
   });
 
-  it('accepting: Marco is K.O.\'d (trashed) and the other Character stays on the field', () => {
+  it("accepting: Marco is K.O.'d (trashed) and the other Character stays on the field", () => {
     const g = koKomachiyo();
     accept(g);
     skipUnusable(g, 'p1');
@@ -80,14 +80,14 @@ describe('OP16-014 Marco: replacement, K.O. this Character instead of another on
     expect(trash(g)).toEqual([MARCO]);
   });
 
-  it('declining: the other Character is K.O.\'d as usual and Marco stays', () => {
+  it("declining: the other Character is K.O.'d as usual and Marco stays", () => {
     const g = koKomachiyo();
     decline(g);
     expect(charIds(g, 'p1')).toEqual([MARCO]);
     expect(trash(g)).toEqual([KOMACHIYO]);
   });
 
-  it('not offered when the other Character is K.O.\'d in battle (only an opponent\'s EFFECT triggers it)', () => {
+  it("not offered when the other Character is K.O.'d in battle (only an opponent's EFFECT triggers it)", () => {
     const g = theirTurn(
       side(OL.luffy, BLUE, { characters: [MARCO, { card: KOMACHIYO, rested: true }] }),
       side(OL.luffy, RED, { characters: [OV.kingdew5] }),
@@ -99,7 +99,7 @@ describe('OP16-014 Marco: replacement, K.O. this Character instead of another on
     expect(trash(g)).toEqual([KOMACHIYO]);
   });
 
-  it('the replacing Marco is still K.O.\'d: its [On K.O.] is offered and, with an 8000-power Character in hand, brings it back', () => {
+  it("the replacing Marco is still K.O.'d: its [On K.O.] is offered and, with an 8000-power Character in hand, brings it back", () => {
     const g = koKomachiyo([OV.thatch]);
     accept(g);
     need(g, 'optional', 'p1');
@@ -140,7 +140,7 @@ describe('OP16-014 Marco: replacement, K.O. this Character instead of another on
     expect(charIds(g, 'p1')).toEqual([MARCO, KOMACHIYO].sort());
   });
 
-  it('a Marco K.O.\'d in battle (no replacement involved) also uses [On K.O.] to come back', () => {
+  it("a Marco K.O.'d in battle (no replacement involved) also uses [On K.O.] to come back", () => {
     const g = theirTurn(
       side(OL.luffy, BLUE, { characters: [{ card: MARCO, rested: true }], hand: [OV.thatch] }),
       side(OL.luffy, RED, { characters: [OV.accino10] }),
@@ -154,12 +154,8 @@ describe('OP16-014 Marco: replacement, K.O. this Character instead of another on
     expect(trash(g)).toEqual([OV.thatch]);
   });
 
-  it('works for either player: when p1\'s effect would K.O. p2\'s Character, p2 (the controller of Marco) is asked, not p1', () => {
-    const g = mine(
-      OL.luffy,
-      { hand: [LIGHTNING] },
-      { characters: [MARCO, KOMACHIYO] },
-    );
+  it("works for either player: when p1's effect would K.O. p2's Character, p2 (the controller of Marco) is asked, not p1", () => {
+    const g = mine(OL.luffy, { hand: [LIGHTNING] }, { characters: [MARCO, KOMACHIYO] });
     opponentKOs(g, g.find('p2', 'characters', KOMACHIYO));
     expect(offered(g, 'p2')).toBe(true);
     expect(decider(g)).toBe('p2');

@@ -128,7 +128,7 @@ describe('OP16-008 Squard: [On Play] trash a 10000-base Character: K.O. an 8000-
     expect(trash(g, 'p1')).toEqual([OV.accino10]);
   });
 
-  it('declining: nothing is trashed and nothing is K.O.\'d', () => {
+  it("declining: nothing is trashed and nothing is K.O.'d", () => {
     const g = start([OV.accino10]);
     no(g);
     expect(charIds(g, 'p1')).toEqual([OV.accino10, SQUARD].sort());
@@ -143,7 +143,7 @@ describe('OP16-008 Squard: [On Play] trash a 10000-base Character: K.O. an 8000-
     expect(atMain(g)).toBe(true);
   });
 
-  it('an opponent\'s 10000-base Character cannot pay the cost', () => {
+  it("an opponent's 10000-base Character cannot pay the cost", () => {
     const g = start([], [OV.accino10]);
     unusable(g, 'p1');
     expect(charIds(g, 'p2')).toEqual([OV.accino10]);

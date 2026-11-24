@@ -40,7 +40,11 @@ describe('OP16-029 Antlerkov: further checks', () => {
     pickInst(g, [g.find('p1', 'hand', 'OP01-012')]);
     noDefence(g);
     expect(restedChar(g, 'p1', 'OP01-012')).toBe(false);
-    expect(g.legal().some((a) => a.type === 'attack' && a.attacker === g.find('p1', 'characters', 'OP01-012'))).toBe(false);
+    expect(
+      g
+        .legal()
+        .some((a) => a.type === 'attack' && a.attacker === g.find('p1', 'characters', 'OP01-012')),
+    ).toBe(false);
   });
 
   it('a played Character with its own [On Play] and cost 2 (OP16-037) is offered and played; its false condition asks nothing', () => {

@@ -39,7 +39,9 @@ const MCGUY = 'OP16-013';
  * p2's turn: p2's `attacker` (with `don` DON!! given, 8000 or more current power) attacks p1's rested
  * McGuy; p1 does not block or counter. `p1chars` are p1's other Characters; `p2chars` p2's others.
  */
-function koMcGuy(o: { attacker?: string; don?: number; p1chars?: string[]; p2chars?: string[] } = {}) {
+function koMcGuy(
+  o: { attacker?: string; don?: number; p1chars?: string[]; p2chars?: string[] } = {},
+) {
   const don = o.don ?? 0;
   const attacker = o.attacker ?? OV.accino10;
   const g = theirTurn(
@@ -61,7 +63,7 @@ describe('OP16-013 McGuy: [On K.O.] K.O. up to 1 opposing Character with 8000 ba
     need(g, 'choose', 'p1');
   });
 
-  it('K.O.s the chosen Character, which goes to the opponent\'s trash', () => {
+  it("K.O.s the chosen Character, which goes to the opponent's trash", () => {
     const g = koMcGuy({ p2chars: [OV.thatch] });
     pickInst(g, [at(g, 'p2', 'characters', OV.thatch)]);
     expect(charIds(g, 'p2')).toEqual([OV.accino10]);
@@ -112,7 +114,7 @@ describe('OP16-013 McGuy: [On K.O.] K.O. up to 1 opposing Character with 8000 ba
     expect(choices(g)).not.toContain(g.leader('p1'));
   });
 
-  it('with no Character of 8000 base power or less on the opponent\'s side nothing happens', () => {
+  it("with no Character of 8000 base power or less on the opponent's side nothing happens", () => {
     const g = koMcGuy({});
     expect(kind(g)).toBe('main');
     expect(charIds(g, 'p2')).toEqual([OV.accino10]);

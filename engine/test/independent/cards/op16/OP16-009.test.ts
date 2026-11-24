@@ -31,7 +31,11 @@ import {
 const JIL = 'OP16-009';
 
 function playIt(extra: string[]) {
-  const g = mine(OL.luffy, { hand: [JIL, ...extra] }, { characters: [{ card: OV.hajrudin6, rested: true }] });
+  const g = mine(
+    OL.luffy,
+    { hand: [JIL, ...extra] },
+    { characters: [{ card: OV.hajrudin6, rested: true }] },
+  );
   playCard(g, JIL);
   return g;
 }
@@ -78,14 +82,14 @@ describe('OP16-009 Speed Jil: [On Play] gains [Rush] and +2000', () => {
     expect(hand(g)).toEqual([OV.sai4]);
   });
 
-  it('the bonus lasts through the opponent\'s turn: still 7000 with [Rush] in their Main Phase', () => {
+  it("the bonus lasts through the opponent's turn: still 7000 with [Rush] in their Main Phase", () => {
     const g = pay();
     endTurn(g);
     expect(pw(g, 'p1', JIL)).toBe(7000);
     expect(kw(g, jil(g))).toContain('Rush');
   });
 
-  it('it ends at the end of the opponent\'s next End Phase: back to 5000 without [Rush] on my next turn', () => {
+  it("it ends at the end of the opponent's next End Phase: back to 5000 without [Rush] on my next turn", () => {
     const g = pay();
     endTurn(g);
     endTurn(g);

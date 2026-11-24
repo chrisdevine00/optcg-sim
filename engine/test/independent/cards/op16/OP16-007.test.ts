@@ -70,7 +70,7 @@ describe('OP16-007 Jozu: [Blocker] and [On Play] -1000 power', () => {
     expect(pw(g, 'p2', OV.hajrudin6)).toBe(5000);
   });
 
-  it('the choice is among the opponent\'s Characters only', () => {
+  it("the choice is among the opponent's Characters only", () => {
     const g = mine(
       OL.luffy,
       { hand: [JOZU, OV.thatch], characters: [OV.sai4] },

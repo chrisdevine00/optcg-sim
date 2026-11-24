@@ -110,7 +110,11 @@ describe('OP16-002 Izo: [On Play] reveal an 8000-power Character, draw 1', () =>
   });
 
   it('must not: the opponent draws nothing and the opponent hand is untouched', () => {
-    const g = mine(OL.luffy, { hand: [IZO, OV.thatch], deck: DECK }, { hand: [OV.sai4], deck: DECK });
+    const g = mine(
+      OL.luffy,
+      { hand: [IZO, OV.thatch], deck: DECK },
+      { hand: [OV.sai4], deck: DECK },
+    );
     playCard(g, IZO);
     yes(g);
     payHand(g, [OV.thatch]);

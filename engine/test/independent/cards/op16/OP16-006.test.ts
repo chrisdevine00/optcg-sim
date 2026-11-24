@@ -33,12 +33,12 @@ import {
 
 const SHANKS = 'OP16-006';
 
-function start(
-  p2chars: string[],
-  costArea = { active: 10, rested: 0 },
-  mineChars: string[] = [],
-) {
-  const g = mine(OL.shanks, { hand: [SHANKS], costArea, characters: mineChars }, { characters: p2chars });
+function start(p2chars: string[], costArea = { active: 10, rested: 0 }, mineChars: string[] = []) {
+  const g = mine(
+    OL.shanks,
+    { hand: [SHANKS], costArea, characters: mineChars },
+    { characters: p2chars },
+  );
   playCard(g, SHANKS);
   return g;
 }
@@ -93,7 +93,7 @@ describe('OP16-006 Shanks: [On Play] rest 2 DON!!: K.O. a 4000-or-less Character
     expect(don(g, 'p1')).toMatchObject({ active: 4, rested: 6 });
   });
 
-  it('declining pays nothing: only the play cost is rested and nothing is K.O.\'d', () => {
+  it("declining pays nothing: only the play cost is rested and nothing is K.O.'d", () => {
     const g = start([OV.sai4]);
     no(g);
     expect(don(g, 'p1')).toMatchObject({ active: 6, rested: 4 });
@@ -123,7 +123,7 @@ describe('OP16-006 Shanks: [On Play] rest 2 DON!!: K.O. a 4000-or-less Character
     expect(charIds(g, 'p2')).toEqual([]);
   });
 
-  it('only the opponent\'s Characters are candidates (not mine, not the Leader)', () => {
+  it("only the opponent's Characters are candidates (not mine, not the Leader)", () => {
     const g = mine(
       OL.shanks,
       { hand: [SHANKS], characters: [OV.dadan2] },
@@ -137,7 +137,7 @@ describe('OP16-006 Shanks: [On Play] rest 2 DON!!: K.O. a 4000-or-less Character
     expect(choices(g)).not.toContain(g.leader('p2'));
   });
 
-  it('with no Character of 4000 or less nothing is K.O.\'d (the cost, once paid, stays paid)', () => {
+  it("with no Character of 4000 or less nothing is K.O.'d (the cost, once paid, stays paid)", () => {
     const g = pay([OV.marco5, OV.hajrudin6]);
     expect(atMain(g)).toBe(true);
     expect(charIds(g, 'p2')).toEqual([OV.marco5, OV.hajrudin6].sort());

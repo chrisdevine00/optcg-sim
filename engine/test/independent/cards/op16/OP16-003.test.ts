@@ -38,7 +38,10 @@ import {
 } from './kit-op16a.ts';
 
 const NEWGATE = 'OP16-003';
-const P2 = { characters: [OV.hajrudin6], deck: fill(RED, 10) };
+const P2: { characters: string[]; deck: string[] } = {
+  characters: [OV.hajrudin6],
+  deck: fill(RED, 10),
+};
 
 function playIt(extra: string[], p2 = P2) {
   const g = mine(OL.luffy, { hand: [NEWGATE, ...extra], deck: fill(RED, 10) }, p2);
@@ -56,7 +59,7 @@ describeEightKCost({
 });
 
 describe('OP16-003 Edward.Newgate: [On Play] -6000 power', () => {
-  it('after paying, the choice is among the opponent\'s Characters only (not the Leader, not mine)', () => {
+  it("after paying, the choice is among the opponent's Characters only (not the Leader, not mine)", () => {
     const g = mine(
       OL.luffy,
       { hand: [NEWGATE, OV.thatch, OV.ramba], characters: [OV.sai4], deck: fill(RED, 10) },
@@ -123,7 +126,7 @@ describe('OP16-003 Edward.Newgate: [Your Turn] Leader gains [Double Attack] and 
     expect(kw(without, without.leader('p1'))).not.toContain('Double Attack');
   });
 
-  it('on the opponent\'s turn the Leader is back to 5000 without [Double Attack]', () => {
+  it("on the opponent's turn the Leader is back to 5000 without [Double Attack]", () => {
     const g = theirs(OL.luffy, { characters: [NEWGATE] });
     expect(g.power(g.leader('p1'))).toBe(5000);
     expect(kw(g, g.leader('p1'))).not.toContain('Double Attack');
@@ -153,7 +156,11 @@ describe('OP16-003 Edward.Newgate: [Your Turn] Leader gains [Double Attack] and 
   it('the +2000 decides a battle: 7000 Leader beats a 6000 Character that would beat 5000', () => {
     const g = mine(OL.luffy, { characters: [NEWGATE] }, { characters: [{ card: OV.hajrudin6 }] });
     expect(g.power(g.leader('p1'))).toBe(7000);
-    const rested = mine(OL.luffy, { characters: [NEWGATE] }, { characters: [{ card: OV.hajrudin6, rested: true }] });
+    const rested = mine(
+      OL.luffy,
+      { characters: [NEWGATE] },
+      { characters: [{ card: OV.hajrudin6, rested: true }] },
+    );
     attack(rested, rested.leader('p1'), at(rested, 'p2', 'characters', OV.hajrudin6));
     noDefence(rested);
     expect(rested.zone('p2', 'characters')).toHaveLength(0);
@@ -170,4 +177,3 @@ describe('OP16-003 Edward.Newgate: [Your Turn] Leader gains [Double Attack] and 
     expect(g.power(g.leader('p1'))).toBe(7000);
   });
 });
-

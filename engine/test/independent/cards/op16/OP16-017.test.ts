@@ -60,7 +60,7 @@ describe('OP16-017 LittleOars Jr.: -4000 power unless I have a Whitebeard Pirate
     expect(pw(g, 'p1', OARS, 1)).toBe(4000);
   });
 
-  it('only my Characters count: an opponent\'s {Whitebeard Pirates} cost-8 Character does not', () => {
+  it("only my Characters count: an opponent's {Whitebeard Pirates} cost-8 Character does not", () => {
     expect(power([], [WB8])).toBe(4000);
   });
 
@@ -78,22 +78,14 @@ describe('OP16-017 LittleOars Jr.: -4000 power unless I have a Whitebeard Pirate
   });
 
   it('the reduced 4000 power matters in a block: a 5000 attacker K.O.s a blocking LittleOars alone, not one with support', () => {
-    const alone = theirs(
-      OL.luffy,
-      { characters: [OARS] },
-      { characters: [OV.marco5] },
-    );
+    const alone = theirs(OL.luffy, { characters: [OARS] }, { characters: [OV.marco5] });
     attack(alone, at(alone, 'p2', 'characters', OV.marco5), alone.leader('p1'));
     expect(blockers(alone)).toEqual([at(alone, 'p1', 'characters', OARS)]);
     alone.act({ type: 'block', blocker: at(alone, 'p1', 'characters', OARS) });
     alone.act({ type: 'endCounter' });
     expect(charIds(alone, 'p1')).toEqual([]);
 
-    const supported = theirs(
-      OL.luffy,
-      { characters: [OARS, WB8] },
-      { characters: [OV.marco5] },
-    );
+    const supported = theirs(OL.luffy, { characters: [OARS, WB8] }, { characters: [OV.marco5] });
     attack(supported, at(supported, 'p2', 'characters', OV.marco5), supported.leader('p1'));
     supported.act({ type: 'block', blocker: at(supported, 'p1', 'characters', OARS) });
     supported.act({ type: 'endCounter' });

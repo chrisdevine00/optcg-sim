@@ -20,6 +20,7 @@ import {
   offeredIds,
   payDonStrict,
   payHand,
+  pickInOrder,
   pickInst,
   unusable,
   yes,
@@ -272,6 +273,26 @@ export function tryActivate(g: TestGame, card: InstanceId): boolean {
   if (offeredAbilities(g, card).length === 0) return false;
   useAbility(g, card);
   return true;
+}
+
+/**
+ * An "up to N" effect with no candidate: the engine still asks the (empty) `choose`, which ends
+ * with `done`. Asserts the prompt is a `choose` with nothing to pick, then answers it.
+ */
+export function skipEmpty(g: TestGame): void {
+  need(g, 'choose');
+  expect(choices(g)).toEqual([]);
+  none(g);
+}
+
+/**
+ * Pay a pending "rest N of your cards" cost with these cards and `donN` active DON!!. When exactly N
+ * candidates exist the engine may decide the pick itself (forced pick): then nothing is asked and
+ * nothing is done here.
+ */
+export function payRest(g: TestGame, cards: InstanceId[], donN = 0): void {
+  const d = decision(g);
+  if (d?.kind === 'choose' && d.purpose === 'cost') pickInOrder(g, cards, donN, 'costActive');
 }
 
 type Placed = CardId | { card: CardId; rested?: boolean };

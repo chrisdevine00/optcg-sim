@@ -75,7 +75,12 @@ describe('OP16-011 Vista: [On Play] draw 1', () => {
     yes(g);
     payHand(g, [OV.thatch]);
     expect(deck(g)).toHaveLength(DECK.length - 1);
-    expect(g.zone('p1', 'hand').map((c) => c.card).sort()).toEqual([OV.thatch, RED].sort());
+    expect(
+      g
+        .zone('p1', 'hand')
+        .map((c) => c.card)
+        .sort(),
+    ).toEqual([OV.thatch, RED].sort());
     expect(atMain(g)).toBe(true);
   });
 });
@@ -87,7 +92,7 @@ describe('OP16-011 Vista: [DON!! x1] [When Attacking] K.O. up to 2 base-2000-or-
     expect(offeredIds(g)).toEqual([OV.cobra0, OV.dadan2].sort());
   });
 
-  it('K.O.s both chosen Characters (2 targets) and they go to the opponent\'s trash', () => {
+  it("K.O.s both chosen Characters (2 targets) and they go to the opponent's trash", () => {
     const g = swing([OV.dadan2, OV.cobra0]);
     choose(g, [at(g, 'p2', 'characters', OV.dadan2), at(g, 'p2', 'characters', OV.cobra0)]);
     expect(charIds(g, 'p2')).toEqual([]);

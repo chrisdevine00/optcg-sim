@@ -61,14 +61,14 @@ function koInBattle(target: string, inHand: string[], chars: string[] = []) {
 }
 
 describe('OP16-018 Rockstar: replacement, trash a 6000+ Character card from hand instead of a Red-Haired Pirates K.O.', () => {
-  it('offers the replacement to me when my {Red-Haired Pirates} Character would be K.O.\'d in battle', () => {
+  it("offers the replacement to me when my {Red-Haired Pirates} Character would be K.O.'d in battle", () => {
     const g = koInBattle(GAB, [OV.thatch]);
     expect(decider(g)).toBe('p1');
     expect(kind(g)).toBe('optional');
     expect(decision(g)?.purpose).toBe('replacement');
   });
 
-  it('accepting: the hand card is trashed, the Character is not K.O.\'d and stays on the field', () => {
+  it("accepting: the hand card is trashed, the Character is not K.O.'d and stays on the field", () => {
     const g = koInBattle(GAB, [OV.thatch]);
     accept(g);
     payHand(g, [OV.thatch]);
@@ -77,7 +77,7 @@ describe('OP16-018 Rockstar: replacement, trash a 6000+ Character card from hand
     expect(g.eventsOfType('KO')).toHaveLength(0);
   });
 
-  it('declining: the Character is K.O.\'d and the hand card stays', () => {
+  it("declining: the Character is K.O.'d and the hand card stays", () => {
     const g = koInBattle(GAB, [OV.thatch]);
     decline(g);
     expect(charIds(g, 'p1')).toEqual([ROCKSTAR]);
@@ -116,7 +116,7 @@ describe('OP16-018 Rockstar: replacement, trash a 6000+ Character card from hand
     expect(trash(g)).toEqual([GAB]);
   });
 
-  it('Rockstar itself is a {Red-Haired Pirates} Character: it is covered when it would be K.O.\'d', () => {
+  it("Rockstar itself is a {Red-Haired Pirates} Character: it is covered when it would be K.O.'d", () => {
     const g = theirTurn(
       side(OL.luffy, BLUE, { characters: [{ card: ROCKSTAR, rested: true }], hand: [OV.thatch] }),
       side(OL.luffy, RED, { characters: [OV.accino10] }),
@@ -137,7 +137,7 @@ describe('OP16-018 Rockstar: replacement, trash a 6000+ Character card from hand
     expect(hand(g)).toEqual([OV.thatch]);
   });
 
-  it('it also covers a K.O. by an opponent\'s effect', () => {
+  it("it also covers a K.O. by an opponent's effect", () => {
     const g = theirs(
       OL.luffy,
       { characters: [ROCKSTAR, SC2.rockstar], hand: [OV.thatch], life: fill(BLUE, 4) },
@@ -153,11 +153,7 @@ describe('OP16-018 Rockstar: replacement, trash a 6000+ Character card from hand
   it('[Once Per Turn]: the second K.O. of the turn is not replaced', () => {
     const g = theirTurn(
       side(OL.luffy, BLUE, {
-        characters: [
-          ROCKSTAR,
-          { card: GAB, rested: true },
-          { card: YASOPP, rested: true },
-        ],
+        characters: [ROCKSTAR, { card: GAB, rested: true }, { card: YASOPP, rested: true }],
         hand: [OV.thatch, OV.ramba],
         life: fill(BLUE, 4),
       }),
@@ -191,7 +187,7 @@ describe('OP16-018 Rockstar: replacement, trash a 6000+ Character card from hand
     expect(offered(g, 'p1')).toBe(true);
   });
 
-  it('must not: my Rockstar does not protect the opponent\'s {Red-Haired Pirates} Character (nobody is asked)', () => {
+  it("must not: my Rockstar does not protect the opponent's {Red-Haired Pirates} Character (nobody is asked)", () => {
     const g = myTurn(
       side(OL.luffy, BLUE, { characters: [ROCKSTAR, OV.accino10], hand: [OV.thatch] }),
       side(OL.luffy, RED, { characters: [{ card: GAB, rested: true }] }),

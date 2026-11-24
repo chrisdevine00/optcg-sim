@@ -168,7 +168,7 @@ describe('OP16-001 Portgas.D.Ace: [Activate: Main] [Once Per Turn] give [Rush]',
     expect(offeredAbilities(g, g.leader('p1'))).toHaveLength(1);
   });
 
-  it('must not: it never targets the opponent\'s Characters', () => {
+  it("must not: it never targets the opponent's Characters", () => {
     const g = myTurn(
       side(ACE, RED, { characters: [OV.thatch] }),
       side(LD.luffy, RED, { characters: [OV.ramba] }),

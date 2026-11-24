@@ -72,7 +72,7 @@ describe('OP16-005 Thatch: -3 cost in hand with an 8000+ {Whitebeard Pirates} Ch
     expect(handCost(board([OV.accino10]))).toBe(8);
   });
 
-  it('only my Characters count: an opponent\'s 8000 {Whitebeard Pirates} Character does not', () => {
+  it("only my Characters count: an opponent's 8000 {Whitebeard Pirates} Character does not", () => {
     expect(handCost(board([], [OV.thatch]))).toBe(8);
   });
 
@@ -96,7 +96,12 @@ describe('OP16-005 Thatch: -3 cost in hand with an 8000+ {Whitebeard Pirates} Ch
   it('paying the reduced cost rests exactly 5 DON!!', () => {
     const g = board([OV.thatch], [], 10);
     playCard(g, THATCH);
-    expect(g.zone('p1', 'characters').map((c) => c.card).sort()).toEqual([OV.thatch, THATCH].sort());
+    expect(
+      g
+        .zone('p1', 'characters')
+        .map((c) => c.card)
+        .sort(),
+    ).toEqual([OV.thatch, THATCH].sort());
     expect(don(g, 'p1')).toMatchObject({ active: 5, rested: 5 });
   });
 
@@ -107,11 +112,7 @@ describe('OP16-005 Thatch: -3 cost in hand with an 8000+ {Whitebeard Pirates} Ch
   });
 
   it('it has [Blocker] and can block an attack on my Leader', () => {
-    const g = theirs(
-      OL.luffy,
-      { characters: [THATCH] },
-      { characters: [OV.hajrudin6] },
-    );
+    const g = theirs(OL.luffy, { characters: [THATCH] }, { characters: [OV.hajrudin6] });
     expect(kw(g, at(g, 'p1', 'characters', THATCH))).toContain('Blocker');
     attack(g, g.find('p2', 'characters', OV.hajrudin6), g.leader('p1'));
     expect(blockers(g)).toEqual([at(g, 'p1', 'characters', THATCH)]);

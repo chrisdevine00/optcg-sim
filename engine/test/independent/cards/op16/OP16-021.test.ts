@@ -185,4 +185,3 @@ describe('OP16-021 Moby Dick: [Activate: Main] trash this Stage: give a rested D
     expect(offeredAbilities(g, at(g, 'p1', 'stage', MOBY))).toHaveLength(1);
   });
 });
-
