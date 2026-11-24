@@ -25,9 +25,9 @@ export const OP16_041: CardScript = {
       conditions: [{ donGiven: 1 }],
       effect: [
         {
-          if: {
-            exists: { from: 'hand', owner: 'you', filter: { name: 'Prisoner of Impel Down' } },
-          },
+          // Gated on the public hand size only: the pick is asked at max 0 when no [Prisoner]
+          // is held, so the prompt never tells the opponent what the hand holds (ADR 0005).
+          if: { cmp: [{ hand: 'you' }, '>=', 1] },
           then: [
             {
               do: {

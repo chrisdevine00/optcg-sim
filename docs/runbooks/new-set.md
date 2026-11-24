@@ -32,7 +32,8 @@ Order inside the set: Leaders first, then by play weight (`coverage-report.json`
 1. **Verify the text.** Compare the card with the official card list by hand (never fetched by a script, ADR 0007) and write `cards/overrides/<ID>.json` with `verified: true`, the source and the printed keywords (`npm run cards:verify-meta` shows the format).
 2. **Script it.** `cards/effects/<SET>/<ID>.ts`, exporting `<SET>_<NUM>` (for example `OP18_001`), with `textHash` from `textHash(effectText, triggerText)`. Read existing scripts with similar wording first. Text is never parsed into behaviour (ADR 0006).
 3. **Test it.** `engine/test/cards/<ID>.test.ts`, about 5 author tests: the effect, the edge the text names ("up to", "if", "then", once per turn), and a case where it must not fire.
-4. Run `npm run cards:effects-index`, then `npx vitest run engine/test/cards/<ID>.test.ts cards/test`.
+4. **A prompt must not be gated on a hidden-zone condition** (an `exists` or count over your hand, deck top or Life gating a pick, `may` or choice): gate on public facts (a hand size, a field state) and let the pick be asked at max 0. `cards/test/hidden-gate.test.ts` (`cards/src/hidden-gate.ts`) enforces it; an allowlist entry needs a one-line reason.
+5. Run `npm run cards:effects-index`, then `npx vitest run engine/test/cards/<ID>.test.ts cards/test`.
 
 Readings and ambiguities go in `docs/research/<SET>-scripting.md`, one line each, with the card text.
 

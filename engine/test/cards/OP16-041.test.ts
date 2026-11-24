@@ -1,5 +1,6 @@
 /** OP16-041 Buggy (Leader). */
 import { describe, expect, it } from 'vitest';
+import { project, projectEvents } from '../../src/index.ts';
 import { withAbilities, type Ability } from '../../src/testing.ts';
 import { BLUE, expectDecision, game, hand, none, pick, PLAIN_BLUE, PURPLE, V } from './helpers.ts';
 import { activate, canPick, IMPEL_4, IMPEL_5, koBy, PRISONER } from './helpers-w3s.ts';
@@ -85,14 +86,24 @@ describe('OP16-041 Buggy', () => {
     expect(hand(g, 'p1')).toEqual([PRISONER]);
   });
 
-  it('only [Prisoner of Impel Down]: other cards in hand are not offered, and none in hand means nothing', () => {
+  it('only [Prisoner of Impel Down]: other cards in hand are not offered', () => {
     const g = start({ hand: [PRISONER, V.c1] });
     koBy(g, 'p1', IMPEL_4, 'p2');
     expect(canPick(g, g.find('p1', 'hand', V.c1))).toBe(false);
     pick(g, [g.find('p1', 'hand', PRISONER)]);
+  });
+
+  it('no leak (ADR 0005): a non-empty hand with no [Prisoner] still asks the pick, at max 0; an empty hand asks nothing', () => {
     const h = start({ hand: [V.c1] });
     koBy(h, 'p1', IMPEL_4, 'p2');
+    const d = expectDecision(h, 'choose', 'p1');
+    expect(d).toMatchObject({ min: 0, max: 0 });
+    expect(canPick(h, h.find('p1', 'hand', V.c1))).toBe(false);
+    none(h);
     expectDecision(h, 'main', 'p1');
+    const e = start({ hand: [] });
+    koBy(e, 'p1', IMPEL_4, 'p2');
+    expectDecision(e, 'main', 'p1');
   });
 
   it('[Once Per Turn]: a second removal in the same turn does not trigger it again', () => {
@@ -103,5 +114,14 @@ describe('OP16-041 Buggy', () => {
     expectDecision(g, 'main', 'p1');
     expect(onField(g)).toEqual([PRISONER]);
     expect(hand(g, 'p1')).toEqual([PRISONER]);
+  });
+
+  it('leak test (ADR 0005, W3C-R1): same public state, hands differ only in a [Prisoner]: the opponent sees the same view and events', () => {
+    const seen = (handCards: string[]) => {
+      const g = start({ hand: handCards });
+      koBy(g, 'p1', IMPEL_4, 'p2');
+      return JSON.stringify([project(g.state, 'p2'), projectEvents(g.events, 'p2')]);
+    };
+    expect(seen([PRISONER])).toEqual(seen([V.c1]));
   });
 });

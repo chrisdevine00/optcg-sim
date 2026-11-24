@@ -9,6 +9,8 @@
  * CR 10-1-4; a rested Character cannot attack (CR 6-5-3).
  */
 import { describe, expect, it } from 'vitest';
+import { withAbilities, type Ability } from '../../../../src/testing.ts';
+import { mine } from '../m4b/kit-a.ts';
 import {
   act,
   atMain,
@@ -130,5 +132,32 @@ describe("OP16-024 Inazuma: when K.O.'d by the opponent's effect, rest up to 1 o
     expect(blockers(g)).toEqual([inazuma]);
     act(g, { type: 'block', blocker: inazuma });
     expect(g.life('p1')).toBe(4);
+  });
+
+  it("K.O.'d by MY OWN effect (cause 'effect', not 'opponentEffect'): nothing is rested (W3C-R9 kill test)", () => {
+    const g = mine(W3L.kid, { characters: [INAZUMA, W3C.sai] }, { characters: [W3C.thatch] });
+    g.state = withAbilities(g.state, W3C.sai, [
+      {
+        id: 'k',
+        kind: 'activate',
+        when: 'activateMain',
+        effect: [
+          {
+            do: {
+              ko: {
+                from: 'characters',
+                owner: 'you',
+                filter: { name: 'Inazuma' },
+                pick: { exactly: 1 },
+              },
+            },
+          },
+        ],
+      } as Ability,
+    ]);
+    act(g, { type: 'activate', card: g.find('p1', 'characters', W3C.sai), ability: 'k' });
+    expect(g.zone('p1', 'characters').map((c) => c.card)).toEqual([W3C.sai]);
+    expect(kind(g)).toBe('main');
+    expect(g.card(g.find('p2', 'characters', W3C.thatch)).rested).toBe(false);
   });
 });
