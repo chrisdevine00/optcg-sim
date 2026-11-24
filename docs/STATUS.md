@@ -1,7 +1,7 @@
 # Status
 
 **Phase:** 5 Build, slice pass (ADR 0012), starting at M0. Phases 1–4 gated 2026-10-28.
-**Milestone:** **M6b Card pool and live updates: in progress** (PLAN §2a, row 17b), at M6b-0 infrastructure. **M6 Deck builder: done 2026-11-23** (review FAIL, fix round, re-review 1 PASS). **M5b AI breadth: done 2026-11-23 under the time-box, with the Warlord-vs-Pirate target (65%) NOT met:** 123/200 (61.5%) every nightly, no tested change beat noise on fresh seeds (DECISIONS 2026-11-23; carried to docs/BACKLOG.md #1); the nightly asserts a 55% floor. **M4b Effects breadth: done 2026-11-16.** All 182 meta-list cards play fully. L Learning slice done 2026-11-09. M5a done 2026-11-05. M4a done 2026-10-29. M3 done 2026-11-05. M0, M1 and M2 done 2026-10-28.
+**Milestone:** **M6b Card pool and live updates: in progress** (PLAN §2a, row 17b), M6b-0 infrastructure done 2026-11-23; next M6b-1 runtime audit. **M6 Deck builder: done 2026-11-23** (review FAIL, fix round, re-review 1 PASS). **M5b AI breadth: done 2026-11-23 under the time-box, with the Warlord-vs-Pirate target (65%) NOT met:** 123/200 (61.5%) every nightly, no tested change beat noise on fresh seeds (DECISIONS 2026-11-23; carried to docs/BACKLOG.md #1); the nightly asserts a 55% floor. **M4b Effects breadth: done 2026-11-16.** All 182 meta-list cards play fully. L Learning slice done 2026-11-09. M5a done 2026-11-05. M4a done 2026-10-29. M3 done 2026-11-05. M0, M1 and M2 done 2026-10-28.
 **Run the app:** `npm install && npm run dev` then open http://localhost:5173/optcg-sim/ and go to `/cards` for the card browser
 **Deployed:** https://chrisdevine00.github.io/optcg-sim/ (auto-deploys after green CI on `main`)
 
@@ -142,7 +142,7 @@
 
 ## Next (slice pass, PLAN.md §1)
 
-**Current next step (2026-11-23): finish M6b-0 (re-baseline the M6b estimate from the measured backlog), then M6b-1 runtime audit of the Standard pool. Then M7 to M10. The items below are history.**
+**Current next step (2026-11-23): M6b-1, the runtime audit of the Standard pool (M6b-0 done). Then M6b-2 engine waves and M6b-3 batches (OP-18 and EB-05 first; OP-18 needs `cards:update -- --refresh` once upstream has it), with M6b-5 update pipeline in parallel. Then M7 to M10. The items below are history.**
 
 **Roadmap (owner-approved 2026-11-17, amendment A1; DECISIONS "Full Standard card pool and live updates (M6b)", ADR 0014):** M5b, then M6, then **M6b Card pool and live updates** (PLAN §2a, row 17b), then M7 to M10. M6b scripts every Standard-legal card (block 5, then 4, then 3; block 2 held until the post-2027-03-31 rotation is announced), builds `meta:update` and the scheduled `update.yml`, adds the app update prompt and a default playbook for any leader. `meta:update` is no longer an M9 item.
 
@@ -191,7 +191,9 @@
 - [x] Per-set script chunks (`cards:effects-index`, `loadScripts`, engine refuses unloaded scripts).
 - [x] Test decks pinned (`ai/test/fixtures/strength-decks.json`).
 - [x] Per-push card tests for changed cards only (`npm run test:ci`, `cards/scripts/card-tests.ts`; a change to the engine, card data, the loader or a shared kit runs them all); `npm test` in full nightly.
-- [ ] Re-baseline the M6b estimate from the measured backlog (PLAN amendment A1 asks for it at the end of M6b-0).
+- [x] Re-baselined (PLAN §1, DECISIONS "M6b-0 re-baseline"): **M6b about 830–880 h without block 2**, plus about 240 h if block 2 survives the rotation (was 1,000–1,100 h).
+
+**M6b-0: done 2026-11-23.** Next: **M6b-1**, the runtime audit of the Standard pool (`docs/research/m6b-runtime-audit.md`, the method of `m4b-runtime-audit.md`), driven by the gap list in `cards/data/coverage-report.json`. M6b-5 (update pipeline) is built first among M6b-5 to M6b-7, in parallel with the scripting batches.
 - Also: Deploy workflow split into build and deploy jobs (the Pages artifact race failed three deploys on 2026-11-23).
 
 ### M6 Deck builder: done 2026-11-23
