@@ -142,6 +142,7 @@ export const IMPLEMENTED = {
     'div',
     'eventCount',
     'donGivenToTarget',
+    'targetPower',
   ],
 } as const;
 
@@ -269,6 +270,7 @@ function num(c: Ctx, path: string, v: unknown): void {
       'div',
       'eventCount',
       'donGivenToTarget',
+      'targetPower',
     ],
     { donOnField: ['state'], refStat: ['stat'], count: ['distinctNames'] },
   );
@@ -321,6 +323,12 @@ function num(c: Ctx, path: string, v: unknown): void {
       if (o.donGivenToTarget !== true) err(c, `${path}.donGivenToTarget`, 'expected true');
       else if (!c.perTarget)
         err(c, path, 'donGivenToTarget is read in the amount of a power or cost action');
+      return;
+    case 'targetPower':
+      // The current power of the card an amount applies to (B4T-R1): only `power` and `cost` have one.
+      if (o.targetPower !== true) err(c, `${path}.targetPower`, 'expected true');
+      else if (!c.perTarget)
+        err(c, path, 'targetPower is read in the amount of a power or cost action');
       return;
     case 'eventCount':
       // The number of cards the triggering event moved (G22): only an auto ability has one.

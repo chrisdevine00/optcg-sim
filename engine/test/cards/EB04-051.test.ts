@@ -21,6 +21,12 @@ describe('EB04-051 Emet', () => {
     expect(can(g)).toBe(true);
   });
 
+  it('B4T-R5: the threshold is 12000: an 11000 base power Character (either side) does not enable it', () => {
+    const SHANKS11 = 'ST16-004'; // cost 9, 11000 base power
+    expect(can(setup([], [SHANKS11]))).toBe(false);
+    expect(can(setup([SHANKS11], []))).toBe(false);
+  });
+
   it('can attack when you have one yourself', () => {
     const g = setup([BIG12], []);
     expect(can(g)).toBe(true);

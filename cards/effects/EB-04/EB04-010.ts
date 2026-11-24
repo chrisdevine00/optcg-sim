@@ -43,7 +43,7 @@ export const EB04_010: CardScript = {
       effect: [
         {
           do: {
-            setBasePower: {
+            power: {
               target: {
                 from: 'characters',
                 owner: 'opponent',
@@ -51,7 +51,9 @@ export const EB04_010: CardScript = {
                   upTo: 1,
                 },
               },
-              value: 0,
+              amount: {
+                mul: [{ targetPower: true }, -1],
+              },
               duration: 'thisTurn',
             },
           },
@@ -60,7 +62,7 @@ export const EB04_010: CardScript = {
     },
   ],
   rulings: [
-    'reading (M6b-Q9): "Set the power to 0" is a base-power set on the power layer, so later +power this turn still adds; an official ruling that later buffs do not apply would change this',
+    '"Set the power to 0" lowers the target\'s power by its current power at resolution (rules-digest 35, CR 4-12-1), so power it already has (given DON!!, an earlier buff) does not survive; power added afterwards this turn still adds (B4T-R1)',
     'reading: base cost 1 is the printed cost (a cost-reduced Character does not qualify, an increased one does not lose it); the buff covers Characters that arrive later and the Stage itself is not a Character',
   ],
 };

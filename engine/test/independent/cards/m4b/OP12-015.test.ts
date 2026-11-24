@@ -184,7 +184,7 @@ describe('OP12-015 [On Play]: you may reveal 2 Events: play up to 1 red Characte
     accept(g);
     drive(g, 'p1', {
       cost: [g.find('p1', 'hand', EV.kick), g.find('p1', 'hand', EV.asura)],
-      picks: [[g.leader('p1')]], // nothing eligible to play: no decision, so the one pick is the DON!! recipient
+      picks: [[], [g.leader('p1')]], // the "play up to 1" pick is asked (nothing eligible: none), then the DON!! recipient
     });
     expect(sortedIds(g, 'p1', 'characters')).toEqual([LUFFY]);
     expect(g.card(g.leader('p1')).don).toBe(1);

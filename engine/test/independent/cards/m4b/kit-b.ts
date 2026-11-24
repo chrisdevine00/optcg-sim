@@ -19,10 +19,12 @@ import {
   choose,
   decider,
   donChoices,
+  identOf,
   kind,
   offered,
   payDon,
   skipUnusable,
+  stillSameDecision,
 } from '../kit.ts';
 
 export * from '../kit.ts';
@@ -356,7 +358,7 @@ export function pickMixed(
   items: (InstanceId | 'DON')[],
   don: 'costActive' | 'costRested',
 ): void {
-  const player = g.decider;
+  const before = identOf(g);
   const cards = items.filter((i): i is InstanceId => i !== 'DON');
   const dons = items.filter((i) => i === 'DON').length;
   const max = decision(g)?.max;
@@ -375,10 +377,10 @@ export function pickMixed(
     act(g, { type: 'pick', choice: want });
   }
   if (
-    decider(g) === player &&
+    stillSameDecision(g, before, items.length) &&
     kind(g) === 'choose' &&
     canFinish(g) &&
-    (max === undefined || items.length < max)
+    (items.length === 0 || max === undefined || items.length < max)
   ) {
     act(g, { type: 'done' });
   }

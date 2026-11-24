@@ -16,6 +16,7 @@ import {
   attack,
   cardIds,
   choices,
+  decision,
   don,
   hand,
   kind,
@@ -118,22 +119,25 @@ describe('EB04-015 Jinbe: [Blocker]; [On K.O.] rest 1 of your cards: Fish-Man/Me
     expect(don(g, 'p1').rested).toBe(1);
   });
 
-  // DISAGREEMENT B-1 (DISAGREEMENTS-a.md): the engine asks the "up to 1" hand pick only when the hand
-  // holds a matching card, so the prompt itself reveals hidden information (severity 4).
-  it.fails(
-    'an "up to 1" pick over the hand is asked even when nothing matches (empty hand, or no green cost-6 Character): no hidden-card dependency',
-    () => {
-      for (const h of [[], [SN.c3, SN.green7]]) {
-        const g = koInBattle(LE.fishMan, SN.c7, h);
-        yes(g, 'p1');
-        restCost(g, [], 1);
-        need(g, 'choose', 'p1');
-        expect(choices(g)).toEqual([]);
-        none(g);
-        expect(cardIds(g, 'p1', 'characters')).toEqual([]);
-      }
-    },
-  );
+  // B4T-R3: this was DISAGREEMENT B-1; the "no prompt" was a test-helper artifact (restCost used to
+  // answer the next, empty pick with `done`). The cost is paid here with raw picks only.
+  it('an "up to 1" pick over the hand is asked even when nothing matches (empty hand, or no green cost-6 Character): no hidden-card dependency', () => {
+    for (const h of [[], [SN.c3, SN.green7]]) {
+      const g = koInBattle(LE.fishMan, SN.c7, h);
+      yes(g, 'p1');
+      need(g, 'choose', 'p1');
+      expect(decision(g)?.purpose).toBe('cost');
+      const donPick = g.legal().find((a) => a.type === 'pick' && typeof a.choice === 'object');
+      if (donPick) g.act(donPick);
+      else g.act(g.legal().find((a) => a.type === 'pick')!);
+      need(g, 'choose', 'p1');
+      expect(decision(g)?.purpose).toBe('target');
+      expect(decision(g)?.max).toBe(0);
+      expect(choices(g)).toEqual([]);
+      none(g);
+      expect(cardIds(g, 'p1', 'characters')).toEqual([]);
+    }
+  });
 
   it('must not happen: a Leader that is neither {Fish-Man} nor {Merfolk} plays nothing', () => {
     const g = koInBattle(LE.luffy, SN.c7, [SN.green6]);

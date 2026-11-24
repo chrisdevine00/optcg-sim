@@ -7,7 +7,7 @@
  * less from your hand."
  *
  * Rules: base power is the printed number (CR 4-9-2); DON!! given still adds +1000 each on the
- * owner's turn (M6b-Q29: "same as the Leader" copies base power). "During this turn" ends at the end
+ * owner's turn (B4T-R2, lead decision: "the same as your opponent's Leader" reads its current power, as OP16-036). "During this turn" ends at the end
  * of the turn. [On K.O.] fires on a battle K.O. too. The play comes from the hand, active, free.
  */
 import { describe, expect, it } from 'vitest';

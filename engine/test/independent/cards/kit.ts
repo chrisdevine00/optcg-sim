@@ -14,6 +14,7 @@ import {
   queries,
   type Action,
   type CardId,
+  type Decision,
   type DonClass,
   type InstanceId,
   type PlayerId,
@@ -237,6 +238,37 @@ export function kind(g: TestGame) {
   return decision(g)?.kind ?? null;
 }
 
+/**
+ * A snapshot of the pending decision, to tell later whether it is still the one that was being
+ * answered (B4T-R3: a `done` sent to the *next*, empty "up to" pick hides a missing prompt).
+ */
+export function identOf(g: TestGame): Decision | null {
+  const d = decision(g);
+  return d ? { ...d } : null;
+}
+
+/**
+ * True if the decision pending now is `before` after `picks` picks were made in it: same kind,
+ * prompt, purpose and source, and the remaining pick counts have gone down by the picks made. A
+ * different decision (the next step of the effect) differs in prompt or purpose, or starts with
+ * its own full count.
+ */
+export function stillSameDecision(g: TestGame, before: Decision | null, picks: number): boolean {
+  const now = decision(g);
+  if (!now || !before) return false;
+  const left = (n: number | undefined) => (n === undefined ? undefined : Math.max(0, n - picks));
+  return (
+    now.kind === before.kind &&
+    now.player === before.player &&
+    now.prompt === before.prompt &&
+    now.purpose === before.purpose &&
+    now.source?.instance === before.source?.instance &&
+    now.source?.ability === before.source?.ability &&
+    now.max === left(before.max) &&
+    now.min === left(before.min)
+  );
+}
+
 export function decider(g: TestGame): PlayerId | null {
   return decision(g)?.player ?? null;
 }
@@ -381,7 +413,7 @@ export function canFinish(g: TestGame): boolean {
 
 /** Pick these card instances in the current `choose` decision (any order the engine accepts), then `done` if asked. */
 export function choose(g: TestGame, targets: InstanceId[]): void {
-  const player = g.decider;
+  const before = identOf(g);
   const max = decision(g)?.max;
   // Unordered picks must be made in canonical order (ARCHITECTURE §2.3): try them sorted by
   // instance id, taking the first one the engine offers each time.
@@ -399,7 +431,7 @@ export function choose(g: TestGame, targets: InstanceId[]): void {
   }
   // Below the maximum, the same decision is still open: confirm it. At the maximum the engine may
   // have moved on to a new `choose` already, so confirm only if nothing is left to pick.
-  if (decider(g) !== player || !canFinish(g)) return;
+  if (!stillSameDecision(g, before, targets.length) || !canFinish(g)) return;
   const atMax = max !== undefined && targets.length >= max;
   if (!atMax || choices(g).length === 0) act(g, { type: 'done' });
 }
@@ -416,15 +448,18 @@ export function chooseNone(g: TestGame): void {
  */
 export function payWith(g: TestGame, cards: InstanceId[]): void {
   const player = g.decider;
+  const before = identOf(g);
   const left = [...cards].sort();
+  let made = 0;
   while (left.length && decider(g) === player) {
     const i = left.findIndex((c) => choices(g).includes(c));
     if (i < 0) break;
     act(g, { type: 'pick', choice: left[i]! });
     left.splice(i, 1);
+    made++;
   }
   if (
-    decider(g) === player &&
+    stillSameDecision(g, before, made) &&
     canFinish(g) &&
     donChoices(g).length === 0 &&
     choices(g).length === 0

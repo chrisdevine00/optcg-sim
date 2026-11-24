@@ -70,6 +70,9 @@ describe('OP17-092 Brogy: +12 cost; [On Play] play Dorry, then no Character play
     need(g, 'choose', 'p1');
     expect(offeredIds(g)).toEqual([DORRY]);
     pickCards(g, [DORRY]);
+    // The played card's own [On Play] asks for its partner (an empty "up to" pick): answer it.
+    need(g, 'choose', 'p1');
+    none(g);
     expect(atMain(g)).toBe(true);
     expect(chars(g)).toEqual([DORRY, BROGY].sort());
   });
@@ -94,6 +97,9 @@ describe('OP17-092 Brogy: +12 cost; [On Play] play Dorry, then no Character play
     const g = mine(LD.elbaph, { hand: [BROGY, DORRY, SCN.c2] });
     playCard(g, BROGY);
     pickCards(g, [DORRY]);
+    // The played card's own [On Play] asks for its partner (an empty "up to" pick): answer it.
+    need(g, 'choose', 'p1');
+    none(g);
     expect(atMain(g)).toBe(true);
     expect(playableCharacters(g)).toEqual([]);
   });

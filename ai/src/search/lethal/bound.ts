@@ -273,7 +273,7 @@ function numBound(n: unknown): number {
   if ('donOnField' in o || 'donGiven' in o || 'donGivenToTarget' in o) return 10;
   if ('turnIndex' in o) return 30;
   if ('refCount' in o) return 10;
-  if ('refStat' in o) return 20_000;
+  if ('refStat' in o || 'targetPower' in o) return 20_000;
   return 100_000;
 }
 

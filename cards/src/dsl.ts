@@ -219,6 +219,12 @@ export type Num =
    * amount of those two actions has a target to read.
    */
   | { donGivenToTarget: true }
+  /**
+   * The current power of the card a `power` or `cost` action is applying to, read once per target
+   * and floored at 0. `{ mul: [{ targetPower: true }, -1] }` is "set the power to 0" (CR 4-12-1:
+   * it lowers by the current power, so buffs and given DON!! do not survive, B4T-R1).
+   */
+  | { targetPower: true }
   | { sum: Num[] }
   | { mul: [Num, number] }
   /** Integer floor of a division: "for every 5 cards in your trash" (G23). The divisor is >= 1. */

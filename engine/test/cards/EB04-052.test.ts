@@ -32,12 +32,16 @@ describe('EB04-052 Sanji', () => {
     expect(g.power(g.find('p1', 'characters', ID))).toBe(6000);
   });
 
-  it("the Leader's base power is copied, not its current power (a boosted or lowered Leader)", () => {
+  it("B4T-R2: the Leader's current power is copied (a boosted or lowered Leader), as OP16-036", () => {
     const g = setup(PLAIN_BLUE);
     boost(g, g.leader('p2'), 2000);
     attackLeader(g);
     expect(g.power(g.leader('p2'))).toBe(7000);
-    expect(g.power(g.find('p1', 'characters', ID))).toBe(5000);
+    expect(g.power(g.find('p1', 'characters', ID))).toBe(7000);
+    const h = setup(PLAIN_BLUE);
+    boost(h, h.leader('p2'), -2000);
+    attackLeader(h);
+    expect(h.power(h.find('p1', 'characters', ID))).toBe(3000);
   });
 
   it('DON!! given to Sanji still add to the new base power', () => {
