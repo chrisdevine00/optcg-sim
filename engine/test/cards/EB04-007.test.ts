@@ -42,12 +42,14 @@ describe('EB04-007 Roronoa Zoro', () => {
     expect(g.card(z).keywords).not.toContain('Rush: Character');
   });
 
-  it('[Activate: Main] is not offered when no opponent Character has 8000 power or more (7000 is not enough)', () => {
-    const g = activateSetup([V.c5]);
+  it('B4T-R4: the "If" is in the effect, not an activation condition: with no opponent Character of 8000 power or more it can be activated, grants nothing and spends Once Per Turn', () => {
+    const g = activateSetup([V.c5]); // 7000 is not enough
     const z = g.find('p1', 'characters', ZORO);
-    expect(g.isLegal({ type: 'activate', card: z, ability: 'rush-character', player: 'p1' })).toBe(
-      false,
-    );
+    const act = { type: 'activate', card: z, ability: 'rush-character', player: 'p1' } as const;
+    expect(g.isLegal(act)).toBe(true);
+    g.act({ type: 'activate', card: z, ability: 'rush-character' });
+    expect(g.card(z).keywords).not.toContain('Rush: Character');
+    expect(g.isLegal(act)).toBe(false); // the use is spent
   });
 
   it('the power check reads current power: a power boost on a smaller Character qualifies', () => {

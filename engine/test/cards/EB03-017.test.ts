@@ -73,4 +73,18 @@ describe('EB03-017 Jewelry Bonney', () => {
     expect(canPick(g, g.find('p2', 'characters', V.c1))).toBe(true);
     none(g);
   });
+
+  it('B4T-R5: the cost bound is 8: a cost-8 Character is a candidate, a cost-9 Character is not', () => {
+    const ACCINO = 'EB02-004'; // cost 8, 10000, no effect
+    const SHANKS = 'ST16-004'; // cost 9, 11000
+    const g = mk(
+      { leader: SN_LEADER, hand: [ID], costArea: { active: 5, rested: 2 } },
+      { characters: [ACCINO, SHANKS] },
+    );
+    play(g, ID);
+    addMost(g);
+    expectDecision(g, 'choose', 'p1');
+    expect(canPick(g, g.find('p2', 'characters', ACCINO))).toBe(true);
+    expect(canPick(g, g.find('p2', 'characters', SHANKS))).toBe(false);
+  });
 });

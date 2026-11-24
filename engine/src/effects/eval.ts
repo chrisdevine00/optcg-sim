@@ -224,6 +224,9 @@ function numOf(c: Ctx, n: Num): number {
     return (n.stat === 'cost' ? dv.cost : n.stat === 'power' ? dv.power : dv.basePower) ?? 0;
   }
   // The DON!! given to the card this amount is read for (G34); 0 outside a power or cost action.
+  // The current power of the card this amount is read for (B4T-R1), floored at 0 (CR 4-12-2).
+  if ('targetPower' in n)
+    return c.target && s.cards[c.target] ? Math.max(0, dvOf(c, c.target).power ?? 0) : 0;
   if ('donGivenToTarget' in n) return (c.target && s.cards[c.target]?.don) || 0;
   if ('sum' in n) return n.sum.reduce((a: number, x) => a + num(c, x), 0);
   // "For every 5 cards in your trash" (G23): the whole number of times it fits.

@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest';
 import type { CardId, InstanceId, PlayerId } from '@optcg/engine';
 import type { TestGame } from '../../../fixtures/index.ts';
 import { act, cardIds, decision } from '../../helpers.ts';
-import { canFinish, cardOf, choices, kind, offered } from '../kit.ts';
+import { canFinish, cardOf, choices, identOf, kind, offered, stillSameDecision } from '../kit.ts';
 import {
   activateTrigger,
   declineTrigger,
@@ -129,6 +129,7 @@ export function payCost29(g: TestGame, cards: InstanceId[]): void {
 export function pickTargets(g: TestGame, targets: InstanceId[]): void {
   const d = need(g, 'choose');
   expect(d.purpose).not.toBe('cost');
+  const before = identOf(g);
   const left = [...targets];
   for (let guard = 0; left.length && guard < 20; guard++) {
     const pick = left.find((c) => choices(g).includes(c));
@@ -140,7 +141,12 @@ export function pickTargets(g: TestGame, targets: InstanceId[]): void {
     act(g, { type: 'pick', choice: pick });
     left.splice(left.indexOf(pick), 1);
   }
-  if (kind(g) === 'choose' && d.max !== undefined && targets.length < d.max && canFinish(g)) {
+  if (
+    stillSameDecision(g, before, targets.length) &&
+    d.max !== undefined &&
+    targets.length < d.max &&
+    canFinish(g)
+  ) {
     act(g, { type: 'done' });
   }
 }

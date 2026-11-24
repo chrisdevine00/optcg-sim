@@ -139,6 +139,8 @@ describe('OP14-116 Salamander: [Counter] +2000, then play an Amazon Lily / Kuja 
     const g = defend({ hand: [] });
     useCounter(g, g.find('p1', 'hand', ID), g.leader('p1'));
     pickInst(g, [g.leader('p1')]);
+    need(g, 'choose', 'p1'); // the "play up to 1" pick is still asked (empty hand): answer it
+    none(g);
     g.act({ type: 'endCounter' });
     expect(atMain(g, 'p2')).toBe(true);
     expect(g.power(g.leader('p1'))).toBe(5000);

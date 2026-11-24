@@ -37,12 +37,38 @@ describe('EB04-010 Lulucia Kingdom', () => {
     expect(g.power(at(g, 'p2', 'characters', V.c3))).toBe(5000);
   });
 
-  it('reading (M6b-Q9): the set is a base power, so a later +2000 this turn still adds', () => {
+  it('B4T-R1: power the target already has (an earlier +2000) does not survive; a later +2000 still adds', () => {
     const g = mk({ leader: RED_LEADER, hand: [ID] }, { characters: [V.c5] });
+    const t = at(g, 'p2', 'characters', V.c5);
+    boost(g, t, 2000);
+    expect(g.power(t)).toBe(9000);
     play(g, ID);
-    pick(g, [at(g, 'p2', 'characters', V.c5)]);
-    boost(g, at(g, 'p2', 'characters', V.c5), 2000);
-    expect(g.power(at(g, 'p2', 'characters', V.c5))).toBe(2000);
+    pick(g, [t]);
+    expect(g.power(t)).toBe(0);
+    boost(g, t, 2000);
+    expect(g.power(t)).toBe(2000);
+  });
+
+  it('B4T-R1: several buffs and a debuff on the target are all cancelled (resolved power, not one layer)', () => {
+    const g = mk({ leader: RED_LEADER, hand: [ID] }, { characters: [V.c5] });
+    const t = at(g, 'p2', 'characters', V.c5);
+    boost(g, t, 3000);
+    boost(g, t, -1000);
+    expect(g.power(t)).toBe(9000);
+    play(g, ID);
+    pick(g, [t]);
+    expect(g.power(t)).toBe(0);
+  });
+
+  it("the 0 lasts the turn only (given DON!! on its owner's side add nothing on my turn)", () => {
+    const g = mk({ leader: RED_LEADER, hand: [ID] }, { characters: [{ card: V.c5, don: 2 }] });
+    const t = at(g, 'p2', 'characters', V.c5);
+    expect(g.power(t)).toBe(7000); // the opponent's DON!! add power on the opponent's turn only
+    play(g, ID);
+    pick(g, [t]);
+    expect(g.power(t)).toBe(0);
+    g.act({ type: 'endTurn' });
+    expect(g.power(t)).toBe(7000);
   });
 
   it('"up to 1": may be skipped', () => {

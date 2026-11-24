@@ -31,40 +31,43 @@ export const EB04_007: CardScript = {
     },
     {
       id: 'rush-character',
-      label: 'If your opponent has a Character with 8000 power or more, gains [Rush: Character]',
+      label:
+        'If your opponent has a Character with 8000 power or more, this Character gains [Rush: Character]',
       kind: 'activate',
       when: 'activateMain',
       oncePerTurn: true,
-      conditions: [
-        {
-          exists: {
-            from: 'characters',
-            owner: 'opponent',
-            filter: {
-              power: {
-                gte: 8000,
-              },
-            },
-          },
-        },
-      ],
       effect: [
         {
-          do: {
-            grant: {
-              target: {
-                from: 'self',
-                owner: 'you',
+          if: {
+            exists: {
+              from: 'characters',
+              owner: 'opponent',
+              filter: {
+                power: {
+                  gte: 8000,
+                },
               },
-              keyword: 'Rush: Character',
-              duration: 'thisTurn',
             },
           },
+          then: [
+            {
+              do: {
+                grant: {
+                  target: {
+                    from: 'self',
+                    owner: 'you',
+                  },
+                  keyword: 'Rush: Character',
+                  duration: 'thisTurn',
+                },
+              },
+            },
+          ],
         },
       ],
     },
   ],
   rulings: [
-    'reading: the opponent power condition is checked when the ability is activated (CR 8-3-2-3), and Once Per Turn is spent by activating it',
+    'the "If your opponent has a Character with 8000 power or more" has no colon before it (no cost), so it is part of the effect: the ability can be activated at any time (spending Once Per Turn) and does nothing when the condition fails (B4T-R4)',
   ],
 };

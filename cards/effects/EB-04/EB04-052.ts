@@ -33,7 +33,7 @@ export const EB04_052: CardScript = {
               },
               value: {
                 refStat: 'l',
-                stat: 'basePower',
+                stat: 'power',
               },
               duration: 'thisTurn',
             },
@@ -91,5 +91,8 @@ export const EB04_052: CardScript = {
         },
       ],
     },
+  ],
+  rulings: [
+    'reading (B4T-R2, lead decision): "the same as your opponent\'s Leader" reads the Leader\'s current power at resolution, as OP16-036 and OP16-055; given DON!! and other modifiers still add on top of the new base power',
   ],
 };

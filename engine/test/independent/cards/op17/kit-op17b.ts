@@ -14,10 +14,12 @@ import {
   choose,
   donChoices,
   hasEvent,
+  identOf,
   kind,
   reachablePickSets,
   RED,
   side,
+  stillSameDecision,
   theirTurn,
 } from '../kit.ts';
 import { BLUE, checkLook, deck, hand, minus, tail, trash } from '../m4b/kit-a.ts';
@@ -157,10 +159,11 @@ export function offer(g: TestGame, card: CardId, nth = 0): InstanceId {
 /**
  * Pick cards by card id, one at a time, always taking the first listed pick that is still wanted
  * (the engine only lists picks that can start a canonical selection, so later picks appear only
- * after earlier ones). Confirms with `done` as `choose` in kit.ts does.
+ * after earlier ones). Confirms with `done` as `choose` in kit.ts does, and only for the decision it
+ * was answering (never the next, empty pick).
  */
 function pickByCardIds(g: TestGame, cards: CardId[]): void {
-  const player = g.decider;
+  const before = identOf(g);
   const max = decision(g)?.max;
   const left = [...cards];
   while (left.length) {
@@ -178,7 +181,7 @@ function pickByCardIds(g: TestGame, cards: CardId[]): void {
     left.splice(left.indexOf(cardOf(g, a.choice) as CardId), 1);
     g.act(a);
   }
-  if (decision(g)?.player !== player || !canFinish(g)) return;
+  if (!stillSameDecision(g, before, cards.length) || !canFinish(g)) return;
   const atMax = max !== undefined && cards.length >= max;
   if (!atMax || choices(g).length === 0) act(g, { type: 'done' });
 }
@@ -590,7 +593,7 @@ export function restCost(g: TestGame, cards: InstanceId[], donN = 0): void {
  * Pick exactly these card instances and `donN` DON!! of class `from` in an exact-N `choose`.
  * The engine lists legal picks in its canonical order and only the earliest candidates can start a
  * selection, so each step takes the first listed pick that is wanted. Throws if a wanted item is
- * never offered. Confirms with `done` only if the decision stays open for a lower minimum.
+ * never offered. Confirms with `done` only if the same decision (not the next one) stays open for a lower minimum.
  */
 export function pickInOrder(
   g: TestGame,
@@ -598,7 +601,8 @@ export function pickInOrder(
   donN = 0,
   from: 'costActive' | 'costRested' = 'costActive',
 ): void {
-  const player = g.decider;
+  const before = identOf(g);
+  const total = cards.length + donN;
   const want = new Set(cards);
   let don_ = donN;
   while (want.size || don_) {
@@ -617,7 +621,7 @@ export function pickInOrder(
     g.act(pick);
   }
   if (
-    decision(g)?.player === player &&
+    stillSameDecision(g, before, total) &&
     kind(g) === 'choose' &&
     canFinish(g) &&
     choices(g).length === 0 &&

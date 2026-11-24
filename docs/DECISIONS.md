@@ -2,6 +2,17 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-24 — Block 4 tail fix round: "set the power to 0", "same as the Leader" and the test kits (ENGINE_VERSION 0.5.16)
+
+- **Context:** the block 4 tail review (`docs/reviews/m6b-block4-tail.md`) failed on B4T-R1: EB04-010 scripted "Set the power of up to 1 of your opponent's Characters to 0" as `setBasePower 0`, which leaves power the target already has (an earlier buff).
+- **Decision:**
+  - B4T-R1: a new Num `{ targetPower: true }` is the current power of the card a `power` or `cost` action applies to (read once per target, floored at 0). "Set the power to 0" is `power` with `amount: { mul: [{ targetPower: true }, -1] }` (CR 4-12-1, rules-digest 35: it lowers by the current power; a power already at 0 or below is left alone, CR 4-12-2). Validator: only inside a power or cost amount, like `donGivenToTarget`. Lethal bound: 20,000. No new action. A `setBasePower` grep judged every script against its text: only EB04-010 says "the power ... to 0"; ST34-004 says "base power becomes 0" and stays a base-power set, as do the other "base power becomes N" scripts. Given DON!! on an opposing target add no power on the active player's turn, so only buffs matter for EB04-010 (the review's given-DON!! probe was in a position where they add nothing).
+  - B4T-R2 (lead decision, closes M6b-Q29 and OP-16-Q2): "base power becomes the same as your opponent's Leader" reads the Leader's current power, as OP16-036 / OP16-055 / OP16-104 already did. EB04-052 `refStat` changed from `basePower` to `power`; its tests flip. EB01-061, OP04-069 and OP06-009 (same wording, unscripted) follow the same reading when scripted.
+  - B4T-R3: the kit helpers `choose`, `payWith` (kit.ts), `pickInOrder`/`restCost`, `pickByCardIds`/`payHand`/`pickInst` (op17/kit-op17b.ts), `pickMixed`/`drive` (m4b/kit-b.ts) and `pickTargets` (st29/kit-st29a.ts) send `done` only if the pending decision is the one they were answering (`stillSameDecision`: same kind, prompt, purpose, source, and remaining min and max reduced by the picks made). Tests that relied on the swallowing now answer the next empty pick explicitly (OP12-015, OP14-116, OP17-085, OP17-092). The EB04-015 Jinbe `it.fails` is a plain test with raw picks; DISAGREEMENTS-a B-1 is closed. `payCost` (op16) and `mayPayHand` (st-b5) only send `done` to a `cost` choose and were left.
+  - B4T-R4: EB04-007 has no colon before "If your opponent has a Character with 8000 power or more", so it is part of the effect: an `if` step, not an activation condition. The Activate is always offered and spends Once Per Turn.
+- **Rejected:** a `setPower` action (a Num reuses `power`, its duration, layers and expiry); clamping to 0 inside the action (the Num floors, so a negative power is left alone); keeping the base-power reading for EB04-052 (one wording, two readings).
+- Goldens re-recorded for the version string only.
+
 ## 2026-11-24 — M6b-2 wave 4: G30 to G38, D6, G14 (b) and two backlog items (ENGINE_VERSION 0.5.15)
 
 - **Context:** wave 4 of the M6b-1 audit (`docs/research/m6b-wave4.md`): Life to the trash, looking at the opponent's deck, "can also attack active Characters", base-power swap, `donGiven`, `winGame`, `damage`, a replacement for being rested, `koed` for the opponent, D6 (an Event creates a replacement), one replacement over two events, and two engine gaps found while scripting (`[DON!! xN] [On K.O.]`, `play` from `self`).

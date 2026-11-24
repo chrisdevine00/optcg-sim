@@ -120,10 +120,10 @@ Full text, proposed readings, source auditor IDs and what `rulings.md`/`rules-di
 - M6b-Q23. EB05-043: K.O.-or-rest then target, as a choose-one.
 - M6b-Q24. OP15-003/010/012/017/023/025/026/028: whose DON!! is given, active or rested.
 - M6b-Q25. OP15-023, OP14-024, EB03-012, EB03-061, OP10-033: do "cards" include DON!! for rest and skip-refresh?
-- M6b-Q26. OP15-073, EB03-010: one card in total or one of each description.
+- M6b-Q26. OP15-073, EB03-010, EB03-042: one card in total or one of each description.
 - M6b-Q27. OP15-014, OP15-046, EB03-031, OP12-041: cost paid and destination when an effect activates an Event.
 - M6b-Q28. Same four: does it count as activating an Event for watchers?
-- M6b-Q29. EB03-003/007/009/039, EB04-052, EB04-010: "no base effect", "same as Leader", "power to 0".
+- M6b-Q29. EB03-003/007/009/039, EB04-052, EB04-010: "no base effect", "same as Leader", "power to 0". *Settled 2026-11-24 (block 4 tail fix round, lead decision; B4T-R1, B4T-R2): "the same as your opponent's Leader" reads the Leader's **current** power (EB04-052 now matches OP16-036 and OP16-055; OP-16-Q2 and the audit's base-power reading are closed); "Set the power of ... to 0" lowers the target's power by its current power at resolution (CR 4-12-1, rules-digest 35; EB04-010 uses `power` with `mul: [{ targetPower: true }, -1]`). ST34-004 says "base power becomes 0", so it stays a base-power set. "No base effect" is unchanged.*
 - M6b-Q30. OP14-021/027/028/032/035/119/070: does attacking, blocking or paying a cost count as becoming rested?
 - M6b-Q31. OP14-045/049/056, OP12-040, ST15-001: does a cost count as "by an effect"? (RD 112 and RL-16 conflict with the auditors) *Cost half settled 2026-11-24 (OP-14 fix round, lead decision): a cost is part of the effect (CR 8-1-1, RD 112), so a card trashed as a cost counts ("trashed from your hand by an effect"); OP14-045/049/056 have `includeCosts: true`. DECISIONS 2026-11-24.*
 - M6b-Q32. OP13-003: given DON!! state and the first player's single placement.
@@ -157,10 +157,12 @@ Full text, proposed readings, source auditor IDs and what `rulings.md`/`rules-di
 - EB-05-V2. EB05-014 Shirahoshi: block 5 (product) or X (Limitless)? Both are Standard-legal now, so play is unaffected; check the printed icon on the official list with V1.
 - Five clear upstream defects were settled on Limitless (EB05-029 and EB05-053 missing [Trigger] text, EB05-057 "If your have", EB05-058 accent, EB05-030 and EB05-040 the ♡ in the name); each override says so.
 - OP-17-V1. OP17-037 name: "Are You That Afraid of the New Era?!" (optcgapi) or "…?!!" (Limitless)? Read on the official list; no script depends on it.
+- M6b-Q56. EB04-013 Carrot "set up to 2 of your {Minks} Characters and your Leader as active": the Leader is always set (scripted, not part of "up to 2") or counts as one of the 2? Both readings agree on the tested cases (block 4 tail review, B4T-R6).
+- M6b-Q57. EB03-021 Alvida: the second placement has no "of your opponent's" and may take one of your own Characters (scripted: sequential picks, the same card cannot fill both). Block 4 tail review, B4T-R6.
 - OP-17-Q1. OP17-007 Kouzuki Oden: does "with 6000 power or less" apply to both "{Land of Wano} type Character card" and "Character card with a type including Whitebeard Pirates", or only the second? Scripted for both (review OP17-R1); a Q&A saying "second only" raises it to severity 3.
 - OP-17-Q2. EB05-052 Gloriosa against a [Double Attack] hit: one "would take damage" for both points (scripted) or one per point (review OP17-R3; joins M6b-Q5 and Q8).
 - OP-16-Q1. OP16-001 Ace Leader: does the "8000 power or more" clause cover the [Monkey.D.Luffy] branch too (audit) or only the Whitebeard branch (scripted)? Review OP16-R2; M6b-Q16.
-- OP-16-Q2. OP16-036 / OP16-055 "the same as your opponent's Leader": current power (scripted) or base power (audit)? Review OP16-R5; M6b-Q29.
+- OP-16-Q2. OP16-036 / OP16-055 "the same as your opponent's Leader": current power (scripted) or base power (audit)? Review OP16-R5; M6b-Q29. *Settled 2026-11-24 (lead decision): current power; see M6b-Q29.*
 
 ## Block 4 verification (2026-11-24, runbook step d.1)
 
