@@ -22,5 +22,5 @@ Details and options: `docs/research/m6b-runtime-audit.md` §3.
 - EB05-R5 (sev 1): EB05-043 asks K.O.-or-rest before checking that any Character is a legal target.
 - EB05-R6 (sev 1): unverified older cards print [Blocker] with `keywords: []` (ST08-006 etc.), so printed-value reads miss it; closed by the Standard-wide Limitless verification run.
 - Test kit: `engine/test/independent/cards/eb05/kit-b.ts` `beginUse` accepts every optional prompt, which can hide a missing "up to" prompt; narrow it before reuse.
-- E-Q11 revisit: `addDon` never offers fewer than N for "up to N" (18 scripts); the rule (CR 4-8-1, rules-digest 15) allows fewer.
+- ~~E-Q11 revisit~~ done 2026-11-24 (`addDon` asks a count).
 

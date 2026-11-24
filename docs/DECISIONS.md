@@ -2,6 +2,10 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-24 — E-Q11 revisited: "add up to N DON!!" asks a count (ENGINE_VERSION 0.5.7)
+
+Context: E-Q11 (2026-10-29, kept at M4b) let `addDon` add the maximum without asking, on the reasoning that more DON!! is never worse and no card needed fewer. The OP-17 review (OP17-R2) disproved it: 38 Standard cards compare your DON!! count with the opponent's ("equal to or less than", "at least N less"), so a forced add can switch your own cards off (OP17-068 or OP17-078 with OP06-061/063/065/069 or EB04-038; two EB05-033 in one turn). Decision: an `addDon` part with `upTo: true` (already on all 20 scripts that use it) asks a count, most first, with "None" last, reusing `giveDon`'s decision (purpose `mode`), so UI, projection, replay and AI needed no change; exact adds and an empty DON!! deck ask nothing; a two-part add asks per part. The count is public. `setActive` stays automatic (no counter-example found). The four `it.fails` that documented E-Q11 now pass; 9 planted tests in `engine/test/cards/m6b-eq11/` (7 fail with the change reverted; 2 guard unchanged behaviour). Pirate and Warlord rollouts take the first option (the most); MCTS can explore fewer; Rookie picks at random, as for every decision. Also: playbook `cite` text quotes types (`"Rocks Pirates"`), so the hidden-name check in explanations cannot match a type that is also a card name. Rejected: keeping E-Q11 (wrong under the rules and now observable); a new DSL field (the scripts already said `upTo`).
+
 ## 2026-11-24 — M6b-2 wave 2: ten more engine gaps (ENGINE_VERSION 0.5.6)
 
 Wave 2 of `docs/research/m6b-runtime-audit.md` §4 (D4 and G11 to G19), built by an agent in a worktree and merged after a full suite run (5,733 unit, 234 e2e); detail and revert results in `docs/research/m6b-wave2.md`; planted tests in `engine/test/cards/m6b-w2/`, each seen to fail with its implementation broken. Goldens re-recorded for the bump; hashes identical.
