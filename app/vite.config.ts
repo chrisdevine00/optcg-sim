@@ -92,6 +92,20 @@ function serviceWorker(): Plugin {
 // GitHub Pages serves the site under /<repo>/.
 export default defineConfig({
   base: '/optcg-sim/',
+  // The e2e build (PINNED_META=1, playwright.config.ts) uses the pinned meta, as the unit tests do,
+  // so a weekly meta PR does not move what the e2e tests expect (M6b-0).
+  ...(process.env.PINNED_META
+    ? {
+        resolve: {
+          alias: [
+            {
+              find: /^(?:\.\.\/)+docs\/research\/meta-lists\.json$/,
+              replacement: resolve(here, '../ai/test/fixtures/meta-lists.pinned.json'),
+            },
+          ],
+        },
+      }
+    : {}),
   plugins: [react(), serviceWorker()],
   worker: { format: 'es' },
   build: {

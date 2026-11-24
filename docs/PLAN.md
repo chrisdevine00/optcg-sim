@@ -86,7 +86,7 @@ Steps, in order:
    - Per-card script hashes in `engine/src/record.ts`, with the golden guard fixed at the same time (closes M4b-17).
    - Lazy per-set script chunks (`cards/effects/<SET>/index.ts` plus a registry of IDs).
    - Per-push card tests cover changed cards only; the full card suite runs nightly.
-   - Pin the strength-test decks to `ai/test/fixtures/strength-decks.json`, so a meta refresh never moves the gates.
+   - Pin the strength-test decks to `ai/test/fixtures/strength-decks.json`, so a meta refresh never moves the gates. (Built as `ai/test/fixtures/meta-lists.pinned.json`, the whole meta file, which every test and the e2e build import instead of the live one; DECISIONS 2026-11-23.)
    - Build `scripts/meta-update.ts` (Limitless API to a candidate `meta-lists.json` plus a per-card play-frequency table). M6b-3's ordering needs it, so it lands here, before any scripting; M6b-5 only wires it into `update.yml`.
 2. **M6b-1, runtime audit of the Standard pool (about 30 h).** `docs/research/m6b-runtime-audit.md`, using the method of `m4b-runtime-audit.md`. It lists the gap IDs, including the known long tail: redirectAttack, activate from hand, deck and loss rules clauses, and Life reorder.
 3. **M6b-2, DSL and engine waves (about 120 h).** 8 to 10 primitives per wave, ordered by pool weight. Each primitive gets a planted test that fails when its implementation is reverted. Bump `ENGINE_VERSION` once per wave.

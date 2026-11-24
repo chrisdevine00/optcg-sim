@@ -189,7 +189,7 @@
 - [x] Tagger port: `npm run cards:measure` / `cards:report`, `cards/data/coverage-report.json`. **Standard coverage 351 of 2,011 (17.5%)**: block 5 31.3%, block 4 17.6%, block 3 17.1%, block 2 (held) 11.2%; 246 unknown legality; backlog 1,660 cards.
 - [x] Per-game scripts version in records (`scriptsVersionOf`; M4b-17 closed as far as it can be; done criterion "an old record stays live after an unrelated card is scripted" has its test).
 - [x] Per-set script chunks (`cards:effects-index`, `loadScripts`, engine refuses unloaded scripts).
-- [x] Test decks pinned (`ai/test/fixtures/strength-decks.json`).
+- [x] Test decks pinned (`ai/test/fixtures/meta-lists.pinned.json`).
 - [x] Per-push card tests for changed cards only (`npm run test:ci`, `cards/scripts/card-tests.ts`; a change to the engine, card data, the loader or a shared kit runs them all); `npm test` in full nightly.
 - [x] Re-baselined (PLAN §1, DECISIONS "M6b-0 re-baseline"): **M6b about 830–880 h without block 2**, plus about 240 h if block 2 survives the rotation (was 1,000–1,100 h).
 

@@ -1,5 +1,14 @@
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { configDefaults, defineConfig } from 'vitest/config';
+
+// Tests run against the pinned meta (M6b-0): a weekly meta PR changes docs/research/meta-lists.json, and
+// the AI's opponent model, lethal certainty and explanations read it. Tests that check the live file
+// itself read it from disk (engine/test/rules/deck-format.test.ts, cards/test/decklist.test.ts).
+export const PINNED_META = {
+  find: /^(?:\.\.\/)+docs\/research\/meta-lists\.json$/,
+  replacement: fileURLToPath(new URL('./ai/test/fixtures/meta-lists.pinned.json', import.meta.url)),
+};
 
 // `npm run test:ci` leaves out the per-card tests of cards a push did not change (M6b-0).
 const skip: string[] = process.env.CARD_TESTS_SKIP
@@ -7,6 +16,7 @@ const skip: string[] = process.env.CARD_TESTS_SKIP
   : [];
 
 export default defineConfig({
+  resolve: { alias: [PINNED_META] },
   test: {
     include: ['{engine,cards,ai,app}/{src,test}/**/*.test.{ts,tsx}'],
     exclude: [...configDefaults.exclude, ...skip],

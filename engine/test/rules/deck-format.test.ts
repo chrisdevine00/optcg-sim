@@ -76,8 +76,11 @@ describe('deckIssues: every meta list (36 at M6; meta:update may change the coun
     for (const a of meta.archetypes) expect(a.lists.length, a.id).toBeLessThanOrEqual(3);
   });
   for (const l of lists)
-    it(`${l.name} is Standard-legal with no issue`, () => {
-      expect(deckIssues(l.deck, all, 'standard')).toEqual([]);
+    it(`${l.name} is Standard-legal (no error; uncited legality is only a warning)`, () => {
+      const issues = deckIssues(l.deck, all, 'standard');
+      expect(issues.filter((i) => i.severity === 'error')).toEqual([]);
+      // The only warning a sourced list may carry: a card whose block no source cites yet (EB-05).
+      expect(issues.every((i) => i.code === 'legalityUnknown')).toBe(true);
     });
 });
 

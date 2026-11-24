@@ -24,7 +24,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `npm run build -w @optcg/app && cd app && npx vite preview --port ${PORT} --strictPort`,
+    // PINNED_META: the e2e build uses the pinned meta lists (app/vite.config.ts).
+    command: `PINNED_META=1 npm run build -w @optcg/app && cd app && npx vite preview --port ${PORT} --strictPort`,
     url: `http://localhost:${PORT}/optcg-sim/`,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
