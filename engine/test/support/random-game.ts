@@ -21,7 +21,7 @@ import {
   scriptsVersionOf,
 } from '../../src/index.ts';
 import { cards } from '../fixtures/index.ts';
-import { metaDecks } from './decks.ts';
+import { metaDecks, standardDecksFor } from './decks.ts';
 
 export const ACTION_CAP = 2000;
 
@@ -36,6 +36,8 @@ export interface RandomGameOptions {
   seed: number;
   /** Indexes into metaDecks(); default chosen from the seed. */
   decks?: [number, number];
+  /** Both seats play random Standard-legal decks drawn from the seed (`standardDecksFor`); `decks` is ignored. */
+  standard?: boolean;
   /** Check invariants after every action (default true). */
   invariants?: boolean;
   policy?: Policy;
@@ -78,19 +80,25 @@ export function pickAction(
 }
 
 export function playRandomGame(opts: RandomGameOptions): RandomGame {
-  const all = metaDecks();
   let rng = seedRng(opts.seed ^ 0x2545f491);
-  let a: number;
-  let b: number;
-  if (opts.decks) [a, b] = opts.decks;
-  else {
-    [a, rng] = nextInt(rng, all.length);
-    [b, rng] = nextInt(rng, all.length);
+  let decks: Record<PlayerId, { leader: string; main: string[] }>;
+  if (opts.standard) {
+    const [da, db] = standardDecksFor(opts.seed);
+    decks = { p1: { leader: da.leader, main: da.main }, p2: { leader: db.leader, main: db.main } };
+  } else {
+    const all = metaDecks();
+    let a: number;
+    let b: number;
+    if (opts.decks) [a, b] = opts.decks;
+    else {
+      [a, rng] = nextInt(rng, all.length);
+      [b, rng] = nextInt(rng, all.length);
+    }
+    decks = {
+      p1: { leader: all[a]!.leader, main: all[a]!.main },
+      p2: { leader: all[b]!.leader, main: all[b]!.main },
+    };
   }
-  const decks: Record<PlayerId, { leader: string; main: string[] }> = {
-    p1: { leader: all[a]!.leader, main: all[a]!.main },
-    p2: { leader: all[b]!.leader, main: all[b]!.main },
-  };
   const setup = { seed: opts.seed, decks };
   const state = createGame({ ...setup, cards: cards() }).state;
   const record: GameRecord = {

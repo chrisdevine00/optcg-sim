@@ -29,7 +29,7 @@ import {
 } from '../../src/index.ts';
 import { internals, withAbilities } from '../../src/testing.ts';
 import { cards } from '../fixtures/index.ts';
-import { metaDecks } from '../support/decks.ts';
+import { metaDecks, standardDecksFor } from '../support/decks.ts';
 import { pickAction } from '../support/random-game.ts';
 
 const PLAYERS: PlayerId[] = ['p1', 'p2'];
@@ -52,16 +52,19 @@ function diffPaths(a: unknown, b: unknown, path = '', out: string[] = []): strin
 type Side = { leader: string; hand: string[]; life: CardPlacement[]; deck: string[] };
 
 /** Two scenarios that differ only in cards hidden from `viewer`. */
-function pair(seed: number, viewer: PlayerId, mode: 'all' | 'life') {
+function pair(seed: number, viewer: PlayerId, mode: 'all' | 'life', standard: boolean) {
   let rng = seedRng(seed);
-  const all = metaDecks();
+  const all = standard ? standardDecksFor(seed) : metaDecks();
   const scripted = all
     .map((d, i) => (d.leader === 'OP17-039' || d.leader === 'OP17-058' ? i : -1))
     .filter((i) => i >= 0);
-  const a = scripted[seed % scripted.length]!;
-  let b: number;
-  [b, rng] = nextInt(rng, all.length);
-  if (seed % 2) b = scripted[(seed >> 1) % scripted.length]!;
+  let a = 0;
+  let b = 1;
+  if (!standard) {
+    a = scripted[seed % scripted.length]!;
+    [b, rng] = nextInt(rng, all.length);
+    if (seed % 2) b = scripted[(seed >> 1) % scripted.length]!;
+  }
   const side = (i: number): Side => {
     let main: string[];
     [main, rng] = shuffle(all[i]!.main, rng);
@@ -120,38 +123,43 @@ function pair(seed: number, viewer: PlayerId, mode: 'all' | 'life') {
   return { A: make(sides.p1, sides.p2), B: make(alt.p1, alt.p2), rng };
 }
 
-describe('search skeletons over reachable pairs (review M5a-02)', () => {
-  for (const mode of ['all', 'life'] as const) {
-    it(`equal views give equal search views (${mode} mode)`, () => {
-      const leaks: string[] = [];
-      let compared = 0;
-      let foreign = 0;
-      for (let seed = 1; seed <= SEEDS; seed++) {
-        for (const viewer of PLAYERS) {
-          let { A, B, rng } = pair(seed, viewer, mode);
-          for (let step = 0; step < 400; step++) {
-            if (JSON.stringify(project(A, viewer)) !== JSON.stringify(project(B, viewer))) break;
-            compared++;
-            if (internals(A).decision && internals(A).decision!.player !== viewer) foreign++;
-            const d = diffPaths(projectForSearch(A, viewer), projectForSearch(B, viewer));
-            if (d.length && leaks.length < 5)
-              leaks.push(`seed ${seed} viewer ${viewer} step ${step}: ${d.join(' | ')}`);
-            const legal = legalActions(A).filter((x) => x.type !== 'concede');
-            if (!legal.length) break;
-            let act: Action;
-            [act, rng] = pickAction(legal, rng);
-            try {
-              A = reduce(A, act).state;
-              B = reduce(B, act).state;
-            } catch {
-              break;
+describe.each([false, true])(
+  'search skeletons over reachable pairs (standard decks: %s)',
+  (standard) => {
+    for (const mode of ['all', 'life'] as const) {
+      it(`equal views give equal search views (${mode} mode)`, () => {
+        const leaks: string[] = [];
+        let compared = 0;
+        let foreign = 0;
+        for (let seed = 1; seed <= SEEDS; seed++) {
+          for (const viewer of PLAYERS) {
+            let { A, B, rng } = pair(seed, viewer, mode, standard);
+            for (let step = 0; step < 400; step++) {
+              if (JSON.stringify(project(A, viewer)) !== JSON.stringify(project(B, viewer))) break;
+              compared++;
+              if (internals(A).decision && internals(A).decision!.player !== viewer) foreign++;
+              const d = diffPaths(projectForSearch(A, viewer), projectForSearch(B, viewer));
+              if (d.length && leaks.length < 5)
+                leaks.push(
+                  `${standard ? 'STANDARD ' : ''}seed ${seed} viewer ${viewer} step ${step}: ${d.join(' | ')}`,
+                );
+              const legal = legalActions(A).filter((x) => x.type !== 'concede');
+              if (!legal.length) break;
+              let act: Action;
+              [act, rng] = pickAction(legal, rng);
+              try {
+                A = reduce(A, act).state;
+                B = reduce(B, act).state;
+              } catch {
+                break;
+              }
             }
           }
         }
-      }
-      expect(compared).toBeGreaterThan(200);
-      expect(foreign).toBeGreaterThan(20);
-      expect(leaks).toEqual([]);
-    }, 600_000);
-  }
-});
+        expect(compared).toBeGreaterThan(200);
+        expect(foreign).toBeGreaterThan(20);
+        expect(leaks).toEqual([]);
+      }, 600_000);
+    }
+  },
+);

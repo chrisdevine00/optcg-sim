@@ -19,9 +19,9 @@ import {
 } from '../../src/index.ts';
 import { internals } from '../../src/testing.ts';
 import { cards } from '../fixtures/index.ts';
-import { metaDecks } from '../support/decks.ts';
+import { metaDecks, standardDecksFor } from '../support/decks.ts';
 import { playRandomGame } from '../support/random-game.ts';
-import { propertySeed } from '../support/seed.ts';
+import { BASE_SEED, propertySeed } from '../support/seed.ts';
 
 /** Total games across the PARTS files; 500 per push, ENGINE_GAMES overrides (nightly 10,000). */
 export const TOTAL_GAMES = Number(process.env.ENGINE_GAMES ?? 500);
@@ -85,8 +85,15 @@ function candidates(s: GameState, rnd: () => number): Action[] {
   return out;
 }
 
-export function runGames(part: number, tally: Tally): void {
-  const runs = Math.ceil(TOTAL_GAMES / PARTS);
+export interface RunOptions {
+  /** Both seats play random Standard-legal decks (`standardDecksFor`) instead of the meta lists. */
+  standard?: boolean;
+  /** Games to play (default: this part's share of TOTAL_GAMES). */
+  runs?: number;
+}
+
+export function runGames(part: number, tally: Tally, options: RunOptions = {}): void {
+  const runs = options.runs ?? Math.ceil(TOTAL_GAMES / PARTS);
   const decks = metaDecks().length;
   fc.assert(
     fc.property(
@@ -94,64 +101,78 @@ export function runGames(part: number, tally: Tally): void {
       fc.integer({ min: 0, max: decks - 1 }),
       fc.integer({ min: 0, max: decks - 1 }),
       (seed, a, b) => {
-        let n = 0;
-        let x = seed;
-        const rnd = (): number => {
-          x = (Math.imul(x ^ (x >>> 15), 2246822507) + 0x9e3779b9) >>> 0;
-          return x / 4294967296;
-        };
-        const game = playRandomGame({
-          seed,
-          decks: [a, b],
-          // One game in five plays passively, so deck-out is exercised too.
-          policy: seed % 5 === 0 ? 'passive' : 'random',
-          onStep: (before, _action, _after, legal) => {
-            n++;
-            const listed = new Set(legal.map(key));
-            // Every listed action reduces (all of them on every 8th state, else 1 sampled).
-            const sample = n % 8 === 0 ? legal : [legal[Math.floor(rnd() * legal.length)]!];
-            for (const act of sample) {
-              reduce(before, act);
-              tally.listedReduced++;
-            }
-            // Sampled unlisted actions throw, and whyNot agrees with the list (every 4th state).
-            if (n % 4 !== 1) return;
-            for (const act of candidates(before, rnd)) {
-              const { player, intentId: _i, ...intent } = act;
-              const reason = whyNot(before, player, intent);
-              if (listed.has(key(act))) {
-                if (reason !== null)
-                  throw new Error(`whyNot rejects a listed action: ${reason.text}`);
-                continue;
-              }
-              // Concession by the non-decider is legal but not listed (CR 1-2-3).
-              if (act.type === 'concede') continue;
-              if (reason === null)
-                throw new Error(`whyNot accepts an unlisted action ${JSON.stringify(act)}`);
-              let threw = false;
-              try {
-                reduce(before, act);
-              } catch (e) {
-                threw = e instanceof IllegalAction;
-              }
-              if (!threw)
-                throw new Error(`reduce accepted an unlisted action ${JSON.stringify(act)}`);
-              tally.unlistedThrew++;
-            }
-          },
-        });
-        // Replay reproduces the live hash.
-        const replayed = replay(game.record, cards());
-        expect(summaryHash(replayed.state)).toBe(summaryHash(game.final));
-        expect(legalActions(game.final).filter((x) => x.type !== 'concede')).toEqual([]);
-        tally.games++;
-        tally.actions += game.record.actions.length;
-        if (game.capped) tally.capped++;
-        const r = internals(game.final).result;
-        const k = !r ? 'capped' : 'winner' in r ? r.reason : r.draw;
-        tally.results[k] = (tally.results[k] ?? 0) + 1;
+        try {
+          playOne(seed, a, b);
+        } catch (e) {
+          if (options.standard) {
+            const [da, db] = standardDecksFor(seed);
+            console.error(
+              `[standard-games] FAILED seed=${seed} (PROPERTY_SEED=${BASE_SEED}, part ${part})\n` +
+                `p1 ${da.leader}: ${da.main.join(',')}\np2 ${db.leader}: ${db.main.join(',')}`,
+            );
+          }
+          throw e;
+        }
       },
     ),
     { numRuns: runs, seed: propertySeed(part), endOnFailure: true },
   );
+
+  function playOne(seed: number, a: number, b: number): void {
+    let n = 0;
+    let x = seed;
+    const rnd = (): number => {
+      x = (Math.imul(x ^ (x >>> 15), 2246822507) + 0x9e3779b9) >>> 0;
+      return x / 4294967296;
+    };
+    const game = playRandomGame({
+      seed,
+      decks: [a, b],
+      standard: options.standard,
+      // One game in five plays passively, so deck-out is exercised too.
+      policy: seed % 5 === 0 ? 'passive' : 'random',
+      onStep: (before, _action, _after, legal) => {
+        n++;
+        const listed = new Set(legal.map(key));
+        // Every listed action reduces (all of them on every 8th state, else 1 sampled).
+        const sample = n % 8 === 0 ? legal : [legal[Math.floor(rnd() * legal.length)]!];
+        for (const act of sample) {
+          reduce(before, act);
+          tally.listedReduced++;
+        }
+        // Sampled unlisted actions throw, and whyNot agrees with the list (every 4th state).
+        if (n % 4 !== 1) return;
+        for (const act of candidates(before, rnd)) {
+          const { player, intentId: _i, ...intent } = act;
+          const reason = whyNot(before, player, intent);
+          if (listed.has(key(act))) {
+            if (reason !== null) throw new Error(`whyNot rejects a listed action: ${reason.text}`);
+            continue;
+          }
+          // Concession by the non-decider is legal but not listed (CR 1-2-3).
+          if (act.type === 'concede') continue;
+          if (reason === null)
+            throw new Error(`whyNot accepts an unlisted action ${JSON.stringify(act)}`);
+          let threw = false;
+          try {
+            reduce(before, act);
+          } catch (e) {
+            threw = e instanceof IllegalAction;
+          }
+          if (!threw) throw new Error(`reduce accepted an unlisted action ${JSON.stringify(act)}`);
+          tally.unlistedThrew++;
+        }
+      },
+    });
+    // Replay reproduces the live hash.
+    const replayed = replay(game.record, cards());
+    expect(summaryHash(replayed.state)).toBe(summaryHash(game.final));
+    expect(legalActions(game.final).filter((x) => x.type !== 'concede')).toEqual([]);
+    tally.games++;
+    tally.actions += game.record.actions.length;
+    if (game.capped) tally.capped++;
+    const r = internals(game.final).result;
+    const k = !r ? 'capped' : 'winner' in r ? r.reason : r.draw;
+    tally.results[k] = (tally.results[k] ?? 0) + 1;
+  }
 }
