@@ -42,10 +42,12 @@ import { EB04_040 } from './EB04-040.ts';
 import { EB04_041 } from './EB04-041.ts';
 import { EB04_042 } from './EB04-042.ts';
 import { EB04_043 } from './EB04-043.ts';
+import { EB04_044 } from './EB04-044.ts';
 import { EB04_045 } from './EB04-045.ts';
 import { EB04_046 } from './EB04-046.ts';
 import { EB04_047 } from './EB04-047.ts';
 import { EB04_049 } from './EB04-049.ts';
+import { EB04_050 } from './EB04-050.ts';
 import { EB04_051 } from './EB04-051.ts';
 import { EB04_052 } from './EB04-052.ts';
 import { EB04_053 } from './EB04-053.ts';
@@ -101,10 +103,12 @@ const SET: readonly CardScript[] = [
   EB04_041,
   EB04_042,
   EB04_043,
+  EB04_044,
   EB04_045,
   EB04_046,
   EB04_047,
   EB04_049,
+  EB04_050,
   EB04_051,
   EB04_052,
   EB04_053,
