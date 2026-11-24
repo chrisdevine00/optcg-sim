@@ -125,7 +125,7 @@ Full text, proposed readings, source auditor IDs and what `rulings.md`/`rules-di
 - M6b-Q28. Same four: does it count as activating an Event for watchers?
 - M6b-Q29. EB03-003/007/009/039, EB04-052, EB04-010: "no base effect", "same as Leader", "power to 0".
 - M6b-Q30. OP14-021/027/028/032/035/119/070: does attacking, blocking or paying a cost count as becoming rested?
-- M6b-Q31. OP14-045/049/056, OP12-040, ST15-001: does a cost count as "by an effect"? (RD 112 and RL-16 conflict with the auditors) *Cost half settled 2026-11-24 (OP-14 fix round, owner decision): a cost is part of the effect (CR 8-1-1, RD 112), so a card trashed as a cost counts ("trashed from your hand by an effect"); OP14-045/049/056 have `includeCosts: true`. DECISIONS 2026-11-24.*
+- M6b-Q31. OP14-045/049/056, OP12-040, ST15-001: does a cost count as "by an effect"? (RD 112 and RL-16 conflict with the auditors) *Cost half settled 2026-11-24 (OP-14 fix round, lead decision): a cost is part of the effect (CR 8-1-1, RD 112), so a card trashed as a cost counts ("trashed from your hand by an effect"); OP14-045/049/056 have `includeCosts: true`. DECISIONS 2026-11-24.*
 - M6b-Q32. OP13-003: given DON!! state and the first player's single placement.
 - M6b-Q33. OP13-028: `cannotPlay` has no hand-only scope.
 - M6b-Q34. OP13-066: when is the DON!! added, when set active.
