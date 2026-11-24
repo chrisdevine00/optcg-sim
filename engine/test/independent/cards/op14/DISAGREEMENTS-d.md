@@ -1,9 +1,11 @@
 # Disagreements: OP-14 independent tests, group D (OP14-087 to OP14-120, 21 cards)
 
-Each entry has an `it.fails` in the card's test file, so the suite stays green while the question is
+Each open entry has an `it.fails` in the card's test file, so the suite stays green while the question is
 open. When it is settled, fix the engine and drop `it.fails`, or change the test and delete the entry.
 
-## D-1. OP14-116 Salamander: "play up to 1 ... from your hand" is skipped when the hand holds no qualifying card (severity 4)
+> Resolved: the engine asks the play pick at max 0 (probe: `choose`, max 0, 0 candidates). `pickInst`/`choose` in `kit.ts` answers a following empty `choose` with `done` when the first pick reaches its max, which looked like a skip. The test now picks raw and passes (`it`). Planted engine tests: `engine/test/cards/empty-pick-hidden.test.ts`.
+
+## D-1 (RESOLVED, a test-helper artifact; the engine asks the empty pick). OP14-116 Salamander: "play up to 1 ... from your hand" is skipped when the hand holds no qualifying card (severity 4)
 
 - **Card text:** "[Counter] Up to 1 of your Leader or Character cards gains +2000 power during this
   battle. Then, play up to 1 {Amazon Lily} or {Kuja Pirates} type Character card with a cost of 4 or

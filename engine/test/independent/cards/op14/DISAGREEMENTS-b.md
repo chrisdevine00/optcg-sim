@@ -4,7 +4,7 @@ Cards: OP14-035, 036, 037, 038, 039, 040, 042, 043, 044, 045, 046, 047, 048, 049
 
 One disagreement (an `it.fails` in the card's test file).
 
-1. **OP14-052 Hannyabal, [On Play] "You may trash 3 cards from your hand: Play up to 1 {Impel Down} type Character card with a cost of 6 or less from your hand." The play pick is not asked when no card left in hand qualifies.**
+1. **RESOLVED (test-helper artifact, no engine skip): the pick is asked at max 0; `payHand` answered it with `done` once the 3 cost cards were picked. The test now picks raw and passes (`it`). Original report:** OP14-052 Hannyabal, [On Play] "You may trash 3 cards from your hand: Play up to 1 {Impel Down} type Character card with a cost of 6 or less from your hand." The play pick is not asked when no card left in hand qualifies.**
    After paying the cost with a hand that leaves only a non-{Impel Down} card (Marco), the engine goes straight back to the Main Phase. When a qualifying card exists the pick is asked, and the same "play up to 1 ... from your hand" shape is asked with 0 candidates on OP14-043, OP14-047 and OP14-058. A missing prompt tells the opponent that the remaining hand holds no {Impel Down} card of cost 6 or less, so a prompt depends on hidden cards (severity 4 by the brief). Test: `OP14-052.test.ts`, "with no {Impel Down} card to play after paying, the pick is still asked ...". Expected: a `choose` with no candidates and `done` available.
 
 Readings the tests assume, so the review can check them:
