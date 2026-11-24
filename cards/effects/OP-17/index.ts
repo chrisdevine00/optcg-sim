@@ -21,26 +21,45 @@ import { OP17_021 } from './OP17-021.ts';
 import { OP17_022 } from './OP17-022.ts';
 import { OP17_023 } from './OP17-023.ts';
 import { OP17_024 } from './OP17-024.ts';
+import { OP17_025 } from './OP17-025.ts';
+import { OP17_026 } from './OP17-026.ts';
+import { OP17_027 } from './OP17-027.ts';
+import { OP17_028 } from './OP17-028.ts';
+import { OP17_029 } from './OP17-029.ts';
+import { OP17_030 } from './OP17-030.ts';
+import { OP17_031 } from './OP17-031.ts';
+import { OP17_032 } from './OP17-032.ts';
+import { OP17_033 } from './OP17-033.ts';
+import { OP17_034 } from './OP17-034.ts';
+import { OP17_036 } from './OP17-036.ts';
+import { OP17_037 } from './OP17-037.ts';
+import { OP17_038 } from './OP17-038.ts';
 import { OP17_039 } from './OP17-039.ts';
 import { OP17_040 } from './OP17-040.ts';
+import { OP17_041 } from './OP17-041.ts';
 import { OP17_042 } from './OP17-042.ts';
 import { OP17_044 } from './OP17-044.ts';
 import { OP17_045 } from './OP17-045.ts';
 import { OP17_046 } from './OP17-046.ts';
+import { OP17_047 } from './OP17-047.ts';
 import { OP17_048 } from './OP17-048.ts';
 import { OP17_049 } from './OP17-049.ts';
 import { OP17_050 } from './OP17-050.ts';
 import { OP17_052 } from './OP17-052.ts';
+import { OP17_053 } from './OP17-053.ts';
 import { OP17_054 } from './OP17-054.ts';
 import { OP17_055 } from './OP17-055.ts';
 import { OP17_056 } from './OP17-056.ts';
+import { OP17_057 } from './OP17-057.ts';
 import { OP17_058 } from './OP17-058.ts';
 import { OP17_059 } from './OP17-059.ts';
 import { OP17_060 } from './OP17-060.ts';
 import { OP17_061 } from './OP17-061.ts';
 import { OP17_062 } from './OP17-062.ts';
 import { OP17_063 } from './OP17-063.ts';
+import { OP17_064 } from './OP17-064.ts';
 import { OP17_065 } from './OP17-065.ts';
+import { OP17_066 } from './OP17-066.ts';
 import { OP17_073 } from './OP17-073.ts';
 import { OP17_074 } from './OP17-074.ts';
 import { OP17_075 } from './OP17-075.ts';
@@ -96,26 +115,45 @@ const SET: readonly CardScript[] = [
   OP17_022,
   OP17_023,
   OP17_024,
+  OP17_025,
+  OP17_026,
+  OP17_027,
+  OP17_028,
+  OP17_029,
+  OP17_030,
+  OP17_031,
+  OP17_032,
+  OP17_033,
+  OP17_034,
+  OP17_036,
+  OP17_037,
+  OP17_038,
   OP17_039,
   OP17_040,
+  OP17_041,
   OP17_042,
   OP17_044,
   OP17_045,
   OP17_046,
+  OP17_047,
   OP17_048,
   OP17_049,
   OP17_050,
   OP17_052,
+  OP17_053,
   OP17_054,
   OP17_055,
   OP17_056,
+  OP17_057,
   OP17_058,
   OP17_059,
   OP17_060,
   OP17_061,
   OP17_062,
   OP17_063,
+  OP17_064,
   OP17_065,
+  OP17_066,
   OP17_073,
   OP17_074,
   OP17_075,
