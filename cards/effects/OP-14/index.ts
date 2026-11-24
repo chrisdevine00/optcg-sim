@@ -72,14 +72,35 @@ import { OP14_083 } from './OP14-083.ts';
 import { OP14_084 } from './OP14-084.ts';
 import { OP14_085 } from './OP14-085.ts';
 import { OP14_086 } from './OP14-086.ts';
+import { OP14_087 } from './OP14-087.ts';
+import { OP14_088 } from './OP14-088.ts';
+import { OP14_089 } from './OP14-089.ts';
+import { OP14_090 } from './OP14-090.ts';
+import { OP14_091 } from './OP14-091.ts';
+import { OP14_092 } from './OP14-092.ts';
+import { OP14_093 } from './OP14-093.ts';
 import { OP14_096 } from './OP14-096.ts';
+import { OP14_097 } from './OP14-097.ts';
+import { OP14_098 } from './OP14-098.ts';
+import { OP14_099 } from './OP14-099.ts';
+import { OP14_100 } from './OP14-100.ts';
+import { OP14_102 } from './OP14-102.ts';
 import { OP14_104 } from './OP14-104.ts';
 import { OP14_105 } from './OP14-105.ts';
+import { OP14_106 } from './OP14-106.ts';
 import { OP14_107 } from './OP14-107.ts';
 import { OP14_108 } from './OP14-108.ts';
+import { OP14_109 } from './OP14-109.ts';
+import { OP14_110 } from './OP14-110.ts';
+import { OP14_111 } from './OP14-111.ts';
 import { OP14_112 } from './OP14-112.ts';
+import { OP14_113 } from './OP14-113.ts';
 import { OP14_114 } from './OP14-114.ts';
+import { OP14_116 } from './OP14-116.ts';
+import { OP14_117 } from './OP14-117.ts';
 import { OP14_118 } from './OP14-118.ts';
+import { OP14_119 } from './OP14-119.ts';
+import { OP14_120 } from './OP14-120.ts';
 
 const SET: readonly CardScript[] = [
   OP14_002,
@@ -154,13 +175,34 @@ const SET: readonly CardScript[] = [
   OP14_084,
   OP14_085,
   OP14_086,
+  OP14_087,
+  OP14_088,
+  OP14_089,
+  OP14_090,
+  OP14_091,
+  OP14_092,
+  OP14_093,
   OP14_096,
+  OP14_097,
+  OP14_098,
+  OP14_099,
+  OP14_100,
+  OP14_102,
   OP14_104,
   OP14_105,
+  OP14_106,
   OP14_107,
   OP14_108,
+  OP14_109,
+  OP14_110,
+  OP14_111,
   OP14_112,
+  OP14_113,
   OP14_114,
+  OP14_116,
+  OP14_117,
   OP14_118,
+  OP14_119,
+  OP14_120,
 ];
 export default SET;
