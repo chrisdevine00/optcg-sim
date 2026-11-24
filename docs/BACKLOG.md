@@ -17,3 +17,10 @@ Ordered by value (PROMPT.md "After M10"). Items carried from closed milestones c
 - D7 a battle watcher registered by an Activate effect, OP12-020.
 Details and options: `docs/research/m6b-runtime-audit.md` §3.
 
+## 4. EB-05 review nits (docs/reviews/m6b-EB-05.md)
+
+- EB05-R5 (sev 1): EB05-043 asks K.O.-or-rest before checking that any Character is a legal target.
+- EB05-R6 (sev 1): unverified older cards print [Blocker] with `keywords: []` (ST08-006 etc.), so printed-value reads miss it; closed by the Standard-wide Limitless verification run.
+- Test kit: `engine/test/independent/cards/eb05/kit-b.ts` `beginUse` accepts every optional prompt, which can hide a missing "up to" prompt; narrow it before reuse.
+- E-Q11 revisit: `addDon` never offers fewer than N for "up to N" (18 scripts); the rule (CR 4-8-1, rules-digest 15) allows fewer.
+

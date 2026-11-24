@@ -38,9 +38,6 @@ export const EB05_013: CardScript = {
                     },
                   ],
                 },
-                pick: {
-                  upTo: 1,
-                },
               },
               amount: 2000,
               duration: 'battle',
@@ -51,6 +48,7 @@ export const EB05_013: CardScript = {
     },
   ],
   rulings: [
+    'review EB05-R1: no "up to" in the text, so the Leader boost is mandatory (no pick: every matching Leader, i.e. yours)',
     'reading: the type check is on the target, so with a Leader of neither type the cost can still be paid and nothing happens (the printed text has no "if")',
   ],
 };

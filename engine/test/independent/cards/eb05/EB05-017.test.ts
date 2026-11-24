@@ -76,16 +76,13 @@ describe('EB05-017 Mermaid Cafe Dancers: [On Your Opponent’s Attack] rest 1 DO
   });
 
   // DISAGREEMENTS-a.md EB05-017 (same shape as EB05-013): the Leader is not an "up to" target.
-  it.fails(
-    'the Leader boost has no "up to": after paying, the player cannot choose to skip it',
-    () => {
-      const g = defending(EL.fishMan);
-      attack(g, g.leader('p2'), g.leader('p1'));
-      accept(g);
-      payDon(g, 1);
-      expect(g.legal().some((a) => a.type === 'done')).toBe(false);
-    },
-  );
+  it('the Leader boost has no "up to": after paying, the player cannot choose to skip it', () => {
+    const g = defending(EL.fishMan);
+    attack(g, g.leader('p2'), g.leader('p1'));
+    accept(g);
+    payDon(g, 1);
+    expect(g.legal().some((a) => a.type === 'done')).toBe(false);
+  });
 
   it('CR 8-3-1-4: declining pays nothing: Dancers stays and the Leader is not boosted', () => {
     const g = defending(EL.fishMan);

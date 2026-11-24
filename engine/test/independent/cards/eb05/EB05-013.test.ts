@@ -96,17 +96,14 @@ describe('EB05-013 Shirley: [On Your Opponent’s Attack] [Once Per Turn] rest 1
     expect(g.power(g.leader('p1'))).toBe(7000);
   });
 
-  // DISAGREEMENTS-a.md EB05-013: the Leader is not an "up to" target.
-  it.fails(
-    'the Leader boost has no "up to": after paying, the player cannot choose to skip it',
-    () => {
-      const g = defending(EL.fishMan);
-      toLeader(g);
-      accept(g);
-      payDon(g, 1);
-      expect(g.legal().some((a) => a.type === 'done')).toBe(false);
-    },
-  );
+  // DISAGREEMENTS-a.md EB05-013, settled by review EB05-R1: the Leader is not an "up to" target.
+  it('the Leader boost has no "up to": after paying, the player cannot choose to skip it', () => {
+    const g = defending(EL.fishMan);
+    toLeader(g);
+    accept(g);
+    payDon(g, 1);
+    expect(g.legal().some((a) => a.type === 'done')).toBe(false);
+  });
 
   it('CR 8-3-1-4: declining the cost rests no DON!! and gives no boost', () => {
     const g = defending(EL.fishMan);

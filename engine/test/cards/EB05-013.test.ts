@@ -11,7 +11,6 @@ import {
   game,
   passBlock,
   payDon,
-  pick,
   PLAIN_BLUE,
   PLAIN_PURPLE,
   takeDamage,
@@ -40,7 +39,7 @@ describe('EB05-013 Shirley', () => {
     expectDecision(g, 'optional', 'p1');
     accept(g);
     payDon(g);
-    pick(g, [g.leader('p1')]);
+    // No pick: the boost is mandatory (review EB05-R1).
     expect(don(g, 'p1').active).toBe(1);
     expect(don(g, 'p1').rested).toBe(1);
     passBlock(g);
@@ -54,7 +53,7 @@ describe('EB05-013 Shirley', () => {
     const g = attack({ leader: FISHMAN });
     accept(g);
     payDon(g);
-    pick(g, [g.leader('p1')]);
+    // No pick: the boost is mandatory (review EB05-R1).
     passBlock(g);
     expect(g.power(g.leader('p1'))).toBe(7000);
   });
@@ -83,7 +82,7 @@ describe('EB05-013 Shirley', () => {
     const g = attack({ leader: MERFOLK, life: [V.c1, V.c1, V.c1, V.c1] }, 2);
     accept(g);
     payDon(g);
-    pick(g, [g.leader('p1')]);
+    // No pick: the boost is mandatory (review EB05-R1).
     passBlock(g);
     endCounter(g);
     const second = g.find('p2', 'characters', V.c4, 1);

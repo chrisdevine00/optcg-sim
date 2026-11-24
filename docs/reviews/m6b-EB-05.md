@@ -99,3 +99,13 @@ Decks (built by script from the verified data, Standard-legal, 50 cards, at most
 
 - Author-test and independent-test counts match the scripts (53 each); the only `it.fails` are the five disagreement tests (013, 017, 033, 036, 060).
 - `EB05-016`'s `[Your Turn]` condition is untestable through [On Play] on the opponent's turn (API-GAPS-a); low risk.
+
+## Fix round (2026-11-24)
+
+- **EB05-R1 fixed:** EB05-013 and EB05-017 no longer pick the Leader (the boost is mandatory); author tests updated; independent tests A-1 and A-2 now pass as `it`.
+- **EB05-R4 fixed:** the EB05-060 independent test accepts only the cost and explores the effect's own "add up to 1" prompt; now `it`. The kit's `beginUse` still accepts every optional prompt: noted in docs/BACKLOG.md, to be narrowed before it is reused for another batch.
+- **EB05-R2:** no change; `addDon` "up to" stays the recorded E-Q11 decision (18 scripts), the two `it.fails` document it.
+- **EB05-R3:** no change; EB05-061 stays on the opponent-effect reading until M6b-Q7 has a ruling.
+- **EB05-R5, EB05-R6:** severity 1, to docs/BACKLOG.md.
+
+Batch merged to main after the fix round (runbook step h).

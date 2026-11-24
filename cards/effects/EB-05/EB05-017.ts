@@ -40,9 +40,6 @@ export const EB05_017: CardScript = {
                     },
                   ],
                 },
-                pick: {
-                  upTo: 1,
-                },
               },
               amount: 4000,
               duration: 'battle',

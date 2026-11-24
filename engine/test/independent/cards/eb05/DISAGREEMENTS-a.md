@@ -29,3 +29,9 @@ right.
 - **Expected / Engine / Source:** as A-1. Here the skip is more visible: both halves of the cost (the
   rested DON!! and the trashed Dancers) are already paid when the player can still pick nothing.
 - **Confidence:** medium.
+
+## Settled by the review (docs/reviews/m6b-EB-05.md, fix round 2026-11-24)
+
+- A-1, A-2 (EB05-013, EB05-017): the independent author was right (no "up to"); scripts fixed, tests now `it`.
+- B-1 (EB05-033, EB05-036): right on the rule; the engine's `addDon` always adds the full amount by a recorded decision (OPEN-QUESTIONS E-Q11). Kept as `it.fails` until E-Q11 is revisited.
+- B-2 (EB05-060): the test was wrong (the kit's `beginUse` accepted the effect's own prompt); fixed, now `it`.

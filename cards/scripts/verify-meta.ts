@@ -92,6 +92,8 @@ async function main() {
   const ids = set
     ? [...(await pipeline({ refresh: false, log: () => {} })).cards.values()]
         .filter((c) => c.set === set)
+        // Verification matters for play: Standard cards only (block 1 reprints stay as they are).
+        .filter((c) => ['legal', 'restricted', 'unknown'].includes(c.legality.standard.status))
         .map((c) => c.id)
         .sort()
     : metaIds(JSON.parse(readFileSync(join(ROOT, 'docs/research/meta-lists.json'), 'utf8')));

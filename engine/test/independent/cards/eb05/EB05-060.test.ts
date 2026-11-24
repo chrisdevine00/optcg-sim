@@ -12,6 +12,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { attack, passBlock, passCounter } from '../../helpers.ts';
+import { accept } from '../kit.ts';
 import {
   BLUE,
   beginUse,
@@ -79,27 +80,21 @@ describe('EB05-060 Take Care of Lilith!!! [Main]: trash an {Egghead} Character (
     expect(g.life('p1')).toBe(2);
   });
 
-  // DISAGREEMENT B-2: after the cost the engine always adds the card (only 0/3 is reachable); "up to 1" allows none (RD 15). EB05-055 offers the choice.
-  it.fails(
-    '"up to 1": after paying, adding no card is allowed (the Character is still trashed)',
-    () => {
-      const g = mine(LD.vegapunk, {
-        hand: [ID],
-        characters: [CH.shaka],
-        deck: DECK,
-        life: fill(RED, 2),
-      });
-      g.act({ type: 'playCard', card: g.find('p1', 'hand', ID) });
-      beginUse(g);
-      const lives = outcomes(
-        g,
-        'p1',
-        (x) => `${x.zone('p1', 'characters').length}/${x.life('p1')}`,
-      );
-      expect(lives.has('0/2')).toBe(true);
-      expect(lives.has('0/3')).toBe(true);
-    },
-  );
+  // DISAGREEMENT B-2, settled by review EB05-R4: the engine does ask "add up to 1"; the test kit's
+  // beginUse accepted that prompt too. Accept only the cost here and explore the rest.
+  it('"up to 1": after paying, adding no card is allowed (the Character is still trashed)', () => {
+    const g = mine(LD.vegapunk, {
+      hand: [ID],
+      characters: [CH.shaka],
+      deck: DECK,
+      life: fill(RED, 2),
+    });
+    g.act({ type: 'playCard', card: g.find('p1', 'hand', ID) });
+    accept(g); // the optional cost only; the effect's own prompt is explored below
+    const lives = outcomes(g, 'p1', (x) => `${x.zone('p1', 'characters').length}/${x.life('p1')}`);
+    expect(lives.has('0/2')).toBe(true);
+    expect(lives.has('0/3')).toBe(true);
+  });
 
   it('the cost is a trash, not a K.O.: Shaka goes to the trash from the field', () => {
     const g = main([CH.shaka], true, CH.shaka);

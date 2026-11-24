@@ -11,7 +11,6 @@ import {
   game,
   passBlock,
   payDon,
-  pick,
   PLAIN_BLUE,
   PLAIN_PURPLE,
   takeDamage,
@@ -41,7 +40,7 @@ describe('EB05-017 Mermaid Cafe Dancers', () => {
     expectDecision(g, 'optional', 'p1');
     accept(g);
     payDon(g);
-    pick(g, [g.leader('p1')]);
+    // No pick: the boost is mandatory (review EB05-R1).
     expect(trash(g, 'p1')).toEqual([ID]);
     expect(g.zone('p1', 'characters')).toHaveLength(0);
     expect(don(g, 'p1').rested).toBe(1);
@@ -56,7 +55,7 @@ describe('EB05-017 Mermaid Cafe Dancers', () => {
     const g = attack({ leader: FISHMAN });
     accept(g);
     payDon(g);
-    pick(g, [g.leader('p1')]);
+    // No pick: the boost is mandatory (review EB05-R1).
     passBlock(g);
     expect(g.power(g.leader('p1'))).toBe(9000);
   });
