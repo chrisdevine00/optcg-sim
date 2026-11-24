@@ -3,8 +3,29 @@ import type { CardScript } from '../../src/dsl.ts';
 import { OP13_001 } from './OP13-001.ts';
 import { OP13_004 } from './OP13-004.ts';
 import { OP13_027 } from './OP13-027.ts';
+import { OP13_032 } from './OP13-032.ts';
+import { OP13_033 } from './OP13-033.ts';
+import { OP13_034 } from './OP13-034.ts';
+import { OP13_035 } from './OP13-035.ts';
 import { OP13_037 } from './OP13-037.ts';
+import { OP13_038 } from './OP13-038.ts';
+import { OP13_039 } from './OP13-039.ts';
 import { OP13_040 } from './OP13-040.ts';
+import { OP13_041 } from './OP13-041.ts';
+import { OP13_042 } from './OP13-042.ts';
+import { OP13_043 } from './OP13-043.ts';
+import { OP13_044 } from './OP13-044.ts';
+import { OP13_045 } from './OP13-045.ts';
+import { OP13_047 } from './OP13-047.ts';
+import { OP13_050 } from './OP13-050.ts';
+import { OP13_051 } from './OP13-051.ts';
+import { OP13_052 } from './OP13-052.ts';
+import { OP13_053 } from './OP13-053.ts';
+import { OP13_054 } from './OP13-054.ts';
+import { OP13_055 } from './OP13-055.ts';
+import { OP13_056 } from './OP13-056.ts';
+import { OP13_057 } from './OP13-057.ts';
+import { OP13_058 } from './OP13-058.ts';
 import { OP13_076 } from './OP13-076.ts';
 import { OP13_113 } from './OP13-113.ts';
 import { OP13_118 } from './OP13-118.ts';
@@ -13,8 +34,29 @@ const SET: readonly CardScript[] = [
   OP13_001,
   OP13_004,
   OP13_027,
+  OP13_032,
+  OP13_033,
+  OP13_034,
+  OP13_035,
   OP13_037,
+  OP13_038,
+  OP13_039,
   OP13_040,
+  OP13_041,
+  OP13_042,
+  OP13_043,
+  OP13_044,
+  OP13_045,
+  OP13_047,
+  OP13_050,
+  OP13_051,
+  OP13_052,
+  OP13_053,
+  OP13_054,
+  OP13_055,
+  OP13_056,
+  OP13_057,
+  OP13_058,
   OP13_076,
   OP13_113,
   OP13_118,
