@@ -142,6 +142,8 @@ Full text, proposed readings, source auditor IDs and what `rulings.md`/`rules-di
 - M6b-Q45. OP14-065, OP16-074, OP15-059: "your opponent returns N DON!! cards" when they have fewer (as many as they have, built), and OP15-059's "may return 1 of their active DON!!" when they have none active (they cannot return one; not yet decided how the offer reads). The owner chooses which classes (RL, QA-OP16 OP16-074).
 - M6b-Q46. OP12-040, OP14-045/049/056: "a card is trashed from your hand by an effect": one event per trash instruction (built) or per effect resolution (an effect with two trash steps)? Joins Q31 (costs).
 - M6b-Q47. EB04-016, OP10-030: "you cannot set DON!! cards as active using Character effects": built as a restriction on the DON!!'s owner against any Character effect, either player's; no ruling on whose Character effect.
+- M6b-Q48. OP15-024 Usopp [On K.O.]: "rest up to 1 of your opponent's Leader or Character cards with a cost of 7 or less": a Leader has no cost. Built: the cost limit restricts the Characters only and the opposing Leader is always eligible (review OP15-R4, fixed in the OP-15 fix round). The other reading (a Leader never matches a cost filter) was the first script. Look for an official Q&A.
+- M6b-Q49. OP15-098 Monkey.D.Luffy (Leader): "would be removed from the field by your opponent" has no "effect": does a battle K.O. also trigger the Life-to-hand replacement? Built: opponent's effects only, as EB05-061 and OP15-035/069 (joins M6b-Q7; review OP15-R3). A Leader of this shape matters most in battle, so check the official card text and Q&A first.
 
 ## EB-05 verification (2026-11-24, runbook step d.1)
 

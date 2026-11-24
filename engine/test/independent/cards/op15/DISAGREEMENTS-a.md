@@ -4,5 +4,10 @@ Each entry is an `it.fails` in the card's independent test. Severity as in the r
 
 | # | Card | Test | Card text / rule | Engine behaviour | Severity |
 | --- | --- | --- | --- | --- | --- |
-| A-1 | OP15-013 Pincers | `boundary: Leader at exactly 0 power ... gives cost 2` | "If your Leader has 0 power or less, give this card in your hand -2 cost." True at exactly 0. | With the Leader at 0 power (OP13-004 Sabo 4000, two OP15-009 Koby replacements) the hand card still costs 4; at -2000 it costs 2. The condition behaves as "less than 0". The same threshold would also decide OP15-004 Sea Cat's "0 power or less" (not reachable in a test, see API-GAPS-a.md G1). | 2 |
+| A-1 (fixed) | OP15-013 Pincers | `boundary: Leader at exactly 0 power ... gives cost 2` | "If your Leader has 0 power or less, give this card in your hand -2 cost." True at exactly 0. | With the Leader at 0 power (OP13-004 Sabo 4000, two OP15-009 Koby replacements) the hand card still costs 4; at -2000 it costs 2. The condition behaves as "less than 0". The same threshold would also decide OP15-004 Sea Cat's "0 power or less" (not reachable in a test, see API-GAPS-a.md G1). | 2 |
 | A-2 | OP15-024 Usopp | `the restriction names Leader and Character effects only: an opposing Event may rest it` | "[Opponent's Turn] This Character cannot be rested by your opponent's Leader and Character effects". An Event effect is neither. | An opposing Event (OP17-038, "rest up to 1 of your opponent's Characters") picks Usopp but Usopp stays active: the engine treats every opposing effect as covered. | 1 |
+
+## Settled by the review (docs/reviews/m6b-OP-15.md)
+
+- **A-1: the independent author was right on the result; the cause was an engine layering defect** (a hand cost read power before power-stage permanents), not the threshold. Fixed in the OP-15 fix round (ENGINE_VERSION 0.5.12, hand-cost effects in layer stage 6); the test is now an `it`.
+- **A-2: the independent author is right on the text.** Not expressible today (no source card type on `cannotBeRested`); still an `it.fails`, BACKLOG section 5.

@@ -46,4 +46,37 @@ describe('OP15-013 Pincers', () => {
     expect(g.card(g.find('p1', 'characters', ID)).keywords).toContain('Blocker');
     expect(g.card(g.find('p1', 'characters', ID)).cost).toBe(4);
   });
+
+  // OP15-R1: the hand cost reads the Leader's fully derived power, permanent effects included.
+  describe('a Leader with a permanent power effect (OP13-004 Sabo: -1000 with 4 or more Life)', () => {
+    const SABO = 'OP13-004';
+    const withSabo = (shrink: number, life: number) => {
+      const g = mk({
+        leader: SABO,
+        hand: [ID],
+        life: Array.from({ length: life }, () => 'ST01-006'),
+        costArea: { active: 2, rested: 0 },
+      });
+      shrinkLeader(g, 'p1', shrink);
+      return { g, id: g.find('p1', 'hand', ID) };
+    };
+
+    it('exactly 0 power (printed 5000, -1000 permanent, -4000 timed): the cost drops to 2', () => {
+      const { g, id } = withSabo(4000, 4);
+      expect(g.card(g.leader('p1')).power).toBe(0);
+      expect(g.card(id).cost).toBe(2);
+    });
+
+    it('1000 power (-1000 permanent, -3000 timed): still 4', () => {
+      const { g, id } = withSabo(3000, 4);
+      expect(g.card(g.leader('p1')).power).toBe(1000);
+      expect(g.card(id).cost).toBe(4);
+    });
+
+    it('without the permanent (3 Life) the same timed -4000 leaves 1000: still 4', () => {
+      const { g, id } = withSabo(4000, 3);
+      expect(g.card(g.leader('p1')).power).toBe(1000);
+      expect(g.card(id).cost).toBe(4);
+    });
+  });
 });

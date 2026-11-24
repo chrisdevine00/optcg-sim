@@ -17,7 +17,7 @@ export const OP15_002: CardScript = {
       when: ['whenAttacking', 'onOpponentAttack'],
       effect: [
         {
-          if: { exists: { from: 'hand', owner: 'you', filter: { category: ['Event', 'Stage'] } } },
+          if: { cmp: [{ hand: 'you' }, '>=', 1] },
           then: [
             {
               do: {
@@ -58,6 +58,7 @@ export const OP15_002: CardScript = {
     },
   ],
   rulings: [
+    'hidden information (OP15 fix round): the gate is the public hand size (at least 1 card), not "the hand holds an Event or Stage", so the pick is asked at max 0 when none is held; whether the hand holds one stays secret (DECISIONS "Empty picks", ADR 0005)',
     'reading: "You may trash any number" is the pick itself (choosing none is the decline), so there is no separate accept prompt; the bonus is +1000 times the cards actually trashed, +0 for none',
     'reading: "activated an Event with a base cost of 3 or more" reads the Event\'s printed cost when it is activated from hand ([Main] or [Counter], M6b-Q31 family); the "If" is an effect condition (no colon before it), so the Once Per Turn is spent even when it is false',
   ],

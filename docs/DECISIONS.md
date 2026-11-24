@@ -2,6 +2,15 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-24 — Hand-zone cost permanents move to a last layer stage (ENGINE_VERSION 0.5.12; OP15-R1)
+
+- **Context:** review OP15-R1. A hand-zone cost permanent sat in stage 1 (cost), and a stage reads only the stages before it, so "If your Leader has 0 power or less, give this card in your hand -2 cost" (OP15-013, OP15-102) read the Leader's power without its power-stage permanents (Sabo printed 5000 with a permanent -1000 and timed -4000: 0 power, read as 1000).
+- **Decision:** a new stage 6 holds the cost effects whose source is in hand (`zone: 'hand'`). Its conditions read stages 1 to 5, the fully derived power, so the read is right; no field stage reads a stage above its own, so there is no cycle. `LAST_STAGE` is 6. A field-zone cost permanent stays in stage 1. Goldens re-recorded: only the version string changed.
+- **Consequence:** a permanent in stages 1 to 5 no longer sees the discounted cost of a card in hand (no script reads a hand card's cost there). Hand-cost effects read each other without the other's stage 6 discount, so two of them cannot loop.
+- **Rejected:** re-reading power at the last stage for hand abilities only (a second evaluation path, still cyclic if the hand cost fed a power condition).
+- Also in this fix round: OP15-002 Lucy's pick was gated on the hand holding an Event or Stage (a hidden fact visible through the prompt); the 2000-game leak property caught it. The gate is now the public hand size, so the pick is asked at max 0.
+- Also considered and not done (OP15-R7): revealing a card on a `play` frame in the view (`canSee`). It removed the skeleton/view mismatch but fails the leak property "views are invariant under hidden permutations" (the played card is a hidden hand card in the property's model), so it is in BACKLOG instead.
+
 ## 2026-11-24 — M6b-2 wave 3: G20 to G29 (ENGINE_VERSION 0.5.11)
 
 - **Context:** wave 3 of the M6b-1 audit (`docs/research/m6b-wave3.md`): the opponent's DON!! given to the opponent's cards, `cannotSetDonActive`, hand-trash and rested timings, `Num` division, `cardPlayed` origin and `via`, per-turn history, `returnDon` for the opponent, the K.O. cause on [On K.O.], and `removed`. It unblocks 44 cards, closing block 5 except OP16-079 (D9) and OP16-080 (D3).
