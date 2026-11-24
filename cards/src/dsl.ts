@@ -85,7 +85,11 @@ export type PermanentAbility = AbilityBase & {
 };
 export type ReplacementAbility = AbilityBase & {
   kind: 'replacement';
-  replaces: ReplaceEvent;
+  /**
+   * One event, or a list of K.O. / removal events that one ability covers with a single Once Per
+   * Turn ("would be K.O.'d or would be removed from the field by your opponent's effect", G14 b).
+   */
+  replaces: ReplaceEvent | ReplaceEvent[];
   /** "you may … instead" (every meta replacement is optional). */
   optional: boolean;
   instead: Cost[] | Effect;
@@ -126,7 +130,11 @@ export type AutoTiming =
   | { event: 'donReturned'; owner: P }
   | { event: 'lifeRemoved'; owner: P | 'any' }
   | { event: 'lifeBecameZero'; owner: P }
-  | { event: 'koed'; filter: Filter }
+  /**
+   * "When one of your Characters is K.O.'d" (`owner` absent or `you`), or "when one of your
+   * opponent's Characters is K.O.'d" (`owner: 'opponent'`, G38).
+   */
+  | { event: 'koed'; filter: Filter; owner?: P }
   /**
    * "When a card is trashed from your hand by an effect" (G22): fires once per instruction with
    * the number trashed (`{ eventCount }`). `by`: whose effect (relative to the watcher; absent:
@@ -204,7 +212,13 @@ export type Num =
   | { donGiven: P }
   | { turnIndex: P }
   | { refCount: Name }
-  | { refStat: Name; stat: 'cost' | 'power' | 'basePower' }
+  | { refStat: Name; stat: 'cost' | 'power' | 'basePower' | 'donGiven' }
+  /**
+   * The number of DON!! cards given to the card a `power` or `cost` action is applying to, read
+   * once per target ("-1000 power for every DON!! card given to that Character", G34). Only an
+   * amount of those two actions has a target to read.
+   */
+  | { donGivenToTarget: true }
   | { sum: Num[] }
   | { mul: [Num, number] }
   /** Integer floor of a division: "for every 5 cards in your trash" (G23). The divisor is >= 1. */
@@ -281,6 +295,8 @@ export type Filter =
   | { isSelf: boolean }
   /** "If this Character was played on this turn". */
   | { playedThisTurn: true }
+  /** The number of DON!! cards given to the card: "with a DON!! card given" (gte 1), G34. */
+  | { donGiven: Cmp }
   | { ref: Name }
   | { all: Filter[] }
   | { any: Filter[] }
@@ -302,6 +318,11 @@ export type Cost =
   /** "Turn N of your Life cards face-down": the top N, which must be face-up (G8). */
   | { turnLifeFaceDown: number }
   | { mill: number }
+  /**
+   * "Trash N cards from the top of your Life cards" (G30): not damage, so no [Trigger]; the card
+   * is trashed face up. Payable while the Life area holds N cards.
+   */
+  | { trashLife: number }
   /**
    * Replacement payloads: "return 1 DON!! card from your field to your DON!! deck instead". The
    * object form returns active cost-area DON!! only: "return 2 of your active DON!! cards" (G9).
@@ -363,14 +384,47 @@ export type Action =
   | {
       lookAtTop: {
         n: number;
+        /**
+         * Whose deck. `opponent` is look-only (G31): no `take`, and the cards stay where they are
+         * (`rest: 'stay'`); the looker remembers them until the deck changes.
+         */
         player?: P;
         take: Take[];
-        rest: 'bottomAnyOrder' | 'trash' | 'topOrBottomAnyOrder' | 'topAnyOrder';
+        /**
+         * `topAnyOrder`: all the cards go back on top, in an order you choose (G31). `stay`: nothing
+         * is taken and nothing moves (look only).
+         */
+        rest: 'bottomAnyOrder' | 'trash' | 'topOrBottomAnyOrder' | 'topAnyOrder' | 'stay';
       };
     }
   | { reveal: { from: 'deckTop' | 'lifeTop'; n: number; bind: Name } }
   | { move: { what: Selector; to: Dest } }
   | { trashLifeUntil: number }
+  /** "You take N damage" / "deal N damage to your opponent": real damage, a [Trigger] may activate (G36). */
+  | { damage: { player: P; n: Num } }
+  /** "You win the game" (G35): the controller wins at once. */
+  | { winGame: true }
+  /**
+   * "Select 2 Characters. Swap their base power with each other during this turn / battle" (G33):
+   * `a` and `b` are chosen one after the other (`b` is never the card `a` chose); each one's base
+   * power becomes the other's, read when the effect resolves.
+   */
+  | { swapBasePower: { a: Selector; b: Selector; duration: Duration } }
+  /** "Up to 1 of your Leader or Character cards can also attack active Characters during this turn" (G32). */
+  | { canAttackActive: { target: Selector; duration: Duration } }
+  /**
+   * An Event (or any effect) creates a replacement that lasts to the end of the turn (D6): "if any
+   * of your Characters would be K.O.'d in battle during this turn, you may trash 1 card from your
+   * hand instead". It may apply to every matching event of the turn.
+   */
+  | {
+      addReplacement: {
+        replaces: ReplaceEvent;
+        optional: boolean;
+        instead: Cost[] | Effect;
+        duration: 'thisTurn';
+      };
+    }
   | { play: { what: Selector; rested?: true } }
   | { ko: Selector }
   | { rest: Selector }
@@ -463,7 +517,12 @@ export type Continuous =
 export type ReplaceEvent =
   | { ko: Selector; cause?: 'opponentEffect' | 'effect' | 'battle' }
   | { leaveField: Selector; cause: 'opponentEffect' | 'any' }
-  | { damage: 'you' };
+  | { damage: 'you' }
+  /**
+   * "If this Character would be rested by your opponent's Character's effect" (G37): a rest by an
+   * effect whose source is a Character of the card owner's opponent. The rest does not happen.
+   */
+  | { rest: Selector; cause: 'opponentCharacterEffect' };
 
 /**
  * Hash of a card's verified text, for `CardScript.textHash`. cyrb53 over the effect and trigger

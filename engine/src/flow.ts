@@ -3,12 +3,12 @@
  * the stack until some player owes a decision or the game is over. Every frame is plain data, so a
  * suspended choice is just a frame waiting for its next action.
  */
-import type { Cost, Selector } from '@optcg/cards';
+import type { Cost, ReplaceEvent } from '@optcg/cards';
 import { isEffect } from '@optcg/cards';
 import type { InstanceId, PlayerId } from './api.ts';
 import type { Ability, AutoTiming, InternalStep } from './abilities.ts';
 import { hasTiming, isInternal } from './abilities.ts';
-import { deriveLive, isNegated, koProtected } from './derive.ts';
+import { deriveLive, isNegated, koProtected, restBlocked } from './derive.ts';
 import {
   allHold,
   costIsSecret,
@@ -31,6 +31,7 @@ import {
   markDamagedAtZero,
   moveCard,
   placeDon,
+  rest,
   returnGivenDon,
   ruleProcessing,
   untapAll,
@@ -74,6 +75,11 @@ export function ask(d: Draft, dec: DecisionState): void {
 }
 
 export function abilityOf(s: State, cardId: string, abilityId: string): Ability | undefined {
+  // A replacement an effect created lives in its modifier, as the ability `mod-<id>` (D6).
+  if (abilityId.startsWith('mod-')) {
+    const id = Number(abilityId.slice(4));
+    return s.mods.find((m) => m.kind === 'replacement' && m.id === id)?.ab;
+  }
   return s.defs[cardId]?.abilities.find((a) => a.id === abilityId);
 }
 
@@ -128,6 +134,8 @@ function runFrame(d: Draft, f: Frame): void {
       return runEffect(d, f);
     case 'remove':
       return runRemove(d, f);
+    case 'rest':
+      return runRest(d, f);
     case 'loop':
       // Test-only mandatory loop: does nothing and stays on the stack forever.
       d.ops++;
@@ -720,10 +728,18 @@ export function pushRemove(
 /** Offer the next applicable replacement for the event on top of the stack, if any. */
 function offerReplacement(
   d: Draft,
-  f: Extract<Frame, { f: 'ko' | 'remove' }>,
-  event: 'ko' | 'remove',
+  f: Extract<Frame, { f: 'ko' | 'remove' | 'rest' }>,
+  event: 'ko' | 'remove' | 'rest',
 ): boolean {
-  const reps = collectReplacements(d.s, f.card, event, f.cause, f.considered);
+  const cause: Cause = f.f === 'rest' ? { kind: 'effect', by: f.by } : f.cause;
+  const reps = collectReplacements(
+    d.s,
+    f.card,
+    event,
+    cause,
+    f.considered,
+    f.f === 'rest' ? f.source : undefined,
+  );
   const r = reps[0];
   if (!r) return false;
   f.considered = [...f.considered, `${r.card}/${r.ability}`];
@@ -733,7 +749,7 @@ function offerReplacement(
     ask(d, {
       kind: 'optional',
       player: r.controller,
-      prompt: `Use ${d.s.defs[d.card(r.card).card]!.name}'s effect instead of ${event === 'ko' ? 'the K.O. of' : 'removing'} ${target}?`,
+      prompt: `Use ${d.s.defs[d.card(r.card).card]!.name}'s effect instead of ${event === 'ko' ? 'the K.O. of' : event === 'rest' ? 'resting' : 'removing'} ${target}?`,
       replacement: r,
       purpose: 'replacement',
       role: 'replacement',
@@ -765,6 +781,15 @@ function runKo(d: Draft, f: Extract<Frame, { f: 'ko' }>): void {
   if (offerReplacement(d, f, 'ko')) return;
   // No replacement: the K.O. happens (to its owner's trash, CR 10-2-1-2).
   const owner = c.owner;
+  // `[DON!! xN] [On K.O.]` reads the DON!! the card had when it left (OP14-051): kept only when the
+  // card has such a condition, so every other game's pending effects are as before.
+  const don = c.don;
+  const readsDon = d.s.defs[c.card]!.abilities.some(
+    (a) =>
+      a.kind === 'auto' &&
+      a.when.includes('onKO') &&
+      (a.conditions ?? []).some((k) => 'donGiven' in k),
+  );
   d.emit({ type: 'KO', instance: f.card, card: c.card, owner, cause: f.cause });
   if (d.s.defs[c.card]!.category === 'Character') recordKo(d, owner);
   const nid = leaveField(d, f.card, 'trash', f.cause);
@@ -780,7 +805,7 @@ function runKo(d: Draft, f: Extract<Frame, { f: 'ko' }>): void {
       (w) => w === 'onKO',
       'onKO',
       undefined,
-      { cause: f.cause },
+      readsDon ? { cause: f.cause, don } : { cause: f.cause },
     );
   // "When one of your Characters is K.O.'d" (OP14-041): the filter reads the card as it now is in
   // the trash, which has its printed values (a last-known snapshot would only matter for a card
@@ -792,7 +817,8 @@ function runKo(d: Draft, f: Extract<Frame, { f: 'ko' }>): void {
     (w, card, p) =>
       typeof w === 'object' &&
       w.event === 'koed' &&
-      p === owner &&
+      // `owner: 'opponent'` watches the other player's Characters (G38).
+      (w.owner === 'opponent' ? p !== owner : p === owner) &&
       // "When one of your Characters is K.O.'d": a K.O.'d Stage is not a Character.
       d.s.defs[d.s.cards[nid]!.card]!.category === 'Character' &&
       matches({ s: d.s, you: p, self: card, live: true }, nid, w.filter),
@@ -832,6 +858,23 @@ function runRemove(d: Draft, f: Extract<Frame, { f: 'remove' }>): void {
   pop(d);
 }
 
+/** The rest by an effect, once no replacement stops it (G37). */
+function runRest(d: Draft, f: Extract<Frame, { f: 'rest' }>): void {
+  const c = d.s.cards[f.card];
+  if (!c || c.rested || !['leader', 'characters', 'stage'].includes(c.zone)) {
+    pop(d);
+    return;
+  }
+  // A card that cannot be rested is not rested, so there is nothing to replace.
+  if (restBlocked(deriveLive(d.s, f.card), c.owner, 'effect', f.by)) {
+    pop(d);
+    return;
+  }
+  if (offerReplacement(d, f, 'rest')) return;
+  rest(d, f.card, 'effect', f.by, f.source);
+  pop(d);
+}
+
 /**
  * Replacements that apply to the K.O. (`ko`) or other removal (`remove`) of `card`, in
  * CR 8-1-3-4-2 order: the card's own first, then the turn player's, then the non-turn player's.
@@ -842,12 +885,55 @@ function runRemove(d: Draft, f: Extract<Frame, { f: 'remove' }>): void {
 export function collectReplacements(
   s: State,
   card: InstanceId,
-  event: 'ko' | 'remove',
+  event: 'ko' | 'remove' | 'rest',
   cause: Cause,
   considered: string[],
+  /** For `rest`: the card whose effect rests it. */
+  source?: InstanceId,
 ): ReplacementRef[] {
   const target = s.cards[card]!;
   const out: (ReplacementRef & { rank: number })[] = [];
+  /** Does this replaced event cover the event under way? (`p` controls the replacement.) */
+  const covers = (rp: ReplaceEvent, c: Ctx, p: PlayerId): boolean => {
+    if ('ko' in rp) {
+      if (event !== 'ko') return false;
+      if (rp.cause && !causeMatches(rp.cause, cause, target.owner)) return false;
+      return pool(c, rp.ko).includes(card);
+    }
+    if ('leaveField' in rp) {
+      if (event === 'rest') return false;
+      // "removed from the field by your opponent's effect" (`opponentEffect`), or by anything
+      // that takes it off the field, a battle K.O. and your own effects too (`any`, G14).
+      if (rp.cause === 'opponentEffect' && (cause.kind !== 'effect' || cause.by === p))
+        return false;
+      return pool(c, rp.leaveField).includes(card);
+    }
+    if ('rest' in rp) {
+      // "rested by your opponent's Character's effect" (G37).
+      if (event !== 'rest' || cause.kind !== 'effect' || cause.by === p) return false;
+      const src = source === undefined ? undefined : s.cards[source];
+      if (!src || s.defs[src.card]!.category !== 'Character') return false;
+      return pool(c, rp.rest).includes(card);
+    }
+    return false; // a damage replacement
+  };
+  const consider = (
+    id: InstanceId,
+    p: PlayerId,
+    ab: Extract<Ability, { kind: 'replacement' }>,
+    c: Ctx,
+  ): void => {
+    const key = `${id}/${ab.id}`;
+    if (considered.includes(key)) return;
+    if (ab.oncePerTurn && s.oncePerTurn.includes(key)) return;
+    // One ability may cover several events (G14 b): it applies once, whichever one it is.
+    const rps = Array.isArray(ab.replaces) ? ab.replaces : [ab.replaces];
+    if (!rps.some((rp) => covers(rp, c, p))) return;
+    if (!allHold(c, ab.conditions)) return;
+    if (!possible(c, ab.instead, ab.optional)) return;
+    const rank = id === card ? 0 : p === s.active ? 1 : 2;
+    out.push({ card: id, ability: ab.id, controller: p, rank });
+  };
   for (const p of [s.active, other(s.active)]) {
     const ps = s.players[p];
     for (const id of [ps.leader, ...ps.characters, ...ps.stage]) {
@@ -855,34 +941,17 @@ export function collectReplacements(
       if (!def.abilities.some((a) => a.kind === 'replacement')) continue;
       if (isNegated(s, id)) continue;
       const c: Ctx = { s, you: p, self: id, live: true };
-      for (const ab of def.abilities) {
-        if (ab.kind !== 'replacement') continue;
-        const key = `${id}/${ab.id}`;
-        if (considered.includes(key)) continue;
-        if (ab.oncePerTurn && s.oncePerTurn.includes(key)) continue;
-        const rp = ab.replaces;
-        let sel: Selector;
-        if ('ko' in rp) {
-          if (event !== 'ko') continue;
-          if (rp.cause && !causeMatches(rp.cause, cause, target.owner)) continue;
-          sel = rp.ko;
-        } else if ('leaveField' in rp) {
-          // "removed from the field by your opponent's effect" (`opponentEffect`), or by anything
-          // that takes it off the field, a battle K.O. and your own effects too (`any`, G14).
-          if (rp.cause === 'opponentEffect' && (cause.kind !== 'effect' || cause.by === p))
-            continue;
-          sel = rp.leaveField;
-        } else continue; // a damage replacement
-
-        if (!pool(c, sel).includes(card)) continue;
-        if (!allHold(c, ab.conditions)) continue;
-        if (!possible(c, ab.instead, ab.optional)) continue;
-        const rank = id === card ? 0 : p === s.active ? 1 : 2;
-        out.push({ card: id, ability: ab.id, controller: p, rank });
-      }
+      for (const ab of def.abilities) if (ab.kind === 'replacement') consider(id, p, ab, c);
     }
   }
-  void target;
+  // Replacements an effect created for the turn (D6): the source is the card that made them, or
+  // the controller's Leader once that card has gone.
+  for (const m of s.mods) {
+    if (m.kind !== 'replacement' || !m.ab || m.ab.kind !== 'replacement') continue;
+    const p = m.controller;
+    const id = m.source && s.cards[m.source] ? m.source : s.players[p].leader;
+    consider(id, p, m.ab, { s, you: p, self: id, live: true });
+  }
   out.sort((a, b) => a.rank - b.rank);
   return out.map(({ rank: _r, ...r }) => r);
 }
@@ -920,7 +989,8 @@ export function collectDamageReplacements(
     if (isNegated(s, id)) continue;
     const c: Ctx = { s, you: player, self: id, live: true };
     for (const ab of def.abilities) {
-      if (ab.kind !== 'replacement' || !('damage' in ab.replaces)) continue;
+      if (ab.kind !== 'replacement' || Array.isArray(ab.replaces) || !('damage' in ab.replaces))
+        continue;
       const key = `${id}/${ab.id}`;
       if (considered.includes(key)) continue;
       if (ab.oncePerTurn && s.oncePerTurn.includes(key)) continue;
@@ -1010,6 +1080,24 @@ export function applyReplacement(d: Draft, r: ReplacementRef): void {
       controller: r.controller,
     });
     pop(d); // the damage does not happen: no Life card is taken (CR 4-6-3-1)
+    pushEffect(d, r.card, c.card, ab, r.controller, 'instead');
+    return;
+  }
+  if (f?.f === 'rest') {
+    // The rest does not happen (G37); the payload takes its place.
+    const c = d.card(r.card);
+    const ab = abilityOf(d.s, c.card, r.ability)!;
+    if (ab.oncePerTurn) d.opt().push(`${r.card}/${r.ability}`);
+    d.emit({
+      type: 'ReplacementApplied',
+      instance: r.card,
+      card: c.card,
+      ability: r.ability,
+      replaced: 'rest',
+      target: f.card,
+      controller: r.controller,
+    });
+    pop(d);
     pushEffect(d, r.card, c.card, ab, r.controller, 'instead');
     return;
   }

@@ -50,7 +50,7 @@ export type Ability =
   | (Base & { kind: 'permanent'; zone?: 'field' | 'hand'; apply: Continuous[] })
   | (Base & {
       kind: 'replacement';
-      replaces: ReplaceEvent;
+      replaces: ReplaceEvent | ReplaceEvent[];
       optional: boolean;
       instead: Cost[] | EStep[];
     });

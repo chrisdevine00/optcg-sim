@@ -117,6 +117,12 @@ function actionPrompts(a: Action, out: string[]): void {
   else if ('negate' in a) selPrompts(a.negate.target, out);
   else if ('restrict' in a) selPrompts(a.restrict.target, out);
   else if ('select' in a) selPrompts(a.select, out);
+  else if ('swapBasePower' in a) {
+    selPrompts(a.swapBasePower.a, out);
+    selPrompts(a.swapBasePower.b, out);
+  } else if ('canAttackActive' in a) selPrompts(a.canAttackActive.target, out);
+  // The damaged player is asked about every Life card taken (a [Trigger] decision, ADR 0005).
+  else if ('damage' in a) out.push('damage');
 }
 
 /** Every prompt an effect can ask, as comparable tokens in order. */

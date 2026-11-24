@@ -34,6 +34,8 @@ export interface Ctx {
   n?: Record<string, number> | undefined;
   /** What the triggering event told the ability: a K.O.'s cause, a count of cards (M6b wave 3). */
   ev?: Ev | undefined;
+  /** The card a `power` or `cost` amount is being read for, one target at a time (G34). */
+  target?: InstanceId | undefined;
   /** The state is a draft being written: derive without the memo. */
   live?: boolean;
   /**
@@ -164,6 +166,7 @@ function matchesOf(c: Ctx, id: InstanceId, f: Filter): boolean {
   if ('state' in f) return card.rested === (f.state === 'rested');
   if ('isSelf' in f) return (id === c.self) === f.isSelf;
   if ('playedThisTurn' in f) return card.played === c.s.turn;
+  if ('donGiven' in f) return cmp(c, card.don, f.donGiven);
   if ('ref' in f) return (c.b?.[f.ref] ?? []).includes(id);
   if ('all' in f) return f.all.every((g) => matches(c, id, g));
   if ('any' in f) return f.any.some((g) => matches(c, id, g));
@@ -216,9 +219,12 @@ function numOf(c: Ctx, n: Num): number {
   if ('refStat' in n) {
     const id = (c.b?.[n.refStat] ?? []).find((x) => s.cards[x]);
     if (!id) return 0;
+    if (n.stat === 'donGiven') return s.cards[id]!.don;
     const dv = dvOf(c, id);
     return (n.stat === 'cost' ? dv.cost : n.stat === 'power' ? dv.power : dv.basePower) ?? 0;
   }
+  // The DON!! given to the card this amount is read for (G34); 0 outside a power or cost action.
+  if ('donGivenToTarget' in n) return (c.target && s.cards[c.target]?.don) || 0;
   if ('sum' in n) return n.sum.reduce((a: number, x) => a + num(c, x), 0);
   // "For every 5 cards in your trash" (G23): the whole number of times it fits.
   if ('div' in n) return Math.floor(num(c, n.div[0]) / n.div[1]);
@@ -235,7 +241,12 @@ function holdsOf(c: Ctx, k: Condition): boolean {
   const s = c.s;
   if ('yourTurn' in k) return s.active === c.you;
   if ('opponentsTurn' in k) return s.active !== c.you;
-  if ('donGiven' in k) return (s.cards[c.self]?.don ?? 0) >= k.donGiven;
+  if ('donGiven' in k) {
+    // `[DON!! xN] [On K.O.]`: the card is in the trash by the time it resolves, where its DON!! have
+    // gone back to the cost area, so it reads what it had when it left the field (OP14-051).
+    const had = c.ev?.don;
+    return (had !== undefined ? had : (s.cards[c.self]?.don ?? 0)) >= k.donGiven;
+  }
   if ('cmp' in k) {
     const [a, op, b] = k.cmp;
     const x = num(c, a);
@@ -339,6 +350,7 @@ export function payable(c: Ctx, costs: readonly Cost[] | undefined, o: PayOption
         if (pool(c, sel).length < n) return false;
       } else handNeeds.push({ sel, n });
     } else if ('lifeToHand' in k) lifeNeeds += k.lifeToHand.n;
+    else if ('trashLife' in k) lifeNeeds += k.trashLife;
     else if ('turnLifeFaceUp' in k) {
       // The top Life card is turned: it must be there and face-down.
       const top = ps.life.slice(0, k.turnLifeFaceUp);

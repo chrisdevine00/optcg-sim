@@ -108,6 +108,10 @@ export function modifierWords(e: GameEvent): string {
       return 'cannot be blocked by [Blocker]';
     case 'cannotBeRemoved':
       return 'cannot be removed by opponent’s effects';
+    case 'attackActive':
+      return 'can also attack active Characters';
+    case 'replacement':
+      return 'has a replacement effect this turn';
     default:
       return `gets an effect (${String(e.kind)})`;
   }
@@ -310,7 +314,7 @@ export function describeMove(
         break;
       case 'ReplacementApplied':
         bits.push(
-          `${name(e.card)}: replaces ${e.replaced === 'ko' ? 'the K.O.' : e.replaced === 'damage' ? 'the damage' : 'the removal'}`,
+          `${name(e.card)}: replaces ${e.replaced === 'ko' ? 'the K.O.' : e.replaced === 'damage' ? 'the damage' : e.replaced === 'rest' ? 'the rest' : 'the removal'}`,
         );
         break;
       case 'SetActive':
@@ -547,6 +551,8 @@ export function resultReason(reason: string | undefined, winner: PlayerId, names
         : loser === names.me
           ? 'You conceded.'
           : 'Your opponent conceded.';
+    case 'card effect':
+      return 'A card effect won the game.';
     default:
       return `${who} Leader was hit at 0 Life (CR 9-2-1-1).`;
   }

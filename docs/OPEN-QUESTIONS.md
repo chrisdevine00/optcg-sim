@@ -100,7 +100,7 @@ Full text, proposed readings, source auditor IDs and what `rulings.md`/`rules-di
 - M6b-Q3. PRB02-017: timing header missing; probably [Activate: Main].
 - M6b-Q4. EB05-001, EB05-057, OP16-039, OP16-043, OP16-014, OP14-119, OP14-120, EB04-025: scrape typos; EB-05 text is unverified.
 - M6b-Q5. OP17-043, EB04-044: unqualified "would be removed from the field": does it cover battle K.O. and own effects?
-- M6b-Q6. OP13-046: does one Once Per Turn cover both replaced events?
+- M6b-Q6. OP13-046: does one Once Per Turn cover both replaced events? *Open. The mechanism is built (wave 4, G14 b): `replaces` may be a list and one ability, one Once Per Turn, covers all its events; two separate replacements give two uses. Which one OP13-046 is stays for its review.*
 - M6b-Q7. EB05-061: "removed from the field by your opponent" with no "effect".
 - M6b-Q8. EB05-052: is replaced damage not dealt at all (no Life card, no Trigger)?
 - M6b-Q9. OP16-034: distinct names including itself, or Characters named differently from it?
@@ -144,6 +144,12 @@ Full text, proposed readings, source auditor IDs and what `rulings.md`/`rules-di
 - M6b-Q47. EB04-016, OP10-030: "you cannot set DON!! cards as active using Character effects": built as a restriction on the DON!!'s owner against any Character effect, either player's; no ruling on whose Character effect.
 - M6b-Q48. OP15-024 Usopp [On K.O.]: "rest up to 1 of your opponent's Leader or Character cards with a cost of 7 or less": a Leader has no cost. Built: the cost limit restricts the Characters only and the opposing Leader is always eligible (review OP15-R4, fixed in the OP-15 fix round). The other reading (a Leader never matches a cost filter) was the first script. Look for an official Q&A.
 - M6b-Q49. OP15-098 Monkey.D.Luffy (Leader): "would be removed from the field by your opponent" has no "effect": does a battle K.O. also trigger the Life-to-hand replacement? Built: opponent's effects only, as EB05-061 and OP15-035/069 (joins M6b-Q7; review OP15-R3). A Leader of this shape matters most in battle, so check the official card text and Q&A first.
+- M6b-Q50. OP09-118 `winGame`: an effect's win against a defeat not yet processed (the opponent is also at a defeat condition in the same check, RL-27). Built: the effect's win is final at once and ends the game before any pending defeat is read. No ruling.
+- M6b-Q51. OP14-001, OP14-009, OP14-017 `swapBasePower`: with another effect that already sets the same card's base power ("base power becomes N"), which value does the swap give? Built: each card takes the other's base power as it is now (set effects included) and is given as one more base-power setting, so the highest setting applies (CR 4-9-2-1), as for any two base-power effects. No ruling.
+- M6b-Q52. PRB02-006 rest replacement: with several of the owner's Characters rested by one effect, each Character is offered its own replacement (the others are rested at once); an "if you do" after the replaced rest reads it as done. No ruling for either.
+- M6b-Q53. OP14-051 Hatchan `[DON!! xN] [On K.O.]`: built as the DON!! the card had given when it left the field (last-known information), as CR 8-3-2-3 checks the condition at activation. No ruling that names this combination.
+- M6b-Q54. EB02-030 (D6): a replacement an Event creates "during this turn" applies to every matching K.O. of the turn (built: it is offered again each time, there is no Once Per Turn in the text). Decided in M6b-1 (D6), recorded here for the card's review.
+- M6b-Q55. OP15-008 Krieg: "for every DON!! card given to that Character": built per target (each opposing Character gets -1000 for each DON!! given to it). The other reading (the one Character the [On Play] gave DON!! to) needs an official card text check before the card is scripted.
 
 ## EB-05 verification (2026-11-24, runbook step d.1)
 

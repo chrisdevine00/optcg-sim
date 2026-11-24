@@ -17,6 +17,7 @@ import type {
   Cost,
   Effect,
   Num,
+  ReplaceEvent,
   Selector,
   Step,
   Zone,
@@ -67,7 +68,8 @@ function cost(k: Cost): boolean {
   if ('move' in k) return selector(k.move) || destHidden(k.to.zone);
   if ('oneOf' in k) return k.oneOf.some((a) => a.some(cost));
   // lifeToHand, mill, turnLifeFaceDown, giveDon, returnDon: no hidden card is read; a Life card
-  // turned face-down is hidden from then on, not read.
+  // turned face-down is hidden from then on, not read. trashLife (G30) takes the top Life card
+  // whatever it is and shows it face up in the trash: whether it can be paid is the Life count.
   return false;
 }
 
@@ -80,6 +82,13 @@ function action(a: Action): boolean {
   if ('lookAtTop' in a) return true;
   if ('reveal' in a) return true;
   if ('trashLifeUntil' in a) return false; // trashed face up
+  // Damage takes the top Life card without reading it; what the damaged player does with a
+  // [Trigger] is their own decision (G36). Winning the game reads nothing (G35).
+  if ('damage' in a) return num(a.damage.n);
+  if ('winGame' in a) return false;
+  if ('swapBasePower' in a) return selector(a.swapBasePower.a) || selector(a.swapBasePower.b);
+  if ('canAttackActive' in a) return selector(a.canAttackActive.target);
+  if ('addReplacement' in a) return replacementReads(a.addReplacement);
   if ('move' in a) return selector(a.move.what) || destHidden(a.move.to.zone);
   if ('play' in a) return selector(a.play.what);
   if ('ko' in a) return selector(a.ko);
@@ -152,11 +161,26 @@ export function abilityReadsHiddenZone(ab: Ability): boolean {
     case 'permanent':
       return ab.apply.some(continuous);
     case 'replacement':
-      return (
-        ('damage' in ab.replaces
-          ? false
-          : selector('ko' in ab.replaces ? ab.replaces.ko : ab.replaces.leaveField)) ||
-        (isEffect(ab.instead) ? effect(ab.instead as Effect) : (ab.instead as Cost[]).some(cost))
-      );
+      return replacementReads(ab);
   }
+}
+
+/** The selectors a replaced event names, and the payload that takes its place. */
+function replacementReads(r: {
+  replaces: ReplaceEvent | ReplaceEvent[];
+  instead: Cost[] | Effect;
+}): boolean {
+  const events = Array.isArray(r.replaces) ? r.replaces : [r.replaces];
+  const named = events.some((e) =>
+    'damage' in e
+      ? false
+      : 'ko' in e
+        ? selector(e.ko)
+        : 'leaveField' in e
+          ? selector(e.leaveField)
+          : selector(e.rest),
+  );
+  return (
+    named || (isEffect(r.instead) ? effect(r.instead as Effect) : (r.instead as Cost[]).some(cost))
+  );
 }

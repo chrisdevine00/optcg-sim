@@ -71,6 +71,8 @@ export const IMPLEMENTED = {
     'rest',
     'move',
     'oneOf',
+    // M6b wave 4 (G30).
+    'trashLife',
   ],
   steps: ['do', 'if', 'may', 'ifDid', 'chooseOne', 'delayed', 'forEach'],
   actions: [
@@ -98,6 +100,12 @@ export const IMPLEMENTED = {
     'giveDon',
     'skipRefresh',
     'trashLifeUntil',
+    // M6b wave 4 (G33, G32, G35, G36, D6).
+    'damage',
+    'winGame',
+    'swapBasePower',
+    'canAttackActive',
+    'addReplacement',
   ],
   continuous: [
     'counter',
@@ -133,6 +141,7 @@ export const IMPLEMENTED = {
     'mul',
     'div',
     'eventCount',
+    'donGivenToTarget',
   ],
 } as const;
 
@@ -150,6 +159,8 @@ interface Ctx {
   evCount?: boolean;
   /** The ability is an `onKO` auto, so `{ koCause }` has a K.O. to read (G28). */
   koOk?: boolean;
+  /** Inside the amount of a `power` or `cost` action, which has a target to read (G34). */
+  perTarget?: boolean;
 }
 
 const isObj = (v: unknown): v is Obj => !!v && typeof v === 'object' && !Array.isArray(v);
@@ -257,6 +268,7 @@ function num(c: Ctx, path: string, v: unknown): void {
       'mul',
       'div',
       'eventCount',
+      'donGivenToTarget',
     ],
     { donOnField: ['state'], refStat: ['stat'], count: ['distinctNames'] },
   );
@@ -285,7 +297,7 @@ function num(c: Ctx, path: string, v: unknown): void {
       return ref(c, `${path}.refCount`, o.refCount);
     case 'refStat':
       ref(c, `${path}.refStat`, o.refStat);
-      return enumOf(c, `${path}.stat`, o.stat, ['cost', 'power', 'basePower']);
+      return enumOf(c, `${path}.stat`, o.stat, ['cost', 'power', 'basePower', 'donGiven']);
     case 'sum':
       return arr(c, `${path}.sum`, o.sum, (x, p) => num(c, p, x));
     case 'mul': {
@@ -304,6 +316,12 @@ function num(c: Ctx, path: string, v: unknown): void {
         err(c, `${path}.div[1]`, 'the divisor is 1 or more');
       return;
     }
+    case 'donGivenToTarget':
+      // The DON!! given to the card an amount applies to (G34): only `power` and `cost` have one.
+      if (o.donGivenToTarget !== true) err(c, `${path}.donGivenToTarget`, 'expected true');
+      else if (!c.perTarget)
+        err(c, path, 'donGivenToTarget is read in the amount of a power or cost action');
+      return;
     case 'eventCount':
       // The number of cards the triggering event moved (G22): only an auto ability has one.
       if (o.eventCount !== true) err(c, `${path}.eventCount`, 'expected true');
@@ -344,6 +362,7 @@ function filter(c: Ctx, path: string, v: unknown): void {
     'state',
     'isSelf',
     'playedThisTurn',
+    'donGiven',
     'ref',
     'all',
     'any',
@@ -353,6 +372,8 @@ function filter(c: Ctx, path: string, v: unknown): void {
   const x = (v as Obj)[k];
   const p = `${path}.${k}`;
   switch (k) {
+    case 'donGiven':
+      return cmp(c, p, x);
     case 'attribute':
       return enumOf(c, p, x, ATTRIBUTES);
     case 'category':
@@ -418,7 +439,7 @@ function selector(c: Ctx, path: string, v: unknown): void {
     if (typeof z === 'string' && ZONES.includes(z) && !has(IMPLEMENTED.zones, z))
       err(c, `${path}.from`, `zone ${z} is not implemented in the runtime yet`);
     if (z === 'lifeTop' && !c.lifeOk)
-      err(c, `${path}.from`, 'lifeTop can only be the source of a move to a hand');
+      err(c, `${path}.from`, 'lifeTop can only be the source of a move to a hand or the trash');
   }
   enumOf(c, `${path}.owner`, v.owner, [...P, 'any']);
   if (v.filter !== undefined) filter(c, `${path}.filter`, v.filter);
@@ -547,6 +568,7 @@ function cost(c: Ctx, path: string, v: unknown): void {
       'ko',
       'move',
       'oneOf',
+      'trashLife',
     ],
     { move: ['to'] },
   );
@@ -558,9 +580,11 @@ function cost(c: Ctx, path: string, v: unknown): void {
     case 'donMinus':
     case 'turnLifeFaceUp':
     case 'turnLifeFaceDown':
+    case 'trashLife':
     case 'mill':
       int(c, p, o[k]);
-      if (k === 'turnLifeFaceDown' && (o[k] as number) < 1) err(c, p, 'must be at least 1');
+      if ((k === 'turnLifeFaceDown' || k === 'trashLife') && (o[k] as number) < 1)
+        err(c, p, 'must be at least 1');
       return;
     case 'returnDon':
       // A number: DON!! from anywhere on the field. `{ n, state: 'active' }`: active cost-area DON!! (G9).
@@ -802,6 +826,11 @@ function action(c: Ctx, path: string, v: unknown): void {
       'restrict',
       'activate',
       'select',
+      'damage',
+      'winGame',
+      'swapBasePower',
+      'canAttackActive',
+      'addReplacement',
     ],
     { draw: ['player', 'upTo'] },
   );
@@ -860,12 +889,19 @@ function action(c: Ctx, path: string, v: unknown): void {
       fields(c, p, x, ['n', 'take', 'rest'], ['player']);
       if (!isObj(x)) return;
       int(c, `${p}.n`, x.n);
-      if (x.player !== undefined && x.player !== 'you')
+      // The opponent's deck is look-only (G31): nothing is taken and the cards stay where they are.
+      if (x.player !== undefined) enumOf(c, `${p}.player`, x.player, P);
+      if (
+        x.player === 'opponent' &&
+        (!Array.isArray(x.take) || x.take.length > 0 || x.rest !== 'stay')
+      )
         err(
           c,
           `${p}.player`,
-          "looking at the opponent's deck is not implemented in the runtime yet",
+          "a look at the opponent's deck takes nothing: take is [] and rest is 'stay'",
         );
+      if (x.rest === 'stay' && Array.isArray(x.take) && x.take.length > 0)
+        err(c, `${p}.rest`, "'stay' leaves every card where it is, so nothing can be taken");
       arr(c, `${p}.take`, x.take, (t, q) => {
         fields(c, q, t, ['pick', 'to'], ['filter', 'reveal', 'rested']);
         if (!isObj(t)) return;
@@ -879,7 +915,13 @@ function action(c: Ctx, path: string, v: unknown): void {
         if (t.to === 'play' && isObj(t.pick) && !('upTo' in t.pick || 'exactly' in t.pick))
           err(c, `${q}.pick`, 'a take that plays cards picks upTo or exactly');
       });
-      return enumOf(c, `${p}.rest`, x.rest, ['bottomAnyOrder', 'topOrBottomAnyOrder', 'trash']);
+      return enumOf(c, `${p}.rest`, x.rest, [
+        'bottomAnyOrder',
+        'topOrBottomAnyOrder',
+        'topAnyOrder',
+        'stay',
+        'trash',
+      ]);
     }
     case 'reveal':
       fields(c, p, x, ['from', 'n', 'bind']);
@@ -918,7 +960,9 @@ function action(c: Ctx, path: string, v: unknown): void {
       if (!isObj(x)) return;
       selector(c, `${p}.target`, x.target);
       zonesIn(c, `${p}.target`, x.target, FIELD_ZONES, 'modifiers apply to cards on the field');
+      c.perTarget = true;
       num(c, `${p}.amount`, x.amount);
+      c.perTarget = false;
       return enumOf(c, `${p}.duration`, x.duration, DURATIONS);
     case 'setBasePower':
       fields(c, p, x, ['target', 'value', 'duration']);
@@ -1029,6 +1073,63 @@ function action(c: Ctx, path: string, v: unknown): void {
       }
       restriction(c, `${p}.what`, x.what);
       return enumOf(c, `${p}.duration`, x.duration, DURATIONS);
+    case 'damage':
+      // Real damage (G36): the Life card taken may carry a [Trigger], and 0 Life defeats (RL-22).
+      fields(c, p, x, ['player', 'n']);
+      if (!isObj(x)) return;
+      enumOf(c, `${p}.player`, x.player, P);
+      return num(c, `${p}.n`, x.n);
+    case 'winGame':
+      if (x !== true) err(c, p, 'expected true');
+      return;
+    case 'swapBasePower': {
+      // Two chosen cards, one after the other (G33): each selector picks exactly 1 card.
+      fields(c, p, x, ['a', 'b', 'duration']);
+      if (!isObj(x)) return;
+      for (const side of ['a', 'b'] as const) {
+        selector(c, `${p}.${side}`, x[side]);
+        zonesIn(
+          c,
+          `${p}.${side}`,
+          x[side],
+          ['leader', 'characters'],
+          'only a Leader or Character has a base power',
+        );
+        const sel = x[side];
+        if (isObj(sel) && !(isObj(sel.pick) && sel.pick.exactly === 1))
+          err(c, `${p}.${side}.pick`, 'each card of a swap is chosen with pick { exactly: 1 }');
+      }
+      return enumOf(c, `${p}.duration`, x.duration, ['thisTurn', 'battle']);
+    }
+    case 'canAttackActive':
+      fields(c, p, x, ['target', 'duration']);
+      if (!isObj(x)) return;
+      selector(c, `${p}.target`, x.target);
+      zonesIn(
+        c,
+        `${p}.target`,
+        x.target,
+        ['leader', 'characters', 'field', 'self'],
+        'only a Leader or Character attacks',
+      );
+      return enumOf(c, `${p}.duration`, x.duration, ['thisTurn']);
+    case 'addReplacement': {
+      // A replacement that lasts to the end of the turn (D6): K.O. and removal events only.
+      fields(c, p, x, ['replaces', 'optional', 'instead', 'duration']);
+      if (!isObj(x)) return;
+      if (c.noAlt) err(c, p, 'a replacement does not create another replacement');
+      enumOf(c, `${p}.duration`, x.duration, ['thisTurn']);
+      const rp = x.replaces;
+      if (!isObj(rp) || !('ko' in rp || 'leaveField' in rp))
+        err(
+          c,
+          `${p}.replaces`,
+          'a created replacement replaces a K.O. or a removal (ko, leaveField)',
+        );
+      else replacesEvent(c, `${p}.replaces`, rp);
+      replacementBody(c, p, x.optional, x.instead);
+      return;
+    }
     case 'activate':
       fields(c, p, x, ['ability', 'of']);
       if (!isObj(x)) return;
@@ -1073,14 +1174,31 @@ function moveShape(c: Ctx, path: string, what: unknown, to: unknown): void {
     return;
   }
   if (zones.includes('lifeTop')) {
-    if (zones.length !== 1 || dz !== 'hand' || pos !== undefined || to.faceUp !== undefined)
-      return err(c, path, "a move from the top of Life is implemented only to the owner's hand");
+    // To the owner's hand, or (G30) to the trash: not damage, so no [Trigger] either way.
+    if (
+      zones.length !== 1 ||
+      (dz !== 'hand' && dz !== 'trash') ||
+      pos !== undefined ||
+      to.faceUp !== undefined
+    )
+      return err(
+        c,
+        path,
+        "a move from the top of Life is implemented only to the owner's hand or to the trash",
+      );
     const pk = what.pick as Record<string, unknown> | undefined;
     if (!pk || (pk.upTo !== 1 && pk.exactly !== 1))
       err(
         c,
         `${path}.what.pick`,
         'a move from the top of Life needs { upTo: 1 } or { exactly: 1 }',
+      );
+    // Both players' top Life cards at once is for the trash, and is never optional (OP11-102).
+    if (what.owner === 'any' && (dz !== 'trash' || pk?.exactly !== 1))
+      err(
+        c,
+        `${path}.what.owner`,
+        'owner "any" trashes the top Life card of each player: only to the trash, with { exactly: 1 }',
       );
     return;
   }
@@ -1322,6 +1440,8 @@ function timing(c: Ctx, path: string, v: unknown): void {
   } else if (v.event === 'koed') {
     if (v.filter === undefined) err(c, path, 'a koed event needs a filter');
     else filter(c, `${path}.filter`, v.filter);
+    // G38: whose Characters. Absent means the watcher's own, as before.
+    if (v.owner !== undefined) enumOf(c, `${path}.owner`, v.owner, P);
   } else if (v.event === 'lifeRemoved') {
     enumOf(c, `${path}.owner`, v.owner, [...P, 'any']);
   } else {
@@ -1379,33 +1499,59 @@ function ability(c: Ctx, path: string, v: unknown, ids: Set<string>): void {
       return arr(c, `${path}.apply`, v.apply, (x, p) => continuous(c, p, x));
     case 'replacement': {
       fields(c, path, v, ['kind', 'replaces', 'optional', 'instead', 'id'], base);
-      const k = oneOf(c, `${path}.replaces`, v.replaces, ['ko', 'leaveField', 'damage'], {
-        ko: ['cause'],
-        leaveField: ['cause'],
-      });
-      if (k === 'damage') {
-        // D4: "if you would take damage": the damage to the replacing card's controller.
-        if ((v.replaces as Obj).damage !== 'you')
-          err(c, `${path}.replaces.damage`, 'expected "you"');
-      } else if (k) {
-        selector(c, `${path}.replaces.${k}`, (v.replaces as Obj)[k]);
-        const cause = (v.replaces as Obj).cause;
-        if (k === 'leaveField')
-          enumOf(c, `${path}.replaces.cause`, cause, ['opponentEffect', 'any']);
-        else if (cause !== undefined)
-          enumOf(c, `${path}.replaces.cause`, cause, ['opponentEffect', 'effect', 'battle']);
-      }
-      c.noAlt = true;
-      if (typeof v.optional !== 'boolean') err(c, `${path}.optional`, 'expected a boolean');
-      if (!Array.isArray(v.instead)) err(c, `${path}.instead`, 'expected an array');
-      else if (isEffect(v.instead)) steps(c, `${path}.instead`, v.instead);
-      else costs(c, `${path}.instead`, v.instead);
-      c.noAlt = false;
+      if (Array.isArray(v.replaces)) {
+        // One ability covering several events with one Once Per Turn (G14 b, OP13-046).
+        if (v.replaces.length < 2) err(c, `${path}.replaces`, 'a list covers at least 2 events');
+        v.replaces.forEach((r, i) => {
+          if (!isObj(r) || !('ko' in r || 'leaveField' in r))
+            err(
+              c,
+              `${path}.replaces[${i}]`,
+              'a list holds K.O. and removal events (ko, leaveField)',
+            );
+          else replacesEvent(c, `${path}.replaces[${i}]`, r);
+        });
+      } else replacesEvent(c, `${path}.replaces`, v.replaces);
+      replacementBody(c, path, v.optional, v.instead);
       return;
     }
     default:
       err(c, `${path}.kind`, `unknown ability kind ${JSON.stringify(v.kind)}`);
   }
+}
+
+/** One replaced event: `ko`, `leaveField`, `damage` or `rest`, with its qualifiers. */
+function replacesEvent(c: Ctx, path: string, v: unknown): void {
+  const k = oneOf(c, path, v, ['ko', 'leaveField', 'damage', 'rest'], {
+    ko: ['cause'],
+    leaveField: ['cause'],
+    rest: ['cause'],
+  });
+  if (!k || !isObj(v)) return;
+  if (k === 'damage') {
+    // D4: "if you would take damage": the damage to the replacing card's controller.
+    if (v.damage !== 'you') err(c, `${path}.damage`, 'expected "you"');
+  } else if (k === 'rest') {
+    // G37: only "by your opponent's Character's effect" is implemented.
+    selector(c, `${path}.rest`, v.rest);
+    enumOf(c, `${path}.cause`, v.cause, ['opponentCharacterEffect']);
+  } else {
+    selector(c, `${path}.${k}`, v[k]);
+    if (k === 'leaveField') enumOf(c, `${path}.cause`, v.cause, ['opponentEffect', 'any']);
+    else if (v.cause !== undefined)
+      enumOf(c, `${path}.cause`, v.cause, ['opponentEffect', 'effect', 'battle']);
+  }
+}
+
+/** The `optional` flag and the payload of a replacement, written or created by an effect. */
+function replacementBody(c: Ctx, path: string, optional: unknown, instead: unknown): void {
+  const was = c.noAlt;
+  c.noAlt = true;
+  if (typeof optional !== 'boolean') err(c, `${path}.optional`, 'expected a boolean');
+  if (!Array.isArray(instead)) err(c, `${path}.instead`, 'expected an array');
+  else if (isEffect(instead)) steps(c, `${path}.instead`, instead);
+  else costs(c, `${path}.instead`, instead);
+  c.noAlt = was;
 }
 
 const STEP_KEYS = ['do', 'if', 'may', 'ifDid', 'chooseOne', 'forEach', 'delayed'];
