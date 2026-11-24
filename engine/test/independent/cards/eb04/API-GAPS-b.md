@@ -1,0 +1,12 @@
+# API gaps: EB-04 independent tests, group B
+
+None of these stopped a test from being written. Each says what the public API leaves open and how the tests cope.
+
+1. **Most cards before OP-13 are not scripted yet, so as scenery they are inert.** A DON!! −N source, a Counter Event or a Leader with a type-based effect must be a card in `cards/effects/registry.ts`. The usable ones found: OP15-061 Ohm (cost 1, [On Play] DON!! −1: draw 1) as the DON!! return source for EB04-035 Kamazo; OP07-076 Slow-Slow Beam Sword (a [Counter] DON!! −1) for the opponent-turn case; OP09-077 Gum-Gum Lightning and EB01-059 Kingdom Come as opposing K.O. effects. The tests that use unscripted vanilla-like cards (OP11-004, OP11-013, EB03-008, OP09-064) rely on them staying inert; a later script for one of them would add prompts to EB04-039 or EB04-047.
+2. **An effect with no possible result is not always offered.** A [On Play] "DON!! −1: set up 1 Leader as active" on an active Leader (OP09-064, unscripted) and "K.O. up to 1 ... base cost 5 or less" with no candidate (EB04-049) ask nothing, while "play up to 1 {X} from your hand" is asked with no candidate. The tests accept both where the board is public and require the prompt where the hand is hidden.
+3. **With one class of DON!! the engine pays DON!! −N on its own.** `payDonAny` does nothing when no DON!! `choose` is pending.
+4. **The Block Step is presented even when no Character can block.** A test that asks "can Pacifista block" reads `blockers(g)` and treats a missing `block` decision and an empty list alike.
+5. **The "add up to 1 DON!!" count is a `mode` choose with options `"0"`, `"1"`.** (E-Q11, engine 0.5.7.) Kamazo, Foxy and Kid answer it by `{ option: 'n' }`.
+6. **A taken-top-or-bottom Life choice is a `mode` choose with options `top` / `bottom`** (EB04-060).
+7. **The cost of an optional [On K.O.] "add up to 1 card from the top of your opponent's Life cards" is asked as an `optional`, not a `choose`** (EB04-054).
+8. **Independence note.** While searching the docs for DON!!-return sources, one `grep` line from `docs/research/EB-04-scripting-g2.md` (the EB04-035 entry, naming the author's event shape and "any cause counts") was printed in the output. It was not used to choose any assertion; the EB04-035 tests assert only the printed text (once per turn, Kid Pirates Leader, add up to 1 rested), including the "opponent turn: nothing" and "second return same turn: nothing more" cases.
