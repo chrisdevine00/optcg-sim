@@ -38,7 +38,8 @@ export interface ProjectedView extends PlayerView {
   readonly resolving: ViewCard[];
   /**
    * What this player legitimately knows about hidden cards, by positional handle
-   * (`p1.deck.0` → card id): a revealed deck top, cards put back after a look. Cleared when the
+   * (`p1.deck.0` → card id, also Life and hand placeholders): a revealed deck top, cards put back
+   * after a look, a Life card looked at. Cleared when the
    * card moves or its deck is shuffled.
    */
   readonly known: Record<string, CardId>;
@@ -115,10 +116,20 @@ function hiddenCard(p: PlayerId, zone: ZoneName, i: number): ViewCard {
   };
 }
 
-/** Can `viewer` see this card where it is now? */
+/**
+ * Is this card being played right now, past the reveal? A card is revealed when it is paid for
+ * (CR 2-7-2, the `CardRevealed` event of the `pay` step), so both players know it while it waits,
+ * still in its origin zone, at a prompt such as "Character area is full" (M4a-06, OP15-R7). A
+ * queued play that has not reached `pay` is not revealed yet.
+ */
+export function beingPlayed(s: State, id: InstanceId): boolean {
+  return s.stack.some((f) => f.f === 'play' && f.card === id && f.step !== 'pay');
+}
+
+/** Can `viewer` see this card where it is now (or because it is being played)? */
 export function visibleTo(s: State, id: InstanceId, viewer: PlayerId): boolean {
   const c = s.cards[id]!;
-  return zoneVisible(c.zone, c.owner, viewer, c.faceUp);
+  return zoneVisible(c.zone, c.owner, viewer, c.faceUp) || beingPlayed(s, id);
 }
 
 export function zoneVisible(
@@ -139,14 +150,33 @@ export function zoneVisible(
   }
 }
 
+/**
+ * The ids of a zone in the order `viewer` is shown, and how many lead as revealed. The other
+ * player's hand lists a card being played first (it is revealed, so where it sat in the hand must
+ * not show: ADR 0005 hides "the position of a card in the opponent's hand"); a placeholder's index
+ * then counts from after them, so they leave no gap. Everything else keeps its order.
+ */
+export function viewOrder(
+  s: State,
+  viewer: PlayerId,
+  p: PlayerId,
+  zone: ZoneName,
+): { ids: readonly InstanceId[]; lead: number } {
+  const ids = zoneIds(s, p, zone);
+  if (zone !== 'hand' || p === viewer) return { ids, lead: 0 };
+  const up = ids.filter((id) => beingPlayed(s, id));
+  if (up.length === 0) return { ids, lead: 0 };
+  return { ids: [...up, ...ids.filter((id) => !up.includes(id))], lead: up.length };
+}
+
 function zonesFor(s: State, viewer: PlayerId): PlayerView['zones'] {
   const out = {} as Record<PlayerId, Record<ZoneName, ViewCard[]>>;
   for (const p of PLAYERS) {
     const z = {} as Record<ZoneName, ViewCard[]>;
     for (const zone of ZONE_NAMES) {
-      const ids = zoneIds(s, p, zone);
+      const { ids, lead } = viewOrder(s, viewer, p, zone);
       z[zone] = ids.map((id, i) =>
-        visibleTo(s, id, viewer) ? viewCard(s, id, viewer) : hiddenCard(p, zone, i),
+        visibleTo(s, id, viewer) ? viewCard(s, id, viewer) : hiddenCard(p, zone, i - lead),
       );
     }
     out[p] = z;
@@ -243,10 +273,16 @@ export function project(s: State, player: PlayerId): ProjectedView {
   const lock =
     s.decision?.kind === 'main' && s.decision.player === player ? attackLock(s, player) : null;
   const knownMap: Record<string, CardId> = {};
+  // Every hidden position holding a card the player knows, under the placeholder's own handle
+  // (OP15-R7 sibling: a known Life card was in the skeleton's seen set but not in the view).
   for (const p of PLAYERS) {
-    s.players[p].deck.forEach((id, i) => {
-      if (s.known[player].includes(id)) knownMap[`${p}.deck.${i}`] = s.cards[id]!.card;
-    });
+    for (const zone of ['deck', 'life', 'hand'] as const) {
+      const { ids, lead } = viewOrder(s, player, p, zone);
+      ids.forEach((id, i) => {
+        if (s.known[player].includes(id) && !visibleTo(s, id, player))
+          knownMap[`${p}.${zone}.${i - lead}`] = s.cards[id]!.card;
+      });
+    }
   }
   return {
     player,
