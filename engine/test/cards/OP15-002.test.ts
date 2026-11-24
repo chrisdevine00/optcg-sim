@@ -73,8 +73,18 @@ describe('OP15-002 Lucy', () => {
       expectDecision(g, 'block', 'p2');
     });
 
-    it('with no Event or Stage in hand nothing is asked', () => {
+    it('with no Event or Stage in hand the pick is still asked at 0 (the hand contents are secret), then nothing changes', () => {
       const g = start([V.c1, BLUE]);
+      attack(g);
+      const d = expectDecision(g, 'choose', 'p1');
+      expect(d.max).toBe(0);
+      g.act({ type: 'done' });
+      expectDecision(g, 'block', 'p2');
+      expect(g.power(g.leader('p1'))).toBe(5000);
+    });
+
+    it('with an empty hand (public) nothing is asked', () => {
+      const g = start([]);
       attack(g);
       expectDecision(g, 'block', 'p2');
       expect(g.power(g.leader('p1'))).toBe(5000);

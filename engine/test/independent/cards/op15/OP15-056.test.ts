@@ -56,6 +56,7 @@ describe('OP15-056 Would You Let Me Eat the Flame-Flame Fruit?: [Main] draw 2, t
     const g = start(LD15.lucy);
     playRaw(g, EVENT);
     attack(g, g.leader('p1'), g.leader('p2'));
+    g.act({ type: 'done' }); // OP15-002 Lucy [When Attacking]: trash none (the two drawn cards are not Events)
     noDefence(g);
     expect(g.life('p2')).toBe(2);
   });

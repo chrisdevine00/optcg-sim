@@ -35,7 +35,7 @@ export const OP15_024: CardScript = {
             rest: {
               from: ['leader', 'characters'],
               owner: 'opponent',
-              filter: { cost: { lte: 7 } },
+              filter: { any: [{ category: ['Leader'] }, { cost: { lte: 7 } }] },
               pick: { upTo: 1 },
             },
           },
@@ -45,6 +45,6 @@ export const OP15_024: CardScript = {
   ],
   rulings: [
     'reading: "by your opponent\'s Leader and Character effects" is scripted as the engine\'s "by your opponent\'s effects" (an opposing Event or Stage effect would also be stopped; the engine does not tell the source card type apart, M6b-Q30 family)',
-    'reading: a Leader has no cost, so a cost filter never matches the opposing Leader: only Characters can be rested by [On K.O.] (open: the Leader may be meant to be eligible whatever its cost)',
+    'reading (M6b-Q48, review OP15-R4): a Leader has no cost, so the cost limit of 7 is read as restricting the Characters only; the opposing Leader is always eligible',
   ],
 };

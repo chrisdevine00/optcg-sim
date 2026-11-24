@@ -28,6 +28,7 @@ describe('OP15-110 Braham', () => {
 
   it('with a Leader that is not {Shandian Warrior} nothing is added', () => {
     const g = koed(OTHER_LEADER);
+    expect(dec(g)?.kind).not.toBe('optional');
     expect(g.life('p1')).toBe(3);
     expect(names(g, 'p1', 'deck')).toHaveLength(3);
     expect(names(g, 'p1', 'trash')).toEqual([ID]);
@@ -41,6 +42,8 @@ describe('OP15-110 Braham', () => {
 
   it('a {Sky Island} Leader that is not {Shandian Warrior} does not qualify', () => {
     const g = koed(ENEL_SI);
+    // Not even offered: a pending "up to 1" offer would leave Life at 3 until it is accepted.
+    expect(dec(g)?.kind).not.toBe('optional');
     expect(g.life('p1')).toBe(3);
     expect(names(g, 'p1', 'deck')).toHaveLength(3);
   });

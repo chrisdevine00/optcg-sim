@@ -66,8 +66,8 @@ describe('OP15-013 Pincers: -2 cost in hand while my Leader has 0 power or less'
     expect(cost(g)).toBe(4);
   });
 
-  // Disagreement A-1: "0 power or less" is true at exactly 0, the engine reduces only below 0.
-  it.fails('boundary: Leader at exactly 0 power (after two Koby replacements) gives cost 2', () => {
+  // Disagreement A-1 (fixed, OP15 fix round): the hand cost reads the fully derived Leader power.
+  it('boundary: Leader at exactly 0 power (after two Koby replacements) gives cost 2', () => {
     const g = board();
     koReplaced(g, [SCN.c3, SCN.c4]);
     expect(leaderPower(g, 'p1')).toBe(0);

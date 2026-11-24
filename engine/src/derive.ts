@@ -11,7 +11,9 @@
  * here in stages, so a permanent effect's condition can read another card's cost, base power or
  * power without a cycle. A stage reads the values of the stages before it (M4b wave 1,
  * docs/research/m4b-runtime-audit.md §2):
- *   1 cost, 2 base power, 3 power, 4 keyword grants, 5 restrictions.
+ *   1 cost, 2 base power, 3 power, 4 keyword grants, 5 restrictions, 6 cost of cards in hand.
+ * Stage 6 holds only the cost effects whose source is in hand: their conditions see the fully
+ * derived power (OP15-013, OP15-102), and nothing reads a stage above its own, so no cycle.
  * A game whose cards have no such permanent skips all of it.
  */
 import type { Continuous } from '@optcg/cards';
@@ -84,7 +86,7 @@ export interface LayerMemo {
   derived: Map<number, Map<InstanceId, Derived>>;
 }
 export const newMemo = (): LayerMemo => ({ perms: new Map(), derived: new Map() });
-export const LAST_STAGE = 5;
+export const LAST_STAGE = 6;
 
 /** Does any card of this game carry a permanent effect the layers must compute? */
 const layeredDefs = new WeakMap<object, boolean>();

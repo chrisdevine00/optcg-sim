@@ -3,7 +3,8 @@
  * never stored as a modifier: `derive` asks this module, per stage, for the modifiers every live
  * permanent effect currently produces, and merges them with the stored ones.
  *
- * Stages (see `derive.ts`): 1 cost, 2 base power, 3 power, 4 keyword grants, 5 restrictions. While
+ * Stages (see `derive.ts`): 1 cost, 2 base power, 3 power, 4 keyword grants, 5 restrictions, 6 cost
+ * of cards in hand. While
  * a stage's abilities are read (their conditions, their targets, their amounts), card values come
  * from the stages before it, so "if there is a Character with a cost of 12 or more, this gains
  * +3000 power" sees the +12 cost effects, and "base power becomes 8000 for a Character with 4000
@@ -24,6 +25,8 @@ const STAGE_OF: Record<string, number> = {
   power: 3,
   grant: 4,
   restrict: 5,
+  /** Cost effects of a card in hand: they read every field stage (OP15-013), never feed one. */
+  handCost: 6,
 };
 
 const RESTRICT_KIND = {
@@ -100,7 +103,15 @@ function permsOf(def: { abilities: readonly Ability[] }): readonly PermInfo[] {
   if (!v) {
     v = def.abilities
       .filter((a): a is Permanent => a.kind === 'permanent')
-      .map((ab) => ({ ab, mask: stageMask(ab.apply) }));
+      .map((ab) => {
+        let mask = stageMask(ab.apply);
+        // A hand-zone cost effect moves to the last stage, so its conditions read the fully
+        // derived power of the Leader and Characters (a field stage cannot read it: cycle).
+        if (ab.zone === 'hand' && mask & (1 << STAGE_OF.cost!)) {
+          mask = (mask & ~(1 << STAGE_OF.cost!)) | (1 << STAGE_OF.handCost!);
+        }
+        return { ab, mask };
+      });
     permInfo.set(def, v);
   }
   return v;
@@ -155,7 +166,7 @@ export function computePerms(
             for (const id of pool(c, ap.setBasePower.target))
               add({ ...base, kind: 'basePower', target: id, amount });
           } else if ('cost' in ap) {
-            if (stage !== STAGE_OF.cost) continue;
+            if (stage !== (zone === 'hand' ? STAGE_OF.handCost : STAGE_OF.cost)) continue;
             const amount = num(c, ap.cost.amount);
             for (const id of pool(c, ap.cost.target))
               add({ ...base, kind: 'cost', target: id, amount });

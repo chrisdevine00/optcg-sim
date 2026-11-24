@@ -47,7 +47,7 @@ describe('OP15-024 Usopp', () => {
   it("[On K.O.]: rests up to 1 of your opponent's Characters with a cost of 7 or less", () => {
     const g = koUsopp([V.c7, V.c4, COST8]);
     expectDecision(g, 'choose', 'p1');
-    expect(g.legal().filter((a) => a.type === 'pick')).toHaveLength(2); // cost 8 is not a candidate
+    expect(g.legal().filter((a) => a.type === 'pick')).toHaveLength(3); // Leader, cost 7, cost 4; not cost 8
     pick(g, [g.find('p2', 'characters', V.c7)]);
     expect(g.card(g.find('p2', 'characters', V.c7)).rested).toBe(true);
     expect(g.card(g.find('p2', 'characters', V.c4)).rested).toBe(false);
@@ -55,16 +55,23 @@ describe('OP15-024 Usopp', () => {
 
   it('[On K.O.]: boundary cost 7 is allowed and cost 8 is not; "up to 1" may rest nothing', () => {
     const g = koUsopp([COST8]);
-    expectDecision(g, 'main', 'p2'); // no legal target: nothing to choose
+    expectDecision(g, 'choose', 'p1'); // only the Leader is a candidate: cost 8 is not
+    expect(g.legal().filter((a) => a.type === 'pick')).toHaveLength(1);
+    none(g);
     expect(g.card(g.find('p2', 'characters', COST8)).rested).toBe(false);
     const h = koUsopp([V.c7]);
     none(h);
     expect(h.card(h.find('p2', 'characters', V.c7)).rested).toBe(false);
   });
 
-  it("[On K.O.]: a Leader has no cost, so the opponent's Leader is not a candidate (reading)", () => {
-    const g = koUsopp([V.c4]);
+  it("[On K.O.]: the opponent's Leader is a candidate whatever its cost (reading, M6b-Q48), and rests", () => {
+    const g = koUsopp([V.c4, COST8]);
+    expectDecision(g, 'choose', 'p1');
     const choices = g.legal().filter((a) => a.type === 'pick');
-    expect(choices.map((a) => (a.type === 'pick' ? a.choice : ''))).not.toContain(g.leader('p2'));
+    // Leader and the cost 4 Character; the cost 8 Character is not a candidate.
+    expect(choices).toHaveLength(2);
+    pick(g, [g.leader('p2')]);
+    expect(g.card(g.leader('p2')).rested).toBe(true);
+    expect(g.card(g.find('p2', 'characters', COST8)).rested).toBe(false);
   });
 });
