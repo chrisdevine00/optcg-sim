@@ -29,9 +29,17 @@
    "block": 3,
    "effectText": "If you have a Character with 10000 power or more, give this card in your hand −4 cost.\n[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Blocker"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST23-001",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -80,8 +88,14 @@
    "effectText": "If your opponent has a Character with 8000 base power or more, give this card in your hand −3 cost.\n[On Play] If your Leader has the \"Red-Haired Pirates\" type or is [Uta], your Leader gains +2000 power until the end of your opponent's next End Phase.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST23-002",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -129,8 +143,14 @@
    "effectText": "[On Play] You may trash 1 card from your hand: If your Leader has the \"Red-Haired Pirates\" type, K.O. up to 1 of your opponent's Characters with 4000 base power or less.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST23-003",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -180,8 +200,14 @@
    "effectText": "[Activate:Main] You may rest 1 of your DON!! cards and this Character: Give up to 1 of your opponent's Characters-1000 power during this turn.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST23-004",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -238,8 +264,14 @@
    "effectText": "[Activate:Main] [Once Per Turn] Give up to 1 rested DON!! card to your Leader or 1 of your Characters.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST23-005",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {

@@ -100,8 +100,14 @@
    "effectText": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 Character card with 6000 power and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST30-002",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -160,8 +166,14 @@
    "effectText": "[Your Turn] All of your Characters with 6000 base power gain +1000 power.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST30-003",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -220,8 +232,14 @@
    "effectText": "[On Play] You may reveal 2 Character cards with 6000 power from your hand: Draw 3 cards and trash 2 cards from your hand.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST30-004",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -279,8 +297,14 @@
    "effectText": "",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST30-005",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -340,8 +364,14 @@
    "effectText": "[On Play] You may trash 1 Character card with 6000 power from your hand: Draw 2 cards.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST30-006",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -399,8 +429,14 @@
    "effectText": "[On Play] You may rest 1 of your DON!! cards: This Character gains [Rush] during this turn.\n(This card can attack on the turn in which it is played.)\n[When Attacking] Give up to 1 of your opponent's Characters −1000 power during this turn.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST30-007",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -457,9 +493,17 @@
    "block": 5,
    "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n\n[On K.O.] You may trash 1 Character card with 6000 power from your hand: Play this Character card from your trash rested.",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Blocker"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST30-008",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -577,9 +621,17 @@
    "block": 5,
    "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n\n[On Play] Up to 1 of your opponent's rested Characters will not become active in your opponent's next Refresh Phase.",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Blocker"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST30-010",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -637,9 +689,17 @@
    "block": 5,
    "effectText": "If your Character with 6000 base power would be removed from the field by your opponent's effect, you may rest this Character instead.\n\n[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Blocker"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST30-011",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -764,8 +824,14 @@
    "effectText": "",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST30-013",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -824,8 +890,14 @@
    "effectText": "[Activate: Main] You may rest this Character: Give up to 2 of your Characters with 6000 base power up to 2 rested DON!! cards each.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST30-014",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -881,8 +953,14 @@
    "effectText": "[Counter] If you have 2 or more Characters with 6000 base power, up to 1 of your Leader or Character cards gains +4000 power during this battle.",
    "triggerText": "K.O. up to 1 of your opponent's Characters with 6000 power or less.",
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST30-015",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -939,8 +1017,14 @@
    "effectText": "[Counter] Up to 1 of your Leader or Character cards gains +3000 power during this battle. Then, if you have [Portgas.D.Ace] and [Monkey.D.Luffy] Characters with 6000 base power, draw 1 card.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST30-016",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -996,8 +1080,14 @@
    "effectText": "[Main] Look at 5 cards from the top of your deck; reveal up to 1 Character card with 6000 power and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
    "triggerText": "Activate this card's [Main] effect.",
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST30-017",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {

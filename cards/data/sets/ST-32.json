@@ -81,8 +81,14 @@
    "effectText": "[On Play] Draw 1 card and up to 1 of your opponent's Characters with a base cost of 6 or less cannot be rested until the end of your opponent's next End Phase.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST32-002",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {

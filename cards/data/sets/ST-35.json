@@ -31,9 +31,17 @@
    "block": 5,
    "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)[On Play] K.O. up to 1 of your opponent's Characters with 2000 base power or less.",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Blocker"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST35-001",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -82,8 +90,14 @@
    "effectText": "[On Play] Give up to 1 of your opponent's Characters −3000 power during this turn.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST35-002",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [
     {
      "field": "effectText",
@@ -138,8 +152,14 @@
    "effectText": "[When Attacking] You may trash 2 cards from the top of your deck: If your opponent has 7 or more cards in their hand, your opponent trashes 1 card from their hand.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST35-003",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -188,8 +208,14 @@
    "effectText": "This Character gains [Blocker] and +1 cost.[On Play] Give up to 1 rested DON!! card to your Leader. Then, play up to 1 Character card with 4000 power or less and the {Revolutionary Army} type from your hand or trash.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST35-004",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -237,8 +263,14 @@
    "effectText": "This Character gains +3 cost.[On Play] Give up to 1 rested DON!! card to your Leader. Then, play up to 1 Character card with 4000 power or less and the {Revolutionary Army} type from your hand or trash.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST35-005",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {

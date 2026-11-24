@@ -82,8 +82,14 @@
    "effectText": "[Activate:Main] [Once Per Turn] If you have 0 DON!! cards on your field or 8 or more DON!! cards on your field, add up to 1 DON!! card from your DON!! deck and set it as active.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST10-002",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -132,8 +138,14 @@
    "effectText": "[Your Turn] If you have 4 or more Life cards, give this Leader −1000 power. [When Attacking] DON!! −1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): This Leader gains +2000 power during this turn.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST10-003",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -181,8 +193,14 @@
    "effectText": "[On Play] If your opponent has a Character with 5000 or more power, this Character gains [Rush] during this turn. (This card can attack on the turn in which it is played.)",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST10-004",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -231,8 +249,14 @@
    "effectText": "[DON!! x1] [When Attacking] Give up to 1 of your opponent's Characters −2000 power during this turn.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST10-005",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -299,9 +323,17 @@
    "block": 2,
    "effectText": "[Rush] (This card can attack on the turn in which it is played.) [Once Per Turn] When your opponent activates a [Blocker], K.O. up to 1 of your opponent's Characters with 8000 power or less.",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Rush"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST10-006",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -349,8 +381,14 @@
    "effectText": "[Your Turn] [Once Per Turn] When a DON!! card on your field is returned to your DON!! deck, K.O. up to 1 of your opponent's rested Characters with a cost of 3 or less.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST10-007",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -398,8 +436,14 @@
    "effectText": "[On Play] If you have 3 or less DON!! cards on your field, add up to 2 DON!! cards from your DON!! deck and rest them.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST10-008",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -467,8 +511,14 @@
    "effectText": "[On Play] (1) (You may rest the specified number of DON!! cards in your cost area.): Add up to 1 DON!! card from your DON!! deck and set it as active.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST10-009",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -603,8 +653,14 @@
    "effectText": "[Your Turn] [Once Per Turn] When a DON!! card on your field is returned to your DON!! deck, this Character gains +2000 power until the start of your next turn.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST10-011",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -653,8 +709,14 @@
    "effectText": "[On Play] / [When Attacking] If your opponent has more DON!! cards on their field than you, add up to 1 DON!! card from your DON!! deck and rest it.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST10-012",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -702,8 +764,14 @@
    "effectText": "[On Play] / [When Attacking] DON!! −1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): Up to 1 of your Leader gains +1000 power until the start of your next turn.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST10-013",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -750,9 +818,17 @@
    "block": 2,
    "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.) [Once Per Turn] When a DON!! card on your field is returned to your DON!! deck, draw 1 card and trash 1 card from your hand.",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Blocker"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST10-014",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -798,8 +874,14 @@
    "effectText": "[Counter] Up to 1 of your Leader or Character cards gains +2000 power during this battle, and K.O. up to 1 of your opponent's Characters with 2000 power or less.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST10-015",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -845,8 +927,14 @@
    "effectText": "[Main] K.O. up to 1 of your opponent's Characters with 7000 power or less.",
    "triggerText": "Up to 1 of your Leader gains +1000 power until the end of your next turn.",
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST10-016",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -892,8 +980,14 @@
    "effectText": "[Main] Rest up to 1 of your opponent's Characters with a cost of 2 or less, and add up to 1 DON!! card from your DON!! deck and rest it.",
    "triggerText": "Add up to 1 DON!! card from your DON!! deck and set it as active.",
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST10-017",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {

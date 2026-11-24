@@ -1,13 +1,19 @@
 {
   "id": "OP17-099",
-  "verified": false,
+  "verified": true,
   "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP17-099",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    },
     {
       "url": "https://en.onepiece-cardgame.com/cardlist/?series=569117",
       "date": "2026-10-28",
       "use": "disagreement"
     }
   ],
+  "keywords": [],
   "fields": {
     "power": {
       "value": 5000,

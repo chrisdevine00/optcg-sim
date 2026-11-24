@@ -1,6 +1,6 @@
 {
   "id": "OP12-016",
-  "verified": false,
+  "verified": true,
   "sources": [
     {
       "url": "https://onepiece.limitlesstcg.com/cards/OP12-016",
@@ -13,6 +13,7 @@
       "use": "disagreement"
     }
   ],
+  "keywords": [],
   "fields": {
     "cost": {
       "value": 0,

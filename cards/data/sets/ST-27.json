@@ -30,8 +30,14 @@
    "effectText": "[Activate:Main] [Once Per Turn] You may rest 1 of your [Fullalead] cards: If your Leader has the \"Blackbeard Pirates\" type, this Character gains +4000 power during this turn.\n[On K.O.] Draw 1 card.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST27-001",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -79,8 +85,14 @@
    "effectText": "[Activate:Main] You may trash this Character: If your Leader has the \"Blackbeard Pirates\" type, give up to 1 of your opponent's Characters −1 cost during this turn.\n[On K.O.] Draw 1 card.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST27-002",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -128,9 +140,17 @@
    "block": 3,
    "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[On K.O.] Play up to 1 \"Blackbeard Pirates\" type Character card with a cost of 5 or less from your trash rested.",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Blocker"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST27-003",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -179,8 +199,14 @@
    "effectText": "If your Leader has the \"Blackbeard Pirates\" type, this Character gains [Blocker] and +1 cost for every 4 cards in your trash.\n(After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[On Play] Trash 1 card from your hand.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST27-004",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -229,8 +255,14 @@
    "effectText": "[Activate:Main] You may rest this Character: K.O. up to 1 Character with a cost of 3 or less.\n[On K.O.] Add up to 1 black card from your trash to your hand.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST27-005",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {

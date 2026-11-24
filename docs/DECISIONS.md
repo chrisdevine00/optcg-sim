@@ -2,6 +2,10 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-24 — The Standard pool verified against Limitless (keyword-only cards play fully)
+
+The EB-05 review (EB05-R6) and the independent testers found that unverified cards which print a keyword (for example [Blocker] on ST08-006) have empty `keywords` in the source data, so the engine ignored the keyword: printed keywords reach the engine only through a verification override (E-D7). `cards:verify-meta -- --set <SET>` now takes a whole product (Standard-legal cards only); it was run over all 52 Standard products with unverified cards (about 2,060 Limitless pages, cached in `.cache/m1/limitless/`, one request a second; robots.txt allows). **1,950 cards matched field for field** and got verified overrides with their printed keywords (the M1 method); 110 disagree in some field and stay unverified until their batch is scripted (the runbook's step d.1 settles them). Verified cards: 183 → 2,013. Standard coverage 19.5% → 20.6% (keyword-only cards now count as playing fully). Alternatives rejected: parsing keywords from optcgapi's text (ADR 0006: text is never parsed into behaviour); waiting for each batch (the keyword-only cards would stay wrong in play for months).
+
 ## 2026-11-24 — Blocks cited for EB-05 and nine starter decks (runbook step a)
 
 EB-05 (the first scripting batch) and the starter decks with no cited block had `unknown` Standard legality. Each product's block was read from one Limitless card page (the source `standard.json` already accepts for ST-30): EB-05, ST-33, ST-35 and ST-36 block 5; ST-22, ST-23, ST-24, ST-25 and ST-28 block 3; ST-08 block 1 (not Standard). 113 cards became Standard-legal and ST-08's 15 rotated; the Standard pool is now 2,124 cards. As for the other products, every printing is assumed to carry the product block. Promos keep `unknown` until each is read (their block is per card). Tests that used EB05-001 as the example of an uncited card now use the promo Leader P-011; `play-frequency.json` was re-enriched (it records each card's Standard status).
