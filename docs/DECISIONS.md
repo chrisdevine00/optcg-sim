@@ -2,6 +2,20 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-24 — M6b-2 wave 1: ten engine gaps (ENGINE_VERSION 0.5.5)
+
+Context: wave 1 of `docs/research/m6b-runtime-audit.md` §4 (G1 to G10), built by an agent in a worktree and merged after its report and a full suite run; detail and per-gap revert results in `docs/research/m6b-wave1.md`. Each gap has planted tests on vanilla test cards (`engine/test/cards/m6b-w1/`, 44 tests), and each was seen to fail with its implementation broken. Goldens re-recorded for the version bump: hashes and event sequences unchanged.
+
+- **Field costs (G1)** go through the existing removal and K.O. frames with cause `cost` (last-known information, given DON!! returned, [On K.O.] fires), not a plain move; the validator accepts them only for your own Characters and Stage. **A K.O. cost on a protected Character is offered and fails**: earlier costs stay paid and the effect does not resolve (RL-16, "legal but failed payment"); the check is whether the card left the field, so a replaced K.O. fails the same way. Rejected: hiding protected Characters from the choice (cannot express the replaced K.O.).
+- **A cost counts as an effect for protection** ("cannot be K.O.'d by effects" stops a K.O. cost; rules-digest 112, RL-16); "by your opponent's effects" stops only the card owner's opponent's (RL-14, OP04-079).
+- **`mill` clamps to the deck, and an empty deck loses at once** (RL-26, digest note 274.2). The audit's sentence that milling must never lose by itself contradicted the rulings and was not followed.
+- **`cannotBeRested`**: unscoped blocks every rest, own effects, attacks and blocks included (digest 57); the opponent-effect form blocks only a rest by an effect of the owner's opponent.
+- **"During this battle" with no battle in progress** creates nothing and asks for no target (any action with a battle duration).
+- **One `scope` field on modifiers and one `restrictionMod` mapping** for timed and permanent restrictions, not one modifier kind per scope.
+- **Two more shapes refused by the validator** that used to pass and misexecute (a player restriction on a card target; a permanent `cannotDrawByOwnEffects`); no script used them.
+- **The lethal bound** counts `cannotActivateBlocker` as a Blocker lost (it was treated as neutral, which would have been unsound); scoped restrictions, `mill`, `activate` and the new costs stay unclassified, so the solver searches instead of trusting the bound.
+- **Open questions left open:** M6b-Q12, Q30, Q31 (the mechanisms support either reading; settled when their cards are scripted).
+
 ## 2026-11-23 — Tests run on a pinned copy of the meta file
 
 Context: the first real `update.yml` run (2026-11-24 UTC) produced a meta PR whose CI failed 23 unit tests and 4 e2e tests: pinning only the test decks (M6b-0) was not enough, because the AI's opponent model (`ai/src/knowledge.ts`), lethal certainty, the review flags and the AI's explanations all read `docs/research/meta-lists.json`. A weekly PR that can never pass CI would never be merged. Decision: Vitest and the e2e build (`PINNED_META=1` in `playwright.config.ts`) alias every import of `meta-lists.json` to `ai/test/fixtures/meta-lists.pinned.json` (the file as of 2026-10-28; it replaces `strength-decks.json`). Tests about the live file itself read it from disk and still run on the PR: every list is Standard-legal (errors only; an uncited block such as EB-05's is a warning, as in the deck builder) and round-trips through every export format. Checked by running the failing tests with the PR's meta file in place: all pass. Alternatives rejected: letting the meta PR fail until a person updates expectations (the PR is weekly and machine-made); injecting the meta into `priorFor` (every caller would change, for a test concern). Update the pinned copy only on purpose, with a DECISIONS entry.
