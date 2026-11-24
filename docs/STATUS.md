@@ -9,10 +9,10 @@
 
 - **`origin/main`:** 32c4876 — blocks 5 and 4 complete (except the cards listed below), engine waves 1 to 4 (ENGINE_VERSION 0.5.16), block 3 verified against Limitless (B3-V1 to B3-V4 open). Standard coverage 48.1% on `main`.
 - **Local `main` (this checkout, not pushed):** 13 commits ahead of `origin/main`. It adds the six block 3 scripting groups, merged: **OP-11 (79 cards) and OP-12 (68 cards) scripted** with author tests and readings (`docs/research/OP-11-scripting-g1..g3.md`, `OP-12-scripting-g1..g3.md`), plus a fix to the optional-cost checker for an untagged start-of-turn unit (OP11-040). Full suite green there (20,249 tests). It is not pushed because these scripts have not had their blind tests or review yet (runbook steps e to g); nothing unreviewed goes to `origin/main`.
-- **Running now (step e):** six blind independent-test groups for those 147 cards, writing to `engine/test/independent/cards/op11/` and `op12/` on worktree branches `worktree-agent-*` (`.claude/worktrees/`). Each reports a commit; disagreements land as `it.fails` plus a line in `DISAGREEMENTS-<x>.md`.
+- **Done since checkpoint 2:** step e — the six blind independent-test groups are merged locally (about 1,530 tests in `engine/test/independent/cards/op11/` and `op12/`, no disagreements); full suite green on local `main` (21,789 tests). Four groups dropped on an API connection error and were resumed; no work was lost.
+- **Running now (step f):** the adversarial review of OP-11 and OP-12 (`docs/reviews/m6b-OP-11-12.md` when done, on a worktree branch).
 - **Next steps, in order:**
-  1. Merge the six blind-test branches; run the full suite.
-  2. Adversarial review of OP-11 and OP-12 (step f; brief as `docs/reviews/m6b-block4-tail.md`), then one fix round (step g), then run all checks (unit, `ENGINE_GAMES=2000` property, e2e) and push (step h).
+  1. Merge the review; one fix round (step g), then run all checks (unit, `ENGINE_GAMES=2000` property, e2e) and push (step h).
   3. The rest of block 3: OP-10 (96), OP-09 (87), EB-02 (44), PRB-02 (15), ST-15 to ST-27 (about 45), expressible after wave 4 per `docs/research/m6b-audit/block3.md` mapped through `m6b-runtime-audit.md` §2. Same pipeline (scripting brief `script-brief-b3` in the session scratchpad: runbook step d with the newest review lessons).
   4. Engine: the OP12-081 attack-target gap (BACKLOG §5), then waves 5 to 7 (`m6b-runtime-audit.md` §4) and the cards they unblock.
   5. Wave 8 design items (D1, D2, D5, D7, D8, D9) only after the lead decides each.
