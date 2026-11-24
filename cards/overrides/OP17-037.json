@@ -1,0 +1,13 @@
+{
+  "id": "OP17-037",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP17-037",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "note": "Name punctuation differs: optcgapi \"?!\", Limitless \"?!!\". Kept \"?!\" until the official list is read (OPEN-QUESTIONS OP-17-V1); no script matches this name. Every other field matches."
+}

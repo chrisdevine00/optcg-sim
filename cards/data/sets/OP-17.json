@@ -406,12 +406,26 @@
    "rarity": "R",
    "set": "OP-17",
    "block": 5,
-   "effectText": "[On Play] If your Leader is [Edward.Newgate] or has the {Land of Wano} type, play up to 1 {Land of Wano} type Character card with a type including \"Whitebeard Pirates\" with 6000 power or less from your hand.",
+   "effectText": "[On Play] If your Leader is [Edward.Newgate] or has the {Land of Wano} type, play up to 1 {Land of Wano} type Character card or Character card with a type including \"Whitebeard Pirates\" with 6000 power or less from your hand.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
-   "textFixes": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/OP17-007",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "override",
+     "from": "{Land of Wano} type Character card with a type including",
+     "to": "{Land of Wano} type Character card or Character card with a type including",
+     "source": "https://onepiece.limitlesstcg.com/cards/OP17-007"
+    }
+   ],
    "artworks": [
     {
      "artworkId": "OP17-007",
@@ -1197,8 +1211,14 @@
    "effectText": "If your Character with a type including \"Red-Haired Pirates\" would be removed from the field by your opponent's effect, you may rest 1 of your cards instead.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/OP17-021",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -1554,12 +1574,28 @@
    "rarity": "R",
    "set": "OP-17",
    "block": 5,
-   "effectText": "[Rush Character] (This card can attack Characters on the turn in which it is played.)[On Play] If your Leader has the {Red-Haired Pirates} type, draw 1 card and rest up to 2 of your opponent's Characters.",
+   "effectText": "[Rush: Character] (This card can attack Characters on the turn in which it is played.)[On Play] If your Leader has the {Red-Haired Pirates} type, draw 1 card and rest up to 2 of your opponent's Characters.",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
-   "textFixes": [],
+   "keywords": [
+    "Rush: Character"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/OP17-027",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "override",
+     "from": "[Rush Character]",
+     "to": "[Rush: Character]",
+     "source": "https://onepiece.limitlesstcg.com/cards/OP17-027"
+    }
+   ],
    "artworks": [
     {
      "artworkId": "OP17-027",
@@ -2126,8 +2162,14 @@
    "effectText": "[Main] Look at 5 cards from the top of your deck; reveal up to 1 card with a type including \"Red-Haired Pirates\" and add it to your hand. Then, place the rest at the bottom of your deck in any order.\n[Counter] You may rest 1 of your cards: Up to 1 of your Leader or Characters gains +3000 power during this battle.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/OP17-037",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {

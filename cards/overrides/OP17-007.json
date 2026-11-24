@@ -1,0 +1,22 @@
+{
+  "id": "OP17-007",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP17-007",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "textPatches": [
+    {
+      "field": "effectText",
+      "find": "{Land of Wano} type Character card with a type including",
+      "replace": "{Land of Wano} type Character card or Character card with a type including",
+      "note": "optcgapi drops \"or Character card\"; Limitless has the printed text.",
+      "source": "https://onepiece.limitlesstcg.com/cards/OP17-007"
+    }
+  ],
+  "note": "Settled on Limitless (official list not reachable 2026-11-24); a dropped phrase, not a reading."
+}
