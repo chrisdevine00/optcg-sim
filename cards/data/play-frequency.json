@@ -1,16 +1,16 @@
 {
-  "asOf": "2026-11-23",
+  "asOf": "2026-11-24",
   "window": {
-    "from": "2026-08-25",
-    "to": "2026-11-23"
+    "from": "2026-08-26",
+    "to": "2026-11-24"
   },
-  "events": 34,
-  "decks": 2024,
+  "events": 33,
+  "decks": 1968,
   "cards": [
     {
       "id": "EB04-058",
-      "decks": 408,
-      "copies": 1332,
+      "decks": 397,
+      "copies": 1298,
       "share": 20.2,
       "colors": [
         "Yellow"
@@ -20,9 +20,9 @@
     },
     {
       "id": "OP17-109",
-      "decks": 406,
-      "copies": 1591,
-      "share": 20.1,
+      "decks": 392,
+      "copies": 1535,
+      "share": 19.9,
       "colors": [
         "Yellow"
       ],
@@ -31,9 +31,9 @@
     },
     {
       "id": "OP17-074",
-      "decks": 385,
-      "copies": 1496,
-      "share": 19,
+      "decks": 377,
+      "copies": 1464,
+      "share": 19.2,
       "colors": [
         "Purple"
       ],
@@ -42,9 +42,9 @@
     },
     {
       "id": "OP17-114",
-      "decks": 383,
-      "copies": 1388,
-      "share": 18.9,
+      "decks": 374,
+      "copies": 1356,
+      "share": 19,
       "colors": [
         "Yellow"
       ],
@@ -53,9 +53,9 @@
     },
     {
       "id": "OP15-078",
-      "decks": 377,
-      "copies": 1470,
-      "share": 18.6,
+      "decks": 372,
+      "copies": 1450,
+      "share": 18.9,
       "colors": [
         "Purple"
       ],
@@ -64,41 +64,8 @@
     },
     {
       "id": "OP17-095",
-      "decks": 369,
-      "copies": 1445,
-      "share": 18.2,
-      "colors": [
-        "Black"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP17-080",
-      "decks": 364,
-      "copies": 1451,
-      "share": 18,
-      "colors": [
-        "Black"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP17-046",
-      "decks": 364,
-      "copies": 1417,
-      "share": 18,
-      "colors": [
-        "Blue"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP17-119",
-      "decks": 363,
-      "copies": 1369,
+      "decks": 352,
+      "copies": 1378,
       "share": 17.9,
       "colors": [
         "Black"
@@ -107,10 +74,32 @@
       "standard": "legal"
     },
     {
-      "id": "OP04-016",
-      "decks": 361,
-      "copies": 988,
+      "id": "OP17-046",
+      "decks": 351,
+      "copies": 1366,
       "share": 17.8,
+      "colors": [
+        "Blue"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP17-080",
+      "decks": 347,
+      "copies": 1385,
+      "share": 17.6,
+      "colors": [
+        "Black"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP04-016",
+      "decks": 347,
+      "copies": 960,
+      "share": 17.6,
       "colors": [
         "Red"
       ],
@@ -118,10 +107,21 @@
       "standard": "legal"
     },
     {
+      "id": "OP17-119",
+      "decks": 346,
+      "copies": 1304,
+      "share": 17.6,
+      "colors": [
+        "Black"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
       "id": "OP17-093",
-      "decks": 360,
-      "copies": 1316,
-      "share": 17.8,
+      "decks": 345,
+      "copies": 1261,
+      "share": 17.5,
       "colors": [
         "Black"
       ],
@@ -130,9 +130,9 @@
     },
     {
       "id": "OP17-082",
-      "decks": 360,
-      "copies": 1278,
-      "share": 17.8,
+      "decks": 345,
+      "copies": 1228,
+      "share": 17.5,
       "colors": [
         "Black"
       ],
@@ -141,9 +141,9 @@
     },
     {
       "id": "OP17-089",
-      "decks": 357,
-      "copies": 1351,
-      "share": 17.6,
+      "decks": 343,
+      "copies": 1297,
+      "share": 17.4,
       "colors": [
         "Black"
       ],
@@ -152,9 +152,9 @@
     },
     {
       "id": "OP17-087",
-      "decks": 357,
-      "copies": 1311,
-      "share": 17.6,
+      "decks": 342,
+      "copies": 1255,
+      "share": 17.4,
       "colors": [
         "Black"
       ],
@@ -163,9 +163,9 @@
     },
     {
       "id": "OP17-054",
-      "decks": 353,
-      "copies": 1361,
-      "share": 17.4,
+      "decks": 341,
+      "copies": 1315,
+      "share": 17.3,
       "colors": [
         "Blue"
       ],
@@ -174,30 +174,8 @@
     },
     {
       "id": "OP15-088",
-      "decks": 345,
-      "copies": 1211,
-      "share": 17,
-      "colors": [
-        "Black"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP17-049",
-      "decks": 344,
-      "copies": 1361,
-      "share": 17,
-      "colors": [
-        "Blue"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP17-084",
-      "decks": 342,
-      "copies": 755,
+      "decks": 333,
+      "copies": 1172,
       "share": 16.9,
       "colors": [
         "Black"
@@ -206,10 +184,32 @@
       "standard": "legal"
     },
     {
+      "id": "OP17-049",
+      "decks": 331,
+      "copies": 1310,
+      "share": 16.8,
+      "colors": [
+        "Blue"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP17-084",
+      "decks": 327,
+      "copies": 719,
+      "share": 16.6,
+      "colors": [
+        "Black"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
       "id": "OP17-055",
-      "decks": 337,
-      "copies": 1348,
-      "share": 16.7,
+      "decks": 325,
+      "copies": 1300,
+      "share": 16.5,
       "colors": [
         "Blue"
       ],
@@ -218,9 +218,9 @@
     },
     {
       "id": "OP17-118",
-      "decks": 337,
-      "copies": 1348,
-      "share": 16.7,
+      "decks": 325,
+      "copies": 1300,
+      "share": 16.5,
       "colors": [
         "Blue"
       ],
@@ -229,9 +229,9 @@
     },
     {
       "id": "OP17-040",
-      "decks": 337,
-      "copies": 1347,
-      "share": 16.7,
+      "decks": 325,
+      "copies": 1299,
+      "share": 16.5,
       "colors": [
         "Blue"
       ],
@@ -240,9 +240,9 @@
     },
     {
       "id": "OP17-048",
-      "decks": 337,
-      "copies": 1347,
-      "share": 16.7,
+      "decks": 325,
+      "copies": 1299,
+      "share": 16.5,
       "colors": [
         "Blue"
       ],
@@ -251,9 +251,9 @@
     },
     {
       "id": "OP17-056",
-      "decks": 337,
-      "copies": 1347,
-      "share": 16.7,
+      "decks": 325,
+      "copies": 1299,
+      "share": 16.5,
       "colors": [
         "Blue"
       ],
@@ -262,9 +262,9 @@
     },
     {
       "id": "OP17-045",
-      "decks": 337,
-      "copies": 1334,
-      "share": 16.7,
+      "decks": 325,
+      "copies": 1287,
+      "share": 16.5,
       "colors": [
         "Blue"
       ],
@@ -273,9 +273,9 @@
     },
     {
       "id": "OP17-086",
-      "decks": 337,
-      "copies": 1028,
-      "share": 16.7,
+      "decks": 324,
+      "copies": 984,
+      "share": 16.5,
       "colors": [
         "Black"
       ],
@@ -284,9 +284,9 @@
     },
     {
       "id": "OP17-044",
-      "decks": 323,
-      "copies": 857,
-      "share": 16,
+      "decks": 313,
+      "copies": 827,
+      "share": 15.9,
       "colors": [
         "Blue"
       ],
@@ -295,8 +295,8 @@
     },
     {
       "id": "OP01-016",
-      "decks": 318,
-      "copies": 1025,
+      "decks": 308,
+      "copies": 1000,
       "share": 15.7,
       "colors": [
         "Red"
@@ -306,8 +306,8 @@
     },
     {
       "id": "OP17-112",
-      "decks": 316,
-      "copies": 1228,
+      "decks": 307,
+      "copies": 1193,
       "share": 15.6,
       "colors": [
         "Yellow"
@@ -317,9 +317,9 @@
     },
     {
       "id": "OP08-051",
-      "decks": 315,
-      "copies": 1027,
-      "share": 15.6,
+      "decks": 306,
+      "copies": 997,
+      "share": 15.5,
       "colors": [
         "Blue"
       ],
@@ -328,9 +328,9 @@
     },
     {
       "id": "OP17-107",
-      "decks": 302,
-      "copies": 1155,
-      "share": 14.9,
+      "decks": 295,
+      "copies": 1127,
+      "share": 15,
       "colors": [
         "Yellow"
       ],
@@ -339,9 +339,9 @@
     },
     {
       "id": "OP16-119",
-      "decks": 294,
-      "copies": 973,
-      "share": 14.5,
+      "decks": 288,
+      "copies": 954,
+      "share": 14.6,
       "colors": [
         "Yellow"
       ],
@@ -350,20 +350,9 @@
     },
     {
       "id": "OP17-052",
-      "decks": 270,
-      "copies": 836,
-      "share": 13.3,
-      "colors": [
-        "Blue"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP17-050",
-      "decks": 266,
-      "copies": 794,
-      "share": 13.1,
+      "decks": 260,
+      "copies": 807,
+      "share": 13.2,
       "colors": [
         "Blue"
       ],
@@ -372,9 +361,9 @@
     },
     {
       "id": "OP17-113",
-      "decks": 263,
-      "copies": 966,
-      "share": 13,
+      "decks": 257,
+      "copies": 943,
+      "share": 13.1,
       "colors": [
         "Yellow"
       ],
@@ -382,20 +371,20 @@
       "standard": "legal"
     },
     {
-      "id": "OP17-081",
-      "decks": 260,
-      "copies": 826,
-      "share": 12.8,
+      "id": "OP17-050",
+      "decks": 256,
+      "copies": 757,
+      "share": 13,
       "colors": [
-        "Black"
+        "Blue"
       ],
       "category": "Character",
       "standard": "legal"
     },
     {
       "id": "OP17-102",
-      "decks": 258,
-      "copies": 1004,
+      "decks": 250,
+      "copies": 972,
       "share": 12.7,
       "colors": [
         "Yellow"
@@ -404,10 +393,21 @@
       "standard": "legal"
     },
     {
+      "id": "OP17-081",
+      "decks": 249,
+      "copies": 795,
+      "share": 12.7,
+      "colors": [
+        "Black"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
       "id": "ST31-005",
-      "decks": 233,
-      "copies": 896,
-      "share": 11.5,
+      "decks": 232,
+      "copies": 893,
+      "share": 11.8,
       "colors": [
         "Red"
       ],
@@ -415,21 +415,10 @@
       "standard": "legal"
     },
     {
-      "id": "OP17-042",
-      "decks": 224,
-      "copies": 539,
-      "share": 11.1,
-      "colors": [
-        "Blue"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
       "id": "OP13-076",
-      "decks": 224,
-      "copies": 302,
-      "share": 11.1,
+      "decks": 220,
+      "copies": 295,
+      "share": 11.2,
       "colors": [
         "Purple"
       ],
@@ -437,9 +426,20 @@
       "standard": "legal"
     },
     {
+      "id": "OP17-042",
+      "decks": 212,
+      "copies": 505,
+      "share": 10.8,
+      "colors": [
+        "Blue"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
       "id": "OP17-106",
-      "decks": 203,
-      "copies": 756,
+      "decks": 196,
+      "copies": 728,
       "share": 10,
       "colors": [
         "Yellow"
@@ -448,32 +448,10 @@
       "standard": "legal"
     },
     {
-      "id": "OP17-098",
-      "decks": 203,
-      "copies": 363,
-      "share": 10,
-      "colors": [
-        "Black"
-      ],
-      "category": "Event",
-      "standard": "legal"
-    },
-    {
       "id": "OP09-077",
-      "decks": 196,
-      "copies": 333,
-      "share": 9.7,
-      "colors": [
-        "Purple"
-      ],
-      "category": "Event",
-      "standard": "legal"
-    },
-    {
-      "id": "OP09-078",
       "decks": 195,
-      "copies": 734,
-      "share": 9.6,
+      "copies": 332,
+      "share": 9.9,
       "colors": [
         "Purple"
       ],
@@ -482,8 +460,30 @@
     },
     {
       "id": "OP07-077",
-      "decks": 193,
-      "copies": 705,
+      "decks": 191,
+      "copies": 697,
+      "share": 9.7,
+      "colors": [
+        "Purple"
+      ],
+      "category": "Event",
+      "standard": "legal"
+    },
+    {
+      "id": "OP17-098",
+      "decks": 191,
+      "copies": 339,
+      "share": 9.7,
+      "colors": [
+        "Black"
+      ],
+      "category": "Event",
+      "standard": "legal"
+    },
+    {
+      "id": "OP09-078",
+      "decks": 187,
+      "copies": 703,
       "share": 9.5,
       "colors": [
         "Purple"
@@ -492,43 +492,10 @@
       "standard": "legal"
     },
     {
-      "id": "ST01-011",
-      "decks": 185,
-      "copies": 590,
-      "share": 9.1,
-      "colors": [
-        "Red"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP07-076",
-      "decks": 178,
-      "copies": 479,
-      "share": 8.8,
-      "colors": [
-        "Purple"
-      ],
-      "category": "Event",
-      "standard": "legal"
-    },
-    {
-      "id": "OP17-083",
-      "decks": 178,
-      "copies": 338,
-      "share": 8.8,
-      "colors": [
-        "Black"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
       "id": "OP12-037",
-      "decks": 177,
-      "copies": 367,
-      "share": 8.7,
+      "decks": 176,
+      "copies": 364,
+      "share": 8.9,
       "colors": [
         "Green"
       ],
@@ -536,10 +503,32 @@
       "standard": "legal"
     },
     {
-      "id": "EB04-002",
+      "id": "OP07-076",
+      "decks": 175,
+      "copies": 469,
+      "share": 8.9,
+      "colors": [
+        "Purple"
+      ],
+      "category": "Event",
+      "standard": "legal"
+    },
+    {
+      "id": "ST01-011",
       "decks": 174,
-      "copies": 672,
-      "share": 8.6,
+      "copies": 549,
+      "share": 8.8,
+      "colors": [
+        "Red"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "EB04-002",
+      "decks": 173,
+      "copies": 668,
+      "share": 8.8,
       "colors": [
         "Red"
       ],
@@ -548,9 +537,9 @@
     },
     {
       "id": "ST34-003",
-      "decks": 172,
-      "copies": 486,
-      "share": 8.5,
+      "decks": 169,
+      "copies": 475,
+      "share": 8.6,
       "colors": [
         "Purple"
       ],
@@ -558,10 +547,21 @@
       "standard": "legal"
     },
     {
-      "id": "OP17-110",
-      "decks": 172,
-      "copies": 433,
+      "id": "OP17-083",
+      "decks": 167,
+      "copies": 317,
       "share": 8.5,
+      "colors": [
+        "Black"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP17-110",
+      "decks": 166,
+      "copies": 414,
+      "share": 8.4,
       "colors": [
         "Yellow"
       ],
@@ -569,21 +569,10 @@
       "standard": "legal"
     },
     {
-      "id": "OP17-017",
-      "decks": 167,
-      "copies": 562,
-      "share": 8.3,
-      "colors": [
-        "Red"
-      ],
-      "category": "Event",
-      "standard": "legal"
-    },
-    {
       "id": "ST10-010",
-      "decks": 166,
-      "copies": 467,
-      "share": 8.2,
+      "decks": 165,
+      "copies": 466,
+      "share": 8.4,
       "colors": [
         "Purple"
       ],
@@ -592,9 +581,9 @@
     },
     {
       "id": "OP13-040",
-      "decks": 166,
-      "copies": 414,
-      "share": 8.2,
+      "decks": 165,
+      "copies": 410,
+      "share": 8.4,
       "colors": [
         "Green"
       ],
@@ -602,10 +591,21 @@
       "standard": "legal"
     },
     {
+      "id": "OP17-017",
+      "decks": 164,
+      "copies": 555,
+      "share": 8.3,
+      "colors": [
+        "Red"
+      ],
+      "category": "Event",
+      "standard": "legal"
+    },
+    {
       "id": "EB02-017",
-      "decks": 163,
-      "copies": 638,
-      "share": 8.1,
+      "decks": 162,
+      "copies": 634,
+      "share": 8.2,
       "colors": [
         "Green"
       ],
@@ -614,9 +614,9 @@
     },
     {
       "id": "OP17-022",
-      "decks": 163,
-      "copies": 464,
-      "share": 8.1,
+      "decks": 162,
+      "copies": 460,
+      "share": 8.2,
       "colors": [
         "Green"
       ],
@@ -625,9 +625,9 @@
     },
     {
       "id": "EB04-007",
-      "decks": 158,
-      "copies": 429,
-      "share": 7.8,
+      "decks": 156,
+      "copies": 425,
+      "share": 7.9,
       "colors": [
         "Red"
       ],
@@ -635,9 +635,9 @@
       "standard": "legal"
     },
     {
-      "id": "OP13-016",
-      "decks": 157,
-      "copies": 596,
+      "id": "OP12-015",
+      "decks": 153,
+      "copies": 610,
       "share": 7.8,
       "colors": [
         "Red"
@@ -647,8 +647,8 @@
     },
     {
       "id": "ST34-004",
-      "decks": 157,
-      "copies": 495,
+      "decks": 153,
+      "copies": 483,
       "share": 7.8,
       "colors": [
         "Purple"
@@ -657,43 +657,10 @@
       "standard": "legal"
     },
     {
-      "id": "OP17-062",
-      "decks": 156,
-      "copies": 577,
-      "share": 7.7,
-      "colors": [
-        "Purple"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP17-094",
-      "decks": 155,
-      "copies": 598,
-      "share": 7.7,
-      "colors": [
-        "Black"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP12-015",
-      "decks": 154,
-      "copies": 614,
-      "share": 7.6,
-      "colors": [
-        "Red"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
       "id": "ST31-001",
-      "decks": 153,
-      "copies": 611,
-      "share": 7.6,
+      "decks": 152,
+      "copies": 607,
+      "share": 7.7,
       "colors": [
         "Red"
       ],
@@ -702,9 +669,9 @@
     },
     {
       "id": "ST21-014",
-      "decks": 153,
-      "copies": 605,
-      "share": 7.6,
+      "decks": 152,
+      "copies": 601,
+      "share": 7.7,
       "colors": [
         "Red"
       ],
@@ -712,10 +679,43 @@
       "standard": "legal"
     },
     {
+      "id": "OP17-094",
+      "decks": 152,
+      "copies": 586,
+      "share": 7.7,
+      "colors": [
+        "Black"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP13-016",
+      "decks": 152,
+      "copies": 578,
+      "share": 7.7,
+      "colors": [
+        "Red"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP17-062",
+      "decks": 152,
+      "copies": 561,
+      "share": 7.7,
+      "colors": [
+        "Purple"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
       "id": "EB04-031",
-      "decks": 149,
-      "copies": 596,
-      "share": 7.4,
+      "decks": 147,
+      "copies": 588,
+      "share": 7.5,
       "colors": [
         "Purple"
       ],
@@ -724,9 +724,9 @@
     },
     {
       "id": "EB04-032",
-      "decks": 149,
-      "copies": 596,
-      "share": 7.4,
+      "decks": 147,
+      "copies": 588,
+      "share": 7.5,
       "colors": [
         "Purple"
       ],
@@ -735,9 +735,9 @@
     },
     {
       "id": "OP17-073",
-      "decks": 148,
-      "copies": 587,
-      "share": 7.3,
+      "decks": 146,
+      "copies": 579,
+      "share": 7.4,
       "colors": [
         "Purple"
       ],
@@ -746,9 +746,9 @@
     },
     {
       "id": "ST30-012",
-      "decks": 147,
-      "copies": 540,
-      "share": 7.3,
+      "decks": 146,
+      "copies": 536,
+      "share": 7.4,
       "colors": [
         "Green"
       ],
@@ -757,9 +757,9 @@
     },
     {
       "id": "OP11-106",
-      "decks": 146,
-      "copies": 487,
-      "share": 7.2,
+      "decks": 144,
+      "copies": 481,
+      "share": 7.3,
       "colors": [
         "Yellow"
       ],
@@ -768,9 +768,9 @@
     },
     {
       "id": "OP17-063",
-      "decks": 145,
-      "copies": 328,
-      "share": 7.2,
+      "decks": 143,
+      "copies": 324,
+      "share": 7.3,
       "colors": [
         "Purple"
       ],
@@ -779,42 +779,9 @@
     },
     {
       "id": "OP17-065",
-      "decks": 138,
-      "copies": 292,
-      "share": 6.8,
-      "colors": [
-        "Purple"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP14-096",
-      "decks": 138,
-      "copies": 274,
-      "share": 6.8,
-      "colors": [
-        "Black"
-      ],
-      "category": "Event",
-      "standard": "legal"
-    },
-    {
-      "id": "OP12-112",
-      "decks": 136,
-      "copies": 402,
-      "share": 6.7,
-      "colors": [
-        "Yellow"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP17-061",
-      "decks": 133,
-      "copies": 399,
-      "share": 6.6,
+      "decks": 137,
+      "copies": 290,
+      "share": 7,
       "colors": [
         "Purple"
       ],
@@ -825,7 +792,7 @@
       "id": "OP14-019",
       "decks": 133,
       "copies": 388,
-      "share": 6.6,
+      "share": 6.8,
       "colors": [
         "Red"
       ],
@@ -833,9 +800,53 @@
       "standard": "legal"
     },
     {
-      "id": "OP06-115",
+      "id": "OP14-096",
+      "decks": 133,
+      "copies": 263,
+      "share": 6.8,
+      "colors": [
+        "Black"
+      ],
+      "category": "Event",
+      "standard": "legal"
+    },
+    {
+      "id": "OP17-061",
       "decks": 131,
-      "copies": 362,
+      "copies": 395,
+      "share": 6.7,
+      "colors": [
+        "Purple"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP12-112",
+      "decks": 131,
+      "copies": 384,
+      "share": 6.7,
+      "colors": [
+        "Yellow"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP13-031",
+      "decks": 128,
+      "copies": 419,
+      "share": 6.5,
+      "colors": [
+        "Green"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP06-115",
+      "decks": 128,
+      "copies": 355,
       "share": 6.5,
       "colors": [
         "Yellow"
@@ -844,21 +855,21 @@
       "standard": "legal"
     },
     {
-      "id": "OP13-031",
-      "decks": 128,
-      "copies": 419,
-      "share": 6.3,
+      "id": "OP14-104",
+      "decks": 121,
+      "copies": 459,
+      "share": 6.1,
       "colors": [
-        "Green"
+        "Yellow"
       ],
       "category": "Character",
       "standard": "legal"
     },
     {
       "id": "OP17-096",
-      "decks": 127,
-      "copies": 265,
-      "share": 6.3,
+      "decks": 121,
+      "copies": 254,
+      "share": 6.1,
       "colors": [
         "Black"
       ],
@@ -866,34 +877,12 @@
       "standard": "legal"
     },
     {
-      "id": "OP14-104",
-      "decks": 126,
-      "copies": 478,
-      "share": 6.2,
-      "colors": [
-        "Yellow"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
       "id": "OP17-041",
-      "decks": 118,
-      "copies": 307,
-      "share": 5.8,
+      "decks": 117,
+      "copies": 305,
+      "share": 5.9,
       "colors": [
         "Blue"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP15-113",
-      "decks": 117,
-      "copies": 378,
-      "share": 5.8,
-      "colors": [
-        "Yellow"
       ],
       "category": "Character",
       "standard": "legal"
@@ -902,7 +891,7 @@
       "id": "OP14-031",
       "decks": 116,
       "copies": 427,
-      "share": 5.7,
+      "share": 5.9,
       "colors": [
         "Green"
       ],
@@ -910,9 +899,31 @@
       "standard": "legal"
     },
     {
+      "id": "OP15-113",
+      "decks": 112,
+      "copies": 364,
+      "share": 5.7,
+      "colors": [
+        "Yellow"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "ST14-017",
+      "decks": 107,
+      "copies": 335,
+      "share": 5.4,
+      "colors": [
+        "Black"
+      ],
+      "category": "Stage",
+      "standard": "legal"
+    },
+    {
       "id": "OP06-058",
-      "decks": 109,
-      "copies": 171,
+      "decks": 107,
+      "copies": 168,
       "share": 5.4,
       "colors": [
         "Blue"
@@ -921,31 +932,9 @@
       "standard": "legal"
     },
     {
-      "id": "ST14-017",
-      "decks": 108,
-      "copies": 338,
-      "share": 5.3,
-      "colors": [
-        "Black"
-      ],
-      "category": "Stage",
-      "standard": "legal"
-    },
-    {
-      "id": "EB02-030",
-      "decks": 108,
-      "copies": 161,
-      "share": 5.3,
-      "colors": [
-        "Blue"
-      ],
-      "category": "Event",
-      "standard": "legal"
-    },
-    {
       "id": "OP15-077",
-      "decks": 107,
-      "copies": 382,
+      "decks": 105,
+      "copies": 374,
       "share": 5.3,
       "colors": [
         "Purple"
@@ -954,21 +943,10 @@
       "standard": "legal"
     },
     {
-      "id": "OP17-091",
-      "decks": 106,
-      "copies": 284,
-      "share": 5.2,
-      "colors": [
-        "Black"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
       "id": "EB05-001",
       "decks": 103,
       "copies": 412,
-      "share": 5.1,
+      "share": 5.2,
       "colors": [
         "Red"
       ],
@@ -976,21 +954,32 @@
       "standard": "unknown"
     },
     {
-      "id": "OP15-032",
-      "decks": 99,
-      "copies": 177,
-      "share": 4.9,
+      "id": "EB02-030",
+      "decks": 103,
+      "copies": 153,
+      "share": 5.2,
       "colors": [
-        "Green"
+        "Blue"
+      ],
+      "category": "Event",
+      "standard": "legal"
+    },
+    {
+      "id": "OP17-091",
+      "decks": 100,
+      "copies": 266,
+      "share": 5.1,
+      "colors": [
+        "Black"
       ],
       "category": "Character",
       "standard": "legal"
     },
     {
-      "id": "ST32-002",
-      "decks": 94,
-      "copies": 360,
-      "share": 4.6,
+      "id": "OP15-032",
+      "decks": 98,
+      "copies": 175,
+      "share": 5,
       "colors": [
         "Green"
       ],
@@ -1001,7 +990,18 @@
       "id": "OP06-033",
       "decks": 93,
       "copies": 358,
-      "share": 4.6,
+      "share": 4.7,
+      "colors": [
+        "Green"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "ST32-002",
+      "decks": 93,
+      "copies": 358,
+      "share": 4.7,
       "colors": [
         "Green"
       ],
@@ -1010,8 +1010,8 @@
     },
     {
       "id": "OP05-077",
-      "decks": 93,
-      "copies": 254,
+      "decks": 91,
+      "copies": 248,
       "share": 4.6,
       "colors": [
         "Purple"
@@ -1021,8 +1021,8 @@
     },
     {
       "id": "OP12-071",
-      "decks": 91,
-      "copies": 348,
+      "decks": 89,
+      "copies": 342,
       "share": 4.5,
       "colors": [
         "Purple"
@@ -1032,9 +1032,9 @@
     },
     {
       "id": "OP15-061",
-      "decks": 90,
-      "copies": 360,
-      "share": 4.4,
+      "decks": 88,
+      "copies": 352,
+      "share": 4.5,
       "colors": [
         "Purple"
       ],
@@ -1043,9 +1043,9 @@
     },
     {
       "id": "OP15-075",
-      "decks": 90,
-      "copies": 360,
-      "share": 4.4,
+      "decks": 88,
+      "copies": 352,
+      "share": 4.5,
       "colors": [
         "Purple"
       ],
@@ -1054,9 +1054,9 @@
     },
     {
       "id": "OP15-076",
-      "decks": 90,
-      "copies": 360,
-      "share": 4.4,
+      "decks": 88,
+      "copies": 352,
+      "share": 4.5,
       "colors": [
         "Purple"
       ],
@@ -1065,42 +1065,9 @@
     },
     {
       "id": "OP15-067",
-      "decks": 90,
-      "copies": 358,
-      "share": 4.4,
-      "colors": [
-        "Purple"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP14-112",
-      "decks": 89,
-      "copies": 320,
-      "share": 4.4,
-      "colors": [
-        "Yellow"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP10-067",
       "decks": 88,
-      "copies": 210,
-      "share": 4.3,
-      "colors": [
-        "Purple"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "EB04-030",
-      "decks": 88,
-      "copies": 173,
-      "share": 4.3,
+      "copies": 350,
+      "share": 4.5,
       "colors": [
         "Purple"
       ],
@@ -1111,7 +1078,7 @@
       "id": "ST21-017",
       "decks": 88,
       "copies": 156,
-      "share": 4.3,
+      "share": 4.5,
       "colors": [
         "Red"
       ],
@@ -1119,9 +1086,42 @@
       "standard": "legal"
     },
     {
+      "id": "EB04-030",
+      "decks": 87,
+      "copies": 172,
+      "share": 4.4,
+      "colors": [
+        "Purple"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP10-067",
+      "decks": 86,
+      "copies": 206,
+      "share": 4.4,
+      "colors": [
+        "Purple"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP14-112",
+      "decks": 85,
+      "copies": 304,
+      "share": 4.3,
+      "colors": [
+        "Yellow"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
       "id": "OP15-074",
-      "decks": 83,
-      "copies": 240,
+      "decks": 81,
+      "copies": 234,
       "share": 4.1,
       "colors": [
         "Purple"
@@ -1130,20 +1130,9 @@
       "standard": "legal"
     },
     {
-      "id": "OP15-118",
-      "decks": 82,
-      "copies": 235,
-      "share": 4.1,
-      "colors": [
-        "Purple"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
       "id": "OP15-066",
-      "decks": 82,
-      "copies": 190,
+      "decks": 81,
+      "copies": 188,
       "share": 4.1,
       "colors": [
         "Purple"
@@ -1155,20 +1144,9 @@
       "id": "OP01-055",
       "decks": 81,
       "copies": 186,
-      "share": 4,
+      "share": 4.1,
       "colors": [
         "Green"
-      ],
-      "category": "Event",
-      "standard": "legal"
-    },
-    {
-      "id": "OP12-018",
-      "decks": 81,
-      "copies": 179,
-      "share": 4,
-      "colors": [
-        "Red"
       ],
       "category": "Event",
       "standard": "legal"
@@ -1177,7 +1155,7 @@
       "id": "EB05-028",
       "decks": 81,
       "copies": 143,
-      "share": 4,
+      "share": 4.1,
       "colors": [
         "Blue"
       ],
@@ -1185,54 +1163,10 @@
       "standard": "unknown"
     },
     {
-      "id": "OP16-056",
-      "decks": 76,
-      "copies": 255,
-      "share": 3.8,
-      "colors": [
-        "Blue"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP17-005",
-      "decks": 73,
-      "copies": 275,
-      "share": 3.6,
-      "colors": [
-        "Red"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP17-090",
-      "decks": 72,
-      "copies": 132,
-      "share": 3.6,
-      "colors": [
-        "Black"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP16-021",
-      "decks": 71,
-      "copies": 268,
-      "share": 3.5,
-      "colors": [
-        "Red"
-      ],
-      "category": "Stage",
-      "standard": "legal"
-    },
-    {
-      "id": "OP11-067",
-      "decks": 71,
-      "copies": 144,
-      "share": 3.5,
+      "id": "OP15-118",
+      "decks": 80,
+      "copies": 227,
+      "share": 4.1,
       "colors": [
         "Purple"
       ],
@@ -1240,10 +1174,32 @@
       "standard": "legal"
     },
     {
+      "id": "OP12-018",
+      "decks": 78,
+      "copies": 172,
+      "share": 4,
+      "colors": [
+        "Red"
+      ],
+      "category": "Event",
+      "standard": "legal"
+    },
+    {
+      "id": "OP16-056",
+      "decks": 76,
+      "copies": 255,
+      "share": 3.9,
+      "colors": [
+        "Blue"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
       "id": "OP17-076",
-      "decks": 69,
-      "copies": 124,
-      "share": 3.4,
+      "decks": 68,
+      "copies": 122,
+      "share": 3.5,
       "colors": [
         "Purple"
       ],
@@ -1251,23 +1207,12 @@
       "standard": "legal"
     },
     {
-      "id": "OP14-108",
-      "decks": 68,
-      "copies": 154,
+      "id": "OP17-005",
+      "decks": 67,
+      "copies": 251,
       "share": 3.4,
       "colors": [
-        "Yellow"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP14-049",
-      "decks": 68,
-      "copies": 89,
-      "share": 3.4,
-      "colors": [
-        "Blue"
+        "Red"
       ],
       "category": "Character",
       "standard": "legal"
@@ -1276,7 +1221,7 @@
       "id": "OP08-036",
       "decks": 67,
       "copies": 148,
-      "share": 3.3,
+      "share": 3.4,
       "colors": [
         "Green"
       ],
@@ -1284,10 +1229,10 @@
       "standard": "legal"
     },
     {
-      "id": "OP15-071",
-      "decks": 65,
-      "copies": 218,
-      "share": 3.2,
+      "id": "OP11-067",
+      "decks": 67,
+      "copies": 132,
+      "share": 3.4,
       "colors": [
         "Purple"
       ],
@@ -1295,10 +1240,43 @@
       "standard": "legal"
     },
     {
-      "id": "OP13-113",
+      "id": "OP17-090",
+      "decks": 67,
+      "copies": 121,
+      "share": 3.4,
+      "colors": [
+        "Black"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP14-049",
+      "decks": 67,
+      "copies": 87,
+      "share": 3.4,
+      "colors": [
+        "Blue"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP16-021",
       "decks": 65,
-      "copies": 214,
-      "share": 3.2,
+      "copies": 245,
+      "share": 3.3,
+      "colors": [
+        "Red"
+      ],
+      "category": "Stage",
+      "standard": "legal"
+    },
+    {
+      "id": "OP14-108",
+      "decks": 65,
+      "copies": 148,
+      "share": 3.3,
       "colors": [
         "Yellow"
       ],
@@ -1306,42 +1284,20 @@
       "standard": "legal"
     },
     {
-      "id": "OP14-105",
+      "id": "OP15-071",
       "decks": 64,
-      "copies": 256,
-      "share": 3.2,
+      "copies": 214,
+      "share": 3.3,
       "colors": [
-        "Yellow"
+        "Purple"
       ],
       "category": "Character",
       "standard": "legal"
     },
     {
       "id": "OP17-103",
-      "decks": 64,
-      "copies": 256,
-      "share": 3.2,
-      "colors": [
-        "Yellow"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP16-113",
-      "decks": 64,
-      "copies": 255,
-      "share": 3.2,
-      "colors": [
-        "Yellow"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP14-107",
-      "decks": 64,
-      "copies": 254,
+      "decks": 63,
+      "copies": 252,
       "share": 3.2,
       "colors": [
         "Yellow"
@@ -1351,8 +1307,8 @@
     },
     {
       "id": "OP08-074",
-      "decks": 64,
-      "copies": 205,
+      "decks": 63,
+      "copies": 201,
       "share": 3.2,
       "colors": [
         "Purple"
@@ -1361,9 +1317,31 @@
       "standard": "legal"
     },
     {
-      "id": "OP17-104",
-      "decks": 64,
-      "copies": 199,
+      "id": "OP14-105",
+      "decks": 62,
+      "copies": 248,
+      "share": 3.2,
+      "colors": [
+        "Yellow"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP16-113",
+      "decks": 62,
+      "copies": 247,
+      "share": 3.2,
+      "colors": [
+        "Yellow"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP14-107",
+      "decks": 62,
+      "copies": 246,
       "share": 3.2,
       "colors": [
         "Yellow"
@@ -1373,9 +1351,9 @@
     },
     {
       "id": "OP14-114",
-      "decks": 63,
-      "copies": 250,
-      "share": 3.1,
+      "decks": 62,
+      "copies": 246,
+      "share": 3.2,
       "colors": [
         "Yellow"
       ],
@@ -1383,21 +1361,10 @@
       "standard": "legal"
     },
     {
-      "id": "OP14-118",
-      "decks": 63,
-      "copies": 107,
-      "share": 3.1,
-      "colors": [
-        "Yellow"
-      ],
-      "category": "Event",
-      "standard": "legal"
-    },
-    {
       "id": "OP12-023",
       "decks": 62,
       "copies": 245,
-      "share": 3.1,
+      "share": 3.2,
       "colors": [
         "Green"
       ],
@@ -1405,12 +1372,23 @@
       "standard": "legal"
     },
     {
-      "id": "ST30-004",
+      "id": "OP13-113",
       "decks": 62,
-      "copies": 233,
-      "share": 3.1,
+      "copies": 205,
+      "share": 3.2,
       "colors": [
-        "Red"
+        "Yellow"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP17-104",
+      "decks": 62,
+      "copies": 191,
+      "share": 3.2,
+      "colors": [
+        "Yellow"
       ],
       "category": "Character",
       "standard": "legal"
@@ -1419,7 +1397,7 @@
       "id": "P-088",
       "decks": 61,
       "copies": 244,
-      "share": 3,
+      "share": 3.1,
       "colors": [
         "Yellow"
       ],
@@ -1427,14 +1405,14 @@
       "standard": "legal"
     },
     {
-      "id": "OP16-078",
+      "id": "ST30-004",
       "decks": 61,
-      "copies": 234,
-      "share": 3,
+      "copies": 229,
+      "share": 3.1,
       "colors": [
-        "Purple"
+        "Red"
       ],
-      "category": "Stage",
+      "category": "Character",
       "standard": "legal"
     },
     {
@@ -1460,6 +1438,17 @@
       "standard": "legal"
     },
     {
+      "id": "OP16-078",
+      "decks": 60,
+      "copies": 232,
+      "share": 3,
+      "colors": [
+        "Purple"
+      ],
+      "category": "Stage",
+      "standard": "legal"
+    },
+    {
       "id": "PRB02-003",
       "decks": 60,
       "copies": 183,
@@ -1471,10 +1460,21 @@
       "standard": "legal"
     },
     {
+      "id": "OP14-118",
+      "decks": 60,
+      "copies": 102,
+      "share": 3,
+      "colors": [
+        "Yellow"
+      ],
+      "category": "Event",
+      "standard": "legal"
+    },
+    {
       "id": "OP12-115",
       "decks": 59,
       "copies": 236,
-      "share": 2.9,
+      "share": 3,
       "colors": [
         "Yellow"
       ],
@@ -1485,7 +1485,7 @@
       "id": "P-093",
       "decks": 59,
       "copies": 236,
-      "share": 2.9,
+      "share": 3,
       "colors": [
         "Purple"
       ],
@@ -1496,22 +1496,11 @@
       "id": "OP16-064",
       "decks": 59,
       "copies": 222,
-      "share": 2.9,
+      "share": 3,
       "colors": [
         "Purple"
       ],
       "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP07-057",
-      "decks": 59,
-      "copies": 75,
-      "share": 2.9,
-      "colors": [
-        "Blue"
-      ],
-      "category": "Event",
       "standard": "legal"
     },
     {
@@ -1540,11 +1529,22 @@
       "id": "OP07-064",
       "decks": 57,
       "copies": 109,
-      "share": 2.8,
+      "share": 2.9,
       "colors": [
         "Purple"
       ],
       "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP07-057",
+      "decks": 57,
+      "copies": 72,
+      "share": 2.9,
+      "colors": [
+        "Blue"
+      ],
+      "category": "Event",
       "standard": "legal"
     },
     {
@@ -1562,42 +1562,9 @@
       "id": "ST21-003",
       "decks": 55,
       "copies": 96,
-      "share": 2.7,
+      "share": 2.8,
       "colors": [
         "Red"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP16-003",
-      "decks": 54,
-      "copies": 179,
-      "share": 2.7,
-      "colors": [
-        "Red"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "ST23-001",
-      "decks": 54,
-      "copies": 129,
-      "share": 2.7,
-      "colors": [
-        "Red"
-      ],
-      "category": "Character",
-      "standard": "unknown"
-    },
-    {
-      "id": "OP11-054",
-      "decks": 52,
-      "copies": 137,
-      "share": 2.6,
-      "colors": [
-        "Blue"
       ],
       "category": "Character",
       "standard": "legal"
@@ -1606,9 +1573,20 @@
       "id": "OP08-062",
       "decks": 51,
       "copies": 193,
-      "share": 2.5,
+      "share": 2.6,
       "colors": [
         "Purple"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP11-054",
+      "decks": 51,
+      "copies": 135,
+      "share": 2.6,
+      "colors": [
+        "Blue"
       ],
       "category": "Character",
       "standard": "legal"
@@ -1628,7 +1606,7 @@
       "id": "OP13-027",
       "decks": 49,
       "copies": 185,
-      "share": 2.4,
+      "share": 2.5,
       "colors": [
         "Green"
       ],
@@ -1639,7 +1617,7 @@
       "id": "ST18-001",
       "decks": 49,
       "copies": 169,
-      "share": 2.4,
+      "share": 2.5,
       "colors": [
         "Purple"
       ],
@@ -1647,10 +1625,10 @@
       "standard": "legal"
     },
     {
-      "id": "OP16-118",
+      "id": "OP16-003",
       "decks": 49,
-      "copies": 159,
-      "share": 2.4,
+      "copies": 161,
+      "share": 2.5,
       "colors": [
         "Red"
       ],
@@ -1658,20 +1636,20 @@
       "standard": "legal"
     },
     {
-      "id": "OP16-004",
-      "decks": 47,
-      "copies": 185,
-      "share": 2.3,
+      "id": "ST23-001",
+      "decks": 49,
+      "copies": 115,
+      "share": 2.5,
       "colors": [
         "Red"
       ],
       "category": "Character",
-      "standard": "legal"
+      "standard": "unknown"
     },
     {
       "id": "OP17-111",
-      "decks": 47,
-      "copies": 104,
+      "decks": 46,
+      "copies": 102,
       "share": 2.3,
       "colors": [
         "Yellow"
@@ -1681,35 +1659,13 @@
     },
     {
       "id": "EB04-059",
-      "decks": 47,
-      "copies": 88,
+      "decks": 46,
+      "copies": 86,
       "share": 2.3,
       "colors": [
         "Yellow"
       ],
       "category": "Event",
-      "standard": "legal"
-    },
-    {
-      "id": "OP06-018",
-      "decks": 47,
-      "copies": 73,
-      "share": 2.3,
-      "colors": [
-        "Red"
-      ],
-      "category": "Event",
-      "standard": "legal"
-    },
-    {
-      "id": "ST32-001",
-      "decks": 46,
-      "copies": 128,
-      "share": 2.3,
-      "colors": [
-        "Green"
-      ],
-      "category": "Character",
       "standard": "legal"
     },
     {
@@ -1724,23 +1680,23 @@
       "standard": "legal"
     },
     {
-      "id": "OP07-022",
-      "decks": 45,
-      "copies": 177,
-      "share": 2.2,
+      "id": "OP06-018",
+      "decks": 46,
+      "copies": 72,
+      "share": 2.3,
       "colors": [
-        "Green"
+        "Red"
       ],
-      "category": "Character",
+      "category": "Event",
       "standard": "legal"
     },
     {
-      "id": "OP16-015",
+      "id": "OP07-022",
       "decks": 45,
-      "copies": 152,
-      "share": 2.2,
+      "copies": 177,
+      "share": 2.3,
       "colors": [
-        "Red"
+        "Green"
       ],
       "category": "Character",
       "standard": "legal"
@@ -1749,9 +1705,20 @@
       "id": "ST34-002",
       "decks": 45,
       "copies": 134,
-      "share": 2.2,
+      "share": 2.3,
       "colors": [
         "Purple"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "ST32-001",
+      "decks": 45,
+      "copies": 126,
+      "share": 2.3,
+      "colors": [
+        "Green"
       ],
       "category": "Character",
       "standard": "legal"
@@ -1801,9 +1768,9 @@
       "standard": "legal"
     },
     {
-      "id": "OP16-014",
+      "id": "OP16-118",
       "decks": 44,
-      "copies": 162,
+      "copies": 140,
       "share": 2.2,
       "colors": [
         "Red"
@@ -1837,7 +1804,7 @@
       "id": "EB05-040",
       "decks": 43,
       "copies": 170,
-      "share": 2.1,
+      "share": 2.2,
       "colors": [
         "Purple"
       ],
@@ -1848,7 +1815,7 @@
       "id": "ST25-003",
       "decks": 43,
       "copies": 169,
-      "share": 2.1,
+      "share": 2.2,
       "colors": [
         "Blue"
       ],
@@ -1859,7 +1826,7 @@
       "id": "OP09-057",
       "decks": 43,
       "copies": 168,
-      "share": 2.1,
+      "share": 2.2,
       "colors": [
         "Blue"
       ],
@@ -1870,7 +1837,7 @@
       "id": "ST25-005",
       "decks": 43,
       "copies": 168,
-      "share": 2.1,
+      "share": 2.2,
       "colors": [
         "Blue"
       ],
@@ -1878,26 +1845,26 @@
       "standard": "unknown"
     },
     {
-      "id": "EB04-018",
-      "decks": 43,
-      "copies": 157,
-      "share": 2.1,
-      "colors": [
-        "Green"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
       "id": "EB05-046",
       "decks": 43,
       "copies": 94,
-      "share": 2.1,
+      "share": 2.2,
       "colors": [
         "Black"
       ],
       "category": "Character",
       "standard": "unknown"
+    },
+    {
+      "id": "OP16-004",
+      "decks": 42,
+      "copies": 165,
+      "share": 2.1,
+      "colors": [
+        "Red"
+      ],
+      "category": "Character",
+      "standard": "legal"
     },
     {
       "id": "ST25-002",
@@ -1911,45 +1878,12 @@
       "standard": "unknown"
     },
     {
-      "id": "OP16-011",
+      "id": "EB04-018",
       "decks": 42,
-      "copies": 125,
+      "copies": 155,
       "share": 2.1,
       "colors": [
-        "Red"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "ST17-004",
-      "decks": 42,
-      "copies": 83,
-      "share": 2.1,
-      "colors": [
-        "Blue"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP16-017",
-      "decks": 41,
-      "copies": 157,
-      "share": 2,
-      "colors": [
-        "Red"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP17-006",
-      "decks": 41,
-      "copies": 157,
-      "share": 2,
-      "colors": [
-        "Red"
+        "Green"
       ],
       "category": "Character",
       "standard": "legal"
@@ -1958,7 +1892,7 @@
       "id": "EB02-052",
       "decks": 41,
       "copies": 57,
-      "share": 2,
+      "share": 2.1,
       "colors": [
         "Yellow"
       ],
@@ -1977,12 +1911,34 @@
       "standard": "unknown"
     },
     {
-      "id": "OP09-072",
+      "id": "OP16-015",
       "decks": 40,
-      "copies": 71,
+      "copies": 136,
       "share": 2,
       "colors": [
-        "Purple"
+        "Red"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "ST17-004",
+      "decks": 40,
+      "copies": 78,
+      "share": 2,
+      "colors": [
+        "Blue"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP16-014",
+      "decks": 39,
+      "copies": 145,
+      "share": 2,
+      "colors": [
+        "Red"
       ],
       "category": "Character",
       "standard": "legal"
@@ -1999,12 +1955,23 @@
       "standard": "legal"
     },
     {
-      "id": "OP06-106",
+      "id": "OP09-072",
       "decks": 38,
-      "copies": 101,
+      "copies": 67,
       "share": 1.9,
       "colors": [
-        "Yellow"
+        "Purple"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP17-006",
+      "decks": 37,
+      "copies": 143,
+      "share": 1.9,
+      "colors": [
+        "Red"
       ],
       "category": "Character",
       "standard": "legal"
@@ -2013,7 +1980,7 @@
       "id": "EB05-047",
       "decks": 37,
       "copies": 142,
-      "share": 1.8,
+      "share": 1.9,
       "colors": [
         "Black"
       ],
@@ -2021,9 +1988,42 @@
       "standard": "unknown"
     },
     {
-      "id": "OP05-073",
+      "id": "OP16-011",
       "decks": 37,
-      "copies": 104,
+      "copies": 109,
+      "share": 1.9,
+      "colors": [
+        "Red"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP06-106",
+      "decks": 37,
+      "copies": 99,
+      "share": 1.9,
+      "colors": [
+        "Yellow"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP16-017",
+      "decks": 36,
+      "copies": 140,
+      "share": 1.8,
+      "colors": [
+        "Red"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP05-073",
+      "decks": 36,
+      "copies": 101,
       "share": 1.8,
       "colors": [
         "Purple"
@@ -2033,8 +2033,8 @@
     },
     {
       "id": "EB01-059",
-      "decks": 37,
-      "copies": 91,
+      "decks": 36,
+      "copies": 89,
       "share": 1.8,
       "colors": [
         "Yellow"
@@ -2044,8 +2044,8 @@
     },
     {
       "id": "EB01-061",
-      "decks": 35,
-      "copies": 134,
+      "decks": 34,
+      "copies": 130,
       "share": 1.7,
       "colors": [
         "Purple"
@@ -2054,32 +2054,10 @@
       "standard": "legal"
     },
     {
-      "id": "OP09-118",
-      "decks": 34,
-      "copies": 51,
-      "share": 1.7,
-      "colors": [
-        "Red"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP17-031",
-      "decks": 33,
-      "copies": 127,
-      "share": 1.6,
-      "colors": [
-        "Green"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
       "id": "OP17-043",
       "decks": 33,
       "copies": 79,
-      "share": 1.6,
+      "share": 1.7,
       "colors": [
         "Blue"
       ],
@@ -2087,20 +2065,9 @@
       "standard": "legal"
     },
     {
-      "id": "OP12-119",
+      "id": "OP17-031",
       "decks": 32,
-      "copies": 72,
-      "share": 1.6,
-      "colors": [
-        "Yellow"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "ST16-004",
-      "decks": 32,
-      "copies": 69,
+      "copies": 123,
       "share": 1.6,
       "colors": [
         "Green"
@@ -2120,9 +2087,42 @@
       "standard": "unknown"
     },
     {
-      "id": "OP17-077",
+      "id": "OP09-118",
       "decks": 32,
-      "copies": 62,
+      "copies": 48,
+      "share": 1.6,
+      "colors": [
+        "Red"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP12-119",
+      "decks": 31,
+      "copies": 68,
+      "share": 1.6,
+      "colors": [
+        "Yellow"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "ST16-004",
+      "decks": 31,
+      "copies": 66,
+      "share": 1.6,
+      "colors": [
+        "Green"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP17-077",
+      "decks": 31,
+      "copies": 60,
       "share": 1.6,
       "colors": [
         "Purple"
@@ -2132,8 +2132,8 @@
     },
     {
       "id": "OP17-027",
-      "decks": 31,
-      "copies": 123,
+      "decks": 30,
+      "copies": 119,
       "share": 1.5,
       "colors": [
         "Green"
@@ -2143,19 +2143,8 @@
     },
     {
       "id": "OP15-103",
-      "decks": 31,
-      "copies": 89,
-      "share": 1.5,
-      "colors": [
-        "Yellow"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP14-111",
       "decks": 30,
-      "copies": 110,
+      "copies": 85,
       "share": 1.5,
       "colors": [
         "Yellow"
@@ -2178,64 +2167,20 @@
       "id": "EB03-053",
       "decks": 29,
       "copies": 103,
-      "share": 1.4,
+      "share": 1.5,
       "colors": [
         "Yellow"
       ],
       "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP17-036",
-      "decks": 29,
-      "copies": 83,
-      "share": 1.4,
-      "colors": [
-        "Green"
-      ],
-      "category": "Event",
-      "standard": "legal"
-    },
-    {
-      "id": "OP07-096",
-      "decks": 29,
-      "copies": 81,
-      "share": 1.4,
-      "colors": [
-        "Black"
-      ],
-      "category": "Event",
       "standard": "legal"
     },
     {
       "id": "OP17-023",
       "decks": 29,
       "copies": 81,
-      "share": 1.4,
+      "share": 1.5,
       "colors": [
         "Green"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP17-032",
-      "decks": 28,
-      "copies": 110,
-      "share": 1.4,
-      "colors": [
-        "Green"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP14-110",
-      "decks": 28,
-      "copies": 106,
-      "share": 1.4,
-      "colors": [
-        "Yellow"
       ],
       "category": "Character",
       "standard": "legal"
@@ -2263,32 +2208,21 @@
       "standard": "legal"
     },
     {
-      "id": "OP17-029",
+      "id": "OP17-036",
       "decks": 28,
-      "copies": 94,
+      "copies": 79,
       "share": 1.4,
       "colors": [
         "Green"
       ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP08-069",
-      "decks": 28,
-      "copies": 54,
-      "share": 1.4,
-      "colors": [
-        "Purple"
-      ],
-      "category": "Character",
+      "category": "Event",
       "standard": "legal"
     },
     {
       "id": "EB05-037",
       "decks": 27,
       "copies": 108,
-      "share": 1.3,
+      "share": 1.4,
       "colors": [
         "Purple"
       ],
@@ -2299,7 +2233,7 @@
       "id": "OP12-034",
       "decks": 27,
       "copies": 107,
-      "share": 1.3,
+      "share": 1.4,
       "colors": [
         "Green"
       ],
@@ -2307,12 +2241,34 @@
       "standard": "legal"
     },
     {
-      "id": "OP14-102",
+      "id": "OP17-032",
       "decks": 27,
       "copies": 106,
-      "share": 1.3,
+      "share": 1.4,
+      "colors": [
+        "Green"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP14-111",
+      "decks": 27,
+      "copies": 101,
+      "share": 1.4,
       "colors": [
         "Yellow"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP17-029",
+      "decks": 27,
+      "copies": 91,
+      "share": 1.4,
+      "colors": [
+        "Green"
       ],
       "category": "Character",
       "standard": "legal"
@@ -2321,7 +2277,7 @@
       "id": "OP13-029",
       "decks": 27,
       "copies": 84,
-      "share": 1.3,
+      "share": 1.4,
       "colors": [
         "Green"
       ],
@@ -2329,14 +2285,25 @@
       "standard": "legal"
     },
     {
-      "id": "OP16-020",
-      "decks": 27,
-      "copies": 73,
+      "id": "OP07-096",
+      "decks": 26,
+      "copies": 69,
       "share": 1.3,
       "colors": [
-        "Red"
+        "Black"
       ],
       "category": "Event",
+      "standard": "legal"
+    },
+    {
+      "id": "OP08-069",
+      "decks": 26,
+      "copies": 50,
+      "share": 1.3,
+      "colors": [
+        "Purple"
+      ],
+      "category": "Character",
       "standard": "legal"
     },
     {
@@ -2365,7 +2332,7 @@
       "id": "OP14-022",
       "decks": 25,
       "copies": 97,
-      "share": 1.2,
+      "share": 1.3,
       "colors": [
         "Green"
       ],
@@ -2373,23 +2340,12 @@
       "standard": "legal"
     },
     {
-      "id": "OP09-106",
+      "id": "OP14-110",
       "decks": 25,
-      "copies": 89,
-      "share": 1.2,
+      "copies": 94,
+      "share": 1.3,
       "colors": [
         "Yellow"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP17-033",
-      "decks": 25,
-      "copies": 85,
-      "share": 1.2,
-      "colors": [
-        "Green"
       ],
       "category": "Character",
       "standard": "legal"
@@ -2398,9 +2354,20 @@
       "id": "OP16-051",
       "decks": 25,
       "copies": 70,
-      "share": 1.2,
+      "share": 1.3,
       "colors": [
         "Blue"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP14-102",
+      "decks": 24,
+      "copies": 94,
+      "share": 1.2,
+      "colors": [
+        "Yellow"
       ],
       "category": "Character",
       "standard": "legal"
@@ -2428,32 +2395,10 @@
       "standard": "legal"
     },
     {
-      "id": "OP11-070",
+      "id": "OP17-033",
       "decks": 24,
-      "copies": 76,
+      "copies": 82,
       "share": 1.2,
-      "colors": [
-        "Purple"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP08-076",
-      "decks": 24,
-      "copies": 63,
-      "share": 1.2,
-      "colors": [
-        "Purple"
-      ],
-      "category": "Event",
-      "standard": "legal"
-    },
-    {
-      "id": "OP17-021",
-      "decks": 23,
-      "copies": 80,
-      "share": 1.1,
       "colors": [
         "Green"
       ],
@@ -2461,12 +2406,12 @@
       "standard": "legal"
     },
     {
-      "id": "OP17-037",
-      "decks": 23,
-      "copies": 77,
-      "share": 1.1,
+      "id": "OP16-020",
+      "decks": 24,
+      "copies": 64,
+      "share": 1.2,
       "colors": [
-        "Green"
+        "Red"
       ],
       "category": "Event",
       "standard": "legal"
@@ -2475,7 +2420,7 @@
       "id": "OP13-118",
       "decks": 23,
       "copies": 70,
-      "share": 1.1,
+      "share": 1.2,
       "colors": [
         "Green"
       ],
@@ -2483,32 +2428,10 @@
       "standard": "legal"
     },
     {
-      "id": "OP10-005",
-      "decks": 23,
-      "copies": 67,
-      "share": 1.1,
-      "colors": [
-        "Red"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "ST33-004",
-      "decks": 23,
-      "copies": 61,
-      "share": 1.1,
-      "colors": [
-        "Blue"
-      ],
-      "category": "Character",
-      "standard": "unknown"
-    },
-    {
       "id": "OP10-040",
       "decks": 23,
       "copies": 33,
-      "share": 1.1,
+      "share": 1.2,
       "colors": [
         "Green"
       ],
@@ -2571,6 +2494,28 @@
       "standard": "legal"
     },
     {
+      "id": "OP09-106",
+      "decks": 22,
+      "copies": 78,
+      "share": 1.1,
+      "colors": [
+        "Yellow"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP17-021",
+      "decks": 22,
+      "copies": 77,
+      "share": 1.1,
+      "colors": [
+        "Green"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
       "id": "OP05-067",
       "decks": 22,
       "copies": 76,
@@ -2591,6 +2536,17 @@
       ],
       "category": "Character",
       "standard": "unknown"
+    },
+    {
+      "id": "OP17-037",
+      "decks": 22,
+      "copies": 73,
+      "share": 1.1,
+      "colors": [
+        "Green"
+      ],
+      "category": "Event",
+      "standard": "legal"
     },
     {
       "id": "EB05-052",
@@ -2648,6 +2604,17 @@
       "standard": "legal"
     },
     {
+      "id": "ST33-004",
+      "decks": 22,
+      "copies": 57,
+      "share": 1.1,
+      "colors": [
+        "Blue"
+      ],
+      "category": "Character",
+      "standard": "unknown"
+    },
+    {
       "id": "EB05-034",
       "decks": 22,
       "copies": 48,
@@ -2681,23 +2648,23 @@
       "standard": "legal"
     },
     {
-      "id": "OP17-019",
+      "id": "OP11-070",
       "decks": 21,
-      "copies": 81,
-      "share": 1,
+      "copies": 64,
+      "share": 1.1,
       "colors": [
-        "Red"
+        "Purple"
       ],
-      "category": "Event",
+      "category": "Character",
       "standard": "legal"
     },
     {
-      "id": "OP12-063",
+      "id": "OP10-005",
       "decks": 21,
-      "copies": 55,
-      "share": 1,
+      "copies": 61,
+      "share": 1.1,
       "colors": [
-        "Purple"
+        "Red"
       ],
       "category": "Character",
       "standard": "legal"
@@ -2706,20 +2673,9 @@
       "id": "OP16-067",
       "decks": 21,
       "copies": 38,
-      "share": 1,
+      "share": 1.1,
       "colors": [
         "Purple"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP16-108",
-      "decks": 20,
-      "copies": 79,
-      "share": 1,
-      "colors": [
-        "Yellow"
       ],
       "category": "Character",
       "standard": "legal"
@@ -2747,21 +2703,21 @@
       "standard": "legal"
     },
     {
-      "id": "OP05-082",
+      "id": "OP08-076",
       "decks": 20,
-      "copies": 43,
+      "copies": 51,
       "share": 1,
       "colors": [
-        "Black"
+        "Purple"
       ],
-      "category": "Character",
+      "category": "Event",
       "standard": "legal"
     },
     {
       "id": "OP16-055",
       "decks": 19,
       "copies": 76,
-      "share": 0.9,
+      "share": 1,
       "colors": [
         "Blue"
       ],
@@ -2772,9 +2728,20 @@
       "id": "OP16-098",
       "decks": 19,
       "copies": 76,
-      "share": 0.9,
+      "share": 1,
       "colors": [
         "Black"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP16-108",
+      "decks": 19,
+      "copies": 75,
+      "share": 1,
+      "colors": [
+        "Yellow"
       ],
       "category": "Character",
       "standard": "legal"
@@ -2783,7 +2750,7 @@
       "id": "OP16-084",
       "decks": 19,
       "copies": 74,
-      "share": 0.9,
+      "share": 1,
       "colors": [
         "Black"
       ],
@@ -2794,7 +2761,7 @@
       "id": "OP16-087",
       "decks": 19,
       "copies": 74,
-      "share": 0.9,
+      "share": 1,
       "colors": [
         "Black"
       ],
@@ -2805,20 +2772,9 @@
       "id": "OP16-097",
       "decks": 19,
       "copies": 74,
-      "share": 0.9,
+      "share": 1,
       "colors": [
         "Black"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP17-003",
-      "decks": 19,
-      "copies": 74,
-      "share": 0.9,
-      "colors": [
-        "Red"
       ],
       "category": "Character",
       "standard": "legal"
@@ -2827,7 +2783,7 @@
       "id": "OP16-085",
       "decks": 19,
       "copies": 73,
-      "share": 0.9,
+      "share": 1,
       "colors": [
         "Black"
       ],
@@ -2835,10 +2791,21 @@
       "standard": "legal"
     },
     {
+      "id": "OP17-019",
+      "decks": 19,
+      "copies": 73,
+      "share": 1,
+      "colors": [
+        "Red"
+      ],
+      "category": "Event",
+      "standard": "legal"
+    },
+    {
       "id": "OP16-096",
       "decks": 19,
       "copies": 69,
-      "share": 0.9,
+      "share": 1,
       "colors": [
         "Black"
       ],
@@ -2849,7 +2816,7 @@
       "id": "OP16-099",
       "decks": 19,
       "copies": 68,
-      "share": 0.9,
+      "share": 1,
       "colors": [
         "Black"
       ],
@@ -2860,7 +2827,7 @@
       "id": "OP13-043",
       "decks": 19,
       "copies": 63,
-      "share": 0.9,
+      "share": 1,
       "colors": [
         "Blue"
       ],
@@ -2871,7 +2838,7 @@
       "id": "OP12-102",
       "decks": 19,
       "copies": 59,
-      "share": 0.9,
+      "share": 1,
       "colors": [
         "Yellow"
       ],
@@ -2879,12 +2846,23 @@
       "standard": "legal"
     },
     {
-      "id": "OP17-016",
+      "id": "OP12-063",
       "decks": 19,
-      "copies": 43,
-      "share": 0.9,
+      "copies": 49,
+      "share": 1,
       "colors": [
-        "Red"
+        "Purple"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP05-082",
+      "decks": 19,
+      "copies": 39,
+      "share": 1,
+      "colors": [
+        "Black"
       ],
       "category": "Character",
       "standard": "legal"
@@ -2893,7 +2871,7 @@
       "id": "ST36-005",
       "decks": 19,
       "copies": 36,
-      "share": 0.9,
+      "share": 1,
       "colors": [
         "Yellow"
       ],
@@ -2989,6 +2967,17 @@
       "standard": "legal"
     },
     {
+      "id": "OP17-003",
+      "decks": 18,
+      "copies": 70,
+      "share": 0.9,
+      "colors": [
+        "Red"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
       "id": "OP16-082",
       "decks": 18,
       "copies": 69,
@@ -3066,21 +3055,10 @@
       "standard": "legal"
     },
     {
-      "id": "OP16-010",
-      "decks": 18,
-      "copies": 46,
-      "share": 0.9,
-      "colors": [
-        "Red"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
       "id": "EB05-020",
       "decks": 17,
       "copies": 68,
-      "share": 0.8,
+      "share": 0.9,
       "colors": [
         "Green"
       ],
@@ -3091,40 +3069,7 @@
       "id": "OP16-091",
       "decks": 17,
       "copies": 68,
-      "share": 0.8,
-      "colors": [
-        "Black"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP17-008",
-      "decks": 17,
-      "copies": 68,
-      "share": 0.8,
-      "colors": [
-        "Red"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP15-084",
-      "decks": 17,
-      "copies": 67,
-      "share": 0.8,
-      "colors": [
-        "Black"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "PRB02-013",
-      "decks": 17,
-      "copies": 65,
-      "share": 0.8,
+      "share": 0.9,
       "colors": [
         "Black"
       ],
@@ -3135,7 +3080,7 @@
       "id": "EB05-004",
       "decks": 17,
       "copies": 64,
-      "share": 0.8,
+      "share": 0.9,
       "colors": [
         "Red"
       ],
@@ -3146,7 +3091,7 @@
       "id": "EB05-014",
       "decks": 17,
       "copies": 63,
-      "share": 0.8,
+      "share": 0.9,
       "colors": [
         "Green"
       ],
@@ -3157,7 +3102,7 @@
       "id": "OP15-035",
       "decks": 17,
       "copies": 59,
-      "share": 0.8,
+      "share": 0.9,
       "colors": [
         "Green"
       ],
@@ -3168,7 +3113,7 @@
       "id": "EB05-057",
       "decks": 17,
       "copies": 56,
-      "share": 0.8,
+      "share": 0.9,
       "colors": [
         "Yellow"
       ],
@@ -3176,10 +3121,21 @@
       "standard": "unknown"
     },
     {
+      "id": "OP17-016",
+      "decks": 17,
+      "copies": 39,
+      "share": 0.9,
+      "colors": [
+        "Red"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
       "id": "OP10-114",
       "decks": 17,
       "copies": 37,
-      "share": 0.8,
+      "share": 0.9,
       "colors": [
         "Yellow"
       ],
@@ -3190,7 +3146,7 @@
       "id": "OP16-088",
       "decks": 17,
       "copies": 33,
-      "share": 0.8,
+      "share": 0.9,
       "colors": [
         "Black"
       ],
@@ -3226,6 +3182,17 @@
       "share": 0.8,
       "colors": [
         "Yellow"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP17-008",
+      "decks": 16,
+      "copies": 64,
+      "share": 0.8,
+      "colors": [
+        "Red"
       ],
       "category": "Character",
       "standard": "legal"
@@ -3308,17 +3275,6 @@
       "standard": "legal"
     },
     {
-      "id": "OP17-026",
-      "decks": 16,
-      "copies": 52,
-      "share": 0.8,
-      "colors": [
-        "Green"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
       "id": "OP14-004",
       "decks": 16,
       "copies": 50,
@@ -3352,6 +3308,17 @@
       "standard": "legal"
     },
     {
+      "id": "OP16-010",
+      "decks": 16,
+      "copies": 42,
+      "share": 0.8,
+      "colors": [
+        "Red"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
       "id": "OP04-083",
       "decks": 16,
       "copies": 38,
@@ -3371,17 +3338,6 @@
         "Green"
       ],
       "category": "Event",
-      "standard": "legal"
-    },
-    {
-      "id": "OP11-012",
-      "decks": 16,
-      "copies": 34,
-      "share": 0.8,
-      "colors": [
-        "Red"
-      ],
-      "category": "Character",
       "standard": "legal"
     },
     {
@@ -3407,32 +3363,10 @@
       "standard": "legal"
     },
     {
-      "id": "OP17-038",
-      "decks": 16,
-      "copies": 25,
-      "share": 0.8,
-      "colors": [
-        "Green"
-      ],
-      "category": "Event",
-      "standard": "legal"
-    },
-    {
-      "id": "OP07-056",
-      "decks": 16,
-      "copies": 22,
-      "share": 0.8,
-      "colors": [
-        "Blue"
-      ],
-      "category": "Event",
-      "standard": "legal"
-    },
-    {
       "id": "OP16-034",
       "decks": 15,
       "copies": 60,
-      "share": 0.7,
+      "share": 0.8,
       "colors": [
         "Green"
       ],
@@ -3443,7 +3377,29 @@
       "id": "OP16-092",
       "decks": 15,
       "copies": 60,
-      "share": 0.7,
+      "share": 0.8,
+      "colors": [
+        "Black"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP15-084",
+      "decks": 15,
+      "copies": 59,
+      "share": 0.8,
+      "colors": [
+        "Black"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "PRB02-013",
+      "decks": 15,
+      "copies": 57,
+      "share": 0.8,
       "colors": [
         "Black"
       ],
@@ -3454,7 +3410,18 @@
       "id": "ST32-005",
       "decks": 15,
       "copies": 53,
-      "share": 0.7,
+      "share": 0.8,
+      "colors": [
+        "Green"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP17-026",
+      "decks": 15,
+      "copies": 50,
+      "share": 0.8,
       "colors": [
         "Green"
       ],
@@ -3465,20 +3432,9 @@
       "id": "OP15-009",
       "decks": 15,
       "copies": 45,
-      "share": 0.7,
+      "share": 0.8,
       "colors": [
         "Red"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP17-028",
-      "decks": 15,
-      "copies": 37,
-      "share": 0.7,
-      "colors": [
-        "Green"
       ],
       "category": "Character",
       "standard": "legal"
@@ -3487,7 +3443,7 @@
       "id": "OP16-038",
       "decks": 15,
       "copies": 35,
-      "share": 0.7,
+      "share": 0.8,
       "colors": [
         "Green"
       ],
@@ -3495,12 +3451,12 @@
       "standard": "legal"
     },
     {
-      "id": "OP05-081",
+      "id": "OP11-012",
       "decks": 15,
-      "copies": 34,
-      "share": 0.7,
+      "copies": 32,
+      "share": 0.8,
       "colors": [
-        "Black"
+        "Red"
       ],
       "category": "Character",
       "standard": "legal"
@@ -3509,7 +3465,7 @@
       "id": "OP14-069",
       "decks": 15,
       "copies": 29,
-      "share": 0.7,
+      "share": 0.8,
       "colors": [
         "Purple"
       ],
@@ -3520,7 +3476,7 @@
       "id": "OP07-002",
       "decks": 15,
       "copies": 28,
-      "share": 0.7,
+      "share": 0.8,
       "colors": [
         "Red"
       ],
@@ -3531,7 +3487,7 @@
       "id": "OP11-018",
       "decks": 15,
       "copies": 26,
-      "share": 0.7,
+      "share": 0.8,
       "colors": [
         "Red"
       ],
@@ -3539,21 +3495,10 @@
       "standard": "legal"
     },
     {
-      "id": "OP07-085",
-      "decks": 15,
-      "copies": 23,
-      "share": 0.7,
-      "colors": [
-        "Black"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
       "id": "OP16-068",
       "decks": 15,
       "copies": 23,
-      "share": 0.7,
+      "share": 0.8,
       "colors": [
         "Purple"
       ],
@@ -3561,12 +3506,23 @@
       "standard": "legal"
     },
     {
-      "id": "EB02-021",
+      "id": "OP17-038",
       "decks": 15,
-      "copies": 22,
-      "share": 0.7,
+      "copies": 23,
+      "share": 0.8,
       "colors": [
         "Green"
+      ],
+      "category": "Event",
+      "standard": "legal"
+    },
+    {
+      "id": "OP07-056",
+      "decks": 15,
+      "copies": 21,
+      "share": 0.8,
+      "colors": [
+        "Blue"
       ],
       "category": "Event",
       "standard": "legal"
@@ -3575,7 +3531,7 @@
       "id": "OP02-068",
       "decks": 15,
       "copies": 18,
-      "share": 0.7,
+      "share": 0.8,
       "colors": [
         "Blue"
       ],
@@ -3715,9 +3671,20 @@
       "standard": "legal"
     },
     {
-      "id": "OP14-120",
+      "id": "OP17-028",
       "decks": 14,
-      "copies": 33,
+      "copies": 35,
+      "share": 0.7,
+      "colors": [
+        "Green"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP05-081",
+      "decks": 14,
+      "copies": 30,
       "share": 0.7,
       "colors": [
         "Black"
@@ -3759,6 +3726,17 @@
       "standard": "legal"
     },
     {
+      "id": "EB02-021",
+      "decks": 14,
+      "copies": 21,
+      "share": 0.7,
+      "colors": [
+        "Green"
+      ],
+      "category": "Event",
+      "standard": "legal"
+    },
+    {
       "id": "OP09-084",
       "decks": 14,
       "copies": 17,
@@ -3770,54 +3748,10 @@
       "standard": "legal"
     },
     {
-      "id": "OP17-002",
-      "decks": 13,
-      "copies": 50,
-      "share": 0.6,
-      "colors": [
-        "Red"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP14-100",
-      "decks": 13,
-      "copies": 48,
-      "share": 0.6,
-      "colors": [
-        "Yellow"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP10-072",
-      "decks": 13,
-      "copies": 46,
-      "share": 0.6,
-      "colors": [
-        "Purple"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP16-005",
-      "decks": 13,
-      "copies": 36,
-      "share": 0.6,
-      "colors": [
-        "Red"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
       "id": "OP09-098",
       "decks": 13,
       "copies": 35,
-      "share": 0.6,
+      "share": 0.7,
       "colors": [
         "Black"
       ],
@@ -3828,7 +3762,7 @@
       "id": "OP14-014",
       "decks": 13,
       "copies": 33,
-      "share": 0.6,
+      "share": 0.7,
       "colors": [
         "Red"
       ],
@@ -3839,9 +3773,20 @@
       "id": "OP16-032",
       "decks": 13,
       "copies": 31,
-      "share": 0.6,
+      "share": 0.7,
       "colors": [
         "Green"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP14-120",
+      "decks": 13,
+      "copies": 30,
+      "share": 0.7,
+      "colors": [
+        "Black"
       ],
       "category": "Character",
       "standard": "legal"
@@ -3850,7 +3795,7 @@
       "id": "OP08-099",
       "decks": 13,
       "copies": 21,
-      "share": 0.6,
+      "share": 0.7,
       "colors": [
         "Yellow"
       ],
@@ -3858,10 +3803,10 @@
       "standard": "legal"
     },
     {
-      "id": "OP06-090",
+      "id": "OP07-085",
       "decks": 13,
-      "copies": 16,
-      "share": 0.6,
+      "copies": 20,
+      "share": 0.7,
       "colors": [
         "Black"
       ],
@@ -3872,7 +3817,7 @@
       "id": "OP17-060",
       "decks": 13,
       "copies": 15,
-      "share": 0.6,
+      "share": 0.7,
       "colors": [
         "Purple"
       ],
@@ -3883,7 +3828,7 @@
       "id": "EB03-062",
       "decks": 13,
       "copies": 14,
-      "share": 0.6,
+      "share": 0.7,
       "colors": [
         "Yellow"
       ],
@@ -3891,12 +3836,12 @@
       "standard": "legal"
     },
     {
-      "id": "OP06-091",
+      "id": "OP17-002",
       "decks": 12,
-      "copies": 46,
+      "copies": 47,
       "share": 0.6,
       "colors": [
-        "Black"
+        "Red"
       ],
       "category": "Character",
       "standard": "legal"
@@ -3919,6 +3864,17 @@
       "share": 0.6,
       "colors": [
         "Black"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP10-072",
+      "decks": 12,
+      "copies": 42,
+      "share": 0.6,
+      "colors": [
+        "Purple"
       ],
       "category": "Character",
       "standard": "legal"
@@ -4012,10 +3968,21 @@
       "standard": "legal"
     },
     {
+      "id": "OP14-100",
+      "decks": 11,
+      "copies": 41,
+      "share": 0.6,
+      "colors": [
+        "Yellow"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
       "id": "PRB02-001",
       "decks": 11,
       "copies": 39,
-      "share": 0.5,
+      "share": 0.6,
       "colors": [
         "Red"
       ],
@@ -4026,7 +3993,7 @@
       "id": "OP14-011",
       "decks": 11,
       "copies": 37,
-      "share": 0.5,
+      "share": 0.6,
       "colors": [
         "Red"
       ],
@@ -4037,9 +4004,20 @@
       "id": "OP16-109",
       "decks": 11,
       "copies": 33,
-      "share": 0.5,
+      "share": 0.6,
       "colors": [
         "Yellow"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP16-005",
+      "decks": 11,
+      "copies": 29,
+      "share": 0.6,
+      "colors": [
+        "Red"
       ],
       "category": "Character",
       "standard": "legal"
@@ -4048,7 +4026,7 @@
       "id": "OP16-058",
       "decks": 11,
       "copies": 28,
-      "share": 0.5,
+      "share": 0.6,
       "colors": [
         "Blue"
       ],
@@ -4059,12 +4037,23 @@
       "id": "EB05-059",
       "decks": 11,
       "copies": 26,
-      "share": 0.5,
+      "share": 0.6,
       "colors": [
         "Yellow"
       ],
       "category": "Event",
       "standard": "unknown"
+    },
+    {
+      "id": "OP06-090",
+      "decks": 11,
+      "copies": 14,
+      "share": 0.6,
+      "colors": [
+        "Black"
+      ],
+      "category": "Character",
+      "standard": "legal"
     },
     {
       "id": "EB03-008",
@@ -4100,17 +4089,6 @@
       "standard": "legal"
     },
     {
-      "id": "OP06-119",
-      "decks": 10,
-      "copies": 40,
-      "share": 0.5,
-      "colors": [
-        "Blue"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
       "id": "OP11-004",
       "decks": 10,
       "copies": 40,
@@ -4128,6 +4106,17 @@
       "share": 0.5,
       "colors": [
         "Red"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP06-091",
+      "decks": 10,
+      "copies": 38,
+      "share": 0.5,
+      "colors": [
+        "Black"
       ],
       "category": "Character",
       "standard": "legal"
@@ -4185,17 +4174,6 @@
         "Black"
       ],
       "category": "Event",
-      "standard": "legal"
-    },
-    {
-      "id": "OP12-002",
-      "decks": 10,
-      "copies": 35,
-      "share": 0.5,
-      "colors": [
-        "Red"
-      ],
-      "category": "Character",
       "standard": "legal"
     },
     {
@@ -4265,10 +4243,21 @@
       "standard": "legal"
     },
     {
+      "id": "OP06-119",
+      "decks": 9,
+      "copies": 36,
+      "share": 0.5,
+      "colors": [
+        "Blue"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
       "id": "OP11-080",
       "decks": 9,
       "copies": 36,
-      "share": 0.4,
+      "share": 0.5,
       "colors": [
         "Purple"
       ],
@@ -4279,7 +4268,7 @@
       "id": "OP11-082",
       "decks": 9,
       "copies": 35,
-      "share": 0.4,
+      "share": 0.5,
       "colors": [
         "Black"
       ],
@@ -4290,9 +4279,20 @@
       "id": "OP13-054",
       "decks": 9,
       "copies": 32,
-      "share": 0.4,
+      "share": 0.5,
       "colors": [
         "Blue"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP12-002",
+      "decks": 9,
+      "copies": 31,
+      "share": 0.5,
+      "colors": [
+        "Red"
       ],
       "category": "Character",
       "standard": "legal"
@@ -4301,7 +4301,7 @@
       "id": "OP09-107",
       "decks": 9,
       "copies": 29,
-      "share": 0.4,
+      "share": 0.5,
       "colors": [
         "Yellow"
       ],
@@ -4312,7 +4312,7 @@
       "id": "OP17-070",
       "decks": 9,
       "copies": 24,
-      "share": 0.4,
+      "share": 0.5,
       "colors": [
         "Purple"
       ],
@@ -4323,7 +4323,7 @@
       "id": "OP10-062",
       "decks": 9,
       "copies": 23,
-      "share": 0.4,
+      "share": 0.5,
       "colors": [
         "Purple"
       ],
@@ -4334,7 +4334,7 @@
       "id": "OP13-037",
       "decks": 9,
       "copies": 23,
-      "share": 0.4,
+      "share": 0.5,
       "colors": [
         "Green"
       ],
@@ -4345,7 +4345,7 @@
       "id": "EB04-003",
       "decks": 9,
       "copies": 20,
-      "share": 0.4,
+      "share": 0.5,
       "colors": [
         "Red"
       ],
@@ -4356,7 +4356,7 @@
       "id": "OP16-026",
       "decks": 9,
       "copies": 20,
-      "share": 0.4,
+      "share": 0.5,
       "colors": [
         "Green"
       ],
@@ -4367,7 +4367,7 @@
       "id": "EB03-051",
       "decks": 9,
       "copies": 19,
-      "share": 0.4,
+      "share": 0.5,
       "colors": [
         "Yellow"
       ],
@@ -4375,21 +4375,10 @@
       "standard": "legal"
     },
     {
-      "id": "OP13-117",
-      "decks": 9,
-      "copies": 17,
-      "share": 0.4,
-      "colors": [
-        "Yellow"
-      ],
-      "category": "Event",
-      "standard": "legal"
-    },
-    {
       "id": "OP09-060",
       "decks": 9,
       "copies": 16,
-      "share": 0.4,
+      "share": 0.5,
       "colors": [
         "Blue"
       ],
@@ -4400,22 +4389,11 @@
       "id": "OP12-038",
       "decks": 9,
       "copies": 14,
-      "share": 0.4,
+      "share": 0.5,
       "colors": [
         "Green"
       ],
       "category": "Event",
-      "standard": "legal"
-    },
-    {
-      "id": "OP14-109",
-      "decks": 9,
-      "copies": 11,
-      "share": 0.4,
-      "colors": [
-        "Yellow"
-      ],
-      "category": "Character",
       "standard": "legal"
     },
     {
@@ -4595,17 +4573,6 @@
       "standard": "legal"
     },
     {
-      "id": "OP14-018",
-      "decks": 8,
-      "copies": 24,
-      "share": 0.4,
-      "colors": [
-        "Red"
-      ],
-      "category": "Event",
-      "standard": "legal"
-    },
-    {
       "id": "OP14-061",
       "decks": 8,
       "copies": 24,
@@ -4661,28 +4628,6 @@
       "standard": "legal"
     },
     {
-      "id": "OP15-116",
-      "decks": 8,
-      "copies": 16,
-      "share": 0.4,
-      "colors": [
-        "Yellow"
-      ],
-      "category": "Event",
-      "standard": "legal"
-    },
-    {
-      "id": "OP06-076",
-      "decks": 8,
-      "copies": 15,
-      "share": 0.4,
-      "colors": [
-        "Purple"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
       "id": "OP16-095",
       "decks": 8,
       "copies": 15,
@@ -4700,6 +4645,17 @@
       "share": 0.4,
       "colors": [
         "Red"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP14-109",
+      "decks": 8,
+      "copies": 10,
+      "share": 0.4,
+      "colors": [
+        "Yellow"
       ],
       "category": "Character",
       "standard": "legal"
@@ -4741,7 +4697,7 @@
       "id": "OP10-078",
       "decks": 7,
       "copies": 25,
-      "share": 0.3,
+      "share": 0.4,
       "colors": [
         "Purple"
       ],
@@ -4752,7 +4708,7 @@
       "id": "OP15-023",
       "decks": 7,
       "copies": 23,
-      "share": 0.3,
+      "share": 0.4,
       "colors": [
         "Green"
       ],
@@ -4763,7 +4719,7 @@
       "id": "EB05-008",
       "decks": 7,
       "copies": 22,
-      "share": 0.3,
+      "share": 0.4,
       "colors": [
         "Red"
       ],
@@ -4771,10 +4727,21 @@
       "standard": "unknown"
     },
     {
+      "id": "OP14-018",
+      "decks": 7,
+      "copies": 22,
+      "share": 0.4,
+      "colors": [
+        "Red"
+      ],
+      "category": "Event",
+      "standard": "legal"
+    },
+    {
       "id": "ST32-003",
       "decks": 7,
       "copies": 21,
-      "share": 0.3,
+      "share": 0.4,
       "colors": [
         "Green"
       ],
@@ -4785,7 +4752,7 @@
       "id": "EB03-021",
       "decks": 7,
       "copies": 20,
-      "share": 0.3,
+      "share": 0.4,
       "colors": [
         "Blue"
       ],
@@ -4796,7 +4763,7 @@
       "id": "OP13-108",
       "decks": 7,
       "copies": 19,
-      "share": 0.3,
+      "share": 0.4,
       "colors": [
         "Yellow"
       ],
@@ -4807,7 +4774,7 @@
       "id": "ST14-003",
       "decks": 7,
       "copies": 19,
-      "share": 0.3,
+      "share": 0.4,
       "colors": [
         "Black"
       ],
@@ -4818,7 +4785,7 @@
       "id": "OP10-020",
       "decks": 7,
       "copies": 15,
-      "share": 0.3,
+      "share": 0.4,
       "colors": [
         "Red"
       ],
@@ -4829,7 +4796,7 @@
       "id": "OP06-035",
       "decks": 7,
       "copies": 14,
-      "share": 0.3,
+      "share": 0.4,
       "colors": [
         "Green"
       ],
@@ -4840,7 +4807,7 @@
       "id": "OP09-119",
       "decks": 7,
       "copies": 14,
-      "share": 0.3,
+      "share": 0.4,
       "colors": [
         "Purple"
       ],
@@ -4851,20 +4818,9 @@
       "id": "OP11-028",
       "decks": 7,
       "copies": 14,
-      "share": 0.3,
+      "share": 0.4,
       "colors": [
         "Green"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP13-120",
-      "decks": 7,
-      "copies": 14,
-      "share": 0.3,
-      "colors": [
-        "Black"
       ],
       "category": "Character",
       "standard": "legal"
@@ -4873,7 +4829,7 @@
       "id": "OP08-118",
       "decks": 7,
       "copies": 13,
-      "share": 0.3,
+      "share": 0.4,
       "colors": [
         "Red"
       ],
@@ -4884,9 +4840,20 @@
       "id": "OP10-019",
       "decks": 7,
       "copies": 13,
-      "share": 0.3,
+      "share": 0.4,
       "colors": [
         "Red"
+      ],
+      "category": "Event",
+      "standard": "legal"
+    },
+    {
+      "id": "OP13-117",
+      "decks": 7,
+      "copies": 13,
+      "share": 0.4,
+      "colors": [
+        "Yellow"
       ],
       "category": "Event",
       "standard": "legal"
@@ -4895,9 +4862,20 @@
       "id": "PRB02-015",
       "decks": 7,
       "copies": 12,
-      "share": 0.3,
+      "share": 0.4,
       "colors": [
         "Black"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP06-076",
+      "decks": 7,
+      "copies": 11,
+      "share": 0.4,
+      "colors": [
+        "Purple"
       ],
       "category": "Character",
       "standard": "legal"
@@ -4906,7 +4884,7 @@
       "id": "OP16-115",
       "decks": 7,
       "copies": 7,
-      "share": 0.3,
+      "share": 0.4,
       "colors": [
         "Yellow"
       ],
@@ -5024,12 +5002,23 @@
       "standard": "legal"
     },
     {
-      "id": "OP06-104",
+      "id": "OP15-116",
+      "decks": 6,
+      "copies": 13,
+      "share": 0.3,
+      "colors": [
+        "Yellow"
+      ],
+      "category": "Event",
+      "standard": "legal"
+    },
+    {
+      "id": "OP13-120",
       "decks": 6,
       "copies": 12,
       "share": 0.3,
       "colors": [
-        "Yellow"
+        "Black"
       ],
       "category": "Character",
       "standard": "legal"
@@ -5041,17 +5030,6 @@
       "share": 0.3,
       "colors": [
         "Black"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP15-060",
-      "decks": 6,
-      "copies": 7,
-      "share": 0.3,
-      "colors": [
-        "Purple"
       ],
       "category": "Character",
       "standard": "legal"
@@ -5082,7 +5060,7 @@
       "id": "EB02-035",
       "decks": 5,
       "copies": 20,
-      "share": 0.2,
+      "share": 0.3,
       "colors": [
         "Purple"
       ],
@@ -5093,7 +5071,7 @@
       "id": "OP07-099",
       "decks": 5,
       "copies": 20,
-      "share": 0.2,
+      "share": 0.3,
       "colors": [
         "Yellow"
       ],
@@ -5104,7 +5082,7 @@
       "id": "ST18-004",
       "decks": 5,
       "copies": 20,
-      "share": 0.2,
+      "share": 0.3,
       "colors": [
         "Purple"
       ],
@@ -5115,7 +5093,7 @@
       "id": "EB01-002",
       "decks": 5,
       "copies": 17,
-      "share": 0.2,
+      "share": 0.3,
       "colors": [
         "Red"
       ],
@@ -5123,21 +5101,10 @@
       "standard": "legal"
     },
     {
-      "id": "OP17-117",
-      "decks": 5,
-      "copies": 17,
-      "share": 0.2,
-      "colors": [
-        "Yellow"
-      ],
-      "category": "Event",
-      "standard": "legal"
-    },
-    {
       "id": "ST22-002",
       "decks": 5,
       "copies": 17,
-      "share": 0.2,
+      "share": 0.3,
       "colors": [
         "Blue"
       ],
@@ -5148,18 +5115,7 @@
       "id": "ST30-016",
       "decks": 5,
       "copies": 16,
-      "share": 0.2,
-      "colors": [
-        "Red"
-      ],
-      "category": "Event",
-      "standard": "legal"
-    },
-    {
-      "id": "EB04-008",
-      "decks": 5,
-      "copies": 14,
-      "share": 0.2,
+      "share": 0.3,
       "colors": [
         "Red"
       ],
@@ -5170,7 +5126,7 @@
       "id": "OP13-015",
       "decks": 5,
       "copies": 14,
-      "share": 0.2,
+      "share": 0.3,
       "colors": [
         "Red"
       ],
@@ -5181,7 +5137,7 @@
       "id": "OP14-089",
       "decks": 5,
       "copies": 13,
-      "share": 0.2,
+      "share": 0.3,
       "colors": [
         "Black"
       ],
@@ -5192,7 +5148,7 @@
       "id": "EB05-049",
       "decks": 5,
       "copies": 12,
-      "share": 0.2,
+      "share": 0.3,
       "colors": [
         "Black"
       ],
@@ -5200,21 +5156,10 @@
       "standard": "unknown"
     },
     {
-      "id": "ST30-009",
-      "decks": 5,
-      "copies": 12,
-      "share": 0.2,
-      "colors": [
-        "Red"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
       "id": "OP09-009",
       "decks": 5,
       "copies": 11,
-      "share": 0.2,
+      "share": 0.3,
       "colors": [
         "Red"
       ],
@@ -5225,7 +5170,7 @@
       "id": "ST12-010",
       "decks": 5,
       "copies": 11,
-      "share": 0.2,
+      "share": 0.3,
       "colors": [
         "Blue"
       ],
@@ -5236,7 +5181,7 @@
       "id": "EB01-056",
       "decks": 5,
       "copies": 10,
-      "share": 0.2,
+      "share": 0.3,
       "colors": [
         "Yellow"
       ],
@@ -5247,7 +5192,7 @@
       "id": "EB02-061",
       "decks": 5,
       "copies": 10,
-      "share": 0.2,
+      "share": 0.3,
       "colors": [
         "Purple"
       ],
@@ -5258,7 +5203,7 @@
       "id": "OP08-019",
       "decks": 5,
       "copies": 10,
-      "share": 0.2,
+      "share": 0.3,
       "colors": [
         "Red"
       ],
@@ -5266,10 +5211,21 @@
       "standard": "legal"
     },
     {
+      "id": "OP06-104",
+      "decks": 5,
+      "copies": 9,
+      "share": 0.3,
+      "colors": [
+        "Yellow"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
       "id": "OP13-095",
       "decks": 5,
       "copies": 9,
-      "share": 0.2,
+      "share": 0.3,
       "colors": [
         "Black"
       ],
@@ -5280,7 +5236,7 @@
       "id": "OP09-097",
       "decks": 5,
       "copies": 8,
-      "share": 0.2,
+      "share": 0.3,
       "colors": [
         "Black"
       ],
@@ -5291,7 +5247,7 @@
       "id": "OP13-097",
       "decks": 5,
       "copies": 8,
-      "share": 0.2,
+      "share": 0.3,
       "colors": [
         "Black"
       ],
@@ -5302,7 +5258,7 @@
       "id": "OP16-039",
       "decks": 5,
       "copies": 7,
-      "share": 0.2,
+      "share": 0.3,
       "colors": [
         "Green"
       ],
@@ -5313,7 +5269,7 @@
       "id": "OP17-057",
       "decks": 5,
       "copies": 7,
-      "share": 0.2,
+      "share": 0.3,
       "colors": [
         "Blue"
       ],
@@ -5324,7 +5280,7 @@
       "id": "OP11-061",
       "decks": 5,
       "copies": 6,
-      "share": 0.2,
+      "share": 0.3,
       "colors": [
         "Blue"
       ],
@@ -5332,10 +5288,21 @@
       "standard": "legal"
     },
     {
+      "id": "OP15-060",
+      "decks": 5,
+      "copies": 6,
+      "share": 0.3,
+      "colors": [
+        "Purple"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
       "id": "OP16-037",
       "decks": 5,
       "copies": 6,
-      "share": 0.2,
+      "share": 0.3,
       "colors": [
         "Green"
       ],
@@ -5585,17 +5552,6 @@
       "standard": "legal"
     },
     {
-      "id": "OP12-089",
-      "decks": 4,
-      "copies": 14,
-      "share": 0.2,
-      "colors": [
-        "Black"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
       "id": "PRB02-010",
       "decks": 4,
       "copies": 14,
@@ -5629,14 +5585,14 @@
       "standard": "legal"
     },
     {
-      "id": "OP05-091",
+      "id": "OP17-117",
       "decks": 4,
-      "copies": 12,
+      "copies": 13,
       "share": 0.2,
       "colors": [
-        "Black"
+        "Yellow"
       ],
-      "category": "Character",
+      "category": "Event",
       "standard": "legal"
     },
     {
@@ -5706,6 +5662,17 @@
       "standard": "unknown"
     },
     {
+      "id": "EB04-008",
+      "decks": 4,
+      "copies": 10,
+      "share": 0.2,
+      "colors": [
+        "Red"
+      ],
+      "category": "Event",
+      "standard": "legal"
+    },
+    {
       "id": "EB05-009",
       "decks": 4,
       "copies": 10,
@@ -5739,17 +5706,6 @@
       "standard": "legal"
     },
     {
-      "id": "OP17-078",
-      "decks": 4,
-      "copies": 10,
-      "share": 0.2,
-      "colors": [
-        "Purple"
-      ],
-      "category": "Event",
-      "standard": "legal"
-    },
-    {
       "id": "OP07-026",
       "decks": 4,
       "copies": 9,
@@ -5772,18 +5728,18 @@
       "standard": "legal"
     },
     {
-      "id": "OP10-098",
+      "id": "ST15-004",
       "decks": 4,
       "copies": 9,
       "share": 0.2,
       "colors": [
-        "Black"
+        "Red"
       ],
-      "category": "Event",
+      "category": "Character",
       "standard": "legal"
     },
     {
-      "id": "ST15-004",
+      "id": "ST30-009",
       "decks": 4,
       "copies": 9,
       "share": 0.2,
@@ -5838,28 +5794,6 @@
       "standard": "legal"
     },
     {
-      "id": "OP17-034",
-      "decks": 4,
-      "copies": 6,
-      "share": 0.2,
-      "colors": [
-        "Green"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "ST15-002",
-      "decks": 4,
-      "copies": 6,
-      "share": 0.2,
-      "colors": [
-        "Red"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
       "id": "P-046",
       "decks": 4,
       "copies": 5,
@@ -5871,21 +5805,10 @@
       "standard": "unknown"
     },
     {
-      "id": "EB03-035",
-      "decks": 3,
-      "copies": 12,
-      "share": 0.1,
-      "colors": [
-        "Purple"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
       "id": "EB05-002",
       "decks": 3,
       "copies": 12,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Red"
       ],
@@ -5896,7 +5819,7 @@
       "id": "EB05-045",
       "decks": 3,
       "copies": 12,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Black"
       ],
@@ -5907,7 +5830,7 @@
       "id": "OP05-006",
       "decks": 3,
       "copies": 12,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Red"
       ],
@@ -5918,7 +5841,7 @@
       "id": "OP05-017",
       "decks": 3,
       "copies": 12,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Red"
       ],
@@ -5929,18 +5852,7 @@
       "id": "OP07-104",
       "decks": 3,
       "copies": 12,
-      "share": 0.1,
-      "colors": [
-        "Yellow"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP09-100",
-      "decks": 3,
-      "copies": 12,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Yellow"
       ],
@@ -5951,7 +5863,7 @@
       "id": "OP12-028",
       "decks": 3,
       "copies": 12,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Green"
       ],
@@ -5962,7 +5874,7 @@
       "id": "OP12-031",
       "decks": 3,
       "copies": 12,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Green"
       ],
@@ -5973,7 +5885,7 @@
       "id": "OP12-039",
       "decks": 3,
       "copies": 12,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Green"
       ],
@@ -5984,7 +5896,7 @@
       "id": "OP15-037",
       "decks": 3,
       "copies": 12,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Green"
       ],
@@ -5995,7 +5907,7 @@
       "id": "OP15-053",
       "decks": 3,
       "copies": 12,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Blue"
       ],
@@ -6006,9 +5918,20 @@
       "id": "OP11-030",
       "decks": 3,
       "copies": 11,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Green"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP12-089",
+      "decks": 3,
+      "copies": 11,
+      "share": 0.2,
+      "colors": [
+        "Black"
       ],
       "category": "Character",
       "standard": "legal"
@@ -6017,7 +5940,7 @@
       "id": "OP14-024",
       "decks": 3,
       "copies": 11,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Green"
       ],
@@ -6028,7 +5951,7 @@
       "id": "OP14-090",
       "decks": 3,
       "copies": 11,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Black"
       ],
@@ -6039,7 +5962,7 @@
       "id": "OP15-013",
       "decks": 3,
       "copies": 11,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Red"
       ],
@@ -6050,20 +5973,9 @@
       "id": "OP05-070",
       "decks": 3,
       "copies": 10,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Purple"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP09-109",
-      "decks": 3,
-      "copies": 10,
-      "share": 0.1,
-      "colors": [
-        "Yellow"
       ],
       "category": "Character",
       "standard": "legal"
@@ -6072,7 +5984,7 @@
       "id": "OP09-112",
       "decks": 3,
       "copies": 10,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Yellow"
       ],
@@ -6083,7 +5995,7 @@
       "id": "OP10-112",
       "decks": 3,
       "copies": 10,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Yellow"
       ],
@@ -6094,7 +6006,7 @@
       "id": "OP15-052",
       "decks": 3,
       "copies": 10,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Blue"
       ],
@@ -6105,7 +6017,7 @@
       "id": "OP15-109",
       "decks": 3,
       "copies": 10,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Yellow"
       ],
@@ -6116,7 +6028,7 @@
       "id": "OP16-002",
       "decks": 3,
       "copies": 10,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Red"
       ],
@@ -6127,7 +6039,7 @@
       "id": "EB05-054",
       "decks": 3,
       "copies": 9,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Yellow"
       ],
@@ -6138,7 +6050,7 @@
       "id": "OP10-045",
       "decks": 3,
       "copies": 9,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Blue"
       ],
@@ -6149,7 +6061,7 @@
       "id": "OP12-094",
       "decks": 3,
       "copies": 9,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Black"
       ],
@@ -6160,7 +6072,7 @@
       "id": "OP15-038",
       "decks": 3,
       "copies": 9,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Green"
       ],
@@ -6171,7 +6083,7 @@
       "id": "OP16-107",
       "decks": 3,
       "copies": 9,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Yellow"
       ],
@@ -6182,7 +6094,7 @@
       "id": "ST34-001",
       "decks": 3,
       "copies": 9,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Purple"
       ],
@@ -6193,7 +6105,7 @@
       "id": "EB02-031",
       "decks": 3,
       "copies": 8,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Blue"
       ],
@@ -6204,7 +6116,7 @@
       "id": "EB04-033",
       "decks": 3,
       "copies": 8,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Purple"
       ],
@@ -6215,7 +6127,7 @@
       "id": "OP05-019",
       "decks": 3,
       "copies": 8,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Red"
       ],
@@ -6226,7 +6138,7 @@
       "id": "OP08-023",
       "decks": 3,
       "copies": 8,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Green"
       ],
@@ -6237,7 +6149,7 @@
       "id": "OP14-086",
       "decks": 3,
       "copies": 8,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Black"
       ],
@@ -6248,7 +6160,7 @@
       "id": "OP15-021",
       "decks": 3,
       "copies": 8,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Red"
       ],
@@ -6259,7 +6171,7 @@
       "id": "OP15-105",
       "decks": 3,
       "copies": 8,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Yellow"
       ],
@@ -6267,10 +6179,21 @@
       "standard": "legal"
     },
     {
+      "id": "OP17-078",
+      "decks": 3,
+      "copies": 8,
+      "share": 0.2,
+      "colors": [
+        "Purple"
+      ],
+      "category": "Event",
+      "standard": "legal"
+    },
+    {
       "id": "ST21-010",
       "decks": 3,
       "copies": 8,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Red"
       ],
@@ -6281,7 +6204,7 @@
       "id": "OP16-086",
       "decks": 3,
       "copies": 7,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Black"
       ],
@@ -6292,7 +6215,7 @@
       "id": "P-111",
       "decks": 3,
       "copies": 7,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Green"
       ],
@@ -6303,20 +6226,9 @@
       "id": "PRB02-017",
       "decks": 3,
       "copies": 7,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Yellow"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "ST06-008",
-      "decks": 3,
-      "copies": 7,
-      "share": 0.1,
-      "colors": [
-        "Black"
       ],
       "category": "Character",
       "standard": "legal"
@@ -6325,7 +6237,7 @@
       "id": "OP06-007",
       "decks": 3,
       "copies": 6,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Red"
       ],
@@ -6336,9 +6248,20 @@
       "id": "OP07-078",
       "decks": 3,
       "copies": 6,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Purple"
+      ],
+      "category": "Event",
+      "standard": "legal"
+    },
+    {
+      "id": "OP10-098",
+      "decks": 3,
+      "copies": 6,
+      "share": 0.2,
+      "colors": [
+        "Black"
       ],
       "category": "Event",
       "standard": "legal"
@@ -6347,7 +6270,7 @@
       "id": "OP15-011",
       "decks": 3,
       "copies": 6,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Red"
       ],
@@ -6358,7 +6281,7 @@
       "id": "OP17-012",
       "decks": 3,
       "copies": 6,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Red"
       ],
@@ -6369,7 +6292,7 @@
       "id": "OP17-053",
       "decks": 3,
       "copies": 6,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Blue"
       ],
@@ -6380,7 +6303,7 @@
       "id": "OP03-072",
       "decks": 3,
       "copies": 5,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Purple"
       ],
@@ -6391,7 +6314,7 @@
       "id": "OP14-077",
       "decks": 3,
       "copies": 5,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Purple"
       ],
@@ -6402,7 +6325,7 @@
       "id": "OP15-036",
       "decks": 3,
       "copies": 5,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Green"
       ],
@@ -6413,7 +6336,7 @@
       "id": "OP15-047",
       "decks": 3,
       "copies": 5,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Blue"
       ],
@@ -6424,7 +6347,7 @@
       "id": "OP15-112",
       "decks": 3,
       "copies": 5,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Yellow"
       ],
@@ -6435,18 +6358,7 @@
       "id": "OP16-102",
       "decks": 3,
       "copies": 5,
-      "share": 0.1,
-      "colors": [
-        "Yellow"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP16-111",
-      "decks": 3,
-      "copies": 5,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Yellow"
       ],
@@ -6457,7 +6369,7 @@
       "id": "OP17-116",
       "decks": 3,
       "copies": 5,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Yellow"
       ],
@@ -6468,7 +6380,7 @@
       "id": "OP13-020",
       "decks": 3,
       "copies": 4,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Red"
       ],
@@ -6476,26 +6388,37 @@
       "standard": "legal"
     },
     {
+      "id": "OP17-034",
+      "decks": 3,
+      "copies": 4,
+      "share": 0.2,
+      "colors": [
+        "Green"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "ST15-002",
+      "decks": 3,
+      "copies": 4,
+      "share": 0.2,
+      "colors": [
+        "Red"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
       "id": "ST24-004",
       "decks": 3,
       "copies": 4,
-      "share": 0.1,
+      "share": 0.2,
       "colors": [
         "Green"
       ],
       "category": "Character",
       "standard": "unknown"
-    },
-    {
-      "id": "EB01-048",
-      "decks": 2,
-      "copies": 8,
-      "share": 0.1,
-      "colors": [
-        "Black"
-      ],
-      "category": "Character",
-      "standard": "legal"
     },
     {
       "id": "EB01-057",
@@ -6526,6 +6449,17 @@
       "share": 0.1,
       "colors": [
         "Green"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "EB03-035",
+      "decks": 2,
+      "copies": 8,
+      "share": 0.1,
+      "colors": [
+        "Purple"
       ],
       "category": "Character",
       "standard": "legal"
@@ -6575,7 +6509,18 @@
       "standard": "legal"
     },
     {
-      "id": "OP09-104",
+      "id": "OP09-100",
+      "decks": 2,
+      "copies": 8,
+      "share": 0.1,
+      "colors": [
+        "Yellow"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP09-109",
       "decks": 2,
       "copies": 8,
       "share": 0.1,
@@ -6927,17 +6872,6 @@
       "standard": "legal"
     },
     {
-      "id": "ST29-015",
-      "decks": 2,
-      "copies": 7,
-      "share": 0.1,
-      "colors": [
-        "Yellow"
-      ],
-      "category": "Event",
-      "standard": "legal"
-    },
-    {
       "id": "ST36-001",
       "decks": 2,
       "copies": 7,
@@ -6957,17 +6891,6 @@
         "Blue"
       ],
       "category": "Event",
-      "standard": "legal"
-    },
-    {
-      "id": "EB01-046",
-      "decks": 2,
-      "copies": 6,
-      "share": 0.1,
-      "colors": [
-        "Black"
-      ],
-      "category": "Character",
       "standard": "legal"
     },
     {
@@ -7180,17 +7103,6 @@
       "standard": "legal"
     },
     {
-      "id": "PRB02-014",
-      "decks": 2,
-      "copies": 6,
-      "share": 0.1,
-      "colors": [
-        "Black"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
       "id": "EB01-018",
       "decks": 2,
       "copies": 5,
@@ -7345,6 +7257,17 @@
       "standard": "legal"
     },
     {
+      "id": "OP05-091",
+      "decks": 2,
+      "copies": 4,
+      "share": 0.1,
+      "colors": [
+        "Black"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
       "id": "OP12-059",
       "decks": 2,
       "copies": 4,
@@ -7401,28 +7324,6 @@
     },
     {
       "id": "OP17-072",
-      "decks": 2,
-      "copies": 4,
-      "share": 0.1,
-      "colors": [
-        "Purple"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP17-097",
-      "decks": 2,
-      "copies": 4,
-      "share": 0.1,
-      "colors": [
-        "Black"
-      ],
-      "category": "Event",
-      "standard": "legal"
-    },
-    {
-      "id": "ST26-005",
       "decks": 2,
       "copies": 4,
       "share": 0.1,
@@ -7510,6 +7411,17 @@
       "standard": "legal"
     },
     {
+      "id": "OP16-111",
+      "decks": 2,
+      "copies": 3,
+      "share": 0.1,
+      "colors": [
+        "Yellow"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
       "id": "EB01-039",
       "decks": 2,
       "copies": 2,
@@ -7590,7 +7502,7 @@
       "id": "EB01-023",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -7601,7 +7513,7 @@
       "id": "EB03-024",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -7612,7 +7524,7 @@
       "id": "EB03-037",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -7623,7 +7535,7 @@
       "id": "EB04-005",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
       ],
@@ -7634,7 +7546,7 @@
       "id": "EB04-026",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -7645,7 +7557,7 @@
       "id": "EB05-018",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -7656,7 +7568,7 @@
       "id": "EB05-023",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -7667,7 +7579,7 @@
       "id": "OP03-008",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
       ],
@@ -7678,7 +7590,7 @@
       "id": "OP04-096",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -7689,7 +7601,7 @@
       "id": "OP05-118",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -7700,7 +7612,7 @@
       "id": "OP06-025",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -7711,7 +7623,7 @@
       "id": "OP06-050",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -7722,7 +7634,7 @@
       "id": "OP06-051",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -7733,7 +7645,7 @@
       "id": "OP06-093",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -7744,7 +7656,7 @@
       "id": "OP07-021",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -7755,7 +7667,7 @@
       "id": "OP07-045",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -7766,20 +7678,9 @@
       "id": "OP07-046",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP07-107",
-      "decks": 1,
-      "copies": 4,
-      "share": 0,
-      "colors": [
-        "Yellow"
       ],
       "category": "Character",
       "standard": "legal"
@@ -7788,7 +7689,7 @@
       "id": "OP08-063",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -7799,7 +7700,7 @@
       "id": "OP09-027",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -7810,7 +7711,7 @@
       "id": "OP09-031",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -7821,7 +7722,7 @@
       "id": "OP09-037",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -7832,7 +7733,7 @@
       "id": "OP09-069",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -7843,9 +7744,20 @@
       "id": "OP09-071",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "OP09-104",
+      "decks": 1,
+      "copies": 4,
+      "share": 0.1,
+      "colors": [
+        "Yellow"
       ],
       "category": "Character",
       "standard": "legal"
@@ -7854,7 +7766,7 @@
       "id": "OP10-025",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -7865,7 +7777,7 @@
       "id": "OP10-029",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -7876,7 +7788,7 @@
       "id": "OP10-037",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -7887,7 +7799,7 @@
       "id": "OP10-046",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -7898,7 +7810,7 @@
       "id": "OP10-057",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -7909,7 +7821,7 @@
       "id": "OP10-058",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -7920,7 +7832,7 @@
       "id": "OP10-111",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Yellow"
       ],
@@ -7931,20 +7843,9 @@
       "id": "OP10-119",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Yellow"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP11-074",
-      "decks": 1,
-      "copies": 4,
-      "share": 0,
-      "colors": [
-        "Purple"
       ],
       "category": "Character",
       "standard": "legal"
@@ -7953,7 +7854,7 @@
       "id": "OP12-016",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
       ],
@@ -7964,7 +7865,7 @@
       "id": "OP12-017",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
       ],
@@ -7975,7 +7876,7 @@
       "id": "OP12-118",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -7986,7 +7887,7 @@
       "id": "OP13-021",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
       ],
@@ -7994,21 +7895,10 @@
       "standard": "legal"
     },
     {
-      "id": "OP13-102",
-      "decks": 1,
-      "copies": 4,
-      "share": 0,
-      "colors": [
-        "Yellow"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
       "id": "OP14-056",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -8019,7 +7909,7 @@
       "id": "OP14-057",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -8030,7 +7920,7 @@
       "id": "OP14-070",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -8041,7 +7931,7 @@
       "id": "OP14-113",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Yellow"
       ],
@@ -8052,7 +7942,7 @@
       "id": "OP15-015",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
       ],
@@ -8063,7 +7953,7 @@
       "id": "OP15-027",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -8074,7 +7964,7 @@
       "id": "OP15-055",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -8085,7 +7975,7 @@
       "id": "OP15-081",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -8096,7 +7986,7 @@
       "id": "OP15-086",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -8107,7 +7997,7 @@
       "id": "OP16-052",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -8118,7 +8008,7 @@
       "id": "OP16-063",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -8129,7 +8019,7 @@
       "id": "OP16-066",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -8140,7 +8030,7 @@
       "id": "OP16-076",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -8151,7 +8041,7 @@
       "id": "P-048",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -8162,7 +8052,7 @@
       "id": "P-103",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -8170,10 +8060,21 @@
       "standard": "unknown"
     },
     {
+      "id": "PRB02-014",
+      "decks": 1,
+      "copies": 4,
+      "share": 0.1,
+      "colors": [
+        "Black"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
       "id": "ST02-007",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -8184,20 +8085,9 @@
       "id": "ST10-005",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "ST17-005",
-      "decks": 1,
-      "copies": 4,
-      "share": 0,
-      "colors": [
-        "Blue"
       ],
       "category": "Character",
       "standard": "legal"
@@ -8206,7 +8096,7 @@
       "id": "ST24-005",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -8217,7 +8107,7 @@
       "id": "ST26-003",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -8225,10 +8115,21 @@
       "standard": "legal"
     },
     {
+      "id": "ST29-015",
+      "decks": 1,
+      "copies": 4,
+      "share": 0.1,
+      "colors": [
+        "Yellow"
+      ],
+      "category": "Event",
+      "standard": "legal"
+    },
+    {
       "id": "ST33-001",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -8239,7 +8140,7 @@
       "id": "ST33-005",
       "decks": 1,
       "copies": 4,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -8250,7 +8151,7 @@
       "id": "EB02-006",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
       ],
@@ -8261,7 +8162,7 @@
       "id": "EB03-005",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
       ],
@@ -8272,7 +8173,7 @@
       "id": "EB04-022",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -8283,7 +8184,7 @@
       "id": "OP05-018",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
       ],
@@ -8294,7 +8195,7 @@
       "id": "OP05-087",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -8305,7 +8206,7 @@
       "id": "OP06-003",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
       ],
@@ -8316,7 +8217,7 @@
       "id": "OP06-085",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -8327,7 +8228,7 @@
       "id": "OP07-027",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -8338,7 +8239,7 @@
       "id": "OP07-040",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -8349,7 +8250,7 @@
       "id": "OP08-067",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -8360,7 +8261,7 @@
       "id": "OP10-090",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -8371,7 +8272,7 @@
       "id": "OP10-095",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -8382,7 +8283,7 @@
       "id": "OP11-068",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -8393,7 +8294,7 @@
       "id": "OP11-079",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -8404,7 +8305,7 @@
       "id": "OP12-026",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -8415,7 +8316,7 @@
       "id": "OP12-043",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -8426,7 +8327,7 @@
       "id": "OP12-057",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -8437,7 +8338,7 @@
       "id": "OP12-085",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -8448,7 +8349,7 @@
       "id": "OP14-033",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -8459,7 +8360,7 @@
       "id": "OP14-054",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -8470,7 +8371,7 @@
       "id": "OP15-054",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -8481,7 +8382,7 @@
       "id": "OP16-043",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -8492,7 +8393,7 @@
       "id": "OP16-070",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -8503,7 +8404,7 @@
       "id": "OP16-074",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -8514,7 +8415,7 @@
       "id": "OP16-075",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -8525,7 +8426,7 @@
       "id": "OP16-090",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -8536,7 +8437,7 @@
       "id": "OP16-100",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -8547,7 +8448,7 @@
       "id": "P-101",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
       ],
@@ -8558,7 +8459,7 @@
       "id": "ST14-016",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -8569,7 +8470,7 @@
       "id": "ST17-003",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -8580,7 +8481,7 @@
       "id": "ST18-002",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -8591,7 +8492,7 @@
       "id": "ST32-004",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -8602,7 +8503,7 @@
       "id": "ST35-002",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
       ],
@@ -8613,7 +8514,7 @@
       "id": "ST35-003",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -8624,7 +8525,7 @@
       "id": "ST36-004",
       "decks": 1,
       "copies": 3,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Yellow"
       ],
@@ -8635,7 +8536,7 @@
       "id": "EB02-040",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -8646,7 +8547,7 @@
       "id": "EB03-045",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -8657,7 +8558,7 @@
       "id": "EB03-048",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -8668,7 +8569,7 @@
       "id": "EB03-049",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -8679,7 +8580,7 @@
       "id": "EB04-028",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -8690,7 +8591,7 @@
       "id": "EB04-045",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -8701,7 +8602,7 @@
       "id": "EB05-011",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -8712,7 +8613,7 @@
       "id": "EB05-039",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -8723,7 +8624,7 @@
       "id": "EB05-042",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -8734,7 +8635,7 @@
       "id": "OP05-016",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
       ],
@@ -8745,7 +8646,7 @@
       "id": "OP05-021",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
       ],
@@ -8756,7 +8657,7 @@
       "id": "OP05-096",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -8767,7 +8668,7 @@
       "id": "OP05-108",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Yellow"
       ],
@@ -8778,7 +8679,7 @@
       "id": "OP05-115",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Yellow"
       ],
@@ -8789,20 +8690,9 @@
       "id": "OP06-016",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP06-092",
-      "decks": 1,
-      "copies": 2,
-      "share": 0,
-      "colors": [
-        "Black"
       ],
       "category": "Character",
       "standard": "legal"
@@ -8811,7 +8701,7 @@
       "id": "OP06-111",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Yellow"
       ],
@@ -8822,7 +8712,7 @@
       "id": "OP06-118",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -8833,7 +8723,7 @@
       "id": "OP07-035",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -8844,7 +8734,7 @@
       "id": "OP07-051",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -8855,7 +8745,7 @@
       "id": "OP07-073",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -8866,7 +8756,7 @@
       "id": "OP07-074",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -8877,7 +8767,7 @@
       "id": "OP07-119",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Yellow"
       ],
@@ -8888,7 +8778,7 @@
       "id": "OP09-041",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -8899,7 +8789,7 @@
       "id": "OP09-076",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -8910,7 +8800,7 @@
       "id": "OP09-114",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Yellow"
       ],
@@ -8921,7 +8811,7 @@
       "id": "OP09-117",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Yellow"
       ],
@@ -8932,7 +8822,7 @@
       "id": "OP10-016",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
       ],
@@ -8943,7 +8833,7 @@
       "id": "OP10-024",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -8954,7 +8844,7 @@
       "id": "OP10-031",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -8965,7 +8855,7 @@
       "id": "OP10-032",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -8976,7 +8866,7 @@
       "id": "OP10-033",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -8987,7 +8877,7 @@
       "id": "OP10-076",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -8998,7 +8888,7 @@
       "id": "OP11-007",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
       ],
@@ -9009,7 +8899,7 @@
       "id": "OP11-026",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -9020,7 +8910,7 @@
       "id": "OP11-035",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -9031,7 +8921,7 @@
       "id": "OP11-100",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Yellow"
       ],
@@ -9042,7 +8932,7 @@
       "id": "OP12-009",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
       ],
@@ -9053,7 +8943,7 @@
       "id": "OP12-030",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -9064,7 +8954,7 @@
       "id": "OP12-044",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -9075,7 +8965,7 @@
       "id": "OP12-047",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -9086,7 +8976,7 @@
       "id": "OP13-030",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -9097,7 +8987,7 @@
       "id": "OP13-057",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -9105,21 +8995,10 @@
       "standard": "legal"
     },
     {
-      "id": "OP13-061",
-      "decks": 1,
-      "copies": 2,
-      "share": 0,
-      "colors": [
-        "Purple"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
       "id": "OP13-066",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -9130,7 +9009,7 @@
       "id": "OP13-104",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Yellow"
       ],
@@ -9141,7 +9020,7 @@
       "id": "OP14-006",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
       ],
@@ -9152,7 +9031,7 @@
       "id": "OP14-017",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
       ],
@@ -9163,7 +9042,7 @@
       "id": "OP14-036",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -9174,7 +9053,7 @@
       "id": "OP15-107",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Yellow"
       ],
@@ -9185,7 +9064,7 @@
       "id": "OP16-030",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -9196,20 +9075,9 @@
       "id": "OP16-053",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
-      ],
-      "category": "Character",
-      "standard": "legal"
-    },
-    {
-      "id": "OP16-069",
-      "decks": 1,
-      "copies": 2,
-      "share": 0,
-      "colors": [
-        "Purple"
       ],
       "category": "Character",
       "standard": "legal"
@@ -9218,7 +9086,7 @@
       "id": "OP16-072",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -9229,7 +9097,7 @@
       "id": "OP17-014",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
       ],
@@ -9240,7 +9108,7 @@
       "id": "OP17-018",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
       ],
@@ -9251,7 +9119,7 @@
       "id": "OP17-024",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -9259,10 +9127,21 @@
       "standard": "legal"
     },
     {
+      "id": "OP17-097",
+      "decks": 1,
+      "copies": 2,
+      "share": 0.1,
+      "colors": [
+        "Black"
+      ],
+      "category": "Event",
+      "standard": "legal"
+    },
+    {
       "id": "P-075",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -9273,7 +9152,7 @@
       "id": "P-090",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -9284,7 +9163,7 @@
       "id": "P-098",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -9295,7 +9174,7 @@
       "id": "P-105",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -9306,9 +9185,20 @@
       "id": "PRB02-011",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
+      ],
+      "category": "Character",
+      "standard": "legal"
+    },
+    {
+      "id": "ST06-008",
+      "decks": 1,
+      "copies": 2,
+      "share": 0.1,
+      "colors": [
+        "Black"
       ],
       "category": "Character",
       "standard": "legal"
@@ -9317,7 +9207,7 @@
       "id": "ST13-016",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Yellow"
       ],
@@ -9328,7 +9218,7 @@
       "id": "ST14-015",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -9336,23 +9226,23 @@
       "standard": "legal"
     },
     {
-      "id": "ST15-005",
+      "id": "ST20-001",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
-        "Red"
+        "Yellow"
       ],
       "category": "Character",
       "standard": "legal"
     },
     {
-      "id": "ST20-001",
+      "id": "ST26-005",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
-        "Yellow"
+        "Purple"
       ],
       "category": "Character",
       "standard": "legal"
@@ -9361,7 +9251,7 @@
       "id": "ST30-006",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
       ],
@@ -9372,7 +9262,7 @@
       "id": "ST31-003",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
       ],
@@ -9383,7 +9273,7 @@
       "id": "ST34-005",
       "decks": 1,
       "copies": 2,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -9394,7 +9284,7 @@
       "id": "EB01-010",
       "decks": 1,
       "copies": 1,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
       ],
@@ -9405,7 +9295,7 @@
       "id": "EB03-017",
       "decks": 1,
       "copies": 1,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -9416,7 +9306,7 @@
       "id": "EB03-025",
       "decks": 1,
       "copies": 1,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -9427,7 +9317,7 @@
       "id": "EB04-050",
       "decks": 1,
       "copies": 1,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -9438,7 +9328,7 @@
       "id": "EB05-012",
       "decks": 1,
       "copies": 1,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -9449,7 +9339,7 @@
       "id": "OP05-057",
       "decks": 1,
       "copies": 1,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -9460,7 +9350,7 @@
       "id": "OP06-081",
       "decks": 1,
       "copies": 1,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -9471,7 +9361,7 @@
       "id": "OP07-015",
       "decks": 1,
       "copies": 1,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Red"
       ],
@@ -9482,7 +9372,7 @@
       "id": "OP08-043",
       "decks": 1,
       "copies": 1,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -9493,7 +9383,7 @@
       "id": "OP08-106",
       "decks": 1,
       "copies": 1,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Yellow"
       ],
@@ -9504,7 +9394,7 @@
       "id": "OP09-079",
       "decks": 1,
       "copies": 1,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -9515,7 +9405,7 @@
       "id": "OP11-071",
       "decks": 1,
       "copies": 1,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -9526,7 +9416,7 @@
       "id": "OP11-073",
       "decks": 1,
       "copies": 1,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -9534,21 +9424,10 @@
       "standard": "legal"
     },
     {
-      "id": "OP11-114",
-      "decks": 1,
-      "copies": 1,
-      "share": 0,
-      "colors": [
-        "Yellow"
-      ],
-      "category": "Event",
-      "standard": "legal"
-    },
-    {
       "id": "OP11-119",
       "decks": 1,
       "copies": 1,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -9559,7 +9438,7 @@
       "id": "OP15-090",
       "decks": 1,
       "copies": 1,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -9570,7 +9449,7 @@
       "id": "OP15-094",
       "decks": 1,
       "copies": 1,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Black"
       ],
@@ -9581,7 +9460,7 @@
       "id": "OP16-027",
       "decks": 1,
       "copies": 1,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Green"
       ],
@@ -9592,7 +9471,7 @@
       "id": "P-045",
       "decks": 1,
       "copies": 1,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Purple"
       ],
@@ -9603,7 +9482,7 @@
       "id": "PRB02-009",
       "decks": 1,
       "copies": 1,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Blue"
       ],
@@ -9614,67 +9493,50 @@
       "id": "ST13-017",
       "decks": 1,
       "copies": 1,
-      "share": 0,
+      "share": 0.1,
       "colors": [
         "Yellow"
       ],
       "category": "Event",
-      "standard": "legal"
-    },
-    {
-      "id": "ST29-014",
-      "decks": 1,
-      "copies": 1,
-      "share": 0,
-      "colors": [
-        "Yellow"
-      ],
-      "category": "Character",
       "standard": "legal"
     }
   ],
   "leaders": [
     {
       "id": "OP17-039",
-      "decks": 337,
-      "top8": 41,
-      "share": 16.7
+      "decks": 325,
+      "top8": 38,
+      "share": 16.5
     },
     {
       "id": "OP13-001",
       "decks": 101,
       "top8": 26,
-      "share": 5
+      "share": 5.1
     },
     {
       "id": "OP09-062",
-      "decks": 160,
-      "top8": 23,
-      "share": 7.9
+      "decks": 153,
+      "top8": 22,
+      "share": 7.8
     },
     {
       "id": "ST30-001",
-      "decks": 145,
+      "decks": 144,
       "top8": 19,
-      "share": 7.2
+      "share": 7.3
     },
     {
       "id": "OP13-004",
-      "decks": 198,
+      "decks": 187,
       "top8": 17,
-      "share": 9.8
+      "share": 9.5
     },
     {
       "id": "OP17-058",
-      "decks": 149,
+      "decks": 147,
       "top8": 17,
-      "share": 7.4
-    },
-    {
-      "id": "OP17-079",
-      "decks": 157,
-      "top8": 14,
-      "share": 7.8
+      "share": 7.5
     },
     {
       "id": "OP05-098",
@@ -9683,20 +9545,26 @@
       "share": 2.9
     },
     {
+      "id": "OP17-079",
+      "decks": 154,
+      "top8": 13,
+      "share": 7.8
+    },
+    {
       "id": "OP12-061",
       "decks": 59,
       "top8": 10,
-      "share": 2.9
+      "share": 3
     },
     {
       "id": "OP15-058",
-      "decks": 90,
-      "top8": 8,
-      "share": 4.4
+      "decks": 88,
+      "top8": 7,
+      "share": 4.5
     },
     {
       "id": "OP14-041",
-      "decks": 64,
+      "decks": 62,
       "top8": 7,
       "share": 3.2
     },
@@ -9714,7 +9582,7 @@
     },
     {
       "id": "OP17-020",
-      "decks": 31,
+      "decks": 30,
       "top8": 4,
       "share": 1.5
     },
@@ -9728,13 +9596,13 @@
       "id": "OP09-042",
       "decks": 43,
       "top8": 3,
-      "share": 2.1
+      "share": 2.2
     },
     {
       "id": "OP08-058",
       "decks": 49,
       "top8": 2,
-      "share": 2.4
+      "share": 2.5
     },
     {
       "id": "EB05-010",
@@ -9744,13 +9612,13 @@
     },
     {
       "id": "OP17-001",
-      "decks": 17,
+      "decks": 16,
       "top8": 2,
       "share": 0.8
     },
     {
       "id": "OP17-099",
-      "decks": 15,
+      "decks": 14,
       "top8": 2,
       "share": 0.7
     },
@@ -9758,19 +9626,19 @@
       "id": "OP11-040",
       "decks": 9,
       "top8": 2,
-      "share": 0.4
+      "share": 0.5
     },
     {
       "id": "OP16-001",
-      "decks": 43,
+      "decks": 38,
       "top8": 1,
-      "share": 2.1
+      "share": 1.9
     },
     {
       "id": "OP16-079",
       "decks": 19,
       "top8": 1,
-      "share": 0.9
+      "share": 1
     },
     {
       "id": "OP11-022",
@@ -9780,7 +9648,7 @@
     },
     {
       "id": "OP14-080",
-      "decks": 17,
+      "decks": 15,
       "top8": 1,
       "share": 0.8
     },
@@ -9800,13 +9668,13 @@
       "id": "OP13-100",
       "decks": 7,
       "top8": 1,
-      "share": 0.3
+      "share": 0.4
     },
     {
       "id": "OP12-001",
       "decks": 1,
       "top8": 1,
-      "share": 0
+      "share": 0.1
     },
     {
       "id": "OP14-001",
@@ -9818,7 +9686,7 @@
       "id": "OP16-022",
       "decks": 15,
       "top8": 0,
-      "share": 0.7
+      "share": 0.8
     },
     {
       "id": "OP13-002",
@@ -9830,7 +9698,7 @@
       "id": "OP10-003",
       "decks": 9,
       "top8": 0,
-      "share": 0.4
+      "share": 0.5
     },
     {
       "id": "OP13-079",
@@ -9848,19 +9716,7 @@
       "id": "EB02-010",
       "decks": 5,
       "top8": 0,
-      "share": 0.2
-    },
-    {
-      "id": "OP12-081",
-      "decks": 5,
-      "top8": 0,
-      "share": 0.2
-    },
-    {
-      "id": "EB04-001",
-      "decks": 4,
-      "top8": 0,
-      "share": 0.2
+      "share": 0.3
     },
     {
       "id": "OP05-002",
@@ -9876,6 +9732,12 @@
     },
     {
       "id": "OP11-041",
+      "decks": 4,
+      "top8": 0,
+      "share": 0.2
+    },
+    {
+      "id": "OP12-081",
       "decks": 4,
       "top8": 0,
       "share": 0.2
@@ -9905,16 +9767,16 @@
       "share": 0.2
     },
     {
+      "id": "EB04-001",
+      "decks": 3,
+      "top8": 0,
+      "share": 0.2
+    },
+    {
       "id": "OP12-020",
       "decks": 3,
       "top8": 0,
-      "share": 0.1
-    },
-    {
-      "id": "ST13-001",
-      "decks": 3,
-      "top8": 0,
-      "share": 0.1
+      "share": 0.2
     },
     {
       "id": "EB01-001",
@@ -9965,82 +9827,70 @@
       "share": 0.1
     },
     {
+      "id": "ST13-001",
+      "decks": 2,
+      "top8": 0,
+      "share": 0.1
+    },
+    {
       "id": "EB03-001",
       "decks": 1,
       "top8": 0,
-      "share": 0
-    },
-    {
-      "id": "OP05-041",
-      "decks": 1,
-      "top8": 0,
-      "share": 0
-    },
-    {
-      "id": "OP05-060",
-      "decks": 1,
-      "top8": 0,
-      "share": 0
+      "share": 0.1
     },
     {
       "id": "OP06-021",
       "decks": 1,
       "top8": 0,
-      "share": 0
+      "share": 0.1
     },
     {
       "id": "OP07-019",
       "decks": 1,
       "top8": 0,
-      "share": 0
-    },
-    {
-      "id": "OP07-079",
-      "decks": 1,
-      "top8": 0,
-      "share": 0
+      "share": 0.1
     },
     {
       "id": "OP09-022",
       "decks": 1,
       "top8": 0,
-      "share": 0
+      "share": 0.1
     },
     {
       "id": "OP09-061",
       "decks": 1,
       "top8": 0,
-      "share": 0
+      "share": 0.1
     },
     {
       "id": "OP10-042",
       "decks": 1,
       "top8": 0,
-      "share": 0
+      "share": 0.1
     },
     {
       "id": "OP12-040",
       "decks": 1,
       "top8": 0,
-      "share": 0
+      "share": 0.1
     },
     {
       "id": "OP15-022",
       "decks": 1,
       "top8": 0,
-      "share": 0
+      "share": 0.1
     },
     {
       "id": "OP16-041",
       "decks": 1,
       "top8": 0,
-      "share": 0
+      "share": 0.1
     },
     {
       "id": "OP16-060",
       "decks": 1,
       "top8": 0,
-      "share": 0
+      "share": 0.1
     }
   ],
   "leaderColors": {
