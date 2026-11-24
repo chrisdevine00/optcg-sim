@@ -87,6 +87,13 @@ describe('validateScript', () => {
       ];
     });
     expect(validateScript(upTo).join()).toMatch(/must be "exactly"/);
+    // M6b-1 audit §5: a trash cost from the field would skip its cause and removal frame.
+    const fromField = variant((s) => {
+      (s.abilities[0] as { cost: unknown[] }).cost = [
+        { trash: { from: 'characters', owner: 'you', pick: { exactly: 1 } } },
+      ];
+    });
+    expect(validateScript(fromField).join()).toMatch(/trash cost trashes cards from a hand only/);
   });
 
   it('rejects vocabulary the runtime does not implement yet, and $-prefixed or duplicate ids', () => {

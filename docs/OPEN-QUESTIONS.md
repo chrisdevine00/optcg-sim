@@ -90,3 +90,48 @@ Settled by Track F from official sources: R1 (reveal → pay → trash 1 → pla
 ## Engine (from the M2 review)
 
 - M2-16. Single-elimination loss rule (TRM §5.2: on a simultaneous loss, the turn player loses; RL-27). It needs a new `GameSetup` option, and `GameSetup` is a frozen shape. Best answer: add an optional `lossRule: 'bothLose' | 'turnPlayerLoses'` when a tournament mode is built (backlog). Casual play records `bothLost` and shows a draw.
+
+## M6b-1 runtime audit (2026-11-23)
+
+Full text, proposed readings, source auditor IDs and what `rulings.md`/`rules-digest.md` already say are in `docs/research/m6b-runtime-audit.md` §7 (per-card evidence in `docs/research/m6b-audit/block{5,4,3}.md`). One line per question; the 15 cards held for design decisions D1 to D9 are in §3 of the same file.
+
+- M6b-Q1. ST32-001/003/004/005, EB03-014: attribute name dropped from the verified text; restore Slash by override.
+- M6b-Q2. OP15-102, OP11-023, EB03-006, OP14-016, OP13-017, EB02-005: lost +/- signs on power and cost; check each at verification.
+- M6b-Q3. PRB02-017: timing header missing; probably [Activate: Main].
+- M6b-Q4. EB05-001, EB05-057, OP16-039, OP16-043, OP16-014, OP14-119, OP14-120, EB04-025: scrape typos; EB-05 text is unverified.
+- M6b-Q5. OP17-043, EB04-044: unqualified "would be removed from the field": does it cover battle K.O. and own effects?
+- M6b-Q6. OP13-046: does one Once Per Turn cover both replaced events?
+- M6b-Q7. EB05-061: "removed from the field by your opponent" with no "effect".
+- M6b-Q8. EB05-052: is replaced damage not dealt at all (no Life card, no Trigger)?
+- M6b-Q9. OP16-034: distinct names including itself, or Characters named differently from it?
+- M6b-Q10. OP16-080, OP14-060: new Block Step, [When Attacking] refire, legal new targets after redirecting an attack.
+- M6b-Q11. OP16-079: does "played from your trash" cover any play, and is "that Character" the played card?
+- M6b-Q12. OP01-120: is the 2000-power Blocker filter read at block time or at resolution?
+- M6b-Q13. OP16-116 and others: is "Then" gated by a failed "If"? (answered: yes, M4b-5)
+- M6b-Q14. OP17-117: opponent may trash 3 from hand with fewer than 3 cards.
+- M6b-Q15. OP17-099: whose hand, and who chooses, in each mode.
+- M6b-Q16. OP17-057, OP16-001: one target in total over Leader and Characters; power condition on both.
+- M6b-Q17. EB05-010: printed or last-known values for the K.O.'d Character (answered: printed, M4b-2).
+- M6b-Q18. OP04-083: does the protection cover Characters that arrive later?
+- M6b-Q19. EB05-048, EB05-049, OP16-008: is a K.O. cost a K.O.? (answered: RL-15, RL-16)
+- M6b-Q20. OP16-041: any move off the field, with the type read as it left?
+- M6b-Q21. OP16-022: "only Characters are X" with no Characters (E-Q4 precedent says false; auditor proposed true).
+- M6b-Q22. OP16-100: any K.O. of an opponent's Character this turn, and replaced K.O.s?
+- M6b-Q23. EB05-043: K.O.-or-rest then target, as a choose-one.
+- M6b-Q24. OP15-003/010/012/017/023/025/026/028: whose DON!! is given, active or rested.
+- M6b-Q25. OP15-023, OP14-024, EB03-012, EB03-061, OP10-033: do "cards" include DON!! for rest and skip-refresh?
+- M6b-Q26. OP15-073, EB03-010: one card in total or one of each description.
+- M6b-Q27. OP15-014, OP15-046, EB03-031, OP12-041: cost paid and destination when an effect activates an Event.
+- M6b-Q28. Same four: does it count as activating an Event for watchers?
+- M6b-Q29. EB03-003/007/009/039, EB04-052, EB04-010: "no base effect", "same as Leader", "power to 0".
+- M6b-Q30. OP14-021/027/028/032/035/119/070: does attacking, blocking or paying a cost count as becoming rested?
+- M6b-Q31. OP14-045/049/056, OP12-040, ST15-001: does a cost count as "by an effect"? (RD 112 and RL-16 conflict with the auditors)
+- M6b-Q32. OP13-003: given DON!! state and the first player's single placement.
+- M6b-Q33. OP13-028: `cannotPlay` has no hand-only scope.
+- M6b-Q34. OP13-066: when is the DON!! added, when set active.
+- M6b-Q35. OP11-066/071/073/074/079/081: range, publicity and empty deck for "choose a cost".
+- M6b-Q36. OP10-118: once-per-turn K.O. protection is spent when it prevents.
+- M6b-Q37. OP12-096: "may select cost 6 or less instead" as an if/else.
+- M6b-Q38. OP11-092: played Character already gone at end of turn.
+- M6b-Q39. OP09-101: cost that moves an opponent's Character into their Life.
+- M6b-Q40. OP10-022: revealed Life card played; does lifeRemoved fire?

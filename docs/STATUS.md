@@ -1,7 +1,7 @@
 # Status
 
 **Phase:** 5 Build, slice pass (ADR 0012), starting at M0. Phases 1–4 gated 2026-10-28.
-**Milestone:** **M6b Card pool and live updates: in progress** (PLAN §2a, row 17b), M6b-0 infrastructure done 2026-11-23; next M6b-1 runtime audit. **M6 Deck builder: done 2026-11-23** (review FAIL, fix round, re-review 1 PASS). **M5b AI breadth: done 2026-11-23 under the time-box, with the Warlord-vs-Pirate target (65%) NOT met:** 123/200 (61.5%) every nightly, no tested change beat noise on fresh seeds (DECISIONS 2026-11-23; carried to docs/BACKLOG.md #1); the nightly asserts a 55% floor. **M4b Effects breadth: done 2026-11-16.** All 182 meta-list cards play fully. L Learning slice done 2026-11-09. M5a done 2026-11-05. M4a done 2026-10-29. M3 done 2026-11-05. M0, M1 and M2 done 2026-10-28.
+**Milestone:** **M6b Card pool and live updates: in progress** (PLAN §2a, row 17b), M6b-0, M6b-1, M6b-5, M6b-6 and M6b-7 done 2026-11-23; next M6b-2 wave 1. **M6 Deck builder: done 2026-11-23** (review FAIL, fix round, re-review 1 PASS). **M5b AI breadth: done 2026-11-23 under the time-box, with the Warlord-vs-Pirate target (65%) NOT met:** 123/200 (61.5%) every nightly, no tested change beat noise on fresh seeds (DECISIONS 2026-11-23; carried to docs/BACKLOG.md #1); the nightly asserts a 55% floor. **M4b Effects breadth: done 2026-11-16.** All 182 meta-list cards play fully. L Learning slice done 2026-11-09. M5a done 2026-11-05. M4a done 2026-10-29. M3 done 2026-11-05. M0, M1 and M2 done 2026-10-28.
 **Run the app:** `npm install && npm run dev` then open http://localhost:5173/optcg-sim/ and go to `/cards` for the card browser
 **Deployed:** https://chrisdevine00.github.io/optcg-sim/ (auto-deploys after green CI on `main`)
 
@@ -142,7 +142,7 @@
 
 ## Next (slice pass, PLAN.md §1)
 
-**Current next step (2026-11-23): M6b-1, the runtime audit of the Standard pool (M6b-0 done). Then M6b-2 engine waves and M6b-3 batches (OP-18 and EB-05 first; OP-18 needs `cards:update -- --refresh` once upstream has it), with M6b-5 update pipeline in parallel. Then M7 to M10. The items below are history.**
+**Current next step (2026-11-23): M6b-2 wave 1 (`docs/research/m6b-runtime-audit.md` §4; M6b-0, -1, -5, -6, -7 done). Then the M6b-3 batches (OP-18 and EB-05 first; OP-18 needs `cards:update -- --refresh` once upstream has it), with M6b-5 update pipeline in parallel. Then M7 to M10. The items below are history.**
 
 **Roadmap (owner-approved 2026-11-17, amendment A1; DECISIONS "Full Standard card pool and live updates (M6b)", ADR 0014):** M5b, then M6, then **M6b Card pool and live updates** (PLAN §2a, row 17b), then M7 to M10. M6b scripts every Standard-legal card (block 5, then 4, then 3; block 2 held until the post-2027-03-31 rotation is announced), builds `meta:update` and the scheduled `update.yml`, adds the app update prompt and a default playbook for any leader. `meta:update` is no longer an M9 item.
 
@@ -197,7 +197,7 @@
 
 **M6b-6 app updates: built 2026-11-23** (app shell precache, offline, update prompt never mid-game, `version.json`; e2e `app/e2e/update.spec.ts`; IndexedDB records moved to M8). **M6b-7 AI for any Leader: built 2026-11-23** (default playbook from the AI's own deck; synthetic prior from play frequency; lethal stays conservative against a guessed deck). DECISIONS "M6b-6 and M6b-7".
 
-**M6b-1 runtime audit: in progress** (per-block audits done in `docs/research/m6b-audit/block{5,4,3}.md`: 1,175 cards, 883 need nothing new, 292 need a gap, 13 need a design decision; consolidation into `docs/research/m6b-runtime-audit.md` with the M6b-2 wave plan in progress).
+**M6b-1 runtime audit: done 2026-11-23** (`docs/research/m6b-runtime-audit.md`, per-card evidence in `docs/research/m6b-audit/`): 1,175 cards, 883 need nothing new, 292 need one of 67 gaps, 15 need one of 9 design items (decided: DECISIONS "M6b-1 decisions"). 40 open questions M6b-Q1 to Q40. **Next: M6b-2 wave 1** (10 gaps; 84% of audited cards and 88% of pool weight expressible after it, 54 of EB-05's 55).
 
 **M6b-0: done 2026-11-23.** Next: **M6b-1**, the runtime audit of the Standard pool (`docs/research/m6b-runtime-audit.md`, the method of `m4b-runtime-audit.md`), driven by the gap list in `cards/data/coverage-report.json`. M6b-5 (update pipeline) is built first among M6b-5 to M6b-7, in parallel with the scripting batches.
 - Also: Deploy workflow split into build and deploy jobs (the Pages artifact race failed three deploys on 2026-11-23).

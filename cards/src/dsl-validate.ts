@@ -511,6 +511,10 @@ function cost(c: Ctx, path: string, v: unknown): void {
           [...FIELD_ZONES, 'donCostArea'],
           'a rest cost rests cards on the field or DON!! in the cost area',
         );
+      // A trash cost from the field would run as a plain move, with no cause and no removal frame
+      // (M6b-1 audit §5): refused until own-Character costs are built (M6b-2 wave 1).
+      if (k === 'trash')
+        zonesIn(c, p, o[k], ['hand'], 'a trash cost trashes cards from a hand only (for now)');
       return;
     case 'restSelf':
     case 'trashSelf':

@@ -9,3 +9,11 @@ Ordered by value (PROMPT.md "After M10"). Items carried from closed milestones c
 5. More archetypes.
 6. Japanese-format toggle.
 7. Replay sharing by URL.
+
+## 3. M6b-1 design items left stats-only (DECISIONS 2026-11-23 "M6b-1 decisions")
+
+- D1 rules-changing Leaders OP13-079 Imu, OP13-003 Roger, OP15-022 Brook (per-leader rule flags).
+- D5 whole-side [On Play] negation, OP09-081 Marshall.D.Teach (needs a ruling on [Trigger] [On Play]).
+- D7 a battle watcher registered by an Activate effect, OP12-020.
+Details and options: `docs/research/m6b-runtime-audit.md` §3.
+
