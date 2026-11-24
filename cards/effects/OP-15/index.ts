@@ -59,13 +59,35 @@ import { OP15_080 } from './OP15-080.ts';
 import { OP15_081 } from './OP15-081.ts';
 import { OP15_082 } from './OP15-082.ts';
 import { OP15_083 } from './OP15-083.ts';
+import { OP15_084 } from './OP15-084.ts';
+import { OP15_085 } from './OP15-085.ts';
+import { OP15_086 } from './OP15-086.ts';
+import { OP15_087 } from './OP15-087.ts';
 import { OP15_088 } from './OP15-088.ts';
+import { OP15_090 } from './OP15-090.ts';
+import { OP15_091 } from './OP15-091.ts';
 import { OP15_092 } from './OP15-092.ts';
+import { OP15_094 } from './OP15-094.ts';
+import { OP15_095 } from './OP15-095.ts';
+import { OP15_096 } from './OP15-096.ts';
+import { OP15_097 } from './OP15-097.ts';
+import { OP15_098 } from './OP15-098.ts';
+import { OP15_100 } from './OP15-100.ts';
 import { OP15_101 } from './OP15-101.ts';
+import { OP15_102 } from './OP15-102.ts';
+import { OP15_103 } from './OP15-103.ts';
+import { OP15_104 } from './OP15-104.ts';
+import { OP15_105 } from './OP15-105.ts';
+import { OP15_106 } from './OP15-106.ts';
 import { OP15_108 } from './OP15-108.ts';
+import { OP15_109 } from './OP15-109.ts';
+import { OP15_110 } from './OP15-110.ts';
+import { OP15_111 } from './OP15-111.ts';
 import { OP15_112 } from './OP15-112.ts';
 import { OP15_113 } from './OP15-113.ts';
 import { OP15_114 } from './OP15-114.ts';
+import { OP15_115 } from './OP15-115.ts';
+import { OP15_117 } from './OP15-117.ts';
 import { OP15_118 } from './OP15-118.ts';
 import { OP15_119 } from './OP15-119.ts';
 
@@ -129,13 +151,35 @@ const SET: readonly CardScript[] = [
   OP15_081,
   OP15_082,
   OP15_083,
+  OP15_084,
+  OP15_085,
+  OP15_086,
+  OP15_087,
   OP15_088,
+  OP15_090,
+  OP15_091,
   OP15_092,
+  OP15_094,
+  OP15_095,
+  OP15_096,
+  OP15_097,
+  OP15_098,
+  OP15_100,
   OP15_101,
+  OP15_102,
+  OP15_103,
+  OP15_104,
+  OP15_105,
+  OP15_106,
   OP15_108,
+  OP15_109,
+  OP15_110,
+  OP15_111,
   OP15_112,
   OP15_113,
   OP15_114,
+  OP15_115,
+  OP15_117,
   OP15_118,
   OP15_119,
 ];
