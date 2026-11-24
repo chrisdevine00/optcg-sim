@@ -87,13 +87,25 @@ describe('validateScript', () => {
       ];
     });
     expect(validateScript(upTo).join()).toMatch(/must be "exactly"/);
-    // M6b-1 audit §5: a trash cost from the field would skip its cause and removal frame.
-    const fromField = variant((s) => {
-      (s.abilities[0] as { cost: unknown[] }).cost = [
-        { trash: { from: 'characters', owner: 'you', pick: { exactly: 1 } } },
-      ];
-    });
-    expect(validateScript(fromField).join()).toMatch(/trash cost trashes cards from a hand only/);
+    // M6b wave 1 G1: a trash cost from your own field runs as a removal with the cause `cost`
+    // (the refusal of M6b-1 audit §5 is lifted for that shape); other field shapes stay refused.
+    const costOf = (cost: unknown) =>
+      variant((s) => {
+        (s.abilities[0] as { cost: unknown[] }).cost = [cost];
+      });
+    expect(
+      validateScript(costOf({ trash: { from: 'characters', owner: 'you', pick: { exactly: 1 } } })),
+    ).toEqual([]);
+    expect(
+      validateScript(
+        costOf({ trash: { from: 'characters', owner: 'opponent', pick: { exactly: 1 } } }),
+      ).join(),
+    ).toMatch(/owner must be "you"/);
+    expect(
+      validateScript(
+        costOf({ trash: { from: ['hand', 'characters'], owner: 'you', pick: { exactly: 1 } } }),
+      ).join(),
+    ).toMatch(/not hand, characters/);
   });
 
   it('rejects vocabulary the runtime does not implement yet, and $-prefixed or duplicate ids', () => {

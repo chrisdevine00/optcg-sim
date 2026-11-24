@@ -8,7 +8,7 @@
  * - nothing outside `IMPLEMENTED` is used, so a script never silently does nothing.
  * It has no dependencies, so it runs in tests, scripts and CI.
  */
-import { CATEGORIES, COLORS, KEYWORDS } from './validate.ts';
+import { ATTRIBUTES, CATEGORIES, COLORS, KEYWORDS } from './validate.ts';
 
 /**
  * What the engine runtime implements (M4a: the Rocks and Kaido archetypes plus the general
@@ -59,6 +59,9 @@ export const IMPLEMENTED = {
     'returnDon',
     'lifeToHand',
     'turnLifeFaceUp',
+    'turnLifeFaceDown',
+    'giveDon',
+    'ko',
     'mill',
     'rest',
     'move',
@@ -67,6 +70,7 @@ export const IMPLEMENTED = {
   actions: [
     'draw',
     'trashFromHand',
+    'mill',
     'lookAtTop',
     'reveal',
     'move',
@@ -105,6 +109,8 @@ export const IMPLEMENTED = {
     'cannotDrawByOwnEffects',
     'cannotBeRemovedByOpponentEffects',
     'cannotBeKOd',
+    'cannotBeRested',
+    'cannotActivateBlocker',
   ],
   nums: [
     'count',
@@ -295,6 +301,7 @@ function filter(c: Ctx, path: string, v: unknown): void {
     'typeIncludes',
     'name',
     'color',
+    'attribute',
     'multicolor',
     'hasTrigger',
     'keyword',
@@ -310,6 +317,8 @@ function filter(c: Ctx, path: string, v: unknown): void {
   const x = (v as Obj)[k];
   const p = `${path}.${k}`;
   switch (k) {
+    case 'attribute':
+      return enumOf(c, p, x, ATTRIBUTES);
     case 'category':
       return arr(c, p, x, (y, q) => enumOf(c, q, y, CATEGORIES));
     case 'cost':
@@ -479,8 +488,11 @@ function cost(c: Ctx, path: string, v: unknown): void {
       'trashSelf',
       'lifeToHand',
       'turnLifeFaceUp',
+      'turnLifeFaceDown',
       'mill',
       'returnDon',
+      'giveDon',
+      'ko',
       'move',
     ],
     { move: ['to'] },
@@ -491,10 +503,20 @@ function cost(c: Ctx, path: string, v: unknown): void {
   if (!has(IMPLEMENTED.costs, k)) err(c, path, `cost ${k} is not implemented in the runtime yet`);
   switch (k) {
     case 'donMinus':
-    case 'returnDon':
     case 'turnLifeFaceUp':
+    case 'turnLifeFaceDown':
     case 'mill':
-      return int(c, p, o[k]);
+      int(c, p, o[k]);
+      if (k === 'turnLifeFaceDown' && (o[k] as number) < 1) err(c, p, 'must be at least 1');
+      return;
+    case 'returnDon':
+      // A number: DON!! from anywhere on the field. `{ n, state: 'active' }`: active cost-area DON!! (G9).
+      if (isObj(o.returnDon)) {
+        fields(c, p, o.returnDon, ['n', 'state']);
+        int(c, `${p}.n`, o.returnDon.n);
+        enumOf(c, `${p}.state`, o.returnDon.state, ['active']);
+      } else int(c, p, o.returnDon);
+      return;
     case 'restDon':
       if (o.restDon !== 'any') int(c, p, o.restDon);
       return;
@@ -511,11 +533,32 @@ function cost(c: Ctx, path: string, v: unknown): void {
           [...FIELD_ZONES, 'donCostArea'],
           'a rest cost rests cards on the field or DON!! in the cost area',
         );
-      // A trash cost from the field would run as a plain move, with no cause and no removal frame
-      // (M6b-1 audit §5): refused until own-Character costs are built (M6b-2 wave 1).
-      if (k === 'trash')
-        zonesIn(c, p, o[k], ['hand'], 'a trash cost trashes cards from a hand only (for now)');
+      // A trash cost takes cards from a hand or from your own Characters or Stage (a removal with
+      // the cause `cost`, M6b wave 1 G1); the two are never mixed in one cost.
+      if (k === 'trash') fieldOrHand(c, p, o[k], 'a trash cost');
       return;
+    case 'ko':
+      // "K.O. 1 of your Characters": a real K.O. of one of your own Characters (G1).
+      selector(c, p, o.ko);
+      if (isObj(o.ko) && !(o.ko as Obj).pick) err(c, p, 'a cost selector needs a pick');
+      zonesIn(c, p, o.ko, ['characters'], "only Characters are K.O.'d (CR 10-2-1)");
+      ownerYou(c, p, o.ko, 'a K.O. cost K.O.s your own Characters');
+      return;
+    case 'giveDon': {
+      fields(c, p, o.giveDon, ['n', 'state', 'to']);
+      const g = o.giveDon;
+      if (!isObj(g)) return;
+      int(c, `${p}.n`, g.n);
+      if (typeof g.n === 'number' && g.n < 1) err(c, `${p}.n`, 'must be at least 1');
+      enumOf(c, `${p}.state`, g.state, ['active']);
+      selector(c, `${p}.to`, g.to);
+      if (isObj(g.to) && !(g.to as Obj).pick) err(c, `${p}.to`, 'a cost selector needs a pick');
+      zonesIn(c, `${p}.to`, g.to, ['leader', 'characters'], 'DON!! go to a Leader or Character');
+      ownerYou(c, `${p}.to`, g.to, 'a giveDon cost gives DON!! to your own cards');
+      if (isObj(g.to) && isObj(g.to.pick) && g.to.pick.exactly !== 1)
+        err(c, `${p}.to.pick`, 'a giveDon cost gives to exactly 1 card');
+      return;
+    }
     case 'restSelf':
     case 'trashSelf':
       if (o[k] !== true) err(c, p, 'expected true');
@@ -529,13 +572,55 @@ function cost(c: Ctx, path: string, v: unknown): void {
       if (spec.n !== 1) err(c, `${p}.n`, 'only n = 1 is implemented');
       return;
     }
-    case 'move':
+    case 'move': {
       selector(c, p, o.move);
       if (isObj(o.move) && !(o.move as Obj).pick) err(c, p, 'a cost selector needs a pick');
-      zonesIn(c, p, o.move, ['hand', 'trash'], 'a cost moves cards from a hand or trash only');
+      const fieldSide = fieldOrHand(c, p, o.move, 'a move cost', ['hand', 'trash']);
       dest(c, `${path}.to`, o.to);
+      if (fieldSide && isObj(o.to)) {
+        // Your own Character or Stage goes to your hand, to the top or bottom of your deck, or to
+        // the trash (a removal with the cause `cost`, G1). One card only: several cards going to a
+        // deck would need an order, which a cost does not ask for.
+        if (o.to.zone === 'life')
+          err(c, `${path}.to`, 'a cost does not move a field card into Life');
+        const pk = isObj(o.move) && isObj(o.move.pick) ? o.move.pick : undefined;
+        if (o.to.zone === 'deck' && pk?.exactly !== 1)
+          err(c, `${p}.pick`, 'a cost that puts a field card into the deck takes exactly 1');
+        if (o.to.zone === 'deck' && o.to.position === 'topOrBottom')
+          err(c, `${path}.to.position`, 'a field cost picks the top or the bottom');
+      }
       return moveShape(c, p, o.move, o.to);
+    }
   }
+}
+
+/**
+ * A cost selector reads either hand-side zones (`handSide`) or your own Characters and Stage, never
+ * a mix: the two run differently. Returns true for the field side.
+ */
+function fieldOrHand(
+  c: Ctx,
+  path: string,
+  sel: unknown,
+  what: string,
+  handSide: string[] = ['hand'],
+): boolean {
+  if (!isObj(sel)) return false;
+  const zones = (Array.isArray(sel.from) ? sel.from : [sel.from]) as string[];
+  const hand = zones.every((z) => handSide.includes(z));
+  const field = zones.every((z) => z === 'characters' || z === 'stage');
+  if (!hand && !field)
+    err(
+      c,
+      `${path}.from`,
+      `${what} reads ${handSide.join(' or ')}, or your Characters or Stage, not ${zones.join(', ')}`,
+    );
+  if (field) ownerYou(c, path, sel, `${what} from the field takes your own cards`);
+  return field && !hand;
+}
+
+function ownerYou(c: Ctx, path: string, sel: unknown, why: string): void {
+  if (isObj(sel) && sel.owner !== 'you') err(c, `${path}.owner`, `${why}: owner must be "you"`);
 }
 
 function steps(c: Ctx, path: string, v: unknown): void {
@@ -680,7 +765,10 @@ function action(c: Ctx, path: string, v: unknown): void {
     case 'select':
       return selector(c, p, x);
     case 'mill':
-      return fields(c, p, x, ['player', 'n']);
+      fields(c, p, x, ['player', 'n']);
+      if (!isObj(x)) return;
+      enumOf(c, `${p}.player`, x.player, P);
+      return num(c, `${p}.n`, x.n);
     case 'lookAtTop': {
       fields(c, p, x, ['n', 'take', 'rest'], ['player']);
       if (!isObj(x)) return;
@@ -802,13 +890,15 @@ function action(c: Ctx, path: string, v: unknown): void {
       } else {
         selector(c, `${p}.target`, x.target);
         zonesIn(c, `${p}.target`, x.target, FIELD_ZONES, 'modifiers apply to cards on the field');
+        if (x.what === 'cannotDrawByOwnEffects' || (isObj(x.what) && 'cannotPlay' in x.what))
+          err(c, `${p}.what`, 'that restriction applies to a player, not to cards');
       }
       restriction(c, `${p}.what`, x.what);
       return enumOf(c, `${p}.duration`, x.duration, DURATIONS);
     case 'activate':
       fields(c, p, x, ['ability', 'of']);
       if (!isObj(x)) return;
-      enumOf(c, `${p}.ability`, x.ability, ['main', 'onPlay']);
+      enumOf(c, `${p}.ability`, x.ability, ['main', 'onPlay', 'onKO', 'counter']);
       return enumOf(c, `${p}.of`, x.of, ['self']);
   }
 }
@@ -890,6 +980,8 @@ function restriction(c: Ctx, path: string, v: unknown): void {
     'cannotDrawByOwnEffects',
     'cannotBeRemovedByOpponentEffects',
     'cannotBeKOd',
+    'cannotBeRested',
+    'cannotActivateBlocker',
   ];
   if (typeof v === 'string') {
     enumOf(c, path, v, all);
@@ -897,8 +989,24 @@ function restriction(c: Ctx, path: string, v: unknown): void {
       err(c, path, `restriction ${v} is not implemented in the runtime yet`);
     return;
   }
-  fields(c, path, v, ['cannotPlay']);
-  if (isObj(v)) filter(c, `${path}.cannotPlay`, v.cannotPlay);
+  const k = oneOf(c, path, v, ['cannotPlay', 'cannotBeKOd', 'cannotBeRested']);
+  if (!k || !isObj(v)) return;
+  if (k === 'cannotPlay') filter(c, `${path}.cannotPlay`, v.cannotPlay);
+  else if (k === 'cannotBeKOd') {
+    // Scoped by cause (G6): "by effects", "by your opponent's effects", "in battle".
+    fields(c, `${path}.cannotBeKOd`, v.cannotBeKOd, ['cause']);
+    if (isObj(v.cannotBeKOd))
+      enumOf(c, `${path}.cannotBeKOd.cause`, v.cannotBeKOd.cause, [
+        'effect',
+        'opponentEffect',
+        'battle',
+      ]);
+  } else {
+    // Scoped by source (G2): only "by your opponent's effects" is implemented.
+    fields(c, `${path}.cannotBeRested`, v.cannotBeRested, ['by']);
+    if (isObj(v.cannotBeRested))
+      enumOf(c, `${path}.cannotBeRested.by`, v.cannotBeRested.by, ['opponentEffect']);
+  }
 }
 
 function continuous(c: Ctx, path: string, v: unknown): void {
@@ -969,8 +1077,12 @@ function continuous(c: Ctx, path: string, v: unknown): void {
           'a permanent restricts cards on the field',
         );
       }
-      if (typeof x.what !== 'string')
-        err(c, `${p}.what`, 'a permanent restriction is a plain restriction');
+      // A permanent restriction is a card restriction: a player restriction ({ cannotPlay }) and
+      // the draw restriction are modifiers on a Leader, which a permanent does not produce.
+      if (isObj(x.what) && 'cannotPlay' in x.what)
+        err(c, `${p}.what`, 'a permanent cannot restrict what a player may play');
+      else if (x.what === 'cannotDrawByOwnEffects')
+        err(c, `${p}.what`, 'a permanent cannot restrict drawing');
       else restriction(c, `${p}.what`, x.what);
       return;
     case 'tiers':

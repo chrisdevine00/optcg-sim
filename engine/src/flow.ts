@@ -8,7 +8,7 @@ import { isEffect } from '@optcg/cards';
 import type { InstanceId, PlayerId } from './api.ts';
 import type { Ability, AutoTiming, InternalStep } from './abilities.ts';
 import { hasTiming, isInternal } from './abilities.ts';
-import { deriveLive, isNegated } from './derive.ts';
+import { deriveLive, isNegated, koProtected } from './derive.ts';
 import { allHold, matches, payable, playCostOf, pool, type Ctx } from './effects/eval.ts';
 import { answerEffect, pushEffect, runEffect } from './effects/run.ts';
 import type { Draft } from './draft.ts';
@@ -653,11 +653,14 @@ function runTrigger(d: Draft, f: Extract<Frame, { f: 'trigger' }>): void {
 // K.O. and removal with replacement hooks (CR 8-1-3-4, 10-2-1; ADR 0013; E-D3)
 // ---------------------------------------------------------------------------------------------
 
-/** Push a K.O. of a Character by battle or effect. */
+/**
+ * Push a K.O. of a Character by battle, by effect, or as a cost ("K.O. 1 of your Characters:",
+ * M6b wave 1 G1). A cost is part of the effect (CR 8-1-1), so protection against effects stops it.
+ */
 export function pushKo(
   d: Draft,
   card: InstanceId,
-  cause: { kind: 'battle' | 'effect'; by: PlayerId },
+  cause: { kind: 'battle' | 'effect' | 'cost'; by: PlayerId },
   group?: number,
 ): void {
   const f: Frame = { f: 'ko', card, cause, considered: [] };
@@ -717,7 +720,10 @@ function runKo(d: Draft, f: Extract<Frame, { f: 'ko' }>): void {
     return;
   }
   const dv = deriveLive(d.s, f.card);
-  if (dv.cannotBeKOd || (dv.removalProof && byOpponentEffect(f.cause, c.owner))) {
+  if (
+    koProtected(dv, f.cause, c.owner) ||
+    (dv.removalProof && byOpponentEffect(f.cause, c.owner))
+  ) {
     d.emit({ type: 'KOPrevented', instance: f.card, card: c.card });
     pop(d);
     return;

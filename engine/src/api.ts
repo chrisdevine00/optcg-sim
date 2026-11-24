@@ -253,7 +253,9 @@ export type GameEventType =
   // Added in M4a.
   | 'CardsLooked'
   | 'ModeChosen'
-  | 'EffectDeclined';
+  | 'EffectDeclined'
+  // Added in M6b wave 1: Life cards turned face-down (a cost); no card is named.
+  | 'LifeTurnedFaceDown';
 
 export interface GameEvent {
   type: GameEventType;

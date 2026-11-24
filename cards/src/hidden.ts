@@ -62,8 +62,10 @@ function cost(k: Cost): boolean {
   if ('trash' in k) return selector(k.trash);
   if ('reveal' in k) return true;
   if ('rest' in k) return selector(k.rest);
+  if ('ko' in k) return selector(k.ko); // your own Characters: public
   if ('move' in k) return selector(k.move) || destHidden(k.to.zone);
-  // lifeToHand, mill: the moved card is public or goes to the payer alone.
+  // lifeToHand, mill, turnLifeFaceDown, giveDon, returnDon: no hidden card is read; a Life card
+  // turned face-down is hidden from then on, not read.
   return false;
 }
 

@@ -8,7 +8,7 @@
  * unreplaceable step.
  */
 import type { GameEvent, InstanceId, PlayerId } from '../api.ts';
-import { deriveLive } from '../derive.ts';
+import { deriveLive, restBlocked } from '../derive.ts';
 import type { Draft } from '../draft.ts';
 import { shuffle } from '../rng.ts';
 import { other, type Cause, type Modifier, type PlayerState, type Zone } from '../state.ts';
@@ -247,9 +247,15 @@ export function lifeToHand(d: Draft, p: PlayerId, n: number): number {
 // Card state
 // ---------------------------------------------------------------------------------------------
 
-/** Rest a card. Resting a rested card is not performed (CR 1-3-2-1); returns whether it was. */
-export function rest(d: Draft, id: InstanceId, reason?: 'effect' | 'cost'): boolean {
+/**
+ * Rest a card. Resting a rested card is not performed (CR 1-3-2-1); returns whether it was. A
+ * card that "cannot be rested" is not rested by anything (rules-digest 57); one that cannot be
+ * rested "by your opponent's effects" is spared only when `by`, the player whose effect rests it,
+ * is its owner's opponent (M6b G2).
+ */
+export function rest(d: Draft, id: InstanceId, reason?: 'effect' | 'cost', by?: PlayerId): boolean {
   if (d.card(id).rested) return false;
+  if (restBlocked(deriveLive(d.s, id), d.card(id).owner, reason ?? 'rule', by)) return false;
   d.wcard(id).rested = true;
   const e: GameEvent = { type: 'Rested', instance: id, card: d.card(id).card };
   if (reason) e.reason = reason;
@@ -344,6 +350,7 @@ export function addModifier(d: Draft, m: Omit<Modifier, 'id'>): Modifier {
     card: d.card(mod.target).card,
   };
   if (mod.keyword) e.keyword = mod.keyword;
+  if (mod.scope) e.scope = mod.scope;
   if (mod.source !== null) e.byEffect = true;
   d.emit(e);
   return mod;

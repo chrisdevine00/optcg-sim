@@ -13,6 +13,7 @@ import {
   isNegated,
   LAST_STAGE,
   newMemo,
+  restBlocked,
   type Derived,
   type LayerMemo,
 } from '../derive.ts';
@@ -148,6 +149,7 @@ function matchesOf(c: Ctx, id: InstanceId, f: Filter): boolean {
   if ('typeIncludes' in f) return def.types.some((t) => t.includes(f.typeIncludes));
   if ('name' in f) return def.name === f.name || (def.alsoNamed?.includes(f.name) ?? false);
   if ('color' in f) return def.colors.includes(f.color);
+  if ('attribute' in f) return def.attributes.includes(f.attribute);
   if ('multicolor' in f) return def.colors.length > 1;
   if ('hasTrigger' in f) return def.hasTrigger === f.hasTrigger;
   if ('keyword' in f) return dvOf(c, id).keywords.includes(f.keyword);
@@ -264,6 +266,7 @@ export function payable(c: Ctx, costs: readonly Cost[] | undefined, o: PayOption
   if (play > ps.donActive) return false;
   if (!costs || costs.length === 0) return true;
   let returns = 0;
+  let activeReturns = 0;
   let rests = 0;
   let lifeNeeds = 0;
   let millNeeds = 0;
@@ -271,17 +274,37 @@ export function payable(c: Ctx, costs: readonly Cost[] | undefined, o: PayOption
   const handNeeds: { sel: Selector; n: number }[] = [];
   for (const k of costs) {
     if ('donMinus' in k) returns += k.donMinus;
-    else if ('returnDon' in k) returns += k.returnDon;
-    else if ('restDon' in k) rests += k.restDon === 'any' ? 0 : k.restDon;
+    else if ('returnDon' in k) {
+      // The object form returns active cost-area DON!! only (G9).
+      const n = typeof k.returnDon === 'number' ? k.returnDon : k.returnDon.n;
+      returns += n;
+      if (typeof k.returnDon !== 'number') activeReturns += n;
+    } else if ('giveDon' in k) {
+      // Active cost-area DON!! go to a card (G7): they leave the cost area like a rested one.
+      rests += k.giveDon.n;
+      if (pool(c, k.giveDon.to).length < 1) return false;
+    } else if ('ko' in k) {
+      // A protected Character may still be chosen; the K.O. then fails and the effect with it
+      // (RL-16), so the pool is not narrowed here.
+      const n = k.ko.pick && 'exactly' in k.ko.pick ? k.ko.pick.exactly : 1;
+      if (pool(c, k.ko).length < n) return false;
+    } else if ('restDon' in k) rests += k.restDon === 'any' ? 0 : k.restDon;
     else if ('trash' in k || 'reveal' in k) {
       const sel = 'trash' in k ? k.trash : k.reveal;
       const n = sel.pick && 'exactly' in sel.pick ? sel.pick.exactly : 1;
-      handNeeds.push({ sel, n });
+      if (!hiddenPool(sel) && 'trash' in k) {
+        // Your own Characters or Stage (G1): enough of them match.
+        if (pool(c, sel).length < n) return false;
+      } else handNeeds.push({ sel, n });
     } else if ('lifeToHand' in k) lifeNeeds += k.lifeToHand.n;
     else if ('turnLifeFaceUp' in k) {
       // The top Life card is turned: it must be there and face-down.
       const top = ps.life.slice(0, k.turnLifeFaceUp);
       if (top.length < k.turnLifeFaceUp || top.some((id) => s.cards[id]!.faceUp)) return false;
+    } else if ('turnLifeFaceDown' in k) {
+      // The mirror: the top Life cards must be there and face-up (G8).
+      const top = ps.life.slice(0, k.turnLifeFaceDown);
+      if (top.length < k.turnLifeFaceDown || top.some((id) => !s.cards[id]!.faceUp)) return false;
     } else if ('mill' in k) millNeeds += k.mill;
     else if ('rest' in k)
       restNeeds.push({
@@ -294,6 +317,8 @@ export function payable(c: Ctx, costs: readonly Cost[] | undefined, o: PayOption
     } else if ('restSelf' in k) {
       const me = s.cards[c.self];
       if (!me || me.rested || !['leader', 'characters', 'stage'].includes(me.zone)) return false;
+      // A card that cannot be rested cannot pay "rest this Character" (rules-digest 57).
+      if (restBlocked(dvOf(c, c.self), me.owner, 'cost')) return false;
     } else if ('trashSelf' in k) {
       const me = s.cards[c.self];
       if (!me || !['characters', 'stage'].includes(me.zone)) return false;
@@ -306,11 +331,12 @@ export function payable(c: Ctx, costs: readonly Cost[] | undefined, o: PayOption
     // Only an active card can be rested (CR 1-3-2-1); DON!! in the cost area count when named.
     const zones = Array.isArray(sel.from) ? sel.from : [sel.from];
     const cards = pool(c, { ...sel, from: zones.filter((z) => z !== 'donCostArea') }).filter(
-      (id) => !s.cards[id]!.rested,
+      (id) => !s.cards[id]!.rested && !restBlocked(dvOf(c, id), s.cards[id]!.owner, 'cost'),
     );
     const don = zones.includes('donCostArea') ? Math.max(0, active - rests) : 0;
     if (cards.length + don < n) return false;
   }
+  if (activeReturns > 0 && rests + activeReturns > active) return false;
   if (returns > donOnField(s, c.you) - rests) return false;
   // Hand costs: enough matching cards, other than the card being played.
   const used = new Set<InstanceId>();
@@ -324,7 +350,8 @@ export function payable(c: Ctx, costs: readonly Cost[] | undefined, o: PayOption
 
 /** Does paying these costs depend on cards hidden from the opponent (a cost paid from hand)? */
 export function costIsSecret(costs: readonly Cost[] | undefined): boolean {
-  return (costs ?? []).some((k) => 'trash' in k || 'reveal' in k);
+  // A trash cost from your own Characters or Stage is paid from public cards (G1).
+  return (costs ?? []).some((k) => ('trash' in k && hiddenPool(k.trash)) || 'reveal' in k);
 }
 
 /** Active cost-area DON!! the costs after index `from` will still need to rest. */
@@ -333,6 +360,9 @@ export function reservedActive(costs: readonly Cost[], from: number): number {
   for (let i = from; i < costs.length; i++) {
     const k = costs[i]!;
     if ('restDon' in k && k.restDon !== 'any') n += k.restDon;
+    // Later costs that need active DON!! of their own (G7, G9).
+    else if ('giveDon' in k) n += k.giveDon.n;
+    else if ('returnDon' in k && typeof k.returnDon !== 'number') n += k.returnDon.n;
   }
   return n;
 }
