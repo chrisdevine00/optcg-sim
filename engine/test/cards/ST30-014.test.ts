@@ -1,6 +1,6 @@
 /** ST30-014 Mr.3(Galdino). */
 import { describe, expect, it } from 'vitest';
-import { don, expectDecision, game, none, pick, PLAIN_BLUE } from './helpers.ts';
+import { don, expectDecision, game, none, option, pick, PLAIN_BLUE } from './helpers.ts';
 import {
   ACE6,
   ATMOS,
@@ -33,6 +33,8 @@ describe('ST30-014 Mr.3(Galdino)', () => {
     give(g);
     expect(g.card(g.find('p1', 'characters', ID)).rested).toBe(true);
     pick(g, [g.find('p1', 'characters', ATMOS), g.find('p1', 'characters', ACE6)]);
+    option(g, '2');
+    option(g, '2');
     expect(dons(g, ATMOS)).toBe(2);
     expect(dons(g, ACE6)).toBe(2);
     expect(don(g, 'p1')).toMatchObject({ rested: 0, given: 4 });
@@ -52,6 +54,7 @@ describe('ST30-014 Mr.3(Galdino)', () => {
     const g = start(4);
     give(g);
     pick(g, [g.find('p1', 'characters', ACE6)]);
+    option(g, '2');
     expect(dons(g, ACE6)).toBe(2);
     expect(dons(g, ATMOS)).toBe(0);
     expect(don(g, 'p1')).toMatchObject({ rested: 2, given: 2 });
@@ -62,8 +65,24 @@ describe('ST30-014 Mr.3(Galdino)', () => {
     give(g);
     expect(expectDecision(g, 'choose').max).toBe(2);
     pick(g, [g.find('p1', 'characters', ATMOS), g.find('p1', 'characters', 'P-022')]);
+    option(g, '2');
+    option(g, '2');
     expect(don(g, 'p1')).toMatchObject({ rested: 2, given: 4 });
     expect(dons(g, ACE6)).toBe(0);
+  });
+
+  it('the DON!! on hand do not cap the targets at 2 each: 3 rested DON!! give 2 + 1, 1 rested gives 1', () => {
+    const g = start(3);
+    give(g);
+    expect(expectDecision(g, 'choose').max).toBe(2);
+    pick(g, [g.find('p1', 'characters', ATMOS), g.find('p1', 'characters', ACE6)]);
+    option(g, '2');
+    expect([dons(g, ATMOS), dons(g, ACE6)]).toEqual([2, 1]);
+    const one = start(1);
+    give(one);
+    expect(expectDecision(one, 'choose').max).toBe(1);
+    pick(one, [one.find('p1', 'characters', ATMOS)]);
+    expect(dons(one, ATMOS)).toBe(1);
   });
 
   it('cannot be activated while rested (the cost is resting this Character) and the DON!! must be rested ones', () => {
@@ -76,8 +95,7 @@ describe('ST30-014 Mr.3(Galdino)', () => {
     );
     expect(canActivate(g, g.find('p1', 'characters', ID), 'give')).toBe(true);
     give(g);
-    expect(offeredPicks(g)).toEqual([]);
-    none(g);
+    expectDecision(g, 'main'); // no rested DON!!: no target is asked, the effect ends
     expect(g.card(g.find('p1', 'characters', ATMOS)).don).toBe(0);
     expect(don(g, 'p1')).toMatchObject({ active: 3, given: 0 });
   });

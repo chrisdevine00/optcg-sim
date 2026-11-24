@@ -43,6 +43,6 @@ export const OP02_013: CardScript = {
     },
   ],
   rulings: [
-    'Reading (M6b-Q10): "Then, if your Leader\'s type includes ..." is its own condition; Rush is granted even when no opposing Character was chosen',
+    'Reading (M4b-5, M6b-Q13): "Then, if your Leader\'s type includes ..." is its own condition; Rush is granted even when no opposing Character was chosen',
   ],
 };

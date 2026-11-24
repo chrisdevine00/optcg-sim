@@ -32,7 +32,7 @@ export const OP04_083: CardScript = {
     },
   ],
   rulings: [
-    "Reading (M6b-Q15): covers the Characters on your field when it resolves (Sabo included), not later arrivals; lasts through the opponent's whole turn",
+    "Reading (M6b-Q18): covers the Characters on your field when it resolves (Sabo included), not later arrivals; lasts through the opponent's whole turn",
     'Reading: the protection is against effects only, so battle K.O. still applies',
   ],
 };

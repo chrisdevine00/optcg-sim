@@ -60,6 +60,7 @@ describe('ST30-014 Mr.3(Galdino): [Activate: Main] rest this: give up to 2 reste
   it('gives 2 rested DON!! to one chosen Character: +2000 power on my turn, taken from the rested DON!!', () => {
     const g = start([HAJ, JIL]);
     pickInst(g, [g.find('p1', 'characters', HAJ)]);
+    act(g, { type: 'pick', choice: { option: '2' } });
     expect(given(g, HAJ)).toBe(2);
     expect(given(g, JIL)).toBe(0);
     expect(pw(g, 'p1', HAJ)).toBe(8000);
@@ -69,6 +70,8 @@ describe('ST30-014 Mr.3(Galdino): [Activate: Main] rest this: give up to 2 reste
   it('two Characters get 2 each (4 rested DON!! used) when enough rested DON!! exist', () => {
     const g = start([HAJ, JIL], 5);
     pickInst(g, [g.find('p1', 'characters', HAJ), g.find('p1', 'characters', JIL)]);
+    act(g, { type: 'pick', choice: { option: '2' } });
+    act(g, { type: 'pick', choice: { option: '2' } });
     expect(given(g, HAJ)).toBe(2);
     expect(given(g, JIL)).toBe(2);
     expect(don(g)).toMatchObject({ active: 5, rested: 1, given: 4 });
@@ -79,6 +82,8 @@ describe('ST30-014 Mr.3(Galdino): [Activate: Main] rest this: give up to 2 reste
     need(g, 'choose', 'p1');
     expect(offeredIds(g)).toEqual([HAJ, JIL, 'OP02-003'].sort());
     pickInst(g, [g.find('p1', 'characters', HAJ), g.find('p1', 'characters', JIL)]);
+    act(g, { type: 'pick', choice: { option: '2' } });
+    act(g, { type: 'pick', choice: { option: '2' } });
     expect(given(g, 'OP02-003')).toBe(0);
     expect(kind(g)).toBe('main');
   });
@@ -130,25 +135,19 @@ describe('ST30-014 Mr.3(Galdino): [Activate: Main] rest this: give up to 2 reste
     expect(don(g)).toMatchObject({ active: 10, given: 0 });
   });
 
-  // Engine disagreements (see DISAGREEMENTS-a.md): the DON!! count of "up to 2 ... each" is not asked.
-  it.fails(
-    '"up to 2 rested DON!! each": the count per Character is asked (2, 1 or 0), not fixed at 2',
-    () => {
-      const g = start([HAJ], 5);
-      pickInst(g, [g.find('p1', 'characters', HAJ)]);
-      const d = decision(g);
-      expect(d?.kind).toBe('choose');
-      expect(d?.purpose).toBe('mode');
-    },
-  );
+  // Disagreement A (STB5-R1, R4): fixed in the m6b-ST-block5 fix round; these were `it.fails`.
+  it('"up to 2 rested DON!! each": the count per Character is asked (2, 1 or 0), not fixed at 2', () => {
+    const g = start([HAJ], 5);
+    pickInst(g, [g.find('p1', 'characters', HAJ)]);
+    const d = decision(g);
+    expect(d?.kind).toBe('choose');
+    expect(d?.purpose).toBe('mode');
+  });
 
-  it.fails(
-    'with 3 rested DON!! and two Characters, both may be chosen (2 to one, 1 to the other)',
-    () => {
-      const g = start([HAJ, JIL], 3, 7);
-      need(g, 'choose', 'p1');
-      const d = decision(g);
-      expect(d?.max).toBe(2);
-    },
-  );
+  it('with 3 rested DON!! and two Characters, both may be chosen (2 to one, 1 to the other)', () => {
+    const g = start([HAJ, JIL], 3, 7);
+    need(g, 'choose', 'p1');
+    const d = decision(g);
+    expect(d?.max).toBe(2);
+  });
 });

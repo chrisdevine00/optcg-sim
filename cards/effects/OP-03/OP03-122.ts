@@ -37,6 +37,6 @@ export const OP03_122: CardScript = {
   ],
   rulings: [
     'Reading: "Then, draw 2 and trash 2" is not "If you do": it happens even when no Character was returned',
-    "The returned Character may be either player's, including Sogeking itself",
+    "The returned Character may be either player's, never Sogeking itself (cost 7, above the cost 6 limit)",
   ],
 };

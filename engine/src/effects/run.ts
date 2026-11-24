@@ -1305,21 +1305,49 @@ function giveDon(
     });
   };
   if (g.each) {
-    // "up to N of your Characters ... M DON!! each" (G16): an `upTo` pick caps the targets; every
-    // target chosen gets M, so the DON!! on hand cap the targets too.
-    const cap = g.to.pick && 'upTo' in g.to.pick ? g.to.pick.upTo : Infinity;
-    const targets = Math.min(pool(c, g.to).length, cap);
-    const fits = per > 0 ? Math.floor(d.ro(you)[key] / per) : 0;
-    const sel: Selector =
-      fits >= targets && !g.to.pick
-        ? g.to
-        : { ...g.to, pick: { upTo: Math.max(0, Math.min(fits, cap)) } };
-    const ids = select(d, f, sel, { role: 'target', verb: 'give DON!! to' });
-    if (ids === WAIT) return WAIT;
-    for (const id of ids) {
-      const k = Math.min(per, d.ro(you)[key]);
-      if (k <= 0) break;
+    // "up to N of your Characters ... M DON!! each" (G16, STB5-R1): "up to" allows fewer than M to a
+    // target and fewer targets, so the DON!! on hand cap the targets only at one each. The player
+    // picks up to min(N, DON!! available) targets, then a count 1 to min(M, DON!! left minus the
+    // targets still to serve) for each, most first; a one-value range is not asked (M = 1).
+    let ids = f.tmp?.sel;
+    if (!ids) {
+      const left = d.ro(you)[key];
+      if (per <= 0 || left <= 0) return 'next';
+      const cap = g.to.pick && 'upTo' in g.to.pick ? g.to.pick.upTo : Infinity;
+      const sel: Selector =
+        !g.to.pick && pool(c, g.to).length <= left
+          ? g.to
+          : { ...g.to, pick: { upTo: Math.min(left, cap) } };
+      const picked = select(d, f, sel, { role: 'target', verb: 'give DON!! to' });
+      if (picked === WAIT) return WAIT;
+      ids = picked;
+      f.tmp = { ...f.tmp, sel: ids, give: 0 };
+    }
+    for (let i = f.tmp?.give ?? 0; i < ids.length; i++) {
+      const id = ids[i]!;
+      const hi = Math.min(per, d.ro(you)[key] - (ids.length - i - 1));
+      if (hi <= 0) break;
+      let k = hi;
+      if (hi > 1) {
+        const got = take(f);
+        if (!Array.isArray(got)) {
+          const counts = Array.from({ length: hi }, (_, j) => hi - j);
+          return ask(d, f, {
+            kind: 'choose',
+            player: you,
+            prompt: `${nameOf(d, f)}: how many ${g.state} DON!! cards will you give to ${d.s.defs[d.card(id).card]?.name ?? id} (up to ${hi})?`,
+            min: 1,
+            max: 1,
+            candidates: counts.map((j) => ({ option: String(j) })) as never,
+            picked: [],
+            role: 'mode',
+            options: counts.map((j) => ({ id: String(j), label: `${j} DON!!` })),
+          });
+        }
+        k = Math.min(hi, Math.max(1, Number((got[0] as { option: string }).option)));
+      }
       give(id, k);
+      f.tmp = { ...f.tmp, give: i + 1 };
     }
     return 'next';
   }

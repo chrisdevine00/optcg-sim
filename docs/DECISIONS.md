@@ -2,6 +2,13 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-24 — `giveDon` with `each` asks the targets and a count per target (ENGINE_VERSION 0.5.10)
+
+- **Context:** the ST block 5 review (STB5-R1, severity 3) showed that the wave 2 rule for "give up to M rested DON!! to each of up to N targets" (the DON!! on hand cap the targets at `floor(DON / M)`, every target gets exactly M) made legal plays unreachable: ST30-014 with 1 rested DON!! could give nothing, and 3 rested could not give 2 + 1.
+- **Decision:** the target pick allows up to `min(N, DON available)` targets (a target needs at least 1); then, in pick order, each target is asked a count from `min(M, DON left - targets still to serve)` down to 1, most first (the same `mode` choose that `giveDon` already uses, so UI, projection and AI are unchanged). A range of one value is not asked, so OP14-105 (M = 1) plays as before. Zero is not offered per target because choosing fewer targets already means that (and the reservation keeps every picked target served).
+- **Rejected:** keeping the cap (a rules error), and a 0 option per target (a second way to say "fewer targets").
+- Games recorded before are unchanged in play (the three goldens differ only in the version stamp).
+
 ## 2026-11-24 — Random Standard decks in the property games; a replacement-offer leak fixed (ENGINE_VERSION 0.5.9)
 
 - **Random Standard decks** (`randomStandardDeck`, `standardDecksFor` in `engine/test/support/decks.ts`): a Standard Leader and 50 Standard-legal cards in its colours, scripted cards weighted 6:1, restricted limits, banned pairs and deck clauses respected, validated with `deckIssues(..., 'standard')`. `standard-games.test.ts` (invariants, replay, listed and unlisted actions), both leak properties and the skeleton diff now run on them too (60 games per push, 10,000 nightly), with seed and decks logged on failure. The default meta-deck games are unchanged (goldens depend on them). This is the M6b done criterion "10,000 nightly random-Standard-deck games"; the first 10,000-game run was invariant-clean.

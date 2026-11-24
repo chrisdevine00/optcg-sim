@@ -192,6 +192,8 @@ describe('G16 giveDon each with an upTo pick', () => {
     const g = mk(4, 2);
     run(g);
     pick(g, [g.find('p1', 'characters', V.c1), g.find('p1', 'characters', V.c3)]);
+    option(g, '2'); // the count per target is asked (1 to 2)
+    option(g, '2');
     expect([given(g, V.c1), given(g, V.c2), given(g, V.c3)]).toEqual([2, 0, 2]);
     expect(don(g, 'p1')).toMatchObject({ rested: 0, given: 4 });
   });
@@ -201,6 +203,8 @@ describe('G16 giveDon each with an upTo pick', () => {
     run(g);
     expect(expectDecision(g, 'choose').max).toBe(2);
     pick(g, [g.find('p1', 'characters', V.c1), g.find('p1', 'characters', V.c2)]);
+    option(g, '2');
+    option(g, '2');
     expect([given(g, V.c1), given(g, V.c2), given(g, V.c3)]).toEqual([2, 2, 0]);
     expect(don(g, 'p1')).toMatchObject({ rested: 2, given: 4 });
   });
@@ -209,17 +213,48 @@ describe('G16 giveDon each with an upTo pick', () => {
     const g = mk(4, 2);
     run(g);
     pick(g, [g.find('p1', 'characters', V.c2)]);
+    option(g, '2');
     expect([given(g, V.c1), given(g, V.c2), given(g, V.c3)]).toEqual([0, 2, 0]);
     expect(don(g, 'p1')).toMatchObject({ rested: 2, given: 2 });
   });
 
-  it('the DON!! on hand cap the targets (3 rested DON!! reach one target of 2 each)', () => {
+  it('3 rested DON!! reach two targets (2 + 1): the count of the first is capped to leave 1 for the second', () => {
     const g = mk(3, 2);
     run(g);
+    expect(expectDecision(g, 'choose').max).toBe(2);
+    pick(g, [g.find('p1', 'characters', V.c1), g.find('p1', 'characters', V.c2)]);
     const d = expectDecision(g, 'choose');
-    expect(d.max).toBe(1);
+    expect(d.purpose).toBe('mode');
+    expect(d.options?.map((o) => o.id)).toEqual(['2', '1']);
+    option(g, '2');
+    expect([given(g, V.c1), given(g, V.c2), given(g, V.c3)]).toEqual([2, 1, 0]);
+    expect(don(g, 'p1')).toMatchObject({ rested: 0, given: 3 });
+  });
+
+  it('1 rested DON!! can still be given to one target (up to 2 each allows 1); 2 targets are not offered', () => {
+    const g = mk(1, 2);
+    run(g);
+    expect(expectDecision(g, 'choose').max).toBe(1);
+    pick(g, [g.find('p1', 'characters', V.c3)]);
+    expect([given(g, V.c1), given(g, V.c2), given(g, V.c3)]).toEqual([0, 0, 1]);
+    expect(don(g, 'p1')).toMatchObject({ rested: 0, given: 1 });
+  });
+
+  it('2 rested DON!! reach two targets with 1 each; the first count is capped at 1', () => {
+    const g = mk(2, 2);
+    run(g);
+    expect(expectDecision(g, 'choose').max).toBe(2);
+    pick(g, [g.find('p1', 'characters', V.c1), g.find('p1', 'characters', V.c2)]);
+    expect([given(g, V.c1), given(g, V.c2), given(g, V.c3)]).toEqual([1, 1, 0]);
+  });
+
+  it('a smaller count may be chosen for a target (1 of 2), leaving DON!! rested', () => {
+    const g = mk(4, 2);
+    run(g);
     pick(g, [g.find('p1', 'characters', V.c1)]);
-    expect(don(g, 'p1')).toMatchObject({ rested: 1, given: 2 });
+    option(g, '1');
+    expect(given(g, V.c1)).toBe(1);
+    expect(don(g, 'p1')).toMatchObject({ rested: 3, given: 1 });
   });
 
   it('the validator accepts each with no pick or an upTo pick, and refuses other picks', () => {

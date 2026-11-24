@@ -26,6 +26,9 @@ describe('ST30-002 Inazuma', () => {
     const g = start([P5000, ATMOS, V.c1, V.c2, P7000]);
     play(g, ID);
     pick(g, [g.find('p1', 'deck', ATMOS)]);
+    // "in any order" (STB5-R3): 4 cards go to the bottom, so the owner is asked the order
+    expect(dec(g)?.kind).toBe('order');
+    expect(dec(g)?.player).toBe('p1');
     orderAll(g);
     expect(hand(g, 'p1')).toEqual([ATMOS]);
     expect(g.eventsOfType('CardRevealed').map((e) => e.card)).toContain(ATMOS);

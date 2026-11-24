@@ -152,3 +152,12 @@ Wave 2 (DECISIONS, `m6b-wave2.md` item 7): "`giveDon each` with an `upTo` pick: 
 
 - 157 Characters have [Blocker] in `effectText` and no `keywords` entry (readings g2 data note): for OP01-120 this is harmless (such cards cannot block in the sim anyway). The data ticket stays open.
 - ST34-001's two simultaneous own effects (Tamago's K.O. then Katakuri's add) resolve in a fixed order without asking; the tests do not assert the order (API-GAPS-b 10).
+
+## Fix round
+
+Done on the fix-round branch (runbook `docs/runbooks/new-set.md` step g). ENGINE_VERSION 0.5.9 to 0.5.10; the three goldens re-recorded (version stamp only, every hash unchanged).
+
+- **STB5-R1 and R4 (engine):** `giveDon` with `each` (`engine/src/effects/run.ts`) now picks up to `min(N, DON available)` targets, then asks a count for each, from `min(M, DON left - targets still to serve)` down to 1 (role `mode`, most first; a one-value range is not asked, so OP14-105 is unchanged). Tests: `engine/test/cards/m6b-w2/g13-g15-g16-g17-g18-g19.test.ts` (3 rested DON!! split 2 + 1; 1 rested gives 1; 2 rested gives 1 + 1; a smaller count is allowed) and the rewritten `engine/test/cards/ST30-014.test.ts` cases; the two independent `it.fails` in `st-b5/ST30-014.test.ts` are now `it`. With the old `each` branch restored, the planted tests, the author tests and the two former `it.fails` fail. The wave-2 test that pinned one target for 3 DON!! is replaced by the 2 + 1 test. DECISIONS: "`giveDon` with `each` asks the targets and a count per target".
+- **STB5-R3:** ST30-002 and ST30-017 author tests now assert that the owner's `order` decision is pending after the pick. Note: the review's mutation `bottomAnyOrder` to `bottom` is not a valid `rest` value (the enum is `bottomAnyOrder | topOrBottomAnyOrder | trash`) and the engine treats any non-`trash`, non-`topOrBottomAnyOrder` value as a bottom placement with an owner order, so that mutation was an equivalent one and could never fail. The meaningful mutation (the engine's order ask in `lookAtTop` made unreachable, `left.length >= 2` to `>= 99`) now fails both tests (it survived before); restored.
+- **STB5-R5:** OP03-122's ruling no longer says Sogeking may return itself (cost 7 is above the cost 6 limit). The scripts' audit "B5-Q" citations are renumbered: OP01-120 M6b-Q12, OP04-083 M6b-Q18, OP02-013 M4b-5 / M6b-Q13 (also in `docs/research/ST-block5-scripting-g2.md`).
+- **Left as reviewed:** STB5-R2 (OP01-120 snapshot filter, open question M6b-Q12), R6, R7 (and R4 is closed by R1).

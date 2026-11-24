@@ -34,6 +34,6 @@ export const OP01_120: CardScript = {
     },
   ],
   rulings: [
-    'Reading (M6b-Q9, approximation): the filter (a [Blocker] with 2000 or less power) is read when [When Attacking] resolves, current power; a Blocker pumped later in the same battle stays locked',
+    'Reading (M6b-Q12, approximation): the filter (a [Blocker] with 2000 or less power) is read when [When Attacking] resolves, current power; a Blocker pumped later in the same battle stays locked',
   ],
 };
