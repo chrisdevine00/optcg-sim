@@ -193,6 +193,10 @@
 - [x] Per-push card tests for changed cards only (`npm run test:ci`, `cards/scripts/card-tests.ts`; a change to the engine, card data, the loader or a shared kit runs them all); `npm test` in full nightly.
 - [x] Re-baselined (PLAN §1, DECISIONS "M6b-0 re-baseline"): **M6b about 830–880 h without block 2**, plus about 240 h if block 2 survives the rotation (was 1,000–1,100 h).
 
+**M6b-5 update pipeline: built 2026-11-23** (DECISIONS "M6b-5"): `update.yml` (weekly `cards` and `meta` jobs, PRs on `update/cards` and `update/meta`), `scripts/cards-pr-body.ts`, `scripts/update-pr.sh`, `docs/runbooks/new-set.md`, the script text-hash test. Done criterion still open: a real update PR for the next set after OP-18 and EB-05, run through the runbook. **Owner: allow Actions to create pull requests** (Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests"); until then each run pushes the branch and its summary links to open the PR by hand.
+
+**M6b-1 runtime audit: in progress** (three auditors: block 5 with X, block 1 exceptions and EB-05; block 4; block 3 → `docs/research/m6b-audit/`).
+
 **M6b-0: done 2026-11-23.** Next: **M6b-1**, the runtime audit of the Standard pool (`docs/research/m6b-runtime-audit.md`, the method of `m4b-runtime-audit.md`), driven by the gap list in `cards/data/coverage-report.json`. M6b-5 (update pipeline) is built first among M6b-5 to M6b-7, in parallel with the scripting batches.
 - Also: Deploy workflow split into build and deploy jobs (the Pages artifact race failed three deploys on 2026-11-23).
 
@@ -242,6 +246,7 @@ Warlord vs Pirate by ordered pair (Warlord's deck first): Rocks 14/17, Kaido 3/1
 ## Blockers
 
 Owner decisions needed (not blocking progress):
+- **Allow GitHub Actions to create pull requests** (Settings → Actions → General → Workflow permissions → "Allow GitHub Actions to create and approve pull requests"), so the weekly `update.yml` can open its card and meta PRs (M6b-5, ADR 0014). Until then each run pushes `update/cards` / `update/meta` and its run summary links to open the PR by hand.
 - **M3 VoiceOver pass:** please run the VoiceOver passes in `docs/design/a11y-passes/README.md` when convenient. That's either a 30-minute listening pass by hand with the §11.3 script, or the scripted Guidepup run, whose setup step changes macOS settings, so it's your choice to run it.
 - The first Track C attempt captured 62 DuelVoyager screenshots (`docs/research/teardown-shots/dv-*.png`, gitignored, local only) against DuelVoyager's robots.txt. They are unused. Deleting them was blocked by the permission system; please delete them: `rm docs/research/teardown-shots/dv-*.png`.
 - Commit 80357a0 (already pushed) contains a partial teardown with DuelVoyager observations; HEAD no longer has them. Rewriting public history needs a force-push, so it is the owner's call.

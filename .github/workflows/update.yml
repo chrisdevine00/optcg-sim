@@ -1,0 +1,60 @@
+name: Update
+# Weekly card-data and meta PRs (ADR 0014, ARCHITECTURE §3 "Update pipeline", PLAN M6b-5).
+# Each job opens or updates its own PR on a fixed branch; nothing reaches main without review.
+# The only workflow that calls an external data API; the official site is never fetched (ADR 0007).
+on:
+  schedule:
+    - cron: '17 6 * * 1' # Mondays 06:17 UTC
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write # to start CI on the update branch (PRs made with GITHUB_TOKEN do not trigger it)
+concurrency:
+  group: update
+  cancel-in-progress: false
+
+jobs:
+  cards:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: cp cards/data/coverage-report.json "$RUNNER_TEMP/coverage-before.json"
+      # Errata on a scripted card is written and listed, and fails the PR's CI until re-verified.
+      - run: npm run cards:update -- --refresh --allow-script-changes
+      - run: npm run cards:measure
+      - run: npx tsx scripts/cards-pr-body.ts "$RUNNER_TEMP/coverage-before.json" > "$RUNNER_TEMP/body.md"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cards-report
+          path: .cache/cards/report.json
+      - name: Open or update the PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/update-pr.sh update/cards "Card data update" "$RUNNER_TEMP/body.md" cards/data
+
+  meta:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      # Standings of settled events are never re-fetched (meta:update caches them).
+      - uses: actions/cache@v4
+        with:
+          path: .cache/meta
+          key: meta-${{ github.run_id }}
+          restore-keys: meta-
+      - run: npm run meta:update -- --refresh --write --report "$RUNNER_TEMP/body.md"
+      - name: Open or update the PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/update-pr.sh update/meta "Meta update" "$RUNNER_TEMP/body.md" docs/research/meta-lists.json cards/data/play-frequency.json

@@ -2,6 +2,17 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-23 — M6b-5: the update pipeline (`update.yml`) and the new-set runbook
+
+- **`.github/workflows/update.yml`**, weekly (Mondays 06:17 UTC) and on dispatch, two jobs. `cards`: `cards:update -- --refresh --allow-script-changes`, `cards:measure`, a PR body from `scripts/cards-pr-body.ts` (new, removed and changed cards; scripted cards whose text changed; products with no cited block; Standard coverage before and after; a rotation warning within 60 days of `regulation.to`). `meta`: `meta:update -- --refresh --write` with its report as the body, and the standings cache kept between runs. Each job commits to a fixed branch (`update/cards`, `update/meta`) and opens or updates its PR (`scripts/update-pr.sh`).
+- **Errata on a scripted card is written, not refused,** in the scheduled run (`--allow-script-changes`), and listed in the PR. The new test `cards/test/script-text.test.ts` compares every script's `textHash` with its card's current text, so that PR's CI fails until each card is re-verified. Before this, nothing checked the hash against the data: a text change to a scripted card would have passed CI.
+- **CI on the update branches:** PRs opened with `GITHUB_TOKEN` do not trigger `pull_request` workflows, so the job starts CI with `workflow_dispatch` (now allowed in `ci.yml`), which runs every card test (no base to diff against).
+- **The repository does not allow Actions to create pull requests** (`can_approve_pull_request_reviews: false`). Changing a repository security setting is the owner's call, so the job does not need it: it always pushes the branch, and when PR creation is refused it writes the compare link and the body to the run summary. Owner item in STATUS Blockers.
+- **The M1 meta-card tests read the pinned lists** (`cards/test/data.test.ts`): a meta PR brings cards that are not verified yet, and its report lists them for the next batch. They should not make the meta PR unmergeable.
+- **`docs/runbooks/new-set.md`** writes out steps a to h (cited block, audit, engine wave with planted tests, parallel scripting with overrides and author tests, independent tests, adversarial review, one fix round, the "Scripts: <SET>" PR).
+
+Alternatives rejected: `peter-evans/create-pull-request` (a third-party action with write access; `gh` does the same); a personal access token so PRs trigger CI (a long-lived secret; `workflow_dispatch` is enough); committing straight to main (ADR 0014: nothing reaches main unreviewed).
+
 ## 2026-11-23 — M6b-0 re-baseline: about 830–880 h without block 2
 
 Context: PLAN amendment A1 asks for a re-baseline at the end of M6b-0, once `cards:measure` has measured the backlog. Measured: 1,660 unscripted Standard cards (block 5 180, block 4 422, block 3 510, X and block 1 exceptions 8, block 2 held 540). Decision: M6b-3 is estimated from the cards in scope while block 2 is held (about 1,300 to 1,400 with EB-05, OP-18 and uncited-legality cards) at the plan's own rate of about 2.6 cards an hour: about 500–540 h; M6b-4 75–80 h; M6b about 830–880 h, plus about 240 h if block 2 stays legal after the 2027-03-31 rotation. PLAN §1 carries the arithmetic. Alternatives rejected: keeping 1,000–1,100 h (it counted block 2, which the plan itself holds); a new rate before any non-meta batch has been scripted (the first batch measures it, and the existing trigger, fewer than 3 cards an hour, forces a re-plan).

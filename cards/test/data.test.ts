@@ -55,13 +55,15 @@ describe('generated card data', () => {
 });
 
 describe('meta-list cards (PLAN M1 done criteria)', () => {
+  // The M1 lists, pinned (M6b-0): a meta update PR adds cards that are not verified yet; its report
+  // lists them for the next scripting batch instead of failing here.
   const ids = metaIds(
     JSON.parse(
-      readFileSync(new URL('../../docs/research/meta-lists.json', import.meta.url), 'utf8'),
+      readFileSync(new URL('../../ai/test/fixtures/strength-decks.json', import.meta.url), 'utf8'),
     ),
   );
 
-  it('covers all 182 card IDs in docs/research/meta-lists.json', () => {
+  it('covers all 182 card IDs of the M1 meta lists', () => {
     expect(ids).toHaveLength(182);
     expect(ids.filter((id) => !cards.has(id))).toEqual([]);
   });

@@ -3,6 +3,8 @@ on:
   push:
     branches: [main]
   pull_request:
+  # update.yml starts CI on its PR branches this way (GITHUB_TOKEN PRs do not trigger pull_request).
+  workflow_dispatch:
 jobs:
   checks:
     runs-on: ubuntu-latest

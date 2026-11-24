@@ -1,5 +1,5 @@
 /**
- * `npm run cards:update [-- --refresh] [-- --dry-run]`
+ * `npm run cards:update [-- --refresh] [-- --dry-run] [-- --allow-script-changes]`
  *
  * Fetches optcgapi.com bulk endpoints (cached in .cache/cards/), normalizes every defect class, applies
  * cards/overrides/, computes block and legality from cards/format/standard.json, validates every record,
@@ -170,7 +170,9 @@ async function main() {
     `\nDiff against the previous snapshot (${prev ? `${prev.size} cards` : 'none'}; ${scripted.size} scripted cards):`,
   );
   log(formatDiff(diff));
-  fatals.push(...diff.failures);
+  // The scheduled update PR (update.yml) writes anyway and lists them: the PR's CI then fails on
+  // the scripts' text hashes until each card is re-verified (ARCHITECTURE §3 "Update pipeline").
+  if (!args.has('--allow-script-changes')) fatals.push(...diff.failures);
 
   mkdirSync(join(ROOT, '.cache/cards'), { recursive: true });
   writeFileSync(
