@@ -112,12 +112,9 @@ describe('OP16-022 Monkey.D.Luffy: [Activate: Main] set up to 2 DON!! as active'
 
   // M6b-Q21 (answered): with NO Characters on the field "the only Characters ... are {Impel Down}
   // Characters" is false (E-Q4 / QA-OP17 OP17-118 precedent), so nothing is set active.
-  it.fails(
-    'M6b-Q21: with no Characters at all the condition is false and no DON!! is set active',
-    () => {
-      const g = field([]);
-      tryActivate(g, g.leader('p1'));
-      expect(don(g, 'p1')).toMatchObject({ active: 3, rested: 7 });
-    },
-  );
+  it('M6b-Q21: with no Characters at all the condition is false and no DON!! is set active', () => {
+    const g = field([]);
+    tryActivate(g, g.leader('p1'));
+    expect(don(g, 'p1')).toMatchObject({ active: 3, rested: 7 });
+  });
 });

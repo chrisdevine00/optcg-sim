@@ -127,3 +127,14 @@ Author survivors that the independent tests kill: OP16-012, OP16-085, OP16-059, 
 - The independent kits (`kit-op16*.ts`, over `kit-op17b.ts`) still accept some "optional" prompts automatically (the EB05-R4 blind spot, in BACKLOG).
 - An "up to 1" step with no candidate opens an empty `choose` in OP16-116 with 10 DON!! and no [Marshall.D.Teach], but not in OP16-097. Harmless (the empty pick is auto-skipped for a human watcher: no candidates to hide).
 - Scripts compile to hashes that match the data (`cards/test/script-text.test.ts` passes); the registry and set index are current.
+
+## Fix round (2026-11-24)
+
+- **OP16-R1 (sev 3) fixed:** OP16-022 adds `exists your Characters` before the `none` condition, so "the only Characters are {Impel Down}" is false with no Characters (E-Q4, M6b-Q21). The author test that pinned the wrong reading is flipped; the independent A-1 `it.fails` now passes as `it` (it failed against the old script).
+- **OP16-R6 fixed:** the OP16-035 independent test plays Zoro with a raw action (the kit's `playCard` answered the target choice); now `it`.
+- **OP16-R3 (sev 2):** "in any order" for hand or trash cards placed at the deck bottom: engine change with planted tests as a follow-up (OP16-047, OP17-053, OP17-095).
+- **OP16-R7 (sev 1):** tests for the OP16-081 cost boundary and OP16-104 base power go with that follow-up.
+- **OP16-R2, R4, R5:** reading questions, to OPEN-QUESTIONS (M6b-Q9, Q16, Q29); scripts unchanged until a ruling.
+- **OP16-R8:** RL-19's remark on OP16-048 checked against the verified text; the script stays (it names only [Prisoner of Impel Down] cards).
+
+Batch merged to main after the fix round (runbook step h).

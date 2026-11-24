@@ -173,15 +173,18 @@ describe('OP16-035 Roronoa Zoro: Then you may trash 1 card: give up to 3 rested 
 });
 
 // "Rest up to 1 of your opponent's cards" may be answered with any card the opponent has (Leader,
-// Character, Stage or DON!!), and "up to 1" lets me choose which. With an opposing DON!! in the cost
-// area the engine rests that DON!! at once, without a prompt.
+// Character, Stage or DON!!), and "up to 1" lets me choose which. Settled by review OP16-R6: the
+// engine asks; the kit's playCard answered the choice (it pays any choose that lists active DON!!),
+// so this test plays the card with a raw action.
 describe("OP16-035 Roronoa Zoro: the opponent's DON!! among the candidates", () => {
-  it.fails(
-    'the player is asked which card to rest even when the opponent has DON!! in the cost area',
-    () => {
-      const g = start([], { characters: [OV.thatch], costArea: { active: 3, rested: 0 } });
-      need(g, 'choose', 'p1');
-      expect(offeredIds(g)).toContain(OV.thatch);
-    },
-  );
+  it('the player is asked which card to rest even when the opponent has DON!! in the cost area', () => {
+    const g = mine(
+      OL.kid,
+      { hand: [ZORO], costArea: { active: 10, rested: 0 } },
+      { characters: [OV.thatch], costArea: { active: 3, rested: 0 } },
+    );
+    act(g, { type: 'playCard', card: g.find('p1', 'hand', ZORO) });
+    need(g, 'choose', 'p1');
+    expect(offeredIds(g)).toContain(OV.thatch);
+  });
 });

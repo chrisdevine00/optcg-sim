@@ -17,6 +17,8 @@ export const OP16_022: CardScript = {
       when: 'activateMain',
       oncePerTurn: true,
       conditions: [
+        // "The only Characters are X" is false with no Characters (E-Q4, M6b-Q21; review OP16-R1).
+        { exists: { from: 'characters', owner: 'you' } },
         {
           none: {
             from: 'characters',

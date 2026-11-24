@@ -25,11 +25,9 @@ describe('OP16-022 Monkey.D.Luffy', () => {
     expect(canActivate(g, g.leader('p1'), 'set-don')).toBe(false);
   });
 
-  it('with no Characters at all there is no other Character, so it can be activated (reading)', () => {
+  it('with no Characters at all the condition is false, so it cannot be activated (E-Q4; review OP16-R1)', () => {
     const g = start([]);
-    expect(canActivate(g, g.leader('p1'), 'set-don')).toBe(true);
-    act(g);
-    expect(don(g, 'p1')).toMatchObject({ active: 2, rested: 1 });
+    expect(canActivate(g, g.leader('p1'), 'set-don')).toBe(false);
   });
 
   it('"up to 2": with only 1 rested DON!! it sets 1', () => {

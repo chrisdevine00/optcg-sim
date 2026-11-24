@@ -144,3 +144,5 @@ Full text, proposed readings, source auditor IDs and what `rulings.md`/`rules-di
 - OP-17-V1. OP17-037 name: "Are You That Afraid of the New Era?!" (optcgapi) or "…?!!" (Limitless)? Read on the official list; no script depends on it.
 - OP-17-Q1. OP17-007 Kouzuki Oden: does "with 6000 power or less" apply to both "{Land of Wano} type Character card" and "Character card with a type including Whitebeard Pirates", or only the second? Scripted for both (review OP17-R1); a Q&A saying "second only" raises it to severity 3.
 - OP-17-Q2. EB05-052 Gloriosa against a [Double Attack] hit: one "would take damage" for both points (scripted) or one per point (review OP17-R3; joins M6b-Q5 and Q8).
+- OP-16-Q1. OP16-001 Ace Leader: does the "8000 power or more" clause cover the [Monkey.D.Luffy] branch too (audit) or only the Whitebeard branch (scripted)? Review OP16-R2; M6b-Q16.
+- OP-16-Q2. OP16-036 / OP16-055 "the same as your opponent's Leader": current power (scripted) or base power (audit)? Review OP16-R5; M6b-Q29.
