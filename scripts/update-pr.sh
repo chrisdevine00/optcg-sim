@@ -11,8 +11,11 @@ git config user.name 'github-actions[bot]'
 git config user.email '41898283+github-actions[bot]@users.noreply.github.com'
 git checkout -B "$branch"
 git add -- "$@"
-if git diff --cached --quiet; then
-  echo "No changes for $branch." | tee -a "$GITHUB_STEP_SUMMARY"
+# Only fetch and generation times changed: no PR (a weekly no-op would be noise).
+real=$(git diff --cached -U0 | grep -E '^[+-]' | grep -vE '^(\+\+\+|---) ' |
+  grep -vE '"(fetchedAt|generatedAt|asOf)": ' || true)
+if [ -z "$real" ]; then
+  echo "No changes for $branch (timestamps only)." | tee -a "$GITHUB_STEP_SUMMARY"
   exit 0
 fi
 git commit -q -m "chore: ${title,,} $(date -u +%F) (update.yml)"
