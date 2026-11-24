@@ -16,6 +16,8 @@
  * the tree, and not by rollouts after it, so a veto on `endTurn` binds the plans that end the
  * turn in the tree.
  */
+import type { Card } from '@optcg/cards';
+import { counterValueOf } from './knowledge.ts';
 import rocks from '../playbooks/OP17-039.json';
 import kaido from '../playbooks/OP17-058.json';
 import enel from '../playbooks/OP05-098.json';
@@ -324,6 +326,11 @@ export interface LeaderTrickCopy {
 }
 
 export interface Playbook {
+  /**
+   * True for the generic playbook of a Leader with no guide (`defaultPlaybook`). It carries no
+   * biases, so "Why?" has nothing to cite, and its mulligan copy does not say "its guide".
+   */
+  isDefault?: true;
   leaderId: string;
   archetypeId: string;
   /** How explanations name this AI (explanations.md copy rules: by its Leader). */
@@ -367,8 +374,86 @@ const ALL = [
 
 export const PLAYBOOKS: ReadonlyMap<string, Playbook> = new Map(ALL.map((p) => [p.leaderId, p]));
 
-export function playbookFor(leaderId: string): Playbook | null {
-  return PLAYBOOKS.get(leaderId) ?? null;
+/** Costs that count as an early play (strategy-concepts §9 [S9]: "can I act on turns 1–2?"). */
+const EARLY_COST = 3;
+
+/**
+ * The playbook of a Leader with no guide (M6b-7): neutral weights, no biases, no assertions, going
+ * second (strategy-concepts §10 [S17]: the general default is to go second), and a mulligan rule
+ * built from the AI's own deck, because a static file cannot list the deck's card ids. The rule is
+ * the [S9] heuristic: act on turns 1-2 (a 1- to 3-cost Character) and be able to defend (a card
+ * with a Counter). Going first it needs the early play (redraw hands that "need a second turn");
+ * going second one piece short is enough.
+ */
+export function defaultPlaybook(
+  leaderId: string,
+  ownDeck: readonly string[] = [],
+  cards: ReadonlyMap<string, Card> = new Map(),
+): Playbook {
+  const early = [
+    ...new Set(
+      ownDeck.filter((id) => {
+        const c = cards.get(id);
+        return c?.category === 'Character' && (c.cost ?? 99) >= 1 && (c.cost ?? 99) <= EARLY_COST;
+      }),
+    ),
+  ];
+  const hasCounter = ownDeck.some((id) => counterValueOf(cards.get(id)) > 0);
+  const pieces: MulliganPiece[] = [
+    ...(early.length > 0
+      ? [
+          {
+            name: 'early',
+            label: 'a 1- to 3-cost Character to play on turns 1\u20132',
+            cards: early,
+            min: 1,
+          },
+        ]
+      : []),
+    ...(hasCounter
+      ? [{ name: 'defence', label: 'a card with a Counter to defend with', min: 1 }]
+      : []),
+  ];
+  return {
+    isDefault: true,
+    leaderId,
+    archetypeId: 'default',
+    aiName: cards.get(leaderId)?.name ?? 'The AI',
+    asOf: '2026-11-23',
+    guide: 'docs/research/strategy-concepts.md',
+    notes: [
+      'Generic playbook for a Leader with no guide (M6b-7). Neutral weights and no biases, so the heuristic and search decide alone and "Why?" cites no guide line.',
+      'goFirst false: strategy-concepts section 10 [S17], the general default is to go second.',
+      'mulligan: strategy-concepts section 9 [S9], act on turns 1-2 and be able to defend; built from the AI\u2019s own deck.',
+    ],
+    goFirst: false,
+    digTargets: [],
+    winConditions: [],
+    cardValue: {},
+    weights: {},
+    faceBias: { early: 1, mid: 1, late: 1 },
+    counterAggression: 1,
+    mulligan: {
+      pieces,
+      secondShort: 1,
+      requireGoingFirst: pieces.some((p) => p.name === 'early') ? ['early'] : [],
+      source: 'strategy-concepts section 9 [S9], section 10 [S17]',
+    },
+    biases: [],
+    assertions: [],
+  };
+}
+
+/**
+ * The AI's playbook: the Leader's own when it has one, else the default built from the AI's deck.
+ * Never null.
+ */
+export function playbookFor(
+  leaderId: string,
+  ownDeck?: readonly string[],
+  cards?: ReadonlyMap<string, Card>,
+): Playbook {
+  return PLAYBOOKS.get(leaderId) ?? defaultPlaybook(leaderId, ownDeck, cards);
 }
 
 /** The AI's own turn count: T1 is its first turn (the guides count turns this way). */

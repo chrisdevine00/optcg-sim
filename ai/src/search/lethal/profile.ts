@@ -276,9 +276,12 @@ export function defenceBound(
   cards: ReadonlyMap<string, Card>,
   defenderDon: number,
   fallback: number,
+  /** The prior is synthetic (no sourced list): its pool counts, and `fallback` stays the floor. */
+  synthetic = false,
 ): DefenceBound {
-  const prof = counterProfile(cardIds, cards, cardIds.length === 0 ? fallback : 0);
-  let perCard = cardIds.length === 0 ? fallback : 0;
+  const floor = cardIds.length === 0 || synthetic ? fallback : 0;
+  const prof = counterProfile(cardIds, cards, floor);
+  let perCard = floor;
   for (const id of cardIds) {
     const card = cards.get(id);
     if (card && card.category !== 'Event') perCard = Math.max(perCard, card.counter ?? 0);
@@ -294,7 +297,7 @@ export function defenceBound(
     perCard,
     rests: prof.rests,
     draws: prof.draws,
-    noPrior: cardIds.length === 0,
+    noPrior: cardIds.length === 0 || synthetic,
     gaps: prof.gaps,
   };
 }

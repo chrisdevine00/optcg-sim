@@ -3,8 +3,9 @@
  * (a card's text is public), and the archetype prior built from the sourced tournament lists in
  * `docs/research/meta-lists.json`. Nothing here reads a game.
  */
-import { SCRIPTS, type Card } from '@optcg/cards';
+import { COLORS, SCRIPTS, type Card, type CardCategory, type Color } from '@optcg/cards';
 import meta from '../../docs/research/meta-lists.json';
+import frequencyJson from '../../cards/data/play-frequency.json';
 
 /** A script's `when` that names the [Counter] timing, alone or in a list. */
 export const hasCounterTiming = (when: unknown): boolean =>
@@ -61,15 +62,114 @@ export interface Prior {
   leaderId: string;
   archetypeId: string;
   lists: PriorList[];
+  /**
+   * A synthetic prior (a Leader with no sourced list; see `syntheticPrior`). Its `lists` are
+   * plausible 50-card guesses for determinization; `pool` is every card the Leader could run.
+   */
+  synthetic?: true;
+  /** Synthetic only: every Standard-legal, colour-fitting, non-Leader card played in the window. */
+  pool?: string[];
 }
 
+interface FrequencyRow {
+  id: string;
+  decks: number;
+  copies: number;
+  colors?: Color[];
+  category?: CardCategory;
+  standard?: string;
+  limit?: number;
+}
+const FREQUENCY = frequencyJson as unknown as {
+  asOf: string;
+  cards: FrequencyRow[];
+  leaderColors?: Record<string, Color[]>;
+};
+
 /**
- * The archetype prior for a Leader (ARCHITECTURE §4.3): its sourced lists, weighted by recency (the
- * newest list 3, then 2, then 1; ties keep their order). Null for a Leader with no sourced list.
+ * The prior for a Leader nobody has a sourced list for (ARCHITECTURE §4.3): the legal cards of the
+ * Leader's colours, weighted by how often the meta plays them (`cards/data/play-frequency.json`).
+ * A card fits when every one of its colours is one of the Leader's (CR 5-1-2-2); banned and
+ * rotated cards are out.
+ *
+ * - `pool` is every such card: the lethal detector's "any hand" bound reads it, so a hidden card may
+ *   be any of them and the biggest Counter is the biggest of the pool. A wider pool only raises the
+ *   bound, so the detector is more conservative, never less.
+ * - `lists` are three 50-card guesses for determinization, built from the most-played cards at the
+ *   copies the meta runs them (one to four, a restricted card at its limit). The second and third
+ *   defer every third and every second card of the ranking to the end, so the guesses differ.
+ *
+ * A Leader the table does not know (a set newer than the table) is treated as having every colour:
+ * a wide pool, conservative for the detector.
  */
-export function priorFor(leaderId: string): Prior | null {
+function syntheticPrior(leaderId: string): Prior {
+  const colors = FREQUENCY.leaderColors?.[leaderId] ?? [...COLORS];
+  const fits = FREQUENCY.cards
+    .filter(
+      (r) =>
+        r.category !== 'Leader' &&
+        (r.standard === 'legal' || r.standard === 'restricted') &&
+        (r.colors ?? []).every((c) => colors.includes(c)),
+    )
+    .sort((a, b) => b.decks - a.decks || b.copies - a.copies || (a.id < b.id ? -1 : 1));
+  const cap = (r: FrequencyRow) => r.limit ?? 4;
+  const typical = (r: FrequencyRow) =>
+    Math.min(cap(r), Math.max(1, Math.round(r.copies / Math.max(1, r.decks))));
+  const build = (every: number): { id: string; count: number }[] => {
+    const out: { id: string; count: number }[] = [];
+    let n = 0;
+    const take = (r: FrequencyRow) => {
+      const k = Math.min(typical(r), 50 - n);
+      if (k > 0) {
+        out.push({ id: r.id, count: k });
+        n += k;
+      }
+    };
+    const deferred = (i: number) => every > 0 && i % every === every - 1;
+    fits.forEach((r, i) => {
+      if (!deferred(i)) take(r);
+    });
+    fits.forEach((r, i) => {
+      if (deferred(i)) take(r);
+    });
+    // Still short of 50 (a narrow colour pool): more copies of the played cards, up to their limit.
+    for (const c of out) {
+      const r = fits.find((x) => x.id === c.id)!;
+      const k = Math.min(cap(r) - c.count, 50 - n);
+      if (k > 0) {
+        c.count += k;
+        n += k;
+      }
+    }
+    return out;
+  };
+  return {
+    leaderId,
+    archetypeId: `synthetic-${leaderId}`,
+    synthetic: true,
+    pool: fits.map((r) => r.id).sort(),
+    lists: [0, 3, 2].map((every, i) => ({
+      date: FREQUENCY.asOf,
+      weight: 3 - i,
+      cards: build(every),
+    })),
+  };
+}
+
+const SYNTHETIC = new Map<string, Prior>();
+
+/**
+ * The prior for a Leader (ARCHITECTURE §4.3): its sourced lists, weighted by recency (the newest
+ * list 3, then 2, then 1; ties keep their order), else a synthetic prior from play frequency.
+ * Never null.
+ */
+export function priorFor(leaderId: string): Prior {
   const a = ARCHETYPES.find((x) => x.leaderId === leaderId);
-  if (!a || a.lists.length === 0) return null;
+  if (!a || a.lists.length === 0) {
+    let p = SYNTHETIC.get(leaderId);
+    if (!p) SYNTHETIC.set(leaderId, (p = syntheticPrior(leaderId)));
+    return p;
+  }
   const sorted = [...a.lists].sort((x, y) => (x.date < y.date ? 1 : x.date > y.date ? -1 : 0));
   return {
     leaderId,
@@ -82,11 +182,17 @@ export function priorFor(leaderId: string): Prior | null {
   };
 }
 
-/** Every card id in a prior. */
+const listCardIds = (p: Prior): string[] => [
+  ...new Set(p.lists.flatMap((l) => l.cards.map((c) => c.id))),
+];
+
+/**
+ * Every card id a hidden card of this Leader's deck may be: the sourced lists' cards, or a
+ * synthetic prior's whole pool. The app loads these and the lethal bound reads them.
+ */
 export function priorCardIds(leaderId: string): string[] {
   const p = priorFor(leaderId);
-  if (!p) return [];
-  return [...new Set(p.lists.flatMap((l) => l.cards.map((c) => c.id)))].sort();
+  return (p.pool ? [...p.pool] : listCardIds(p)).sort();
 }
 
 /**
@@ -95,14 +201,15 @@ export function priorCardIds(leaderId: string): string[] {
  */
 export function biggestCounter(leaderId: string, cards: ReadonlyMap<string, Card>): number {
   let best = 0;
-  for (const id of priorCardIds(leaderId)) best = Math.max(best, counterValueOf(cards.get(id)));
+  // The lists, not a synthetic pool: "its deck's biggest counter" speaks of a typical list.
+  for (const id of listCardIds(priorFor(leaderId)))
+    best = Math.max(best, counterValueOf(cards.get(id)));
   return best;
 }
 
 /** The average defensive value per card of an archetype (for the heuristic's unknown hands). */
 export function averageCounter(leaderId: string, cards: ReadonlyMap<string, Card>): number {
   const p = priorFor(leaderId);
-  if (!p) return 1000;
   let sum = 0;
   let n = 0;
   for (const l of p.lists)

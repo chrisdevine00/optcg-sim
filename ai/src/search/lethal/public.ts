@@ -101,21 +101,21 @@ export function publicState(
   const me = view.player;
   const def = other(me);
   const leader = view.zones[def].leader[0]?.card ?? '';
-  const prior = leader ? priorFor(leader) : null;
+  const prior = priorFor(leader);
+  // A synthetic prior (no sourced list) widens the pool but keeps the old floor and the
+  // "no sourced list" gap: it can only make a claim more conservative (M6b-7).
+  const sourced = !prior.synthetic;
   // The most one hidden card adds, given the DON!! on their field (public): a Counter that costs
   // DON!! −N counts only if N are there.
   const dn = view.don[def];
   const maxPerCard = defenceBound(
-    prior ? priorCardIds(leader) : [],
+    priorCardIds(leader),
     cards,
     dn.active + dn.rested + dn.given,
     FALLBACK_COUNTER,
+    !sourced,
   ).perCard;
-  const fullProfile = counterProfile(
-    prior ? priorCardIds(leader) : [],
-    cards,
-    prior ? 0 : FALLBACK_COUNTER,
-  );
+  const fullProfile = counterProfile(priorCardIds(leader), cards, sourced ? 0 : FALLBACK_COUNTER);
   const profile: typeof fullProfile =
     model === 'full'
       ? fullProfile
@@ -134,13 +134,14 @@ export function publicState(
   const blank = placeholder(BLANK, 'Unknown card', 'Character', null);
   // A deck holds at most this many copies of the cards that draw: only that many cards from the top
   // of the deck can be a drawing mode (the rest of a chain of draws is finite, as a real one is).
-  const drawCopies = prior
+  // A synthetic pool has no real lists: each drawing card may run its four copies.
+  const drawCopies = sourced
     ? Math.max(
         ...prior.lists.map((l) =>
           l.cards.filter((c) => profile.drawIds.includes(c.id)).reduce((t, c) => t + c.count, 0),
         ),
       )
-    : 0;
+    : Math.min(50, profile.drawIds.length * 4);
   const fill: Record<string, string> = {};
   let hiddenLife = 0;
   let hiddenHand = 0;
@@ -171,10 +172,10 @@ export function publicState(
   return {
     state,
     maxPerCard,
-    noPrior: !prior,
+    noPrior: !sourced,
     rests: profile.rests,
     draws: profile.draws,
-    gaps: [...profile.gaps, ...(prior ? [] : ['no sourced list']), ...handCostGaps(boardIds)],
+    gaps: [...profile.gaps, ...(sourced ? [] : ['no sourced list']), ...handCostGaps(boardIds)],
     hiddenLife,
     hiddenHand,
     plain: plainOf(profile.modes[0]),

@@ -104,8 +104,8 @@ export interface SessionDecision extends Decided {
   stats: { rollouts: number; actions: number; planned: boolean; value?: number };
 }
 
-function withoutBiases(pb: Playbook | null, off: boolean): Playbook | null {
-  return pb && off ? { ...pb, biases: [] } : pb;
+function withoutBiases(pb: Playbook, off: boolean): Playbook {
+  return off ? { ...pb, biases: [] } : pb;
 }
 
 function priorWithout(p: Prior | null, date: string | undefined): Prior | null {
@@ -140,7 +140,10 @@ export class AiSession {
     this.setup = {
       ownDeck: opts.ownDeck,
       cards: opts.cards,
-      playbook: withoutBiases(playbookFor(opts.leader), opts.biases === false),
+      playbook: withoutBiases(
+        playbookFor(opts.leader, opts.ownDeck, opts.cards),
+        opts.biases === false,
+      ),
       prior: priorWithout(priorFor(opts.opponentLeader), opts.priorWithout),
       oppAvgCounter: averageCounter(opts.opponentLeader, opts.cards),
       ...(opts.weights ? { weights: opts.weights } : {}),

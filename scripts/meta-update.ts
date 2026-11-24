@@ -144,7 +144,7 @@ async function main() {
   const t = tally(events, lookup, opts, knownSets);
   const current = JSON.parse(readFileSync(META, 'utf8')) as MetaFile;
   const cand = candidate(current, t, lookup, opts, today);
-  const freq = frequency(t, opts, today);
+  const freq = frequency(t, opts, today, snapshot);
   const body = report({
     cand,
     t,

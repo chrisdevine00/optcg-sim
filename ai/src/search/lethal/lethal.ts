@@ -228,7 +228,7 @@ function run(
     /** Counter effects the model does not know: a proof cannot claim any-hand. */
     gaps: string[];
     hiddenLife: number;
-    prior: ReturnType<typeof priorFor>;
+    prior: ReturnType<typeof priorFor> | null;
     /** Public mode: what the search-free refutation may assume (`bound.ts`); null: no bound. */
     bound: { hand: number; plain: number } | null;
     /**
@@ -413,7 +413,7 @@ export function lethal(
       draws: pub.draws,
       gaps: pub.gaps,
       hiddenLife: pub.hiddenLife,
-      prior: leader ? priorFor(leader) : null,
+      prior: priorFor(leader),
       reducedRoot: reduced ? reduced.state : null,
       bound:
         input.bound === 'off'

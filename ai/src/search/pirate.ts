@@ -1119,22 +1119,23 @@ function mulligan(view: PlayerView, setup: PirateSetup): PirateDecision {
   const action = view.actions.find((a) => a.type === 'mulligan' && a.redraw === !keep)!;
   const m = pb?.mulligan;
   // The guide's rule, one line for what it keeps and one for the seat allowance (copy: <= 30 words).
-  const rule: { text: string; figures: Record<string, number> }[] = m
-    ? [
-        {
-          text: `Its guide keeps a hand with ${m.pieces.map((p) => p.label).join(', and ')}.`,
-          figures: {},
-        },
-        ...(m.secondShort > 0
-          ? [
-              {
-                text: `Going second, ${m.secondShort === 1 ? 'one piece' : `${m.secondShort} pieces`} short is enough.`,
-                figures: {},
-              },
-            ]
-          : []),
-      ]
-    : [{ text: 'It keeps any opening hand.', figures: {} }];
+  const rule: { text: string; figures: Record<string, number> }[] =
+    m && m.pieces.length > 0
+      ? [
+          {
+            text: `${pb?.isDefault ? 'It keeps' : 'Its guide keeps'} a hand with ${m.pieces.map((p) => p.label).join(', and ')}.`,
+            figures: {},
+          },
+          ...(m.secondShort > 0
+            ? [
+                {
+                  text: `Going second, ${m.secondShort === 1 ? 'one piece' : `${m.secondShort} pieces`} short is enough.`,
+                  figures: {},
+                },
+              ]
+            : []),
+        ]
+      : [{ text: 'It keeps any opening hand.', figures: {} }];
   return {
     action,
     explanation: explainMove({

@@ -21,6 +21,7 @@ export {
 export {
   PLAYBOOKS,
   playbookFor,
+  defaultPlaybook,
   ownTurn,
   type Playbook,
   type Bias,
