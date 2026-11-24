@@ -142,3 +142,5 @@ Full text, proposed readings, source auditor IDs and what `rulings.md`/`rules-di
 - EB-05-V2. EB05-014 Shirahoshi: block 5 (product) or X (Limitless)? Both are Standard-legal now, so play is unaffected; check the printed icon on the official list with V1.
 - Five clear upstream defects were settled on Limitless (EB05-029 and EB05-053 missing [Trigger] text, EB05-057 "If your have", EB05-058 accent, EB05-030 and EB05-040 the ♡ in the name); each override says so.
 - OP-17-V1. OP17-037 name: "Are You That Afraid of the New Era?!" (optcgapi) or "…?!!" (Limitless)? Read on the official list; no script depends on it.
+- OP-17-Q1. OP17-007 Kouzuki Oden: does "with 6000 power or less" apply to both "{Land of Wano} type Character card" and "Character card with a type including Whitebeard Pirates", or only the second? Scripted for both (review OP17-R1); a Q&A saying "second only" raises it to severity 3.
+- OP-17-Q2. EB05-052 Gloriosa against a [Double Attack] hit: one "would take damage" for both points (scripted) or one per point (review OP17-R3; joins M6b-Q5 and Q8).

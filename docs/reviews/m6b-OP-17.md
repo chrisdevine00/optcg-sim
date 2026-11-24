@@ -146,3 +146,12 @@ Evidence, from card data (Standard-legal) and this batch:
 - `cards/src/optional-cost.ts` already has `/would (?:be|take)/` for replacements, so the tooling finding in `wave2-cards-scripting.md` is fixed.
 - The four `it.fails` in the suite are the E-Q11 documentation tests (OP17-068, 078, EB05-033, 036); none hides another defect.
 - The independent kits (`kit-op17a.ts`, `kit-op17b.ts`) still accept some "optional" prompts automatically (the EB05-R4 blind spot, in BACKLOG); the OP-17 disagreements do not depend on it, but a missing effect-level "use?" prompt would not be seen by those helpers.
+
+## Fix round (2026-11-24)
+
+- **OP17-R2 (E-Q11):** accepted. `addDon` gets a count choice (most first, as `giveDon`), as a separate engine change with its own planted tests and ENGINE_VERSION bump; `setActive` stays as it is (no counter-example found). The four `it.fails` (OP17-068, OP17-078, EB05-033, EB05-036) become `it` with that change.
+- **OP17-R5:** the author tests of OP17-066 (cost threshold) and OP17-021 (cause) are tightened with the same change.
+- **OP17-R1 (OP17-007 power limit) and OP17-R3 (EB05-052 against Double Attack):** reading questions, added to OPEN-QUESTIONS (OP-17-Q1, M6b-Q5/Q8); scripts unchanged until a ruling.
+- **OP17-R4, R6, R7:** severity 1, accepted as they are (R7 is correct play).
+
+Batch merged to main after the review (runbook step h).
