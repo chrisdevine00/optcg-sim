@@ -45,7 +45,8 @@ function num(n: Num): boolean {
   if ('count' in n) return selector(n.count);
   if ('sum' in n) return n.sum.some(num);
   if ('mul' in n) return num(n.mul[0]);
-  return false; // public counts and stats
+  if ('div' in n) return num(n.div[0]);
+  return false; // public counts and stats (and the number of cards an event moved)
 }
 
 function condition(c: Condition): boolean {

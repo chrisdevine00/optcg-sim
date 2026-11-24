@@ -106,7 +106,18 @@ export type NamedTiming =
   | 'startOfGame';
 export type AutoTiming =
   | NamedTiming
-  | { event: 'cardPlayed'; by: P; filter?: Filter }
+  /**
+   * `from`: where the card was played from (`trash`: "played from your trash"); `via`: how it was
+   * played, `rule` (the normal play from hand), `effect` (any effect) or `characterEffect` (an
+   * effect whose source is a Character) (M6b wave 3, G25).
+   */
+  | {
+      event: 'cardPlayed';
+      by: P;
+      filter?: Filter;
+      from?: 'hand' | 'trash';
+      via?: 'rule' | 'effect' | 'characterEffect';
+    }
   | { event: 'eventActivated'; by: P }
   | { event: 'blockerActivated'; by: P }
   /** "When your Leader … attacks" (`attacker`) or "… is attacked" (`target`). */
@@ -115,7 +126,42 @@ export type AutoTiming =
   | { event: 'donReturned'; owner: P }
   | { event: 'lifeRemoved'; owner: P | 'any' }
   | { event: 'lifeBecameZero'; owner: P }
-  | { event: 'koed'; filter: Filter };
+  | { event: 'koed'; filter: Filter }
+  /**
+   * "When a card is trashed from your hand by an effect" (G22): fires once per instruction with
+   * the number trashed (`{ eventCount }`). `by`: whose effect (relative to the watcher; absent:
+   * either), `sourceFilter`: the effect's source card. A cost trash counts only with `includeCosts`
+   * (M6b-Q31 is open).
+   */
+  | { event: 'trashedFromHand'; owner: P; by?: P; sourceFilter?: Filter; includeCosts?: true }
+  /**
+   * "When this Character becomes rested" (G24): a card of `owner` (or either) goes from active to
+   * rested. Without `by` any cause counts (an effect, a cost, an attack or a block). `by` limits it
+   * to a rest by an effect: any (`effect`), the watcher's (`yourEffect`) or the other player's
+   * (`opponentEffect`); `sourceFilter` is the effect's source card ("by your opponent's
+   * Character's effect"). M6b-Q30 is open.
+   */
+  | {
+      event: 'rested';
+      owner: P | 'any';
+      filter?: Filter;
+      by?: 'effect' | 'yourEffect' | 'opponentEffect';
+      sourceFilter?: Filter;
+    }
+  /**
+   * "When your Character is removed from the field" (G29): a Character or Stage of `owner` leaves
+   * the field by any move (a K.O., trashed, returned to hand or deck; battle, effect, cost or rule).
+   * `cause` limits it to an effect: any (`effect`, a cost included), the watcher's (`yourEffect`)
+   * or the other player's (`opponentEffect`); `to`: where it went. `filter` reads the card where it
+   * now is (printed values, M6b-Q20). `leftField` is the same event.
+   */
+  | {
+      event: 'removed' | 'leftField';
+      owner: P;
+      filter?: Filter;
+      cause?: 'effect' | 'yourEffect' | 'opponentEffect';
+      to?: 'hand' | 'deck' | 'trash';
+    };
 
 export type Condition =
   | { yourTurn: true }
@@ -132,7 +178,18 @@ export type Condition =
   | { did: Label }
   | { all: Condition[] }
   | { any: Condition[] }
-  | { not: Condition };
+  | { not: Condition }
+  /**
+   * `[On K.O.]` and "when this Character is K.O.'d" qualified by the cause (G28): `opponentEffect`
+   * is an effect of the K.O.'d card's controller's opponent, `effect` an effect of either player
+   * (a cost included, as `cause: 'effect'` of a replacement). False when the ability did not
+   * resolve from a K.O.
+   */
+  | { koCause: 'opponentEffect' | 'effect' }
+  /** "A Character of P has been K.O.'d during this turn" (G26): any cause, either player's doing. */
+  | { koedThisTurn: P }
+  /** "P has activated an Event [with a base cost …] during this turn" (G26). */
+  | { eventsActivatedThisTurn: P; baseCost?: Cmp };
 export type CmpOp = '<=' | '>=' | '=' | '<' | '>';
 
 export type Num =
@@ -149,7 +206,11 @@ export type Num =
   | { refCount: Name }
   | { refStat: Name; stat: 'cost' | 'power' | 'basePower' }
   | { sum: Num[] }
-  | { mul: [Num, number] };
+  | { mul: [Num, number] }
+  /** Integer floor of a division: "for every 5 cards in your trash" (G23). The divisor is >= 1. */
+  | { div: [Num, number] }
+  /** The number of cards the event that triggered this ability moved (trashed from hand, G22). */
+  | { eventCount: true };
 
 export type Zone =
   | 'leader'
@@ -248,6 +309,8 @@ export type Cost =
   | { returnDon: number | { n: number; state: 'active' } }
   /** "Give N active DON!! cards to your Leader or 1 of your Characters" as a cost (G7). */
   | { giveDon: { n: number; state: 'active'; to: Selector } }
+  /** "Give 1 of your opponent's rested DON!! cards to 1 of your opponent's Characters" (G20). */
+  | { giveDon: { n: number; state: 'rested'; to: Selector; from: 'opponent' } }
   /**
    * "K.O. 1 of your Characters": a cost that is a real K.O. of one of your own Characters (G1).
    * It is part of the effect (CR 8-1-1), so "cannot be K.O.'d by effects" stops it (RL-16).
@@ -317,9 +380,26 @@ export type Action =
   | { setBasePower: { target: Selector; value: Num; duration: Duration } }
   | { cost: { target: Selector; amount: Num; duration: Duration } }
   | { playCost: { next: Filter; from: 'hand'; amount: number; window: 'thisTurn'; uses: 1 } }
-  | { giveDon: { n: Num; state: 'rested' | 'active'; to: Selector; each?: true } }
+  | {
+      giveDon: {
+        n: Num;
+        /** With `from: 'opponent'`, `any` lets the giver pick active or rested DON!! (G20). */
+        state: 'rested' | 'active' | 'any';
+        to: Selector;
+        each?: true;
+        /**
+         * Give the opponent's DON!! to the opponent's own Leader or Characters (G20): the giver
+         * chooses which DON!! and which card; they return to their owner at Refresh (CR 6-2-3).
+         */
+        from?: 'opponent';
+      };
+    }
   | { addDon: { n: number; state: 'active' | 'rested'; upTo?: true }[] }
-  | { returnDon: { n: Num | 'toMatchOpponent' } }
+  /**
+   * `player: 'opponent'`: the opponent returns n DON!! from their field (they choose which, as many
+   * as they have); `from: 'active'` limits it to their active cost-area DON!! (G27).
+   */
+  | { returnDon: { n: Num | 'toMatchOpponent'; player?: 'opponent'; from?: 'active' } }
   | { grant: { target: Selector; keyword: Keyword; duration: Duration } }
   | { negate: { target: Selector; duration: Duration } }
   | { restrict: { target: Selector | P; what: Restriction; duration: Duration } }
@@ -347,7 +427,12 @@ export type Restriction =
   | { cannotBeRested: { by: 'opponentEffect' } }
   /** This card cannot activate [Blocker] (the blocking side, G10). */
   | 'cannotActivateBlocker'
-  | { cannotPlay: Filter };
+  | { cannotPlay: Filter }
+  /**
+   * "You cannot set DON!! cards as active using Character effects" (G21): a restriction on a
+   * player. The effects of Leaders, Stages and Events stay allowed.
+   */
+  | { cannotSetDonActive: { by: 'characterEffects' } };
 
 export type Continuous =
   | { power: { target: Selector; amount: Num } }

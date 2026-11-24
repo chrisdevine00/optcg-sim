@@ -198,6 +198,7 @@ export function skeletonOf(s: State, viewer: PlayerId): Skeleton {
       State,
       'battle' | 'stack' | 'decision' | 'mods' | 'pending' | 'oncePerTurn' | 'delayed'
     >),
+    ...(s.hist ? { hist: s.hist } : {}),
     v: s.v,
     rng: 0,
     idRng: 0,

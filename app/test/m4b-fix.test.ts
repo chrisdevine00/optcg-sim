@@ -33,6 +33,7 @@ describe('every modifier kind has words (review M4b-12)', () => {
     skipRefresh: true,
     cannotBeRemoved: true,
     cannotDraw: true,
+    cannotSetDon: true,
     cannotPlay: true,
     playCost: true,
   };

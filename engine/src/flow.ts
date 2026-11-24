@@ -35,10 +35,12 @@ import {
   ruleProcessing,
   untapAll,
 } from './ops/index.ts';
+import { recordEvent, recordKo } from './history.ts';
 import {
   other,
   type Cause,
   type DecisionState,
+  type Ev,
   type Frame,
   type Modifier,
   type ReplacementRef,
@@ -352,6 +354,7 @@ function runPlay(d: Draft, f: Extract<Frame, { f: 'play' }>): void {
         const timing = f.counter ? 'counter' : 'main';
         d.emit({ type: 'EventActivated', instance: nid, card: c.card, player: f.player, timing });
         // "When your opponent activates an Event" (OP11-012, OP15-119).
+        recordEvent(d, f.player, def.cost);
         fireActor(d, 'eventActivated', f.player);
         pop(d);
         const ab = def.abilities.find((a) => hasTiming(a, timing));
@@ -391,6 +394,8 @@ function runPlay(d: Draft, f: Extract<Frame, { f: 'play' }>): void {
       return;
     case 'place': {
       const to = def.category === 'Stage' ? 'stage' : 'characters';
+      // Where it is played from (G25): a card taken from a look at the deck is in the deck.
+      const origin = c.zone;
       moveCard(d, f.card, to, { revealed: true, extra: { reason: 'play' } });
       const w = d.wcard(f.card);
       w.played = d.s.turn;
@@ -414,6 +419,13 @@ function runPlay(d: Draft, f: Extract<Frame, { f: 'play' }>): void {
           typeof w === 'object' &&
           w.event === 'cardPlayed' &&
           (w.by === 'you') === (p === f.player) &&
+          (w.from === undefined || w.from === origin) &&
+          (w.via === undefined ||
+            (w.via === 'rule'
+              ? f.via === undefined
+              : w.via === 'effect'
+                ? f.via !== undefined
+                : f.via === 'characterEffect')) &&
           (!w.filter || matches({ s: d.s, you: p, self: card, live: true }, f.card, w.filter)),
         'cardPlayed',
       );
@@ -754,10 +766,12 @@ function runKo(d: Draft, f: Extract<Frame, { f: 'ko' }>): void {
   // No replacement: the K.O. happens (to its owner's trash, CR 10-2-1-2).
   const owner = c.owner;
   d.emit({ type: 'KO', instance: f.card, card: c.card, owner, cause: f.cause });
+  if (d.s.defs[c.card]!.category === 'Character') recordKo(d, owner);
   const nid = leaveField(d, f.card, 'trash', f.cause);
   pop(d);
   // [On K.O.] activates on the field and resolves from the trash, following the rename
-  // (CR 10-2-17-1/-2). A negated card's [On K.O.] does not activate (CR 8-2-1-1; E-Q1).
+  // (CR 10-2-17-1/-2). A negated card's [On K.O.] does not activate (CR 8-2-1-1; E-Q1). The cause
+  // goes with it, for "K.O.'d by your opponent's effect" (G28).
   if (!dv.negated)
     fire(
       d,
@@ -765,6 +779,8 @@ function runKo(d: Draft, f: Extract<Frame, { f: 'ko' }>): void {
       () => [nid],
       (w) => w === 'onKO',
       'onKO',
+      undefined,
+      { cause: f.cause },
     );
   // "When one of your Characters is K.O.'d" (OP14-041): the filter reads the card as it now is in
   // the trash, which has its printed values (a last-known snapshot would only matter for a card
@@ -1084,6 +1100,7 @@ export function fire(
   match: TimingMatch,
   label: string,
   shared?: number,
+  ev?: Ev,
 ): void {
   let added: State['pending'] | null = null;
   let batch = shared ?? -1;
@@ -1097,7 +1114,7 @@ export function fire(
       for (const ab of abilities) {
         if (ab.kind !== 'auto' || !ab.when.some((w) => match(w, id, p))) continue;
         if (ab.oncePerTurn && d.s.oncePerTurn.includes(`${id}/${ab.id}`)) continue;
-        if (!allHold({ s: d.s, you: p, self: id, live: true }, ab.conditions)) continue;
+        if (!allHold({ s: d.s, you: p, self: id, live: true, ev }, ab.conditions)) continue;
         if (batch < 0) batch = d.s.nextMod++;
         (added ??= []).push({
           batch,
@@ -1107,6 +1124,7 @@ export function fire(
           ability: ab.id,
           controller: p,
           timing: label,
+          ...(ev ? { ev } : {}),
         });
       }
     }
@@ -1149,6 +1167,93 @@ hooks.lifeRemoved = (d, owner) => {
     'lifeRemoved',
   );
 };
+
+// A card became rested (G24): "[Your Turn] When this Character becomes rested", "when a Character is
+// rested by your effect". `reason` says how (a rest by an effect, a cost, or the rules: attacking,
+// blocking); `by` is the player whose effect rested it and `source` that effect's card.
+hooks.rested = (d, id, reason, by, source) => {
+  const owner = d.card(id).owner;
+  fire(
+    d,
+    [d.s.active, other(d.s.active)],
+    (q) => fieldCards(d, q),
+    (w, card, p) => {
+      if (typeof w !== 'object' || w.event !== 'rested') return false;
+      if (w.owner !== 'any' && (w.owner === 'you') !== (owner === p)) return false;
+      if (w.by) {
+        if (reason !== 'effect' || by === undefined) return false;
+        if (w.by === 'yourEffect' && by !== p) return false;
+        if (w.by === 'opponentEffect' && by === p) return false;
+      }
+      const c: Ctx = { s: d.s, you: p, self: card, live: true };
+      if (w.sourceFilter) {
+        if (reason !== 'effect' || source === undefined || !d.s.cards[source]) return false;
+        if (!matches(c, source, w.sourceFilter)) return false;
+      }
+      return !w.filter || matches(c, id, w.filter);
+    },
+    'rested',
+  );
+};
+
+// A Character or Stage left the field (G29): "when your Character is removed from the field". The
+// card is read where it went (printed values, M6b-Q20); the watchers are the cards still on a field.
+hooks.removed = (d, info) => {
+  fire(
+    d,
+    [d.s.active, other(d.s.active)],
+    (q) => fieldCards(d, q),
+    (w, card, p) => {
+      if (typeof w !== 'object' || (w.event !== 'removed' && w.event !== 'leftField')) return false;
+      if ((w.owner === 'you') !== (info.owner === p)) return false;
+      if (w.to && w.to !== info.to) return false;
+      if (w.cause) {
+        const c = info.cause;
+        // An effect, or a cost (part of the effect, RL-16); a rule move or a battle is neither.
+        if (c.kind !== 'effect' && c.kind !== 'cost') return false;
+        if (w.cause === 'yourEffect' && c.by !== p) return false;
+        if (w.cause === 'opponentEffect' && (c.kind !== 'effect' || c.by === p)) return false;
+      }
+      return !w.filter || matches({ s: d.s, you: p, self: card, live: true }, info.card, w.filter);
+    },
+    'removed',
+  );
+};
+
+/**
+ * `n` cards were trashed from `owner`'s hand by the effect (or, with `cost`, the cost) of `source`,
+ * controlled by `by` (G22). One event per instruction, so the watchers see the whole number.
+ */
+export function fireTrashedFromHand(
+  d: Draft,
+  owner: PlayerId,
+  n: number,
+  source: InstanceId,
+  by: PlayerId,
+  cost: boolean,
+): void {
+  if (n <= 0) return;
+  fire(
+    d,
+    [d.s.active, other(d.s.active)],
+    (q) => fieldCards(d, q),
+    (w, card, p) => {
+      if (typeof w !== 'object' || w.event !== 'trashedFromHand') return false;
+      if ((w.owner === 'you') !== (owner === p)) return false;
+      if (cost && !w.includeCosts) return false;
+      if (w.by && (w.by === 'you') !== (by === p)) return false;
+      if (w.sourceFilter) {
+        if (!d.s.cards[source]) return false;
+        if (!matches({ s: d.s, you: p, self: card, live: true }, source, w.sourceFilter))
+          return false;
+      }
+      return true;
+    },
+    'trashedFromHand',
+    undefined,
+    { n },
+  );
+}
 
 /** Named-timing shorthand (CR 10-2). */
 export function fireFor(
@@ -1237,6 +1342,9 @@ const TIMING_WORDS: Record<string, string> = {
   donReturned: '(DON!! returned)',
   onBlock: '[On Block]',
   startOfYourTurn: '(start of turn)',
+  rested: '(when rested)',
+  removed: '(removed from the field)',
+  trashedFromHand: '(card trashed from hand)',
 };
 
 export const pendingKey = (e: { card: InstanceId; ability: string }): string =>
@@ -1298,11 +1406,12 @@ function drainPending(d: Draft): boolean {
     timing: next!.timing,
     keys: { instance: next!.key },
   });
-  const opts: { start?: number; delayed?: boolean } = {};
+  const opts: { start?: number; delayed?: boolean; ev?: Ev } = {};
   if (next!.start !== undefined) {
     opts.start = next!.start;
     opts.delayed = true;
   }
+  if (next!.ev) opts.ev = next!.ev;
   pushEffect(d, next!.card, next!.cardId, ab, next!.controller, 'effect', opts);
   return true;
 }

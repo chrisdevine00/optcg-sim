@@ -90,6 +90,8 @@ export function summary(s: State): unknown {
     ),
     mods,
     oncePerTurn: s.oncePerTurn.map(canon),
+    // This turn's K.O.s and Event activations, only in a game where a card reads them (G26).
+    hist: s.hist && s.hist.turn === s.turn ? s.hist : undefined,
     result: s.result,
     rng: s.rng,
   };

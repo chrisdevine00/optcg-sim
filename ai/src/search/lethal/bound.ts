@@ -264,6 +264,8 @@ function numBound(n: unknown): number {
     return numBound(a) * Math.abs(k);
   }
   if ('sum' in o) return (o.sum as unknown[]).reduce<number>((t, x) => t + numBound(x), 0);
+  // A floor division by 1 or more is at most the number (M6b wave 3, G23).
+  if ('div' in o) return numBound((o.div as [unknown, number])[0]);
   if ('count' in o || 'hand' in o) return 20;
   if ('life' in o) return 6;
   if ('trash' in o || 'deck' in o) return 50;

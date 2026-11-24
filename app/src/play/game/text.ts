@@ -82,6 +82,8 @@ export function modifierWords(e: GameEvent): string {
       return `cost ${signed}`;
     case 'cannotDraw':
       return 'cannot draw with effects';
+    case 'cannotSetDon':
+      return 'cannot set DON!! active with Character effects';
     case 'cannotPlay':
       return 'cannot play some cards';
     case 'playCost':

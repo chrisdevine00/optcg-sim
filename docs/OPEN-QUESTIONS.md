@@ -135,6 +135,13 @@ Full text, proposed readings, source auditor IDs and what `rulings.md`/`rules-di
 - M6b-Q38. OP11-092: played Character already gone at end of turn.
 - M6b-Q39. OP09-101: cost that moves an opponent's Character into their Life.
 - M6b-Q40. OP10-022: revealed Life card played; does lifeRemoved fire?
+- M6b-Q41. OP10-036, PRB02-009, OP14-070: "rested by your (opponent's) effect": does a rest paid as a cost count? Built: a `by` qualifier matches a rest by an effect only; leaving `by` out matches every cause (attack, block, cost). Joins Q30.
+- M6b-Q42. OP16-041, OP13-078, OP10-042: a K.O.'d Character's [On K.O.] and the "removed from the field" watchers activate together; whose order? Built: the removal watchers are queued first, as their own batch, then the [On K.O.] (so a player orders them only within a batch).
+- M6b-Q43. OP16-041: is a Character trashed to make room (Character area full, CR 3-7-6-1) "removed from the field"? Built: yes when the timing names no `cause`; no when it names one (a rule move is not an effect).
+- M6b-Q44. OP15-023, OP15-025, OP15-028: "give DON!! from its owner's cost area": who picks active or rested? Built: the giver, asked only when both kinds are there and not all of them go. Joins Q24.
+- M6b-Q45. OP14-065, OP16-074, OP15-059: "your opponent returns N DON!! cards" when they have fewer (as many as they have, built), and OP15-059's "may return 1 of their active DON!!" when they have none active (they cannot return one; not yet decided how the offer reads). The owner chooses which classes (RL, QA-OP16 OP16-074).
+- M6b-Q46. OP12-040, OP14-045/049/056: "a card is trashed from your hand by an effect": one event per trash instruction (built) or per effect resolution (an effect with two trash steps)? Joins Q31 (costs).
+- M6b-Q47. EB04-016, OP10-030: "you cannot set DON!! cards as active using Character effects": built as a restriction on the DON!!'s owner against any Character effect, either player's; no ruling on whose Character effect.
 
 ## EB-05 verification (2026-11-24, runbook step d.1)
 
