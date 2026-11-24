@@ -2,6 +2,27 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-24 — M6b-2 wave 4: G30 to G38, D6, G14 (b) and two backlog items (ENGINE_VERSION 0.5.15)
+
+- **Context:** wave 4 of the M6b-1 audit (`docs/research/m6b-wave4.md`): Life to the trash, looking at the opponent's deck, "can also attack active Characters", base-power swap, `donGiven`, `winGame`, `damage`, a replacement for being rested, `koed` for the opponent, D6 (an Event creates a replacement), one replacement over two events, and two engine gaps found while scripting (`[DON!! xN] [On K.O.]`, `play` from `self`).
+- **Decision:**
+  - A replacement an effect creates is a `replacement` modifier on the controller's Leader that holds the ability as `mod-<id>`. `abilityOf` resolves that id and `collectReplacements` reads `state.mods`, so the offer, the answer, the payload frame and the events are the printed-replacement code.
+  - A rest by an effect goes through a `rest` frame only for a card that has a replacement for it; every other rest is immediate, so no game without such a card changes.
+  - `replaces` may be a list: one ability, one `considered` key, one Once Per Turn. M6b-Q6 stays open; both answers are expressible (a list, or two abilities).
+  - `[DON!! xN] [On K.O.]`: `ev.don` is set only when the K.O.'d card has an `onKO` auto with a `donGiven` condition, so other games' pending effects and hashes are unchanged.
+  - `from: 'self'` plays are checked at run time: `resolving` for a [Trigger], the trash for anything else.
+  - Looking at the opponent's deck is `lookAtTop` with `player: 'opponent'`, no take and `rest: 'stay'`; the validator refuses every other combination.
+  - `damage` is the battle damage frame (a Trigger decision per Life card); `winGame` ends the game at once (M6b-Q50); `swapBasePower` takes two selectors so a Leader and a Character can be swapped (OP14-009).
+  - The lethal bound needed one line (`donGivenToTarget` is at most 10); every new action is unclassified there, so the solver searches.
+- **Rejected:**
+  - A `Keyword` for "can also attack active Characters": the schema's keyword list is printed keywords and card data; a modifier kind keeps it out of the card data.
+  - A single `swapBasePower` selector with `exactly: 2`: it cannot say "your Leader and 1 Character" (OP14-009).
+  - Storing the created replacement in a new state field: the modifier already has the duration, the expiry order and the hash.
+  - Routing every effect rest through a frame: it adds a stack step to every game.
+  - Keeping `ev.don` on every K.O.: it changes every pending effect's hash.
+  - Settling M6b-Q6, Q50 to Q55 now.
+- Goldens re-recorded for the version string only.
+
 ## 2026-11-24 — OP-13 fix round: `cannotPlay` scoped to the hand; "Then" inside failed "If" (ENGINE_VERSION 0.5.14)
 
 - **OP13-R3 (sev 2).** `restrict { cannotPlay: Filter, from?: 'hand' }`: with `from: 'hand'` the bar applies only while the card is in the hand (`playBlocked` reads the card's zone; the modifier carries `from`). The validator accepts only `hand` and rejects any other `from`. OP13-028 Shanks ("you cannot play cards from your hand during this turn") uses it, so a same-turn play from the trash or deck by an effect (OP13-082 Five Elders, probed by the review) is no longer barred. Every other `cannotPlay` script (OP13-023, 118, OP14-024, EB05-021, OP17-085, 092) has no zone in its text and keeps the any-means bar. Settles M6b-Q33. Planted `engine/test/cards/m4b/actions.test.ts` ("cannot play cards from your hand"): the hand barred and the trash play allowed with the scope, both barred without it, validator rejects `from: 'trash'`; with the zone check removed the first test fails.

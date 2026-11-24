@@ -12,6 +12,7 @@ import { hasTiming, optionalCost } from '../abilities.ts';
 import type { Draft } from '../draft.ts';
 import {
   abilityOf,
+  collectReplacements,
   fireEvent,
   fireTrashedFromHand,
   pop,
@@ -24,6 +25,7 @@ import {
 import {
   addModifier,
   draw,
+  endGame,
   leaveField,
   lifeToHand,
   markKnown,
@@ -671,6 +673,17 @@ function payCost(d: Draft, f: EffectFrame, k: Cost, reserve: number): Out {
     d.emit({ type: 'LifeTurnedFaceDown', player: f.controller, count: ids.length });
     return 'next';
   }
+  if ('trashLife' in k) {
+    // "Trash N cards from the top of your Life cards" (G30): not damage, so no [Trigger]; each card
+    // goes face up to the trash and the Life watchers (`lifeRemoved`) fire as for any Life move.
+    if (d.ro(f.controller).life.length < k.trashLife) return anomaly(d, f, 'trashLife');
+    for (let i = 0; i < k.trashLife; i++)
+      moveCard(d, d.ro(f.controller).life[0]!, 'trash', {
+        revealed: true,
+        extra: { reason: 'cost' },
+      });
+    return 'next';
+  }
   if ('mill' in k) {
     if (d.ro(f.controller).deck.length < k.mill) return anomaly(d, f, 'mill');
     for (let i = 0; i < k.mill; i++)
@@ -1064,6 +1077,12 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
   }
   if ('move' in a) return move(d, f, a.move.what, a.move.to);
   if ('play' in a) {
+    // "Play this card" (`from: 'self'`) plays the source from the place its text names: a [Trigger]
+    // card is in the `resolving` slot, an [On K.O.] card in the trash. A cost that moved the card
+    // elsewhere (the deck bottom, the hand) leaves nothing to play (BACKLOG OP-15, found on OP15-080).
+    const zonesOf = Array.isArray(a.play.what.from) ? a.play.what.from : [a.play.what.from];
+    const selfZone =
+      abilityOf(d.s, f.cardId, f.ability)?.kind === 'trigger' ? 'resolving' : 'trash';
     const ids = select(d, f, a.play.what, {
       role: 'target',
       verb: 'play',
@@ -1072,6 +1091,7 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
       // cannot be chosen.
       restrict: (id) => {
         const cat = d.s.defs[d.card(id).card]!.category;
+        if (zonesOf.includes('self') && d.card(id).zone !== selfZone) return false;
         return (cat === 'Character' || cat === 'Stage') && !playBlocked(d.s, you, id);
       },
     });
@@ -1119,8 +1139,23 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
     }
     const ids = select(d, f, a.rest, { role: 'target', verb: 'rest' });
     if (ids === WAIT) return WAIT;
-    for (const id of ids)
-      if (FIELD.has(d.card(id).zone) && rest(d, id, 'effect', you, f.card)) f.acted = true;
+    // A card that has a replacement for being rested by this effect goes through a `rest` frame,
+    // which offers it (G37); every other card is rested at once.
+    const held: InstanceId[] = [];
+    for (const id of ids) {
+      if (!FIELD.has(d.card(id).zone)) continue;
+      const cd = d.card(id);
+      if (
+        !cd.rested &&
+        !restBlocked(dvOf(c, id), cd.owner, 'effect', you) &&
+        collectReplacements(d.s, id, 'rest', { kind: 'effect', by: you }, [], f.card).length > 0
+      ) {
+        held.push(id);
+        f.acted = true;
+      } else if (rest(d, id, 'effect', you, f.card)) f.acted = true;
+    }
+    for (const id of held.slice().reverse())
+      push(d, { f: 'rest', card: id, by: you, source: f.card, considered: [] });
     return 'next';
   }
   if ('skipRefresh' in a) {
@@ -1144,13 +1179,13 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
     const ids = select(d, f, a.cost.target, { role: 'target', verb: 'choose' });
     if (ids === WAIT) return WAIT;
     const du = duration(d, f, a.cost.duration);
-    const amount = num(c, a.cost.amount);
     for (const id of ids)
       if (FIELD.has(d.card(id).zone))
         addModifier(d, {
           kind: 'cost',
           target: id,
-          amount,
+          // Read once per target: "for every DON!! card given to that Character" (G34).
+          amount: num({ ...c, target: id }, a.cost.amount),
           duration: du,
           controller: you,
           source: f.card,
@@ -1173,8 +1208,108 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
     return 'next';
   }
   if ('giveDon' in a) return giveDon(d, f, a.giveDon);
+  if ('damage' in a) {
+    // "You take N damage" / "deal N damage to your opponent" (G36): the same damage frame as a
+    // battle hit, so the top Life card goes to the hand unless its [Trigger] is activated, and 0
+    // Life defeats (RL-22). The effect resumes when the frame is done.
+    const who = rel(c, a.damage.player);
+    const n = Math.max(0, num(c, a.damage.n));
+    if (n > 0) {
+      d.emit({ type: 'DamageDealt', player: who, amount: n, by: you, effect: true });
+      push(d, {
+        f: 'damage',
+        player: who,
+        remaining: n,
+        banish: false,
+        battle: false,
+        by: you,
+        pending: null,
+      });
+      f.acted = true;
+    }
+    return 'next';
+  }
+  if ('winGame' in a) {
+    // "You win the game" (G35): at once, ahead of any defeat not yet processed (M6b-Q50).
+    endGame(d, { winner: you, reason: 'card effect' });
+    return 'next';
+  }
+  if ('swapBasePower' in a) {
+    // "Select 2 ... Swap their base power" (G33): `a`, then `b` (never the same card), then each
+    // takes the other's base power as it is now.
+    const sw = a.swapBasePower;
+    if (sw.duration === 'battle' && !d.s.battle) return 'next';
+    if (f.ph !== 1) {
+      const first = select(d, f, sw.a, { role: 'target', verb: 'choose' });
+      if (first === WAIT) return WAIT;
+      if (first.length === 0) return 'next';
+      f.tmp = { ...f.tmp, sel: first };
+      f.ph = 1;
+    }
+    const ida = f.tmp?.sel?.[0];
+    if (ida === undefined) return 'next';
+    const second = select(d, f, sw.b, {
+      role: 'target',
+      verb: 'choose',
+      restrict: (id) => id !== ida,
+    });
+    if (second === WAIT) return WAIT;
+    const idb = second[0];
+    if (idb === undefined || !FIELD.has(d.card(ida).zone) || !FIELD.has(d.card(idb).zone))
+      return 'next';
+    const pa = dvOf(c, ida).basePower;
+    const pb = dvOf(c, idb).basePower;
+    if (pa === null || pb === null) return 'next';
+    const du = duration(d, f, sw.duration);
+    const base = { duration: du, controller: you, source: f.card, kind: 'basePower' } as const;
+    addModifier(d, { ...base, target: ida, amount: pb });
+    addModifier(d, { ...base, target: idb, amount: pa });
+    f.acted = true;
+    return 'next';
+  }
+  if ('canAttackActive' in a) {
+    // "Can also attack active Characters during this turn" (G32).
+    const ids = select(d, f, a.canAttackActive.target, { role: 'target', verb: 'choose' });
+    if (ids === WAIT) return WAIT;
+    const du = duration(d, f, a.canAttackActive.duration);
+    for (const id of ids)
+      if (FIELD.has(d.card(id).zone)) {
+        addModifier(d, {
+          kind: 'attackActive',
+          target: id,
+          amount: 0,
+          duration: du,
+          controller: you,
+          source: f.card,
+        });
+        f.acted = true;
+      }
+    return 'next';
+  }
+  if ('addReplacement' in a) {
+    // A replacement the effect creates for the rest of the turn (D6): kept in a modifier on the
+    // controller's Leader, read by `collectReplacements` like a printed one (ability `mod-<id>`).
+    const r = a.addReplacement;
+    const id = d.s.nextMod;
+    addModifier(d, {
+      kind: 'replacement',
+      target: d.ro(you).leader,
+      amount: 0,
+      duration: duration(d, f, r.duration),
+      controller: you,
+      source: f.card,
+      ab: {
+        id: `mod-${id}`,
+        kind: 'replacement',
+        replaces: r.replaces,
+        optional: r.optional,
+        instead: r.instead,
+      } as Ability,
+    });
+    return 'next';
+  }
   if ('trashLifeUntil' in a) {
-    // "Trash cards from the top of your Life cards until you have 1 Life card."
+    // "Trash cards from the top of your Life cards until you have 1 Life card.
     while (d.ro(you).life.length > a.trashLifeUntil)
       moveCard(d, d.ro(you).life[0]!, 'trash', { revealed: true, extra: { reason: 'life' } });
     return 'next';
@@ -1279,7 +1414,12 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
     for (const id of ids) {
       if (!FIELD.has(d.card(id).zone)) continue;
       const base = { target: id, duration: du, controller: you, source: f.card };
-      if ('power' in a) addModifier(d, { ...base, kind: 'power', amount: num(c, a.power.amount) });
+      if ('power' in a)
+        addModifier(d, {
+          ...base,
+          kind: 'power',
+          amount: num({ ...c, target: id }, a.power.amount),
+        });
       else if ('setBasePower' in a)
         addModifier(d, { ...base, kind: 'basePower', amount: num(c, a.setBasePower.value) });
       else if ('grant' in a)
@@ -1604,23 +1744,35 @@ function move(
     return 'next';
   }
   if (zones.length === 1 && zones[0] === 'lifeTop') {
-    // "Add up to 1 card from the top of your opponent's Life cards to the owner's hand." Not damage:
-    // no [Trigger] (QA-GR). "Up to" may be declined, and it reveals nothing, so it is asked.
-    const owner = rel(ctxOf(d, f), what.owner === 'opponent' ? 'opponent' : 'you');
-    const life = d.ro(owner).life;
-    if (life.length === 0) return 'next';
+    // "Add up to 1 card from the top of your opponent's Life cards to the owner's hand," or (G30)
+    // "trash 1 card from the top of your (opponent's, each of your and your opponent's) Life
+    // cards". Not damage: no [Trigger] (QA-GR). "Up to" may be declined, and it reveals nothing, so
+    // it is asked; a trashed card goes face up.
+    const toTrash = to.zone === 'trash';
+    const owners =
+      what.owner === 'any'
+        ? [you, other(you)]
+        : [rel(ctxOf(d, f), what.owner === 'opponent' ? 'opponent' : 'you')];
+    const owner = owners[0]!;
     const mandatory = !what.pick || 'exactly' in what.pick;
+    // With every player's Life in play, only the players that have a Life card are asked about.
+    if (owners.every((p) => d.ro(p).life.length === 0)) return 'next';
     const g = mandatory ? true : take(f);
     if (g === undefined)
       return ask(d, f, {
         kind: 'optional',
         player: you,
-        prompt: `${nameOf(d, f)}: add the top card of ${owner === you ? 'your' : "your opponent's"} Life cards to ${owner === you ? 'your' : 'their'} hand?`,
+        prompt: `${nameOf(d, f)}: ${toTrash ? 'trash' : 'add'} the top card of ${owner === you ? 'your' : "your opponent's"} Life cards${toTrash ? '' : ` to ${owner === you ? 'your' : 'their'} hand`}?`,
         role: 'use',
       });
     if (g === true) {
-      moveCard(d, life[0]!, 'hand', { extra: { reason: 'life' } });
-      f.acted = true;
+      for (const p of owners) {
+        const top = d.ro(p).life[0];
+        if (top === undefined) continue;
+        if (toTrash) moveCard(d, top, 'trash', { revealed: true, extra: { reason: 'effect' } });
+        else moveCard(d, top, 'hand', { extra: { reason: 'life' } });
+        f.acted = true;
+      }
     }
     return 'next';
   }
@@ -1880,12 +2032,22 @@ function lookAtTop(
       secret: true,
     });
   }
+  if (spec.rest === 'stay') {
+    // Look only (G31): nothing is taken and nothing moves. The looker remembers the cards (the
+    // opponent's deck included) until they move or the deck is shuffled; the other player is told
+    // only that a look happened (`CardsLooked`).
+    markKnown(d, look, [f.controller]);
+    delete f.look;
+    return 'next';
+  }
   if (spec.rest === 'trash') {
     // "Then, trash the rest" (OP17-080): face up, public.
     for (const id of look) moveCard(d, id, 'trash', { revealed: true, extra: { reason: 'look' } });
     delete f.look;
     return 'next';
   }
+  // `topAnyOrder` (G31): back on top, in an order chosen; the top-or-bottom question is skipped.
+  if (spec.rest === 'topAnyOrder') tmp.top = true;
   // The rest: optionally top or bottom (OP17-050: all together, QA-OP17), in an order chosen.
   if (spec.rest === 'topOrBottomAnyOrder' && tmp.top === undefined && look.length > 0) {
     const g = take(f);

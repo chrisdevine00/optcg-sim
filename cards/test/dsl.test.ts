@@ -179,12 +179,12 @@ describe('validateScript rejects shapes the runtime would get wrong (M4a-07)', (
       },
     ],
     [
-      'the top Life card to the trash',
+      'the top Life card to the deck',
       {
         do: {
           move: {
             what: { from: 'lifeTop', owner: 'you', pick: { upTo: 1 } },
-            to: { zone: 'trash' },
+            to: { zone: 'deck', position: 'top' },
           },
         },
       },
@@ -239,7 +239,7 @@ describe('validateScript rejects shapes the runtime would get wrong (M4a-07)', (
       { do: { trashFromHand: { from: 'trash', owner: 'you', pick: { exactly: 1 } } } },
     ],
     [
-      "look at the opponent's deck",
+      "look at the opponent's deck and move it",
       { do: { lookAtTop: { n: 3, player: 'opponent', take: [], rest: 'bottomAnyOrder' } } },
     ],
   ];

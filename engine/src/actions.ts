@@ -324,7 +324,7 @@ function checkAttack(
   const t = s.cards[target];
   if (!t || t.owner === p || (t.zone !== 'leader' && t.zone !== 'characters'))
     return r("You can attack only your opponent's Leader or Characters.", 'CR 7-1');
-  if (t.zone === 'characters' && !t.rested)
+  if (t.zone === 'characters' && !t.rested && !dv.attackActive)
     return r("Active Characters can't be attacked.", 'CR 7-1-1-2');
   if (isSick && !kw.includes('Rush') && t.zone === 'leader')
     return r(

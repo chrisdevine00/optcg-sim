@@ -269,7 +269,8 @@ function numBound(n: unknown): number {
   if ('count' in o || 'hand' in o) return 20;
   if ('life' in o) return 6;
   if ('trash' in o || 'deck' in o) return 50;
-  if ('donOnField' in o || 'donGiven' in o) return 10;
+  // DON!! given to one card: at most the 10 a player owns (M6b wave 4, G34).
+  if ('donOnField' in o || 'donGiven' in o || 'donGivenToTarget' in o) return 10;
   if ('turnIndex' in o) return 30;
   if ('refCount' in o) return 10;
   if ('refStat' in o) return 20_000;

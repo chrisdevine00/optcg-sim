@@ -134,7 +134,14 @@ export type ModKind =
   /** On a player's Leader: that player cannot play cards matching `filter` (OP13-118). */
   | 'cannotPlay'
   /** On a player's Leader: the next play from hand matching `filter` costs `amount` more (OP12-061). */
-  | 'playCost';
+  | 'playCost'
+  /** This card can also attack active Characters (M6b wave 4 G32). */
+  | 'attackActive'
+  /**
+   * On the controller's Leader: a replacement an effect created for a while (D6, `ab`). It is offered
+   * for K.O.s and removals like a printed one, as the ability `mod-<id>`.
+   */
+  | 'replacement';
 
 export interface Modifier {
   id: number;
@@ -146,6 +153,8 @@ export interface Modifier {
   keyword?: string;
   /** For `cannotPlay` and `playCost`: which cards. */
   filter?: Filter;
+  /** For `replacement`: the replacement ability, whose id is `mod-<id>` (D6). */
+  ab?: Ability;
   /** For `cannotPlay`: only plays of a card in the hand are barred (M6b-Q33). Absent: any play. */
   from?: 'hand';
   /**
@@ -177,6 +186,8 @@ export interface Cause {
 export interface Ev {
   cause?: Cause;
   n?: number;
+  /** The DON!! given to the K.O.'d card when it left the field, for `[DON!! xN] [On K.O.]`. */
+  don?: number;
 }
 
 /**
@@ -252,6 +263,11 @@ export type Frame =
       zero?: true;
     }
   | { f: 'ko'; card: InstanceId; cause: Cause; considered: string[]; group?: number }
+  /**
+   * A rest by an effect, held while a replacement for it may be offered (G37). `by` is the player
+   * whose effect rests it and `source` that effect's card.
+   */
+  | { f: 'rest'; card: InstanceId; by: PlayerId; source: InstanceId; considered: string[] }
   | { f: 'trigger'; card: InstanceId; player: PlayerId; step: 'run' | 'finish' }
   | {
       f: 'effect';

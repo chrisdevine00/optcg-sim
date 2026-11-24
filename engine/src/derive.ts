@@ -46,6 +46,8 @@ export interface Derived {
   cannotBeRestedByOpp: boolean;
   /** This card cannot activate [Blocker] (G10). */
   cannotBlock: boolean;
+  /** This card can also attack active Characters (G32). */
+  attackActive: boolean;
 }
 
 /** `Derived.koShield` bits. */
@@ -227,6 +229,7 @@ function compute(s: State, id: InstanceId, mods: Modifier[] | undefined): Derive
   let cannotBeRested = false;
   let cannotBeRestedByOpp = false;
   let cannotBlock = false;
+  let attackActive = false;
   if (mods && mods.length > 0) {
     let extra = 0;
     let costDelta = 0;
@@ -259,6 +262,9 @@ function compute(s: State, id: InstanceId, mods: Modifier[] | undefined): Derive
           break;
         case 'cannotBlock':
           cannotBlock = true;
+          break;
+        case 'attackActive':
+          attackActive = true;
           break;
         case 'cannotAttack':
           cannotAttack = true;
@@ -305,6 +311,7 @@ function compute(s: State, id: InstanceId, mods: Modifier[] | undefined): Derive
     cannotBeRested,
     cannotBeRestedByOpp,
     cannotBlock,
+    attackActive,
   };
 }
 
