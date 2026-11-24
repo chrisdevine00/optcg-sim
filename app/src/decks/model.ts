@@ -53,7 +53,13 @@ export interface CheckRow {
   cards: string[];
 }
 
-const ROWS: { label: (d: SavedDeck) => string; rule: string; codes: DeckIssueCode[] }[] = [
+const ROWS: {
+  label: (d: SavedDeck) => string;
+  rule: string;
+  codes: DeckIssueCode[];
+  /** Shown only when it fails (a rule only some Leaders have). */
+  onlyOnIssue?: true;
+}[] = [
   {
     label: (d) => `${DECK_SIZE} cards (${d.main.length})`,
     rule: 'CR 5-1-2',
@@ -61,6 +67,12 @@ const ROWS: { label: (d: SavedDeck) => string; rule: string; codes: DeckIssueCod
   },
   { label: () => `Max ${MAX_COPIES} per card number`, rule: 'CR 5-1-2-3', codes: ['copies'] },
   { label: () => 'Colours match Leader', rule: 'CR 5-1-2-2', codes: ['color'] },
+  {
+    label: () => "Leader's deck-building rule",
+    rule: 'card rules text',
+    codes: ['deckRestriction'],
+    onlyOnIssue: true,
+  },
   {
     label: () => `No banned cards or pairs${BAN_LIST ? ` (list from ${BAN_LIST})` : ''}`,
     rule: 'official ban list',
@@ -76,17 +88,19 @@ const ROWS: { label: (d: SavedDeck) => string; rule: string; codes: DeckIssueCod
 
 /** The check rows at the deck's top (F17 step 2), each with what fails. */
 export function checkRows(d: SavedDeck, issues: readonly DeckIssue[]): CheckRow[] {
-  return ROWS.map((r) => {
-    const mine = issues.filter((i) => r.codes.includes(i.code));
-    const errors = mine.filter((i) => i.severity === 'error');
-    return {
-      label: r.label(d),
-      rule: r.rule,
-      ok: errors.length === 0,
-      detail: mine.map((i) => i.message),
-      cards: [...new Set(mine.flatMap((i) => i.cards))],
-    };
-  });
+  return ROWS.filter((r) => !r.onlyOnIssue || issues.some((i) => r.codes.includes(i.code))).map(
+    (r) => {
+      const mine = issues.filter((i) => r.codes.includes(i.code));
+      const errors = mine.filter((i) => i.severity === 'error');
+      return {
+        label: r.label(d),
+        rule: r.rule,
+        ok: errors.length === 0,
+        detail: mine.map((i) => i.message),
+        cards: [...new Set(mine.flatMap((i) => i.cards))],
+      };
+    },
+  );
 }
 
 export const blocking = (issues: readonly DeckIssue[]) =>

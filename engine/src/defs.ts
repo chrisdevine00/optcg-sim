@@ -2,7 +2,7 @@
  * Card definitions copied into state, so `reduce(state, action)` needs no lookup (ARCHITECTURE §2.1:
  * card data is injected at game start and the state stays self-contained plain JSON).
  */
-import { SCRIPTS, scriptReady, type Card } from '@optcg/cards';
+import { SCRIPTS, scriptReady, type Card, type RulesClause } from '@optcg/cards';
 import type { Ability } from './abilities.ts';
 import type { CardId, CardLookup } from './api.ts';
 import type { Def } from './state.ts';
@@ -14,6 +14,17 @@ import type { Def } from './state.ts';
 export const RULES_CLAUSES: Readonly<Record<CardId, { donDeckSize?: number }>> = {
   // OP15-058 Enel: "Under the rules of this game, your DON!! deck consists of 6 cards" (RL-40).
   'OP15-058': { donDeckSize: 6 },
+};
+
+/**
+ * Deck-construction clauses (G12), for decks checked before any script is loaded (the builder).
+ * `deckRulesOf` (deck.ts) reads a loaded script first; a test keeps this table and the scripts equal.
+ */
+export const DECK_RULES: Readonly<Record<CardId, RulesClause[]>> = {
+  // OP12-001 Silvers Rayleigh: "you cannot include cards with a cost of 5 or more in your deck".
+  'OP12-001': [{ deckRestriction: { cost: { gte: 5 } } }],
+  // OP16-042 Prisoner of Impel Down: "you may have any number of this card in your deck".
+  'OP16-042': [{ anyNumberInDeck: true }],
 };
 
 export const STANDARD_DON = 10;

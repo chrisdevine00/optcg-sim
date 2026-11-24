@@ -307,7 +307,9 @@ export function describeMove(
         if (e.to === 'donDeck') bits.push(`Return ${String(e.count)} DON!! to the DON!! deck`);
         break;
       case 'ReplacementApplied':
-        bits.push(`${name(e.card)}: replaces the ${e.replaced === 'ko' ? 'K.O.' : 'removal'}`);
+        bits.push(
+          `${name(e.card)}: replaces ${e.replaced === 'ko' ? 'the K.O.' : e.replaced === 'damage' ? 'the damage' : 'the removal'}`,
+        );
         break;
       case 'SetActive':
         if (typeof e.don === 'number') bits.push(`Set ${String(e.don)} DON!! active`);
@@ -503,6 +505,7 @@ export function scriptCostText(costs: readonly Cost[] | undefined): string {
       if ('turnLifeFaceDown' in k) return `turn ${k.turnLifeFaceDown} Life face-down`;
       if ('restSelf' in k) return 'rest this card';
       if ('trashSelf' in k) return 'trash this card';
+      if ('oneOf' in k) return k.oneOf.map((a) => scriptCostText(a)).join(' or ');
       return '';
     })
     .filter(Boolean)

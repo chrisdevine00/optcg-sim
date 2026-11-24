@@ -9,7 +9,13 @@ import type { Ability, EStep, InternalStep } from '../abilities.ts';
 import { isInternal } from '../abilities.ts';
 
 export type Instr =
-  | { k: 'pay'; cost: Cost }
+  /** `list` and `at`: the flattened cost list of an alternative this payment belongs to (G19). */
+  | { k: 'pay'; cost: Cost; list?: readonly Cost[]; at?: number }
+  /**
+   * "A or B" costs (G19): choose among the alternatives that can be paid (`alts`, each the whole
+   * cost list with that alternative in place), then jump to its payments (`to`).
+   */
+  | { k: 'alt'; alts: Cost[][]; to: number[] }
   /** Costs are paid: the effect proper starts here (CR 8-4-1 (4)). */
   | { k: 'paid' }
   /** `label`: "if you do" can read whether this action did something (OP08-098). */
@@ -54,7 +60,29 @@ function build(ab: Ability, part: 'effect' | 'instead'): Instr[] {
     return out;
   }
   if (ab.kind === 'permanent' || ab.kind === 'replacement') return [{ k: 'end' }];
-  for (const c of ab.cost ?? []) out.push({ k: 'pay', cost: c });
+  const cost = ab.cost ?? [];
+  const at = cost.findIndex((c) => 'oneOf' in c);
+  if (at < 0) for (const c of cost) out.push({ k: 'pay', cost: c });
+  else {
+    // The choice comes first; each alternative then has its own straight list of payments, so
+    // the DON!! a later cost needs are reserved from the costs that really follow (G19).
+    const alts = (cost[at] as Extract<Cost, { oneOf: unknown }>).oneOf.map((a) => [
+      ...cost.slice(0, at),
+      ...a,
+      ...cost.slice(at + 1),
+    ]);
+    const alt: Instr = { k: 'alt', alts, to: [] };
+    out.push(alt);
+    const ends: Instr[] = [];
+    for (const list of alts) {
+      alt.to.push(out.length);
+      list.forEach((c, i) => out.push({ k: 'pay', cost: c, list, at: i }));
+      const j: Instr = { k: 'jmp', to: -1 };
+      out.push(j);
+      ends.push(j);
+    }
+    for (const j of ends) if (j.k === 'jmp') j.to = out.length;
+  }
   out.push({ k: 'paid' });
   steps(out, ab.effect);
   out.push({ k: 'end' });

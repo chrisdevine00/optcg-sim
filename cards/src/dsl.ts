@@ -137,7 +137,7 @@ export type CmpOp = '<=' | '>=' | '=' | '<' | '>';
 
 export type Num =
   | number
-  | { count: Selector }
+  | { count: Selector; distinctNames?: true }
   | { life: P | 'both' }
   | { hand: P }
   | { trash: P }
@@ -208,6 +208,8 @@ export type Filter =
   | { typeIncludes: string }
   /** An exact card name (CR 2-1-2). */
   | { name: string }
+  /** "a card name including \"Ace\"": a substring of the card name (CR 2-1-2, M6b wave 2, G13). */
+  | { nameIncludes: string }
   | { color: Color }
   /** A printed attribute: "Characters with the <Slash> attribute" (M6b wave 1, G3). */
   | { attribute: Attribute }
@@ -251,7 +253,12 @@ export type Cost =
    * It is part of the effect (CR 8-1-1), so "cannot be K.O.'d by effects" stops it (RL-16).
    */
   | { ko: Selector }
-  | { move: Selector; to: Dest };
+  | { move: Selector; to: Dest }
+  /**
+   * "A or B": the player pays one of the alternatives, a list of costs each (G19). Payable when
+   * any alternative is; a choice is asked only when more than one can be paid.
+   */
+  | { oneOf: Cost[][] };
 
 export type Duration =
   'battle' | 'thisTurn' | 'untilEndOfOpponentsNextTurn' | 'untilStartOfYourNextTurn';
@@ -280,7 +287,9 @@ export interface Take {
   pick: Pick;
   filter?: Filter;
   reveal?: true;
-  to: 'hand' | 'lifeTop';
+  /** `play`: play the taken Characters for free, rested with `rested` (G17). */
+  to: 'hand' | 'lifeTop' | 'play';
+  rested?: true;
 }
 
 export type Action =
@@ -353,7 +362,18 @@ export type Continuous =
   | { lockAttackTarget: { attacker: P; only: Selector } }
   | { tiers: { when: Condition; apply: Continuous[] }[] };
 
-export type ReplaceEvent = { ko: Selector } | { leaveField: Selector; cause: 'opponentEffect' };
+/**
+ * What a replacement replaces. `ko` without a `cause` replaces every K.O. of the matched cards; with
+ * one, only that cause (`effect`: an effect of either player or a cost; `opponentEffect`: an effect
+ * of the card owner's opponent; `battle`). `leaveField` is a removal from the field: by the owner's
+ * opponent's effect (`opponentEffect`), or by any cause, a battle K.O. and your own effects included
+ * (`any`, G14). `damage` replaces damage to the controller of the replacing card (D4); the
+ * replacement's payload happens instead and no Life card is taken (CR 4-6-3-1, rules-digest 103).
+ */
+export type ReplaceEvent =
+  | { ko: Selector; cause?: 'opponentEffect' | 'effect' | 'battle' }
+  | { leaveField: Selector; cause: 'opponentEffect' | 'any' }
+  | { damage: 'you' };
 
 /**
  * Hash of a card's verified text, for `CardScript.textHash`. cyrb53 over the effect and trigger

@@ -59,6 +59,7 @@ export type {
   ReplaceEvent,
   ReplacementAbility,
   Restriction,
+  RulesClause,
   Selector,
   Step,
   Take,
