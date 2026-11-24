@@ -83,7 +83,8 @@ describe('meta-list cards (PLAN M1 done criteria)', () => {
         o.sources.some((s) => s.url.startsWith('https://onepiece.limitlesstcg.com/cards/')),
       ).toBe(true);
     }
-  });
+    // Reads every override file: slow under heavy machine load (timed out at 5 s with six agents running).
+  }, 30_000);
 
   it('every scripted card is verified (none scripted yet)', () => {
     const scripted = loadScriptIndex(new URL('effects/', root).pathname);
