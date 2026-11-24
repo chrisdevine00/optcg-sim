@@ -1,0 +1,115 @@
+# M6b review: OP-14 scripting batch 7 (89 new scripts)
+
+**Reviewer:** independent adversarial review (subagent). Brief: find what is wrong; no stake in the scripts.
+**Build reviewed:** worktree branch merged with the lead's local `main` (`4a251fe`, contains `engine/test/independent/cards/op14/` and the empty-pick investigation `1026413`), `npm ci`. No repository code was changed: every temporary edit (a deck override in `engine/test/support/decks.ts`, the mutation edits, scratch tests and an AI harness, all prefixed `op14rev-`) was reverted or deleted; `git status` is clean apart from this file, which is the only commit.
+
+**Rule:** severity 4 = hidden-information leak or wrong game result; 3 = rules error that changes play, or blocking defect; 2 = notable defect; 1 = nit. Any 3 or 4 fails.
+
+**Verdict: FAIL.** One severity 3 (OP14-R1: OP14-111 Perona's [On K.O.] "cannot attack until the end of your opponent's next End Phase" lasts through the opponent's whole next turn when Perona is K.O.'d on the opponent's turn, which is the usual case; OP14-082 in the same batch gets the same duration right). No severity 4. Two severity 2 (the open "set up to N DON!!" disagreement A-1, which is real; the "trashed from your hand by an effect" cost reading that contradicts rules-digest 112), three severity 1. Both group-B and group-D "leaks" (OP14-052, OP14-116) are test-helper artifacts, confirmed by my own two-position probes. 89 of 89 scripts compared with the verified text; apart from R1 nothing differs in a cost, number, filter, owner, zone, "up to", "you may", "Then" gating, once-per-turn or printed keyword.
+
+## Method
+
+1. Listed the scripts: 101 files in `cards/effects/OP-14/`, of which 89 have independent tests (the new batch) and 12 are older (OP14-019, 022, 031, 041, 096, 104, 105, 107, 108, 112, 114, 118). Dumped every script (all 101) beside its verified text in `cards/data/sets/OP-14.json` (a throwaway `tsx` dump of the loaded `CardScript` objects, not the source text) and compared clause by clause. Checked by script: `textHash`, printed keywords of script, override (`cards/overrides/OP14-*.json`, all `verified: true`) and card data agree for all 101; every `name` filter ([Basil Hawkins], [Monkey.D.Luffy], [Kuro], [Dracule Mihawk], [Jinbe], [Miss.Valentine(Mikita)], [Mr.2.Bon.Kurei(Bentham)], [Hurry Up and Make Me the Pirate King!], [Disappointed?], [Dr. Hogback]) exists in the data with exactly that spelling.
+2. Read the four `OP-14-scripting-g*.md`, DISAGREEMENTS-a..d, API-GAPS-a..d, rules-digest (112, 121-122), rulings (RL-11, RL-16, RL-52), `m6b-runtime-audit.md` (Q2, Q3, Q5, Q6, Q10, Q30, Q31, Q41, Q46), OPEN-QUESTIONS (E-Q11 and its 2026-11-24 revisit), DECISIONS (E-Q11 revisit, "Empty picks", the hidden-gate entry, bottom-order), and the earlier reviews (OP-15, wave3-cards, OP-16) for format.
+3. Tests: `npx vitest run engine/test/cards/OP14 engine/test/independent/cards/op14 cards`: 1,236 files, 12,676 passed, 2 expected fail (OP14-024 A-1 and an older `it.fails`). `cards/test/hidden-gate.test.ts` (the hidden-gate check, `cards/src/hidden-gate.ts`) passes.
+4. Judged each flagged reading against the engine (`engine/src/effects/run.ts`, `flow.ts`) and with probes.
+5. Two-position hidden-information probes, random games, AI games, mutation check (below).
+
+## Findings
+
+### OP14-R1 (3) OP14-111 Perona: "until the end of your opponent's next End Phase" outlasts the opponent's turn when the [On K.O.] happens on the opponent's turn
+- **Card:** "[On Play]/[On K.O.] Up to 1 of your opponent's Characters with a cost of 6 or less cannot attack until the end of your opponent's next End Phase."
+- **Script:** one ability, `when: ['onPlay','onKO']`, `restrict ... 'cannotAttack'`, `duration: 'untilEndOfOpponentsNextTurn'`. The engine (`run.ts` `duration()`) records `{ kind: 'untilEndOfOpponentsNextEndPhase', player: controller, after: d.s.turn }`, which ends at the first opponent End Phase of a turn later than the one the effect was created in.
+- **Probe (scratch test, real script):** p1's rested Perona is attacked by p2's 12000 Character on p2's turn 3, K.O.'d, the lock goes on p2's cost-1 Character. `cannotAttack` is true at turn 3 (right), at turn 4 (p1's turn, irrelevant), **true again at the start of turn 5 (p2's next turn)**, false at turn 6. By RL-11 (rulings.md: "until the end of your opponent's next End Phase" is the opponent's next End Phase, step 6-6-1-2) and the same batch's own OP14-082 Oinkchuck (which splits on whose turn it is: "K.O.'d on the opponent's turn: it lasts to the end of that turn (their next End Phase)"), the lock must end at the End Phase of turn 3, not turn 5.
+- **Impact:** a wrong game result in the common case (a Perona K.O.'d in battle, or by an opposing effect, is by definition on the opponent's turn): the locked Character loses a second whole attack turn. Perona's own [On Play] (your turn) is right.
+- **Why the tests passed:** the author test "[On K.O.] has the same effect" and the independent test assert only the rest of the current turn (DISAGREEMENTS-d: "what 'your opponent's next End Phase' means when the K.O. happens during that turn is open"). The mutation `untilEndOfOpponentsNextTurn` to `thisTurn` is killed only through the [On Play] path.
+- **Scope:** I grepped every scripted card in every set for `untilEndOfOpponentsNextTurn` on an `onKO`, `trigger`, `counter`, `onOpponentAttack`, `onBlock`, `endOfOpponentsTurn` or `opponentsTurn` ability: only OP14-082 (split, right) and OP14-111 (wrong). The cause is in the engine's `duration()`, not in the DSL.
+- **Fix:** same split as OP14-082 for the K.O. path (an `if opponentsTurn then thisTurn else untilEndOfOpponentsNextTurn`), or, better, make `duration()` give `after: turn - 1` when the effect's controller is not the active player, which also lets OP14-082's split go. Add a test that K.O.s Perona on the opponent's turn and checks the lock is gone at the opponent's next turn.
+
+### OP14-R2 (2) "Set up to N of your DON!! cards as active" never asks a count (disagreement A-1, OP14-024; also OP14-022, 031, 039)
+- See the ruling A-1 below: the independent author is right on the rule, and the E-Q11 sentence "no card where fewer is better" no longer holds. Engine behaviour (`run.ts` ~line 1176: `setActive` takes every candidate, `pick.upTo` is ignored for the count); the four scripts are faithful transcriptions.
+- **Fix:** ask a count (most first, "None" last) for a `setActive` with `pick.upTo`, as `addDon` does since 0.5.7; update the E-Q11 note in OPEN-QUESTIONS; flip the `it.fails` in `OP14-024.test.ts`. Engine-wide: OP14-022 Usopp (2), OP14-031 Nami (5, delayed), OP14-039 Coffin Boat (1), OP14-024 (3), and every older "set up to N DON!! as active".
+
+### OP14-R3 (2) OP14-045, 049, 056: "trashed from your hand by an effect" excludes costs; rules-digest 112 says a cost is part of the effect (M6b-Q31)
+- **Script:** `trashedFromHand`, `owner: 'you'`, no `includeCosts` (so a card trashed as a cost does not count), no `by` (either player's effect counts).
+- **Evidence:** the audit marked Q31 "Ask before scripting" because rules-digest 112 (CR 8-1-1: "An effect is the instruction in a card's text together with its cost") and RL-16 both treat a cost as part of the effect, against the auditors' reading. It was scripted anyway with the cost-excluded reading (g2 notes: "a trashed-as-cost card does not count: M6b-Q31"), no owner decision on file. The engine can express both (`includeCosts: true`), so the choice is a one-word change.
+- **Impact:** OP-14 cards that trash from hand as a cost and so would or would not give Kuroobi/Jinbe [Rush] or negate Wadatsumi: OP14-040 Jinbe Leader, 052 Hannyabal, 080 Moria, 119 Mihawk, 120 Crocodile (and older sets' hand costs). The author test pins the exclusion (flipping it is killed by one author test); the independent suite is neutral on purpose.
+- **Fix:** an owner decision, then either keep or add `includeCosts: true` to all three; leave a note in OPEN-QUESTIONS that RD 112 points to costs counting.
+
+### OP14-R4 (1) OP14-005 Killer (and OP14-114 Ran): "give up to 1 rested DON!!" cannot be declined once the ability is activated
+- **Script:** `giveDon { n: 1, to: exactly 1 }`: with a rested DON!! and a target the DON!! is given (no count is asked at n 1). The text says "up to 1". The activation itself is the choice (and burns the Once Per Turn), so declining the give costs the activation, which the engine already allows for an Activate; it is observably different only where a rested DON!! is worth keeping rested (OP07-023 Caribou "6 or more rested DON!! cards", OP13-001 Luffy), which is rare. Same shape: OP14-114 (older script). **Fix (optional):** let `giveDon` with `n: 1` and an "up to" offer a "none" like the n 2 case.
+
+### OP14-R5 (1) Mutation survivors (see numbers below)
+- Survivors in both suites: OP14-086 (trash 7 to 6: no test at 6 cards), OP14-021 (the [Your Turn] gate removed: no test rests Issho on the opponent's turn), OP14-070 (`by: opponentEffect` to `effect`: no test rests Buffalo by his own side's effect), OP14-079 (-10 cost to -5: only cost-5-or-less Characters tested). Author kills what the independent suite misses: OP14-045 (cost exclusion) and OP14-082 (own-turn duration). The independent suite kills nothing the author suite misses.
+- **Fix:** boundary and negative cases for those four.
+
+### OP14-R6 (1) Older scripts (not in the 89) with author-only coverage and a mutation survivor
+- OP14-041 (K.O. base power 5000 to 4000), OP14-096 (trash 10 to 9) and OP14-118 (Life 2 to 3) survive their author tests; these 12 older scripts have no independent test. They are outside this batch; listed for the next review of them.
+
+## Disagreement rulings
+
+| # | Cards | Who is right | Reason |
+| --- | --- | --- | --- |
+| A-1 | OP14-024 Kin'emon "Set up to 3 of your DON!! cards as active" | Independent author on the rule; the defect is the engine (severity 2, OP14-R2) | "Up to" allows fewer (CR 4-8-1), and `setActive` was kept automatic in E-Q11 (2026-10-29, kept 2026-11-16) on the reasoning that "more is never worse and no meta card needs fewer"; the 2026-11-24 revisit for "add up to N" disproved that reasoning for DON!! counts and left `setActive` alone only because "no counter-example was found". There are counter-examples. (a) Cards that want DON!! to stay **rested**: OP07-023 Caribou "If you have 6 or more rested DON!! cards, +1000"; OP13-001 Luffy "If you have 5 or less active DON!! cards ... rest any number" (setting more active turns it off). (b) The whole "give rested DON!!" family, including this set: OP14-005 Killer, OP14-012 Bepo, OP14-040 Jinbe Leader, OP14-105 Gorgon Sisters, OP14-114 Ran, plus OP13-042, OP13-054, OP15-117: a rested DON!! is the thing they give, and Kin'emon's own turn can follow with a give. A turn that sets 3 active and then gives rested DON!! can want fewer set. So the independent test's claim stands; taking the most is the common case, not "never worse". A-1 is real. |
+| B-1 | OP14-052 Hannyabal | Script; the `it.fails` was a test-helper artifact (already resolved on `main`) | Own probe below: with a hand that leaves a qualifying {Impel Down} card the pick has max 1, with one that does not the pick is asked at max 0, and the opponent's projected view and events are byte-identical. |
+| D-1 | OP14-116 Salamander | Script; same artifact (resolved on `main`) | Own probe below: Counter played, +2000 target chosen, then the "play up to 1" pick is asked at max 0 (hand without a cost-4-or-less {Amazon Lily}/{Kuja Pirates} Character) and max 1 (with OP14-114 Ran); the opponent's view and events are identical in both. |
+| C | none | n/a | DISAGREEMENTS-c reports none; spot checks of its riskiest assertions (OP14-082 End Phase per RL-11, OP14-065 empty DON!!, OP14-070 only the Character source) agree with my readings; the one piece it left open (OP14-082 on the opponent's turn) is exactly what OP14-111 got wrong (R1). |
+
+## Readings flagged in the scripting docs: judgments
+
+| Reading | Judgment |
+| --- | --- |
+| OP14-005 Killer `n: 1` give cannot be declined | Acceptable; R4 (1). |
+| OP14-016 X.Drake −2000 vs the audit's +2000 | The script is right. The verified text in `cards/data/sets/OP-14.json` and the override print "give your Leader −2000 power" (cross-checked, `verified: true`); the audit's "+2000" (M6b-Q2) guessed a lost sign, which this card does not have. Same shape as OP13-017 Dragon. It is a payload of the replacement (no cost to decline). |
+| OP14-021 Issho (no colon: `may` plus `ifDid`) | Right. "you may add ... If you do, up to 1 ... will not become active" is `may` with an `ifDid`; the effect is gated only on the public Life count (no hidden gate). "Becomes rested" on your turn by any cause (attack, cost, effect) is the Q30 reading shared by 027, 028, 032, 035, 119; open but consistent. The `yourTurn` gate is untested (R5). |
+| OP14-024 "your opponent's cards" including cost-area DON!! | Right, by precedent: M4b E-Q3 (Laboon) and the M6b-Q5 reading; opposing DON!! is public so no hidden-information issue. "Up to 1" may rest nothing; an already-rested card is not offered. |
+| OP14-027 Shanks continuous while rested | Right. "give all of your opponent's Characters −1000 power" with no duration under an [Opponent's Turn] state condition is a continuous effect that covers Characters arriving later, and not the Leader (the text says Characters). |
+| OP14-061 Vergo group replacement | Acceptable. `leaveField` of a {Donquixote Pirates} Character by an opposing effect, once per turn, `returnDon 1` as the payload (not offered with no DON!!). How one use covers two simultaneous removals is the open M6b-Q6, not specific to this card. |
+| OP14-045/049/056 cause scope | Cost excluded, either player's effect counted: open and contradicts RD 112; R3 (2). |
+| OP14-070 Buffalo source | Right. "by your opponent's Character's effect": `by: opponentEffect` with `sourceFilter: Character`; not an attack, a cost, their Leader, Event or Stage (M6b-Q41). `ifDid` after `may` for the DON!! return is right (not a cost). The `by` split is untested (R5). |
+| OP14-078 Bullet String "Then" inside the "If" | Right (M4b-5, RD 121-122: a "Then" after a failed "If" does not resolve). The DON!! −1 cost is optional (RL-52), and the `select` binds the target once for both +2000 effects. |
+| OP14-079 Crocodile removal lock | Right. A restriction on the opponent's Characters against the Leader controller's effects; K.O., bounce and trash by your effects are blocked, their own effects and battle K.O.s are not (author tests cover each). The K.O. cost is a real K.O. of your Character; the mill is a separate "may" step. |
+| OP14-082 Oinkchuck duration split by turn | Right and consistent with RL-11; it shows how OP14-111 should have been scripted (R1). Only Characters on the field when it resolves are affected. |
+| OP14-084 Ms. All Sunday two picks | Right ("and up to 1" is a second pick; a cost-1 card may fill either, never both). |
+| OP14-090 Rush: Character grant | Right. "can attack Characters on the turn in which it is played" is `Rush: Character`, gained conditionally (the keyword list stays empty). |
+| OP14-091 name with a stray dot | Right. The printed exclusion "[Mr.2.Bon.Kurei.(Bentham)]" is the card's own name with a typo; matching it literally would exclude nothing; [Mr.2.Bon.Kurei] (ST08-013) stays playable. |
+| OP14-092 Mr.3 | Right. The three trash cards go to the bottom in the order picked (DECISIONS "Cards placed at the bottom ... in any order": the order is the pick order, so the OP16-R3 gap does not apply); offered only with 3 cards in the trash; Once Per Turn counts when used. |
+| OP14-110 Hogback | Right. `hasTrigger` filter reads the printed [Trigger], the name is excluded, played active from the trash. |
+| OP14-116 "Then, play" after a declined target | Right. "Then" is independent; the +2000 target is optional and the play pick is asked either way (probe). |
+| OP14-119 rested by its own attack (Q30) | Accepted; the same reading as 021, 027, 028, 032, 035. |
+| OP14-120 [On K.O.] play from self | Right. Cost trash 1 from hand (optional, auto-cost), then play from the trash; the "if" counts only the opponent's Characters, evaluated whether or not the lock target was chosen. |
+
+## Hidden information (severity 4 checks)
+
+**Two-position probes** (scratch test, kept in the scratchpad, not committed): for every non-Leader OP-14 card (119) and every way an ability starts (play, [Counter] activated, [On K.O.] from a Character K.O.'d in battle, [Trigger] from the top Life card, [Activate: Main], [When Attacking]), the same public position was built with different hidden cards (own hand, deck, Life drawn at random from the 119 OP-14 cards, so filters such as {Supernovas}, {Fish-Man}, {Baroque Works}, {Thriller Bark Pirates}, {Kuja Pirates}, cost 0 and 8 qualify in some fills and not in others) under five Leaders (OP14-040, 041, 079, 080, ST01-001), 25 fills each. The owner answered with position-independent choices (accept every optional, `done` whenever "up to", the first legal pick otherwise); the opponent's projected view and projected events had to be identical at every step up to the first card-valued pick or reveal. A planted hand-gated pick (positive control) makes the comparison fail, so the check can see a gate. Result: 192 (card, mode) probes, 22,625 runs, 47,208 step comparisons; 190 identical; the two exceptions (OP14-044 reveal 1 from the deck top, OP14-081 trash 3 from the deck) are public reveals (the revealed or milled card is shown to both players), not leaks. 9 (card, mode) pairs cannot be started (Counter-only Events played from Main, OP14-105 [Activate: Main] needing 3 hand cards); no hidden prompt there.
+- **OP14-052 and OP14-116 two-position probe (task item 2):** a dedicated pair on each real card. 052: hand A leaves no qualifying {Impel Down} Character after the 3-card cost (`choose`, max 0), hand B leaves OP11-064 (max 1); the opponent's view and events are equal. 116: Counter played, +2000 target picked: max 0 with a hand without a cost-4-or-less {Amazon Lily}/{Kuja Pirates} Character, max 1 with OP14-114; opponent's view and events equal. **B-1 and D-1 confirmed as artifacts**: the engine asks the empty pick (`engine/test/cards/empty-pick-hidden.test.ts` covers the shape).
+- The hidden-gate check (`cards/test/hidden-gate.test.ts`) passes with no allowlist entry for OP-14. The prompts that depend on public facts only: OP14-021 (Life count), 063 (opponent DON!! count), 107/108/118 (Life counts), 059 (hand size), 054 (end-of-turn hand size), 092 (trash count), 096 (trash count).
+- No hand-, deck- or Life-gated pick, optional or choice was found in the 89.
+
+## Random games, AI games and mutation checks
+
+**Decks.** A temporary override of `randomStandardDeck` (reverted): Leaders limited to the scripted OP-14 Leaders, and OP-14 scripted cards weighted 40 against 6 for other scripted cards. Pass 1: Leaders OP14-040 Jinbe, OP14-041 Boa Hancock, OP14-079 Crocodile, OP14-080 Gecko Moria (the four scripted OP-14 Leaders; OP14-020 Mihawk is banned in Standard and not scripted, OP14-001 and 060 are not scripted). In the sampled decks 12 to 33 of the 50 cards are OP-14 cards, and 57 distinct OP-14 cards occur across 600 decks. Pass 2 (for the Red, Green and Purple OP-14 cards that the Blue/Black Leaders cannot reach): Leaders OP14-001 Law, OP14-060 Doflamingo, OP17-020 Shanks. Every deck passes `deckIssues(.., 'standard')` (done by `randomStandardDeck`).
+
+**Property harness** (`engine/test/property/standard-games.test.ts`, invariants after every action, replay hash equals live hash, every listed action reduces, sampled unlisted actions throw): 3,000 random legal games.
+- Pass 1 (2,000 games, `PROPERTY_SEED=7001`): 349,542 actions, 0 capped; 1,591 "damage at 0 Life", 409 "deck out"; 617,400 listed reductions, 2,739,324 unlisted attempts that threw. All pass.
+- Pass 2 (1,000 games, `PROPERTY_SEED=7002`): 212,963 actions, 0 capped; 802 "damage at 0 Life", 198 "deck out"; 390,483 listed reductions, 1,667,620 unlisted that threw. All pass.
+- Leak, projection and linkage properties and the skeleton diff (`leaks.test.ts`, `skeleton-diff.test.ts`, `ENGINE_GAMES=3000`, `PROPERTY_SEED=7003`, the "standard decks: true" variants use the OP-14 Leader decks, 250 skeleton seeds per mode): 8 tests, all pass. The known "life mode" skeleton mismatch for a card mid-play at a Character-area-full prompt (BACKLOG §5, OP15-R7) did not occur in these runs (0 hits), so nothing to note against it.
+
+**AI games** (`ai/test/support/match.ts` `playMatch`, tier `pirate` vs `pirate`, both seats OP-14-Leader Standard decks from `standardDecksFor(seed)`, seeds 100 to 147): 48 games, 0 errors, 0 capped, every chosen action was in the seat's own view (`playMatch` throws otherwise); all 48 ended "damage at 0 Life". Deck uses per Leader: OP14-040 18, OP14-041 19, OP14-079 25, OP14-080 34 (at least 18 games on each). `onFallback` was not counted.
+
+**Mutation check.** Broke one clause in 54 mutants across 50 distinct new-batch scripts (a threshold, a count, a base-power or cost filter, an operator, a duration, a `by` source, a Your Turn gate, a cost amount, an `includeCosts` flip; each applied alone, tests run, file restored from its saved text after each run; `git status` clean afterwards). Author tests and the independent test of the card were run separately. (Seven further mutants on older scripts are in R6 and not counted.)
+
+| Result | Author tests | Independent tests |
+| --- | --- | --- |
+| Mutants killed | 50 of 54 | 48 of 54 |
+| Survivors | 4: OP14-086, 021, 070, 079 | 6: OP14-086, 021, 070, 079, 082 (own-turn duration to `thisTurn`), 045 (`includeCosts` flip) |
+
+Survivors in both: the four in R5. The two the independent suite does not kill (045, 082) are deliberate (045: the tests refuse to assert Q31; 082: the independent author follows RL-11 on the opponent's turn only). Mutants that were killed only by one test: OP14-082 and OP14-045 by the author suite alone.
+
+## Other observations (no finding)
+
+- The `it.fails` in `engine/test/independent/cards/op14/OP14-024.test.ts` is the only open one of this batch; it flips with R2.
+- 12 older scripts (OP14-019, 022, 031, 041, 096, 104, 105, 107, 108, 112, 114, 118) have no independent test; their texts were compared in this review as well and matched (no finding apart from R4 for 114 and R6).
+- OP14-080 Moria's [Activate: Main] gives the Leader and all Characters +1000 after the K.O. cost, so the K.O.'d Character gets none (right); the [When Attacking] has no once per turn (right per the text).
+- OP14-041 Hancock reads base power (printed) on the K.O.'d card; the `koed` hook is owner-only, matching "one of your ... Characters".
+- The independent kit still auto-answers some "up to 1" and optional prompts in other sets (BACKLOG, EB05-R4); the OP-14 group kits `need` each prompt kind, which is why the empty picks were caught as a helper artifact once the pick was driven raw.

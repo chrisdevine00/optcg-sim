@@ -2,21 +2,193 @@
 import type { CardScript } from '../../src/dsl.ts';
 import { OP13_001 } from './OP13-001.ts';
 import { OP13_004 } from './OP13-004.ts';
+import { OP13_005 } from './OP13-005.ts';
+import { OP13_006 } from './OP13-006.ts';
+import { OP13_007 } from './OP13-007.ts';
+import { OP13_008 } from './OP13-008.ts';
+import { OP13_009 } from './OP13-009.ts';
+import { OP13_012 } from './OP13-012.ts';
+import { OP13_013 } from './OP13-013.ts';
+import { OP13_014 } from './OP13-014.ts';
+import { OP13_015 } from './OP13-015.ts';
+import { OP13_016 } from './OP13-016.ts';
+import { OP13_017 } from './OP13-017.ts';
+import { OP13_019 } from './OP13-019.ts';
+import { OP13_020 } from './OP13-020.ts';
+import { OP13_021 } from './OP13-021.ts';
+import { OP13_022 } from './OP13-022.ts';
+import { OP13_023 } from './OP13-023.ts';
+import { OP13_024 } from './OP13-024.ts';
+import { OP13_026 } from './OP13-026.ts';
 import { OP13_027 } from './OP13-027.ts';
+import { OP13_028 } from './OP13-028.ts';
+import { OP13_030 } from './OP13-030.ts';
+import { OP13_031 } from './OP13-031.ts';
+import { OP13_032 } from './OP13-032.ts';
+import { OP13_033 } from './OP13-033.ts';
+import { OP13_034 } from './OP13-034.ts';
+import { OP13_035 } from './OP13-035.ts';
 import { OP13_037 } from './OP13-037.ts';
+import { OP13_038 } from './OP13-038.ts';
+import { OP13_039 } from './OP13-039.ts';
 import { OP13_040 } from './OP13-040.ts';
+import { OP13_041 } from './OP13-041.ts';
+import { OP13_042 } from './OP13-042.ts';
+import { OP13_043 } from './OP13-043.ts';
+import { OP13_044 } from './OP13-044.ts';
+import { OP13_045 } from './OP13-045.ts';
+import { OP13_047 } from './OP13-047.ts';
+import { OP13_050 } from './OP13-050.ts';
+import { OP13_051 } from './OP13-051.ts';
+import { OP13_052 } from './OP13-052.ts';
+import { OP13_053 } from './OP13-053.ts';
+import { OP13_054 } from './OP13-054.ts';
+import { OP13_055 } from './OP13-055.ts';
+import { OP13_056 } from './OP13-056.ts';
+import { OP13_057 } from './OP13-057.ts';
+import { OP13_058 } from './OP13-058.ts';
+import { OP13_059 } from './OP13-059.ts';
+import { OP13_060 } from './OP13-060.ts';
+import { OP13_061 } from './OP13-061.ts';
+import { OP13_062 } from './OP13-062.ts';
+import { OP13_063 } from './OP13-063.ts';
+import { OP13_065 } from './OP13-065.ts';
+import { OP13_066 } from './OP13-066.ts';
+import { OP13_067 } from './OP13-067.ts';
+import { OP13_068 } from './OP13-068.ts';
+import { OP13_069 } from './OP13-069.ts';
+import { OP13_071 } from './OP13-071.ts';
+import { OP13_072 } from './OP13-072.ts';
+import { OP13_074 } from './OP13-074.ts';
+import { OP13_075 } from './OP13-075.ts';
 import { OP13_076 } from './OP13-076.ts';
+import { OP13_077 } from './OP13-077.ts';
+import { OP13_078 } from './OP13-078.ts';
+import { OP13_080 } from './OP13-080.ts';
+import { OP13_081 } from './OP13-081.ts';
+import { OP13_082 } from './OP13-082.ts';
+import { OP13_083 } from './OP13-083.ts';
+import { OP13_086 } from './OP13-086.ts';
+import { OP13_087 } from './OP13-087.ts';
+import { OP13_089 } from './OP13-089.ts';
+import { OP13_091 } from './OP13-091.ts';
+import { OP13_092 } from './OP13-092.ts';
+import { OP13_093 } from './OP13-093.ts';
+import { OP13_094 } from './OP13-094.ts';
+import { OP13_095 } from './OP13-095.ts';
+import { OP13_096 } from './OP13-096.ts';
+import { OP13_097 } from './OP13-097.ts';
+import { OP13_098 } from './OP13-098.ts';
+import { OP13_099 } from './OP13-099.ts';
+import { OP13_100 } from './OP13-100.ts';
+import { OP13_102 } from './OP13-102.ts';
+import { OP13_104 } from './OP13-104.ts';
+import { OP13_108 } from './OP13-108.ts';
+import { OP13_109 } from './OP13-109.ts';
+import { OP13_110 } from './OP13-110.ts';
+import { OP13_112 } from './OP13-112.ts';
 import { OP13_113 } from './OP13-113.ts';
+import { OP13_114 } from './OP13-114.ts';
+import { OP13_115 } from './OP13-115.ts';
+import { OP13_116 } from './OP13-116.ts';
+import { OP13_117 } from './OP13-117.ts';
 import { OP13_118 } from './OP13-118.ts';
+import { OP13_120 } from './OP13-120.ts';
 
 const SET: readonly CardScript[] = [
   OP13_001,
   OP13_004,
+  OP13_005,
+  OP13_006,
+  OP13_007,
+  OP13_008,
+  OP13_009,
+  OP13_012,
+  OP13_013,
+  OP13_014,
+  OP13_015,
+  OP13_016,
+  OP13_017,
+  OP13_019,
+  OP13_020,
+  OP13_021,
+  OP13_022,
+  OP13_023,
+  OP13_024,
+  OP13_026,
   OP13_027,
+  OP13_028,
+  OP13_030,
+  OP13_031,
+  OP13_032,
+  OP13_033,
+  OP13_034,
+  OP13_035,
   OP13_037,
+  OP13_038,
+  OP13_039,
   OP13_040,
+  OP13_041,
+  OP13_042,
+  OP13_043,
+  OP13_044,
+  OP13_045,
+  OP13_047,
+  OP13_050,
+  OP13_051,
+  OP13_052,
+  OP13_053,
+  OP13_054,
+  OP13_055,
+  OP13_056,
+  OP13_057,
+  OP13_058,
+  OP13_059,
+  OP13_060,
+  OP13_061,
+  OP13_062,
+  OP13_063,
+  OP13_065,
+  OP13_066,
+  OP13_067,
+  OP13_068,
+  OP13_069,
+  OP13_071,
+  OP13_072,
+  OP13_074,
+  OP13_075,
   OP13_076,
+  OP13_077,
+  OP13_078,
+  OP13_080,
+  OP13_081,
+  OP13_082,
+  OP13_083,
+  OP13_086,
+  OP13_087,
+  OP13_089,
+  OP13_091,
+  OP13_092,
+  OP13_093,
+  OP13_094,
+  OP13_095,
+  OP13_096,
+  OP13_097,
+  OP13_098,
+  OP13_099,
+  OP13_100,
+  OP13_102,
+  OP13_104,
+  OP13_108,
+  OP13_109,
+  OP13_110,
+  OP13_112,
   OP13_113,
+  OP13_114,
+  OP13_115,
+  OP13_116,
+  OP13_117,
   OP13_118,
+  OP13_120,
 ];
 export default SET;
