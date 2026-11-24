@@ -26,13 +26,36 @@ import { EB04_024 } from './EB04-024.ts';
 import { EB04_025 } from './EB04-025.ts';
 import { EB04_026 } from './EB04-026.ts';
 import { EB04_027 } from './EB04-027.ts';
+import { EB04_028 } from './EB04-028.ts';
+import { EB04_029 } from './EB04-029.ts';
 import { EB04_030 } from './EB04-030.ts';
 import { EB04_031 } from './EB04-031.ts';
 import { EB04_032 } from './EB04-032.ts';
+import { EB04_033 } from './EB04-033.ts';
+import { EB04_034 } from './EB04-034.ts';
+import { EB04_035 } from './EB04-035.ts';
+import { EB04_036 } from './EB04-036.ts';
+import { EB04_037 } from './EB04-037.ts';
 import { EB04_038 } from './EB04-038.ts';
+import { EB04_039 } from './EB04-039.ts';
 import { EB04_040 } from './EB04-040.ts';
+import { EB04_041 } from './EB04-041.ts';
+import { EB04_042 } from './EB04-042.ts';
+import { EB04_043 } from './EB04-043.ts';
+import { EB04_045 } from './EB04-045.ts';
+import { EB04_046 } from './EB04-046.ts';
+import { EB04_047 } from './EB04-047.ts';
+import { EB04_049 } from './EB04-049.ts';
+import { EB04_051 } from './EB04-051.ts';
+import { EB04_052 } from './EB04-052.ts';
+import { EB04_053 } from './EB04-053.ts';
+import { EB04_054 } from './EB04-054.ts';
+import { EB04_055 } from './EB04-055.ts';
+import { EB04_056 } from './EB04-056.ts';
+import { EB04_057 } from './EB04-057.ts';
 import { EB04_058 } from './EB04-058.ts';
 import { EB04_059 } from './EB04-059.ts';
+import { EB04_060 } from './EB04-060.ts';
 import { EB04_061 } from './EB04-061.ts';
 
 const SET: readonly CardScript[] = [
@@ -62,13 +85,36 @@ const SET: readonly CardScript[] = [
   EB04_025,
   EB04_026,
   EB04_027,
+  EB04_028,
+  EB04_029,
   EB04_030,
   EB04_031,
   EB04_032,
+  EB04_033,
+  EB04_034,
+  EB04_035,
+  EB04_036,
+  EB04_037,
   EB04_038,
+  EB04_039,
   EB04_040,
+  EB04_041,
+  EB04_042,
+  EB04_043,
+  EB04_045,
+  EB04_046,
+  EB04_047,
+  EB04_049,
+  EB04_051,
+  EB04_052,
+  EB04_053,
+  EB04_054,
+  EB04_055,
+  EB04_056,
+  EB04_057,
   EB04_058,
   EB04_059,
+  EB04_060,
   EB04_061,
 ];
 export default SET;
