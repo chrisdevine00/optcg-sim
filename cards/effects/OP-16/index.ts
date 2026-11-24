@@ -77,8 +77,31 @@ import { OP16_087 } from './OP16-087.ts';
 import { OP16_089 } from './OP16-089.ts';
 import { OP16_090 } from './OP16-090.ts';
 import { OP16_091 } from './OP16-091.ts';
+import { OP16_092 } from './OP16-092.ts';
+import { OP16_093 } from './OP16-093.ts';
+import { OP16_094 } from './OP16-094.ts';
+import { OP16_095 } from './OP16-095.ts';
+import { OP16_096 } from './OP16-096.ts';
+import { OP16_097 } from './OP16-097.ts';
+import { OP16_098 } from './OP16-098.ts';
+import { OP16_099 } from './OP16-099.ts';
+import { OP16_101 } from './OP16-101.ts';
+import { OP16_102 } from './OP16-102.ts';
+import { OP16_103 } from './OP16-103.ts';
+import { OP16_104 } from './OP16-104.ts';
+import { OP16_105 } from './OP16-105.ts';
+import { OP16_106 } from './OP16-106.ts';
+import { OP16_107 } from './OP16-107.ts';
+import { OP16_108 } from './OP16-108.ts';
+import { OP16_109 } from './OP16-109.ts';
+import { OP16_110 } from './OP16-110.ts';
+import { OP16_111 } from './OP16-111.ts';
 import { OP16_113 } from './OP16-113.ts';
+import { OP16_114 } from './OP16-114.ts';
+import { OP16_115 } from './OP16-115.ts';
+import { OP16_116 } from './OP16-116.ts';
 import { OP16_117 } from './OP16-117.ts';
+import { OP16_118 } from './OP16-118.ts';
 import { OP16_119 } from './OP16-119.ts';
 
 const SET: readonly CardScript[] = [
@@ -159,8 +182,31 @@ const SET: readonly CardScript[] = [
   OP16_089,
   OP16_090,
   OP16_091,
+  OP16_092,
+  OP16_093,
+  OP16_094,
+  OP16_095,
+  OP16_096,
+  OP16_097,
+  OP16_098,
+  OP16_099,
+  OP16_101,
+  OP16_102,
+  OP16_103,
+  OP16_104,
+  OP16_105,
+  OP16_106,
+  OP16_107,
+  OP16_108,
+  OP16_109,
+  OP16_110,
+  OP16_111,
   OP16_113,
+  OP16_114,
+  OP16_115,
+  OP16_116,
   OP16_117,
+  OP16_118,
   OP16_119,
 ];
 export default SET;
