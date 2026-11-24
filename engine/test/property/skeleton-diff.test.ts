@@ -131,7 +131,9 @@ describe.each([false, true])(
         const leaks: string[] = [];
         let compared = 0;
         let foreign = 0;
-        for (let seed = 1; seed <= SEEDS; seed++) {
+        // Random Standard decks diverge sooner (their views split at the first differing draw),
+        // so they get twice the seeds to keep the sample above the floor below.
+        for (let seed = 1; seed <= (standard ? 2 * SEEDS : SEEDS); seed++) {
           for (const viewer of PLAYERS) {
             let { A, B, rng } = pair(seed, viewer, mode, standard);
             for (let step = 0; step < 400; step++) {
