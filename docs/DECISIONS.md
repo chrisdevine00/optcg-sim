@@ -2,6 +2,15 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-24 — Open decisions at the end of the block 4 session (lead's register)
+
+- **Context:** the owner asked for a checkpoint. This entry lists every decision still open, so a resumed session or the owner can find them in one place. Decisions already taken are in their own entries below.
+- **Taken by the lead in this stretch and recorded elsewhere:** M6b-Q31 cost half (a cost counts as "trashed from your hand by an effect"); "power the same as your opponent's Leader" reads current power (EB04-052, matching OP16-036); "set up to N DON!! as active" asks a count; "set the power to 0" lowers by current power (`targetPower`); a "Then" after a failed "If" does not resolve (M4b-5, applied to OP13-102/108); the AI lethal gate counts wins by effect. One more, recorded here: **ST22-011** was verified with the Limitless text, which has the cost clause "You may reveal 2 cards with a type including "Whitebeard Pirates" from your hand:" that optcgapi drops; treated as a dropped clause (a clear upstream defect), not a reading. Rejected: leaving it unverified as an open question (the clause is plainly part of the card and the rest of the text matches).
+- **Open, waiting on the owner (official card list):** EB05-031 cost; B4-V1 to B4-V7; B3-V1 to B3-V4 (OPEN-QUESTIONS). Each card stays unscripted until read.
+- **Open, waiting on the lead (design items, wave 8):** D1 rules-changing Leaders (OP13-003, OP13-079, OP15-022); D2 activating an Event from hand or trash (OP15-014, OP15-046, EB03-031); D5 whole-side [On Play] negation; D7 a watcher registered by an Activate; D8 a delayed effect at the opponent's next Main Phase; D9 an effect acting on the event's subject (OP16-079). D3 (`redirectAttack`, OP16-080, ST36-005) is in wave 7. None is decided; each card stays unscripted until it is.
+- **Open rules questions with a working reading (scripts follow the reading; a ruling would change them):** M6b-Q6 (one replacement for two events, OP13-046), Q21 (only-X with no Characters), Q25/Q26 (OP-13/EB-03 "or" picks and rested cards), Q30/Q41 (what counts as "becomes rested"), Q33 settled, Q34 (OP13-066 delayed DON!!), Q42 to Q47 (wave 3 timings), Q48/Q49 (OP15-024 Leader cost, OP15-098 battle K.O.), Q50 to Q58 (wave 4 and its cards). See docs/OPEN-QUESTIONS.md.
+- **Rejected:** spreading this list only across review files (hard to find on resume).
+
 ## 2026-11-24 — Wave 4 fix round: the lethal solver's attacker-count gate lets an effect win through (AI only, no ENGINE_VERSION change)
 
 - **Context:** the wave 4 review (`docs/reviews/m6b-wave4.md`, W4-R1, severity 3) showed that `attackersPossible` refuted a seat before `scanAbility` or the search ran, so a win by `damage`, `winGame`, an opponent Life move or any other unclassified effect was reported "refuted, any hand" (a proof claim that was false). "Unclassified means search" held only inside `scanAbility`.

@@ -1,9 +1,22 @@
 # Status
 
 **Phase:** 5 Build, slice pass (ADR 0012), starting at M0. Phases 1–4 gated 2026-10-28.
-**Milestone:** **M6b Card pool and live updates: in progress** (PLAN §2a, row 17b), M6b-0, M6b-1, M6b-5, M6b-6 and M6b-7 done 2026-11-23; M6b-2 wave 1 done 2026-11-24; next the EB-05 batch and wave 2. **M6 Deck builder: done 2026-11-23** (review FAIL, fix round, re-review 1 PASS). **M5b AI breadth: done 2026-11-23 under the time-box, with the Warlord-vs-Pirate target (65%) NOT met:** 123/200 (61.5%) every nightly, no tested change beat noise on fresh seeds (DECISIONS 2026-11-23; carried to docs/BACKLOG.md #1); the nightly asserts a 55% floor. **M4b Effects breadth: done 2026-11-16.** All 182 meta-list cards play fully. L Learning slice done 2026-11-09. M5a done 2026-11-05. M4a done 2026-10-29. M3 done 2026-11-05. M0, M1 and M2 done 2026-10-28.
+**Milestone:** **M6b Card pool and live updates: in progress** (PLAN §2a, row 17b). Done: M6b-0, M6b-1, M6b-5, M6b-6, M6b-7; M6b-2 engine waves 1 to 4; blocks 5 and 4 scripted, reviewed and on `main` (Standard coverage 48.1%). In progress: block 3. **M6 Deck builder: done 2026-11-23** (review FAIL, fix round, re-review 1 PASS). **M5b AI breadth: done 2026-11-23 under the time-box, with the Warlord-vs-Pirate target (65%) NOT met:** 123/200 (61.5%) every nightly, no tested change beat noise on fresh seeds (DECISIONS 2026-11-23; carried to docs/BACKLOG.md #1); the nightly asserts a 55% floor. **M4b Effects breadth: done 2026-11-16.** All 182 meta-list cards play fully. L Learning slice done 2026-11-09. M5a done 2026-11-05. M4a done 2026-10-29. M3 done 2026-11-05. M0, M1 and M2 done 2026-10-28.
 **Run the app:** `npm install && npm run dev` then open http://localhost:5173/optcg-sim/ and go to `/cards` for the card browser
 **Deployed:** https://chrisdevine00.github.io/optcg-sim/ (auto-deploys after green CI on `main`)
+
+## Where we are (2026-11-24, end of session)
+
+- **`main`:** 87b5ce6 — blocks 5 and 4 complete (except the cards listed below), engine waves 1 to 4 (ENGINE_VERSION 0.5.16), block 3 verified against Limitless (B3-V1 to B3-V4 open). Standard coverage 48.1% (821 scripted, 201 vanilla of 2,124; block 5 98.5%, block 4 93.5%).
+- **Running when the session ended (not merged, on worktree branches):** six block 3 scripting groups for OP-11 and OP-12 (148 cards, brief `script-brief-b3` style: runbook step d, waves 1 to 4, verified cards only). Their branches are `worktree-agent-*` under `.claude/worktrees/`; each reports its commit. If a group did not finish, re-run it from the card lists in the readings docs `docs/research/OP-11-scripting-g1..g3.md`, `OP-12-scripting-g1..g3.md` (missing doc = not done).
+- **Next steps, in order:**
+  1. Merge the six OP-11/OP-12 groups (regenerate `cards:effects-index` and `cards:measure` on conflicts), then runbook steps e to h for them: blind independent tests (6 groups), adversarial review, one fix round, merge and push.
+  2. Block 3, the rest: OP-10 (96), OP-09 (87), EB-02 (44), PRB-02 (15), ST-15 to ST-27 (about 45) — expressible after wave 4 per `docs/research/m6b-audit/block3.md` mapped through `m6b-runtime-audit.md` §2. Same pipeline.
+  3. Engine waves 5 to 7 (`m6b-runtime-audit.md` §4), then the cards they unblock (blocks 3, 4, 5).
+  4. Wave 8 (design items D1, D2, D5, D7, D8, D9) only after the lead decides each (DECISIONS "M6b-1 decisions").
+- **Waiting on the owner:** read on the official card list: EB05-031 (cost), B4-V1 to B4-V7, B3-V1 to B3-V4 (OPEN-QUESTIONS); allow GitHub Actions to create PRs; VoiceOver pass; card-face sign-off; delete the DuelVoyager screenshots.
+- **Cards still waiting:** block 5: OP16-079 (D9), OP16-080 and ST36-005 (D3, wave 7), OP16-109 and ST33-004 (waves 5+), EB05-031 (official list). Block 4: OP13-003, OP13-079, OP15-022 (D1), OP15-014, OP15-046, EB03-031 (D2), unverified OP13-084, OP14-094, OP14-103, EB03-034, EB04-048, and the wave 5 to 7 cards in the block 4 audit.
+- **Process lessons kept in the briefs:** prompts must not depend on hidden cards (static hidden-gate check); "Then" after a failed "If" does not resolve; test helpers no longer swallow the next empty pick (block 4 tail fix round); every batch so far needed its fix round, so never skip step g.
 
 ## Phase plan
 
