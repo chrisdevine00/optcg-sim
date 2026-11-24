@@ -62,14 +62,15 @@ describe('EB04-047 Helmeppo: [Activate: Main] trash this: play a {SWORD} Charact
   });
 
   it('trashes Helmeppo and plays the chosen card from hand, active and free', () => {
-    const g = board([KUJYAKU1, KOMILLE]);
+    // [Prince Grus] (no [On Play]) so the played card asks nothing of its own.
+    const g = board([GRUS1, KOMILLE]);
     const before = donCost(g);
     start(g);
-    pickRaw(g, g.find('p1', 'hand', KUJYAKU1));
+    pickRaw(g, g.find('p1', 'hand', GRUS1));
     expect(atMain(g)).toBe(true);
-    expect(chars(g)).toEqual([KUJYAKU1]);
+    expect(chars(g)).toEqual([GRUS1]);
     expect(trash(g)).toEqual([ID]);
-    expect(isRestedInst(g, at(g, 'p1', 'characters', KUJYAKU1))).toBe(false);
+    expect(isRestedInst(g, at(g, 'p1', 'characters', GRUS1))).toBe(false);
     expect(hand(g)).toEqual([KOMILLE]);
     expect(donCost(g)).toEqual(before);
   });
