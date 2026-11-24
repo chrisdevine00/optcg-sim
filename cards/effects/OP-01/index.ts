@@ -2,6 +2,7 @@
 import type { CardScript } from '../../src/dsl.ts';
 import { OP01_016 } from './OP01-016.ts';
 import { OP01_055 } from './OP01-055.ts';
+import { OP01_120 } from './OP01-120.ts';
 
-const SET: readonly CardScript[] = [OP01_016, OP01_055];
+const SET: readonly CardScript[] = [OP01_016, OP01_055, OP01_120];
 export default SET;
