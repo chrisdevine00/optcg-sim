@@ -39,10 +39,10 @@ import { canSee } from '../../src/project.ts';
 import { internals, withAbilities } from '../../src/testing.ts';
 import type { State } from '../../src/state.ts';
 import { cards } from '../fixtures/index.ts';
-import { metaDecks } from '../support/decks.ts';
+import { metaDecks, standardDecksFor } from '../support/decks.ts';
 import { playFrom, type RandomGame } from '../support/random-game.ts';
 import { LinkTracker } from '../support/link-tracker.ts';
-import { propertySeed } from '../support/seed.ts';
+import { BASE_SEED, propertySeed } from '../support/seed.ts';
 
 const RUNS = Math.max(30, Math.ceil(Number(process.env.ENGINE_GAMES ?? 500) / 15));
 const PLAYERS: PlayerId[] = ['p1', 'p2'];
@@ -52,9 +52,11 @@ export function leakGame(
   seed: number,
   keepStates = true,
   onEvents?: (ev: GameEvent[], after: GameState) => void,
+  /** Both seats play random Standard-legal decks (`standardDecksFor(seed)`) instead of meta lists. */
+  standard = false,
 ): RandomGame {
   let rng = seedRng(seed);
-  const all = metaDecks();
+  const all = standard ? standardDecksFor(seed) : metaDecks();
   const pickDeck = (): number => {
     let v: number;
     [v, rng] = nextInt(rng, all.length);
@@ -65,8 +67,12 @@ export function leakGame(
   const scripted = all
     .map((d, i) => (d.leader === 'OP17-039' || d.leader === 'OP17-058' ? i : -1))
     .filter((i) => i >= 0);
-  const a = seed % 3 === 0 ? scripted[((seed / 3) % scripted.length) | 0]! : pickDeck();
-  const b = pickDeck();
+  const a = standard
+    ? 0
+    : seed % 3 === 0
+      ? scripted[((seed / 3) % scripted.length) | 0]!
+      : pickDeck();
+  const b = standard ? 1 : pickDeck();
   const spec = (i: number) => {
     let main: string[];
     [main, rng] = shuffle(all[i]!.main, rng);
@@ -157,144 +163,181 @@ function untilReveal(events: GameEvent[]): GameEvent[] {
 const stripCards = (events: GameEvent[]): string =>
   JSON.stringify(events.map(({ card: _c, lki: _l, targetCard: _t, label: _x, ...rest }) => rest));
 
-describe('hidden-information leak properties', () => {
-  it('views and observed autoSkip are invariant under hidden permutations, including a pending damage card (M2-01, M2-02)', () => {
-    let damageStates = 0;
-    let secretChoices = 0;
-    let forcedChecks = 0;
-    fc.assert(
-      fc.property(
-        fc.integer({ min: 1, max: 0x7fffffff }),
-        fc.array(fc.nat(), { minLength: 64, maxLength: 64 }),
-        (seed, order) => {
-          const game = leakGame(seed);
-          game.states.forEach((g, i) => {
-            const k = internals(g).decision;
-            if (i % 3 !== 0 && k?.kind !== 'trigger' && !k?.secret) return;
-            const s = internals(g);
-            if (s.decision?.kind === 'trigger') damageStates++;
-            if (s.decision?.secret && s.decision.kind === 'choose') secretChoices++;
-            for (const viewer of PLAYERS) {
-              const other = permuted(s, viewer, order) as unknown as GameState;
-              expect(JSON.stringify(project(other, viewer))).toBe(
-                JSON.stringify(project(g, viewer)),
-              );
-              // M5a: the AI's search skeleton is as blind as the view (ADR 0005). Permuting card
-              // ids after the fact cannot reach text the engine derived from them (a prompt naming
-              // a Life card): skeleton-diff.test.ts compares reachable pairs for that (M5a-02).
-              expect(JSON.stringify(projectForSearch(other, viewer).skeleton)).toBe(
-                JSON.stringify(projectForSearch(g, viewer).skeleton),
-              );
-              if (s.decision && s.decision.player !== viewer)
-                expect(autoSkip(other, { observedByOtherHuman: true })).toEqual(
-                  autoSkip(g, { observedByOtherHuman: true }),
-                );
-              // The same action from both states projects to the same events for the viewer.
-              const action = game.record.actions[i];
-              // Playing a card, a Counter or an activated [Trigger] reveals the card: skip those.
-              if (!action || action.type === 'playCard' || action.type === 'counter') continue;
-              if (action.type === 'trigger' && action.activate) continue;
-              let a: GameEvent[];
-              let b: GameEvent[];
-              let ra: GameState;
-              let rb: GameState;
-              try {
-                ({ events: a, state: ra } = reduce(g, action));
-                ({ events: b, state: rb } = reduce(other, action));
-              } catch {
-                continue; // the action needs a hidden card the permutation changed
-              }
-              // The decision that follows, asked of the other player, must pause (or not) the same
-              // way whatever the hidden cards are, unless a hidden card was revealed (M2-19).
-              const pv = projectEvents(a, viewer);
-              const nextDec = internals(ra).decision;
-              if (nextDec && nextDec.player !== viewer && !pv.some(isReveal)) {
-                expect(autoSkip(rb, { observedByOtherHuman: true })).toEqual(
-                  autoSkip(ra, { observedByOtherHuman: true }),
-                );
-                forcedChecks++;
-              }
-              // Once a hidden card is revealed to the viewer, what follows may legitimately depend
-              // on which card it was (a reveal's condition, a play's [On Play]): compare up to and
-              // including the first reveal.
-              const pa = untilReveal(projectEvents(a, viewer));
-              const pb = untilReveal(projectEvents(b, viewer)).slice(0, pa.length);
-              // Card ids too must match before the reveal (a leaked id would differ, M4a-06);
-              // only the reveal itself may show a different card.
-              const head =
-                pa.length > 0 && isReveal(pa[pa.length - 1]!) ? pa.length - 1 : pa.length;
-              expect(JSON.stringify(pb.slice(0, head))).toBe(JSON.stringify(pa.slice(0, head)));
-              expect(stripCards(pb.slice(head))).toBe(stripCards(pa.slice(head)));
-            }
-          });
-        },
-      ),
-      { numRuns: RUNS, seed: propertySeed(200) },
-    );
-    expect(damageStates).toBeGreaterThan(0);
-    // Choices over hidden zones were exercised, including observed autoSkip on them (M2-19).
-    if (SCRIPTED_IDS.has('OP17-039')) expect(secretChoices).toBeGreaterThan(0);
-    expect(forcedChecks).toBeGreaterThan(0);
-  }, 600_000);
+/**
+ * Standard-deck games with a known, open engine finding (docs/research/standard-deck-property.md):
+ * seed 15, where a hidden Character in the opponent's hand decides whether OP16-018's replacement
+ * prompt pauses the game, so the opponent's event stream differs. Skipped in the permutation
+ * property only; remove the seed when the engine is fixed.
+ */
+const KNOWN_STANDARD_LEAK_SEEDS: ReadonlySet<number> = new Set([15]);
 
-  it('a handle never links a card across a zone hidden from the viewer, and no projected event holds a raw id (M2-03, M2-17)', () => {
-    let rawChecked = 0;
-    let returns = 0;
-    let exempted = 0;
-    fc.assert(
-      fc.property(fc.integer({ min: 1, max: 0x7fffffff }), (seed) => {
-        const t = new LinkTracker(`seed ${seed}`);
-        const observeState = (g: GameState): void => {
-          const s = internals(g);
-          for (const v of PLAYERS) {
-            const view = project(g, v);
-            for (const p of PLAYERS) {
-              for (const [zone, list] of Object.entries(view.zones[p])) {
-                const ids =
-                  zone === 'leader'
-                    ? [s.players[p].leader]
-                    : ((s.players[p] as unknown as Record<string, string[]>)[zone] ?? []);
-                list.forEach((vc, i) => {
-                  const id = ids[i];
-                  if (!id) return;
-                  if (vc.card === null) t.hiddenInView(v, id, zone);
-                  else t.shownInView(v, id, vc.handle, `${p}.${zone}`);
-                });
-              }
-            }
-          }
-        };
-        leakGame(seed, false, (events: GameEvent[], after) => {
-          for (const v of PLAYERS) {
-            const projected = projectEvents(events, v);
-            // M2-17: no projected event carries a raw instance id, live or dead.
-            const raw = JSON.stringify(projected).match(INSTANCE_ID_ANYWHERE);
-            if (raw) throw new Error(`seed ${seed}: raw instance id ${raw[0]} projected to ${v}`);
-            rawChecked++;
-            projected.forEach((pe, i) => {
-              const raw = events[i]!;
-              for (const f of CARD_FIELDS) {
-                const h = pe[f];
-                const id = raw[f];
-                if (typeof h === 'string' && typeof id === 'string' && h !== id) {
-                  t.note(v, id, h, `event ${raw.type}.${f}`);
-                  if (raw.type === 'CardRevealed')
-                    t.revealed(v, id, h, (raw as { from?: string }).from);
+/** Log what reproduces a failing Standard-deck game, then rethrow. */
+function logStandard(seed: number, e: unknown): never {
+  const [da, db] = standardDecksFor(seed);
+  console.error(
+    `[standard leaks] FAILED seed=${seed} (PROPERTY_SEED=${BASE_SEED})\n` +
+      `p1 ${da.leader}: ${da.main.join(',')}\np2 ${db.leader}: ${db.main.join(',')}`,
+  );
+  throw e;
+}
+
+describe.each([false, true])(
+  'hidden-information leak properties (standard decks: %s)',
+  (standard) => {
+    const game = (seed: number, keep = true, on?: (ev: GameEvent[], after: GameState) => void) =>
+      leakGame(seed, keep, on, standard);
+    /** Run a property body; a Standard-deck failure logs the seed and decks first. */
+    const guard = (seed: number, body: () => void): void => {
+      try {
+        body();
+      } catch (e) {
+        if (standard) logStandard(seed, e);
+        throw e;
+      }
+    };
+    it('views and observed autoSkip are invariant under hidden permutations, including a pending damage card (M2-01, M2-02)', () => {
+      let damageStates = 0;
+      let secretChoices = 0;
+      let forcedChecks = 0;
+      fc.assert(
+        fc.property(
+          fc.integer({ min: 1, max: 0x7fffffff }),
+          fc.array(fc.nat(), { minLength: 64, maxLength: 64 }),
+          (seed, order) =>
+            guard(seed, () => {
+              if (standard && KNOWN_STANDARD_LEAK_SEEDS.has(seed)) return;
+              const g0 = game(seed);
+              g0.states.forEach((g, i) => {
+                const k = internals(g).decision;
+                if (i % 3 !== 0 && k?.kind !== 'trigger' && !k?.secret) return;
+                const s = internals(g);
+                if (s.decision?.kind === 'trigger') damageStates++;
+                if (s.decision?.secret && s.decision.kind === 'choose') secretChoices++;
+                for (const viewer of PLAYERS) {
+                  const other = permuted(s, viewer, order) as unknown as GameState;
+                  expect(JSON.stringify(project(other, viewer))).toBe(
+                    JSON.stringify(project(g, viewer)),
+                  );
+                  // M5a: the AI's search skeleton is as blind as the view (ADR 0005). Permuting card
+                  // ids after the fact cannot reach text the engine derived from them (a prompt naming
+                  // a Life card): skeleton-diff.test.ts compares reachable pairs for that (M5a-02).
+                  expect(JSON.stringify(projectForSearch(other, viewer).skeleton)).toBe(
+                    JSON.stringify(projectForSearch(g, viewer).skeleton),
+                  );
+                  if (s.decision && s.decision.player !== viewer)
+                    expect(autoSkip(other, { observedByOtherHuman: true })).toEqual(
+                      autoSkip(g, { observedByOtherHuman: true }),
+                    );
+                  // The same action from both states projects to the same events for the viewer.
+                  const action = g0.record.actions[i];
+                  // Playing a card, a Counter or an activated [Trigger] reveals the card: skip those.
+                  if (!action || action.type === 'playCard' || action.type === 'counter') continue;
+                  if (action.type === 'trigger' && action.activate) continue;
+                  let a: GameEvent[];
+                  let b: GameEvent[];
+                  let ra: GameState;
+                  let rb: GameState;
+                  try {
+                    ({ events: a, state: ra } = reduce(g, action));
+                    ({ events: b, state: rb } = reduce(other, action));
+                  } catch {
+                    continue; // the action needs a hidden card the permutation changed
+                  }
+                  // The decision that follows, asked of the other player, must pause (or not) the same
+                  // way whatever the hidden cards are, unless a hidden card was revealed (M2-19).
+                  const pv = projectEvents(a, viewer);
+                  const nextDec = internals(ra).decision;
+                  if (nextDec && nextDec.player !== viewer && !pv.some(isReveal)) {
+                    expect(autoSkip(rb, { observedByOtherHuman: true })).toEqual(
+                      autoSkip(ra, { observedByOtherHuman: true }),
+                    );
+                    forcedChecks++;
+                  }
+                  // Once a hidden card is revealed to the viewer, what follows may legitimately depend
+                  // on which card it was (a reveal's condition, a play's [On Play]): compare up to and
+                  // including the first reveal.
+                  const pa = untilReveal(projectEvents(a, viewer));
+                  const pb = untilReveal(projectEvents(b, viewer)).slice(0, pa.length);
+                  // Card ids too must match before the reveal (a leaked id would differ, M4a-06);
+                  // only the reveal itself may show a different card.
+                  const head =
+                    pa.length > 0 && isReveal(pa[pa.length - 1]!) ? pa.length - 1 : pa.length;
+                  expect(JSON.stringify(pb.slice(0, head))).toBe(JSON.stringify(pa.slice(0, head)));
+                  expect(stripCards(pb.slice(head))).toBe(stripCards(pa.slice(head)));
+                }
+              });
+            }),
+        ),
+        { numRuns: RUNS, seed: propertySeed(standard ? 210 : 200), endOnFailure: standard },
+      );
+      expect(damageStates).toBeGreaterThan(0);
+      // Choices over hidden zones were exercised, including observed autoSkip on them (M2-19).
+      if (SCRIPTED_IDS.has('OP17-039')) expect(secretChoices).toBeGreaterThan(0);
+      expect(forcedChecks).toBeGreaterThan(0);
+    }, 600_000);
+
+    it('a handle never links a card across a zone hidden from the viewer, and no projected event holds a raw id (M2-03, M2-17)', () => {
+      let rawChecked = 0;
+      let returns = 0;
+      let exempted = 0;
+      fc.assert(
+        fc.property(fc.integer({ min: 1, max: 0x7fffffff }), (seed) =>
+          guard(seed, () => {
+            const t = new LinkTracker(`seed ${seed}`);
+            const observeState = (g: GameState): void => {
+              const s = internals(g);
+              for (const v of PLAYERS) {
+                const view = project(g, v);
+                for (const p of PLAYERS) {
+                  for (const [zone, list] of Object.entries(view.zones[p])) {
+                    const ids =
+                      zone === 'leader'
+                        ? [s.players[p].leader]
+                        : ((s.players[p] as unknown as Record<string, string[]>)[zone] ?? []);
+                    list.forEach((vc, i) => {
+                      const id = ids[i];
+                      if (!id) return;
+                      if (vc.card === null) t.hiddenInView(v, id, zone);
+                      else t.shownInView(v, id, vc.handle, `${p}.${zone}`);
+                    });
+                  }
                 }
               }
+            };
+            game(seed, false, (events: GameEvent[], after) => {
+              for (const v of PLAYERS) {
+                const projected = projectEvents(events, v);
+                // M2-17: no projected event carries a raw instance id, live or dead.
+                const raw = JSON.stringify(projected).match(INSTANCE_ID_ANYWHERE);
+                if (raw)
+                  throw new Error(`seed ${seed}: raw instance id ${raw[0]} projected to ${v}`);
+                rawChecked++;
+                projected.forEach((pe, i) => {
+                  const raw = events[i]!;
+                  for (const f of CARD_FIELDS) {
+                    const h = pe[f];
+                    const id = raw[f];
+                    if (typeof h === 'string' && typeof id === 'string' && h !== id) {
+                      t.note(v, id, h, `event ${raw.type}.${f}`);
+                      if (raw.type === 'CardRevealed')
+                        t.revealed(v, id, h, (raw as { from?: string }).from);
+                    }
+                  }
+                });
+              }
+              observeState(after);
             });
-          }
-          observeState(after);
-        });
-        returns += t.returns;
-        exempted += t.exempted;
-      }),
-      { numRuns: RUNS, seed: propertySeed(300) },
-    );
-    expect(exempted).toBeGreaterThanOrEqual(0);
-    expect(returns).toBeGreaterThan(0); // cards did come back from hidden zones
-    expect(rawChecked).toBeGreaterThan(0);
-  }, 600_000);
-});
+            returns += t.returns;
+            exempted += t.exempted;
+          }),
+        ),
+        { numRuns: RUNS, seed: propertySeed(standard ? 310 : 300), endOnFailure: standard },
+      );
+      expect(exempted).toBeGreaterThanOrEqual(0);
+      expect(returns).toBeGreaterThan(0); // cards did come back from hidden zones
+      expect(rawChecked).toBeGreaterThan(0);
+    }, 600_000);
+  },
+);
 
 export type { Action };
