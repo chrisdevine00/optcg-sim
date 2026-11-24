@@ -60,36 +60,53 @@ import { OP17_063 } from './OP17-063.ts';
 import { OP17_064 } from './OP17-064.ts';
 import { OP17_065 } from './OP17-065.ts';
 import { OP17_066 } from './OP17-066.ts';
+import { OP17_067 } from './OP17-067.ts';
+import { OP17_068 } from './OP17-068.ts';
+import { OP17_069 } from './OP17-069.ts';
+import { OP17_071 } from './OP17-071.ts';
+import { OP17_072 } from './OP17-072.ts';
 import { OP17_073 } from './OP17-073.ts';
 import { OP17_074 } from './OP17-074.ts';
 import { OP17_075 } from './OP17-075.ts';
 import { OP17_076 } from './OP17-076.ts';
 import { OP17_077 } from './OP17-077.ts';
+import { OP17_078 } from './OP17-078.ts';
 import { OP17_079 } from './OP17-079.ts';
 import { OP17_080 } from './OP17-080.ts';
 import { OP17_081 } from './OP17-081.ts';
 import { OP17_082 } from './OP17-082.ts';
 import { OP17_083 } from './OP17-083.ts';
 import { OP17_084 } from './OP17-084.ts';
+import { OP17_085 } from './OP17-085.ts';
 import { OP17_086 } from './OP17-086.ts';
 import { OP17_087 } from './OP17-087.ts';
 import { OP17_089 } from './OP17-089.ts';
 import { OP17_090 } from './OP17-090.ts';
 import { OP17_091 } from './OP17-091.ts';
+import { OP17_092 } from './OP17-092.ts';
 import { OP17_093 } from './OP17-093.ts';
 import { OP17_094 } from './OP17-094.ts';
 import { OP17_095 } from './OP17-095.ts';
 import { OP17_096 } from './OP17-096.ts';
+import { OP17_097 } from './OP17-097.ts';
 import { OP17_098 } from './OP17-098.ts';
+import { OP17_099 } from './OP17-099.ts';
+import { OP17_101 } from './OP17-101.ts';
 import { OP17_102 } from './OP17-102.ts';
+import { OP17_103 } from './OP17-103.ts';
+import { OP17_104 } from './OP17-104.ts';
+import { OP17_105 } from './OP17-105.ts';
 import { OP17_106 } from './OP17-106.ts';
 import { OP17_107 } from './OP17-107.ts';
+import { OP17_108 } from './OP17-108.ts';
 import { OP17_109 } from './OP17-109.ts';
 import { OP17_110 } from './OP17-110.ts';
 import { OP17_111 } from './OP17-111.ts';
 import { OP17_112 } from './OP17-112.ts';
 import { OP17_113 } from './OP17-113.ts';
 import { OP17_114 } from './OP17-114.ts';
+import { OP17_115 } from './OP17-115.ts';
+import { OP17_117 } from './OP17-117.ts';
 import { OP17_118 } from './OP17-118.ts';
 import { OP17_119 } from './OP17-119.ts';
 
@@ -154,36 +171,53 @@ const SET: readonly CardScript[] = [
   OP17_064,
   OP17_065,
   OP17_066,
+  OP17_067,
+  OP17_068,
+  OP17_069,
+  OP17_071,
+  OP17_072,
   OP17_073,
   OP17_074,
   OP17_075,
   OP17_076,
   OP17_077,
+  OP17_078,
   OP17_079,
   OP17_080,
   OP17_081,
   OP17_082,
   OP17_083,
   OP17_084,
+  OP17_085,
   OP17_086,
   OP17_087,
   OP17_089,
   OP17_090,
   OP17_091,
+  OP17_092,
   OP17_093,
   OP17_094,
   OP17_095,
   OP17_096,
+  OP17_097,
   OP17_098,
+  OP17_099,
+  OP17_101,
   OP17_102,
+  OP17_103,
+  OP17_104,
+  OP17_105,
   OP17_106,
   OP17_107,
+  OP17_108,
   OP17_109,
   OP17_110,
   OP17_111,
   OP17_112,
   OP17_113,
   OP17_114,
+  OP17_115,
+  OP17_117,
   OP17_118,
   OP17_119,
 ];
