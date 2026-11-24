@@ -24,3 +24,7 @@ Details and options: `docs/research/m6b-runtime-audit.md` §3.
 - Test kit: `engine/test/independent/cards/eb05/kit-b.ts` `beginUse` accepts every optional prompt, which can hide a missing "up to" prompt; narrow it before reuse.
 - ~~E-Q11 revisit~~ done 2026-11-24 (`addDon` asks a count).
 
+
+## 5. OP-15 batch (2026-11-24)
+
+- Engine: `play { from: 'self' }` plays the source card from wherever it now is, not from the zone the text names (found by the OP-15 group 2 scripter: OP15-080 Oars, paying the deck-bottom cost with Oars itself, would play it from the deck bottom). OP15-080 uses `from: 'trash'` with `isSelf`; OP17-015, OP16-014, ST30-008 pay hand costs and cannot hit it. Fix: the validator should reject `from: 'self'` play where a cost can move the source, or the runtime should check the source's zone.
