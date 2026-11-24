@@ -1,0 +1,20 @@
+{
+  "id": "EB05-040",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/EB05-040",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "fields": {
+    "name": {
+      "value": "You Need Me, Don't You?!!♡",
+      "upstream": "You Need Me, Don't You?!!",
+      "source": "https://onepiece.limitlesstcg.com/cards/EB05-040"
+    }
+  },
+  "note": "optcgapi drops the heart symbol in the name. Settled on Limitless (the official list was not reachable on 2026-11-24); a clear upstream defect, not a reading."
+}

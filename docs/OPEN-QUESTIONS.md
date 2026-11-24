@@ -135,3 +135,9 @@ Full text, proposed readings, source auditor IDs and what `rulings.md`/`rules-di
 - M6b-Q38. OP11-092: played Character already gone at end of turn.
 - M6b-Q39. OP09-101: cost that moves an opponent's Character into their Life.
 - M6b-Q40. OP10-022: revealed Life card played; does lifeRemoved fire?
+
+## EB-05 verification (2026-11-24, runbook step d.1)
+
+- EB-05-V1. **EB05-031 Vinsmoke Reiju: cost 5 (optcgapi) or 4 (Limitless)?** Not verified and not scripted until it is read on the official card list (it was not reachable from here on 2026-11-24). Owner or next agent: read https://en.onepiece-cardgame.com/cardlist/ (EB-05 series) and write `cards/overrides/EB05-031.json`.
+- EB-05-V2. EB05-014 Shirahoshi: block 5 (product) or X (Limitless)? Both are Standard-legal now, so play is unaffected; check the printed icon on the official list with V1.
+- Five clear upstream defects were settled on Limitless (EB05-029 and EB05-053 missing [Trigger] text, EB05-057 "If your have", EB05-058 accent, EB05-030 and EB05-040 the ♡ in the name); each override says so.

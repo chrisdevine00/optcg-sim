@@ -1,5 +1,5 @@
 /**
- * `npm run cards:verify-meta [-- --fetch] [-- --write]`
+ * `npm run cards:verify-meta [-- --set <SET>] [-- --fetch] [-- --write]`
  *
  * M1 verification of every card in docs/research/meta-lists.json: compares the normalized card (after
  * overrides) with its Limitless card page, field by field. Pages are read from .cache/m1/limitless/
@@ -85,10 +85,17 @@ async function fetchPage(id: string): Promise<void> {
 }
 
 async function main() {
-  const args = new Set(process.argv.slice(2));
-  const ids = metaIds(
-    JSON.parse(readFileSync(join(ROOT, 'docs/research/meta-lists.json'), 'utf8')),
-  );
+  const argv = process.argv.slice(2);
+  const args = new Set(argv);
+  // `--set <SET>`: every card of one product (a scripting batch, runbook step d.1), not the meta lists.
+  const set = argv.includes('--set') ? argv[argv.indexOf('--set') + 1] : undefined;
+  const ids = set
+    ? [...(await pipeline({ refresh: false, log: () => {} })).cards.values()]
+        .filter((c) => c.set === set)
+        .map((c) => c.id)
+        .sort()
+    : metaIds(JSON.parse(readFileSync(join(ROOT, 'docs/research/meta-lists.json'), 'utf8')));
+  if (set && ids.length === 0) throw new Error(`no cards in set ${set}`);
   if (args.has('--fetch')) for (const id of ids) if (!pagePath(id)) await fetchPage(id);
   const run = await pipeline({ refresh: false, log: () => {} });
   let clean = 0;
