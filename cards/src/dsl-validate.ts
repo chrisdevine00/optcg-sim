@@ -34,6 +34,11 @@ export const IMPLEMENTED = {
     'event:lifeRemoved',
     'event:lifeBecameZero',
     'event:koed',
+    // M6b wave 3 (G22, G24, G29).
+    'event:trashedFromHand',
+    'event:rested',
+    'event:removed',
+    'event:leftField',
   ],
   zones: [
     'leader',
@@ -126,6 +131,8 @@ export const IMPLEMENTED = {
     'refStat',
     'sum',
     'mul',
+    'div',
+    'eventCount',
   ],
 } as const;
 
@@ -139,6 +146,10 @@ interface Ctx {
   noAlt?: boolean;
   /** A selector may name the top Life card (only a `move` can read it). */
   lifeOk?: boolean;
+  /** The ability watches `trashedFromHand`, so `{ eventCount }` has a count to read (G22). */
+  evCount?: boolean;
+  /** The ability is an `onKO` auto, so `{ koCause }` has a K.O. to read (G28). */
+  koOk?: boolean;
 }
 
 const isObj = (v: unknown): v is Obj => !!v && typeof v === 'object' && !Array.isArray(v);
@@ -244,6 +255,8 @@ function num(c: Ctx, path: string, v: unknown): void {
       'refStat',
       'sum',
       'mul',
+      'div',
+      'eventCount',
     ],
     { donOnField: ['state'], refStat: ['stat'], count: ['distinctNames'] },
   );
@@ -281,6 +294,22 @@ function num(c: Ctx, path: string, v: unknown): void {
       num(c, `${path}.mul[0]`, m[0]);
       return int(c, `${path}.mul[1]`, m[1]);
     }
+    case 'div': {
+      // Integer floor of a division (G23): the divisor is a whole number of 1 or more.
+      const m = o.div;
+      if (!Array.isArray(m) || m.length !== 2) return err(c, `${path}.div`, 'expected [Num, int]');
+      num(c, `${path}.div[0]`, m[0]);
+      int(c, `${path}.div[1]`, m[1]);
+      if (typeof m[1] === 'number' && m[1] < 1)
+        err(c, `${path}.div[1]`, 'the divisor is 1 or more');
+      return;
+    }
+    case 'eventCount':
+      // The number of cards the triggering event moved (G22): only an auto ability has one.
+      if (o.eventCount !== true) err(c, `${path}.eventCount`, 'expected true');
+      else if (!c.evCount)
+        err(c, path, 'eventCount is read by an auto ability that watches trashedFromHand');
+      return;
   }
 }
 
@@ -422,8 +451,11 @@ function condition(c: Ctx, path: string, v: unknown): void {
       'all',
       'any',
       'not',
+      'koCause',
+      'koedThisTurn',
+      'eventsActivatedThisTurn',
     ],
-    { ref: ['matches'] },
+    { ref: ['matches'], eventsActivatedThisTurn: ['baseCost'] },
   );
   if (!k) return;
   const o = v as Obj;
@@ -461,6 +493,16 @@ function condition(c: Ctx, path: string, v: unknown): void {
       return arr(c, p, o[k], (y, q) => condition(c, q, y));
     case 'not':
       return condition(c, p, o.not);
+    case 'koCause':
+      enumOf(c, p, o.koCause, ['opponentEffect', 'effect']);
+      if (!c.koOk) err(c, p, 'koCause is read by an [On K.O.] auto ability (timing "onKO")');
+      return;
+    case 'koedThisTurn':
+      return enumOf(c, p, o.koedThisTurn, P);
+    case 'eventsActivatedThisTurn':
+      enumOf(c, p, o.eventsActivatedThisTurn, P);
+      if (o.baseCost !== undefined) cmp(c, `${path}.baseCost`, o.baseCost);
+      return;
   }
 }
 
@@ -556,16 +598,26 @@ function cost(c: Ctx, path: string, v: unknown): void {
       ownerYou(c, p, o.ko, 'a K.O. cost K.O.s your own Characters');
       return;
     case 'giveDon': {
-      fields(c, p, o.giveDon, ['n', 'state', 'to']);
+      fields(c, p, o.giveDon, ['n', 'state', 'to'], ['from']);
       const g = o.giveDon;
       if (!isObj(g)) return;
       int(c, `${p}.n`, g.n);
       if (typeof g.n === 'number' && g.n < 1) err(c, `${p}.n`, 'must be at least 1');
-      enumOf(c, `${p}.state`, g.state, ['active']);
+      // The opponent's rested DON!! go to the opponent's own card (G20); yours go to yours (G7).
+      const opp = g.from === 'opponent';
+      if (g.from !== undefined && !opp) err(c, `${p}.from`, 'expected "opponent"');
+      enumOf(c, `${p}.state`, g.state, [opp ? 'rested' : 'active']);
       selector(c, `${p}.to`, g.to);
       if (isObj(g.to) && !(g.to as Obj).pick) err(c, `${p}.to`, 'a cost selector needs a pick');
       zonesIn(c, `${p}.to`, g.to, ['leader', 'characters'], 'DON!! go to a Leader or Character');
-      ownerYou(c, `${p}.to`, g.to, 'a giveDon cost gives DON!! to your own cards');
+      if (opp) {
+        if (isObj(g.to) && g.to.owner !== 'opponent')
+          err(
+            c,
+            `${p}.to.owner`,
+            'the opponent\'s DON!! go to the opponent\'s cards: owner must be "opponent"',
+          );
+      } else ownerYou(c, `${p}.to`, g.to, 'a giveDon cost gives DON!! to your own cards');
       if (isObj(g.to) && isObj(g.to.pick) && g.to.pick.exactly !== 1)
         err(c, `${p}.to.pick`, 'a giveDon cost gives to exactly 1 card');
       return;
@@ -885,10 +937,27 @@ function action(c: Ctx, path: string, v: unknown): void {
       if (x.uses !== 1) err(c, `${p}.uses`, 'only uses = 1 is implemented');
       return;
     case 'giveDon':
-      fields(c, p, x, ['n', 'state', 'to'], ['each']);
+      fields(c, p, x, ['n', 'state', 'to'], ['each', 'from']);
       if (!isObj(x)) return;
       num(c, `${p}.n`, x.n);
-      enumOf(c, `${p}.state`, x.state, ['rested', 'active']);
+      if (x.from !== undefined && x.from !== 'opponent') err(c, `${p}.from`, 'expected "opponent"');
+      // The opponent's DON!! go to the opponent's own card, one target (G20); `any` (active or
+      // rested, the giver's choice) is only for that form.
+      if (x.from === 'opponent') {
+        enumOf(c, `${p}.state`, x.state, ['rested', 'active', 'any']);
+        if (x.each !== undefined) err(c, `${p}.each`, "not implemented for the opponent's DON!!");
+        if (isObj(x.to)) {
+          if (x.to.owner !== 'opponent')
+            err(
+              c,
+              `${p}.to.owner`,
+              'the opponent\'s DON!! go to the opponent\'s cards: owner must be "opponent"',
+            );
+          const pk = x.to.pick;
+          if (!isObj(pk) || (pk.upTo !== 1 && pk.exactly !== 1))
+            err(c, `${p}.to.pick`, "the opponent's DON!! go to 1 card: pick upTo 1 or exactly 1");
+        }
+      } else enumOf(c, `${p}.state`, x.state, ['rested', 'active']);
       selector(c, `${p}.to`, x.to);
       zonesIn(c, `${p}.to`, x.to, ['leader', 'characters'], 'DON!! go to a Leader or Character');
       if (x.each !== undefined && x.each !== true) err(c, `${p}.each`, 'expected true');
@@ -909,8 +978,17 @@ function action(c: Ctx, path: string, v: unknown): void {
         enumOf(c, `${q}.state`, y.state, ['active', 'rested']);
       });
     case 'returnDon':
-      fields(c, p, x, ['n']);
-      if (isObj(x) && x.n !== 'toMatchOpponent') num(c, `${p}.n`, x.n);
+      fields(c, p, x, ['n'], ['player', 'from']);
+      if (!isObj(x)) return;
+      if (x.player !== undefined && x.player !== 'opponent')
+        err(c, `${p}.player`, 'expected "opponent"');
+      // The opponent returns their own DON!! (G27); `from: "active"` is for that form only.
+      if (x.player === undefined && x.from !== undefined)
+        err(c, `${p}.from`, "from applies to the opponent's returning");
+      if (x.from !== undefined && x.from !== 'active') err(c, `${p}.from`, 'expected "active"');
+      if (x.player === 'opponent' && x.n === 'toMatchOpponent')
+        err(c, `${p}.n`, 'toMatchOpponent is for your own DON!!');
+      if (x.n !== 'toMatchOpponent') num(c, `${p}.n`, x.n);
       return;
     case 'grant':
       fields(c, p, x, ['target', 'keyword', 'duration']);
@@ -931,12 +1009,22 @@ function action(c: Ctx, path: string, v: unknown): void {
       if (typeof x.target === 'string') {
         enumOf(c, `${p}.target`, x.target, P);
         const w = x.what;
-        if (w !== 'cannotDrawByOwnEffects' && !(isObj(w) && 'cannotPlay' in w))
-          err(c, `${p}.what`, 'a restriction on a player is cannotDrawByOwnEffects or cannotPlay');
+        if (
+          w !== 'cannotDrawByOwnEffects' &&
+          !(isObj(w) && ('cannotPlay' in w || 'cannotSetDonActive' in w))
+        )
+          err(
+            c,
+            `${p}.what`,
+            'a restriction on a player is cannotDrawByOwnEffects, cannotPlay or cannotSetDonActive',
+          );
       } else {
         selector(c, `${p}.target`, x.target);
         zonesIn(c, `${p}.target`, x.target, FIELD_ZONES, 'modifiers apply to cards on the field');
-        if (x.what === 'cannotDrawByOwnEffects' || (isObj(x.what) && 'cannotPlay' in x.what))
+        if (
+          x.what === 'cannotDrawByOwnEffects' ||
+          (isObj(x.what) && ('cannotPlay' in x.what || 'cannotSetDonActive' in x.what))
+        )
           err(c, `${p}.what`, 'that restriction applies to a player, not to cards');
       }
       restriction(c, `${p}.what`, x.what);
@@ -1035,10 +1123,20 @@ function restriction(c: Ctx, path: string, v: unknown): void {
       err(c, path, `restriction ${v} is not implemented in the runtime yet`);
     return;
   }
-  const k = oneOf(c, path, v, ['cannotPlay', 'cannotBeKOd', 'cannotBeRested']);
+  const k = oneOf(c, path, v, [
+    'cannotPlay',
+    'cannotBeKOd',
+    'cannotBeRested',
+    'cannotSetDonActive',
+  ]);
   if (!k || !isObj(v)) return;
   if (k === 'cannotPlay') filter(c, `${path}.cannotPlay`, v.cannotPlay);
-  else if (k === 'cannotBeKOd') {
+  else if (k === 'cannotSetDonActive') {
+    // A player restriction (G21): only "using Character effects" is implemented.
+    fields(c, `${path}.cannotSetDonActive`, v.cannotSetDonActive, ['by']);
+    if (isObj(v.cannotSetDonActive))
+      enumOf(c, `${path}.cannotSetDonActive.by`, v.cannotSetDonActive.by, ['characterEffects']);
+  } else if (k === 'cannotBeKOd') {
     // Scoped by cause (G6): "by effects", "by your opponent's effects", "in battle".
     fields(c, `${path}.cannotBeKOd`, v.cannotBeKOd, ['cause']);
     if (isObj(v.cannotBeKOd))
@@ -1127,6 +1225,8 @@ function continuous(c: Ctx, path: string, v: unknown): void {
       // the draw restriction are modifiers on a Leader, which a permanent does not produce.
       if (isObj(x.what) && 'cannotPlay' in x.what)
         err(c, `${p}.what`, 'a permanent cannot restrict what a player may play');
+      else if (isObj(x.what) && 'cannotSetDonActive' in x.what)
+        err(c, `${p}.what`, 'a permanent cannot restrict setting DON!! active');
       else if (x.what === 'cannotDrawByOwnEffects')
         err(c, `${p}.what`, 'a permanent cannot restrict drawing');
       else restriction(c, `${p}.what`, x.what);
@@ -1146,11 +1246,40 @@ function continuous(c: Ctx, path: string, v: unknown): void {
 
 function timing(c: Ctx, path: string, v: unknown): void {
   if (typeof v === 'string') return enumOf(c, path, v, NAMED);
-  fields(c, path, v, ['event'], ['by', 'filter', 'attacker', 'target', 'owner']);
+  fields(
+    c,
+    path,
+    v,
+    ['event'],
+    [
+      'by',
+      'filter',
+      'attacker',
+      'target',
+      'owner',
+      'from',
+      'via',
+      'sourceFilter',
+      'includeCosts',
+      'cause',
+      'to',
+    ],
+  );
   if (!isObj(v)) return;
   const e = `event:${String(v.event)}`;
   if (!has(IMPLEMENTED.timings, e))
     return err(c, path, `${e} is not implemented in the runtime yet`);
+  // The wave 3 qualifiers belong to one event each; anywhere else they would silently do nothing.
+  const own: Record<string, string[]> = {
+    cardPlayed: ['from', 'via'],
+    trashedFromHand: ['sourceFilter', 'includeCosts', 'by'],
+    rested: ['sourceFilter', 'by'],
+    removed: ['cause', 'to'],
+    leftField: ['cause', 'to'],
+  };
+  for (const k of ['from', 'via', 'sourceFilter', 'includeCosts', 'cause', 'to'])
+    if (k in v && !(own[String(v.event)] ?? []).includes(k))
+      err(c, `${path}.${k}`, `${k} does not apply to a ${String(v.event)} event`);
   if (v.event === 'attack') {
     if (v.attacker === undefined && v.target === undefined)
       err(c, path, 'an attack event needs an attacker or a target');
@@ -1159,8 +1288,34 @@ function timing(c: Ctx, path: string, v: unknown): void {
   } else if (v.event === 'cardPlayed') {
     enumOf(c, `${path}.by`, v.by, P);
     if (v.filter !== undefined) filter(c, `${path}.filter`, v.filter);
+    if (v.from !== undefined) enumOf(c, `${path}.from`, v.from, ['hand', 'trash']);
+    if (v.via !== undefined) enumOf(c, `${path}.via`, v.via, ['rule', 'effect', 'characterEffect']);
   } else if (v.event === 'eventActivated' || v.event === 'blockerActivated') {
     enumOf(c, `${path}.by`, v.by, P);
+  } else if (v.event === 'trashedFromHand') {
+    enumOf(c, `${path}.owner`, v.owner, P);
+    if (v.by !== undefined) enumOf(c, `${path}.by`, v.by, P);
+    if (v.sourceFilter !== undefined) filter(c, `${path}.sourceFilter`, v.sourceFilter);
+    if (v.includeCosts !== undefined && v.includeCosts !== true)
+      err(c, `${path}.includeCosts`, 'expected true');
+    if (v.filter !== undefined)
+      err(c, `${path}.filter`, 'use sourceFilter: the cards trashed are not read');
+  } else if (v.event === 'rested') {
+    enumOf(c, `${path}.owner`, v.owner, [...P, 'any']);
+    if (v.filter !== undefined) filter(c, `${path}.filter`, v.filter);
+    if (v.by !== undefined)
+      enumOf(c, `${path}.by`, v.by, ['effect', 'yourEffect', 'opponentEffect']);
+    if (v.sourceFilter !== undefined) {
+      filter(c, `${path}.sourceFilter`, v.sourceFilter);
+      if (v.by === undefined)
+        err(c, `${path}.sourceFilter`, 'sourceFilter needs a "by" (an effect)');
+    }
+  } else if (v.event === 'removed' || v.event === 'leftField') {
+    enumOf(c, `${path}.owner`, v.owner, P);
+    if (v.filter !== undefined) filter(c, `${path}.filter`, v.filter);
+    if (v.cause !== undefined)
+      enumOf(c, `${path}.cause`, v.cause, ['effect', 'yourEffect', 'opponentEffect']);
+    if (v.to !== undefined) enumOf(c, `${path}.to`, v.to, ['hand', 'deck', 'trash']);
   } else if (v.event === 'koed') {
     if (v.filter === undefined) err(c, path, 'a koed event needs a filter');
     else filter(c, `${path}.filter`, v.filter);
@@ -1177,6 +1332,11 @@ function ability(c: Ctx, path: string, v: unknown, ids: Set<string>): void {
   if (!isObj(v)) return err(c, path, 'expected an object');
   c.bound = new Set();
   c.labels = new Set();
+  c.evCount =
+    v.kind === 'auto' &&
+    Array.isArray(v.when) &&
+    v.when.some((w) => isObj(w) && w.event === 'trashedFromHand');
+  c.koOk = v.kind === 'auto' && Array.isArray(v.when) && v.when.includes('onKO');
   const base = ['id', 'label', 'oncePerTurn', 'conditions'];
   str(c, `${path}.id`, v.id);
   if (typeof v.id === 'string') {

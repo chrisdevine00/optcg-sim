@@ -17,7 +17,8 @@ import {
   type Derived,
   type LayerMemo,
 } from '../derive.ts';
-import { other, type State } from '../state.ts';
+import { historyOf } from '../history.ts';
+import { other, type Ev, type State } from '../state.ts';
 
 export interface Ctx {
   s: State;
@@ -31,6 +32,8 @@ export interface Ctx {
   did?: string[] | undefined;
   /** Numeric bindings, by name (DON!! rested "this way"). */
   n?: Record<string, number> | undefined;
+  /** What the triggering event told the ability: a K.O.'s cause, a count of cards (M6b wave 3). */
+  ev?: Ev | undefined;
   /** The state is a draft being written: derive without the memo. */
   live?: boolean;
   /**
@@ -217,6 +220,10 @@ function numOf(c: Ctx, n: Num): number {
     return (n.stat === 'cost' ? dv.cost : n.stat === 'power' ? dv.power : dv.basePower) ?? 0;
   }
   if ('sum' in n) return n.sum.reduce((a: number, x) => a + num(c, x), 0);
+  // "For every 5 cards in your trash" (G23): the whole number of times it fits.
+  if ('div' in n) return Math.floor(num(c, n.div[0]) / n.div[1]);
+  // The number of cards the triggering event moved (G22); 0 for an ability that has no such event.
+  if ('eventCount' in n) return c.ev?.n ?? 0;
   return num(c, n.mul[0]) * n.mul[1];
 }
 
@@ -249,6 +256,19 @@ function holdsOf(c: Ctx, k: Condition): boolean {
   if ('self' in k) return matches(c, c.self, k.self);
   if ('ref' in k) return (c.b?.[k.ref] ?? []).some((id) => matches(c, id, k.matches));
   if ('did' in k) return (c.did ?? []).includes(k.did);
+  if ('koCause' in k) {
+    // The K.O. that triggered this ability (G28): its cause, read for the K.O.'d card's controller.
+    const cause = c.ev?.cause;
+    if (!cause) return false;
+    if (k.koCause === 'opponentEffect') return cause.kind === 'effect' && cause.by !== c.you;
+    return cause.kind === 'effect' || cause.kind === 'cost';
+  }
+  if ('koedThisTurn' in k) return historyOf(s).koed[rel(c, k.koedThisTurn)] > 0;
+  if ('eventsActivatedThisTurn' in k) {
+    const by = rel(c, k.eventsActivatedThisTurn);
+    const bc = k.baseCost;
+    return historyOf(s).events.some((e) => e.by === by && (!bc || cmp(c, e.baseCost, bc)));
+  }
   if ('all' in k) return k.all.every((x) => holds(c, x));
   if ('any' in k) return k.any.some((x) => holds(c, x));
   return !holds(c, k.not);
@@ -297,8 +317,13 @@ export function payable(c: Ctx, costs: readonly Cost[] | undefined, o: PayOption
       returns += n;
       if (typeof k.returnDon !== 'number') activeReturns += n;
     } else if ('giveDon' in k) {
-      // Active cost-area DON!! go to a card (G7): they leave the cost area like a rested one.
-      rests += k.giveDon.n;
+      if ('from' in k.giveDon && k.giveDon.from === 'opponent') {
+        // The opponent's rested DON!! go to the opponent's cards (G20): nothing of yours is spent.
+        if (s.players[other(c.you)].donRested < k.giveDon.n) return false;
+      } else {
+        // Active cost-area DON!! go to a card (G7): they leave the cost area like a rested one.
+        rests += k.giveDon.n;
+      }
       if (pool(c, k.giveDon.to).length < 1) return false;
     } else if ('ko' in k) {
       // A protected Character may still be chosen; the K.O. then fails and the effect with it
@@ -383,7 +408,7 @@ export function reservedActive(costs: readonly Cost[], from: number): number {
     const k = costs[i]!;
     if ('restDon' in k && k.restDon !== 'any') n += k.restDon;
     // Later costs that need active DON!! of their own (G7, G9).
-    else if ('giveDon' in k) n += k.giveDon.n;
+    else if ('giveDon' in k && !('from' in k.giveDon)) n += k.giveDon.n;
     else if ('returnDon' in k && typeof k.returnDon !== 'number') n += k.returnDon.n;
   }
   return n;
@@ -473,10 +498,22 @@ export function attackLock(s: State, attacker: PlayerId, live = false): Instance
 // player's Leader, which never leaves the field, so they expire with the same durations as any other.
 // ---------------------------------------------------------------------------------------------
 
-function leaderMods(s: State, p: PlayerId, kind: 'cannotDraw' | 'cannotPlay' | 'playCost') {
+function leaderMods(
+  s: State,
+  p: PlayerId,
+  kind: 'cannotDraw' | 'cannotPlay' | 'playCost' | 'cannotSetDon',
+) {
   const leader = s.players[p].leader;
   return s.mods.filter((m) => m.kind === kind && m.target === leader);
 }
+
+/**
+ * "You cannot set DON!! cards as active using Character effects" is in force for `p` (G21): an
+ * effect whose source is a Character, of either player, cannot set `p`'s DON!! active. Effects of
+ * Leaders, Stages and Events are not stopped, and neither is the Refresh Phase.
+ */
+export const cannotSetDonByCharacter = (s: State, p: PlayerId): boolean =>
+  leaderMods(s, p, 'cannotSetDon').length > 0;
 
 /** "Cannot draw cards using your own effects" is in force for `p`. */
 export const cannotDrawByEffect = (s: State, p: PlayerId): boolean =>

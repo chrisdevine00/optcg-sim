@@ -10,7 +10,17 @@ import type { DonClass, InstanceId, PlayerId } from '../api.ts';
 import type { Ability, InternalStep } from '../abilities.ts';
 import { hasTiming, optionalCost } from '../abilities.ts';
 import type { Draft } from '../draft.ts';
-import { abilityOf, fireEvent, pop, push, pushKo, pushRemove, sourceInfo, top } from '../flow.ts';
+import {
+  abilityOf,
+  fireEvent,
+  fireTrashedFromHand,
+  pop,
+  push,
+  pushKo,
+  pushRemove,
+  sourceInfo,
+  top,
+} from '../flow.ts';
 import {
   addModifier,
   draw,
@@ -23,13 +33,21 @@ import {
   setActive,
 } from '../ops/index.ts';
 import type { Dest, Restriction } from '@optcg/cards';
-import { other, type DecisionState, type Duration, type Frame, type Got } from '../state.ts';
+import {
+  other,
+  type DecisionState,
+  type Duration,
+  type Ev,
+  type Frame,
+  type Got,
+} from '../state.ts';
 import { restBlocked } from '../derive.ts';
 import { program, type Instr } from './compile.ts';
 import { restrictionMod } from './layers.ts';
 import {
   allHold,
   cannotDrawByEffect,
+  cannotSetDonByCharacter,
   costIsSecret,
   dvOf,
   hiddenPool,
@@ -49,8 +67,41 @@ const WAIT = Symbol('wait');
 type Out = 'next' | 'jump' | typeof WAIT | 'stop';
 
 export function ctxOf(d: Draft, f: EffectFrame): Ctx {
-  return { s: d.s, you: f.controller, self: f.card, b: f.b, did: f.did, n: f.n, live: true };
+  return {
+    s: d.s,
+    you: f.controller,
+    self: f.card,
+    b: f.b,
+    did: f.did,
+    n: f.n,
+    ev: f.ev,
+    live: true,
+  };
 }
+
+/** How an effect's play of a card reads for a `cardPlayed` watcher: by a Character or not (G25). */
+function viaOf(d: Draft, f: EffectFrame): 'effect' | 'characterEffect' {
+  return d.s.defs[f.cardId]?.category === 'Character' ? 'characterEffect' : 'effect';
+}
+
+/**
+ * The cards of `ids` that were in a hand are now trashed by this effect (or cost): tell the
+ * watchers, one event per owner with that owner's count (G22). `held` is read before the move.
+ */
+function handTrashed(
+  d: Draft,
+  f: EffectFrame,
+  held: { owner: PlayerId; wasHand: boolean }[],
+  cost: boolean,
+): void {
+  for (const p of ['p1', 'p2'] as const) {
+    const n = held.filter((x) => x.wasHand && x.owner === p).length;
+    if (n > 0) fireTrashedFromHand(d, p, n, f.card, f.controller, cost);
+  }
+}
+
+const heldOf = (d: Draft, ids: InstanceId[]): { owner: PlayerId; wasHand: boolean }[] =>
+  ids.map((id) => ({ owner: d.card(id).owner, wasHand: d.card(id).zone === 'hand' }));
 
 /** Push an effect frame for an ability (an activation, a pending auto, a payload). */
 export function pushEffect(
@@ -60,7 +111,7 @@ export function pushEffect(
   ab: Ability,
   controller: PlayerId,
   part: 'effect' | 'instead',
-  opts: { start?: number; delayed?: boolean } = {},
+  opts: { start?: number; delayed?: boolean; ev?: Ev } = {},
 ): void {
   // An optional auto, an auto with a cost, or an Event whose activation cost is worded "you
   // may" (CR 8-3-1-4): ask first.
@@ -79,6 +130,7 @@ export function pushEffect(
     stage: optionalAuto && !opts.delayed ? 'ask' : 'run',
   };
   if (opts.delayed) f.delayed = true;
+  if (opts.ev) f.ev = opts.ev;
   push(d, f);
 }
 
@@ -159,7 +211,10 @@ export function costText(costs: readonly Cost[] | undefined): string {
       return typeof k.returnDon === 'number'
         ? `return ${k.returnDon} DON!!`
         : `return ${k.returnDon.n} active DON!!`;
-    if ('giveDon' in k) return `give ${k.giveDon.n} active DON!!`;
+    if ('giveDon' in k)
+      return 'from' in k.giveDon
+        ? `give ${k.giveDon.n} of your opponent's rested DON!!`
+        : `give ${k.giveDon.n} active DON!!`;
     if ('ko' in k) return 'K.O. 1 of your Characters';
     if ('turnLifeFaceDown' in k) return `turn ${k.turnLifeFaceDown} of your Life cards face-down`;
     if ('restDon' in k) return `rest ${String(k.restDon)} DON!!`;
@@ -534,20 +589,26 @@ function payCost(d: Draft, f: EffectFrame, k: Cost, reserve: number): Out {
     // "Give N active DON!! cards to your Leader or 1 of your Characters" (G7): the DON!! leave the
     // cost area for the card and return at the next Refresh Phase like any given DON!! (CR 6-2-3).
     const g = k.giveDon;
-    if (d.ro(f.controller).donActive - reserve < g.n) return anomaly(d, f, 'giveDon');
+    // "Give 1 of your opponent's rested DON!! cards to 1 of your opponent's Characters" (G20): the
+    // DON!! are the opponent's, rested, and go to the opponent's own card; none of yours is spent.
+    const fromOpp = 'from' in g && g.from === 'opponent';
+    const donor = fromOpp ? other(f.controller) : f.controller;
+    if (fromOpp ? d.ro(donor).donRested < g.n : d.ro(donor).donActive - reserve < g.n)
+      return anomaly(d, f, 'giveDon');
     const ids = select(d, f, g.to, { role: 'cost', verb: 'give DON!! to' });
     if (ids === WAIT) return WAIT;
     const id = ids[0];
     if (id === undefined) return anomaly(d, f, 'giveDon');
-    d.pl(f.controller).donActive -= g.n;
+    if (fromOpp) d.pl(donor).donRested -= g.n;
+    else d.pl(donor).donActive -= g.n;
     d.wcard(id).don += g.n;
     d.emit({
       type: 'DonGiven',
-      player: f.controller,
+      player: donor,
       target: id,
       card: d.card(id).card,
       count: g.n,
-      rested: false,
+      rested: fromOpp,
       by: 'cost',
     });
     return 'next';
@@ -556,7 +617,9 @@ function payCost(d: Draft, f: EffectFrame, k: Cost, reserve: number): Out {
     if (!hiddenPool(k.trash)) return fieldCost(d, f, k.trash, { remove: 'trash' });
     const ids = select(d, f, k.trash, { role: 'cost', verb: 'trash' });
     if (ids === WAIT) return WAIT;
+    const held = heldOf(d, ids);
     for (const id of ids) moveCard(d, id, 'trash', { revealed: true, extra: { reason: 'cost' } });
+    handTrashed(d, f, held, true);
     return 'next';
   }
   if ('ko' in k) return fieldCost(d, f, k.ko, { ko: true });
@@ -641,7 +704,9 @@ function payCost(d: Draft, f: EffectFrame, k: Cost, reserve: number): Out {
       ids = picked;
     }
     if (bottom && ids.length > 1) return placeHandTrash(d, f, ids, k.to as Dest, 'cost');
+    const held = heldOf(d, ids);
     placeCards(d, ids, k.to, 'cost');
+    if (k.to.zone === 'trash') handTrashed(d, f, held, true);
     return 'next';
   }
   void c;
@@ -852,9 +917,15 @@ function returnDon(
   role: 'cost' | 'target',
   /** Only active cost-area DON!! may go ("return 2 of your active DON!! cards", G9). */
   activeOnly = false,
+  /**
+   * The player who returns them and chooses which (G27: "your opponent returns 1 DON!!"). With
+   * `asMany`, an effect that cannot return all n returns what there is; a cost never does.
+   */
+  who: PlayerId = f.controller,
+  asMany = false,
 ): Out {
   if (n <= 0) return 'next';
-  const p = f.controller;
+  const p = who;
   const g = take(f);
   let picks: DonClass[];
   if (Array.isArray(g)) {
@@ -876,19 +947,21 @@ function returnDon(
         add({ from: 'given', card: id }, d.card(id).don);
     }
     const total = counts.reduce((a, b) => a + b, 0);
-    if (total < n) return anomaly(d, f, 'DON!! −');
-    if (classes.length === 1 || total === n) {
+    if (total < n && !asMany) return anomaly(d, f, 'DON!! −');
+    if (total === 0) return 'next';
+    const need = Math.min(n, total);
+    if (classes.length === 1 || total === need) {
       picks = [];
       classes.forEach((cl, i) => {
-        for (let j = 0; j < counts[i]! && picks.length < n; j++) picks.push(cl);
+        for (let j = 0; j < counts[i]! && picks.length < need; j++) picks.push(cl);
       });
     } else {
       return ask(d, f, {
         kind: 'choose',
         player: p,
-        prompt: `${nameOf(d, f)}: choose ${n} DON!! to return to your DON!! deck.`,
-        min: n,
-        max: n,
+        prompt: `${nameOf(d, f)}: choose ${need} DON!! to return to your DON!! deck.`,
+        min: need,
+        max: need,
         candidates: classes,
         counts,
         picked: [],
@@ -904,6 +977,7 @@ function returnDon(
   }
   ps.donDeck += picks.length;
   d.emit({ type: 'DonReturned', player: p, count: picks.length, to: 'donDeck' });
+  if (asMany && picks.length > 0) f.acted = true;
   // "When a DON!! card on your field is returned to your DON!! deck" (OP17-062).
   fireEvent(d, p, (w) => typeof w === 'object' && w.event === 'donReturned', 'donReturned');
   return 'next';
@@ -954,7 +1028,9 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
   if ('trashFromHand' in a) {
     const ids = select(d, f, a.trashFromHand, { role: 'target', verb: 'trash' });
     if (ids === WAIT) return WAIT;
+    const held = heldOf(d, ids);
     for (const id of ids) moveCard(d, id, 'trash', { revealed: true, extra: { reason: 'effect' } });
+    handTrashed(d, f, held, false);
     if (ids.length) f.acted = true;
     return 'next';
   }
@@ -999,7 +1075,14 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
     const batch = ids.length > 1 ? d.s.nextMod++ : undefined;
     if (ids.length) f.acted = true;
     for (const id of ids.slice().reverse()) {
-      const pf: Frame = { f: 'play', card: id, player: you, step: 'pay', free: true };
+      const pf: Frame = {
+        f: 'play',
+        card: id,
+        player: you,
+        step: 'pay',
+        free: true,
+        via: viaOf(d, f),
+      };
       if (batch !== undefined) pf.batch = batch;
       if (a.play.rested) pf.rested = true;
       push(d, pf);
@@ -1020,7 +1103,7 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
       // Cards and DON!! together; DON!! rest by class (E-D4). Only active DON!! can be rested.
       const got = selectRest(d, f, a.rest, 'target');
       if (got === WAIT) return WAIT;
-      for (const id of got.ids) if (FIELD.has(d.card(id).zone)) rest(d, id, 'effect', you);
+      for (const id of got.ids) if (FIELD.has(d.card(id).zone)) rest(d, id, 'effect', you, f.card);
       if (got.don > 0) {
         const p = rel(c, a.rest.owner === 'opponent' ? 'opponent' : 'you');
         const k = Math.min(got.don, d.ro(p).donActive);
@@ -1031,7 +1114,7 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
     const ids = select(d, f, a.rest, { role: 'target', verb: 'rest' });
     if (ids === WAIT) return WAIT;
     for (const id of ids)
-      if (FIELD.has(d.card(id).zone) && rest(d, id, 'effect', you)) f.acted = true;
+      if (FIELD.has(d.card(id).zone) && rest(d, id, 'effect', you, f.card)) f.acted = true;
     return 'next';
   }
   if ('skipRefresh' in a) {
@@ -1096,6 +1179,10 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
     if (zones.includes('donCostArea')) {
       // DON!! are interchangeable within a class (E-D4): "set up to N active" sets as many as it can.
       const p = rel(c, sel.owner === 'opponent' ? 'opponent' : 'you');
+      // "You cannot set DON!! cards as active using Character effects" (G21): a Character's effect
+      // sets none of that player's DON!!; Leader, Stage and Event effects still do.
+      if (cannotSetDonByCharacter(d.s, p) && d.s.defs[f.cardId]?.category === 'Character')
+        return 'next';
       const want =
         sel.pick && 'upTo' in sel.pick
           ? sel.pick.upTo
@@ -1141,6 +1228,8 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
         addModifier(d, { ...base, kind: 'cannotDraw', amount: 0 });
       else if (typeof what === 'object' && 'cannotPlay' in what)
         addModifier(d, { ...base, kind: 'cannotPlay', amount: 0, filter: what.cannotPlay });
+      else if (typeof what === 'object' && 'cannotSetDonActive' in what)
+        addModifier(d, { ...base, kind: 'cannotSetDon', amount: 0 });
       else return unsupported(d, f, `restriction ${JSON.stringify(what)} on a player`);
       return 'next';
     }
@@ -1217,6 +1306,12 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
     }
     return 'next';
   }
+  if ('returnDon' in a && a.returnDon.player === 'opponent') {
+    // "Your opponent returns N DON!! cards from their field to their DON!! deck" (G27): they choose
+    // which and return as many as they have; `donReturned` fires for their watchers.
+    const n = a.returnDon.n === 'toMatchOpponent' ? 0 : num(c, a.returnDon.n);
+    return returnDon(d, f, n, 0, 'target', a.returnDon.from === 'active', other(you), true);
+  }
   if ('returnDon' in a) {
     const n =
       a.returnDon.n === 'toMatchOpponent'
@@ -1289,20 +1384,37 @@ function giveDon(
   const you = f.controller;
   const c = ctxOf(d, f);
   const key = g.state === 'rested' ? 'donRested' : 'donActive';
+  // Whose DON!! go (G20): the opponent's, to the opponent's own card, with `from: 'opponent'`. With
+  // `state: 'any'` the giver picks how many of them are active ones, the rest are rested.
+  const donor = g.from === 'opponent' ? other(you) : you;
+  const any = g.state === 'any';
+  const have = (): number =>
+    any ? d.ro(donor).donActive + d.ro(donor).donRested : d.ro(donor)[key];
   const per = num(c, g.n);
-  const give = (id: InstanceId, k: number) => {
+  const give = (id: InstanceId, k: number, active = 0) => {
     if (d.card(id).zone !== 'leader' && d.card(id).zone !== 'characters') return;
-    d.pl(you)[key] -= k;
-    d.wcard(id).don += k;
-    d.emit({
-      type: 'DonGiven',
-      player: you,
-      target: id,
-      card: d.card(id).card,
-      count: k,
-      rested: g.state === 'rested',
-      by: 'effect',
-    });
+    const ps = d.pl(donor);
+    const parts: [number, boolean][] = any
+      ? [
+          [Math.min(active, k), false],
+          [k - Math.min(active, k), true],
+        ]
+      : [[k, g.state === 'rested']];
+    for (const [n, rested] of parts) {
+      if (n <= 0) continue;
+      if (rested) ps.donRested -= n;
+      else ps.donActive -= n;
+      d.wcard(id).don += n;
+      d.emit({
+        type: 'DonGiven',
+        player: donor,
+        target: id,
+        card: d.card(id).card,
+        count: n,
+        rested,
+        by: 'effect',
+      });
+    }
   };
   if (g.each) {
     // "up to N of your Characters ... M DON!! each" (G16, STB5-R1): "up to" allows fewer than M to a
@@ -1351,7 +1463,7 @@ function giveDon(
     }
     return 'next';
   }
-  const avail = Math.min(per, d.ro(you)[key]);
+  const avail = Math.min(per, have());
   const wanted = f.tmp?.give;
   if (wanted === undefined && (avail <= 0 || pool(c, g.to).length === 0)) return 'next';
   let count = wanted ?? 1;
@@ -1363,7 +1475,7 @@ function giveDon(
       return ask(d, f, {
         kind: 'choose',
         player: you,
-        prompt: `${nameOf(d, f)}: how many ${g.state} DON!! cards will you give (up to ${avail})?`,
+        prompt: `${nameOf(d, f)}: how many ${any ? '' : `${g.state} `}DON!! cards will you give (up to ${avail})?`,
         min: 1,
         max: 1,
         candidates: counts.map((i) => ({ option: String(i) })) as never,
@@ -1379,6 +1491,32 @@ function giveDon(
     if (count <= 0) return 'next';
     f.tmp = { ...f.tmp, give: count };
   }
+  // Any of the opponent's DON!! (G20): which of them, active or rested, is the giver's choice. It is
+  // asked only when both kinds are there and not all of them go (DON!! of a kind are the same, E-D4).
+  let active = f.tmp?.act ?? 0;
+  if (any && f.tmp?.act === undefined) {
+    const ps = d.ro(donor);
+    if (ps.donRested === 0) active = count;
+    else if (ps.donActive === 0) active = 0;
+    else if (count >= ps.donActive + ps.donRested) active = ps.donActive;
+    else {
+      const got = take(f);
+      if (!Array.isArray(got))
+        return ask(d, f, {
+          kind: 'choose',
+          player: you,
+          prompt: `${nameOf(d, f)}: choose ${count} of your opponent's DON!! cards to give.`,
+          min: count,
+          max: count,
+          candidates: [{ from: 'costActive' }, { from: 'costRested' }] as DonClass[],
+          counts: [ps.donActive, ps.donRested],
+          picked: [],
+          role: 'target',
+        });
+      active = (got as DonClass[]).filter((cl) => cl.from === 'costActive').length;
+    }
+    f.tmp = { ...f.tmp, act: active };
+  }
   // With a count chosen the target is owed; with one DON!! the player may still give none.
   const pk = g.to.pick;
   const n = !pk ? 1 : 'exactly' in pk ? pk.exactly : 'upTo' in pk ? pk.upTo : 1;
@@ -1389,9 +1527,9 @@ function giveDon(
   const ids = select(d, f, sel, { role: 'target', verb: 'give DON!! to' });
   if (ids === WAIT) return WAIT;
   for (const id of ids) {
-    const k = Math.min(count, d.ro(you)[key]);
+    const k = Math.min(count, have());
     if (k <= 0) break;
-    give(id, k);
+    give(id, k, active);
   }
   return 'next';
 }
@@ -1549,6 +1687,7 @@ function placeHandTrash(
     ranks = o;
   }
   const placed: InstanceId[] = [];
+  const held = heldOf(d, ids);
   for (const id of ranks ? ids.slice().sort() : ids) {
     const above = ranks ? placed.filter((p) => ranks!.get(p)! > ranks!.get(id)!).length : 0;
     const wasHand = d.card(id).zone === 'hand';
@@ -1561,6 +1700,7 @@ function placeHandTrash(
     });
     placed.push(id);
   }
+  if (to.zone === 'trash') handTrashed(d, f, held, reason === 'cost');
   return 'next';
 }
 
@@ -1638,7 +1778,14 @@ function lookAtTop(
         const batch = ids.length > 1 ? d.s.nextMod++ : undefined;
         if (ids.length) f.acted = true;
         for (const id of ids.slice().reverse()) {
-          const pf: Frame = { f: 'play', card: id, player: f.controller, step: 'pay', free: true };
+          const pf: Frame = {
+            f: 'play',
+            card: id,
+            player: f.controller,
+            step: 'pay',
+            free: true,
+            via: viaOf(d, f),
+          };
           if (batch !== undefined) pf.batch = batch;
           if (tk.rested) pf.rested = true;
           push(d, pf);

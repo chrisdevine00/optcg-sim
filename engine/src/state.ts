@@ -129,6 +129,8 @@ export type ModKind =
   | 'cannotBeRemoved'
   /** On a player's Leader: that player cannot draw cards using their own effects (OP12-099). */
   | 'cannotDraw'
+  /** On a player's Leader: that player cannot set DON!! active using Character effects (G21). */
+  | 'cannotSetDon'
   /** On a player's Leader: that player cannot play cards matching `filter` (OP13-118). */
   | 'cannotPlay'
   /** On a player's Leader: the next play from hand matching `filter` costs `amount` more (OP12-061). */
@@ -163,6 +165,27 @@ export interface Cause {
   kind: 'battle' | 'effect' | 'rule' | 'cost';
   /** The player whose battle, effect or cost it was. */
   by: PlayerId;
+}
+
+/**
+ * What the event that triggered an auto ability tells it (M6b wave 3): the cause of a K.O. (G28,
+ * `koCause`) and how many cards the event moved (G22, `eventCount`). Absent on any ability that
+ * did not come from such an event.
+ */
+export interface Ev {
+  cause?: Cause;
+  n?: number;
+}
+
+/**
+ * What happened this turn, kept only when a card in the game reads it (G26): Characters K.O.'d per
+ * owner and the Events activated (player, base cost). `turn` says which turn it describes, so it
+ * clears itself when the turn changes.
+ */
+export interface History {
+  turn: number;
+  koed: Record<PlayerId, number>;
+  events: { by: PlayerId; baseCost: number | null }[];
 }
 
 /** A replacement offered for one event: identified by card instance and ability id. */
@@ -200,6 +223,11 @@ export type Frame =
       counter?: true;
       /** "Play ... rested": the card is placed rested. */
       rested?: true;
+      /**
+       * Played by an effect (G25): `characterEffect` when the effect's source is a Character,
+       * else `effect`. Absent: the normal play from hand (or a Counter-Step Event).
+       */
+      via?: 'effect' | 'characterEffect';
       /**
        * Cards placed by one effect's `play` share a pending batch, so their [On Play]s are one
        * event and their controller orders them (M4a-04, CR 8-6-1).
@@ -256,6 +284,8 @@ export type Frame =
       tmp?: Scratch;
       /** Cards the controller is looking at (`lookAtTop`): visible to them only (CR 11-3-1). */
       look?: InstanceId[];
+      /** What the triggering event told this ability (`koCause`, `eventCount`). */
+      ev?: Ev;
     }
   | {
       f: 'remove';
@@ -295,6 +325,8 @@ export interface Scratch {
   give?: number;
   /** `addDon`: how many parts are done (an "up to" part asks its count first). */
   add?: number;
+  /** `giveDon` of any opponent DON!!: how many of the DON!! given are active ones (G20). */
+  act?: number;
 }
 
 /** An auto effect that has activated and waits to resolve (CR 8-6). */
@@ -312,6 +344,8 @@ export interface PendingEffect {
   ability: string;
   controller: PlayerId;
   timing: string;
+  /** What the event told it (`koCause`, `eventCount`). */
+  ev?: Ev;
 }
 
 /** The pending decision plus what `legalActions` needs to enumerate it. */
@@ -423,6 +457,8 @@ export interface State {
   known: Record<PlayerId, InstanceId[]>;
   /** Delayed effects ("at the end of this turn, …", OP08-074). */
   delayed: Delayed[];
+  /** This turn's K.O.s and Event activations, when a card in the game reads them (G26). */
+  hist?: History;
 }
 
 export interface Delayed {

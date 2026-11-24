@@ -17,7 +17,19 @@ import { other, type Cause, type Modifier, type PlayerState, type Zone } from '.
  * Callbacks the interpreter registers (flow.ts), so an operation can raise an event without this
  * module importing the frames that own the pending queue.
  */
-export const hooks: { lifeRemoved?: (d: Draft, owner: PlayerId) => void } = {};
+export const hooks: {
+  lifeRemoved?: (d: Draft, owner: PlayerId) => void;
+  /** A card went from active to rested (M6b wave 3, G24). */
+  rested?: (
+    d: Draft,
+    id: InstanceId,
+    reason: 'effect' | 'cost' | 'rule',
+    by: PlayerId | undefined,
+    source: InstanceId | undefined,
+  ) => void;
+  /** A Character or Stage left the field; `card` is its new object (G29). */
+  removed?: (d: Draft, info: { card: InstanceId; owner: PlayerId; to: Zone; cause: Cause }) => void;
+} = {};
 
 const FIELD: ReadonlySet<Zone> = new Set(['leader', 'characters', 'stage']);
 /** Zones some player cannot see: a card moving in gets a fresh projection key (ARCHITECTURE §2.7). */
@@ -158,6 +170,7 @@ export function moveCard(d: Draft, id: InstanceId, to: Zone, opts: MoveOptions =
   d.emit(e);
   if (from === 'deck') touchDeck(d, owner);
   if (from === 'life') hooks.lifeRemoved?.(d, owner);
+  if (lki) hooks.removed?.(d, { card: nid, owner, to, cause: lki.cause });
   return nid;
 }
 
@@ -253,13 +266,21 @@ export function lifeToHand(d: Draft, p: PlayerId, n: number): number {
  * rested "by your opponent's effects" is spared only when `by`, the player whose effect rests it,
  * is its owner's opponent (M6b G2).
  */
-export function rest(d: Draft, id: InstanceId, reason?: 'effect' | 'cost', by?: PlayerId): boolean {
+export function rest(
+  d: Draft,
+  id: InstanceId,
+  reason?: 'effect' | 'cost',
+  by?: PlayerId,
+  source?: InstanceId,
+): boolean {
   if (d.card(id).rested) return false;
   if (restBlocked(deriveLive(d.s, id), d.card(id).owner, reason ?? 'rule', by)) return false;
   d.wcard(id).rested = true;
   const e: GameEvent = { type: 'Rested', instance: id, card: d.card(id).card };
   if (reason) e.reason = reason;
   d.emit(e);
+  // "When this Character becomes rested" (G24): the cause and the acting card are known here.
+  hooks.rested?.(d, id, reason ?? 'rule', by, source);
   return true;
 }
 
