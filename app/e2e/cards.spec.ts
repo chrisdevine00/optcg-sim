@@ -2,7 +2,18 @@ import { readFileSync } from 'node:fs';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
 
-type C = { id: string; name: string; category: string; colors: string[] };
+import { SCRIPTED_ID_LIST } from '../../cards/effects/registry.ts';
+
+type C = {
+  id: string;
+  name: string;
+  category: string;
+  colors: string[];
+  effectText: string;
+  triggerText: string | null;
+  verified: boolean;
+  keywords: string[];
+};
 const load = (code: string) =>
   (
     JSON.parse(
@@ -11,6 +22,19 @@ const load = (code: string) =>
   ).cards;
 const op17 = load('OP-17');
 const NEWEST = 'OP-17 (newest set)';
+const SCRIPTED = new Set(SCRIPTED_ID_LIST);
+/** An unscripted card with effect text and a next card in its set, chosen from the data (M6b
+ * scripts cards set by set, so a fixed example goes stale). */
+const UNSCRIPTED = (() => {
+  for (const code of ['OP-16', 'OP-15', 'OP-14', 'OP-13']) {
+    const cards = load(code);
+    const i = cards.findIndex(
+      (c, k) => c.effectText.trim() !== '' && !SCRIPTED.has(c.id) && k + 1 < cards.length,
+    );
+    if (i >= 0) return { set: code, card: cards[i]!, next: cards[i + 1]! };
+  }
+  throw new Error('no unscripted card left in OP-13 to OP-16');
+})();
 
 // A generated 1x1 PNG stands in for card art: tests never touch the network or Bandai art.
 const PNG = Buffer.from(
@@ -139,18 +163,19 @@ test.describe('card browser', () => {
     await expect(dialog).toBeHidden();
     await expect(page).toHaveURL(/\/cards\?q=OP17-087$/);
     // A link to a card opens it, and Previous/Next walk the results (M1-15).
-    await page.goto('./cards?set=OP-17&card=OP17-002');
-    const atmos = page.getByRole('dialog', { name: 'Atmos' });
-    await expect(atmos).toBeVisible();
+    const { set, card, next } = UNSCRIPTED;
+    await page.goto(`./cards?set=${set}&card=${card.id}`);
+    const unscripted = page.getByRole('dialog', { name: card.name });
+    await expect(unscripted).toBeVisible();
     // An unscripted card with an effect carries the per-card warning.
-    await expect(atmos.getByText('⚠ Effect not automated', { exact: true })).toBeVisible();
-    await expect(atmos.getByText(/In a game this card plays for its stats/)).toBeVisible();
+    await expect(unscripted.getByText('⚠ Effect not automated', { exact: true })).toBeVisible();
+    await expect(unscripted.getByText(/In a game this card plays for its stats/)).toBeVisible();
     await page.keyboard.press('PageDown');
-    await expect(page.getByRole('dialog', { name: 'Izo' })).toBeVisible();
+    await expect(page.getByRole('dialog', { name: next.name })).toBeVisible();
     await page.getByRole('button', { name: '◂ Previous' }).click();
-    await expect(page.getByRole('dialog', { name: 'Atmos' })).toBeVisible();
+    await expect(page.getByRole('dialog', { name: card.name })).toBeVisible();
     await page.keyboard.press('Escape');
-    await expect(tile(page, 'OP17-002')).toBeFocused();
+    await expect(tile(page, card.id)).toBeFocused();
   });
 
   // M1-02: one Tab, or ArrowDown, from search to the first result; a skip link from the top of the page.
@@ -387,10 +412,13 @@ test.describe('card browser', () => {
     }) => {
       await serveArt(page);
       await page.setViewportSize({ width: w, height: h });
-      await page.goto('./cards');
-      await expect(status(page)).toHaveText(`${op17.length} cards in ${NEWEST}`);
+      // A set that still has unscripted cards, so "Automated only" narrows it (OP-17 is fully
+      // scripted since M6b).
+      const scope = load(UNSCRIPTED.set);
+      await page.goto(`./cards?set=${UNSCRIPTED.set}`);
+      await expect(status(page)).toHaveText(`${scope.length} cards in ${UNSCRIPTED.set}`);
       const cov = page.getByTestId('coverage');
-      await expect(cov).toContainText(`of ${op17.length} cards here play fully`);
+      await expect(cov).toContainText(`of ${scope.length} cards here play fully`);
       await expect(cov).toContainText('with a scripted effect');
       await expect(cov).toContainText('with no effect to script');
       await expect(cov).not.toContainText(/automated/i);
@@ -405,7 +433,7 @@ test.describe('card browser', () => {
       await expect(
         page.getByRole('button', { name: 'Remove filter Automated only' }),
       ).toBeVisible();
-      await expect(status(page)).not.toHaveText(`${before} cards in ${NEWEST}`);
+      await expect(status(page)).not.toHaveText(`${before} cards in ${UNSCRIPTED.set}`);
       const after = Number((await status(page).innerText()).match(/^(\d+)/)![1]);
       expect(after).toBeLessThan(before);
       expect(after).toBeGreaterThan(0);
@@ -417,9 +445,9 @@ test.describe('card browser', () => {
       // The URL restores it.
       await page.reload();
       await expect(page.getByRole('checkbox', { name: 'Automated only' })).toBeChecked();
-      await expect(status(page)).toHaveText(`${after} cards in ${NEWEST}`);
+      await expect(status(page)).toHaveText(`${after} cards in ${UNSCRIPTED.set}`);
       await page.getByRole('checkbox', { name: 'Automated only' }).uncheck();
-      await expect(status(page)).toHaveText(`${before} cards in ${NEWEST}`);
+      await expect(status(page)).toHaveText(`${before} cards in ${UNSCRIPTED.set}`);
 
       // A scripted card says so in words; a card with no effect says that instead.
       await page.goto('./cards?q=OP17-039');
