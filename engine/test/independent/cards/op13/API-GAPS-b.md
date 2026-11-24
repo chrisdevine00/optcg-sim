@@ -1,0 +1,8 @@
+# OP-13 group B: observation and setup gaps
+
+- **G1 (OP13-042 Newgate): the "fewer than 2 rested DON!!" boundary is unreachable.** Newgate costs 10, so after paying, all 10 DON!! of the cost area are rested and nothing in the scenario spec can leave fewer. "Give your Leader and 1 Character up to 2 rested DON!! cards each" is only tested with 10 rested DON!!.
+- **G2 (OP13-053 Teach): the "cost cannot be paid" branch is unreachable.** Teach is itself a {Whitebeard Pirates} Character, so the cost "trash 1 of your Characters with a type including Whitebeard Pirates" can always be paid by trashing Teach. Only the self-trash case is tested (end state only).
+- **G3 (OP13-047 Fossa): no scripted way to K.O. my own Character with my own effect.** The replacement is tested against an opponent effect (Gum-Gum Lightning), a battle K.O. (not replaced) and an opposing Fossa; "K.O.'d by your own effect (not covered)" is untested. Whether Fossa can replace its own K.O. is asserted only by the end state (Fossa in the trash).
+- **G4 (OP13-033 Franky): whether a DON!! card is one of "your opponent's cards" to rest is not observable or asserted.** The tests use Characters and the Leader only.
+- **G5 (OP13-055 Rakuyo): a Character played after the [When Attacking] resolved is not tested for the +1000.** Whether "all of your Characters ... during this turn" is a snapshot at resolution is an open reading; nothing asserts it.
+- **G6 (OP01-070 Mihawk as scenery):** its [On Play] is not scripted, so it could not be used as a "place at the bottom of the deck" removal source against Franky (a trash by the 5-Character rule was used instead for the "not a K.O." check).
