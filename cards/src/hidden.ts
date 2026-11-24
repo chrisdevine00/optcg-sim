@@ -64,6 +64,7 @@ function cost(k: Cost): boolean {
   if ('rest' in k) return selector(k.rest);
   if ('ko' in k) return selector(k.ko); // your own Characters: public
   if ('move' in k) return selector(k.move) || destHidden(k.to.zone);
+  if ('oneOf' in k) return k.oneOf.some((a) => a.some(cost));
   // lifeToHand, mill, turnLifeFaceDown, giveDon, returnDon: no hidden card is read; a Life card
   // turned face-down is hidden from then on, not read.
   return false;
@@ -151,7 +152,9 @@ export function abilityReadsHiddenZone(ab: Ability): boolean {
       return ab.apply.some(continuous);
     case 'replacement':
       return (
-        selector('ko' in ab.replaces ? ab.replaces.ko : ab.replaces.leaveField) ||
+        ('damage' in ab.replaces
+          ? false
+          : selector('ko' in ab.replaces ? ab.replaces.ko : ab.replaces.leaveField)) ||
         (isEffect(ab.instead) ? effect(ab.instead as Effect) : (ab.instead as Cost[]).some(cost))
       );
   }

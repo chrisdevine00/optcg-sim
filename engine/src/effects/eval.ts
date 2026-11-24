@@ -148,6 +148,11 @@ function matchesOf(c: Ctx, id: InstanceId, f: Filter): boolean {
   if ('type' in f) return def.types.includes(f.type);
   if ('typeIncludes' in f) return def.types.some((t) => t.includes(f.typeIncludes));
   if ('name' in f) return def.name === f.name || (def.alsoNamed?.includes(f.name) ?? false);
+  if ('nameIncludes' in f)
+    return (
+      def.name.includes(f.nameIncludes) ||
+      (def.alsoNamed?.some((n) => n.includes(f.nameIncludes)) ?? false)
+    );
   if ('color' in f) return def.colors.includes(f.color);
   if ('attribute' in f) return def.attributes.includes(f.attribute);
   if ('multicolor' in f) return def.colors.length > 1;
@@ -184,7 +189,12 @@ export function num(c: Ctx, n: Num): number {
 function numOf(c: Ctx, n: Num): number {
   if (typeof n === 'number') return n;
   const s = c.s;
-  if ('count' in n) return pool(c, n.count).length;
+  if ('count' in n) {
+    const ids = pool(c, n.count);
+    if (!n.distinctNames) return ids.length;
+    // The number of different card names (G15): a name counts once however many cards carry it.
+    return new Set(ids.map((id) => s.defs[s.cards[id]!.card]!.name)).size;
+  }
   if ('life' in n)
     return n.life === 'both'
       ? s.players.p1.life.length + s.players.p2.life.length
@@ -265,6 +275,13 @@ export function payable(c: Ctx, costs: readonly Cost[] | undefined, o: PayOption
   const play = o.playCost ?? 0;
   if (play > ps.donActive) return false;
   if (!costs || costs.length === 0) return true;
+  // "A or B" (G19): payable when the costs are payable with some alternative.
+  const alt = costs.findIndex((k) => 'oneOf' in k);
+  if (alt >= 0) {
+    const k = costs[alt] as Extract<Cost, { oneOf: unknown }>;
+    const rest = costs.filter((_, i) => i !== alt);
+    return k.oneOf.some((a) => payable(c, [...rest, ...a], o));
+  }
   let returns = 0;
   let activeReturns = 0;
   let rests = 0;
@@ -351,7 +368,12 @@ export function payable(c: Ctx, costs: readonly Cost[] | undefined, o: PayOption
 /** Does paying these costs depend on cards hidden from the opponent (a cost paid from hand)? */
 export function costIsSecret(costs: readonly Cost[] | undefined): boolean {
   // A trash cost from your own Characters or Stage is paid from public cards (G1).
-  return (costs ?? []).some((k) => ('trash' in k && hiddenPool(k.trash)) || 'reveal' in k);
+  return (costs ?? []).some(
+    (k) =>
+      ('trash' in k && hiddenPool(k.trash)) ||
+      'reveal' in k ||
+      ('oneOf' in k && k.oneOf.some((a) => costIsSecret(a))),
+  );
 }
 
 /** Active cost-area DON!! the costs after index `from` will still need to rest. */

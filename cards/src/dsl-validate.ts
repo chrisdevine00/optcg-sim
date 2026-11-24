@@ -65,6 +65,7 @@ export const IMPLEMENTED = {
     'mill',
     'rest',
     'move',
+    'oneOf',
   ],
   steps: ['do', 'if', 'may', 'ifDid', 'chooseOne', 'delayed', 'forEach'],
   actions: [
@@ -134,6 +135,8 @@ interface Ctx {
   bound: Set<string>;
   labels: Set<string>;
   inCost: boolean;
+  /** Inside a replacement's `instead`: no alternative costs (G19). */
+  noAlt?: boolean;
   /** A selector may name the top Life card (only a `move` can read it). */
   lifeOk?: boolean;
 }
@@ -242,13 +245,16 @@ function num(c: Ctx, path: string, v: unknown): void {
       'sum',
       'mul',
     ],
-    { donOnField: ['state'], refStat: ['stat'] },
+    { donOnField: ['state'], refStat: ['stat'], count: ['distinctNames'] },
   );
   if (!k) return;
   const o = v as Obj;
   if (!has(IMPLEMENTED.nums, k)) err(c, path, `${k} is not implemented in the runtime yet`);
   switch (k) {
     case 'count':
+      // `distinctNames`: the number of different card names among the matches (G15).
+      if (o.distinctNames !== undefined && o.distinctNames !== true)
+        err(c, `${path}.distinctNames`, 'expected true');
       return selector(c, `${path}.count`, o.count);
     case 'life':
       return enumOf(c, `${path}.life`, o.life, [...P, 'both']);
@@ -300,6 +306,7 @@ function filter(c: Ctx, path: string, v: unknown): void {
     'type',
     'typeIncludes',
     'name',
+    'nameIncludes',
     'color',
     'attribute',
     'multicolor',
@@ -338,6 +345,7 @@ function filter(c: Ctx, path: string, v: unknown): void {
     case 'type':
     case 'typeIncludes':
     case 'name':
+    case 'nameIncludes':
       return str(c, p, x);
     case 'color':
       return enumOf(c, p, x, COLORS);
@@ -470,6 +478,8 @@ function costs(c: Ctx, path: string, v: unknown): void {
   const was = c.inCost;
   c.inCost = true;
   arr(c, path, v, (x, p) => cost(c, p, x));
+  if (Array.isArray(v) && v.filter((x) => isObj(x) && 'oneOf' in x).length > 1)
+    err(c, path, 'at most one "A or B" cost per cost list');
   c.inCost = was;
 }
 
@@ -494,6 +504,7 @@ function cost(c: Ctx, path: string, v: unknown): void {
       'giveDon',
       'ko',
       'move',
+      'oneOf',
     ],
     { move: ['to'] },
   );
@@ -563,6 +574,23 @@ function cost(c: Ctx, path: string, v: unknown): void {
     case 'trashSelf':
       if (o[k] !== true) err(c, p, 'expected true');
       return;
+    case 'oneOf': {
+      // "A or B" (G19): a list of at least two alternatives, each a list of plain costs. Only an
+      // ability's own cost may offer a choice: a replacement's payload has no place to ask.
+      if (c.noAlt) err(c, p, 'a replacement payload does not offer alternative costs');
+      const alts = o.oneOf;
+      if (!Array.isArray(alts) || alts.length < 2)
+        return err(c, p, 'expected at least 2 alternatives, each a list of costs');
+      alts.forEach((alt, i) => {
+        if (!Array.isArray(alt) || alt.length === 0)
+          return err(c, `${p}[${i}]`, 'an alternative is a non-empty list of costs');
+        alt.forEach((x, j) => {
+          if (isObj(x) && 'oneOf' in x) err(c, `${p}[${i}][${j}]`, 'alternatives do not nest');
+          else cost(c, `${p}[${i}][${j}]`, x);
+        });
+      });
+      return;
+    }
     case 'lifeToHand': {
       fields(c, p, o[k], ['from', 'n']);
       const spec = o[k];
@@ -742,7 +770,14 @@ function action(c: Ctx, path: string, v: unknown): void {
       return zonesIn(c, p, x, ['hand'], 'trashFromHand works on a hand');
     case 'ko':
       selector(c, p, x);
-      return zonesIn(c, p, x, ['characters'], "only Characters are K.O.'d (CR 10-2-1)");
+      // Characters, and (G18) Stages: a Stage K.O. goes to the trash through the same K.O. event.
+      return zonesIn(
+        c,
+        p,
+        x,
+        ['characters', 'stage'],
+        "only Characters and Stages are K.O.'d (CR 10-2-1)",
+      );
     case 'rest':
       selector(c, p, x);
       return zonesIn(
@@ -780,12 +815,17 @@ function action(c: Ctx, path: string, v: unknown): void {
           "looking at the opponent's deck is not implemented in the runtime yet",
         );
       arr(c, `${p}.take`, x.take, (t, q) => {
-        fields(c, q, t, ['pick', 'to'], ['filter', 'reveal']);
+        fields(c, q, t, ['pick', 'to'], ['filter', 'reveal', 'rested']);
         if (!isObj(t)) return;
         pick(c, `${q}.pick`, t.pick);
         if (t.filter !== undefined) filter(c, `${q}.filter`, t.filter);
-        enumOf(c, `${q}.to`, t.to, ['hand', 'lifeTop']);
+        enumOf(c, `${q}.to`, t.to, ['hand', 'lifeTop', 'play']);
         if (t.reveal !== undefined && t.reveal !== true) err(c, `${q}.reveal`, 'expected true');
+        if (t.rested !== undefined && t.rested !== true) err(c, `${q}.rested`, 'expected true');
+        if (t.rested === true && t.to !== 'play')
+          err(c, `${q}.rested`, 'only a take that plays the card can place it rested');
+        if (t.to === 'play' && isObj(t.pick) && !('upTo' in t.pick || 'exactly' in t.pick))
+          err(c, `${q}.pick`, 'a take that plays cards picks upTo or exactly');
       });
       return enumOf(c, `${p}.rest`, x.rest, ['bottomAnyOrder', 'topOrBottomAnyOrder', 'trash']);
     }
@@ -852,8 +892,14 @@ function action(c: Ctx, path: string, v: unknown): void {
       selector(c, `${p}.to`, x.to);
       zonesIn(c, `${p}.to`, x.to, ['leader', 'characters'], 'DON!! go to a Leader or Character');
       if (x.each !== undefined && x.each !== true) err(c, `${p}.each`, 'expected true');
-      if (x.each === true && isObj(x.to) && (x.to as Obj).pick)
-        err(c, `${p}.to`, 'with each, the selector has no pick (every match gets DON!!)');
+      // With `each`, no pick means every match gets DON!!; `pick: { upTo }` caps the targets (G16).
+      if (
+        x.each === true &&
+        isObj(x.to) &&
+        isObj((x.to as Obj).pick) &&
+        !('upTo' in (x.to.pick as Obj))
+      )
+        err(c, `${p}.to.pick`, 'with each, the selector has no pick, or an upTo pick');
       return;
     case 'addDon':
       return arr(c, p, x, (y, q) => {
@@ -1170,18 +1216,28 @@ function ability(c: Ctx, path: string, v: unknown, ids: Set<string>): void {
       return arr(c, `${path}.apply`, v.apply, (x, p) => continuous(c, p, x));
     case 'replacement': {
       fields(c, path, v, ['kind', 'replaces', 'optional', 'instead', 'id'], base);
-      const k = oneOf(c, `${path}.replaces`, v.replaces, ['ko', 'leaveField'], {
+      const k = oneOf(c, `${path}.replaces`, v.replaces, ['ko', 'leaveField', 'damage'], {
+        ko: ['cause'],
         leaveField: ['cause'],
       });
-      if (k) {
+      if (k === 'damage') {
+        // D4: "if you would take damage": the damage to the replacing card's controller.
+        if ((v.replaces as Obj).damage !== 'you')
+          err(c, `${path}.replaces.damage`, 'expected "you"');
+      } else if (k) {
         selector(c, `${path}.replaces.${k}`, (v.replaces as Obj)[k]);
+        const cause = (v.replaces as Obj).cause;
         if (k === 'leaveField')
-          enumOf(c, `${path}.replaces.cause`, (v.replaces as Obj).cause, ['opponentEffect']);
+          enumOf(c, `${path}.replaces.cause`, cause, ['opponentEffect', 'any']);
+        else if (cause !== undefined)
+          enumOf(c, `${path}.replaces.cause`, cause, ['opponentEffect', 'effect', 'battle']);
       }
+      c.noAlt = true;
       if (typeof v.optional !== 'boolean') err(c, `${path}.optional`, 'expected a boolean');
-      if (!Array.isArray(v.instead)) return err(c, `${path}.instead`, 'expected an array');
-      if (isEffect(v.instead)) steps(c, `${path}.instead`, v.instead);
+      if (!Array.isArray(v.instead)) err(c, `${path}.instead`, 'expected an array');
+      else if (isEffect(v.instead)) steps(c, `${path}.instead`, v.instead);
       else costs(c, `${path}.instead`, v.instead);
+      c.noAlt = false;
       return;
     }
     default:
@@ -1193,6 +1249,48 @@ const STEP_KEYS = ['do', 'if', 'may', 'ifDid', 'chooseOne', 'forEach', 'delayed'
 /** A replacement's `instead` is an effect when its elements are steps, else a cost list. */
 export function isEffect(list: readonly unknown[]): boolean {
   return list.length > 0 && list.every((x) => isObj(x) && STEP_KEYS.some((k) => k in x));
+}
+
+/**
+ * A `deckRestriction` filter (G12) is read over the cards of a deck, whose data is printed values
+ * only: no state, no `ref`, no `Num` inside a comparison. These keys are the ones the deck check
+ * (`engine/src/deck.ts` `cardMatchesDeckFilter`) implements.
+ */
+const DECK_FILTER_KEYS = [
+  'category',
+  'cost',
+  'baseCost',
+  'power',
+  'basePower',
+  'hasCounter',
+  'type',
+  'typeIncludes',
+  'name',
+  'nameIncludes',
+  'color',
+  'attribute',
+  'multicolor',
+  'hasTrigger',
+  'all',
+  'any',
+  'not',
+];
+
+function deckFilter(c: Ctx, path: string, v: unknown): void {
+  if (!isObj(v)) return err(c, path, 'expected a filter');
+  const k = Object.keys(v)[0];
+  if (k !== undefined && !DECK_FILTER_KEYS.includes(k))
+    return err(c, path, `${k}: a deck restriction reads printed card values only`);
+  filter(c, path, v);
+  if (k === 'all' || k === 'any')
+    (v[k] as unknown[]).forEach((x, i) => deckFilter(c, `${path}.${k}[${i}]`, x));
+  else if (k === 'not') deckFilter(c, `${path}.not`, v.not);
+  else if (k && ['cost', 'baseCost', 'power', 'basePower'].includes(k)) {
+    const cm = v[k];
+    const kind = isObj(cm) ? Object.keys(cm)[0] : undefined;
+    if (!isObj(cm) || kind === undefined || typeof cm[kind] !== 'number')
+      err(c, `${path}.${k}`, 'a deck restriction compares to a number');
+  }
 }
 
 /** Problems with a script; an empty list means it is valid. */
@@ -1223,7 +1321,10 @@ export function validateScript(script: unknown): string[] {
       if (k === 'donDeckSize') int(c, `${p}.donDeckSize`, (r as Obj).donDeckSize);
       else if (k === 'alsoNamed')
         arr(c, `${p}.alsoNamed`, (r as Obj).alsoNamed, (n, q) => str(c, q, n));
-      else err(c, p, `rules clause ${k} is not implemented in the runtime yet`);
+      else if (k === 'anyNumberInDeck') {
+        // G12: "you may have any number of this card in your deck" (deck construction, CR 5-1-2-3).
+        if ((r as Obj).anyNumberInDeck !== true) err(c, `${p}.anyNumberInDeck`, 'expected true');
+      } else deckFilter(c, `${p}.deckRestriction`, (r as Obj).deckRestriction);
     });
   if (script.rulings !== undefined)
     arr(c, `${path}.rulings`, script.rulings, (r, p) => str(c, p, r));

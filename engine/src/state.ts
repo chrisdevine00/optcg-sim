@@ -216,6 +216,10 @@ export type Frame =
       by: PlayerId;
       /** Life card waiting on a `trigger` decision. */
       pending: InstanceId | null;
+      /** Damage replacements already offered for this damage (D4); absent until one is. */
+      considered?: string[];
+      /** Battle damage determined against 0 Life, kept as a frame only so a replacement can stop it. */
+      zero?: true;
     }
   | { f: 'ko'; card: InstanceId; cause: Cause; considered: string[]; group?: number }
   | { f: 'trigger'; card: InstanceId; player: PlayerId; step: 'run' | 'finish' }

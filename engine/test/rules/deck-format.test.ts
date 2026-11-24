@@ -202,3 +202,98 @@ describe('deckIssues: Standard (cards/format/standard.json)', () => {
     expect(codes({ leader: RED_LEADER, main })).toEqual(['rotated']);
   });
 });
+
+describe('deckIssues: rules clauses (M6b wave 2, G12)', () => {
+  const nonLeaders = (color: string, ok: (c: Card) => boolean): Card[] =>
+    allCards().filter(
+      (c) =>
+        c.category !== 'Leader' &&
+        c.colors.length === 1 &&
+        c.colors[0] === color &&
+        c.legality.standard.status === 'legal' &&
+        !c.legality.standard.bannedWith &&
+        ok(c),
+    );
+  const fill = (cs: Card[], n: number) => cs.flatMap((c) => times(4, c.id)).slice(0, n);
+
+  describe('deckRestriction (OP12-001: no cards with a cost of 5 or more)', () => {
+    const leader = 'OP12-001';
+    const cheap = nonLeaders('Red', (c) => (c.cost ?? 0) <= 4);
+    const dear = nonLeaders('Red', (c) => (c.cost ?? 0) >= 5)[0]!;
+    it('a deck of cost 4 or less is legal', () => {
+      const main = fill(cheap, 50);
+      expect(main).toHaveLength(50);
+      expect(codes({ leader, main }, all, 'free')).toEqual([]);
+    });
+    it('a cost 5 card is an error naming it and the Leader, in every format', () => {
+      const main = [...fill(cheap, 49), dear.id];
+      for (const f of ['free', 'standard', 'extra'] as const) {
+        const i = deckIssues({ leader, main }, all, f).find((x) => x.code === 'deckRestriction')!;
+        expect(i, f).toMatchObject({ severity: 'error', cards: [dear.id] });
+        expect(i.rule).toBe('OP12-001 (Leader rule)');
+        expect(i.message).toMatch(/OP12-001.*forbids/);
+      }
+    });
+    it('the createGame check (validateDeck) reports it too', () => {
+      const main = [...fill(cheap, 49), dear.id];
+      expect(validateDeck({ leader, main }, new DefTable(all)).join()).toMatch(/forbids/);
+    });
+    it('every card of the deck is checked once (4 copies are one issue)', () => {
+      const main = [...fill(cheap, 46), ...times(4, dear.id)];
+      const issues = deckIssues({ leader, main }, all, 'free').filter(
+        (x) => x.code === 'deckRestriction',
+      );
+      expect(issues).toHaveLength(1);
+      expect(issues[0]!.cards).toEqual([dear.id]);
+    });
+    it('another Leader has no such rule', () => {
+      const main = [...fill(cheap, 49), dear.id];
+      expect(codes({ leader: RED_LEADER, main }, all, 'free')).not.toContain('deckRestriction');
+    });
+  });
+
+  describe('anyNumberInDeck (OP16-042: any number of this card)', () => {
+    const blueLeader = allCards().find(
+      (c) =>
+        c.category === 'Leader' &&
+        c.colors.join() === 'Blue' &&
+        c.legality.standard.status === 'legal',
+    )!.id;
+    const filler = nonLeaders('Blue', (c) => c.id !== 'OP16-042');
+    it('8 copies are legal; another card at 5 copies still is not', () => {
+      const main = [...times(8, 'OP16-042'), ...fill(filler, 42)];
+      expect(main).toHaveLength(50);
+      expect(codes({ leader: blueLeader, main }, all, 'free')).toEqual([]);
+      const five = [
+        ...times(8, 'OP16-042'),
+        ...times(5, filler[0]!.id),
+        ...fill(filler.slice(1), 37),
+      ];
+      const issue = deckIssues({ leader: blueLeader, main: five }, all, 'free').find(
+        (x) => x.code === 'copies',
+      )!;
+      expect(issue.cards).toEqual([filler[0]!.id]);
+    });
+    it('a card number with no clause: 5 copies is CR 5-1-2-3', () => {
+      const main = [...times(5, filler[0]!.id), ...fill(filler.slice(1), 45)];
+      expect(codes({ leader: blueLeader, main }, all, 'free')).toEqual(['copies']);
+    });
+    it('a caller may supply the clauses (a script not yet in the table)', () => {
+      const id = filler[0]!.id;
+      const main = [...times(7, id), ...fill(filler.slice(1), 43)];
+      const rulesOf = (x: string) => (x === id ? [{ anyNumberInDeck: true as const }] : []);
+      expect(deckIssues({ leader: blueLeader, main }, all, 'free', rulesOf)).toEqual([]);
+      expect(codes({ leader: blueLeader, main }, all, 'free')).toEqual(['copies']);
+    });
+  });
+
+  it('the static table and the scripts agree (a script that gains a clause must be added to DECK_RULES)', async () => {
+    const { DECK_RULES } = await import('../../src/defs.ts');
+    const { loadAllScripts, SCRIPTS } = await import('@optcg/cards');
+    await loadAllScripts();
+    const clauses = (r: readonly object[] | undefined) =>
+      (r ?? []).filter((x) => 'anyNumberInDeck' in x || 'deckRestriction' in x);
+    for (const [id, script] of Object.entries(SCRIPTS))
+      expect(clauses(script.rules), id).toEqual(DECK_RULES[id] ?? []);
+  });
+});

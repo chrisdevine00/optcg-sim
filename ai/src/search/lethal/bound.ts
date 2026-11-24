@@ -76,6 +76,10 @@ export function reachOf(cardId: string): Reach {
         const d = o.do as Record<string, Record<string, unknown>>;
         if (d.setActive) reach.extra += m * pickCount(d.setActive);
         if (d.play) reach.extra += m * pickCount(d.play.what);
+        // A look at the top that plays the cards it takes (M6b wave 2, G17) adds attacks like `play`.
+        const look = d.lookAtTop as { take?: { to?: string; pick?: unknown }[] } | undefined;
+        for (const t of look?.take ?? [])
+          if (t.to === 'play') reach.extra += m * pickCount({ pick: t.pick });
         grant(d.grant, m);
       }
       // A permanent ability's continuous `grant` (also inside `tiers`).

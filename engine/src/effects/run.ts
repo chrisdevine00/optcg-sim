@@ -186,9 +186,17 @@ export function costText(costs: readonly Cost[] | undefined): string {
       return `rest ${n} of your cards`;
     }
     if ('move' in k) return 'move cards';
+    if ('oneOf' in k) return k.oneOf.map((a) => costText(a)).join(' or ');
     return '';
   });
   return words.filter(Boolean).join(' and ');
+}
+
+/** One alternative of an "A or B" cost, in words: the costs of the list that differ from the others. */
+function altText(list: readonly Cost[], ab: Ability): string {
+  const all = ab.kind === 'auto' || ab.kind === 'activate' || ab.kind === 'trigger' ? ab.cost : [];
+  const common = (all ?? []).filter((k) => !('oneOf' in k));
+  return costText(list.filter((k) => !common.includes(k)));
 }
 
 /** An optional auto, or an auto with a cost (CR 8-1-2, 8-3-1-4): ask before anything else. */
@@ -241,8 +249,50 @@ function exec(d: Draft, f: EffectFrame, ins: Instr, ab: Ability): Out {
             ? (ab.cost ?? [])
             : []
       ) as Cost[];
+      // An alternative's payments carry their own straight list (G19).
+      if (ins.list) return payCost(d, f, ins.cost, reservedActive(ins.list, (ins.at ?? 0) + 1));
       const idx = costs.indexOf(ins.cost);
       return payCost(d, f, ins.cost, reservedActive(costs, idx + 1));
+    }
+    case 'alt': {
+      // "A or B" (G19): the alternatives that can be paid now; one is taken without asking.
+      const c = ctxOf(d, f);
+      const ok = ins.alts.map((_, i) => i).filter((i) => payable(c, ins.alts[i]));
+      if (ok.length === 0) {
+        d.emit({
+          type: 'EffectDeclined',
+          player: f.controller,
+          instance: f.card,
+          card: f.cardId,
+          ability: f.ability,
+          reason: 'costNotPaid',
+        });
+        return 'stop';
+      }
+      let pick = ok[0]!;
+      if (ok.length > 1) {
+        const g = take(f);
+        if (g === undefined || !Array.isArray(g)) {
+          const options = ok.map((i) => ({
+            id: String(i),
+            label: altText(ins.alts[i]!, ab),
+          }));
+          return ask(d, f, {
+            kind: 'choose',
+            player: f.controller,
+            prompt: `${nameOf(d, f)}: choose how to pay.`,
+            min: 1,
+            max: 1,
+            candidates: options.map((o) => ({ option: o.id }) as never),
+            picked: [],
+            role: 'mode',
+            options,
+          });
+        }
+        pick = Number((g[0] as { option: string }).option);
+      }
+      f.ip = ins.to[pick]!;
+      return 'jump';
     }
     case 'paid':
       return 'next';
@@ -1221,9 +1271,15 @@ function giveDon(
     });
   };
   if (g.each) {
-    const targets = pool(c, g.to).length;
+    // "up to N of your Characters ... M DON!! each" (G16): an `upTo` pick caps the targets; every
+    // target chosen gets M, so the DON!! on hand cap the targets too.
+    const cap = g.to.pick && 'upTo' in g.to.pick ? g.to.pick.upTo : Infinity;
+    const targets = Math.min(pool(c, g.to).length, cap);
     const fits = per > 0 ? Math.floor(d.ro(you)[key] / per) : 0;
-    const sel: Selector = fits >= targets ? g.to : { ...g.to, pick: { upTo: Math.max(0, fits) } };
+    const sel: Selector =
+      fits >= targets && !g.to.pick
+        ? g.to
+        : { ...g.to, pick: { upTo: Math.max(0, Math.min(fits, cap)) } };
     const ids = select(d, f, sel, { role: 'target', verb: 'give DON!! to' });
     if (ids === WAIT) return WAIT;
     for (const id of ids) {
@@ -1463,6 +1519,24 @@ function lookAtTop(
     const tk = spec.take[tmp.take ?? 0]!;
     const g = take(f);
     if (Array.isArray(g)) {
+      if (tk.to === 'play') {
+        // Play the cards taken, for free (G17): the same frames as the `play` action, with the
+        // batch rule for several. The effect resumes here once they are played.
+        const ids = g as InstanceId[];
+        look = look.filter((id) => !ids.includes(id));
+        f.look = look;
+        tmp.take = (tmp.take ?? 0) + 1;
+        f.tmp = tmp;
+        const batch = ids.length > 1 ? d.s.nextMod++ : undefined;
+        if (ids.length) f.acted = true;
+        for (const id of ids.slice().reverse()) {
+          const pf: Frame = { f: 'play', card: id, player: f.controller, step: 'pay', free: true };
+          if (batch !== undefined) pf.batch = batch;
+          if (tk.rested) pf.rested = true;
+          push(d, pf);
+        }
+        return 'jump';
+      }
       for (const id of g as InstanceId[]) {
         if (tk.reveal)
           d.emit({
@@ -1482,7 +1556,15 @@ function lookAtTop(
       f.tmp = tmp;
       continue;
     }
-    const cands = look.filter((id) => !tk.filter || matches(c, id, tk.filter)).sort();
+    const cands = look
+      .filter((id) => !tk.filter || matches(c, id, tk.filter))
+      // Only Characters and Stages are played, and not one an effect bars you from playing.
+      .filter((id) => {
+        if (tk.to !== 'play') return true;
+        const cat = d.s.defs[d.card(id).card]!.category;
+        return (cat === 'Character' || cat === 'Stage') && !playBlocked(d.s, f.controller, id);
+      })
+      .sort();
     const n = 'upTo' in tk.pick ? tk.pick.upTo : 'exactly' in tk.pick ? tk.pick.exactly : 1;
     if (look.length === 0) {
       // Nothing was looked at (the deck is empty, which is public): nothing to choose (M4b-05,
@@ -1497,7 +1579,7 @@ function lookAtTop(
     return ask(d, f, {
       kind: 'choose',
       player: f.controller,
-      prompt: `${nameOf(d, f)}: choose up to ${n} of the cards you are looking at to add to your ${tk.to === 'lifeTop' ? 'Life cards' : 'hand'}.`,
+      prompt: `${nameOf(d, f)}: choose up to ${n} of the cards you are looking at to ${tk.to === 'play' ? 'play' : `add to your ${tk.to === 'lifeTop' ? 'Life cards' : 'hand'}`}.`,
       min: 0,
       max: Math.min(n, cands.length),
       candidates: cands,

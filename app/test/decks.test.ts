@@ -95,4 +95,19 @@ describe('deck builder model', () => {
       ),
     );
   });
+  it("a Leader's deck rule (OP12-001, M6b wave 2) is a check row only when the deck breaks it", () => {
+    const ok = deck();
+    expect(checkRows(ok, issuesOf(ok, lookup)).map((r) => r.label)).not.toContain(
+      "Leader's deck-building rule",
+    );
+    const dear = [...byId.values()].find(
+      (c) => c.category === 'Character' && c.colors.join() === 'Red' && (c.cost ?? 0) >= 5,
+    )!;
+    const d = deck({ leader: 'OP12-001', main: [...rocks.spec.main.slice(0, 49), dear.id] });
+    const row = checkRows(d, issuesOf(d, lookup)).find(
+      (r) => r.label === "Leader's deck-building rule",
+    )!;
+    expect(row.ok).toBe(false);
+    expect(row.cards).toContain(dear.id);
+  });
 });

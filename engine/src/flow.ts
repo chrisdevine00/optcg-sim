@@ -525,11 +525,13 @@ function runBattle(d: Draft): void {
         const n = kw.includes('Double Attack') ? 2 : 1;
         const banish = kw.includes('Banish');
         d.emit({ type: 'DamageDealt', player: defender, amount: n, by: b.attackerOwner });
-        if (d.ro(defender).life.length === 0) {
+        const atZero = d.ro(defender).life.length === 0;
+        if (atZero && collectDamageReplacements(d.s, defender, []).length === 0) {
           // CR 7-1-4-1-1-1: damage determined against 0 Life: the attacker wins.
           markDamagedAtZero(d, defender);
           return;
         }
+        // A replacement of damage may still stop it, at 0 Life too (D4): the damage frame offers it.
         push(d, {
           f: 'damage',
           player: defender,
@@ -538,6 +540,7 @@ function runBattle(d: Draft): void {
           battle: true,
           by: b.attackerOwner,
           pending: null,
+          ...(atZero ? { zero: true as const } : {}),
         });
       } else {
         // CR 7-1-4-1-2.
@@ -575,6 +578,15 @@ function runBattle(d: Draft): void {
 function runDamage(d: Draft, f: Extract<Frame, { f: 'damage' }>): void {
   if (f.pending !== null) return; // waiting on the trigger decision
   if (f.remaining <= 0) {
+    pop(d);
+    return;
+  }
+  // "If you would take damage, ... instead" (D4): offered before the Life card moves; applying it
+  // ends the whole damage, so no Life card is taken and no [Trigger] activates (CR 4-6-3-1).
+  if (offerDamageReplacement(d, f)) return;
+  if (f.zero) {
+    // Battle damage determined against 0 Life that no replacement stopped (CR 7-1-4-1-1-1).
+    markDamagedAtZero(d, f.player);
     pop(d);
     return;
   }
@@ -715,7 +727,8 @@ function offerReplacement(
 
 function runKo(d: Draft, f: Extract<Frame, { f: 'ko' }>): void {
   const c = d.s.cards[f.card];
-  if (!c || c.zone !== 'characters') {
+  // A Character, or a Stage (G18); anything else already left.
+  if (!c || (c.zone !== 'characters' && c.zone !== 'stage')) {
     pop(d); // it already left; nothing to K.O.
     return;
   }
@@ -755,6 +768,8 @@ function runKo(d: Draft, f: Extract<Frame, { f: 'ko' }>): void {
       typeof w === 'object' &&
       w.event === 'koed' &&
       p === owner &&
+      // "When one of your Characters is K.O.'d": a K.O.'d Stage is not a Character.
+      d.s.defs[d.s.cards[nid]!.card]!.category === 'Character' &&
       matches({ s: d.s, you: p, self: card, live: true }, nid, w.filter),
     'koed',
   );
@@ -824,12 +839,16 @@ export function collectReplacements(
         let sel: Selector;
         if ('ko' in rp) {
           if (event !== 'ko') continue;
+          if (rp.cause && !causeMatches(rp.cause, cause, target.owner)) continue;
           sel = rp.ko;
-        } else {
-          // "removed from the field by your opponent's effect".
-          if (cause.kind !== 'effect' || cause.by === p) continue;
+        } else if ('leaveField' in rp) {
+          // "removed from the field by your opponent's effect" (`opponentEffect`), or by anything
+          // that takes it off the field, a battle K.O. and your own effects too (`any`, G14).
+          if (rp.cause === 'opponentEffect' && (cause.kind !== 'effect' || cause.by === p))
+            continue;
           sel = rp.leaveField;
-        }
+        } else continue; // a damage replacement
+
         if (!pool(c, sel).includes(card)) continue;
         if (!allHold(c, ab.conditions)) continue;
         if (!possible(c, ab.instead)) continue;
@@ -841,6 +860,73 @@ export function collectReplacements(
   void target;
   out.sort((a, b) => a.rank - b.rank);
   return out.map(({ rank: _r, ...r }) => r);
+}
+
+/**
+ * Does the K.O. cause match a `ko` replacement's `cause`? `effect`: an effect of either player, a
+ * cost included (it is part of the effect, RL-16); `opponentEffect`: an effect of the K.O.'d
+ * card's owner's opponent (RL-14); `battle`.
+ */
+function causeMatches(
+  want: 'opponentEffect' | 'effect' | 'battle',
+  cause: Cause,
+  owner: PlayerId,
+): boolean {
+  if (want === 'battle') return cause.kind === 'battle';
+  if (want === 'opponentEffect') return byOpponentEffect(cause, owner);
+  return cause.kind === 'effect' || cause.kind === 'cost';
+}
+
+/**
+ * Replacements of the damage `player` would take (D4): `damage` replacements on that player's own
+ * Leader, Characters and Stage, in field order. Same filters as the removal ones: not negated,
+ * Once Per Turn unspent, not already offered for this damage, conditions hold, payload possible.
+ */
+export function collectDamageReplacements(
+  s: State,
+  player: PlayerId,
+  considered: readonly string[],
+): ReplacementRef[] {
+  const out: ReplacementRef[] = [];
+  const ps = s.players[player];
+  for (const id of [ps.leader, ...ps.characters, ...ps.stage]) {
+    const def = s.defs[s.cards[id]!.card]!;
+    if (!def.abilities.some((a) => a.kind === 'replacement')) continue;
+    if (isNegated(s, id)) continue;
+    const c: Ctx = { s, you: player, self: id, live: true };
+    for (const ab of def.abilities) {
+      if (ab.kind !== 'replacement' || !('damage' in ab.replaces)) continue;
+      const key = `${id}/${ab.id}`;
+      if (considered.includes(key)) continue;
+      if (ab.oncePerTurn && s.oncePerTurn.includes(key)) continue;
+      if (!allHold(c, ab.conditions)) continue;
+      if (!possible(c, ab.instead)) continue;
+      out.push({ card: id, ability: ab.id, controller: player });
+    }
+  }
+  return out;
+}
+
+/** Offer the next damage replacement (D4); true when a decision is waiting or one was applied. */
+function offerDamageReplacement(d: Draft, f: Extract<Frame, { f: 'damage' }>): boolean {
+  const r = collectDamageReplacements(d.s, f.player, f.considered ?? [])[0];
+  if (!r) return false;
+  f.considered = [...(f.considered ?? []), `${r.card}/${r.ability}`];
+  const ab = abilityOf(d.s, d.card(r.card).card, r.ability);
+  if (ab?.kind === 'replacement' && ab.optional) {
+    ask(d, {
+      kind: 'optional',
+      player: r.controller,
+      prompt: `Use ${d.s.defs[d.card(r.card).card]!.name}'s effect instead of taking the damage?`,
+      replacement: r,
+      purpose: 'replacement',
+      role: 'replacement',
+      source: sourceInfo(d.s, r.card, d.card(r.card).card, r.ability, ab.label),
+    });
+    return true;
+  }
+  applyReplacement(d, r);
+  return true;
 }
 
 /** An impossible replacement cannot be applied (CR 8-1-3-4-5): its payload must be payable. */
@@ -857,6 +943,23 @@ function possible(c: Ctx, instead: readonly unknown[]): boolean {
 
 export function applyReplacement(d: Draft, r: ReplacementRef): void {
   const f = top(d);
+  if (f?.f === 'damage') {
+    const c = d.card(r.card);
+    const ab = abilityOf(d.s, c.card, r.ability)!;
+    if (ab.oncePerTurn) d.opt().push(`${r.card}/${r.ability}`);
+    d.emit({
+      type: 'ReplacementApplied',
+      instance: r.card,
+      card: c.card,
+      ability: r.ability,
+      replaced: 'damage',
+      player: f.player,
+      controller: r.controller,
+    });
+    pop(d); // the damage does not happen: no Life card is taken (CR 4-6-3-1)
+    pushEffect(d, r.card, c.card, ab, r.controller, 'instead');
+    return;
+  }
   if (!f || (f.f !== 'ko' && f.f !== 'remove')) throw new Error('No K.O. or removal to replace');
   const c = d.card(r.card);
   const ab = abilityOf(d.s, c.card, r.ability)!;

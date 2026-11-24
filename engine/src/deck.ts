@@ -6,9 +6,16 @@
  * Each issue names its rule and the card numbers involved, so a UI can highlight them. A card the
  * data does not know is an error: the engine cannot play it.
  */
-import type { Card, Legality } from '@optcg/cards';
+import {
+  SCRIPTS,
+  type Card,
+  type Cmp,
+  type Filter,
+  type Legality,
+  type RulesClause,
+} from '@optcg/cards';
 import type { CardId, CardLookup, DeckSpec } from './api.ts';
-import { DECK_SIZE, MAX_COPIES } from './defs.ts';
+import { DECK_RULES, DECK_SIZE, MAX_COPIES } from './defs.ts';
 
 /** `standard`: CR plus Standard legality. `extra`: CR plus bans and pairs. `free`: CR only. */
 export type DeckFormat = 'standard' | 'extra' | 'free';
@@ -21,6 +28,7 @@ export type DeckIssueCode =
   | 'leaderInDeck'
   | 'color'
   | 'copies'
+  | 'deckRestriction'
   | 'banned'
   | 'restricted'
   | 'bannedPair'
@@ -40,11 +48,56 @@ export interface DeckIssue {
 
 const label = (c: Card | undefined, id: CardId) => (c ? `${id} ${c.name}` : id);
 
+/**
+ * The deck-construction clauses of a card's rules text (G12): "you may have any number of this card
+ * in your deck" and "you cannot include cards with ... in your deck". Read from the card's script
+ * when it is loaded, else from `DECK_RULES` (a deck is checked in the builder before any script is
+ * loaded; a test keeps the two equal).
+ */
+export function deckRulesOf(id: CardId): readonly RulesClause[] {
+  const script = SCRIPTS[id];
+  return script ? (script.rules ?? []) : (DECK_RULES[id] ?? []);
+}
+
+const cmpHolds = (v: number | null, k: Cmp): boolean => {
+  if (v === null) return false;
+  if ('lte' in k) return typeof k.lte === 'number' && v <= k.lte;
+  if ('gte' in k) return typeof k.gte === 'number' && v >= k.gte;
+  return typeof k.eq === 'number' && v === k.eq;
+};
+
+/**
+ * Does a card of the deck match a `deckRestriction` filter? Printed values only; the validator
+ * (`deckFilter`) accepts exactly the keys read here, with numeric comparisons.
+ */
+export function cardMatchesDeckFilter(c: Card, f: Filter): boolean {
+  if ('category' in f) return f.category.includes(c.category);
+  if ('cost' in f) return cmpHolds(c.cost, f.cost);
+  if ('baseCost' in f) return cmpHolds(c.cost, f.baseCost);
+  if ('power' in f) return cmpHolds(c.power, f.power);
+  if ('basePower' in f) return cmpHolds(c.power, f.basePower);
+  if ('hasCounter' in f) return (c.counter ?? 0) > 0 === f.hasCounter;
+  if ('type' in f) return c.types.includes(f.type);
+  if ('typeIncludes' in f) return c.types.some((t) => t.includes(f.typeIncludes));
+  if ('name' in f) return c.name === f.name;
+  if ('nameIncludes' in f) return c.name.includes(f.nameIncludes);
+  if ('color' in f) return c.colors.includes(f.color);
+  if ('attribute' in f) return c.attributes.includes(f.attribute);
+  if ('multicolor' in f) return c.colors.length > 1;
+  if ('hasTrigger' in f) return (c.triggerText !== null && c.triggerText !== '') === f.hasTrigger;
+  if ('all' in f) return f.all.every((g) => cardMatchesDeckFilter(c, g));
+  if ('any' in f) return f.any.some((g) => cardMatchesDeckFilter(c, g));
+  if ('not' in f) return !cardMatchesDeckFilter(c, f.not);
+  return false;
+}
+
 /** Every problem with a deck, CR checks first, then the format's. Empty when legal. */
 export function deckIssues(
   deck: DeckSpec,
   lookup: CardLookup,
   format: DeckFormat = 'standard',
+  /** The rules clauses of a card (tests pass their own; the default reads the scripts). */
+  rulesOf: (id: CardId) => readonly RulesClause[] = deckRulesOf,
 ): DeckIssue[] {
   const out: DeckIssue[] = [];
   const err = (code: DeckIssueCode, rule: string, cards: CardId[], message: string) =>
@@ -86,12 +139,28 @@ export function deckIssues(
         [id],
         `${label(c, id)} is ${off.join(' and ')}, a colour the Leader does not have.`,
       );
-    if (n > MAX_COPIES)
+    const anyNumber = rulesOf(id).some((r) => 'anyNumberInDeck' in r);
+    if (n > MAX_COPIES && !anyNumber)
       err(
         'copies',
         'CR 5-1-2-3',
         [id],
         `${n} copies of ${id}; the limit is ${MAX_COPIES} per card number.`,
+      );
+  }
+  // "Under the rules of this game, you cannot include cards ... in your deck" (G12): the Leader's.
+  for (const r of rulesOf(deck.leader)) {
+    if (!('deckRestriction' in r)) continue;
+    const banned = [...counts.keys()].filter((id) => {
+      const c = lookup(id);
+      return !!c && cardMatchesDeckFilter(c, r.deckRestriction);
+    });
+    if (banned.length)
+      err(
+        'deckRestriction',
+        `${deck.leader} (Leader rule)`,
+        banned,
+        `${label(leader, deck.leader)} forbids ${banned.map((id) => label(lookup(id), id)).join(', ')} in the deck.`,
       );
   }
   if (format === 'free') return out;
