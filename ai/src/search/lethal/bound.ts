@@ -232,6 +232,129 @@ export function attackReach(
   return { n, da, drawsIgnored: deckReach && !deckKnown };
 }
 
+/** Ops that cannot change a player's Life, take a deck to 0 or decide the winner (an unknown op is not here). */
+const LIFE_SAFE_OPS = new Set([
+  'trashFromHand',
+  'lookAtTop',
+  'reveal',
+  'swapBasePower',
+  'canAttackActive',
+  'addReplacement',
+  'play',
+  'ko',
+  'rest',
+  'setActive',
+  'skipRefresh',
+  'power',
+  'setBasePower',
+  'cost',
+  'playCost',
+  'giveDon',
+  'addDon',
+  'returnDon',
+  'grant',
+  'negate',
+  'restrict',
+  'activate',
+  'select',
+]);
+
+const LIFE_ZONES = new Set(['lifeTop', 'lifeTopOrBottom', 'life']);
+
+const lifeEffectMemo = new Map<string, boolean>();
+
+/**
+ * Can this card's script, used without an attack, change the other player's Life or end the game: a
+ * `damage`, a `winGame`, a Life card trashed or moved, a deck milled or drawn out, or an op or form
+ * this reading does not know (W4-R1)? Conservative: every ability that is not a [Trigger] or a
+ * permanent counts, whatever its cost or timing, so it can only err toward searching.
+ */
+export function winsByEffect(cardId: string): boolean {
+  let r = lifeEffectMemo.get(cardId);
+  if (r === undefined) {
+    r = false;
+    const walk = (n: unknown): void => {
+      if (r || !n || typeof n !== 'object') return;
+      if (Array.isArray(n)) return n.forEach(walk);
+      const o = n as Loose;
+      if (o.do && typeof o.do === 'object' && !Array.isArray(o.do)) {
+        const d = o.do as Loose;
+        for (const [op, body] of Object.entries(d)) {
+          if (op === 'player' || op === 'upTo') continue; // modifiers of a `draw`
+          if (op === 'move') {
+            const w = (body as { what?: { from?: unknown } }).what;
+            const from = (Array.isArray(w?.from) ? w.from : [w?.from]) as unknown[];
+            if (from.some((z) => typeof z !== 'string' || LIFE_ZONES.has(z))) r = true;
+          } else if (op === 'draw') {
+            if (d.player === 'opponent') r = true;
+          } else if (op === 'mill') {
+            if ((body as { player?: unknown } | null)?.player !== 'you') r = true;
+          } else if (!LIFE_SAFE_OPS.has(op)) r = true; // damage, winGame, trashLifeUntil, unknown
+        }
+      }
+      for (const v of Object.values(o)) walk(v);
+    };
+    const abilities = (SCRIPTS[cardId]?.abilities ?? []) as unknown as Loose[];
+    for (const ab of abilities) {
+      if (ab.kind === 'trigger' || ab.kind === 'permanent') continue; // never fires on the attacker's own turn / no op
+      if (!['activate', 'auto', 'replacement'].includes(ab.kind as string)) r = true;
+      else walk(ab);
+    }
+    lifeEffectMemo.set(cardId, r);
+  }
+  return r;
+}
+
+const trashMemo = new Map<string, boolean>();
+
+/** Can this card's script play or move a card out of the seat's trash? */
+function reachesTrash(cardId: string): boolean {
+  let r = trashMemo.get(cardId);
+  if (r === undefined) {
+    r = false;
+    const walk = (n: unknown): void => {
+      if (r || !n || typeof n !== 'object') return;
+      if (Array.isArray(n)) return n.forEach(walk);
+      const o = n as Loose;
+      if (o.do && typeof o.do === 'object' && !Array.isArray(o.do)) {
+        const d = o.do as Record<string, Loose>;
+        for (const op of ['move', 'play'])
+          if (d[op]) {
+            const from = ((d[op]!.what ?? d[op]) as Loose | undefined)?.from;
+            const zones = (Array.isArray(from) ? from : [from]) as unknown[];
+            if (zones.some((z) => z === 'trash' || typeof z !== 'string')) r = true;
+          }
+      }
+      for (const v of Object.values(o)) walk(v);
+    };
+    walk(SCRIPTS[cardId]?.abilities);
+    trashMemo.set(cardId, r);
+  }
+  return r;
+}
+
+/**
+ * Can the seat win, or take Life, without an attack, with the cards it can reach: its hand, Leader,
+ * Characters and Stage, its trash when one of those plays or moves cards from there, and its deck
+ * when it is known and a card can bring cards from it (the reach of `attackReach`)? Such a seat is
+ * never refuted by the attacker count (`attackersPossible`).
+ */
+export function effectReach(s: GameState, attacker: PlayerId, deckKnown = true): boolean {
+  let deck = false;
+  let trash = false;
+  for (const z of ['hand', 'leader', 'characters', 'stage'] as const)
+    for (const c of queries.zone(s, attacker, z)) {
+      if (winsByEffect(c.card)) return true;
+      if (reachesDeck(c.card)) deck = true;
+      if (reachesTrash(c.card)) trash = true;
+    }
+  if (deck && deckKnown)
+    for (const c of queries.zone(s, attacker, 'deck')) if (winsByEffect(c.card)) return true;
+  if (trash)
+    for (const c of queries.zone(s, attacker, 'trash')) if (winsByEffect(c.card)) return true;
+  return false;
+}
+
 // ---------------------------------------------------------------------------------------------
 // What the attacker's scripts can add to one attack.
 

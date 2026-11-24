@@ -64,6 +64,18 @@ describe('EB03-008 Hibari: [On Play] up to 1 {SWORD} Leader or Character can als
     expect(choices(g)).not.toContain(g.leader('p1'));
   });
 
+  it('a {Navy} Character that is not {SWORD} (Yamakaji) is not offered: the filter is {SWORD}, not {Navy} (W4-R2)', () => {
+    const g = mine(
+      LW.croc,
+      { hand: [HIBARI], characters: [W.yamakaji, W.drake] },
+      { characters: [W.kingdew] },
+    );
+    playRaw(g, HIBARI);
+    need(g, 'choose', 'p1');
+    expect(offeredIds(g)).toEqual([HIBARI, W.drake].sort());
+    expect(offeredIds(g)).not.toContain(W.yamakaji);
+  });
+
   it('offers a {SWORD} Leader too (OP11-001 Koby)', () => {
     const g = playBoard([W.kingdew], LW.kobyLeader);
     playRaw(g, HIBARI);

@@ -23,7 +23,7 @@ import {
 import { counterValueOf, priorFor } from '../../knowledge.ts';
 import { defenceEffectsOf, type DefenceEffect } from './defence.ts';
 import { analyseLine, type LineStep } from './analyse.ts';
-import { attackReach, refutedByBound } from './bound.ts';
+import { attackReach, effectReach, refutedByBound } from './bound.ts';
 import { publicState, triggerRisk, type TriggerRisk } from './public.ts';
 import { search, searchGreedy, searchPlan, type Cap } from './search.ts';
 
@@ -190,7 +190,9 @@ export function attackersPossible(
 ): boolean {
   const life = queries.zone(s, other(attacker), 'life').length;
   const { n, da } = attackReach(s, attacker, cards, deckKnown);
-  return n >= 1 && (n - 1) * (da ? 2 : 1) >= life;
+  if (n >= 1 && (n - 1) * (da ? 2 : 1) >= life) return true;
+  // A win or a Life loss by an effect needs no attacker (W4-R1): never refute by count then.
+  return effectReach(s, attacker, deckKnown);
 }
 
 /** `a` with every card id passed through `f` (view handles for `actionFromView`). */

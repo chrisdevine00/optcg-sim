@@ -80,6 +80,21 @@ describe("EB04-050 I'll Whip You Into Shape.: [Main] up to 1 {SWORD} Leader or C
     expect(choices(g)).not.toContain(g.leader('p1'));
   });
 
+  it('a {Navy} Character that is not {SWORD} (Yamakaji) is not offered: the filter is {SWORD}, not {Navy} (W4-R2)', () => {
+    const g = mine(
+      LW.croc,
+      {
+        hand: [EVENT],
+        characters: [W.yamakaji, W.drake],
+        costArea: { active: 10, rested: 0 },
+      },
+      { characters: [W.kingdew] },
+    );
+    playRaw(g, EVENT);
+    need(g, 'choose', 'p1');
+    expect(offeredIds(g)).toEqual([W.drake]);
+  });
+
   it('a {SWORD} Leader is offered too (OP11-001 Koby) and may then attack an active Character', () => {
     const g = mainBoard([W.kingdew], { leader: LW.kobyLeader });
     const king = at(g, 'p2', 'characters', W.kingdew);

@@ -36,5 +36,6 @@ export const EB04_044: CardScript = {
   rulings: [
     'G14 (any cause): "removed from the field" covers a battle K.O., your own effects and an opponent effect; the trash is paid from the hand as the replacement',
     'reading: the Navy condition reads the Leader as the removal happens',
+    'the Character-area overflow trash (a sixth Character, CR 3-7-6-1-1) is rule processing and is not replaced: no offer when Koby is the one chosen (M6b-Q5)',
   ],
 };

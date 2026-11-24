@@ -2,6 +2,14 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-24 — Wave 4 fix round: the lethal solver's attacker-count gate lets an effect win through (AI only, no ENGINE_VERSION change)
+
+- **Context:** the wave 4 review (`docs/reviews/m6b-wave4.md`, W4-R1, severity 3) showed that `attackersPossible` refuted a seat before `scanAbility` or the search ran, so a win by `damage`, `winGame`, an opponent Life move or any other unclassified effect was reported "refuted, any hand" (a proof claim that was false). "Unclassified means search" held only inside `scanAbility`.
+- **Decision:** `attackersPossible` returns true when the attack count passes **or** `effectReach` finds a card the seat can reach that `winsByEffect` flags. `winsByEffect(cardId)` (`ai/src/search/lethal/bound.ts`, memoised, reads typed scripts only) is true when any [Activate], auto or replacement ability (not a [Trigger], not a permanent) holds a `damage`, `winGame`, `trashLifeUntil`, a `move` from `lifeTop` / `lifeTopOrBottom` / `life` (or an unknown source form), an opponent `draw`, a `mill` not aimed only at the controller, or **any op not on a short list of ops known not to touch Life, deck-out or the winner** (so a future op is searched until classified). Cost, timing and Once Per Turn are ignored: it can only err toward searching. `effectReach` looks at the hand, Leader, Characters and Stage, the trash when a reachable card plays or moves from there, and the deck when it is known (`deckKnown`) and a card can bring cards from it: the same reach as `attackReach`. The `refuted` contract is unchanged: it is still only given when the gate or the search proves it. The search and `refutedByBound` already treat these shapes as unclassified (`attackerPotential` null), as the review confirmed.
+- **Cost:** a seat whose reachable cards hold such an effect now gets a search where it got an instant refutation; `ai/test/budget.test.ts` still holds (run alone), and the lethal suites are green.
+- **Rejected:** counting effect damage in the reach bound (a number per effect, and every future op would need one); gating on the attack count only for seats with no scripts (would not cover a Leader's own effect).
+- **Probe result worth knowing:** the review named OP16-116, EB03-053 and EB03-057 as shapes in the gate; OP16-116 and EB03-053 also hold a `play`, which `reachOf` already counts as an extra attack, so the old gate passed them in the positions tried here. EB03-057 is the real-card case the new check covers by itself (pinned by `winsByEffect`).
+
 ## 2026-11-24 — Block 4 tail fix round: "set the power to 0", "same as the Leader" and the test kits (ENGINE_VERSION 0.5.16)
 
 - **Context:** the block 4 tail review (`docs/reviews/m6b-block4-tail.md`) failed on B4T-R1: EB04-010 scripted "Set the power of up to 1 of your opponent's Characters to 0" as `setBasePower 0`, which leaves power the target already has (an earlier buff).

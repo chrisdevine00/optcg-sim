@@ -80,6 +80,16 @@ describe('OP15-116 Gum-Gum Golden Rifle: [Main]', () => {
     expect(offeredIds(g)).toEqual([W4.hajrudin, W4.kingdew, W4.sai].sort());
   });
 
+  it('the hand trash is mandatory: "trash 1 card" cannot be declined with `done` (W4-R2)', () => {
+    const g = board({});
+    playRaw(g, RIFLE);
+    yes(g, 'p1');
+    need(g, 'choose', 'p1');
+    expect(g.isLegal({ type: 'done', player: 'p1' })).toBe(false);
+    pickInst(g, [at(g, 'p1', 'hand', W4.sai)]);
+    expect(hand(g)).toEqual([W4.hajrudin]);
+  });
+
   it('boundary: Life count stays the same (one out, one in) and the deck loses one card', () => {
     const g = board({});
     playRaw(g, RIFLE);
