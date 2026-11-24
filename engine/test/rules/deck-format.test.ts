@@ -152,11 +152,11 @@ describe('deckIssues: Standard (cards/format/standard.json)', () => {
     expect(codes({ leader, main: swap('OP03-002') })).toEqual(['rotated']);
     expect(deckErrors({ leader, main: swap('OP03-002') }, all, 'extra')).toEqual([]);
   });
-  it('a card whose block no source gives (EB05-001) is a warning, not an error', () => {
-    const i = deckIssues({ leader: 'EB05-001', main }, all);
+  it('a card whose block no source gives (promo Leader P-011) is a warning, not an error', () => {
+    const i = deckIssues({ leader: 'P-011', main }, all);
     const w = i.filter((x) => x.code === 'legalityUnknown');
     expect(w.map((x) => x.severity)).toEqual(['warning']);
-    expect(deckErrors({ leader: 'EB05-001', main }, all).map((x) => x.code)).not.toContain(
+    expect(deckErrors({ leader: 'P-011', main }, all).map((x) => x.code)).not.toContain(
       'legalityUnknown',
     );
   });

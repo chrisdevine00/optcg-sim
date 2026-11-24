@@ -1,6 +1,6 @@
 {
   "format": "standard",
-  "asOf": "2026-10-28",
+  "asOf": "2026-11-24",
   "regulation": {
     "from": "2026-04-01",
     "to": "2027-03-31",
@@ -47,6 +47,15 @@
         "url": "https://en.onepiece-cardgame.com/cardlist/?series=569114",
         "checked": "2026-10-28",
         "note": "Block icon printed on every base printing of the product in this series page (cached by Track B, 2026-10-28). EB-04 cards are inserted in OP-14 (569114) and OP-15 (569115)."
+      }
+    },
+    "EB-05": {
+      "block": 5,
+      "basis": "printed",
+      "source": {
+        "url": "https://onepiece.limitlesstcg.com/cards/EB05-001",
+        "checked": "2026-11-24",
+        "note": "Block 5 shown on the Limitless card page for EB05-001 (read 2026-11-24; M6b runbook step a). No official page for this product was read."
       }
     },
     "OP-01": {
@@ -283,6 +292,15 @@
         "note": "Block icon printed on this product's cards where they are reprinted in this series page (cached by Track B, 2026-10-28); every printing seen agrees. Only OP01-016, OP04-016 and EB04-061 were reprinted with an updated block (blockicon-card.html), so other reprints carry the product block."
       }
     },
+    "ST-08": {
+      "block": 1,
+      "basis": "printed",
+      "source": {
+        "url": "https://onepiece.limitlesstcg.com/cards/ST08-001",
+        "checked": "2026-11-24",
+        "note": "Block 1 shown on the Limitless card page for ST08-001 (read 2026-11-24; M6b runbook step a). No official page for this product was read."
+      }
+    },
     "ST-09": {
       "block": 1,
       "basis": "printed",
@@ -401,6 +419,42 @@
         "note": "Block icon printed on this product's cards where they are reprinted in this series page (cached by Track B, 2026-10-28); every printing seen agrees. Only OP01-016, OP04-016 and EB04-061 were reprinted with an updated block (blockicon-card.html), so other reprints carry the product block."
       }
     },
+    "ST-22": {
+      "block": 3,
+      "basis": "printed",
+      "source": {
+        "url": "https://onepiece.limitlesstcg.com/cards/ST22-001",
+        "checked": "2026-11-24",
+        "note": "Block 3 shown on the Limitless card page for ST22-001 (read 2026-11-24; M6b runbook step a). No official page for this product was read."
+      }
+    },
+    "ST-23": {
+      "block": 3,
+      "basis": "printed",
+      "source": {
+        "url": "https://onepiece.limitlesstcg.com/cards/ST23-001",
+        "checked": "2026-11-24",
+        "note": "Block 3 shown on the Limitless card page for ST23-001 (read 2026-11-24; M6b runbook step a). No official page for this product was read."
+      }
+    },
+    "ST-24": {
+      "block": 3,
+      "basis": "printed",
+      "source": {
+        "url": "https://onepiece.limitlesstcg.com/cards/ST24-001",
+        "checked": "2026-11-24",
+        "note": "Block 3 shown on the Limitless card page for ST24-001 (read 2026-11-24; M6b runbook step a). No official page for this product was read."
+      }
+    },
+    "ST-25": {
+      "block": 3,
+      "basis": "printed",
+      "source": {
+        "url": "https://onepiece.limitlesstcg.com/cards/ST25-001",
+        "checked": "2026-11-24",
+        "note": "Block 3 shown on the Limitless card page for ST25-001 (read 2026-11-24; M6b runbook step a). No official page for this product was read."
+      }
+    },
     "ST-26": {
       "block": 3,
       "basis": "printed",
@@ -417,6 +471,15 @@
         "url": "https://en.onepiece-cardgame.com/cardlist/?series=569117",
         "checked": "2026-10-28",
         "note": "Block icon printed on this product's cards where they are reprinted in this series page (cached by Track B, 2026-10-28); every printing seen agrees. Only OP01-016, OP04-016 and EB04-061 were reprinted with an updated block (blockicon-card.html), so other reprints carry the product block."
+      }
+    },
+    "ST-28": {
+      "block": 3,
+      "basis": "printed",
+      "source": {
+        "url": "https://onepiece.limitlesstcg.com/cards/ST28-001",
+        "checked": "2026-11-24",
+        "note": "Block 3 shown on the Limitless card page for ST28-001 (read 2026-11-24; M6b runbook step a). No official page for this product was read."
       }
     },
     "ST-29": {
@@ -455,6 +518,15 @@
         "note": "Block icon printed on this product's cards where they are reprinted in this series page (cached by Track B, 2026-10-28); every printing seen agrees. Only OP01-016, OP04-016 and EB04-061 were reprinted with an updated block (blockicon-card.html), so other reprints carry the product block."
       }
     },
+    "ST-33": {
+      "block": 5,
+      "basis": "printed",
+      "source": {
+        "url": "https://onepiece.limitlesstcg.com/cards/ST33-001",
+        "checked": "2026-11-24",
+        "note": "Block 5 shown on the Limitless card page for ST33-001 (read 2026-11-24; M6b runbook step a). No official page for this product was read."
+      }
+    },
     "ST-34": {
       "block": 5,
       "basis": "printed",
@@ -462,6 +534,24 @@
         "url": "https://en.onepiece-cardgame.com/cardlist/?series=569034",
         "checked": "2026-10-28",
         "note": "Block icon printed on every base printing of the product in this series page (cached by Track B, 2026-10-28)."
+      }
+    },
+    "ST-35": {
+      "block": 5,
+      "basis": "printed",
+      "source": {
+        "url": "https://onepiece.limitlesstcg.com/cards/ST35-001",
+        "checked": "2026-11-24",
+        "note": "Block 5 shown on the Limitless card page for ST35-001 (read 2026-11-24; M6b runbook step a). No official page for this product was read."
+      }
+    },
+    "ST-36": {
+      "block": 5,
+      "basis": "printed",
+      "source": {
+        "url": "https://onepiece.limitlesstcg.com/cards/ST36-001",
+        "checked": "2026-11-24",
+        "note": "Block 5 shown on the Limitless card page for ST36-001 (read 2026-11-24; M6b runbook step a). No official page for this product was read."
       }
     }
   },
@@ -904,7 +994,7 @@
   ],
   "gaps": [
     "topics/013.php says booster packs 1 to 4 are block 1, 5 to 8 block 2, \"and so on\", but the printed icons do not follow that past OP-12: OP-13 to OP-15 are block 4 and OP-16 and OP-17 are block 5 (official series pages; Limitless agrees for every meta card). This file uses the printed icons for every booster. rulings.md RL-37 applies the formula to OP15-096; that still gives 4, which matches.",
-    "No cited block for starter decks ST-08, ST-22, ST-23, ST-24, ST-25, ST-28, ST-33, ST-35 and ST-36: none of their printings is on a cached official series page or a Limitless page read so far. Their Standard legality is \"unknown\" until a source is read.",
+    "Starter decks ST-08, ST-22 to ST-25, ST-28, ST-33, ST-35 and ST-36 and EB-05 were cited from Limitless card pages on 2026-11-24 (one card per product; every printing of a product is assumed to carry the product block, as for the others).",
     "Promotion cards (P-xxx) have no product block: each promo carries its own printed block. Only promos with a verified override (P-088, P-093, block 3 on Limitless) have one; the rest are \"unknown\".",
     "ST-13: one printing in the promotion series (569901) shows block 1 while 12 others show 2; the product block is taken as 2.",
     "OP15-096 has no block on the official site; the booster formula gives 4 (rulings.md RL-37).",

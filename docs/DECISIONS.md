@@ -2,6 +2,10 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-24 — Blocks cited for EB-05 and nine starter decks (runbook step a)
+
+EB-05 (the first scripting batch) and the starter decks with no cited block had `unknown` Standard legality. Each product's block was read from one Limitless card page (the source `standard.json` already accepts for ST-30): EB-05, ST-33, ST-35 and ST-36 block 5; ST-22, ST-23, ST-24, ST-25 and ST-28 block 3; ST-08 block 1 (not Standard). 113 cards became Standard-legal and ST-08's 15 rotated; the Standard pool is now 2,124 cards. As for the other products, every printing is assumed to carry the product block. Promos keep `unknown` until each is read (their block is per card). Tests that used EB05-001 as the example of an uncited card now use the promo Leader P-011; `play-frequency.json` was re-enriched (it records each card's Standard status).
+
 ## 2026-11-24 — M6b-2 wave 1: ten engine gaps (ENGINE_VERSION 0.5.5)
 
 Context: wave 1 of `docs/research/m6b-runtime-audit.md` §4 (G1 to G10), built by an agent in a worktree and merged after its report and a full suite run; detail and per-gap revert results in `docs/research/m6b-wave1.md`. Each gap has planted tests on vanilla test cards (`engine/test/cards/m6b-w1/`, 44 tests), and each was seen to fail with its implementation broken. Goldens re-recorded for the version bump: hashes and event sequences unchanged.

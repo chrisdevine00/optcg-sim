@@ -4,7 +4,7 @@
   "name": "Starter Deck 36: YELLOW Eustass\"Captain\"Kid",
   "kind": "starter",
   "cardCount": 5,
-  "block": null
+  "block": 5
  },
  "cards": [
   {
@@ -28,7 +28,7 @@
    ],
    "rarity": "C",
    "set": "ST-36",
-   "block": null,
+   "block": 5,
    "effectText": "[On K.O.] You may trash 1 card from your hand: Add up to 1 card from the top of your deck to the top of your Life cards.",
    "triggerText": null,
    "keywords": [],
@@ -48,8 +48,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 5"
     },
     "extra": {
      "status": "legal"
@@ -78,7 +78,7 @@
    ],
    "rarity": "SR",
    "set": "ST-36",
-   "block": null,
+   "block": 5,
    "effectText": "[Your Turn] [On Play] If your Leader has the {Kid Pirates} type, add up to 1 card from the top of your deck to the top of your Life cards.",
    "triggerText": "If your opponent has 3 or less Life cards, play this card.",
    "keywords": [],
@@ -98,8 +98,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 5"
     },
     "extra": {
      "status": "legal"
@@ -128,7 +128,7 @@
    ],
    "rarity": "C",
    "set": "ST-36",
-   "block": null,
+   "block": 5,
    "effectText": "",
    "triggerText": "Draw 1 card and your {Supernovas} type Leader's base power becomes 7000 during this turn.",
    "keywords": [],
@@ -148,8 +148,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 5"
     },
     "extra": {
      "status": "legal"
@@ -179,7 +179,7 @@
    ],
    "rarity": "C",
    "set": "ST-36",
-   "block": null,
+   "block": 5,
    "effectText": "[On Play] You may trash 1 {Supernovas} type card from your hand: Draw 2 cards.",
    "triggerText": null,
    "keywords": [],
@@ -199,8 +199,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 5"
     },
     "extra": {
      "status": "legal"
@@ -229,7 +229,7 @@
    ],
    "rarity": "SR",
    "set": "ST-36",
-   "block": null,
+   "block": 5,
    "effectText": "[On Your Opponent's Attack] [Once Per Turn] You may turn 1 card from the top or bottom of your Life cards face-down: Change the target of the attack to your [Eustass\"Captain\"Kid] with 5000 base power or more.[Activate: Main] [Once Per Turn] You may turn 1 card from the top or bottom of your Life cards face-up: Give up to 1 rested DON!! card to your Leader.",
    "triggerText": null,
    "keywords": [],
@@ -249,8 +249,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 5"
     },
     "extra": {
      "status": "legal"

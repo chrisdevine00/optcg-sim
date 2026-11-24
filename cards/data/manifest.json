@@ -2,7 +2,7 @@
   "source": "optcgapi.com (normalized; see cards/README.md)",
   "sourceUrl": "https://optcgapi.com",
   "fetchedAt": "2026-11-17T16:20:56.544Z",
-  "generatedAt": "2026-11-17T16:21:23.115Z",
+  "generatedAt": "2026-11-24T01:11:01.159Z",
   "cardCount": 2860,
   "printingCount": 5175,
   "newestSet": "OP-17",
@@ -160,7 +160,7 @@
       "name": "Extra Booster: One Piece Heroines Edition Vol. 2",
       "kind": "extra",
       "cardCount": 61,
-      "block": null
+      "block": 5
     },
     {
       "code": "PRB-01",
@@ -230,7 +230,7 @@
       "name": "Starter Deck 8: Monkey.D.Luffy",
       "kind": "starter",
       "cardCount": 15,
-      "block": null
+      "block": 1
     },
     {
       "code": "ST-09",
@@ -328,28 +328,28 @@
       "name": "Starter Deck 22: Ace & Newgate",
       "kind": "starter",
       "cardCount": 17,
-      "block": null
+      "block": 3
     },
     {
       "code": "ST-23",
       "name": "Starter Deck 23: RED Shanks",
       "kind": "starter",
       "cardCount": 5,
-      "block": null
+      "block": 3
     },
     {
       "code": "ST-24",
       "name": "Starter Deck 24: GREEN Jewelry Bonney",
       "kind": "starter",
       "cardCount": 5,
-      "block": null
+      "block": 3
     },
     {
       "code": "ST-25",
       "name": "Starter Deck 25: BLUE Buggy",
       "kind": "starter",
       "cardCount": 5,
-      "block": null
+      "block": 3
     },
     {
       "code": "ST-26",
@@ -370,7 +370,7 @@
       "name": "Starter Deck 28: GREEN/YELLOW Yamato",
       "kind": "starter",
       "cardCount": 5,
-      "block": null
+      "block": 3
     },
     {
       "code": "ST-29",
@@ -405,7 +405,7 @@
       "name": "Starter Deck 33: BLUE Kuzan",
       "kind": "starter",
       "cardCount": 5,
-      "block": null
+      "block": 5
     },
     {
       "code": "ST-34",
@@ -419,14 +419,14 @@
       "name": "Starter Deck 35: RED/BLACK Sabo",
       "kind": "starter",
       "cardCount": 5,
-      "block": null
+      "block": 5
     },
     {
       "code": "ST-36",
       "name": "Starter Deck 36: YELLOW Eustass\"Captain\"Kid",
       "kind": "starter",
       "cardCount": 5,
-      "block": null
+      "block": 5
     },
     {
       "code": "P",

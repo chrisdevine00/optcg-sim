@@ -4,7 +4,7 @@
   "name": "Starter Deck 22: Ace & Newgate",
   "kind": "starter",
   "cardCount": 17,
-  "block": null
+  "block": 3
  },
  "cards": [
   {
@@ -27,7 +27,7 @@
    ],
    "rarity": "L",
    "set": "ST-22",
-   "block": null,
+   "block": 3,
    "effectText": "[Activate: Main] [Once Per Turn] You may reveal 1 card with a type including \"Whitebeard Pirates\" from your hand: Draw 1 card and place the revealed card at the top of your deck.",
    "triggerText": null,
    "keywords": [],
@@ -57,8 +57,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 3"
     },
     "extra": {
      "status": "legal"
@@ -87,7 +87,7 @@
    ],
    "rarity": "SR",
    "set": "ST-22",
-   "block": null,
+   "block": 3,
    "effectText": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 card with a type including \"Whitebeard Pirates\" other than [Izo] and add it to your hand. Then, place the rest at the bottom of your deck in any order.[On Your Opponent's Attack] You may trash this Character: Draw 1 card and place 1 card from your hand at the bottom of your deck.",
    "triggerText": null,
    "keywords": [],
@@ -117,8 +117,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 3"
     },
     "extra": {
      "status": "legal"
@@ -147,7 +147,7 @@
    ],
    "rarity": "C",
    "set": "ST-22",
-   "block": null,
+   "block": 3,
    "effectText": "[Double Attack] (This card deals 2 damage.)\n[On Play] Reveal 1 card from the top of your deck. If that card's type includes \"Whitebeard Pirates\", draw 2 cards.",
    "triggerText": null,
    "keywords": [],
@@ -177,8 +177,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 3"
     },
     "extra": {
      "status": "legal"
@@ -206,7 +206,7 @@
    ],
    "rarity": "C",
    "set": "ST-22",
-   "block": null,
+   "block": 3,
    "effectText": "",
    "triggerText": null,
    "keywords": [],
@@ -236,8 +236,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 3"
     },
     "extra": {
      "status": "legal"
@@ -267,7 +267,7 @@
    ],
    "rarity": "SR",
    "set": "ST-22",
-   "block": null,
+   "block": 3,
    "effectText": "If this Character would be removed from the field by your opponent's effect, you may trash 2 cards from your hand instead.\n[Activate: Main] [Once Per Turn] You may rest 3 of your DON!! cards and return 1 of your Characters other than this Character to the owner's hand: Set this Character as active.",
    "triggerText": null,
    "keywords": [],
@@ -297,8 +297,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 3"
     },
     "extra": {
      "status": "legal"
@@ -326,7 +326,7 @@
    ],
    "rarity": "C",
    "set": "ST-22",
-   "block": null,
+   "block": 3,
    "effectText": "[On Play] Reveal 1 card from the top of your deck. If that card's type includes \"Whitebeard Pirates\", draw 2 cards and trash 1 card from your hand.",
    "triggerText": null,
    "keywords": [],
@@ -356,8 +356,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 3"
     },
     "extra": {
      "status": "legal"
@@ -385,7 +385,7 @@
    ],
    "rarity": "C",
    "set": "ST-22",
-   "block": null,
+   "block": 3,
    "effectText": "[Activate: Main] [Once Per Turn] Reveal 1 card from the top of your deck. If that card's type includes \"Whitebeard Pirates\", give up to 1 rested DON!! card to your Leader or 1 of your Characters.",
    "triggerText": null,
    "keywords": [],
@@ -415,8 +415,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 3"
     },
     "extra": {
      "status": "legal"
@@ -444,7 +444,7 @@
    ],
    "rarity": "C",
    "set": "ST-22",
-   "block": null,
+   "block": 3,
    "effectText": "",
    "triggerText": null,
    "keywords": [],
@@ -474,8 +474,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 3"
     },
     "extra": {
      "status": "legal"
@@ -503,7 +503,7 @@
    ],
    "rarity": "C",
    "set": "ST-22",
-   "block": null,
+   "block": 3,
    "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
    "triggerText": null,
    "keywords": [],
@@ -533,8 +533,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 3"
     },
     "extra": {
      "status": "legal"
@@ -562,7 +562,7 @@
    ],
    "rarity": "C",
    "set": "ST-22",
-   "block": null,
+   "block": 3,
    "effectText": "",
    "triggerText": null,
    "keywords": [],
@@ -592,8 +592,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 3"
     },
     "extra": {
      "status": "legal"
@@ -621,7 +621,7 @@
    ],
    "rarity": "C",
    "set": "ST-22",
-   "block": null,
+   "block": 3,
    "effectText": "[Your Turn] [On Play] Up to 1 of your Leader with a type including \"Whitebeard Pirates\" gains +2000 power during this turn.",
    "triggerText": null,
    "keywords": [],
@@ -651,8 +651,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 3"
     },
     "extra": {
      "status": "legal"
@@ -680,7 +680,7 @@
    ],
    "rarity": "C",
    "set": "ST-22",
-   "block": null,
+   "block": 3,
    "effectText": "[Once Per Turn] If this Character would be K.O.'d by your opponent's effect, you may trash 1 card from your hand instead.\n[When Attacking] Reveal 1 card from the top of your deck. If that card's type includes \"Whitebeard Pirates\", this Character gains +1000 power until the end of your opponent's next turn.",
    "triggerText": null,
    "keywords": [],
@@ -710,8 +710,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 3"
     },
     "extra": {
      "status": "legal"
@@ -740,7 +740,7 @@
    ],
    "rarity": "C",
    "set": "ST-22",
-   "block": null,
+   "block": 3,
    "effectText": "",
    "triggerText": null,
    "keywords": [],
@@ -770,8 +770,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 3"
     },
     "extra": {
      "status": "legal"
@@ -799,7 +799,7 @@
    ],
    "rarity": "C",
    "set": "ST-22",
-   "block": null,
+   "block": 3,
    "effectText": "",
    "triggerText": null,
    "keywords": [],
@@ -829,8 +829,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 3"
     },
     "extra": {
      "status": "legal"
@@ -857,7 +857,7 @@
    ],
    "rarity": "C",
    "set": "ST-22",
-   "block": null,
+   "block": 3,
    "effectText": "[Main] If your Leader's type includes \"Whitebeard Pirates\", play up to 1 [Edward.Newgate] from your hand. Then, you may add 1 card from the top or bottom of your Life cards to your hand. If you do, up to 1 of your Leader gains +2000 power until the end of your opponent's next turn.",
    "triggerText": null,
    "keywords": [],
@@ -877,8 +877,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 3"
     },
     "extra": {
      "status": "legal"
@@ -904,7 +904,7 @@
    ],
    "rarity": "C",
    "set": "ST-22",
-   "block": null,
+   "block": 3,
    "effectText": "[Counter] Reveal 1 card from the top of your deck. If that card's type includes \"Whitebeard Pirates\", up to 1 of your Leader or Character cards gains +4000 power during this battle.",
    "triggerText": "Draw 1 card.",
    "keywords": [],
@@ -924,8 +924,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 3"
     },
     "extra": {
      "status": "legal"
@@ -951,7 +951,7 @@
    ],
    "rarity": "C",
    "set": "ST-22",
-   "block": null,
+   "block": 3,
    "effectText": "[Main] You may reveal 2 cards with a type including \"Whitebeard Pirates\" from your hand: Draw 1 card. Then, place up to 1 Character with a cost of 5 or less at the bottom of the owner's deck.",
    "triggerText": "Return up to 1 Character with a cost of 3 or less to the owner's hand.",
    "keywords": [],
@@ -971,8 +971,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 3"
     },
     "extra": {
      "status": "legal"

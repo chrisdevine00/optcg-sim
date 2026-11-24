@@ -4,7 +4,7 @@
   "name": "Starter Deck 24: GREEN Jewelry Bonney",
   "kind": "starter",
   "cardCount": 5,
-  "block": null
+  "block": 3
  },
  "cards": [
   {
@@ -27,7 +27,7 @@
    ],
    "rarity": "C",
    "set": "ST-24",
-   "block": null,
+   "block": 3,
    "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[On Play] If you have 6 or more rested cards, draw 1 card and trash 1 card from your hand.",
    "triggerText": null,
    "keywords": [],
@@ -47,8 +47,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 3"
     },
     "extra": {
      "status": "legal"
@@ -78,7 +78,7 @@
    ],
    "rarity": "SR",
    "set": "ST-24",
-   "block": null,
+   "block": 3,
    "effectText": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 \"Supernovas\" type card and add it to your hand. Then, place the rest at the bottom of your deck in any order.\n[On Your Opponent's Attack] You may trash this Character: Set up to 1 of your DON!! cards as active.",
    "triggerText": null,
    "keywords": [],
@@ -98,8 +98,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 3"
     },
     "extra": {
      "status": "legal"
@@ -128,7 +128,7 @@
    ],
    "rarity": "C",
    "set": "ST-24",
-   "block": null,
+   "block": 3,
    "effectText": "[End of Your Turn] Set up to 1 of your DON!! cards as active.",
    "triggerText": null,
    "keywords": [],
@@ -148,8 +148,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 3"
     },
     "extra": {
      "status": "legal"
@@ -180,7 +180,7 @@
    ],
    "rarity": "SR",
    "set": "ST-24",
-   "block": null,
+   "block": 3,
    "effectText": "[On Play] Rest up to 1 of your opponent's Characters and that Character will not become active in your opponent's next Refresh Phase. Then, if your opponent has 2 or more rested Characters, your Leader gains +2000 power until the end of your opponent's next End Phase.",
    "triggerText": null,
    "keywords": [],
@@ -200,8 +200,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 3"
     },
     "extra": {
      "status": "legal"
@@ -231,7 +231,7 @@
    ],
    "rarity": "C",
    "set": "ST-24",
-   "block": null,
+   "block": 3,
    "effectText": "[On Play] If your Leader has the \"Supernovas\" type, rest up to 1 of your opponent's Characters with a cost of 5 or less. Then, set up to 1 of your DON!! cards as active at the end of this turn.",
    "triggerText": null,
    "keywords": [],
@@ -260,8 +260,8 @@
    ],
    "legality": {
     "standard": {
-     "status": "unknown",
-     "reason": "block not known"
+     "status": "legal",
+     "reason": "block 3"
     },
     "extra": {
      "status": "legal"
