@@ -55,7 +55,7 @@ function timings(ab: Ability): (string | object)[] {
 const lead = (u: string): string => /^(?:\[[^\]]*\]\s*\/?\s*)+/.exec(u)?.[0] ?? '';
 
 function unitFor(ab: Ability, units: string[]): string | undefined {
-  if (ab.kind === 'replacement') return units.find((u) => /would be/.test(u));
+  if (ab.kind === 'replacement') return units.find((u) => /would (?:be|take)/.test(u));
   const ts = timings(ab);
   const first = ts[0];
   if (typeof first === 'string') {
