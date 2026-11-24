@@ -1,0 +1,13 @@
+{
+  "id": "EB04-014",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/EB04-014",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": ["Blocker"],
+  "note": "Limitless spells the name \"Kozuki Sukiyaki\"; the printed name (as in [Kouzuki Oden]) is \"Kouzuki Sukiyaki\", so this is a Limitless typo and optcgapi's value is kept."
+}

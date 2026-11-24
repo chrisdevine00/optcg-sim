@@ -1,0 +1,13 @@
+{
+  "id": "OP13-079",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP13-079",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "note": "Limitless shows the \"?\" attribute icon, which the schema has no value for; the empty attribute list is the faithful value."
+}

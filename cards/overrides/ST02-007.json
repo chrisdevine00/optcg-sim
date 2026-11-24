@@ -1,0 +1,27 @@
+{
+  "id": "ST02-007",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/ST02-007",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "note": "optcgapi has the original wording: \"this card\" for \"this Character\" and a quoted type. Limitless shows the current text. Settled on Limitless (official list not reachable); a clear upstream defect, not a reading.",
+  "textPatches": [
+    {
+      "field": "effectText",
+      "find": "You may rest this card:",
+      "replace": "You may rest this Character:",
+      "source": "https://onepiece.limitlesstcg.com/cards/ST02-007"
+    },
+    {
+      "field": "effectText",
+      "find": "\"Supernovas\" type",
+      "replace": "{Supernovas} type",
+      "source": "https://onepiece.limitlesstcg.com/cards/ST02-007"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "id": "OP15-102",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP15-102",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "note": "optcgapi drops the minus sign (\"give this card in your hand 3 cost\" for −3). Settled on Limitless (official list not reachable); a clear upstream defect, not a reading.",
+  "fields": {
+    "effectText": {
+      "value": "If you have a {Sky Island} type Character with 7000 power or more, give this card in your hand −3 cost.\n[On Play] Rest up to 1 of your opponent's Characters with a cost equal to or less than the number of your opponent's Life cards.",
+      "upstream": "If you have a {Sky Island} type Character with 7000 power or more, give this card in your hand 3 cost.\n[On Play] Rest up to 1 of your opponent's Characters with a cost equal to or less than the number of your opponent's Life cards.",
+      "source": "https://onepiece.limitlesstcg.com/cards/OP15-102"
+    }
+  }
+}

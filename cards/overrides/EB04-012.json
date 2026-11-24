@@ -1,0 +1,20 @@
+{
+  "id": "EB04-012",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/EB04-012",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "note": "optcgapi has \"[Activate:Main]\" without the space and \"has played\" for \"was played\". Settled on Limitless (official list not reachable); a clear upstream defect, not a reading.",
+  "fields": {
+    "effectText": {
+      "value": "[Activate: Main] [Once Per Turn] If this Character was played on this turn, set your {Land of Wano} type Leader as active.",
+      "upstream": "[Activate:Main] [Once Per Turn] If this Character has played on this turn, set your {Land of Wano} type Leader as active.",
+      "source": "https://onepiece.limitlesstcg.com/cards/EB04-012"
+    }
+  }
+}

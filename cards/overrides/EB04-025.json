@@ -1,0 +1,20 @@
+{
+  "id": "EB04-025",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/EB04-025",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "note": "optcgapi has \"from your hand\" for \"from their hand\" (the opponent places a card). Settled on Limitless (official list not reachable); a clear upstream defect, not a reading.",
+  "fields": {
+    "effectText": {
+      "value": "[On Play] Play up to 1 {Alabasta} type Character card with a cost of 8 or less other than [Nefeltari Vivi] from your hand. Then, your opponent places 1 card from their hand at the bottom of their deck.",
+      "upstream": "[On Play] Play up to 1 {Alabasta} type Character card with a cost of 8 or less other than [Nefeltari Vivi] from your hand. Then, your opponent places 1 card from your hand at the bottom of their deck.",
+      "source": "https://onepiece.limitlesstcg.com/cards/EB04-025"
+    }
+  }
+}

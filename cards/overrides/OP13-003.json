@@ -1,0 +1,20 @@
+{
+  "id": "OP13-003",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP13-003",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "note": "optcgapi drops the minus sign (\"give this Leader 2000 power\" for −2000). Settled on Limitless (official list not reachable); a clear upstream defect, not a reading.",
+  "fields": {
+    "effectText": {
+      "value": "If you have any DON!! cards on your field, 1 DON!! card placed during your DON!! Phase is given to your Leader.\nIf you have 9 or less DON!! cards on your field, give this Leader −2000 power.",
+      "upstream": "If you have any DON!! cards on your field, 1 DON!! card placed during your DON!! Phase is given to your Leader.\nIf you have 9 or less DON!! cards on your field, give this Leader 2000 power.",
+      "source": "https://onepiece.limitlesstcg.com/cards/OP13-003"
+    }
+  }
+}

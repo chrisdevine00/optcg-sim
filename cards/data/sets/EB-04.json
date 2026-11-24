@@ -72,7 +72,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-001/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-002",
@@ -138,7 +138,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-002/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-003",
@@ -207,7 +207,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-003/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-004",
@@ -262,7 +262,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-004/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-005",
@@ -319,7 +319,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-005/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-006",
@@ -374,7 +374,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-006/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-007",
@@ -450,7 +450,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-007/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-008",
@@ -504,7 +504,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-008/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-009",
@@ -557,7 +557,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-009/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-010",
@@ -610,7 +610,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-010/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-011",
@@ -667,7 +667,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-011/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-012",
@@ -690,12 +690,26 @@
    "rarity": "SR",
    "set": "EB-04",
    "block": 4,
-   "effectText": "[Activate:Main] [Once Per Turn] If this Character has played on this turn, set your {Land of Wano} type Leader as active.",
+   "effectText": "[Activate: Main] [Once Per Turn] If this Character was played on this turn, set your {Land of Wano} type Leader as active.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
-   "textFixes": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/EB04-012",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "override",
+     "from": "[Activate:Main] [Once Per Turn] If this Character has played on this turn, set your {Land of Wano} type Leader as active.",
+     "to": "[Activate: Main] [Once Per Turn] If this Character was played on this turn, set your {Land of Wano} type Leader as active.",
+     "source": "https://onepiece.limitlesstcg.com/cards/EB04-012"
+    }
+   ],
    "artworks": [
     {
      "artworkId": "EB04-012",
@@ -727,7 +741,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-012/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-013",
@@ -792,7 +806,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-013/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-014",
@@ -817,9 +831,17 @@
    "block": 4,
    "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.) [Activate: Main] [Once Per Turn] Give up to 1 rested DON!! card to your {Land of Wano} type Leader.",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Blocker"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/EB04-014",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -842,7 +864,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-014/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-015",
@@ -901,7 +923,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-015/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-016",
@@ -956,7 +978,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-016/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-017",
@@ -1019,7 +1041,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-017/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-018",
@@ -1085,7 +1107,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-018/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-019",
@@ -1138,7 +1160,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-019/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-020",
@@ -1193,7 +1215,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-020/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-021",
@@ -1248,7 +1270,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-021/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-022",
@@ -1321,7 +1343,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-022/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-023",
@@ -1378,7 +1400,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-023/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-024",
@@ -1433,7 +1455,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-024/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-025",
@@ -1455,12 +1477,26 @@
    "rarity": "SR",
    "set": "EB-04",
    "block": 4,
-   "effectText": "[On Play] Play up to 1 {Alabasta} type Character card with a cost of 8 or less other than [Nefeltari Vivi] from your hand. Then, your opponent places 1 card from your hand at the bottom of their deck.",
+   "effectText": "[On Play] Play up to 1 {Alabasta} type Character card with a cost of 8 or less other than [Nefeltari Vivi] from your hand. Then, your opponent places 1 card from their hand at the bottom of their deck.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
-   "textFixes": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/EB04-025",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "override",
+     "from": "[On Play] Play up to 1 {Alabasta} type Character card with a cost of 8 or less other than [Nefeltari Vivi] from your hand. Then, your opponent places 1 card from your hand at the bottom of their deck.",
+     "to": "[On Play] Play up to 1 {Alabasta} type Character card with a cost of 8 or less other than [Nefeltari Vivi] from your hand. Then, your opponent places 1 card from their hand at the bottom of their deck.",
+     "source": "https://onepiece.limitlesstcg.com/cards/EB04-025"
+    }
+   ],
    "artworks": [
     {
      "artworkId": "EB04-025",
@@ -1492,7 +1528,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-025/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-026",
@@ -1557,7 +1593,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-026/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-027",
@@ -1613,7 +1649,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-027/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-028",
@@ -1634,11 +1670,25 @@
    "set": "EB-04",
    "block": 4,
    "effectText": "[Main] You may trash 1 card from your hand: If your Leader has the {Navy} type, up to 2 of your opponent's Characters with 10000 power or less cannot attack until the end of your opponent's next End Phase.",
-   "triggerText": null,
+   "triggerText": "Return up to 1 Character with a cost of 5 or less to the owner's hand.",
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
-   "textFixes": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/EB04-028",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "triggerText",
+     "kind": "override",
+     "from": "null",
+     "to": "Return up to 1 Character with a cost of 5 or less to the owner's hand.",
+     "source": "https://onepiece.limitlesstcg.com/cards/EB04-028"
+    }
+   ],
    "artworks": [
     {
      "artworkId": "EB04-028",
@@ -1669,7 +1719,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-028/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-029",
@@ -1723,7 +1773,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-029/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-030",
@@ -1779,7 +1829,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-030/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-031",
@@ -1845,7 +1895,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-031/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-032",
@@ -1900,7 +1950,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-032/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-033",
@@ -1964,7 +2014,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-033/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-034",
@@ -2021,7 +2071,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-034/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-035",
@@ -2080,7 +2130,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-035/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-036",
@@ -2145,7 +2195,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-036/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-037",
@@ -2200,7 +2250,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-037/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-038",
@@ -2269,7 +2319,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-038/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-039",
@@ -2335,7 +2385,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-039/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-040",
@@ -2396,7 +2446,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-040/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-041",
@@ -2449,7 +2499,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-041/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-042",
@@ -2471,12 +2521,26 @@
    "rarity": "C",
    "set": "EB-04",
    "block": 4,
-   "effectText": "[On Play] You may trash 3 cards from the top of your deck: Give up to 1 of your opponent's Characters +1 cost during this turn.",
+   "effectText": "[On Play] You may trash 3 cards from the top of your deck: Give up to 1 of your opponent's Characters −1 cost during this turn.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
-   "textFixes": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/EB04-042",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "override",
+     "from": "[On Play] You may trash 3 cards from the top of your deck: Give up to 1 of your opponent's Characters +1 cost during this turn.",
+     "to": "[On Play] You may trash 3 cards from the top of your deck: Give up to 1 of your opponent's Characters −1 cost during this turn.",
+     "source": "https://onepiece.limitlesstcg.com/cards/EB04-042"
+    }
+   ],
    "artworks": [
     {
      "artworkId": "EB04-042",
@@ -2498,7 +2562,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-042/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-043",
@@ -2564,7 +2628,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-043/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-044",
@@ -2587,12 +2651,26 @@
    "rarity": "SR",
    "set": "EB-04",
    "block": 4,
-   "effectText": "[Once Per Turn] If your Leader has the \"Navy\" type and this Character would be removed from the field, you can discard 1 card from your hand instead.\n[Your Turn] [Once Per Turn] When one of your opponent’s Characters is KO’d, draw 1 card.",
+   "effectText": "[Once Per Turn] If your Leader's type includes \"Navy\" and this Character would be removed from the field, you may trash 1 card from your hand instead.\n[Your Turn] [Once Per Turn] When your opponent's Character is K.O.'d, draw 1 card.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
-   "textFixes": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/EB04-044",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "override",
+     "from": "[Once Per Turn] If your Leader has the \"Navy\" type and this Character would be removed from the field, you can discard 1 card from your hand instead.\n[Your Turn] [Once Per Turn] When one of your opponent’s Characters is KO’d, draw 1 card.",
+     "to": "[Once Per Turn] If your Leader's type includes \"Navy\" and this Character would be removed from the field, you may trash 1 card from your hand instead.\n[Your Turn] [Once Per Turn] When your opponent's Character is K.O.'d, draw 1 card.",
+     "source": "https://onepiece.limitlesstcg.com/cards/EB04-044"
+    }
+   ],
    "artworks": [
     {
      "artworkId": "EB04-044",
@@ -2634,7 +2712,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-044/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-045",
@@ -2689,7 +2767,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-045/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-046",
@@ -2747,7 +2825,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-046/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-047",
@@ -2803,7 +2881,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-047/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-048",
@@ -2863,7 +2941,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-048/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-049",
@@ -2916,11 +2994,11 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-049/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-050",
-   "name": "I'll Whip You Into Shape.",
+   "name": "I'll Whip You Into Shape. ♡",
    "category": "Event",
    "colors": [
     "Black"
@@ -2940,9 +3018,23 @@
    "effectText": "[Main] Up to 1 of your {SWORD} type Leader or Character cards can also attack active Characters during this turn.[Counter] Your Leader gains +3000 power during this battle.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
-   "textFixes": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/EB04-050",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "name",
+     "kind": "override",
+     "from": "I'll Whip You Into Shape.",
+     "to": "I'll Whip You Into Shape. ♡",
+     "source": "https://onepiece.limitlesstcg.com/cards/EB04-050"
+    }
+   ],
    "artworks": [
     {
      "artworkId": "EB04-050",
@@ -2964,7 +3056,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-050/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-051",
@@ -3019,7 +3111,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-051/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-052",
@@ -3085,7 +3177,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-052/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-053",
@@ -3143,7 +3235,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-053/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-054",
@@ -3209,7 +3301,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-054/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-055",
@@ -3265,7 +3357,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-055/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-056",
@@ -3322,7 +3414,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-056/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-057",
@@ -3378,7 +3470,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-057/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-058",
@@ -3452,7 +3544,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-058/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-059",
@@ -3520,7 +3612,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-059/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-060",
@@ -3575,7 +3667,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-060/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "EB04-061",
@@ -3652,7 +3744,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/EB04-061/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   }
  ]
 }

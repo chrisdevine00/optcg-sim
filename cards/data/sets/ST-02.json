@@ -55,7 +55,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/decks/card/ST02-001/",
-   "fetchedAt": "2026-11-17T16:20:53.268Z"
+   "fetchedAt": "2026-11-24T06:39:21.485Z"
   },
   {
    "id": "ST02-002",
@@ -111,7 +111,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/decks/card/ST02-002/",
-   "fetchedAt": "2026-11-17T16:20:53.268Z"
+   "fetchedAt": "2026-11-24T06:39:21.485Z"
   },
   {
    "id": "ST02-003",
@@ -161,7 +161,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/decks/card/ST02-003/",
-   "fetchedAt": "2026-11-17T16:20:53.268Z"
+   "fetchedAt": "2026-11-24T06:39:21.485Z"
   },
   {
    "id": "ST02-004",
@@ -250,7 +250,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/decks/card/ST02-004/",
-   "fetchedAt": "2026-11-17T16:20:53.268Z"
+   "fetchedAt": "2026-11-24T06:39:21.485Z"
   },
   {
    "id": "ST02-005",
@@ -300,7 +300,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/decks/card/ST02-005/",
-   "fetchedAt": "2026-11-17T16:20:53.268Z"
+   "fetchedAt": "2026-11-24T06:39:21.485Z"
   },
   {
    "id": "ST02-006",
@@ -356,7 +356,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/decks/card/ST02-006/",
-   "fetchedAt": "2026-11-17T16:20:53.268Z"
+   "fetchedAt": "2026-11-24T06:39:21.485Z"
   },
   {
    "id": "ST02-007",
@@ -379,12 +379,33 @@
    "rarity": "C",
    "set": "ST-02",
    "block": 4,
-   "effectText": "[Activate: Main] (1) (You may rest the specified number of DON!! cards in your cost area.) You may rest this card: Look at 5 cards from the top of your deck; reveal up to 1 \"Supernovas\" type card and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "effectText": "[Activate: Main] (1) (You may rest the specified number of DON!! cards in your cost area.) You may rest this Character: Look at 5 cards from the top of your deck; reveal up to 1 {Supernovas} type card and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
-   "textFixes": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST02-007",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "override",
+     "from": "You may rest this card:",
+     "to": "You may rest this Character:",
+     "source": "https://onepiece.limitlesstcg.com/cards/ST02-007"
+    },
+    {
+     "field": "effectText",
+     "kind": "override",
+     "from": "\"Supernovas\" type",
+     "to": "{Supernovas} type",
+     "source": "https://onepiece.limitlesstcg.com/cards/ST02-007"
+    }
+   ],
    "artworks": [
     {
      "artworkId": "ST02-007",
@@ -436,7 +457,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/decks/card/ST02-007/",
-   "fetchedAt": "2026-11-17T16:20:53.268Z"
+   "fetchedAt": "2026-11-24T06:39:21.485Z"
   },
   {
    "id": "ST02-008",
@@ -486,7 +507,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/decks/card/ST02-008/",
-   "fetchedAt": "2026-11-17T16:20:53.268Z"
+   "fetchedAt": "2026-11-24T06:39:21.485Z"
   },
   {
    "id": "ST02-009",
@@ -536,7 +557,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/decks/card/ST02-009/",
-   "fetchedAt": "2026-11-17T16:20:53.268Z"
+   "fetchedAt": "2026-11-24T06:39:21.485Z"
   },
   {
    "id": "ST02-010",
@@ -586,7 +607,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/decks/card/ST02-010/",
-   "fetchedAt": "2026-11-17T16:20:53.268Z"
+   "fetchedAt": "2026-11-24T06:39:21.485Z"
   },
   {
    "id": "ST02-011",
@@ -642,7 +663,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/decks/card/ST02-011/",
-   "fetchedAt": "2026-11-17T16:20:53.268Z"
+   "fetchedAt": "2026-11-24T06:39:21.485Z"
   },
   {
    "id": "ST02-012",
@@ -699,7 +720,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/decks/card/ST02-012/",
-   "fetchedAt": "2026-11-17T16:20:53.268Z"
+   "fetchedAt": "2026-11-24T06:39:21.485Z"
   },
   {
    "id": "ST02-013",
@@ -756,7 +777,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/decks/card/ST02-013/",
-   "fetchedAt": "2026-11-17T16:20:53.268Z"
+   "fetchedAt": "2026-11-24T06:39:21.485Z"
   },
   {
    "id": "ST02-014",
@@ -807,7 +828,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/decks/card/ST02-014/",
-   "fetchedAt": "2026-11-17T16:20:53.268Z"
+   "fetchedAt": "2026-11-24T06:39:21.485Z"
   },
   {
    "id": "ST02-015",
@@ -855,7 +876,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/decks/card/ST02-015/",
-   "fetchedAt": "2026-11-17T16:20:53.268Z"
+   "fetchedAt": "2026-11-24T06:39:21.485Z"
   },
   {
    "id": "ST02-016",
@@ -903,7 +924,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/decks/card/ST02-016/",
-   "fetchedAt": "2026-11-17T16:20:53.268Z"
+   "fetchedAt": "2026-11-24T06:39:21.485Z"
   },
   {
    "id": "ST02-017",
@@ -951,7 +972,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/decks/card/ST02-017/",
-   "fetchedAt": "2026-11-17T16:20:53.268Z"
+   "fetchedAt": "2026-11-24T06:39:21.485Z"
   }
  ]
 }

@@ -1,0 +1,20 @@
+{
+  "id": "OP15-115",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP15-115",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "note": "optcgapi has no [Trigger] text; Limitless shows the printed [Trigger]. Settled on Limitless (official list not reachable); a clear upstream defect, not a reading.",
+  "fields": {
+    "triggerText": {
+      "value": "K.O. up to 1 of your opponent's Characters with a cost of 4 or less.",
+      "upstream": null,
+      "source": "https://onepiece.limitlesstcg.com/cards/OP15-115"
+    }
+  }
+}

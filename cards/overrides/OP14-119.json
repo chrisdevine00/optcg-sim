@@ -1,0 +1,20 @@
+{
+  "id": "OP14-119",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP14-119",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "note": "optcgapi typo \"a cost or 9\" for \"a cost of 9\" and a missing line break. Settled on Limitless (official list not reachable); a clear upstream defect, not a reading.",
+  "fields": {
+    "effectText": {
+      "value": "[Your Turn] When this Character becomes rested, up to 1 of your opponent's Characters with a cost of 9 or less cannot be rested until the end of your opponent's next End Phase.\n[On Your Opponent's Attack] [Once Per Turn] You may trash 1 card from your hand: Up to 1 of your Leader or Character cards gains +2000 power during this battle.",
+      "upstream": "[Your Turn] When this Character becomes rested, up to 1 of your opponent's Characters with a cost or 9 or less cannot be rested until the end of your opponent's next End Phase. [On Your Opponent's Attack] [Once Per Turn] You may trash 1 card from your hand: Up to 1 of your Leader or Character cards gains +2000 power during this battle.",
+      "source": "https://onepiece.limitlesstcg.com/cards/OP14-119"
+    }
+  }
+}

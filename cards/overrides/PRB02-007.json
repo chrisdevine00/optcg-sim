@@ -1,0 +1,20 @@
+{
+  "id": "PRB02-007",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/PRB02-007",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "note": "optcgapi drops the [When Attacking] line and quotes the type. Settled on Limitless (official list not reachable); a clear upstream defect, not a reading.",
+  "fields": {
+    "effectText": {
+      "value": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 {The Seven Warlords of the Sea} type card other than [Jinbe] and add it to your hand. Then, place the rest at the bottom of your deck in any order.\n[When Attacking] Place up to 1 Character with a cost of 1 or less at the bottom of the owner's deck.",
+      "upstream": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 \"The Seven Warlords of the Sea\" type card other than [Jinbe] and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+      "source": "https://onepiece.limitlesstcg.com/cards/PRB02-007"
+    }
+  }
+}

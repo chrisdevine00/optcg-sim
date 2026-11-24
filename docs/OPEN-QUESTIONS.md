@@ -146,3 +146,15 @@ Full text, proposed readings, source auditor IDs and what `rulings.md`/`rules-di
 - OP-17-Q2. EB05-052 Gloriosa against a [Double Attack] hit: one "would take damage" for both points (scripted) or one per point (review OP17-R3; joins M6b-Q5 and Q8).
 - OP-16-Q1. OP16-001 Ace Leader: does the "8000 power or more" clause cover the [Monkey.D.Luffy] branch too (audit) or only the Whitebeard branch (scripted)? Review OP16-R2; M6b-Q16.
 - OP-16-Q2. OP16-036 / OP16-055 "the same as your opponent's Leader": current power (scripted) or base power (audit)? Review OP16-R5; M6b-Q29.
+
+## Block 4 verification (2026-11-24, runbook step d.1)
+
+Block 4 sets (OP-13 to OP-15, EB-03, EB-04, ST-29, ST-02, PRB-02; OP-01 to OP-04 had no disagreements) were checked against Limitless. Clear upstream defects were settled on Limitless (each override says so); EB04-014 (Limitless typo "Kozuki") and OP13-079 (the "?" attribute the schema cannot hold) were verified with our value. The cards below are not verified; read the official card list (https://en.onepiece-cardgame.com/cardlist/) and write `cards/overrides/<ID>.json`.
+
+- B4-V1. **EB04-048 Rob Lucci: "−2 cost" (optcgapi) or "+2 cost" (Limitless)** "for every 5 cards in your trash"?
+- B4-V2. **OP13-084 St. Shepherd Ju Peter: different second ability.** optcgapi: "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 \"Five Elders\" type card and add it to your hand. Then, place the rest at the bottom of your deck in any order." Limitless: "[Your Turn] If you have 10 or more cards in your trash, set the base power of all of your {Five Elders} type Characters to 7000."
+- B4-V3. **OP14-094 Mr.5(Gem): attribute Strike (optcgapi) or Special (Limitless)?**
+- B4-V4. **PRB02-017 Boa Hancock: "[Once Per Turn] You may trash 1 card with a [Trigger]..." (optcgapi) or "[On Play] You may trash..." (Limitless)?**
+- B4-V5. **EB03-034 Charlotte Linlin: type {Big Mom Pirates} (optcgapi) or {Rocks Pirates} (Limitless)?**
+- B4-V6. EB04-061 Monkey.D.Luffy (verified, all fields match): block X (optcgapi) or 4 (Limitless)? Block only; check the printed icon (as EB-05-V2).
+- B4-V7. **OP14-103 Gloriosa: Limitless names it "Gloriosa (Grandma Nyon)"; ours is "Gloriosa".** `cards/src/validate.ts` rejects a name ending in "(...)" as a printing suffix, so the override cannot be written as is. Is "(Grandma Nyon)" part of the printed name (it matters for the four-copy rule, since other Gloriosa cards exist) or a Limitless disambiguation? Decide, then either relax the validator for printed parentheticals (OP14-091 "Mr.2.Bon.Kurei(Bentham)" has no space and passes) or verify with the plain name.

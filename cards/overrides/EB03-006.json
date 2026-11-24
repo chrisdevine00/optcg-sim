@@ -1,0 +1,20 @@
+{
+  "id": "EB03-006",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/EB03-006",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "note": "optcgapi drops the minus sign (\"give your active Leader 5000 power\" for −5000). Settled on Limitless (official list not reachable); a clear upstream defect, not a reading.",
+  "fields": {
+    "effectText": {
+      "value": "[On Play] You may give your active Leader −5000 power during this turn: Draw 1 card.\n[Activate: Main] [Once Per Turn] If your Leader has the {Alabasta} type, give up to 1 of your opponent's Characters −1000 power during this turn.",
+      "upstream": "[On Play] You may give your active Leader 5000 power during this turn: Draw 1 card.\n[Activate: Main] [Once Per Turn] If your Leader has the {Alabasta} type, give up to 1 of your opponent's Characters −1000 power during this turn.",
+      "source": "https://onepiece.limitlesstcg.com/cards/EB03-006"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "id": "OP15-017",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP15-017",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": ["Blocker"],
+  "note": "optcgapi drops the [Blocker] line. Settled on Limitless (official list not reachable); a clear upstream defect, not a reading.",
+  "fields": {
+    "effectText": {
+      "value": "[Blocker]\n[Activate: Main] [Once Per Turn] You may give 1 of your opponent's rested DON!! cards to 1 of your opponent's Characters: Give up to 1 rested DON!! card to its owner's Leader or 1 of their Characters.",
+      "upstream": "[Activate: Main] [Once Per Turn] You may give 1 of your opponent's rested DON!! cards to 1 of your opponent's Characters: Give up to 1 rested DON!! card to its owner's Leader or 1 of their Characters.",
+      "source": "https://onepiece.limitlesstcg.com/cards/OP15-017"
+    }
+  }
+}

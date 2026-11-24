@@ -72,7 +72,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-001/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-002",
@@ -128,7 +128,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-002/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-003",
@@ -184,7 +184,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-003/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-004",
@@ -241,7 +241,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-004/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-005",
@@ -297,7 +297,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-005/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-006",
@@ -359,7 +359,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-006/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-007",
@@ -415,7 +415,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-007/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-008",
@@ -471,7 +471,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-008/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-009",
@@ -540,7 +540,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-009/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-010",
@@ -596,7 +596,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-010/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-011",
@@ -653,7 +653,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-011/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-012",
@@ -709,7 +709,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-012/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-013",
@@ -775,7 +775,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-013/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-014",
@@ -833,7 +833,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-014/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-015",
@@ -910,7 +910,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-015/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-016",
@@ -934,17 +934,30 @@
    "rarity": "R",
    "set": "OP-14",
    "block": 4,
-   "effectText": "[Opponent's Turn] [Once Per Turn] If your {Supernovas} type Character would be removed from the field by your opponent's effect, you may give your Leader 2000 power during this turn instead.\n[DON!! x1] [When Attacking] Give up to 1 of your opponent's Characters −2000 power during this turn.",
+   "effectText": "[Opponent's Turn] [Once Per Turn] If your {Supernovas} type Character would be removed from the field by your opponent's effect, you may give your Leader −2000 power during this turn instead.\n[DON!! x1] [When Attacking] Give up to 1 of your opponent's Characters −2000 power during this turn.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/OP14-016",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [
     {
      "field": "effectText",
      "kind": "sign",
      "from": "2000 power",
      "to": "−2000 power"
+    },
+    {
+     "field": "effectText",
+     "kind": "override",
+     "from": "[Opponent's Turn] [Once Per Turn] If your {Supernovas} type Character would be removed from the field by your opponent's effect, you may give your Leader 2000 power during this turn instead.\n[DON!! x1] [When Attacking] Give up to 1 of your opponent's Characters −2000 power during this turn.",
+     "to": "[Opponent's Turn] [Once Per Turn] If your {Supernovas} type Character would be removed from the field by your opponent's effect, you may give your Leader −2000 power during this turn instead.\n[DON!! x1] [When Attacking] Give up to 1 of your opponent's Characters −2000 power during this turn.",
+     "source": "https://onepiece.limitlesstcg.com/cards/OP14-016"
     }
    ],
    "artworks": [
@@ -968,7 +981,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-016/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-017",
@@ -1023,7 +1036,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-017/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-018",
@@ -1078,7 +1091,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-018/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-019",
@@ -1133,7 +1146,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-019/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-020",
@@ -1193,7 +1206,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-020/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-021",
@@ -1249,7 +1262,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-021/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-022",
@@ -1305,7 +1318,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-022/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-023",
@@ -1361,7 +1374,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-023/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-024",
@@ -1417,7 +1430,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-024/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-025",
@@ -1473,7 +1486,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-025/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-026",
@@ -1529,7 +1542,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-026/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-027",
@@ -1603,7 +1616,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-027/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-028",
@@ -1658,7 +1671,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-028/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-029",
@@ -1723,7 +1736,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-029/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-030",
@@ -1778,7 +1791,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-030/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-031",
@@ -1846,7 +1859,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-031/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-032",
@@ -1902,7 +1915,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-032/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-033",
@@ -1988,7 +2001,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-033/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-034",
@@ -2046,7 +2059,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-034/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-035",
@@ -2101,7 +2114,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-035/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-036",
@@ -2155,7 +2168,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-036/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-037",
@@ -2209,7 +2222,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-037/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-038",
@@ -2262,7 +2275,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-038/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-039",
@@ -2316,7 +2329,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-039/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-040",
@@ -2383,7 +2396,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-040/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-041",
@@ -2460,7 +2473,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-041/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-042",
@@ -2526,7 +2539,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-042/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-043",
@@ -2582,7 +2595,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-043/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-044",
@@ -2640,7 +2653,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-044/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-045",
@@ -2696,7 +2709,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-045/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-046",
@@ -2751,7 +2764,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-046/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-047",
@@ -2809,7 +2822,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-047/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-048",
@@ -2864,7 +2877,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-048/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-049",
@@ -2931,7 +2944,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-049/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-050",
@@ -2987,7 +3000,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-050/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-051",
@@ -3043,7 +3056,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-051/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-052",
@@ -3100,7 +3113,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-052/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-053",
@@ -3157,7 +3170,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-053/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-054",
@@ -3213,7 +3226,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-054/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-055",
@@ -3269,7 +3282,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-055/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-056",
@@ -3325,7 +3338,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-056/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-057",
@@ -3380,7 +3393,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-057/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-058",
@@ -3435,7 +3448,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-058/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-059",
@@ -3490,7 +3503,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-059/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-060",
@@ -3556,7 +3569,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-060/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-061",
@@ -3636,7 +3649,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-061/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-062",
@@ -3698,7 +3711,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-062/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-063",
@@ -3753,7 +3766,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-063/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-064",
@@ -3808,7 +3821,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-064/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-065",
@@ -3863,7 +3876,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-065/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-066",
@@ -3918,7 +3931,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-066/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-067",
@@ -3973,7 +3986,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-067/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-068",
@@ -4028,7 +4041,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-068/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-069",
@@ -4094,7 +4107,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-069/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-070",
@@ -4151,7 +4164,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-070/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-071",
@@ -4206,7 +4219,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-071/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-072",
@@ -4268,7 +4281,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-072/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-073",
@@ -4323,7 +4336,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-073/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-074",
@@ -4389,7 +4402,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-074/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-075",
@@ -4451,7 +4464,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-075/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-076",
@@ -4505,7 +4518,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-076/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-077",
@@ -4559,7 +4572,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-077/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-078",
@@ -4620,7 +4633,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-078/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-079",
@@ -4686,7 +4699,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-079/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-080",
@@ -4752,7 +4765,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-080/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-081",
@@ -4807,7 +4820,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-081/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-082",
@@ -4830,11 +4843,25 @@
    "set": "OP-14",
    "block": 4,
    "effectText": "[On K.O.] All of your {Thriller Bark Pirates} type Characters gain +4 cost until the end of your opponent's next End Phase.",
-   "triggerText": null,
+   "triggerText": "Play up to 1 {Thriller Bark Pirates} type Character card with a cost of 2 or less from your trash rested.",
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
-   "textFixes": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/OP14-082",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "triggerText",
+     "kind": "override",
+     "from": "null",
+     "to": "Play up to 1 {Thriller Bark Pirates} type Character card with a cost of 2 or less from your trash rested.",
+     "source": "https://onepiece.limitlesstcg.com/cards/OP14-082"
+    }
+   ],
    "artworks": [
     {
      "artworkId": "OP14-082",
@@ -4856,7 +4883,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-082/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-083",
@@ -4918,7 +4945,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-083/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-084",
@@ -4993,7 +5020,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-084/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-085",
@@ -5048,7 +5075,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-085/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-086",
@@ -5103,7 +5130,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-086/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-087",
@@ -5159,7 +5186,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-087/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-088",
@@ -5214,7 +5241,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-088/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-089",
@@ -5270,7 +5297,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-089/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-090",
@@ -5335,11 +5362,11 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-090/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-091",
-   "name": "Mr.2.Bon.Kurei",
+   "name": "Mr.2.Bon.Kurei(Bentham)",
    "category": "Character",
    "colors": [
     "Black"
@@ -5360,9 +5387,23 @@
    "effectText": "[On K.O.] Play up to 1 Character card with a type including \"Baroque Works\" and a cost of 5 or less other than [Mr.2.Bon.Kurei.(Bentham)] from your hand or trash.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
-   "textFixes": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/OP14-091",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "name",
+     "kind": "override",
+     "from": "Mr.2.Bon.Kurei",
+     "to": "Mr.2.Bon.Kurei(Bentham)",
+     "source": "https://onepiece.limitlesstcg.com/cards/OP14-091"
+    }
+   ],
    "artworks": [
     {
      "artworkId": "OP14-091",
@@ -5395,7 +5436,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-091/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-092",
@@ -5450,7 +5491,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-092/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-093",
@@ -5507,7 +5548,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-093/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-094",
@@ -5556,7 +5597,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-094/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-095",
@@ -5611,7 +5652,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-095/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-096",
@@ -5675,7 +5716,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-096/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-097",
@@ -5729,7 +5770,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-097/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-098",
@@ -5783,7 +5824,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-098/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-099",
@@ -5837,7 +5878,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-099/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-100",
@@ -5892,7 +5933,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-100/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-101",
@@ -5948,7 +5989,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-101/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-102",
@@ -6003,7 +6044,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-102/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-103",
@@ -6053,7 +6094,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-103/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-104",
@@ -6119,7 +6160,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-104/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-105",
@@ -6176,7 +6217,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-105/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-106",
@@ -6234,7 +6275,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-106/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-107",
@@ -6289,7 +6330,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-107/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-108",
@@ -6354,7 +6395,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-108/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-109",
@@ -6411,7 +6452,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-109/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-110",
@@ -6466,7 +6507,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-110/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-111",
@@ -6531,7 +6572,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-111/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-112",
@@ -6617,7 +6658,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-112/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-113",
@@ -6672,7 +6713,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-113/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-114",
@@ -6727,7 +6768,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-114/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-115",
@@ -6782,7 +6823,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-115/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-116",
@@ -6835,7 +6876,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-116/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-117",
@@ -6888,7 +6929,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-117/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-118",
@@ -6965,7 +7006,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-118/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-119",
@@ -6987,12 +7028,26 @@
    "rarity": "SEC",
    "set": "OP-14",
    "block": 4,
-   "effectText": "[Your Turn] When this Character becomes rested, up to 1 of your opponent's Characters with a cost or 9 or less cannot be rested until the end of your opponent's next End Phase. [On Your Opponent's Attack] [Once Per Turn] You may trash 1 card from your hand: Up to 1 of your Leader or Character cards gains +2000 power during this battle.",
+   "effectText": "[Your Turn] When this Character becomes rested, up to 1 of your opponent's Characters with a cost of 9 or less cannot be rested until the end of your opponent's next End Phase.\n[On Your Opponent's Attack] [Once Per Turn] You may trash 1 card from your hand: Up to 1 of your Leader or Character cards gains +2000 power during this battle.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
-   "textFixes": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/OP14-119",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "override",
+     "from": "[Your Turn] When this Character becomes rested, up to 1 of your opponent's Characters with a cost or 9 or less cannot be rested until the end of your opponent's next End Phase. [On Your Opponent's Attack] [Once Per Turn] You may trash 1 card from your hand: Up to 1 of your Leader or Character cards gains +2000 power during this battle.",
+     "to": "[Your Turn] When this Character becomes rested, up to 1 of your opponent's Characters with a cost of 9 or less cannot be rested until the end of your opponent's next End Phase.\n[On Your Opponent's Attack] [Once Per Turn] You may trash 1 card from your hand: Up to 1 of your Leader or Character cards gains +2000 power during this battle.",
+     "source": "https://onepiece.limitlesstcg.com/cards/OP14-119"
+    }
+   ],
    "artworks": [
     {
      "artworkId": "OP14-119",
@@ -7044,7 +7099,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-119/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "OP14-120",
@@ -7067,12 +7122,26 @@
    "rarity": "SEC",
    "set": "OP-14",
    "block": 4,
-   "effectText": "[On Play] up to 1 of your opponent's Characters with a cost of 9 or less cannot attack until the end of your opponent's next End Phase. Then, if your opponent has a Character 1ith a cost of 0 or with a cost of 8 or more, draw 1 card.\n[On K.O.] You may trash 1 card from your hand: Play this Character card from your trash.",
+   "effectText": "[On Play] Up to 1 of your opponent's Characters with a cost of 9 or less cannot attack until the end of your opponent's next End Phase. Then, if your opponent has a Character with a cost of 0 or with a cost of 8 or more, draw 1 card.\n[On K.O.] You may trash 1 card from your hand: Play this Character card from your trash.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
-   "textFixes": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/OP14-120",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "override",
+     "from": "[On Play] up to 1 of your opponent's Characters with a cost of 9 or less cannot attack until the end of your opponent's next End Phase. Then, if your opponent has a Character 1ith a cost of 0 or with a cost of 8 or more, draw 1 card.\n[On K.O.] You may trash 1 card from your hand: Play this Character card from your trash.",
+     "to": "[On Play] Up to 1 of your opponent's Characters with a cost of 9 or less cannot attack until the end of your opponent's next End Phase. Then, if your opponent has a Character with a cost of 0 or with a cost of 8 or more, draw 1 card.\n[On K.O.] You may trash 1 card from your hand: Play this Character card from your trash.",
+     "source": "https://onepiece.limitlesstcg.com/cards/OP14-120"
+    }
+   ],
    "artworks": [
     {
      "artworkId": "OP14-120",
@@ -7114,7 +7183,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/OP14-120/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   }
  ]
 }

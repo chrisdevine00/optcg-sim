@@ -1,0 +1,20 @@
+{
+  "id": "EB03-038",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/EB03-038",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "note": "optcgapi drops the heart from the name. Settled on Limitless (official list not reachable); a clear upstream defect, not a reading.",
+  "fields": {
+    "name": {
+      "value": "Thanks for the Treat. ♡",
+      "upstream": "Thanks for the Treat.",
+      "source": "https://onepiece.limitlesstcg.com/cards/EB03-038"
+    }
+  }
+}

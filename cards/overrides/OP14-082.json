@@ -1,0 +1,20 @@
+{
+  "id": "OP14-082",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP14-082",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "note": "optcgapi has no [Trigger] text; Limitless shows the printed [Trigger]. Settled on Limitless (official list not reachable); a clear upstream defect, not a reading.",
+  "fields": {
+    "triggerText": {
+      "value": "Play up to 1 {Thriller Bark Pirates} type Character card with a cost of 2 or less from your trash rested.",
+      "upstream": null,
+      "source": "https://onepiece.limitlesstcg.com/cards/OP14-082"
+    }
+  }
+}

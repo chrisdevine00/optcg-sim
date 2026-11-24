@@ -1,0 +1,20 @@
+{
+  "id": "OP15-023",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP15-023",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "note": "optcgapi has no attribute; Limitless shows (Slash). Settled on Limitless (official list not reachable); a clear upstream defect, not a reading.",
+  "fields": {
+    "attributes": {
+      "value": ["Slash"],
+      "upstream": [],
+      "source": "https://onepiece.limitlesstcg.com/cards/OP15-023"
+    }
+  }
+}

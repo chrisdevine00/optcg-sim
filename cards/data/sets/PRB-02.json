@@ -71,7 +71,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-001/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "PRB02-002",
@@ -138,7 +138,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-002/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "PRB02-003",
@@ -205,7 +205,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-003/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "PRB02-004",
@@ -273,7 +273,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-004/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "PRB02-005",
@@ -369,7 +369,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-005/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "PRB02-006",
@@ -457,7 +457,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-006/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "PRB02-007",
@@ -481,12 +481,26 @@
    "rarity": "R",
    "set": "PRB-02",
    "block": 3,
-   "effectText": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 \"The Seven Warlords of the Sea\" type card other than [Jinbe] and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "effectText": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 {The Seven Warlords of the Sea} type card other than [Jinbe] and add it to your hand. Then, place the rest at the bottom of your deck in any order.\n[When Attacking] Place up to 1 Character with a cost of 1 or less at the bottom of the owner's deck.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
-   "textFixes": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/PRB02-007",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "override",
+     "from": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 \"The Seven Warlords of the Sea\" type card other than [Jinbe] and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+     "to": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 {The Seven Warlords of the Sea} type card other than [Jinbe] and add it to your hand. Then, place the rest at the bottom of your deck in any order.\n[When Attacking] Place up to 1 Character with a cost of 1 or less at the bottom of the owner's deck.",
+     "source": "https://onepiece.limitlesstcg.com/cards/PRB02-007"
+    }
+   ],
    "artworks": [
     {
      "artworkId": "PRB02-007",
@@ -518,7 +532,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-007/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "PRB02-008",
@@ -586,7 +600,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-008/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "PRB02-009",
@@ -654,7 +668,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-009/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "PRB02-010",
@@ -719,7 +733,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-010/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "PRB02-011",
@@ -787,7 +801,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-011/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "PRB02-012",
@@ -862,7 +876,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-012/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "PRB02-013",
@@ -928,7 +942,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-013/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "PRB02-014",
@@ -1006,7 +1020,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-014/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "PRB02-015",
@@ -1071,7 +1085,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-015/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "PRB02-016",
@@ -1136,7 +1150,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-016/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "PRB02-017",
@@ -1197,7 +1211,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-017/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   },
   {
    "id": "PRB02-018",
@@ -1262,7 +1276,7 @@
     }
    },
    "sourceUrl": "https://optcgapi.com/api/sets/card/PRB02-018/",
-   "fetchedAt": "2026-11-17T16:20:49.872Z"
+   "fetchedAt": "2026-11-24T06:39:17.098Z"
   }
  ]
 }

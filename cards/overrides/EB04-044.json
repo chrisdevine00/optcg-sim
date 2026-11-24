@@ -1,0 +1,20 @@
+{
+  "id": "EB04-044",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/EB04-044",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "note": "optcgapi paraphrases the text (\"discard\" for \"trash\", \"KO'd\", \"has the type\" for \"type includes\", \"one of your opponent's Characters\"). Settled on Limitless (official list not reachable); a clear upstream defect, not a reading.",
+  "fields": {
+    "effectText": {
+      "value": "[Once Per Turn] If your Leader's type includes \"Navy\" and this Character would be removed from the field, you may trash 1 card from your hand instead.\n[Your Turn] [Once Per Turn] When your opponent's Character is K.O.'d, draw 1 card.",
+      "upstream": "[Once Per Turn] If your Leader has the \"Navy\" type and this Character would be removed from the field, you can discard 1 card from your hand instead.\n[Your Turn] [Once Per Turn] When one of your opponent’s Characters is KO’d, draw 1 card.",
+      "source": "https://onepiece.limitlesstcg.com/cards/EB04-044"
+    }
+  }
+}
