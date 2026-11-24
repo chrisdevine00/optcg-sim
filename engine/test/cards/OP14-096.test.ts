@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   accept,
   BLUE,
+  dec,
   decline,
   don,
   endCounter,
@@ -93,8 +94,15 @@ describe('OP14-096 Ground Death', () => {
     expect(g.life('p1')).toBe(1);
   });
 
-  it('[Counter]: with 9 cards (the Event itself goes to the trash only afterwards) it has no effect', () => {
+  it('[Counter]: the Event is trashed before it resolves (CR 8-4-2) so it counts itself: 9 others are enough', () => {
     const g = counter(9);
+    pick(g, [g.leader('p1')]);
+    expect(g.power(g.leader('p1'))).toBe(9000);
+  });
+
+  it('[Counter]: with 8 other cards (9 with the Event) it has no effect and asks nothing', () => {
+    const g = counter(8);
+    expect(dec(g)?.kind).not.toBe('choose');
     expect(g.power(g.leader('p1'))).toBe(5000);
   });
 });

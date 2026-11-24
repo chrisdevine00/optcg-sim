@@ -11,6 +11,7 @@ import {
   PLAIN_BLUE,
   plantOn,
   rep,
+  TBP8,
 } from './helpers-op14g3.ts';
 
 const ID = 'OP14-079';
@@ -83,6 +84,13 @@ describe('OP14-079 Crocodile', () => {
       pick(g, [g.find('p2', 'characters', V.c2)]);
       expect(g.card(g.find('p2', 'characters', V.c2)).cost).toBe(0); // 2 - 10, floored at 0
       expectDecision(g, 'optional', 'p1');
+    });
+
+    it('-10 is the full amount: a cost 8 Character is reduced to 0, not to 3', () => {
+      const g = start([BW5], [TBP8]);
+      act(g);
+      pick(g, [g.find('p2', 'characters', TBP8)]);
+      expect(g.card(g.find('p2', 'characters', TBP8)).cost).toBe(0);
     });
 
     it('then you may trash 2 cards from the top of your deck', () => {

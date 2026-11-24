@@ -9,6 +9,7 @@
  * ([Once Per Turn]), CR 6-6-1-3 ("during this turn" ends in the End Phase), CR 8-3-3 (text after a
  * failed "if" does not resolve).
  */
+import { takeMost } from '../../helpers.ts';
 import { describe, expect, it } from 'vitest';
 import {
   at,
@@ -45,6 +46,7 @@ describe('OP17-030 Monkey.D.Luffy: [On Play] rest 1 DON!!: [Rush]; [Activate: Ma
   it('[On Play]: paying rests exactly 1 DON!! and grants [Rush], so it can attack the Leader this turn', () => {
     const g = mine(LD.rhp, { hand: [LUFFY] });
     playCard(g, LUFFY);
+    takeMost(g);
     yes(g);
     expect(atMain(g)).toBe(true);
     expect(don(g)).toMatchObject({ active: 5, rested: 5 });
@@ -56,6 +58,7 @@ describe('OP17-030 Monkey.D.Luffy: [On Play] rest 1 DON!!: [Rush]; [Activate: Ma
   it('[On Play]: declining the cost rests nothing and the Character has no [Rush] (summoning sickness)', () => {
     const g = mine(LD.rhp, { hand: [LUFFY] });
     playCard(g, LUFFY);
+    takeMost(g);
     no(g);
     expect(don(g)).toMatchObject({ active: 6, rested: 4 });
     const l = at(g, 'p1', 'characters', LUFFY);
@@ -66,6 +69,7 @@ describe('OP17-030 Monkey.D.Luffy: [On Play] rest 1 DON!!: [Rush]; [Activate: Ma
   it('[On Play]: with no active DON!! left after paying the play cost, the cost cannot be paid (CR 8-3-1-3)', () => {
     const g = mine(LD.rhp, { hand: [LUFFY], costArea: { active: 4, rested: 0 } });
     playCard(g, LUFFY);
+    takeMost(g);
     unusable(g, 'p1');
     expect(atMain(g)).toBe(true);
     expect(don(g)).toMatchObject({ active: 0, rested: 4 });
@@ -75,6 +79,7 @@ describe('OP17-030 Monkey.D.Luffy: [On Play] rest 1 DON!!: [Rush]; [Activate: Ma
   it('[Rush] lasts "during this turn" only: gone on the next turn', () => {
     const g = mine(LD.rhp, { hand: [LUFFY] });
     playCard(g, LUFFY);
+    takeMost(g);
     yes(g);
     expect(kw(g, at(g, 'p1', 'characters', LUFFY))).toContain('Rush');
     toMyNextMain(g);
@@ -84,6 +89,7 @@ describe('OP17-030 Monkey.D.Luffy: [On Play] rest 1 DON!!: [Rush]; [Activate: Ma
   it('[Activate: Main]: with exactly 5 cards in hand, sets up 1 rested DON!! as active', () => {
     const g = onField(5, 3, 4);
     useAbility(g, at(g, 'p1', 'characters', LUFFY));
+    takeMost(g);
     expect(atMain(g)).toBe(true);
     expect(don(g)).toMatchObject({ active: 4, rested: 3 });
   });
@@ -91,6 +97,7 @@ describe('OP17-030 Monkey.D.Luffy: [On Play] rest 1 DON!!: [Rush]; [Activate: Ma
   it('[Activate: Main]: "up to 1" sets up one DON!! only, even with several rested', () => {
     const g = onField(0, 0, 6);
     useAbility(g, at(g, 'p1', 'characters', LUFFY));
+    takeMost(g);
     expect(don(g)).toMatchObject({ active: 1, rested: 5 });
   });
 
@@ -106,6 +113,7 @@ describe('OP17-030 Monkey.D.Luffy: [On Play] rest 1 DON!!: [Rush]; [Activate: Ma
     const l = at(g, 'p1', 'characters', LUFFY);
     expect(offeredAbilities(g, l)).toHaveLength(1);
     useAbility(g, l);
+    takeMost(g);
     expect(don(g)).toMatchObject({ active: 1, rested: 4 });
     expect(offeredAbilities(g, l)).toHaveLength(0);
   });
@@ -113,9 +121,11 @@ describe('OP17-030 Monkey.D.Luffy: [On Play] rest 1 DON!!: [Rush]; [Activate: Ma
   it('[Activate: Main] is usable on the turn the Character is played, and refunds the [On Play] cost', () => {
     const g = mine(LD.rhp, { hand: [LUFFY] });
     playCard(g, LUFFY);
+    takeMost(g);
     yes(g);
     expect(don(g)).toMatchObject({ active: 5, rested: 5 });
     useAbility(g, at(g, 'p1', 'characters', LUFFY));
+    takeMost(g);
     expect(don(g)).toMatchObject({ active: 6, rested: 4 });
   });
 

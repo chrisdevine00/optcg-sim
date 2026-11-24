@@ -172,7 +172,8 @@ export function runEffect(d: Draft, f: EffectFrame): void {
     // Start of resolution: [Once Per Turn] is spent now (CR 10-2-13-1, E-D9); conditions are
     // checked again on resolution (CR 8-3-2-3, 8-4-1).
     if (f.part === 'effect' && ab.kind !== 'replacement' && ab.kind !== 'permanent') {
-      if (ab.kind === 'auto' && !allHold(ctxOf(d, f), ab.conditions)) {
+      // A [Trigger]'s `conditions` are checked as for `auto` (BACKLOG OP-13 g4): "[Trigger] If ...".
+      if ((ab.kind === 'auto' || ab.kind === 'trigger') && !allHold(ctxOf(d, f), ab.conditions)) {
         pop(d);
         return;
       }
@@ -994,7 +995,12 @@ function duration(d: Draft, f: EffectFrame, du: DslDuration): Duration {
     case 'thisTurn':
       return { kind: 'thisTurn', turn: d.s.turn };
     case 'untilEndOfOpponentsNextTurn':
-      return { kind: 'untilEndOfOpponentsNextEndPhase', player: f.controller, after: d.s.turn };
+      // RL-11: on the opponent's own turn that turn's End Phase is "the opponent's next".
+      return {
+        kind: 'untilEndOfOpponentsNextEndPhase',
+        player: f.controller,
+        after: d.s.active === f.controller ? d.s.turn : d.s.turn - 1,
+      };
     case 'untilStartOfYourNextTurn':
       return { kind: 'untilStartOfNextTurn', player: f.controller };
   }
@@ -1183,13 +1189,38 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
       // sets none of that player's DON!!; Leader, Stage and Event effects still do.
       if (cannotSetDonByCharacter(d.s, p) && d.s.defs[f.cardId]?.category === 'Character')
         return 'next';
+      const upTo = sel.pick && 'upTo' in sel.pick;
       const want =
         sel.pick && 'upTo' in sel.pick
           ? sel.pick.upTo
           : sel.pick && 'exactly' in sel.pick
             ? sel.pick.exactly
             : 99;
-      const k = Math.min(want, d.ro(p).donRested);
+      let k = Math.min(want, d.ro(p).donRested);
+      if (upTo && k > 0) {
+        // "Set up to N" sets any number from 0 to N (CR 4-8-1, OP14-R2): a count is asked, most
+        // first, as for `addDon` (E-Q11 revisit). Fewer is better when rested DON!! are wanted
+        // (OP07-023, OP13-001, "give rested DON!!"). A range of one value (nothing to set) is not asked.
+        const got = take(f);
+        if (!Array.isArray(got)) {
+          const counts = Array.from({ length: k + 1 }, (_, j) => k - j);
+          return ask(d, f, {
+            kind: 'choose',
+            player: you,
+            prompt: `${nameOf(d, f)}: how many DON!! cards will you set as active (up to ${k})?`,
+            min: 1,
+            max: 1,
+            candidates: counts.map((j) => ({ option: String(j) })) as never,
+            picked: [],
+            role: 'mode',
+            options: counts.map((j) => ({
+              id: String(j),
+              label: j === 0 ? 'None' : `${j} DON!!`,
+            })),
+          });
+        }
+        k = Math.min(k, Math.max(0, Number((got[0] as { option: string }).option)));
+      }
       if (k > 0) {
         const ps = d.pl(p);
         ps.donRested -= k;

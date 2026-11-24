@@ -26,6 +26,14 @@ describe('OP14-086 Miss Doublefinger(Zala)', () => {
     expect(g.card(self(g)).cost).toBe(5);
   });
 
+  it('with 8 and with 10 cards it still applies (the condition is 7 or more, not exactly 7)', () => {
+    for (const n of [8, 10]) {
+      const g = start(n);
+      expect(g.power(self(g))).toBe(7000);
+      expect(g.card(g.find('p1', 'characters', BW4)).cost).toBe(6);
+    }
+  });
+
   it('it is a Baroque Works Character itself: its own cost rises by 2', () => {
     const g = start(7);
     expect(g.card(self(g)).cost).toBe(7);

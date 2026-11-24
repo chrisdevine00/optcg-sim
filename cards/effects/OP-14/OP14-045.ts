@@ -18,6 +18,7 @@ export const OP14_045: CardScript = {
         {
           event: 'trashedFromHand',
           owner: 'you',
+          includeCosts: true,
         },
       ],
       effect: [
@@ -50,6 +51,6 @@ export const OP14_045: CardScript = {
     },
   ],
   rulings: [
-    'Reading (M6b-Q11, Q31): any effect of either player, a cost excluded (no includeCosts)',
+    'Reading (M6b-Q11, Q31): any effect of either player, a cost included (includeCosts: a cost is part of the effect, RD 112, CR 8-1-1; owner decision settling the cost half of M6b-Q31)',
   ],
 };

@@ -1,6 +1,15 @@
 /** OP13-037 Roronoa Zoro. */
 import { describe, expect, it } from 'vitest';
-import { don, expectDecision, game, play, PLAIN_BLUE, PLAIN_PURPLE } from './helpers.ts';
+import {
+  don,
+  expectDecision,
+  game,
+  option,
+  play,
+  PLAIN_BLUE,
+  PLAIN_PURPLE,
+  setMost,
+} from './helpers.ts';
 import { donArea, SHC_LEADER } from './helpers-luffyace.ts';
 
 const ID = 'OP13-037';
@@ -13,6 +22,7 @@ describe('OP13-037 Roronoa Zoro', () => {
   it('[On Play]: with a {Straw Hat Crew} Leader, set up to 2 DON!! cards as active', () => {
     const g = played(SHC_LEADER);
     play(g, ID);
+    setMost(g);
     // The 4 active DON!! paid for Zoro; 7 are rested now. Up to 2 are set active.
     expectDecision(g, 'main', 'p1');
     const d = don(g, 'p1');
@@ -23,7 +33,19 @@ describe('OP13-037 Roronoa Zoro', () => {
   it('[On Play]: a {FILM} Leader qualifies as well', () => {
     const g = played(FILM_LEADER);
     play(g, ID);
+    setMost(g);
     expect(don(g, 'p1').active).toBe(2);
+  });
+
+  it('[On Play] "up to 2": choosing 1 sets one, 0 none (OP14-R2)', () => {
+    const g = played(SHC_LEADER);
+    play(g, ID);
+    option(g, '1');
+    expect(don(g, 'p1').active).toBe(1);
+    const h = played(SHC_LEADER);
+    play(h, ID);
+    option(h, '0');
+    expect(don(h, 'p1').active).toBe(0);
   });
 
   it('[On Play]: with a Leader that is neither {FILM} nor {Straw Hat Crew} nothing is set active', () => {

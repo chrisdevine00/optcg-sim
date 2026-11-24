@@ -69,7 +69,8 @@ function kaidoAttacks(p1: Partial<PlayerSpec>) {
   accept(g);
   payDon(g, 1, 'costRested');
   resolveForP1(g, marco);
-  takeMost(g);
+  takeMost(g); // add up to 1 active DON!!
+  takeMost(g); // set up to 1 DON!! active (OP14-R2)
   return { g, marco };
 }
 

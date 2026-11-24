@@ -8,9 +8,11 @@ import {
   game,
   hand,
   KAIDO,
+  option,
   payDon,
   pick,
   play,
+  setMost,
 } from './helpers.ts';
 import { PLAIN_BLUE } from './helpers-rgl-penel.ts';
 
@@ -34,6 +36,7 @@ describe('OP10-067 Senor Pink', () => {
     // Only the cost-2 purple Event is offered.
     expect(g.legal().filter((a) => a.type === 'pick')).toHaveLength(1);
     pick(g, [g.find('p1', 'trash', P2)]);
+    setMost(g);
     expect(hand(g, 'p1')).toEqual([P2]);
     expect(don(g, 'p1')).toMatchObject({ active: 1, rested: 5, deck: 4 });
     expectDecision(g, 'main', 'p1');
@@ -44,8 +47,18 @@ describe('OP10-067 Senor Pink', () => {
     play(g, 'OP10-067');
     accept(g);
     payDon(g);
+    setMost(g);
     expect(hand(g, 'p1')).toEqual([]);
     expect(don(g, 'p1').active).toBe(1);
+  });
+
+  it('"up to 1": the player may choose to set none (OP14-R2)', () => {
+    const g = start([P6, B1]);
+    play(g, 'OP10-067');
+    accept(g);
+    payDon(g);
+    option(g, '0');
+    expect(don(g, 'p1').active).toBe(0);
   });
 
   it('may be declined: nothing is returned or added', () => {

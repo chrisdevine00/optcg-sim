@@ -81,6 +81,12 @@ describe('OP14-041 Boa Hancock', () => {
       expectDecision(g, 'optional', 'p1');
     });
 
+    it('a {Amazon Lily} Character with 4000 base power (below 5000) does not trigger it', () => {
+      const g = ko('OP08-041');
+      expect(g.legal().some((a) => a.type === 'optional')).toBe(false);
+      expect(g.life('p2')).toBe(3);
+    });
+
     it('is "up to 1": it can be declined', () => {
       const g = ko(KUJA);
       decline(g);

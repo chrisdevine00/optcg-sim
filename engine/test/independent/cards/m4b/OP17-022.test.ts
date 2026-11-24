@@ -11,6 +11,7 @@
  * Characters" is every Character including ones already rested, and excludes the Leader; a rested
  * Character cannot activate [Blocker] and rested Characters become legal attack targets (CR 7-1-1-2).
  */
+import { takeMost } from '../../helpers.ts';
 import { describe, expect, it } from 'vitest';
 import {
   act,
@@ -41,6 +42,7 @@ function game() {
     }),
   );
   play(g, g.find('p1', 'hand', SHANKS));
+  takeMost(g);
   return g;
 }
 
@@ -84,6 +86,7 @@ describe('OP17-022 Shanks [On Play]: set up to 2 DON!! active, then rest all of 
       side(LB.opp, F.red),
     );
     play(g, g.find('p1', 'hand', SHANKS));
+    takeMost(g);
     expect(sortedIds(g, 'p1', 'characters')).toEqual([SHANKS]);
   });
 });

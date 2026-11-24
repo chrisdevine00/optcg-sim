@@ -9,6 +9,7 @@
  * Rules: CR 10-1-4 ([Blocker]), CR 8-4-4-1 ("up to"), CR 4-10-2 (a "Then" clause that cannot be
  * resolved does not stop the next one; here both are "up to"), RL-17.
  */
+import { takeMost } from '../../helpers.ts';
 import { describe, expect, it } from 'vitest';
 import { blockers } from '../../helpers.ts';
 import {
@@ -35,6 +36,7 @@ const HONGO = 'OP17-029';
 function play(opp: string[] = [SC2.cobra0, SC2.komachiyo], costArea = { active: 4, rested: 0 }) {
   const g = mine(LD.shanks, { hand: [HONGO], costArea }, { characters: opp });
   playCard(g, HONGO);
+  takeMost(g);
   return g;
 }
 
