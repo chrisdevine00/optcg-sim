@@ -51,7 +51,37 @@ import { OP11_065 } from './OP11-065.ts';
 import { OP11_067 } from './OP11-067.ts';
 import { OP11_069 } from './OP11-069.ts';
 import { OP11_070 } from './OP11-070.ts';
+import { OP11_072 } from './OP11-072.ts';
+import { OP11_075 } from './OP11-075.ts';
+import { OP11_076 } from './OP11-076.ts';
+import { OP11_077 } from './OP11-077.ts';
+import { OP11_080 } from './OP11-080.ts';
+import { OP11_082 } from './OP11-082.ts';
+import { OP11_083 } from './OP11-083.ts';
+import { OP11_084 } from './OP11-084.ts';
+import { OP11_085 } from './OP11-085.ts';
+import { OP11_086 } from './OP11-086.ts';
+import { OP11_090 } from './OP11-090.ts';
+import { OP11_091 } from './OP11-091.ts';
+import { OP11_095 } from './OP11-095.ts';
+import { OP11_096 } from './OP11-096.ts';
+import { OP11_097 } from './OP11-097.ts';
+import { OP11_098 } from './OP11-098.ts';
+import { OP11_099 } from './OP11-099.ts';
+import { OP11_100 } from './OP11-100.ts';
+import { OP11_103 } from './OP11-103.ts';
+import { OP11_104 } from './OP11-104.ts';
 import { OP11_106 } from './OP11-106.ts';
+import { OP11_107 } from './OP11-107.ts';
+import { OP11_108 } from './OP11-108.ts';
+import { OP11_109 } from './OP11-109.ts';
+import { OP11_110 } from './OP11-110.ts';
+import { OP11_112 } from './OP11-112.ts';
+import { OP11_114 } from './OP11-114.ts';
+import { OP11_115 } from './OP11-115.ts';
+import { OP11_117 } from './OP11-117.ts';
+import { OP11_118 } from './OP11-118.ts';
+import { OP11_119 } from './OP11-119.ts';
 
 const SET: readonly CardScript[] = [
   OP11_001,
@@ -105,6 +135,36 @@ const SET: readonly CardScript[] = [
   OP11_067,
   OP11_069,
   OP11_070,
+  OP11_072,
+  OP11_075,
+  OP11_076,
+  OP11_077,
+  OP11_080,
+  OP11_082,
+  OP11_083,
+  OP11_084,
+  OP11_085,
+  OP11_086,
+  OP11_090,
+  OP11_091,
+  OP11_095,
+  OP11_096,
+  OP11_097,
+  OP11_098,
+  OP11_099,
+  OP11_100,
+  OP11_103,
+  OP11_104,
   OP11_106,
+  OP11_107,
+  OP11_108,
+  OP11_109,
+  OP11_110,
+  OP11_112,
+  OP11_114,
+  OP11_115,
+  OP11_117,
+  OP11_118,
+  OP11_119,
 ];
 export default SET;
