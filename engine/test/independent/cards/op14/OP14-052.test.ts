@@ -129,23 +129,21 @@ describe('OP14-052 Hannyabal: [Blocker]; [On Play] you may trash 3 cards from ha
     expect(chars(g)).toEqual([HAN]);
   });
 
-  // DISAGREEMENT (DISAGREEMENTS-b.md, OP14-052 D1): the engine skips the play pick when no card in the
-  // remaining hand qualifies, so the opponent can tell from the missing prompt that the hand holds no
-  // {Impel Down} card. OP14-043 asks the same kind of pick with 0 candidates.
-  it.fails(
-    'with no {Impel Down} card to play after paying, the pick is still asked (it must not depend on the hidden hand) and may be empty',
-    () => {
-      const g = start([C14.marco, ...FODDER]);
-      put(g, HAN);
-      answerMay(g, true);
-      payHand(g, FODDER);
-      need(g, 'choose', 'p1');
-      expect(choices(g)).toHaveLength(0);
-      expect(canFinish(g)).toBe(true);
-      act(g, { type: 'done' });
-      expect(hand(g)).toEqual([C14.marco]);
-    },
-  );
+  // The empty play pick is asked whatever the hidden hand holds (ADR 0005). It once looked skipped
+  // only because `payHand` answered it with `done` (DISAGREEMENTS-b.md item 1).
+  it('with no {Impel Down} card to play after paying, the pick is still asked (it must not depend on the hidden hand) and may be empty', () => {
+    const g = start([C14.marco, ...FODDER]);
+    put(g, HAN);
+    answerMay(g, true);
+    // Raw picks: `payHand` would also answer the empty play pick that follows with `done`.
+    for (const c of FODDER.map((x) => g.find('p1', 'hand', x)).sort())
+      g.act({ type: 'pick', choice: c });
+    need(g, 'choose', 'p1');
+    expect(choices(g)).toHaveLength(0);
+    expect(canFinish(g)).toBe(true);
+    act(g, { type: 'done' });
+    expect(hand(g)).toEqual([C14.marco]);
+  });
 
   it('has [Blocker]', () => {
     const g = start([]);

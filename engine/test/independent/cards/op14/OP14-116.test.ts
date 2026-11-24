@@ -104,17 +104,15 @@ describe('OP14-116 Salamander: [Counter] +2000, then play an Amazon Lily / Kuja 
 
   // DISAGREEMENT D-1 (DISAGREEMENTS-d.md): the engine skips the "play up to 1 ... from your hand"
   // prompt when no card in the hand qualifies, so the opponent can tell the hand holds no match.
-  it.fails(
-    'with nothing in hand that qualifies the "up to 1" play is still asked (the hand is hidden), empty',
-    () => {
-      const g = defend({ hand: [SC14.c2, KJ.rindo5] });
-      useCounter(g, g.find('p1', 'hand', ID), g.leader('p1'));
-      pickInst(g, [g.leader('p1')]);
-      askedEmpty(g);
-      expect(chars(g)).toEqual([]);
-      expect(hand(g)).toEqual([SC14.c2, KJ.rindo5].sort());
-    },
-  );
+  it('with nothing in hand that qualifies the "up to 1" play is still asked (the hand is hidden), empty', () => {
+    const g = defend({ hand: [SC14.c2, KJ.rindo5] });
+    useCounter(g, g.find('p1', 'hand', ID), g.leader('p1'));
+    // Raw pick: `pickInst` would also answer the empty play pick that follows with `done`.
+    g.act({ type: 'pick', choice: g.leader('p1') });
+    askedEmpty(g);
+    expect(chars(g)).toEqual([]);
+    expect(hand(g)).toEqual([SC14.c2, KJ.rindo5].sort());
+  });
 
   it('"up to 1": the Character may be left in hand, and at most one is played', () => {
     const g = defend({ hand: [KJ.sweetpea4, KJ.ran4] });
