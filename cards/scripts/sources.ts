@@ -29,6 +29,23 @@ export interface CachedResponse {
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+/** Three attempts, 30 s then 90 s apart: the weekly job should survive a slow or briefly down host. */
+async function fetchWithRetry(url: string, log: (s: string) => void): Promise<Response> {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      const res = await fetch(url, {
+        headers: { 'User-Agent': USER_AGENT, Accept: 'application/json' },
+      });
+      if (res.ok || attempt === 3 || res.status < 500) return res;
+      log(`${url}: HTTP ${res.status}, retrying`);
+    } catch (e) {
+      if (attempt === 3) throw e;
+      log(`${url}: ${e instanceof Error ? e.message : String(e)}, retrying`);
+    }
+    await sleep(attempt === 1 ? 30_000 : 90_000);
+  }
+}
+
 /** Loads each endpoint from the cache, seeding or fetching as needed. */
 export async function loadSources(opts: {
   cacheDir: string;
@@ -50,9 +67,7 @@ export async function loadSources(opts: {
     if (opts.refresh || !existsSync(body)) {
       if (fetched++ > 0) await sleep(DELAY_MS);
       opts.log(`fetch ${ep.url}`);
-      const res = await fetch(ep.url, {
-        headers: { 'User-Agent': USER_AGENT, Accept: 'application/json' },
-      });
+      const res = await fetchWithRetry(ep.url, opts.log);
       if (!res.ok) throw new Error(`${ep.url}: HTTP ${res.status}`);
       const text = await res.text();
       JSON.parse(text); // fail before caching a bad body
