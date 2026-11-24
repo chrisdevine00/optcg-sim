@@ -8,6 +8,7 @@
  * active. M6b-Q21 (answered, by analogy with E-Q4 / QA-OP17 OP17-118): "the only Characters are X"
  * is FALSE when there are no Characters.
  */
+import { takeMost } from '../../helpers.ts';
 import { describe, expect, it } from 'vitest';
 import {
   charIds,
@@ -39,67 +40,79 @@ describe('OP16-022 Monkey.D.Luffy: [Activate: Main] set up to 2 DON!! as active'
     const g = field([ID1]);
     expect(offeredAbilities(g, g.leader('p1'))).toHaveLength(1);
     tryActivate(g, g.leader('p1'));
+    takeMost(g);
     expect(don(g, 'p1')).toMatchObject({ active: 5, rested: 5 });
   });
 
   it('with several Characters that are all {Impel Down}: still sets 2', () => {
     const g = field([ID1, ID2]);
     tryActivate(g, g.leader('p1'));
+    takeMost(g);
     expect(don(g, 'p1')).toMatchObject({ active: 5, rested: 5 });
   });
 
   it('"a type including": a Character with other types as well as {Impel Down} counts as an {Impel Down} Character', () => {
     const g = field([ID_MULTI, ID1]);
     tryActivate(g, g.leader('p1'));
+    takeMost(g);
     expect(don(g, 'p1')).toMatchObject({ active: 5, rested: 5 });
   });
 
   it('"up to 2": with only 1 rested DON!! it sets 1', () => {
     const g = field([ID1], 9, 1);
     tryActivate(g, g.leader('p1'));
+    takeMost(g);
     expect(don(g, 'p1')).toMatchObject({ active: 10, rested: 0 });
   });
 
   it('with no rested DON!! nothing changes', () => {
     const g = field([ID1], 10, 0);
     tryActivate(g, g.leader('p1'));
+    takeMost(g);
     expect(don(g, 'p1')).toMatchObject({ active: 10, rested: 0 });
   });
 
   it('does not set more than 2 even with many rested DON!!', () => {
     const g = field([ID1], 0, 10);
     tryActivate(g, g.leader('p1'));
+    takeMost(g);
     expect(don(g, 'p1')).toMatchObject({ active: 2, rested: 8 });
   });
 
   it('a Character that is not {Impel Down} (alone) stops it: nothing is set active', () => {
     const g = field([NOT_ID]);
     tryActivate(g, g.leader('p1'));
+    takeMost(g);
     expect(don(g, 'p1')).toMatchObject({ active: 3, rested: 7 });
   });
 
   it('boundary: one non-{Impel Down} Character among {Impel Down} Characters stops it', () => {
     const g = field([ID1, ID2, NOT_ID]);
     tryActivate(g, g.leader('p1'));
+    takeMost(g);
     expect(don(g, 'p1')).toMatchObject({ active: 3, rested: 7 });
   });
 
   it("only my Characters count: an opponent's non-{Impel Down} Character does not stop it", () => {
     const g = field([ID1], 3, 7, [OV.hajrudin6]);
     tryActivate(g, g.leader('p1'));
+    takeMost(g);
     expect(don(g, 'p1')).toMatchObject({ active: 5, rested: 5 });
   });
 
   it('[Once Per Turn]: after one use it is not offered again this turn', () => {
     const g = field([ID1]);
     tryActivate(g, g.leader('p1'));
+    takeMost(g);
     expect(offeredAbilities(g, g.leader('p1'))).toEqual([]);
   });
 
   it('[Once Per Turn] resets: offered again on my next turn', () => {
     const g = field([ID1]);
     tryActivate(g, g.leader('p1'));
+    takeMost(g);
     endTurn(g);
+    takeMost(g);
     act(g, { type: 'endTurn' });
     expect(offeredAbilities(g, g.leader('p1'))).toHaveLength(1);
   });
@@ -107,6 +120,7 @@ describe('OP16-022 Monkey.D.Luffy: [Activate: Main] set up to 2 DON!! as active'
   it('the Characters are not changed by the effect', () => {
     const g = field([ID1]);
     tryActivate(g, g.leader('p1'));
+    takeMost(g);
     expect(charIds(g, 'p1')).toEqual([ID1]);
   });
 
@@ -115,6 +129,7 @@ describe('OP16-022 Monkey.D.Luffy: [Activate: Main] set up to 2 DON!! as active'
   it('M6b-Q21: with no Characters at all the condition is false and no DON!! is set active', () => {
     const g = field([]);
     tryActivate(g, g.leader('p1'));
+    takeMost(g);
     expect(don(g, 'p1')).toMatchObject({ active: 3, rested: 7 });
   });
 });

@@ -7,8 +7,10 @@ import {
   don,
   expectDecision,
   payDon,
+  pick,
   PLAIN_BLUE,
   PURPLE,
+  V,
 } from './helpers.ts';
 import { canBlockWith } from './helpers-op15g2.ts';
 import { DP_LEADER, game, plant, plantOn } from './helpers-op14g3.ts';
@@ -75,6 +77,20 @@ describe('OP14-070 Buffalo', () => {
     plant(g, 'p1', { rest: { from: 'characters', owner: 'you' } });
     expect(g.card(g.find('p1', 'characters', ID)).rested).toBe(true);
     expect(dec(g)?.kind).not.toBe('optional');
+  });
+
+  it("your own Character's effect resting it does not trigger it (the source must be an OPPOSING Character)", () => {
+    const g = game(
+      { leader: DP_LEADER, characters: [ID, V.c1], costArea: { active: 2, rested: 0 } },
+      { leader: PLAIN_BLUE },
+    );
+    plantOn(g, g.find('p1', 'characters', V.c1), [
+      { do: { rest: { from: 'characters', owner: 'you', pick: { exactly: 1 } } } },
+    ]);
+    pick(g, [g.find('p1', 'characters', ID)]);
+    expect(g.card(g.find('p1', 'characters', ID)).rested).toBe(true);
+    expect(dec(g)?.kind).not.toBe('optional');
+    expect(don(g, 'p1').deck).toBe(8);
   });
 
   it('with no DON!! on your field the DON!! cannot be returned and it stays rested', () => {

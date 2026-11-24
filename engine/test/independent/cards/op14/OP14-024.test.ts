@@ -59,18 +59,14 @@ describe("OP14-024 Kin'emon: [On Play] set up to 3 DON!! active, then no more Ch
     expect(donOf(g, 'p1')).toMatchObject({ active: 3, rested: 4 });
   });
 
-  // Disagreement A-1 (severity 1, unsettled): "Add up to N DON!!" asks a count (E-Q11); by analogy
-  // "Set up to 3 of your DON!! cards as active" is an "up to" choice of the player. The engine sets
-  // the maximum without asking.
-  it.fails(
-    '"up to 3": the player is asked how many DON!! to set (a count question, as for adding DON!!)',
-    () => {
-      const g = mine(LD14.luffy, { hand: [KIN], costArea: { active: 4, rested: 3 } });
-      playRaw(g, KIN);
-      const d = need(g, 'choose', 'p1');
-      expect(d.purpose).toBe('mode');
-    },
-  );
+  // Disagreement A-1 (resolved, OP14-R2): "Set up to 3 of your DON!! cards as active" asks a count,
+  // most first, as "Add up to N DON!!" does (E-Q11 revisit).
+  it('"up to 3": the player is asked how many DON!! to set (a count question, as for adding DON!!)', () => {
+    const g = mine(LD14.luffy, { hand: [KIN], costArea: { active: 4, rested: 3 } });
+    playRaw(g, KIN);
+    const d = need(g, 'choose', 'p1');
+    expect(d.purpose).toBe('mode');
+  });
 
   it('"up to 3": with 5 DON!! rested after the cost, only 3 are set', () => {
     const g = playKin(5, 4);

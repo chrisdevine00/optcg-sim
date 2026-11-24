@@ -1,6 +1,18 @@
 /** OP05-038 Charlestone. Scripted from the card text; the [Counter] "Then, you may trash ... If you do". */
 import { describe, expect, it } from 'vitest';
-import { accept, BLUE, decline, don, expectDecision, hand, pick, trash, V } from './helpers.ts';
+import {
+  accept,
+  BLUE,
+  decline,
+  don,
+  expectDecision,
+  hand,
+  option,
+  pick,
+  setMost,
+  trash,
+  V,
+} from './helpers.ts';
 import { counterStep, damageWithP2, RGL } from './helpers-rgl-penel.ts';
 
 const counter = (handCards: string[]) => {
@@ -21,9 +33,18 @@ describe('OP05-038 Charlestone', () => {
     expectDecision(g, 'optional', 'p1');
     accept(g);
     pick(g, [g.find('p1', 'hand', BLUE)]);
+    setMost(g);
     expect(trash(g, 'p1')).toContain(BLUE);
     expect(don(g, 'p1').active).toBe(3);
     expect(don(g, 'p1').rested).toBe(2);
+  });
+
+  it('"up to 3": a count is asked, 2 sets two (OP14-R2)', () => {
+    const g = counter([BLUE]);
+    accept(g);
+    pick(g, [g.find('p1', 'hand', BLUE)]);
+    option(g, '2');
+    expect(don(g, 'p1')).toMatchObject({ active: 2, rested: 3 });
   });
 
   it('declining the trash gives the power only: no DON!! is set active ("If you do")', () => {

@@ -306,3 +306,58 @@ describe('registered scripts', () => {
     }
   });
 });
+
+describe('validateScript: modifier durations, empty filters and [Trigger] conditions (OP-13 BACKLOG)', () => {
+  const sel = { from: 'characters', owner: 'opponent', pick: { upTo: 1 } };
+  const withStep = (step: unknown): CardScript =>
+    variant((s) => {
+      (s.abilities[0] as { effect: unknown[] }).effect = [step];
+    });
+  const modifiers = (duration: unknown): [string, unknown][] => [
+    ['power', { do: { power: { target: sel, amount: 1000, duration } } }],
+    ['cost', { do: { cost: { target: sel, amount: 1, duration } } }],
+    ['setBasePower', { do: { setBasePower: { target: sel, value: 0, duration } } }],
+    ['grant', { do: { grant: { target: sel, keyword: 'Rush', duration } } }],
+    ['negate', { do: { negate: { target: sel, duration } } }],
+    ['restrict', { do: { restrict: { target: sel, what: 'cannotAttack', duration } } }],
+  ];
+
+  it.each(['turn', 'forever', '', 'untilEndOfTurn'])(
+    'rejects an unknown duration %j on every modifier step',
+    (du) => {
+      for (const [name, step] of modifiers(du))
+        expect(validateScript(withStep(step)).join(), name).toMatch(/duration/);
+    },
+  );
+
+  it.each(['battle', 'thisTurn', 'untilEndOfOpponentsNextTurn', 'untilStartOfYourNextTurn'])(
+    'accepts the duration %s on every modifier step',
+    (du) => {
+      for (const [name, step] of modifiers(du))
+        expect(validateScript(withStep(step)), name).toEqual([]);
+    },
+  );
+
+  it('rejects an empty filter: {} (it would match nothing), also nested', () => {
+    const empty = (filter: unknown) =>
+      withStep({ do: { ko: { from: 'characters', owner: 'opponent', filter } } });
+    expect(validateScript(empty({})).join()).toMatch(/exactly one of/);
+    expect(validateScript(empty({ all: [{}] })).join()).toMatch(/exactly one of/);
+    expect(validateScript(empty({ not: {} })).join()).toMatch(/exactly one of/);
+    expect(validateScript(empty({ cost: { lte: 3 } }))).toEqual([]);
+  });
+
+  it('accepts `conditions` on a [Trigger] (the runtime evaluates them)', () => {
+    const s = variant((x) => {
+      x.abilities = [
+        {
+          id: 'trig',
+          kind: 'trigger',
+          conditions: [{ yourTurn: true }],
+          effect: [{ do: { draw: 1 } }],
+        } as never,
+      ];
+    });
+    expect(validateScript(s)).toEqual([]);
+  });
+});

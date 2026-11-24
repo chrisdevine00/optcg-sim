@@ -1,6 +1,18 @@
 /** OP14-031 Nami. */
 import { describe, expect, it } from 'vitest';
-import { BLUE, don, expectDecision, game, none, pick, play, PLAIN_BLUE, V } from './helpers.ts';
+import {
+  BLUE,
+  don,
+  expectDecision,
+  game,
+  none,
+  option,
+  pick,
+  play,
+  PLAIN_BLUE,
+  setMost,
+  V,
+} from './helpers.ts';
 import { COST10, COST8, donArea, SHC_LEADER } from './helpers-luffyace.ts';
 
 const ID = 'OP14-031';
@@ -41,6 +53,7 @@ describe('OP14-031 Nami', () => {
     expect(don(g, 'p1').active).toBe(0);
     expect(don(g, 'p1').rested).toBe(7);
     g.act({ type: 'endTurn' });
+    setMost(g);
     expect(don(g, 'p1').active).toBe(5);
     expect(don(g, 'p1').rested).toBe(2);
   });
@@ -50,6 +63,22 @@ describe('OP14-031 Nami', () => {
     play(g, ID);
     none(g);
     g.act({ type: 'endTurn' });
+    setMost(g);
     expect(don(g, 'p1').active).toBe(5);
+  });
+
+  it('[On Play]: "up to 5": at the End Phase a count is asked; 2 sets two, 0 none (OP14-R2)', () => {
+    const g = start();
+    play(g, ID);
+    none(g);
+    g.act({ type: 'endTurn' });
+    option(g, '2');
+    expect(don(g, 'p1')).toMatchObject({ active: 2, rested: 5 });
+    const h = start();
+    play(h, ID);
+    none(h);
+    h.act({ type: 'endTurn' });
+    option(h, '0');
+    expect(don(h, 'p1')).toMatchObject({ active: 0, rested: 7 });
   });
 });

@@ -35,6 +35,6 @@ export const OP14_005: CardScript = {
     },
   ],
   rulings: [
-    'reading: "up to 1" DON!! with n 1: the engine asks no count at n 1, so with a rested DON!! and a target the DON!! is given (the player cannot give 0; the Activate itself is the choice). The target is the Leader or 1 Character (exactly 1)',
+    'reading: "up to 1" DON!! with n 1: no count is asked, but the target is a min-0 pick, so once activated the give can be declined (OP14-R4). The target is the Leader or 1 Character (exactly 1)',
   ],
 };

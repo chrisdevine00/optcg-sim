@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { expectDecision, none, pick, play, V } from './helpers.ts';
 import { canAttack } from './helpers-op16g1.ts';
+import { koedInBattle } from './helpers-op15g2.ts';
 import { describeTbpTrigger, koByEffect, OTHER_LEADER, start } from './helpers-op14g4.ts';
 
 const ID = 'OP14-111';
@@ -59,6 +60,29 @@ describe('OP14-111 Perona', () => {
     g.act({ type: 'endTurn' });
     expect(can(g, V.c6)).toBe(false);
     expect(can(g, V.c7)).toBe(true);
+  });
+
+  it("[On K.O.] on your own turn: the lock lasts through the opponent's next turn (turn 2), not turn 4", () => {
+    const g = start({ leader: OTHER_LEADER, characters: [ID] }, { characters: [V.c6, V.c7] });
+    koByEffect(g, 'p1', ID);
+    pick(g, [g.find('p2', 'characters', V.c6)]);
+    g.act({ type: 'endTurn' });
+    expect(can(g, V.c6)).toBe(false);
+    g.act({ type: 'endTurn' });
+    g.act({ type: 'endTurn' });
+    expect(can(g, V.c6)).toBe(true);
+  });
+
+  it("[On K.O.] on the opponent's turn: the lock ends at that turn's End Phase (RL-11), not their next turn", () => {
+    const g = koedInBattle(ID, { leader: OTHER_LEADER }, { characters: [V.c6] });
+    pick(g, [g.find('p2', 'characters', V.c6)]);
+    while (g.decider === 'p1' && g.legal().some((a) => a.type === 'endCounter')) {
+      g.act({ type: 'endCounter' });
+    }
+    expect(can(g, V.c6)).toBe(false); // the rest of this turn
+    g.act({ type: 'endTurn' });
+    g.act({ type: 'endTurn' }); // p1's turn
+    expect(can(g, V.c6)).toBe(true); // p2's next turn
   });
 });
 

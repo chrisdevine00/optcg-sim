@@ -1,6 +1,6 @@
 /** OP13-024 Gordon. */
 import { describe, expect, it } from 'vitest';
-import { accept, decline, don, expectDecision, pick, play, V } from './helpers.ts';
+import { accept, decline, don, expectDecision, option, pick, play, setMost, V } from './helpers.ts';
 import { FILM_CHAR, MUSIC_EVENT, mk } from './helpers-op13g1.ts';
 
 const ID = 'OP13-024';
@@ -18,7 +18,25 @@ describe('OP13-024 Gordon', () => {
     // The revealed card stays in hand.
     expect(g.zone('p1', 'hand').map((c) => c.card)).toContain(MUSIC_EVENT);
     g.act({ type: 'endTurn' });
+    setMost(g);
     expect(don(g, 'p1')).toMatchObject({ active: 6, rested: 4 });
+  });
+
+  it('"up to 2": at the End Phase a count is asked; 1 sets one, 0 none (OP14-R2)', () => {
+    const g = start([MUSIC_EVENT]);
+    play(g, ID);
+    accept(g);
+    pick(g, [g.find('p1', 'hand', MUSIC_EVENT)]);
+    g.act({ type: 'endTurn' });
+    option(g, '1');
+    expect(don(g, 'p1')).toMatchObject({ active: 5, rested: 5 });
+    const h = start([MUSIC_EVENT]);
+    play(h, ID);
+    accept(h);
+    pick(h, [h.find('p1', 'hand', MUSIC_EVENT)]);
+    h.act({ type: 'endTurn' });
+    option(h, '0');
+    expect(don(h, 'p1')).toMatchObject({ active: 4, rested: 6 });
   });
 
   it('a {FILM} card qualifies too; a card of neither type is not offered', () => {
@@ -28,6 +46,7 @@ describe('OP13-024 Gordon', () => {
     expect(g.legal().filter((a) => a.type === 'pick')).toHaveLength(2);
     pick(g, [g.find('p1', 'hand', FILM_CHAR)]);
     g.act({ type: 'endTurn' });
+    setMost(g);
     expect(don(g, 'p1')).toMatchObject({ active: 6 });
   });
 
@@ -55,6 +74,7 @@ describe('OP13-024 Gordon', () => {
     accept(g);
     pick(g, [g.find('p1', 'hand', MUSIC_EVENT)]);
     g.act({ type: 'endTurn' });
+    setMost(g);
     expect(don(g, 'p1')).toMatchObject({ active: 1, rested: 0 });
   });
 });

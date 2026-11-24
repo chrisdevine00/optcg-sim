@@ -1,6 +1,6 @@
 /** OP13-027 Sanji. */
 import { describe, expect, it } from 'vitest';
-import { don, game, play } from './helpers.ts';
+import { don, game, option, play, setMost } from './helpers.ts';
 import { PLAIN_BLUE, RGL } from './helpers-rgl-penel.ts';
 
 describe('OP13-027 Sanji', () => {
@@ -10,7 +10,18 @@ describe('OP13-027 Sanji', () => {
       { leader: PLAIN_BLUE },
     );
     play(g, 'OP13-027');
+    setMost(g);
     expect(don(g, 'p1')).toMatchObject({ active: 2, rested: 6 });
+  });
+
+  it('[On Play] "up to 2": choosing 0 sets none (OP14-R2)', () => {
+    const g = game(
+      { leader: RGL, hand: ['OP13-027'], costArea: { active: 5, rested: 3 } },
+      { leader: PLAIN_BLUE },
+    );
+    play(g, 'OP13-027');
+    option(g, '0');
+    expect(don(g, 'p1')).toMatchObject({ active: 0, rested: 8 });
   });
 
   const endTurn = (leader: string) => {
@@ -19,6 +30,7 @@ describe('OP13-027 Sanji', () => {
       { leader: PLAIN_BLUE },
     );
     g.act({ type: 'endTurn' });
+    if (leader === RGL) setMost(g);
     return g;
   };
 

@@ -48,6 +48,14 @@ describe('OP14-005 Killer', () => {
     expect(queries.don(g.state, 'p1')).toMatchObject({ rested: 3, given: 1 });
   });
 
+  it('"up to 1": once activated the give can be declined (min-0 target pick), the DON!! stays rested', () => {
+    const g = start(3, 2);
+    activate(g, g.find('p1', 'characters', ID), 'give-don');
+    expectDecision(g, 'choose', 'p1');
+    g.act({ type: 'done' });
+    expect(queries.don(g.state, 'p1')).toMatchObject({ active: 3, rested: 2, given: 0 });
+  });
+
   it('Once Per Turn: a second activation is not offered', () => {
     const g = start(0, 4);
     activate(g, g.find('p1', 'characters', ID), 'give-don');

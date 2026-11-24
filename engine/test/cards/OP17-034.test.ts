@@ -1,6 +1,6 @@
 /** OP17-034 Rockstar. */
 import { describe, expect, it } from 'vitest';
-import { don, game } from './helpers.ts';
+import { don, game, option, setMost } from './helpers.ts';
 import { OTHER_LEADER, SHANKS_LEADER } from './helpers-op17g2.ts';
 
 const ID = 'OP17-034';
@@ -20,6 +20,7 @@ describe('OP17-034 Rockstar', () => {
     const g = start(SHANKS_LEADER, BIG_LEADER);
     expect(g.power(g.leader('p1'))).toBe(5000);
     activate(g);
+    setMost(g);
     expect(don(g, 'p1')).toMatchObject({ active: 1, rested: 1 });
     expect(g.power(g.leader('p1'))).toBe(6000);
   });
@@ -27,15 +28,25 @@ describe('OP17-034 Rockstar', () => {
   it("the base power lasts until the end of the opponent's next End Phase", () => {
     const g = start(SHANKS_LEADER, BIG_LEADER);
     activate(g);
+    setMost(g);
     g.act({ type: 'endTurn' });
     expect(g.power(g.leader('p1'))).toBe(6000);
     g.act({ type: 'endTurn' });
     expect(g.power(g.leader('p1'))).toBe(5000);
   });
 
+  it('"up to 1": the player may set none, the base power still changes (OP14-R2)', () => {
+    const g = start(SHANKS_LEADER, BIG_LEADER);
+    activate(g);
+    option(g, '0');
+    expect(don(g, 'p1')).toMatchObject({ active: 0, rested: 2 });
+    expect(g.power(g.leader('p1'))).toBe(6000);
+  });
+
   it('once per turn', () => {
     const g = start(SHANKS_LEADER, BIG_LEADER);
     activate(g);
+    setMost(g);
     expect(
       g.isLegal({
         type: 'activate',
@@ -62,6 +73,7 @@ describe('OP17-034 Rockstar', () => {
     const g = start(OTHER_LEADER, BIG_LEADER);
     const before = g.power(g.leader('p1'));
     activate(g);
+    setMost(g);
     expect(don(g, 'p1').active).toBe(1);
     expect(g.power(g.leader('p1'))).toBe(before);
   });

@@ -34,6 +34,7 @@ export const OP14_056: CardScript = {
         {
           event: 'trashedFromHand',
           owner: 'you',
+          includeCosts: true,
         },
       ],
       effect: [

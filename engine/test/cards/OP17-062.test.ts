@@ -12,6 +12,7 @@ import {
   PLAIN_BLUE,
   play,
   PURPLE,
+  setMost,
   V,
 } from './helpers.ts';
 
@@ -30,6 +31,7 @@ describe('OP17-062 Kaido', () => {
     accept(g);
     payDon(g);
     addMost(g);
+    setMost(g);
     // 6 active − 2 (cost) − 2 returned + 1 added + 1 set active.
     expect(don(g, 'p1')).toMatchObject({ deck: 5, active: 4, rested: 1 });
     expect(g.card(g.find('p1', 'characters', 'OP17-062')).keywords).toContain('Blocker');

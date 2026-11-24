@@ -15,6 +15,7 @@ import {
   game,
   hand,
   option,
+  setMost,
   payDon,
   PLAIN_BLUE,
   PLAIN_PURPLE,
@@ -218,6 +219,7 @@ describe('G21 cannotSetDonActive by Character effects', () => {
       { id: 'b', kind: 'activate', when: 'activateMain', effect: [setOne] } as Ability,
     ]);
     run(g);
+    setMost(g);
     expect(don(g, 'p1')).toMatchObject({ active: 1, rested: 3 }); // only the first set
     g.act({ type: 'activate', card: g.find('p1', 'characters', V.c1), ability: 'b' });
     expect(don(g, 'p1')).toMatchObject({ active: 1, rested: 3 }); // another Character: none
@@ -234,6 +236,7 @@ describe('G21 cannotSetDonActive by Character effects', () => {
     ]);
     run(g);
     g.act({ type: 'activate', card: g.leader('p1'), ability: 'a' });
+    setMost(g);
     expect(don(g, 'p1')).toMatchObject({ active: 1, rested: 3 });
   });
 
@@ -250,6 +253,7 @@ describe('G21 cannotSetDonActive by Character effects', () => {
     g.state = withAbilities(g.state, BLUE, [main([setOne] as never, [{ restDon: 2 }])]);
     const active = don(g, 'p1').active;
     run(g);
+    setMost(g);
     expect(don(g, 'p1').active).toBe(active - 2 + 1);
   });
 

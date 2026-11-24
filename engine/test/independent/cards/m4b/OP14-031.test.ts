@@ -10,6 +10,7 @@
  * active; given the "then" the second part does not depend on any target having been chosen
  * (CR 4-10-2, no "if").
  */
+import { takeMost } from '../../helpers.ts';
 import { describe, expect, it } from 'vitest';
 import type { PlayerSpec } from '@optcg/engine';
 import {
@@ -40,6 +41,7 @@ function game(p1: Partial<PlayerSpec> = {}, p2: Partial<PlayerSpec> = {}) {
     side(LB.opp, F.red, { characters: [CH.kingdew, CH.accino8, CH.luffyP10], ...p2 }),
   );
   play(g, g.find('p1', 'hand', NAMI));
+  takeMost(g);
   return g;
 }
 
@@ -100,6 +102,7 @@ describe('OP14-031 [On Play]: then set up to 5 DON!! as active at the end of thi
     const g = game();
     drive(g, 'p1', { picks: [[]] });
     endTurn(g);
+    takeMost(g);
     expect(donOf(g, 'p1')).toMatchObject({ active: 6, rested: 4 });
   });
 
@@ -108,6 +111,7 @@ describe('OP14-031 [On Play]: then set up to 5 DON!! as active at the end of thi
     drive(g, 'p1', { picks: [[]] });
     expect(donOf(g, 'p1')).toMatchObject({ active: 2, rested: 4 });
     endTurn(g);
+    takeMost(g);
     expect(donOf(g, 'p1')).toMatchObject({ active: 6, rested: 0 });
   });
 
@@ -115,6 +119,7 @@ describe('OP14-031 [On Play]: then set up to 5 DON!! as active at the end of thi
     const g = game({}, { characters: [] });
     drive(g, 'p1', {});
     endTurn(g);
+    takeMost(g);
     expect(donOf(g, 'p1')).toMatchObject({ active: 6, rested: 4 });
   });
 
@@ -122,8 +127,10 @@ describe('OP14-031 [On Play]: then set up to 5 DON!! as active at the end of thi
     const g = game();
     drive(g, 'p1', { picks: [[]] });
     endTurn(g); // p2 turn 4
+    takeMost(g);
     expect(donOf(g, 'p1').active).toBe(6);
     endTurn(g); // p1 turn 5: refresh sets everything active anyway; just ensure play continues
+    takeMost(g);
     expect(donOf(g, 'p1').active + donOf(g, 'p1').rested).toBeLessThanOrEqual(10);
   });
 });

@@ -11,6 +11,7 @@
  * checked when the [On Play] resolves (CR 4-10-1); [End of Your Turn] activates in the End Phase
  * of your own turn only (CR 6-6-1-1) and is unconditional.
  */
+import { takeMost } from '../../helpers.ts';
 import { describe, expect, it } from 'vitest';
 import type { PlayerSpec } from '@optcg/engine';
 import { CH, donOf, drive, endTurn, F, LB, myTurn, play, side } from './kit-b.ts';
@@ -20,6 +21,7 @@ const ZORO = 'OP13-037';
 function playGame(leader: string, costArea = { active: 6, rested: 0 }) {
   const g = myTurn(side(leader, F.green, { hand: [ZORO], costArea }), side(LB.opp, F.red));
   play(g, g.find('p1', 'hand', ZORO));
+  takeMost(g);
   drive(g, 'p1', { picks: [['DON', 'DON']], don: 'costRested' });
   return g;
 }
@@ -74,24 +76,28 @@ describe('OP13-037 [End of Your Turn]: set this Character as active', () => {
     const zoro = g.find('p1', 'characters', ZORO);
     expect(g.card(zoro).rested).toBe(true);
     endTurn(g);
+    takeMost(g);
     expect(g.card(zoro).rested).toBe(false);
   });
 
   it('it is unconditional: it works with a Leader that has neither type', () => {
     const g = fieldGame(true, LB.greenKid);
     endTurn(g);
+    takeMost(g);
     expect(g.card(g.find('p1', 'characters', ZORO)).rested).toBe(false);
   });
 
   it('only "this Character": another rested Character stays rested through the opponent’s turn', () => {
     const g = fieldGame(true);
     endTurn(g);
+    takeMost(g);
     expect(g.card(g.find('p1', 'characters', CH.alvida)).rested).toBe(true);
   });
 
   it('an already-active Zoro simply stays active', () => {
     const g = fieldGame(false);
     endTurn(g);
+    takeMost(g);
     expect(g.card(g.find('p1', 'characters', ZORO)).rested).toBe(false);
   });
 

@@ -17,38 +17,17 @@ export const OP14_082: CardScript = {
       when: ['onKO'],
       effect: [
         {
-          if: { opponentsTurn: true },
-          // K.O.'d on the opponent's turn: the next opponent End Phase is this turn's.
-          then: [
-            {
-              do: {
-                cost: {
-                  target: {
-                    from: 'characters',
-                    owner: 'you',
-                    filter: { type: 'Thriller Bark Pirates' },
-                  },
-                  amount: 4,
-                  duration: 'thisTurn',
-                },
+          do: {
+            cost: {
+              target: {
+                from: 'characters',
+                owner: 'you',
+                filter: { type: 'Thriller Bark Pirates' },
               },
+              amount: 4,
+              duration: 'untilEndOfOpponentsNextTurn',
             },
-          ],
-          else: [
-            {
-              do: {
-                cost: {
-                  target: {
-                    from: 'characters',
-                    owner: 'you',
-                    filter: { type: 'Thriller Bark Pirates' },
-                  },
-                  amount: 4,
-                  duration: 'untilEndOfOpponentsNextTurn',
-                },
-              },
-            },
-          ],
+          },
         },
       ],
     },
@@ -91,6 +70,6 @@ export const OP14_082: CardScript = {
     },
   ],
   rulings: [
-    "reading: 'until the end of your opponent's next End Phase' is split on whose turn it is: on the opponent's turn (a battle K.O., their effect) the next End Phase is that turn's, so the cost is given for this turn; on your own turn it is untilEndOfOpponentsNextTurn (the plain duration alone would last a whole extra turn in the first case); only Characters on the field when the effect resolves are affected (Oinkchuck itself is already gone)",
+    "reading: 'until the end of your opponent's next End Phase' is untilEndOfOpponentsNextTurn; the engine ends it at the K.O.'s own End Phase when the K.O. happens on the opponent's turn (RL-11, OP14-R1); only Characters on the field when the effect resolves are affected (Oinkchuck itself is already gone)",
   ],
 };

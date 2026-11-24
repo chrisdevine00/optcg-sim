@@ -67,12 +67,12 @@ describe('OP14-049 Jinbe', () => {
     expect(canAttack(g, me, g.leader('p2'))).toBe(true);
   });
 
-  it('a cost-trash does not give [Rush] (reading, M6b-Q31)', () => {
+  it('a cost-trash gives [Rush] (a cost is part of the effect, M6b-Q31 decided)', () => {
     const g = start();
     play(g, ID);
     decline(g);
     costTrash(g, V.c1);
     pick(g, [g.find('p1', 'hand', BLUE)]);
-    expect(canAttack(g, g.find('p1', 'characters', ID), g.leader('p2'))).toBe(false);
+    expect(canAttack(g, g.find('p1', 'characters', ID), g.leader('p2'))).toBe(true);
   });
 });

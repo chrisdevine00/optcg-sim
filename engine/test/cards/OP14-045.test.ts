@@ -68,11 +68,11 @@ describe('OP14-045 Kuroobi', () => {
     expect(canAttack(g, kuroobi(g), g.leader('p2'))).toBe(false);
   });
 
-  it('must not fire for a card trashed as a cost (reading, M6b-Q31)', () => {
+  it('a card trashed as a cost counts: a cost is part of the effect (RD 112, CR 8-1-1, M6b-Q31 decided)', () => {
     const g = start();
     costTrash(g, V.c1);
     pick(g, [g.find('p1', 'hand', BLUE)]);
-    expect(canAttack(g, kuroobi(g), g.leader('p2'))).toBe(false);
+    expect(canAttack(g, kuroobi(g), g.leader('p2'))).toBe(true);
   });
 
   it('[On K.O.]: draws 1 card', () => {

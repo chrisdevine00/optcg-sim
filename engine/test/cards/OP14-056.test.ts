@@ -39,11 +39,11 @@ describe('OP14-056 Wadatsumi', () => {
     expect(canAttack(g, me(g), g.leader('p2'))).toBe(false);
   });
 
-  it('a cost-trash does not negate it (reading, M6b-Q31)', () => {
+  it('a cost-trash negates it too (a cost is part of the effect, M6b-Q31 decided)', () => {
     const g = start();
     costTrash(g, V.c1);
     pick(g, [g.find('p1', 'hand', BLUE)]);
-    expect(canAttack(g, me(g), g.leader('p2'))).toBe(false);
+    expect(canAttack(g, me(g), g.leader('p2'))).toBe(true);
   });
 
   it('a card trashed from the opponent’s hand does not negate it', () => {

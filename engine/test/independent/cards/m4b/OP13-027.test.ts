@@ -9,6 +9,7 @@
  * Rules: only rested DON!! can be set active; the [On Play] is unconditional; the [End of Your Turn]
  * condition is checked at the End Phase (CR 6-6-1-1, 4-10-1), once, for 1 DON!!.
  */
+import { takeMost } from '../../helpers.ts';
 import { describe, expect, it } from 'vitest';
 import { donOf, drive, endTurn, F, LB, myTurn, play, side } from './kit-b.ts';
 
@@ -21,6 +22,7 @@ describe('OP13-027 [On Play]: set up to 2 DON!! as active', () => {
       side(LB.opp, F.red),
     );
     play(g, g.find('p1', 'hand', SANJI));
+    takeMost(g);
     drive(g, 'p1', { picks: [['DON', 'DON']], don: 'costRested' });
     return g;
   }
@@ -53,24 +55,28 @@ describe('OP13-027 [End of Your Turn]: if your Leader has "FILM" or "Straw Hat C
     const g = fieldGame(LB.greenShc);
     expect(donOf(g, 'p1')).toMatchObject({ active: 0, rested: 3 });
     endTurn(g);
+    takeMost(g);
     expect(donOf(g, 'p1')).toMatchObject({ active: 1, rested: 2 });
   });
 
   it('FILM Leader (ST05-001): the "or" holds', () => {
     const g = fieldGame(LB.film);
     endTurn(g);
+    takeMost(g);
     expect(donOf(g, 'p1')).toMatchObject({ active: 1, rested: 2 });
   });
 
   it('Leader with neither type (ST02-001): no DON!! is set active', () => {
     const g = fieldGame(LB.greenKid);
     endTurn(g);
+    takeMost(g);
     expect(donOf(g, 'p1')).toMatchObject({ active: 0, rested: 3 });
   });
 
   it('no rested DON!! to set: nothing happens and nothing breaks', () => {
     const g = fieldGame(LB.greenShc, 0);
     endTurn(g);
+    takeMost(g);
     expect(donOf(g, 'p1').rested).toBe(0);
   });
 

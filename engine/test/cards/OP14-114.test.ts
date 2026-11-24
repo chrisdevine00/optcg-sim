@@ -27,6 +27,14 @@ describe('OP14-114 Ran', () => {
     expect(don(g, 'p1')).toMatchObject({ rested: 1, active: 0 });
   });
 
+  it('"up to 1": once activated the give can be declined, the DON!! stays rested', () => {
+    const g = start(2);
+    use(g);
+    g.act({ type: 'done' });
+    expect(don(g, 'p1')).toMatchObject({ rested: 2, active: 0 });
+    expect(g.card(g.leader('p1')).don).toBe(0);
+  });
+
   it('can give it to the Leader', () => {
     const g = start(1);
     use(g);

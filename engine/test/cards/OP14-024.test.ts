@@ -1,6 +1,6 @@
 /** OP14-024 Kin'emon. */
 import { describe, expect, it } from 'vitest';
-import { don, expectDecision, none, pick, play, V } from './helpers.ts';
+import { don, expectDecision, none, option, pick, play, setMost, V } from './helpers.ts';
 import { canPick, koBy } from './helpers-w3s.ts';
 import { mk, restedCard } from './helpers-op14g1.ts';
 
@@ -13,21 +13,45 @@ describe("OP14-024 Kin'emon", () => {
   it('[On Play]: sets up to 3 DON!! as active', () => {
     const g = played();
     play(g, ID); // pays 4: 0 active, 10 rested
+    setMost(g);
     expect(don(g, 'p1')).toMatchObject({ active: 3, rested: 7 });
+  });
+
+  it('"up to 3": a count is asked, most first; 1 sets one, 0 none, the restriction still applies (OP14-R2)', () => {
+    const g = played();
+    play(g, ID);
+    expect(expectDecision(g, 'choose', 'p1').options!.map((o) => o.id)).toEqual([
+      '3',
+      '2',
+      '1',
+      '0',
+    ]);
+    option(g, '1');
+    expect(don(g, 'p1')).toMatchObject({ active: 1, rested: 9 });
+    expect(g.isLegal({ type: 'playCard', card: g.find('p1', 'hand', V.c1), player: 'p1' })).toBe(
+      false,
+    );
+    const h = played();
+    play(h, ID);
+    option(h, '0');
+    expect(don(h, 'p1')).toMatchObject({ active: 0, rested: 10 });
   });
 
   it('with fewer than 3 rested DON!! sets what there is', () => {
     const g = played(0); // 4 active DON!!, all paid: 4 rested
     play(g, ID);
+    setMost(g);
     expect(don(g, 'p1').active).toBe(3);
     const h = mk({ hand: [ID], costArea: { active: 4, rested: 0 } });
     play(h, ID);
+    setMost(h);
     expect(don(h, 'p1')).toMatchObject({ active: 3, rested: 1 });
   });
 
   it('then you cannot play Character cards this turn', () => {
     const g = played();
     play(g, ID);
+    setMost(g);
     expect(g.isLegal({ type: 'playCard', card: g.find('p1', 'hand', V.c1), player: 'p1' })).toBe(
       false,
     );
@@ -36,6 +60,7 @@ describe("OP14-024 Kin'emon", () => {
   it('the restriction ends with the turn: Characters can be played next turn', () => {
     const g = played();
     play(g, ID);
+    setMost(g);
     g.act({ type: 'endTurn' });
     g.act({ type: 'endTurn' });
     expect(g.isLegal({ type: 'playCard', card: g.find('p1', 'hand', V.c1), player: 'p1' })).toBe(

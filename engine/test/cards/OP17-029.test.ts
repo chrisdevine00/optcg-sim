@@ -1,6 +1,6 @@
 /** OP17-029 Hongo. */
 import { describe, expect, it } from 'vitest';
-import { don, none, pick, play, V } from './helpers.ts';
+import { don, none, option, pick, play, setMost, V } from './helpers.ts';
 import { mainGame, OTHER_LEADER } from './helpers-op17g2.ts';
 
 const ID = 'OP17-029';
@@ -16,6 +16,7 @@ describe('OP17-029 Hongo', () => {
   it('[On Play]: sets up to 1 DON!! as active, then rests up to 2 Characters with a cost of 2 or less', () => {
     const g = start();
     play(g, ID);
+    setMost(g);
     // After paying 4 there are 0 active and 6 rested; the rested DON!! cards are
     // interchangeable, so one is set active without a choice.
     pick(g, [g.find('p2', 'characters', V.c1), g.find('p2', 'characters', V.c2)]);
@@ -28,7 +29,7 @@ describe('OP17-029 Hongo', () => {
   it('"up to": the DON!! may be left rested and no Character need be rested', () => {
     const g = start();
     play(g, ID);
-    if (g.legal().some((a) => a.type === 'pick' && typeof a.choice === 'object')) none(g);
+    option(g, '0');
     none(g);
     expect(g.zone('p2', 'characters').some((c) => c.rested)).toBe(false);
   });
@@ -38,6 +39,7 @@ describe('OP17-029 Hongo', () => {
       V.c1,
     ]);
     play(g, ID);
+    setMost(g);
     pick(g, [g.find('p2', 'characters', V.c1)]);
     expect(g.card(g.find('p2', 'characters', V.c1)).rested).toBe(true);
   });

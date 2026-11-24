@@ -123,6 +123,9 @@ export function addMost(g: TestGame, times = 1): void {
   }
 }
 
+/** Answer "how many DON!! will you set as active (up to N)?" (OP14-R2) with the most, `times` times. */
+export const setMost = addMost;
+
 /** Answer a DON!! choice by taking cost-area DON!! (active first). */
 export function payDon(g: TestGame): void {
   while (

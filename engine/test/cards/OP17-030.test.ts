@@ -7,8 +7,10 @@ import {
   don,
   expectDecision,
   game,
+  option,
   PLAIN_BLUE,
   play,
+  setMost,
   times,
 } from './helpers.ts';
 import { OTHER_LEADER } from './helpers-op17g2.ts';
@@ -65,10 +67,18 @@ describe('OP17-030 Monkey.D.Luffy', () => {
       const g = board(5);
       const luffy = g.find('p1', 'characters', ID);
       g.act({ type: 'activate', card: luffy, ability: 'don-active' });
+      setMost(g);
       expect(don(g, 'p1')).toMatchObject({ active: 1, rested: 2 });
       expect(
         g.isLegal({ type: 'activate', card: luffy, ability: 'don-active', player: 'p1' }),
       ).toBe(false);
+    });
+
+    it('"up to 1": the player may set none (OP14-R2)', () => {
+      const g = board(5);
+      g.act({ type: 'activate', card: g.find('p1', 'characters', ID), ability: 'don-active' });
+      option(g, '0');
+      expect(don(g, 'p1')).toMatchObject({ active: 0, rested: 3 });
     });
 
     it('with 6 cards in hand the ability cannot be activated', () => {

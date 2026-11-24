@@ -12,6 +12,7 @@
  * play restriction covers Character cards with a base cost of 5 or more for the rest of the turn
  * (CR 6-6-1-3) and does not touch cost 4 or less.
  */
+import { takeMost } from '../../helpers.ts';
 import { describe, expect, it } from 'vitest';
 import type { PlayerSpec } from '@optcg/engine';
 import { act, CH, donOf, endTurn, F, isLegal, LB, myTurn, noDefence, play, side } from './kit-b.ts';
@@ -28,6 +29,7 @@ function playGame(leader: string, p1: Partial<PlayerSpec> = {}) {
     side(LB.opp, F.red),
   );
   play(g, g.find('p1', 'hand', LUFFY));
+  takeMost(g);
   return g;
 }
 
@@ -81,7 +83,9 @@ describe('OP13-118 [On Play] "Then, you cannot play Character cards with a base 
   it('"during this turn": on your next turn a cost-5 Character can be played again', () => {
     const g = playGame(LB.multiLaw);
     endTurn(g); // p2 turn 4
+    takeMost(g);
     endTurn(g); // p1 turn 5
+    takeMost(g);
     expect(isLegal(g, { type: 'playCard', card: g.find('p1', 'hand', CH.kingdew) })).toBe(true);
   });
 });

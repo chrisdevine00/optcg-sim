@@ -9,6 +9,7 @@
  * CR 10-2-13 ([Once Per Turn]), CR 6-6-1-2 ("until the end of the End Phase", RL-11), CR 6-5-5-2
  * (given DON!! add +1000 on its owner's turn).
  */
+import { takeMost } from '../../helpers.ts';
 import { describe, expect, it } from 'vitest';
 import {
   act,
@@ -44,6 +45,7 @@ describe('OP17-034 Rockstar: [Activate: Main] [Once Per Turn] if the opposing Le
     const g = setup(LD.rhp, MAGELLAN);
     expect(g.power(g.leader('p1'))).toBe(5000);
     useAbility(g, at(g, 'p1', 'characters', ROCKSTAR));
+    takeMost(g);
     expect(atMain(g)).toBe(true);
     expect(don(g)).toMatchObject({ active: 3, rested: 2 });
     expect(g.power(g.leader('p1'))).toBe(6000);
@@ -60,6 +62,7 @@ describe('OP17-034 Rockstar: [Activate: Main] [Once Per Turn] if the opposing Le
   it('opposing Leader above the threshold (7000) also satisfies "6000 or more"', () => {
     const g = setup(LD.rhp, ROGER);
     useAbility(g, at(g, 'p1', 'characters', ROCKSTAR));
+    takeMost(g);
     expect(don(g)).toMatchObject({ active: 3, rested: 2 });
     expect(g.power(g.leader('p1'))).toBe(6000);
   });
@@ -67,12 +70,14 @@ describe('OP17-034 Rockstar: [Activate: Main] [Once Per Turn] if the opposing Le
   it('"up to 1": exactly one rested DON!! is set up, not all of them', () => {
     const g = setup(LD.rhp, MAGELLAN, 5);
     useAbility(g, at(g, 'p1', 'characters', ROCKSTAR));
+    takeMost(g);
     expect(don(g)).toMatchObject({ active: 3, rested: 4 });
   });
 
   it('"Then" is not gated on the DON!! being set up: with no rested DON!! the Leader still gets base 6000', () => {
     const g = setup(LD.rhp, MAGELLAN, 0);
     useAbility(g, at(g, 'p1', 'characters', ROCKSTAR));
+    takeMost(g);
     expect(don(g)).toMatchObject({ active: 2, rested: 0 });
     expect(g.power(g.leader('p1'))).toBe(6000);
   });
@@ -80,6 +85,7 @@ describe('OP17-034 Rockstar: [Activate: Main] [Once Per Turn] if the opposing Le
   it('the Leader must be a {Red-Haired Pirates} type: another Leader keeps its power, the DON!! is still set up', () => {
     const g = setup(LD.neutral, MAGELLAN);
     useAbility(g, at(g, 'p1', 'characters', ROCKSTAR));
+    takeMost(g);
     expect(don(g)).toMatchObject({ active: 3, rested: 2 });
     expect(g.power(g.leader('p1'))).toBe(5000);
   });
@@ -88,12 +94,14 @@ describe('OP17-034 Rockstar: [Activate: Main] [Once Per Turn] if the opposing Le
     const g = setup(LD.rhp, MAGELLAN, 3, 2);
     expect(g.power(g.leader('p1'))).toBe(7000);
     useAbility(g, at(g, 'p1', 'characters', ROCKSTAR));
+    takeMost(g);
     expect(g.power(g.leader('p1'))).toBe(8000);
   });
 
   it("lasts until the end of the opponent's next End Phase: still 6000 during their turn, back to 5000 after", () => {
     const g = setup(LD.rhp, MAGELLAN);
     useAbility(g, at(g, 'p1', 'characters', ROCKSTAR));
+    takeMost(g);
     act(g, { type: 'endTurn' });
     need(g, 'main', 'p2');
     expect(g.power(g.leader('p1'))).toBe(6000);
@@ -106,6 +114,7 @@ describe('OP17-034 Rockstar: [Activate: Main] [Once Per Turn] if the opposing Le
     const r = at(g, 'p1', 'characters', ROCKSTAR);
     expect(offeredAbilities(g, r)).toHaveLength(1);
     useAbility(g, r);
+    takeMost(g);
     expect(offeredAbilities(g, r)).toHaveLength(0);
   });
 
@@ -113,6 +122,7 @@ describe('OP17-034 Rockstar: [Activate: Main] [Once Per Turn] if the opposing Le
     const g = setup(LD.rhp, MAGELLAN, 5);
     const r = at(g, 'p1', 'characters', ROCKSTAR);
     useAbility(g, r);
+    takeMost(g);
     toMyNextMain(g);
     expect(offeredAbilities(g, at(g, 'p1', 'characters', ROCKSTAR))).toHaveLength(1);
   });
