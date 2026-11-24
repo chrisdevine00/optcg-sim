@@ -2,6 +2,28 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-24 — M6b-2 wave 3: G20 to G29 (ENGINE_VERSION 0.5.11)
+
+- **Context:** wave 3 of the M6b-1 audit (`docs/research/m6b-wave3.md`): the opponent's DON!! given to the opponent's cards, `cannotSetDonActive`, hand-trash and rested timings, `Num` division, `cardPlayed` origin and `via`, per-turn history, `returnDon` for the opponent, the K.O. cause on [On K.O.], and `removed`. It unblocks 44 cards, closing block 5 except OP16-079 (D9) and OP16-080 (D3).
+- **Decision:**
+  - Per-turn history (`State.hist`, keyed by turn) is recorded only in a game where some script reads it, so every other game's hashes, goldens and replays are unchanged.
+  - `by` qualifiers match effects only. Costs count only with `by` omitted (G24) or `includeCosts: true` (G22). G29's `cause` counts costs as effects, as G11 did (RL-16).
+  - A hand-trash event fires once per instruction. `removed` watchers form their own batch, queued before the K.O.'d card's [On K.O.].
+  - `removed` fires in `moveCard`, so a rule trash (full Character area) matches when `cause` is absent.
+  - The K.O. cause travels as an event payload (`ev`) on the pending effect and is checked again at resolution.
+  - `giveDon` with `state: 'any'` asks which DON!! kinds only when both exist and not all of them go.
+  - The AI lethal bound leaves `cannotSetDonActive` unclassified, so the solver searches.
+- **Rejected:**
+  - Always recording history: it changes every golden hash.
+  - A history field cleared at turn change: keying by turn needs no clearing step.
+  - Settling M6b-Q30, Q31 or Q41 now: both readings stay expressible.
+  - One batch for removal watchers and [On K.O.]: it needs a `runKo` restructure.
+  - Hooking only the K.O. and remove frames: it misses the cost and rule paths.
+  - A new `Frame` per K.O.
+  - Always asking the DON!! kind.
+  - Classifying `cannotSetDonActive` as neutral without a per-shape proof.
+- New open questions M6b-Q41 to Q47 are in OPEN-QUESTIONS.
+
 ## 2026-11-24 — `giveDon` with `each` asks the targets and a count per target (ENGINE_VERSION 0.5.10)
 
 - **Context:** the ST block 5 review (STB5-R1, severity 3) showed that the wave 2 rule for "give up to M rested DON!! to each of up to N targets" (the DON!! on hand cap the targets at `floor(DON / M)`, every target gets exactly M) made legal plays unreachable: ST30-014 with 1 rested DON!! could give nothing, and 3 rested could not give 2 + 1.
