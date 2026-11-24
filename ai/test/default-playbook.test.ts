@@ -173,3 +173,14 @@ describe('the default mulligan on real opening hands', () => {
     expect(seen.redraw).toBeGreaterThan(0);
   }, 120_000);
 });
+
+describe('the lethal Trigger note for a guessed deck', () => {
+  it('a synthetic prior is marked typical, so the copy never says "their usual lists"', async () => {
+    const { triggerRisk } = await import('../src/search/lethal/public.ts');
+    const cards = cardMap();
+    const guessed = triggerRisk(2, priorFor(TEACH), cards);
+    expect(guessed.typical).toBe(true);
+    const sourced = triggerRisk(2, priorFor('OP17-039'), cards);
+    expect(sourced.typical).toBeUndefined();
+  });
+});

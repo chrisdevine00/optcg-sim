@@ -195,6 +195,8 @@ export interface TriggerRisk {
   exposed: number;
   /** [Trigger] cards in the archetype's newest sourced list (0 if none, or no prior). */
   triggersInPrior: number;
+  /** The prior is a guess from play frequency (no sourced list for the Leader): copy says "typical deck". */
+  typical?: true;
   /** Chance that none of the exposed Life cards is a [Trigger], over the weighted lists. */
   probabilityNone: number;
 }
@@ -240,5 +242,6 @@ export function triggerRisk(
     exposed,
     triggersInPrior: triggersIn(prior.lists[0]!.cards, cards),
     probabilityNone: wsum ? p / wsum : 1,
+    ...(prior.synthetic ? { typical: true as const } : {}),
   };
 }

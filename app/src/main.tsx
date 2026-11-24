@@ -6,6 +6,7 @@ import './styles/tokens.css';
 import './styles/base.css';
 import './styles/app.css';
 import { App } from './App.tsx';
+import { registerServiceWorker } from './update/updates.ts';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -13,11 +14,5 @@ createRoot(document.getElementById('root')!).render(
   </StrictMode>,
 );
 
-// The image cache (ARCHITECTURE §5) runs only in production builds; dev reloads stay uncached.
-if (import.meta.env.PROD && 'serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    void navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`, {
-      scope: import.meta.env.BASE_URL,
-    });
-  });
-}
+// The service worker (images, app shell, update prompt; ARCHITECTURE §5) runs only in production builds.
+if (import.meta.env.PROD) registerServiceWorker(import.meta.env.BASE_URL);

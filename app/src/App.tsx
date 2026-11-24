@@ -3,6 +3,7 @@ import { Footer } from './Footer.tsx';
 import { Header } from './Header.tsx';
 import { usePath } from './router.tsx';
 import { Home } from './routes/Home.tsx';
+import { UpdatePrompt } from './update/UpdatePrompt.tsx';
 
 const CardBrowser = lazy(() => import('./cards/CardBrowser.tsx'));
 const PlayRoute = lazy(() => import('./play/PlayRoute.tsx'));
@@ -37,6 +38,7 @@ export function App() {
         </a>
       )}
       <Header />
+      <UpdatePrompt />
       {path === '/cards' ? (
         <Suspense fallback={<main className="page" id="main" aria-busy="true" />}>
           <CardBrowser />

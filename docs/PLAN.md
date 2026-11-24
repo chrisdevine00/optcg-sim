@@ -96,7 +96,7 @@ Steps, in order:
    - Per card: a verified override, the script, about 5 author tests and about 9 independent tests.
 5. **M6b-4, review per batch.** An adversarial review in `docs/reviews/m6b-<SET>.md`, with one fix round. A severity-3 finding blocks the merge.
 6. **M6b-5, update pipeline.** `.github/workflows/update.yml` (using the M6b-0 `meta-update.ts`) and `docs/runbooks/new-set.md` (ARCHITECTURE §3 "Update pipeline"). Build this first among M6b-5 to M6b-7. OP-18 and EB-05 are the first scripting batch, run through runbook steps b–h (step a, the cited block, is part of their stats-only import; EB-05 was imported 2026-11-17, OP-18 is pending upstream, see STATUS). The runbook runs locally; there is no `script-set.yml` (ADR 0014).
-7. **M6b-6, app updates.** Service-worker app shell, update prompt, `version.json`, and IndexedDB records.
+7. **M6b-6, app updates.** Service-worker app shell, update prompt and `version.json` (built 2026-11-23). IndexedDB records moved to M8 "local save", their first reader (DECISIONS 2026-11-23).
 8. **M6b-7, AI for any leader.**
    - Add `ai/playbooks/default.json` and make `playbookFor` and `priorFor` never null (`ai/src/playbook.ts`, `ai/src/knowledge.ts`).
    - Each new archetype the meta PR flags becomes a content task: guide, playbook and assertions.

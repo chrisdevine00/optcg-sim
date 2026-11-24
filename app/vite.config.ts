@@ -1,13 +1,54 @@
-import { resolve } from 'node:path';
+import { createHash } from 'node:crypto';
+import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build, defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 
 const here = fileURLToPath(new URL('.', import.meta.url));
 
+/** Every built file the app shell precaches (M6b-6): pages, chunks, styles, fonts; not maps. */
+function shellFiles(outDir: string): string[] {
+  const walk = (d: string): string[] =>
+    readdirSync(d).flatMap((f) => {
+      const p = join(d, f);
+      return statSync(p).isDirectory() ? walk(p) : [relative(outDir, p).split('\\').join('/')];
+    });
+  return walk(outDir)
+    .filter((f) => !/\.map$|^sw\.js|^\.vite\/|^version\.json$/.test(f))
+    .sort();
+}
+
+/** What data a build holds (ARCHITECTURE §5 "App updates"), for the About page and bug reports. */
+function versionInfo(build: string) {
+  const root = resolve(here, '..');
+  const manifest = JSON.parse(readFileSync(join(root, 'cards/data/manifest.json'), 'utf8')) as {
+    newestSet: string;
+    fetchedAt: string;
+    cardCount: number;
+  };
+  const meta = JSON.parse(readFileSync(join(root, 'docs/research/meta-lists.json'), 'utf8')) as {
+    asOf: string;
+  };
+  const engine = /ENGINE_VERSION = '([^']+)'/.exec(
+    readFileSync(join(root, 'engine/src/record.ts'), 'utf8'),
+  )?.[1];
+  return {
+    build,
+    builtAt: new Date().toISOString(),
+    cardsThrough: manifest.newestSet,
+    cardCount: manifest.cardCount,
+    cardsFetchedAt: manifest.fetchedAt,
+    metaAsOf: meta.asOf,
+    engine,
+  };
+}
+
 /**
  * Builds src/sw.ts as one self-contained classic script at <base>/sw.js. A service worker registered as a
  * classic script cannot `import`, so it must not share chunks with the app (M1-review service-worker check).
+ * The worker gets the build's file list and an id hashed from their contents (M6b-6): a new deploy is a
+ * new worker, which precaches the new shell and waits for the app's update prompt.
  */
 function serviceWorker(): Plugin {
   let outDir = '';
@@ -18,9 +59,18 @@ function serviceWorker(): Plugin {
       outDir = c.build.outDir;
     },
     async closeBundle() {
+      const files = shellFiles(outDir);
+      const hash = createHash('sha256');
+      for (const f of files) hash.update(f).update(readFileSync(join(outDir, f)));
+      const id = hash.digest('hex').slice(0, 12);
+      writeFileSync(join(outDir, 'version.json'), JSON.stringify(versionInfo(id), null, 2) + '\n');
       await build({
         configFile: false,
         logLevel: 'warn',
+        define: {
+          __BUILD_ID__: JSON.stringify(id),
+          __SHELL_FILES__: JSON.stringify(files),
+        },
         build: {
           outDir,
           emptyOutDir: false,

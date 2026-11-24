@@ -55,11 +55,12 @@ export interface Tier1 {
 export function tier1(r: LethalResult): Tier1 {
   const chip = certaintyLabel(r.certainty, 'coach');
   const t = r.trigger;
+  const runs = t?.typical ? 'a typical deck for this Leader runs' : 'their usual lists run';
   const triggerNote =
-    r.status === 'proven' && t && t.probabilityNone < 1
+    r.status === 'proven' && t && (t.probabilityNone < 1 || t.typical)
       ? r.certainty === 'any-hand'
-        ? `Works against any hand, unless a Life card's Trigger stops it (their usual lists run ${t.triggersInPrior}).`
-        : `Depends on their hand, and a Life card's Trigger could stop it (their usual lists run ${t.triggersInPrior}).`
+        ? `Works against any hand, unless a Life card's Trigger stops it (${runs} ${t.triggersInPrior}).`
+        : `Depends on their hand, and a Life card's Trigger could stop it (${runs} ${t.triggersInPrior}).`
       : null;
   if (r.status === 'proven')
     return {
@@ -352,6 +353,16 @@ function doubleAttackRow(r: LethalResult, cards: ReadonlyMap<string, Card>): Evi
 function triggerRow(r: LethalResult, tense: 'coach' | 'review'): Evidence | null {
   const t = r.trigger;
   if (!t) return null;
+  // A guessed deck (no sourced list for the Leader) never rules a Trigger out.
+  if (t.typical)
+    return {
+      text: `A typical deck for this Leader runs ${plural(t.triggersInPrior, 'Trigger')}; their list may differ. This line works unless one of the ${plural(t.exposed, 'Life card')} you take is one.`,
+      figures: {
+        triggersInPrior: t.triggersInPrior,
+        exposedLife: t.exposed,
+        chanceNoTriggerPct: Math.round(t.probabilityNone * 100),
+      },
+    };
   if (t.probabilityNone >= 1)
     return {
       text:

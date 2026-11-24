@@ -195,7 +195,9 @@
 
 **M6b-5 update pipeline: built 2026-11-23** (DECISIONS "M6b-5"): `update.yml` (weekly `cards` and `meta` jobs, PRs on `update/cards` and `update/meta`), `scripts/cards-pr-body.ts`, `scripts/update-pr.sh`, `docs/runbooks/new-set.md`, the script text-hash test. Done criterion still open: a real update PR for the next set after OP-18 and EB-05, run through the runbook. **Owner: allow Actions to create pull requests** (Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests"); until then each run pushes the branch and its summary links to open the PR by hand.
 
-**M6b-1 runtime audit: in progress** (three auditors: block 5 with X, block 1 exceptions and EB-05; block 4; block 3 → `docs/research/m6b-audit/`).
+**M6b-6 app updates: built 2026-11-23** (app shell precache, offline, update prompt never mid-game, `version.json`; e2e `app/e2e/update.spec.ts`; IndexedDB records moved to M8). **M6b-7 AI for any Leader: built 2026-11-23** (default playbook from the AI's own deck; synthetic prior from play frequency; lethal stays conservative against a guessed deck). DECISIONS "M6b-6 and M6b-7".
+
+**M6b-1 runtime audit: in progress** (per-block audits done in `docs/research/m6b-audit/block{5,4,3}.md`: 1,175 cards, 883 need nothing new, 292 need a gap, 13 need a design decision; consolidation into `docs/research/m6b-runtime-audit.md` with the M6b-2 wave plan in progress).
 
 **M6b-0: done 2026-11-23.** Next: **M6b-1**, the runtime audit of the Standard pool (`docs/research/m6b-runtime-audit.md`, the method of `m4b-runtime-audit.md`), driven by the gap list in `cards/data/coverage-report.json`. M6b-5 (update pipeline) is built first among M6b-5 to M6b-7, in parallel with the scripting batches.
 - Also: Deploy workflow split into build and deploy jobs (the Pages artifact race failed three deploys on 2026-11-23).
