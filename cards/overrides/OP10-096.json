@@ -1,0 +1,13 @@
+{
+  "id": "OP10-096",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP10-096",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "note": "Limitless prints a typographic apostrophe in the name; ours uses a straight one. Typography only; verified with our value (a Limitless difference, not an upstream defect)."
+}

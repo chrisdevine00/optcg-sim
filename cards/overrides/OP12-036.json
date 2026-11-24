@@ -1,0 +1,20 @@
+{
+  "id": "OP12-036",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP12-036",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "note": "optcgapi writes the attribute as (Slash) instead of <Slash> (twice). Settled on Limitless (official list not reachable); a clear upstream defect, not a reading.",
+  "fields": {
+    "effectText": {
+      "value": "This card in your hand cannot be played by effects.\nIf your Leader has the <Slash> attribute, this Character cannot be K.O.'d in battle by <Slash> attribute cards and gains +1000 power.",
+      "upstream": "This card in your hand cannot be played by effects.\nIf your Leader has the (Slash) attribute, this Character cannot be K.O.'d in battle by (Slash) attribute cards and gains +1000 power.",
+      "source": "https://onepiece.limitlesstcg.com/cards/OP12-036"
+    }
+  }
+}

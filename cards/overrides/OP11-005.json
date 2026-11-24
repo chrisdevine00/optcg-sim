@@ -1,0 +1,20 @@
+{
+  "id": "OP11-005",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP11-005",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": ["Blocker"],
+  "note": "optcgapi writes the attribute as (Special) instead of <Special>. Settled on Limitless (official list not reachable); a clear upstream defect, not a reading.",
+  "fields": {
+    "effectText": {
+      "value": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[DON!! x1] This Character cannot be K.O.'d by effects of Characters without the <Special> attribute.",
+      "upstream": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[DON!! x1] This Character cannot be K.O.'d by effects of Characters without the (Special) attribute.",
+      "source": "https://onepiece.limitlesstcg.com/cards/OP11-005"
+    }
+  }
+}

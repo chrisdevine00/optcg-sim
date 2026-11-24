@@ -1,0 +1,20 @@
+{
+  "id": "OP11-006",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP11-006",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "note": "optcgapi writes the attribute as (Special) instead of <Special>. Settled on Limitless (official list not reachable); a clear upstream defect, not a reading.",
+  "fields": {
+    "effectText": {
+      "value": "[DON!! x1] [When Attacking] Give up to 1 of your opponent's <Special> attribute Characters −5000 power during this turn.",
+      "upstream": "[DON!! x1] [When Attacking] Give up to 1 of your opponent's (Special) attribute Characters −5000 power during this turn.",
+      "source": "https://onepiece.limitlesstcg.com/cards/OP11-006"
+    }
+  }
+}

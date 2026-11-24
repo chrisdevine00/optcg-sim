@@ -1,0 +1,20 @@
+{
+  "id": "OP12-027",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP12-027",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": ["Blocker"],
+  "note": "optcgapi writes the attribute as (Slash) instead of <Slash>. Settled on Limitless (official list not reachable); a clear upstream defect, not a reading.",
+  "fields": {
+    "effectText": {
+      "value": "If your <Slash> attribute Character with a cost of 5 or less other than this Character would be K.O.'d by your opponent's effect, you may rest this Character instead.\n[Blocker]",
+      "upstream": "If your (Slash) attribute Character with a cost of 5 or less other than this Character would be K.O.'d by your opponent's effect, you may rest this Character instead.\n[Blocker]",
+      "source": "https://onepiece.limitlesstcg.com/cards/OP12-027"
+    }
+  }
+}

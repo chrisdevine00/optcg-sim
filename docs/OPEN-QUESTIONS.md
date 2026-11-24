@@ -176,3 +176,12 @@ Block 4 sets (OP-13 to OP-15, EB-03, EB-04, ST-29, ST-02, PRB-02; OP-01 to OP-04
 - B4-V5. **EB03-034 Charlotte Linlin: type {Big Mom Pirates} (optcgapi) or {Rocks Pirates} (Limitless)?**
 - B4-V6. EB04-061 Monkey.D.Luffy (verified, all fields match): block X (optcgapi) or 4 (Limitless)? Block only; check the printed icon (as EB-05-V2).
 - B4-V7. **OP14-103 Gloriosa: Limitless names it "Gloriosa (Grandma Nyon)"; ours is "Gloriosa".** `cards/src/validate.ts` rejects a name ending in "(...)" as a printing suffix, so the override cannot be written as is. Is "(Grandma Nyon)" part of the printed name (it matters for the four-copy rule, since other Gloriosa cards exist) or a Limitless disambiguation? Decide, then either relax the validator for printed parentheticals (OP14-091 "Mr.2.Bon.Kurei(Bentham)" has no space and passes) or verify with the plain name.
+
+## Block 3 verification (2026-11-24, runbook step d.1)
+
+Block 3 sets (OP-09 to OP-12, EB-02, ST-15, ST-22) were checked against Limitless. Clear upstream defects (dropped minus signs, `(Slash)` for `<Slash>`, missing [Trigger] text or cost clauses, joined types, missing line breaks) were settled on Limitless, and OP10-096 (a typographic apostrophe in Limitless) was verified with our value; each override says so. The cards below are not verified; read the official card list (https://en.onepiece-cardgame.com/cardlist/) and write `cards/overrides/<ID>.json`.
+
+- B3-V1. **OP10-010 Chadros.Higelyges: Limitless names it "Chadros.Higelyges (Brownbeard)"; ours is "Chadros.Higelyges".** Same question as B4-V7: `cards/src/validate.ts` rejects a name ending in "(...)" as a printing suffix. Is "(Brownbeard)" printed or a Limitless disambiguation?
+- B3-V2. **OP10-064 Clone Soldier: types {The Vinsmoke Family} {Kingdom of GERMA} (optcgapi) or {Kingdom of GERMA} only (Limitless)?**
+- B3-V3. **OP11-031 Jinbe: types {The Sun Pirates} {Merfolk} {Fish-Man Island} (optcgapi) or {Fish-Man} {Fish-Man Island} {The Sun Pirates} (Limitless)?**
+- B3-V4. **ST15-005 Portgas.D.Ace: counter none (optcgapi) or 1000 (Limitless)?** Limitless also has "−2000" where optcgapi has "2000" and line breaks around the reminder text (clear defects, to be fixed in the same override once the counter is settled).

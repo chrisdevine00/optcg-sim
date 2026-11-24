@@ -1,0 +1,20 @@
+{
+  "id": "ST22-011",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/ST22-011",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "note": "optcgapi drops the cost clause (You may reveal 2 cards with a type including Whitebeard Pirates from your hand:). Settled on Limitless (official list not reachable); a clear upstream defect, not a reading.",
+  "fields": {
+    "effectText": {
+      "value": "[Your Turn] [On Play] You may reveal 2 cards with a type including \"Whitebeard Pirates\" from your hand: Up to 1 of your Leader with a type including \"Whitebeard Pirates\" gains +2000 power during this turn.",
+      "upstream": "[Your Turn] [On Play] Up to 1 of your Leader with a type including \"Whitebeard Pirates\" gains +2000 power during this turn.",
+      "source": "https://onepiece.limitlesstcg.com/cards/ST22-011"
+    }
+  }
+}

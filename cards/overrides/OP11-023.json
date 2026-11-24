@@ -1,0 +1,20 @@
+{
+  "id": "OP11-023",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP11-023",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "note": "optcgapi drops the minus sign (3 cost for −3 cost) and quotes the type instead of {Fish-Man}. Settled on Limitless (official list not reachable); a clear upstream defect, not a reading.",
+  "fields": {
+    "effectText": {
+      "value": "If your Leader has the {Fish-Man} type, you have 3 or less Life cards and your opponent has 5 or more rested cards, give this card in your hand −3 cost.",
+      "upstream": "If your Leader has the \"Fish-Man\" type, you have 3 or less Life cards and your opponent has 5 or more rested cards, give this card in your hand 3 cost.",
+      "source": "https://onepiece.limitlesstcg.com/cards/OP11-023"
+    }
+  }
+}

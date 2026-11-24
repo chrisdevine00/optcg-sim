@@ -1,0 +1,20 @@
+{
+  "id": "OP12-021",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP12-021",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": ["Blocker"],
+  "note": "optcgapi writes the attribute as (Slash) and drops the line break before [Blocker]. Settled on Limitless (official list not reachable); a clear upstream defect, not a reading.",
+  "fields": {
+    "effectText": {
+      "value": "If your Leader has the <Slash> attribute and you have 6 or more rested DON!! cards, this Character cannot be rested by your opponent's effects.\n[Blocker]",
+      "upstream": "If your Leader has the (Slash) attribute and you have 6 or more rested DON!! cards, this Character cannot be rested by your opponent's effects.[Blocker]",
+      "source": "https://onepiece.limitlesstcg.com/cards/OP12-021"
+    }
+  }
+}
