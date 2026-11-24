@@ -36,6 +36,23 @@ import { EB05_038 } from './EB05-038.ts';
 import { EB05_039 } from './EB05-039.ts';
 import { EB05_040 } from './EB05-040.ts';
 import { EB05_042 } from './EB05-042.ts';
+import { EB05_043 } from './EB05-043.ts';
+import { EB05_044 } from './EB05-044.ts';
+import { EB05_045 } from './EB05-045.ts';
+import { EB05_046 } from './EB05-046.ts';
+import { EB05_047 } from './EB05-047.ts';
+import { EB05_048 } from './EB05-048.ts';
+import { EB05_049 } from './EB05-049.ts';
+import { EB05_050 } from './EB05-050.ts';
+import { EB05_051 } from './EB05-051.ts';
+import { EB05_053 } from './EB05-053.ts';
+import { EB05_054 } from './EB05-054.ts';
+import { EB05_055 } from './EB05-055.ts';
+import { EB05_056 } from './EB05-056.ts';
+import { EB05_057 } from './EB05-057.ts';
+import { EB05_059 } from './EB05-059.ts';
+import { EB05_060 } from './EB05-060.ts';
+import { EB05_061 } from './EB05-061.ts';
 
 const SET: readonly CardScript[] = [
   EB05_001,
@@ -74,5 +91,22 @@ const SET: readonly CardScript[] = [
   EB05_039,
   EB05_040,
   EB05_042,
+  EB05_043,
+  EB05_044,
+  EB05_045,
+  EB05_046,
+  EB05_047,
+  EB05_048,
+  EB05_049,
+  EB05_050,
+  EB05_051,
+  EB05_053,
+  EB05_054,
+  EB05_055,
+  EB05_056,
+  EB05_057,
+  EB05_059,
+  EB05_060,
+  EB05_061,
 ];
 export default SET;
