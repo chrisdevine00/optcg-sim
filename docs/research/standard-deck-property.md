@@ -20,7 +20,7 @@ nightly `ENGINE_GAMES=10000` (`npm run test:nightly` globs `engine/test/property
 - `standard-games.test.ts`, 10,000 games (PROPERTY_SEED=203953110): clean, about 1.8M actions, 235 s.
 - `leaks.test.ts` both deck sources plus standard-games, 10,000: 8 tests passed, 227 s wall.
 
-## Finding 1: hidden hand decides whether a replacement prompt pauses (open, engine not changed)
+## Finding 1: hidden hand decides whether a replacement prompt pauses (FIXED in 0.5.9, see replacement-offer-leak.md)
 
 - Property: leaks, "views ... invariant under hidden permutations" (events part), standard decks.
 - Seed 15, PROPERTY_SEED=24301 (the per-push default). Decks: `standardDecksFor(15)`;

@@ -163,14 +163,6 @@ function untilReveal(events: GameEvent[]): GameEvent[] {
 const stripCards = (events: GameEvent[]): string =>
   JSON.stringify(events.map(({ card: _c, lki: _l, targetCard: _t, label: _x, ...rest }) => rest));
 
-/**
- * Standard-deck games with a known, open engine finding (docs/research/standard-deck-property.md):
- * seed 15, where a hidden Character in the opponent's hand decides whether OP16-018's replacement
- * prompt pauses the game, so the opponent's event stream differs. Skipped in the permutation
- * property only; remove the seed when the engine is fixed.
- */
-const KNOWN_STANDARD_LEAK_SEEDS: ReadonlySet<number> = new Set([15]);
-
 /** Log what reproduces a failing Standard-deck game, then rethrow. */
 function logStandard(seed: number, e: unknown): never {
   const [da, db] = standardDecksFor(seed);
@@ -205,7 +197,6 @@ describe.each([false, true])(
           fc.array(fc.nat(), { minLength: 64, maxLength: 64 }),
           (seed, order) =>
             guard(seed, () => {
-              if (standard && KNOWN_STANDARD_LEAK_SEEDS.has(seed)) return;
               const g0 = game(seed);
               g0.states.forEach((g, i) => {
                 const k = internals(g).decision;
