@@ -554,7 +554,7 @@
    ],
    "types": [
     "Giant",
-    "Whitebeard Pirates"
+    "Whitebeard Pirates Allies"
    ],
    "rarity": "C",
    "set": "ST-30",
@@ -562,9 +562,23 @@
    "effectText": "If your Character with 6000 base power would be removed from the field by your opponent's effect, you may trash this Character and draw 1 card instead.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
-   "textFixes": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST30-009",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "types",
+     "kind": "override",
+     "from": "[\"Giant\",\"Whitebeard Pirates\"]",
+     "to": "[\"Giant\",\"Whitebeard Pirates Allies\"]",
+     "source": "https://onepiece.limitlesstcg.com/cards/ST30-009"
+    }
+   ],
    "artworks": [
     {
      "artworkId": "ST30-009",

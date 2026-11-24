@@ -1,0 +1,20 @@
+{
+  "id": "ST32-004",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/ST32-004",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "fields": {
+    "effectText": {
+      "value": "If your Leader has the <Slash> attribute, this Character gains [Rush: Character].\n(This card can attack Characters on the turn in which it is played.)\n[On Play] Rest up to 2 of your opponent's Characters with a cost of 2 or less.",
+      "upstream": "If your Leader has the attribute, this Character gains [Rush: Character].(This card can attack Characters on the turn in which it is played.)[On Play] Rest up to 2 of your opponent's Characters with a cost of 2 or less.",
+      "source": "https://onepiece.limitlesstcg.com/cards/ST32-004"
+    }
+  },
+  "note": "optcgapi drops the <Slash> attribute name and the line breaks. Settled on Limitless (official list not reachable 2026-11-24); a clear upstream defect, not a reading."
+}

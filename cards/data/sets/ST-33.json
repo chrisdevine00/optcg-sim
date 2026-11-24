@@ -194,12 +194,28 @@
    "rarity": "SR",
    "set": "ST-33",
    "block": 5,
-   "effectText": "During the turn in which a card in your hand is trashed by an effect, give this card in your hand 3 cost.[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
+   "effectText": "During the turn in which a card in your hand is trashed by an effect, give this card in your hand −3 cost.\n[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
-   "textFixes": [],
+   "keywords": [
+    "Blocker"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/ST33-004",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "override",
+     "from": "During the turn in which a card in your hand is trashed by an effect, give this card in your hand 3 cost.[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
+     "to": "During the turn in which a card in your hand is trashed by an effect, give this card in your hand −3 cost.\n[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
+     "source": "https://onepiece.limitlesstcg.com/cards/ST33-004"
+    }
+   ],
    "artworks": [
     {
      "artworkId": "ST33-004",

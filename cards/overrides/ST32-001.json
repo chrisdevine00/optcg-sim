@@ -1,0 +1,20 @@
+{
+  "id": "ST32-001",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/ST32-001",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "fields": {
+    "effectText": {
+      "value": "[On Play] You may rest your <Slash> attribute Leader or 1 of your DON!! cards: Draw 2 cards and trash 1 card from your hand.",
+      "upstream": "[On Play] You may rest your attribute Leader or 1 of your DON!! cards: Draw 2 cards and trash 1 card from your hand.",
+      "source": "https://onepiece.limitlesstcg.com/cards/ST32-001"
+    }
+  },
+  "note": "optcgapi drops the <Slash> attribute name (\"your attribute Leader\"). Settled on Limitless (official list not reachable 2026-11-24); a clear upstream defect, not a reading."
+}

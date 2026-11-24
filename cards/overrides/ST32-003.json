@@ -1,0 +1,20 @@
+{
+  "id": "ST32-003",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/ST32-003",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "fields": {
+    "effectText": {
+      "value": "[Your Turn] When this Character becomes rested, draw 1 card and trash 1 card from your hand.\n[On Play] If your Leader has the <Slash> attribute, play up to 1 Character card with a cost of 5 or less that is either [Perona] or has the <Slash> attribute from your hand.",
+      "upstream": "[Your Turn] When this Character becomes rested, draw 1 card and trash 1 card from your hand.[On Play] If your Leader has the attribute, play up to 1 Character card with a cost of 5 or less that is either [Perona] or has the attribute from your hand.",
+      "source": "https://onepiece.limitlesstcg.com/cards/ST32-003"
+    }
+  },
+  "note": "optcgapi drops the <Slash> attribute name twice and the line break. Settled on Limitless (official list not reachable 2026-11-24); a clear upstream defect, not a reading."
+}

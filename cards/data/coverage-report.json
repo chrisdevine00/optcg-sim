@@ -14,7 +14,7 @@
   {"block":5,"category":"Character","id":"ST34-002","legality":"legal","set":"ST-34","status":"unscripted","tags":["addDon","ko","timing:onPlay"],"untagged":0,"weight":134},
   {"block":5,"category":"Character","id":"ST34-001","legality":"legal","set":"ST-34","status":"unscripted","tags":["addDon","play","returnDon","timing:autoEvent","timing:onKO"],"untagged":0,"weight":9},
   {"block":5,"category":"Character","id":"ST34-005","legality":"legal","set":"ST-34","status":"unscripted","tags":["cost:donMinus","ko","timing:whenAttacking"],"untagged":0,"weight":2},
-  {"block":5,"category":"Character","id":"ST33-004","legality":"legal","set":"ST-33","status":"unscripted","tags":["timing:fromHand"],"untagged":1,"weight":61},
+  {"block":5,"category":"Character","id":"ST33-004","legality":"legal","set":"ST-33","status":"unscripted","tags":["costMod","timing:fromHand"],"untagged":0,"weight":61},
   {"block":5,"category":"Character","id":"ST33-003","legality":"legal","set":"ST-33","status":"unscripted","tags":["cost:trashFromHand","move","timing:onPlay"],"untagged":0,"weight":12},
   {"block":5,"category":"Character","id":"ST33-001","legality":"legal","set":"ST-33","status":"unscripted","tags":["cost:trashFromHand","draw","timing:onPlay"],"untagged":0,"weight":4},
   {"block":5,"category":"Character","id":"ST33-005","legality":"legal","set":"ST-33","status":"unscripted","tags":["timing:onPlay"],"untagged":1,"weight":4},
@@ -1551,7 +1551,7 @@
   {"cards":106,"dsl":"rest","implemented":"yes","kind":"action","primitive":"rest","weight":463},
   {"cards":89,"dsl":"restSelf","implemented":"yes","kind":"cost","primitive":"cost:restSelf","weight":836},
   {"cards":88,"dsl":"addDon","implemented":"yes","kind":"action","primitive":"addDon","weight":1109},
-  {"cards":85,"dsl":"cost","implemented":"yes","kind":"action","primitive":"costMod","weight":1172},
+  {"cards":86,"dsl":"cost","implemented":"yes","kind":"action","primitive":"costMod","weight":1233},
   {"cards":80,"dsl":"donMinus","implemented":"yes","kind":"cost","primitive":"cost:donMinus","weight":607},
   {"cards":77,"dsl":"setActive","implemented":"yes","kind":"action","primitive":"setActive","weight":596},
   {"cards":73,"dsl":"giveDon","implemented":"yes","kind":"action","primitive":"giveDon","weight":487},
@@ -1793,6 +1793,6 @@
    ]
   }
  },
- "tagger": {"cards":2860,"cardsWithText":2571,"clauseTagRate":97.78,"clauses":4184,"clausesTagged":4091},
+ "tagger": {"cards":2860,"cardsWithText":2571,"clauseTagRate":97.8,"clauses":4184,"clausesTagged":4092},
  "weightSource": "play-frequency.json (copies; leaders by decks)"
 }
