@@ -14,7 +14,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { type PlayerSpec } from '@optcg/engine';
-import { act, attack, isLegal, passBlock } from '../helpers.ts';
+import { act, attack, isLegal, passBlock, takeMost } from '../helpers.ts';
 import {
   accept,
   AKP,
@@ -61,6 +61,7 @@ function payMainCost(g: TestGame): void {
   if (offered(g, 'p1')) accept(g);
   payDon(g, 3, 'costActive');
   payWith(g, [g.find('p1', 'hand', VAN.gordon), g.find('p1', 'hand', VAN.sai)]);
+  takeMost(g);
   if (offered(g, 'p1')) accept(g); // "up to 3" asked as a yes/no
 }
 

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { nextDecision, startGame } from './game-support.ts';
+import { nextDecision, resolveChoose, startGame } from './game-support.ts';
 
 test.describe('M4a: card effects through the UI', () => {
   test("Kaido's [When Attacking] DON!! −1 gives the opponent's Character −2000", async ({
@@ -64,6 +64,11 @@ test.describe('M4a: card effects through the UI', () => {
     const use = page.getByRole('menuitem', { name: /Activate: Add up to 1 active/ });
     await expect(use).toBeVisible();
     await use.click();
+    // "Add up to 1" asks how many (most first) for each of its two parts (E-Q11).
+    expect(await nextDecision(page)).toBe('choose');
+    await resolveChoose(page);
+    expect(await nextDecision(page)).toBe('choose');
+    await resolveChoose(page);
     await expect(
       page.locator('.log-row').filter({ hasText: 'King: Add up to 1 active' }),
     ).toHaveCount(1);

@@ -12,7 +12,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { type PlayerSpec } from '@optcg/engine';
-import { act, attack, noDefence } from '../helpers.ts';
+import { act, attack, noDefence, takeMost } from '../helpers.ts';
 import {
   accept,
   AKP,
@@ -41,6 +41,7 @@ function playUlti(g: TestGame): void {
   act(g, { type: 'playCard', card: g.find('p1', 'hand', AKP.ultiPageOne) });
   // "add up to 1 DON!!" may be asked as a yes/no: take it.
   if (offered(g, 'p1')) accept(g);
+  takeMost(g);
 }
 
 describe('OP17-060 Ulti & Page One: [On Play] add 1 active DON!!, then K.O. a 3000-or-less Character', () => {

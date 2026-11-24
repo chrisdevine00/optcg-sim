@@ -108,7 +108,7 @@ describe('EB05-033 Nico Robin [On Play]: 6+ fewer DON!! than the opponent: draw 
   });
 
   // DISAGREEMENT B-1: the engine always adds all 4; "up to 4" (RD 15, CR 8-4-4-1) allows fewer.
-  it.fails('"up to 4": adding fewer DON!! (even none) is reachable, and never more than 4', () => {
+  it('"up to 4": adding fewer DON!! (even none) is reachable, and never more than 4', () => {
     const g = go({});
     const rested = outcomes(g, 'p1', (x) => String(don(x, 'p1').rested));
     expect(rested.has('5')).toBe(true);

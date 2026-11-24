@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   accept,
+  addMost,
   don,
   expectDecision,
   game,
@@ -38,6 +39,7 @@ describe('OP07-076 Slow-Slow Beam Sword', () => {
   it('[Trigger] adds 1 active DON!!', () => {
     const g = damageWith('OP07-076', { donDeck: 10 });
     g.act({ type: 'trigger', activate: true });
+    addMost(g);
     expect(don(g, 'p1')).toMatchObject({ active: 1, deck: 9 });
     expect(g.zone('p1', 'trash').map((c) => c.card)).toEqual(['OP07-076']);
   });

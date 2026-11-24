@@ -286,3 +286,13 @@ export function cardIds(
 ): CardId[] {
   return g.zone(player, zone).map((c) => c.card);
 }
+
+/**
+ * "Add up to N DON!!" asks a count (E-Q11, most first). Takes the most when that question is the
+ * pending decision; does nothing otherwise.
+ */
+export function takeMost(g: TestGame): void {
+  const d = queries.decision(g.state);
+  if (d?.kind === 'choose' && d.options && d.options.length > 0 && d.purpose === 'mode')
+    g.act({ type: 'pick', choice: { option: d.options[0]!.id } });
+}

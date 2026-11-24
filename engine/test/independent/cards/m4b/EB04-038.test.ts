@@ -33,6 +33,7 @@ import {
   theirTurn,
   VAN,
 } from './kit-d.ts';
+import { takeMost } from '../../helpers.ts';
 
 const CARD = 'EB04-038';
 
@@ -58,6 +59,7 @@ describe('EB04-038 [On Play]: if your DON!! on the field are equal to or fewer t
     const g = game(6, 6);
     const deckBefore = donOf(g, 'p1').deck;
     playFromHand(g, CARD);
+    takeMost(g);
     expect(sortedIds(g, 'p1', 'hand')).toEqual([VAN.sai]);
     expect(donOf(g, 'p1')).toMatchObject({ active: 1, rested: 6, deck: deckBefore - 1 });
     expect(kind(g)).toBe('main');
@@ -66,6 +68,7 @@ describe('EB04-038 [On Play]: if your DON!! on the field are equal to or fewer t
   it('fewer (6 vs 9): both parts resolve', () => {
     const g = game(6, 9);
     playFromHand(g, CARD);
+    takeMost(g);
     expect(g.zone('p1', 'hand')).toHaveLength(1);
     expect(donOf(g, 'p1').active).toBe(1);
   });

@@ -1,6 +1,6 @@
 /** OP09-077 Gum-Gum Lightning. */
 import { describe, expect, it } from 'vitest';
-import { accept, don, game, KAIDO, payDon, pick, play, PLAIN_BLUE, V } from './helpers.ts';
+import { accept, addMost, don, game, KAIDO, payDon, pick, PLAIN_BLUE, play, V } from './helpers.ts';
 import { damageWith } from './triggers.ts';
 
 describe('OP09-077 Gum-Gum Lightning', () => {
@@ -42,6 +42,7 @@ describe('OP09-077 Gum-Gum Lightning', () => {
   it('[Trigger] adds 1 active DON!!', () => {
     const g = damageWith('OP09-077');
     g.act({ type: 'trigger', activate: true });
+    addMost(g);
     expect(don(g, 'p1').active).toBe(1);
   });
 

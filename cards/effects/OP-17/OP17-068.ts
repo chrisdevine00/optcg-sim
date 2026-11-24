@@ -26,6 +26,5 @@ export const OP17_068: CardScript = {
   ],
   rulings: [
     'reading: the Leader type is an "if" in the effect, so the 2 cards are trashed even with another Leader type (the cost is before the colon)',
-    'engine note E-Q11: "add up to 2 DON!!" always adds the full amount available (OPEN-QUESTIONS E-Q11)',
   ],
 };

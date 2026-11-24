@@ -1,6 +1,18 @@
 /** OP17-021 Crone Oil. */
 import { describe, expect, it } from 'vitest';
-import { accept, decline, don, expectDecision, game, PLAIN_BLUE, pick, trash } from './helpers.ts';
+import {
+  accept,
+  decline,
+  don,
+  endCounter,
+  expectDecision,
+  game,
+  passBlock,
+  PLAIN_BLUE,
+  pick,
+  trash,
+  V,
+} from './helpers.ts';
 import { ids } from './helpers-hancock-rosi.ts';
 import { plantOpponentEffect } from './helpers-rgl-penel.ts';
 import { ATMOS, RED_LEADER, ROCKSTAR } from './helpers-op17g1.ts';
@@ -78,5 +90,27 @@ describe('OP17-021 Crone Oil', () => {
       ko: { from: 'characters', owner: 'opponent', filter: { name: 'Rockstar' } },
     });
     expect(g.isLegal({ type: 'optional', accept: true, player: 'p1' })).toBe(false);
+  });
+
+  it('is not offered when the Character is K.O.d in battle (only an opponent effect is replaced)', () => {
+    const g = game(
+      {
+        leader: RED_LEADER,
+        characters: [ID, { card: ROCKSTAR, rested: true }],
+        costArea: { active: 2, rested: 0 },
+      },
+      { leader: PLAIN_BLUE, characters: [V.c7] },
+      { turn: 4, activePlayer: 'p2' },
+    );
+    g.act({
+      type: 'attack',
+      attacker: g.find('p2', 'characters', V.c7),
+      target: g.find('p1', 'characters', ROCKSTAR),
+    });
+    passBlock(g);
+    endCounter(g);
+    expect(g.legal().some((a) => a.type === 'optional')).toBe(false);
+    expect(ids(g, 'p1', 'characters')).toEqual([ID]);
+    expect(trash(g, 'p1')).toEqual([ROCKSTAR]);
   });
 });

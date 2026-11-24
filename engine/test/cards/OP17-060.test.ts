@@ -1,6 +1,6 @@
 /** OP17-060 Ulti & Page One. */
 import { describe, expect, it } from 'vitest';
-import { don, game, KAIDO, pick, play, PLAIN_BLUE, V } from './helpers.ts';
+import { addMost, don, game, KAIDO, pick, PLAIN_BLUE, play, V } from './helpers.ts';
 
 describe('OP17-060 Ulti & Page One', () => {
   it('adds 1 active DON!!, then K.O.s a 3000-or-less Character', () => {
@@ -9,6 +9,7 @@ describe('OP17-060 Ulti & Page One', () => {
       { leader: PLAIN_BLUE, characters: [V.c1, V.c2] },
     );
     play(g, 'OP17-060');
+    addMost(g);
     expect(don(g, 'p1')).toMatchObject({ active: 1, deck: 3 });
     expect(
       g.isLegal({ type: 'pick', choice: g.find('p2', 'characters', V.c2), player: 'p1' }),

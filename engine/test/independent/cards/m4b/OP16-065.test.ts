@@ -38,6 +38,7 @@ import {
   side,
   VAN,
 } from './kit-d.ts';
+import { takeMost } from '../../helpers.ts';
 
 const SAKA = 'OP16-065';
 
@@ -116,6 +117,7 @@ describe('OP16-065 Sakazuki [Activate: Main] [Once Per Turn]: rest 1 DON!!: Navy
     const before = donOf(g, 'p1');
     activate(g, g.find('p1', 'characters', SAKA));
     payDon(g, 1);
+    takeMost(g);
     expect(donOf(g, 'p1')).toMatchObject({
       active: before.active - 1 + 2,
       rested: before.rested + 1,
@@ -127,6 +129,7 @@ describe('OP16-065 Sakazuki [Activate: Main] [Once Per Turn]: rest 1 DON!!: Navy
     const g = onField(LD.navy, { donDeck: 1, costArea: { active: 2, rested: 7 } });
     activate(g, g.find('p1', 'characters', SAKA));
     payDon(g, 1, 'costActive');
+    takeMost(g);
     expect(donOf(g, 'p1')).toMatchObject({ deck: 0 });
     expect(donOf(g, 'p1').active + donOf(g, 'p1').rested).toBe(10);
   });
@@ -147,6 +150,7 @@ describe('OP16-065 Sakazuki [Activate: Main] [Once Per Turn]: rest 1 DON!!: Navy
     const g = onField(LD.navy);
     activate(g, g.find('p1', 'characters', SAKA));
     payDon(g, 1);
+    takeMost(g);
     expect(kind(g)).toBe('main');
     expect(canActivate(g, g.find('p1', 'characters', SAKA))).toBe(false);
   });

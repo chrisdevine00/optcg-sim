@@ -29,6 +29,7 @@ import {
   unusable,
   yes,
 } from './kit-op17b.ts';
+import { takeMost } from '../../helpers.ts';
 
 const SASAKI = 'OP17-068';
 
@@ -49,6 +50,7 @@ describe('OP17-068 Sasaki: [When Attacking] trash 2: if the Leader is {Animal Ki
     need(g, 'optional', 'p1');
     yes(g);
     payHand(g, [SCN.c2, SCN.c3]);
+    takeMost(g);
     expect(don(g)).toMatchObject({ active: 3, rested: 2, deck: 5 });
     expect(trash(g)).toEqual([SCN.c2, SCN.c3].sort());
     expect(hand(g)).toEqual([BLUE]);
@@ -91,6 +93,7 @@ describe('OP17-068 Sasaki: [When Attacking] trash 2: if the Leader is {Animal Ki
     const g = attacking(LD.akp, [SCN.c2, SCN.c3]);
     yes(g);
     payHand(g, [SCN.c2, SCN.c3]);
+    takeMost(g);
     expect(hand(g)).toEqual([]);
     expect(don(g)).toMatchObject({ rested: 2 });
   });
@@ -99,6 +102,7 @@ describe('OP17-068 Sasaki: [When Attacking] trash 2: if the Leader is {Animal Ki
     const g = attacking(LD.akp, [SCN.c2, SCN.c3], 1);
     yes(g);
     payHand(g, [SCN.c2, SCN.c3]);
+    takeMost(g);
     expect(don(g)).toMatchObject({ rested: 1, deck: 0 });
   });
 
@@ -114,8 +118,7 @@ describe('OP17-068 Sasaki: [When Attacking] trash 2: if the Leader is {Animal Ki
     expect(hand(g)).toEqual([SCN.c2, SCN.c4].sort());
   });
 
-  // Known, deliberate engine-wide choice (OPEN-QUESTIONS E-Q11): "add up to N DON!!" is always taken in full.
-  it.fails('"up to 2": adding fewer DON!! (0 or 1) after paying is a reachable outcome', () => {
+  it('"up to 2": adding fewer DON!! (0 or 1) after paying is a reachable outcome', () => {
     const g = attacking(LD.akp, [SCN.c2, SCN.c3]);
     yes(g);
     payHand(g, [SCN.c2, SCN.c3]);

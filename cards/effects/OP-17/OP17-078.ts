@@ -44,6 +44,5 @@ export const OP17_078: CardScript = {
   ],
   rulings: [
     'DECISIONS 2026-11-09 B-1: an Event worded "You may <cost>:" asks the cost after the card is played and it may be declined',
-    'engine note E-Q11: "add up to 3 DON!!" always adds the full amount available',
   ],
 };

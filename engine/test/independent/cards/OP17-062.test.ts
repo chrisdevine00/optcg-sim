@@ -15,7 +15,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { type InstanceId, type PlayerSpec } from '@optcg/engine';
-import { act, attack, blockers, decision } from '../helpers.ts';
+import { act, attack, blockers, decision, takeMost } from '../helpers.ts';
 import {
   accept,
   AKP,
@@ -69,6 +69,7 @@ function kaidoAttacks(p1: Partial<PlayerSpec>) {
   accept(g);
   payDon(g, 1, 'costRested');
   resolveForP1(g, marco);
+  takeMost(g);
   return { g, marco };
 }
 

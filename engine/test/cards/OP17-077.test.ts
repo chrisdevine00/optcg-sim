@@ -2,13 +2,14 @@
 import { describe, expect, it } from 'vitest';
 import {
   accept,
+  addMost,
   don,
   game,
   KAIDO,
   passBlock,
   pick,
-  play,
   PLAIN_BLUE,
+  play,
   PURPLE,
   V,
 } from './helpers.ts';
@@ -22,6 +23,7 @@ describe('OP17-077 Kundali Dragon Swarm', () => {
     play(g, 'OP17-077');
     accept(g); // the "you may" activation cost (CR 8-3-1-4)
     pick(g, [g.find('p1', 'hand', PURPLE), g.find('p1', 'hand', V.c1)]);
+    addMost(g);
     expect(don(g, 'p1')).toMatchObject({ active: 0, rested: 7, deck: 3 });
   });
 

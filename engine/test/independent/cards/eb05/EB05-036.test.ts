@@ -74,7 +74,7 @@ describe('EB05-036 Tsuru [On Play]: Navy Leader: draw 1 and add up to 1 rested D
   });
 
   // DISAGREEMENT B-1: the engine always adds the DON!!; "up to 1" (RD 15) allows adding none.
-  it.fails('"up to 1": adding no DON!! is a reachable outcome', () => {
+  it('"up to 1": adding no DON!! is a reachable outcome', () => {
     const g = mine(LD.navy, {
       hand: [ID],
       deck: [CH.thatch, ...fill(BLUE, 14)],

@@ -115,6 +115,14 @@ export function option(g: TestGame, id: string): void {
   g.act({ type: 'pick', choice: { option: id } });
 }
 
+/** Answer "how many DON!! will you add (up to N)?" with the most (E-Q11), `times` times. */
+export function addMost(g: TestGame, times = 1): void {
+  for (let i = 0; i < times; i++) {
+    const d = expectDecision(g, 'choose');
+    option(g, d.options![0]!.id);
+  }
+}
+
 /** Answer a DON!! choice by taking cost-area DON!! (active first). */
 export function payDon(g: TestGame): void {
   while (

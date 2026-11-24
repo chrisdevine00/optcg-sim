@@ -1,6 +1,6 @@
 /** EB04-038 Rosinante & Law. */
 import { describe, expect, it } from 'vitest';
-import { BLUE, don, game, hand, play, PLAIN_BLUE } from './helpers.ts';
+import { addMost, BLUE, don, game, hand, PLAIN_BLUE, play } from './helpers.ts';
 import { LAW5, ROSI } from './helpers-hancock-rosi.ts';
 
 describe('EB04-038 Rosinante & Law', () => {
@@ -25,12 +25,14 @@ describe('EB04-038 Rosinante & Law', () => {
 
   it('[On Play] with no more DON!! than your opponent: draws 1, then adds 1 DON!! as active', () => {
     const g = start(6);
+    addMost(g);
     expect(hand(g, 'p1')).toEqual([BLUE]);
     expect(don(g, 'p1')).toMatchObject({ active: 1, rested: 6, deck: 3 });
   });
 
   it('applies when you have fewer', () => {
     const g = start(9);
+    addMost(g);
     expect(hand(g, 'p1')).toEqual([BLUE]);
     expect(don(g, 'p1').active).toBe(1);
   });

@@ -2,14 +2,15 @@
 import { describe, expect, it } from 'vitest';
 import {
   accept,
+  addMost,
   don,
   expectDecision,
   game,
   KAIDO,
   payDon,
   pick,
-  play,
   PLAIN_BLUE,
+  play,
   PURPLE,
   V,
 } from './helpers.ts';
@@ -28,6 +29,7 @@ describe('OP17-062 Kaido', () => {
     play(g, 'OP17-075');
     accept(g);
     payDon(g);
+    addMost(g);
     // 6 active − 2 (cost) − 2 returned + 1 added + 1 set active.
     expect(don(g, 'p1')).toMatchObject({ deck: 5, active: 4, rested: 1 });
     expect(g.card(g.find('p1', 'characters', 'OP17-062')).keywords).toContain('Blocker');

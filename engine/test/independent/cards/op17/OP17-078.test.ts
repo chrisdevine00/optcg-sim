@@ -38,6 +38,7 @@ import {
   unusable,
   yes,
 } from './kit-op17b.ts';
+import { takeMost } from '../../helpers.ts';
 
 const EVENT = 'OP17-078';
 
@@ -56,6 +57,7 @@ describe('OP17-078 Drunken Dragon Bagua [Main]', () => {
     need(g, 'optional', 'p1');
     yes(g);
     payHand(g, [SCN.c2, SCN.c3]);
+    takeMost(g);
     expect(atMain(g)).toBe(true);
     expect(don(g)).toMatchObject({ active: 0, rested: 7, deck: 3 });
     expect(trash(g)).toEqual([EVENT, SCN.c2, SCN.c3].sort());
@@ -115,11 +117,11 @@ describe('OP17-078 Drunken Dragon Bagua [Main]', () => {
     playCard(g, EVENT);
     yes(g);
     payHand(g, [SCN.c2, SCN.c3]);
+    takeMost(g);
     expect(don(g)).toMatchObject({ active: 4, rested: 6, deck: 0 });
   });
 
-  // Known, deliberate engine-wide choice (OPEN-QUESTIONS E-Q11): "add up to N DON!!" is always taken in full.
-  it.fails('"up to 3": adding fewer DON!! (0 to 2) after paying is a reachable outcome', () => {
+  it('"up to 3": adding fewer DON!! (0 to 2) after paying is a reachable outcome', () => {
     const g = main(LD.akp, [SCN.c2, SCN.c3]);
     playCard(g, EVENT);
     yes(g);

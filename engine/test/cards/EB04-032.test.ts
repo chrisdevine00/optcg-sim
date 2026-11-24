@@ -2,14 +2,15 @@
 import { describe, expect, it } from 'vitest';
 import {
   accept,
+  addMost,
   don,
   expectDecision,
   game,
   hand,
   KAIDO,
   pick,
-  play,
   PLAIN_BLUE,
+  play,
   PURPLE,
   V,
 } from './helpers.ts';
@@ -39,6 +40,7 @@ describe('EB04-032 Queen', () => {
       { leader: PLAIN_BLUE },
     );
     g.act({ type: 'activate', card: g.find('p1', 'characters', 'EB04-032'), ability: 'ramp' });
+    addMost(g);
     expect(don(g, 'p1')).toMatchObject({ active: 0, rested: 3, deck: 7 });
   });
 

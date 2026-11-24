@@ -1,6 +1,6 @@
 /** EB05-036 Tsuru. */
 import { describe, expect, it } from 'vitest';
-import { don, expectDecision, game, hand, play, PLAIN_BLUE } from './helpers.ts';
+import { addMost, don, expectDecision, game, hand, PLAIN_BLUE, play } from './helpers.ts';
 import { donArea } from './helpers-luffyace.ts';
 import { DONQ_LEADER, NAVY_LEADER } from './helpers-eb05g2.ts';
 
@@ -12,6 +12,7 @@ describe('EB05-036 Tsuru', () => {
   it('[On Play] with a {Navy} Leader: draws 1 and adds 1 DON!! as rested', () => {
     const g = start(NAVY_LEADER);
     play(g, TSURU);
+    addMost(g);
     expectDecision(g, 'main', 'p1');
     expect(hand(g, 'p1')).toHaveLength(1);
     expect(don(g, 'p1')).toMatchObject({ active: 0, rested: 5, deck: 5 });

@@ -79,4 +79,13 @@ describe('OP17-066 Kurozumi Orochi', () => {
     payDon(g);
     expect(hand(g, 'p1')).toEqual([V.c1]);
   });
+
+  it('a Character with a cost of 9 does not count (the threshold is 10, not 9)', () => {
+    const g = start(['OP01-070']); // Dracule Mihawk, cost 9
+    play(g, ID);
+    accept(g);
+    payDon(g);
+    expect(hand(g, 'p1')).toEqual([V.c1]);
+    expect(trash(g, 'p1')).toEqual([]);
+  });
 });

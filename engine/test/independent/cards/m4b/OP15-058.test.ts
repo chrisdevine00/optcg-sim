@@ -18,6 +18,7 @@ import { act } from '../../helpers.ts';
 import { activate, canActivate, donOf, kind, myTurn, outcomes } from '../kit.ts';
 import { newGame, startKeepingHands } from '../../setup-game.ts';
 import { C, drive, V, side, FILLER } from './kit-c.ts';
+import { takeMost } from '../../helpers.ts';
 
 function game(p1: Parameters<typeof side>[2] = {}) {
   return myTurn(
@@ -83,6 +84,8 @@ describe('OP15-058 Enel: [Activate: Main] on your second turn or later', () => {
   it('"up to 1" recipient: the give may be skipped (choose none); the added DON!! stay in the cost area', () => {
     const g = game({ characters: [V.sai] });
     activate(g, g.leader('p1'));
+    takeMost(g); // add up to 1 active
+    takeMost(g); // add up to 4 rested
     drive(g, 'p1', { option: '0' }); // the count is asked first: none
     expect(donOf(g, 'p1')).toMatchObject({ deck: 0, active: 2, rested: 4, given: 0 });
   });

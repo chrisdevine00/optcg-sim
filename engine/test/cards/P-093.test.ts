@@ -1,6 +1,6 @@
 /** P-093 Trafalgar Law. */
 import { describe, expect, it } from 'vitest';
-import { don, game, play, PLAIN_BLUE } from './helpers.ts';
+import { addMost, don, game, PLAIN_BLUE, play } from './helpers.ts';
 import { ROSI } from './helpers-hancock-rosi.ts';
 
 describe('P-093 Trafalgar Law', () => {
@@ -21,6 +21,7 @@ describe('P-093 Trafalgar Law', () => {
   it('[On Play] adds 1 rested DON!! when you have fewer DON!! on your field than your opponent', () => {
     // 4 DON!! paid for the card, so 4 rested remain on my field against 6.
     const g = start(4, 6);
+    addMost(g);
     expect(don(g, 'p1').deck).toBe(5);
     expect(don(g, 'p1').rested).toBe(5);
     expect(don(g, 'p1').active).toBe(0);
@@ -28,6 +29,7 @@ describe('P-093 Trafalgar Law', () => {
 
   it('adds when the counts are equal', () => {
     const g = start(4, 4);
+    addMost(g);
     expect(don(g, 'p1').deck).toBe(5);
     expect(don(g, 'p1').rested).toBe(5);
   });

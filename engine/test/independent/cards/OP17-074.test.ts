@@ -12,7 +12,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { type PlayerSpec } from '@optcg/engine';
-import { act, attack, blockers, isLegal, passCounter } from '../helpers.ts';
+import { act, attack, blockers, isLegal, passCounter, takeMost } from '../helpers.ts';
 import {
   accept,
   AKP,
@@ -39,6 +39,7 @@ function game(p1: Partial<PlayerSpec>, leader: string = LEAD.kaido) {
 function playYamato(g: TestGame): void {
   act(g, { type: 'playCard', card: g.find('p1', 'hand', AKP.yamato) });
   if (offered(g, 'p1')) accept(g); // "up to 1" asked as a yes/no
+  takeMost(g);
 }
 
 describe('OP17-074 Yamato: [Blocker]', () => {

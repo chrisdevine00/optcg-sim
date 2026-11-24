@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   accept,
+  addMost,
   don,
   endCounter,
   expectDecision,
@@ -17,6 +18,7 @@ describe('EB04-031 King', () => {
     const g = game({ leader: KAIDO, characters: ['EB04-031'] }, { leader: PLAIN_BLUE });
     const king = g.find('p1', 'characters', 'EB04-031');
     g.act({ type: 'activate', card: king, ability: 'ramp' });
+    addMost(g, 2);
     expect(don(g, 'p1')).toMatchObject({ active: 1, rested: 1, deck: 8 });
     expect(g.isLegal({ type: 'activate', card: king, ability: 'ramp', player: 'p1' })).toBe(false);
   });

@@ -1,6 +1,6 @@
 /** OP05-077 Gamma Knife. */
 import { describe, expect, it } from 'vitest';
-import { accept, decline, don, game, KAIDO, payDon, pick, play, V } from './helpers.ts';
+import { accept, addMost, decline, don, game, KAIDO, payDon, pick, play, V } from './helpers.ts';
 import { damageWithP2, PLAIN_BLUE } from './helpers-rgl-penel.ts';
 
 describe('OP05-077 Gamma Knife', () => {
@@ -43,6 +43,7 @@ describe('OP05-077 Gamma Knife', () => {
   it('[Trigger]: adds up to 1 DON!! card from the DON!! deck and sets it as active', () => {
     const g = damageWithP2('OP05-077', { donDeck: 10 });
     g.act({ type: 'trigger', activate: true });
+    addMost(g);
     expect(don(g, 'p1')).toMatchObject({ deck: 9, active: 1, rested: 0 });
   });
 });

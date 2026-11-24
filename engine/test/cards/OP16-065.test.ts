@@ -2,14 +2,15 @@
 import { describe, expect, it } from 'vitest';
 import {
   accept,
+  addMost,
   decline,
   don,
   expectDecision,
   game,
   payDon,
   pick,
-  play,
   PLAIN_BLUE,
+  play,
   V,
 } from './helpers.ts';
 import { ROSI } from './helpers-hancock-rosi.ts';
@@ -67,6 +68,7 @@ describe('OP16-065 Sakazuki', () => {
       const g = board(ROSI, 2);
       ramp(g);
       payDon(g);
+      addMost(g);
       expect(don(g, 'p1')).toMatchObject({ active: 3, rested: 1, deck: 6 });
       expect(g.legal().some((a) => a.type === 'activate' && a.ability === 'ramp')).toBe(false);
     });
@@ -75,6 +77,7 @@ describe('OP16-065 Sakazuki', () => {
       const g = board(ROSI, 9, 1);
       ramp(g);
       payDon(g);
+      addMost(g);
       expect(don(g, 'p1')).toMatchObject({ active: 9, rested: 1, deck: 0 });
     });
 

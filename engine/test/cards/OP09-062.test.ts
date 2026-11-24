@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   accept,
+  addMost,
   BLUE,
   decline,
   don,
@@ -32,6 +33,7 @@ describe('OP09-062 Nico Robin', () => {
     // Only the card with a [Trigger] can be paid.
     expect(g.legal().filter((a) => a.type === 'pick')).toHaveLength(1);
     pick(g, [g.find('p1', 'hand', TRIG)]);
+    addMost(g);
     expect(ids(g, 'p1', 'trash')).toEqual([TRIG]);
     expect(ids(g, 'p1', 'hand')).toEqual([BLUE]);
     expect(don(g, 'p1')).toMatchObject({ active: 3, rested: 3, deck: 4 });

@@ -31,6 +31,7 @@ import {
   VAN,
   YL,
 } from './kit-a.ts';
+import { takeMost } from '../../helpers.ts';
 
 const EVENT_TRIG = 'OP07-077';
 
@@ -51,6 +52,7 @@ describe('OP09-062 Nico Robin: [When Attacking] trash a [Trigger] card: add 1 DO
     expect(offered(g, 'p1')).toBe(true);
     accept(g);
     payWith(g, [g.find('p1', 'hand', SC.speed)]);
+    takeMost(g);
     expect(trash(g)).toEqual([SC.speed]);
     expect(hand(g)).toEqual([BLUE]);
     expect(don(g)).toMatchObject({ deck: 7, active: 2, rested: 1, given: 0 });

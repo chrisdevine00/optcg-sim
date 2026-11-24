@@ -12,7 +12,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { type PlayerSpec } from '@optcg/engine';
-import { act } from '../helpers.ts';
+import { act, takeMost } from '../helpers.ts';
 import {
   accept,
   AKP,
@@ -49,6 +49,7 @@ describe('OP17-073 Basil Hawkins: [On Play] you may trash 1 → +1 active DON!! 
     expect(offered(g, 'p1')).toBe(true);
     accept(g);
     payWith(g, [g.find('p1', 'hand', VAN.gordon)]);
+    takeMost(g);
     if (offered(g, 'p1')) accept(g); // "up to 1" asked as a yes/no
     expect(sortedIds(g, 'p1', 'trash')).toEqual([VAN.gordon]);
     expect(donOf(g, 'p1')).toMatchObject({ active: 1, rested: 3, deck: 6 });
@@ -59,6 +60,7 @@ describe('OP17-073 Basil Hawkins: [On Play] you may trash 1 → +1 active DON!! 
     playHawkins(g);
     accept(g);
     payWith(g, [g.find('p1', 'hand', VAN.gordon)]);
+    takeMost(g);
     if (offered(g, 'p1')) accept(g);
     act(g, { type: 'playCard', card: g.find('p1', 'hand', VAN.komachiyo) });
     expect(sortedIds(g, 'p1', 'characters')).toEqual([AKP.hawkins, VAN.komachiyo].sort());
@@ -95,6 +97,7 @@ describe('OP17-073 Basil Hawkins: [On Play] you may trash 1 → +1 active DON!! 
     expect(offered(g, 'p1')).toBe(true);
     accept(g);
     payWith(g, [g.find('p1', 'hand', VAN.gordon)]);
+    takeMost(g);
     if (offered(g, 'p1')) accept(g);
     expect(donOf(g, 'p1')).toMatchObject({ active: 7, rested: 3, deck: 0 });
     expect(sortedIds(g, 'p1', 'trash')).toEqual([VAN.gordon]);

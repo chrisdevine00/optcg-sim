@@ -1,6 +1,16 @@
 /** EB05-033 Nico Robin. */
 import { describe, expect, it } from 'vitest';
-import { don, expectDecision, game, hand, pick, play, PLAIN_BLUE, trash } from './helpers.ts';
+import {
+  addMost,
+  don,
+  expectDecision,
+  game,
+  hand,
+  pick,
+  PLAIN_BLUE,
+  play,
+  trash,
+} from './helpers.ts';
 import { DONQ_LEADER, SHC_LEADER } from './helpers-eb05g2.ts';
 
 const ROBIN = 'EB05-033';
@@ -23,6 +33,7 @@ describe('EB05-033 Nico Robin', () => {
         .slice(0, 2)
         .map((c) => c.instance),
     );
+    addMost(g);
     expect(trash(g, 'p1')).toHaveLength(2);
     expect(hand(g, 'p1')).toHaveLength(1);
     // 1 rested for Robin, then 4 more added rested

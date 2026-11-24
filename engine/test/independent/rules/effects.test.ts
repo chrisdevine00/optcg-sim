@@ -26,6 +26,7 @@ import {
   PURPLE,
   ROCKS,
   V,
+  addMost,
 } from '../../cards/helpers.ts';
 
 describe('effect rules (M4a)', () => {
@@ -219,6 +220,7 @@ describe('effect rules (M4a)', () => {
     passBlock(g);
     endCounter(g);
     g.act({ type: 'trigger', activate: true });
+    addMost(g);
     expect(g.zone('p1', 'trash').map((c) => c.card)).toEqual(['OP09-077']);
     expect(hand(g, 'p1')).toEqual([]);
   });
@@ -240,6 +242,7 @@ describe('effect rules (M4a)', () => {
     const g = game({ leader: KAIDO, characters: ['EB04-031'] }, { leader: PLAIN_BLUE });
     const king = g.find('p1', 'characters', 'EB04-031');
     g.act({ type: 'activate', card: king, ability: 'ramp' });
+    addMost(g, 2);
     expect(whyNot(g.state, 'p1', { type: 'activate', card: king, ability: 'ramp' })?.rule).toBe(
       'CR 10-2-13-1',
     );

@@ -1,6 +1,6 @@
 /** OP08-074 Black Maria. QA-OP08 OP08-074 (two rows). */
 import { describe, expect, it } from 'vitest';
-import { don, expectDecision, game, KAIDO, PLAIN_BLUE, pick, V } from './helpers.ts';
+import { addMost, don, expectDecision, game, KAIDO, pick, PLAIN_BLUE, V } from './helpers.ts';
 
 describe('OP08-074 Black Maria', () => {
   it("adds 5 rested DON!!; at the end of the turn returns DON!! down to the opponent's count", () => {
@@ -9,6 +9,7 @@ describe('OP08-074 Black Maria', () => {
       { leader: PLAIN_BLUE, costArea: { active: 4, rested: 0 } },
     );
     g.act({ type: 'activate', card: g.find('p1', 'characters', 'OP08-074'), ability: 'ramp' });
+    addMost(g);
     expect(don(g, 'p1')).toMatchObject({ active: 3, rested: 5, deck: 2 });
     g.act({ type: 'endTurn' });
     // 8 on the field vs 4: return 4, chosen by location (active and rested both hold DON!!).
@@ -31,6 +32,7 @@ describe('OP08-074 Black Maria', () => {
     );
     const bm = g.find('p1', 'characters', 'OP08-074');
     g.act({ type: 'activate', card: bm, ability: 'ramp' });
+    addMost(g);
     expect(don(g, 'p1').rested).toBe(5);
     // Play a sixth Character and trash Black Maria to make room (CR 3-7-6-1).
     g.act({ type: 'playCard', card: g.find('p1', 'hand', V.c2) });

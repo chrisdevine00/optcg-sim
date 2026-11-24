@@ -293,6 +293,8 @@ export interface Scratch {
   top?: boolean;
   /** `giveDon`: how many DON!! the player chose to give ("up to N" allows 0). */
   give?: number;
+  /** `addDon`: how many parts are done (an "up to" part asks its count first). */
+  add?: number;
 }
 
 /** An auto effect that has activated and waits to resolve (CR 8-6). */

@@ -1166,10 +1166,35 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
     return 'next';
   }
   if ('addDon' in a) {
-    // "Add up to N": as many as the DON!! deck holds (DECISIONS M4a: adding fewer is never asked).
+    // "Add N" adds exactly N (or what the DON!! deck holds). "Add up to N" (`upTo`) may add any
+    // number from 0 to N (CR 4-8-1, QA-GR): a count is asked, most first, as `giveDon` does
+    // (E-Q11, reopened by the OP-17 review). A multi-part add asks per part, in order.
     const ps = d.pl(you);
-    for (const part of a.addDon) {
-      const k = Math.min(part.n, ps.donDeck);
+    for (let i = f.tmp?.add ?? 0; i < a.addDon.length; i++) {
+      const part = a.addDon[i]!;
+      let k = Math.min(part.n, ps.donDeck);
+      if (part.upTo && k > 0) {
+        const got = take(f);
+        if (!Array.isArray(got)) {
+          const counts = Array.from({ length: k + 1 }, (_, j) => k - j);
+          return ask(d, f, {
+            kind: 'choose',
+            player: you,
+            prompt: `${nameOf(d, f)}: how many ${part.state} DON!! cards will you add (up to ${k})?`,
+            min: 1,
+            max: 1,
+            candidates: counts.map((j) => ({ option: String(j) })) as never,
+            picked: [],
+            role: 'mode',
+            options: counts.map((j) => ({
+              id: String(j),
+              label: j === 0 ? 'None' : `${j} DON!!`,
+            })),
+          });
+        }
+        k = Math.min(k, Math.max(0, Number((got[0] as { option: string }).option)));
+      }
+      f.tmp = { ...f.tmp, add: i + 1 };
       if (k <= 0) continue;
       ps.donDeck -= k;
       if (part.state === 'active') ps.donActive += k;

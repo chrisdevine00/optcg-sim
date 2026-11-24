@@ -25,6 +25,7 @@ import {
   side,
   theirTurn,
 } from './kit-d.ts';
+import { takeMost } from '../../helpers.ts';
 
 const LAW = 'P-093';
 
@@ -40,12 +41,14 @@ describe('P-093 Trafalgar Law [On Play]: DON!! on my field <= the opponent’s: 
     const g = game(4, 4);
     const before = donOf(g, 'p1').deck;
     playFromHand(g, LAW);
+    takeMost(g);
     expect(donOf(g, 'p1')).toMatchObject({ active: 0, rested: 5, deck: before - 1 });
   });
 
   it('fewer (4 vs 7): +1 DON!! rested', () => {
     const g = game(4, 7);
     playFromHand(g, LAW);
+    takeMost(g);
     expect(donOf(g, 'p1')).toMatchObject({ active: 0, rested: 5 });
   });
 
@@ -59,6 +62,7 @@ describe('P-093 Trafalgar Law [On Play]: DON!! on my field <= the opponent’s: 
   it('given DON!! on the opponent’s side count: 2 active + 2 given = 4 vs 4 is equal', () => {
     const g = game(4, 2, { leader: { card: LEAD.luffy, don: 2 } });
     playFromHand(g, LAW);
+    takeMost(g);
     expect(donOf(g, 'p1').rested).toBe(5);
   });
 

@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   accept,
+  addMost,
   BLUE,
   decline,
   don,
@@ -30,6 +31,7 @@ describe('OP17-068 Sasaki', () => {
     const g = attack(PLAIN_PURPLE, [BLUE, PURPLE, BLUE]);
     accept(g);
     pick(g, [g.find('p1', 'hand', PURPLE), g.find('p1', 'hand', BLUE, 0)]);
+    addMost(g);
     expect(trash(g, 'p1')).toHaveLength(2);
     expect(hand(g, 'p1')).toHaveLength(1);
     expect(don(g, 'p1')).toMatchObject({ active: 1, rested: 2, deck: 7 });

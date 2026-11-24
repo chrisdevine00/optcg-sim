@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   accept,
+  addMost,
   BLUE,
   decline,
   don,
@@ -12,9 +13,9 @@ import {
   passBlock,
   payDon,
   pick,
-  play,
   PLAIN_BLUE,
   PLAIN_PURPLE,
+  play,
   PURPLE,
   trash,
   V,
@@ -34,6 +35,7 @@ describe('OP17-078 Drunken Dragon Bagua', () => {
     accept(g);
     payDon(g);
     pick(g, [g.find('p1', 'hand', PURPLE), g.find('p1', 'hand', BLUE, 0)]);
+    addMost(g);
     expect(trash(g, 'p1')).toHaveLength(3); // the Event and 2 cards
     expect(hand(g, 'p1')).toHaveLength(1);
     // 2 rested to play the Event, 2 rested for the cost, 3 more added rested
