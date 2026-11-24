@@ -72,3 +72,14 @@ Author tests: 276 passed across the 14 `engine/test/cards/<ID>.test.ts` and the 
 - Random games: 2,000 (319,117 actions), 0 errors, 0 replay differences, 211,396 permutation checks, 0 differences; Pirate: 20 games, 0 errors, 0 fallbacks.
 - Targeted leak probes: 6 positions pairs (Lucy pre-fix, Buggy, Mihawk, Alvida, Jango, Lucy post-fix): leaks in 3 at the first merge, 2 after the second.
 - Mutations: 14 of 14 caught by author tests, 13 of 14 by independent tests.
+
+## Fix round (runbook step g)
+
+Script-only changes (no ENGINE_VERSION bump; goldens unchanged, full suite green). The sweep came from the new static check `cards/src/hidden-gate.ts` (`cards/test/hidden-gate.test.ts`, DECISIONS "Static hidden-gate check"), which found exactly these two gates in all scripts; its allowlist is empty.
+
+- **W3C-R1 (fixed, script):** OP16-041 Buggy now gates on `cmp [{ hand: 'you' }, '>=', 1]`; the pick is asked at max 0 when no [Prisoner] is held, and not at all with an empty hand. Author tests: the "nothing asked" assertion became "asked at max 0, answer none"; a planted two-position leak test (hands `[Prisoner]` against `[vanilla]`, same public state: `project` and `projectEvents` for the opponent are identical). The new tests fail with the old script (checked).
+- **W3C-R2 (fixed, script):** ST32-003 [On Play] keeps the public Leader condition and gates on hand size at least 1; the filtered pick is asked at max 0 when none is eligible. Author tests: "nothing asked with no eligible card" became "asked at max 0"; added an empty-hand test (nothing asked) and a two-position leak test (`[SLASH_2, SLASH_5]` against `[SLASH_6, STRIKE_3]`, identical opponent views). They fail with the old script (checked).
+- **W3C-R3:** closed on main (Lucy).
+- **W3C-R9 (kill test added):** independent `OP16-024.test.ts` now K.O.s Inazuma with its controller's own planted [Activate: Main] and asserts nothing is rested; with `koCause` mutated to `'effect'` it fails (checked, then restored).
+- No independent test needed editing for R1/R2 (none asserted the absence of the prompt).
+- R5, R6, R7, R8, R10: not touched here.

@@ -1,5 +1,6 @@
 /** ST32-003 Dracule Mihawk. */
 import { describe, expect, it } from 'vitest';
+import { project, projectEvents } from '../../src/index.ts';
 import { withAbilities, type Ability } from '../../src/testing.ts';
 import {
   BLUE,
@@ -203,5 +204,21 @@ describe('ST32-003 Dracule Mihawk', () => {
       play(g, ID);
       expectDecision(g, 'main', 'p1');
     });
+  });
+
+  it('leak test (ADR 0005, W3C-R2): same public state, hands differ only in eligibility: the opponent sees the same view and events', () => {
+    const seen = (handCards: string[]) => {
+      const g = game(
+        {
+          leader: EAST_BLUE_SLASH_LEADER,
+          hand: [ID, ...handCards],
+          costArea: { active: 10, rested: 0 },
+        },
+        { leader: PLAIN_BLUE },
+      );
+      play(g, ID);
+      return JSON.stringify([project(g.state, 'p2'), projectEvents(g.events, 'p2')]);
+    };
+    expect(seen([SLASH_2, SLASH_5])).toEqual(seen([SLASH_6, STRIKE_3]));
   });
 });
