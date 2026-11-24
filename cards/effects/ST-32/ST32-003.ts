@@ -32,19 +32,8 @@ export const ST32_003: CardScript = {
           if: {
             all: [
               { leader: { attribute: 'Slash' } },
-              {
-                exists: {
-                  from: 'hand',
-                  owner: 'you',
-                  filter: {
-                    all: [
-                      { category: ['Character'] },
-                      { cost: { lte: 5 } },
-                      { any: [{ name: 'Perona' }, { attribute: 'Slash' }] },
-                    ],
-                  },
-                },
-              },
+              // Public hand size only; the pick is asked at max 0 (ADR 0005, hidden-gate check).
+              { cmp: [{ hand: 'you' }, '>=', 1] },
             ],
           },
           then: [

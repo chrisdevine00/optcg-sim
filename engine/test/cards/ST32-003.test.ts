@@ -189,8 +189,17 @@ describe('ST32-003 Dracule Mihawk', () => {
       expect(g.zone('p1', 'characters').map((c) => c.card)).toEqual([ID]);
     });
 
-    it('with no eligible card in hand nothing is asked', () => {
+    it('no leak (ADR 0005): with no eligible card but a non-empty hand the pick is asked at max 0', () => {
       const g = start(EAST_BLUE_SLASH_LEADER, [SLASH_6, STRIKE_3]);
+      play(g, ID);
+      expect(expectDecision(g, 'choose', 'p1')).toMatchObject({ min: 0, max: 0 });
+      expect(canPick(g, g.find('p1', 'hand', SLASH_6))).toBe(false);
+      none(g);
+      expectDecision(g, 'main', 'p1');
+    });
+
+    it('an empty hand (a public fact) asks nothing', () => {
+      const g = start(EAST_BLUE_SLASH_LEADER, []);
       play(g, ID);
       expectDecision(g, 'main', 'p1');
     });
