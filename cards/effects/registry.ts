@@ -260,6 +260,7 @@ export const SCRIPTED_ID_LIST: readonly string[] = [
   'OP16-020',
   'OP16-021',
   'OP16-022',
+  'OP16-024',
   'OP16-025',
   'OP16-026',
   'OP16-027',

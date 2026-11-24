@@ -7,7 +7,7 @@ import { withAbilities, type Ability } from '../../src/testing.ts';
 import { dec, endCounter, game, passBlock, PLAIN_BLUE, PLAIN_PURPLE, V } from './helpers.ts';
 import type { TestGame } from '../fixtures/index.ts';
 
-/** OP15-002 Lucy Leader ({Revolutionary Army} {Dressrosa}); unscripted, inert. */
+/** OP15-002 Lucy Leader (scripted after wave 3; tests that need an inert Leader decline its choices). */
 export const LUCY = 'OP15-002';
 /** OP15-039 Rebecca Leader ({Dressrosa}, not named Lucy); unscripted, inert. */
 export const DRESSROSA_LEADER = 'OP15-039';

@@ -62,9 +62,12 @@ function unitFor(ab: Ability, units: string[]): string | undefined {
     const re = TIMING_TAG[first];
     // "[Once Per Turn] This effect can be activated when your opponent attacks." is the printed form
     // of an [On Your Opponent's Attack] ability on some cards (OP16-048): no tag, only the window.
+    // Likewise "When this Character is K.O.'d by your opponent's effect, ..." is an [On K.O.]
+    // narrowed by cause (wave 3 `koCause`), printed with no tag (OP16-024).
     const printedWindow = (u: string) =>
-      first === 'onOpponentAttack' &&
-      /^\[Once Per Turn\]\s*This effect can be activated when your opponent attacks/.test(u);
+      (first === 'onOpponentAttack' &&
+        /^\[Once Per Turn\]\s*This effect can be activated when your opponent attacks/.test(u)) ||
+      (first === 'onKO' && /^When this Character is K\.O\.'d\b/.test(u));
     return re && units.find((u) => re.test(lead(u)) || printedWindow(u));
   }
   // An event-worded auto ("When your Leader ... attacks"): a unit that starts with no header tag
