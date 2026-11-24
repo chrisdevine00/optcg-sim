@@ -18,7 +18,7 @@ import {
   rest,
   ruleProcessing,
 } from './ops/index.ts';
-import type { Duration, ModKind, State } from './state.ts';
+import type { Duration, ModKind, Modifier, State } from './state.ts';
 import { other } from './state.ts';
 
 export type { Ability, InternalStep } from './abilities.ts';
@@ -54,6 +54,8 @@ export interface ModSpec {
   target: InstanceId;
   amount?: number;
   keyword?: string;
+  /** For the scoped restrictions (`cannotBeKOd`, `cannotBeRested`), see `Modifier.scope`. */
+  scope?: Modifier['scope'];
   duration: Duration;
   controller: PlayerId;
   source?: InstanceId | null;
@@ -124,6 +126,7 @@ export function applyOp(state: GameState, op: TestOp): Step {
         target: op.mod.target,
         amount: op.mod.amount ?? 0,
         keyword: op.mod.keyword,
+        ...(op.mod.scope ? { scope: op.mod.scope } : {}),
         duration: op.mod.duration,
         controller: op.mod.controller,
         source: op.mod.source ?? null,

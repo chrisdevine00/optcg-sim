@@ -24,7 +24,9 @@ import {
 } from '../ops/index.ts';
 import type { Dest, Restriction } from '@optcg/cards';
 import { other, type DecisionState, type Duration, type Frame, type Got } from '../state.ts';
+import { restBlocked } from '../derive.ts';
 import { program, type Instr } from './compile.ts';
+import { restrictionMod } from './layers.ts';
 import {
   allHold,
   cannotDrawByEffect,
@@ -153,7 +155,13 @@ export function runEffect(d: Draft, f: EffectFrame): void {
 export function costText(costs: readonly Cost[] | undefined): string {
   const words = (costs ?? []).map((k) => {
     if ('donMinus' in k) return `DON!! −${k.donMinus}`;
-    if ('returnDon' in k) return `return ${k.returnDon} DON!!`;
+    if ('returnDon' in k)
+      return typeof k.returnDon === 'number'
+        ? `return ${k.returnDon} DON!!`
+        : `return ${k.returnDon.n} active DON!!`;
+    if ('giveDon' in k) return `give ${k.giveDon.n} active DON!!`;
+    if ('ko' in k) return 'K.O. 1 of your Characters';
+    if ('turnLifeFaceDown' in k) return `turn ${k.turnLifeFaceDown} of your Life cards face-down`;
     if ('restDon' in k) return `rest ${String(k.restDon)} DON!!`;
     if ('trash' in k || 'reveal' in k) {
       const sel = 'trash' in k ? k.trash : k.reveal;
@@ -165,6 +173,7 @@ export function costText(costs: readonly Cost[] | undefined): string {
           : f && 'type' in f
             ? ` {${f.type}}`
             : '';
+      if ('trash' in k && !hiddenPool(sel)) return `trash ${n} of your Characters${what}`;
       return `${'trash' in k ? 'trash' : 'reveal'} ${n} card${n === 1 ? '' : 's'}${what} from your hand`;
     }
     if ('restSelf' in k) return 'rest this card';
@@ -459,19 +468,48 @@ function describe(sel: Selector, mine: boolean): string {
 function payCost(d: Draft, f: EffectFrame, k: Cost, reserve: number): Out {
   const c = ctxOf(d, f);
   if ('donMinus' in k) return returnDon(d, f, k.donMinus, reserve, 'cost');
-  if ('returnDon' in k) return returnDon(d, f, k.returnDon, reserve, 'cost');
+  if ('returnDon' in k) {
+    // The object form returns active cost-area DON!! only (G9).
+    if (typeof k.returnDon !== 'number')
+      return returnDon(d, f, k.returnDon.n, reserve, 'cost', true);
+    return returnDon(d, f, k.returnDon, reserve, 'cost');
+  }
   if ('restDon' in k) {
     const n = k.restDon === 'any' ? 0 : k.restDon;
     if (d.ro(f.controller).donActive < n) return anomaly(d, f, 'restDon');
     payDon(d, f.controller, n);
     return 'next';
   }
+  if ('giveDon' in k) {
+    // "Give N active DON!! cards to your Leader or 1 of your Characters" (G7): the DON!! leave the
+    // cost area for the card and return at the next Refresh Phase like any given DON!! (CR 6-2-3).
+    const g = k.giveDon;
+    if (d.ro(f.controller).donActive - reserve < g.n) return anomaly(d, f, 'giveDon');
+    const ids = select(d, f, g.to, { role: 'cost', verb: 'give DON!! to' });
+    if (ids === WAIT) return WAIT;
+    const id = ids[0];
+    if (id === undefined) return anomaly(d, f, 'giveDon');
+    d.pl(f.controller).donActive -= g.n;
+    d.wcard(id).don += g.n;
+    d.emit({
+      type: 'DonGiven',
+      player: f.controller,
+      target: id,
+      card: d.card(id).card,
+      count: g.n,
+      rested: false,
+      by: 'cost',
+    });
+    return 'next';
+  }
   if ('trash' in k) {
+    if (!hiddenPool(k.trash)) return fieldCost(d, f, k.trash, { remove: 'trash' });
     const ids = select(d, f, k.trash, { role: 'cost', verb: 'trash' });
     if (ids === WAIT) return WAIT;
     for (const id of ids) moveCard(d, id, 'trash', { revealed: true, extra: { reason: 'cost' } });
     return 'next';
   }
+  if ('ko' in k) return fieldCost(d, f, k.ko, { ko: true });
   if ('reveal' in k) {
     const ids = select(d, f, k.reveal, { role: 'cost', verb: 'reveal' });
     if (ids === WAIT) return WAIT;
@@ -505,6 +543,20 @@ function payCost(d: Draft, f: EffectFrame, k: Cost, reserve: number): Out {
     }
     return 'next';
   }
+  if ('turnLifeFaceDown' in k) {
+    // The top N Life cards, all face-up, go face-down (G8). A fresh key: the card is hidden again,
+    // and nothing the viewers saw while it was face-up links to it (CR 3-2-6-1 areas).
+    const ids = d.ro(f.controller).life.slice(0, k.turnLifeFaceDown);
+    if (ids.length < k.turnLifeFaceDown || ids.some((id) => !d.card(id).faceUp))
+      return anomaly(d, f, 'turnLifeFaceDown');
+    for (const id of ids) {
+      const w = d.wcard(id);
+      w.faceUp = false;
+      w.key = d.newKey();
+    }
+    d.emit({ type: 'LifeTurnedFaceDown', player: f.controller, count: ids.length });
+    return 'next';
+  }
   if ('mill' in k) {
     if (d.ro(f.controller).deck.length < k.mill) return anomaly(d, f, 'mill');
     for (let i = 0; i < k.mill; i++)
@@ -522,6 +574,13 @@ function payCost(d: Draft, f: EffectFrame, k: Cost, reserve: number): Out {
     return 'next';
   }
   if ('move' in k) {
+    // Your own Character or Stage to your hand, the deck or the trash (G1): a removal with the
+    // cause `cost`, so replacements and last-known information see it.
+    if (onFieldZones(k.move))
+      return fieldCost(d, f, k.move, {
+        remove: k.to.zone as 'hand' | 'deck' | 'trash',
+        ...(k.to.zone === 'deck' ? { position: k.to.position === 'top' ? 'top' : 'bottom' } : {}),
+      } as FieldCostHow);
     const ids = select(d, f, k.move, { role: 'cost', verb: 'move' });
     if (ids === WAIT) return WAIT;
     placeCards(d, ids, k.to, 'cost');
@@ -529,6 +588,55 @@ function payCost(d: Draft, f: EffectFrame, k: Cost, reserve: number): Out {
   }
   void c;
   return anomaly(d, f, Object.keys(k)[0] ?? 'cost');
+}
+
+type FieldCostHow =
+  { ko: true } | { remove: 'hand' | 'deck' | 'trash'; position?: 'top' | 'bottom' };
+
+/** Does the selector read only Characters and Stage (a cost paid from the field)? */
+function onFieldZones(sel: Selector): boolean {
+  const zones = Array.isArray(sel.from) ? sel.from : [sel.from];
+  return zones.every((z) => z === 'characters' || z === 'stage');
+}
+
+/** The `ph` marker of a field cost whose removal frames have been pushed (see `fieldCost`). */
+const FIELD_COST_PUSHED = 90;
+
+/**
+ * A cost that takes one of your own Characters or Stage off the field: trash, return to hand, the
+ * deck, or a K.O. (M6b wave 1 G1). Each card goes through a `ko` or `remove` frame with the cause
+ * `cost`, so a K.O. cost fires [On K.O.], a removal watcher sees it, replacements and last-known
+ * information apply, and its given DON!! return. The frames run before the paying ability resumes
+ * on this same instruction, which then checks that every chosen card left the field: a card that
+ * "cannot be K.O.'d by effects" or whose K.O. was replaced did not pay (RL-16, CR 8-3-1-3), so the
+ * effect after the colon does not resolve. Earlier costs stay paid, as in the official ruling.
+ */
+function fieldCost(d: Draft, f: EffectFrame, sel: Selector, how: FieldCostHow): Out {
+  if (f.ph === FIELD_COST_PUSHED) {
+    const chosen = f.tmp?.sel ?? [];
+    if (chosen.every((id) => !d.s.cards[id])) return 'next';
+    d.emit({
+      type: 'EffectDeclined',
+      player: f.controller,
+      instance: f.card,
+      card: f.cardId,
+      ability: f.ability,
+      reason: 'costNotPaid',
+    });
+    return 'stop';
+  }
+  const ids = select(d, f, sel, { role: 'cost', verb: 'ko' in how ? 'K.O.' : 'move' });
+  if (ids === WAIT) return WAIT;
+  if (ids.length === 0) return anomaly(d, f, 'field cost');
+  const group = ids.length > 1 ? d.s.nextMod++ : undefined;
+  for (const id of ids.slice().reverse()) {
+    const cause = { kind: 'cost', by: f.controller } as const;
+    if ('ko' in how) pushKo(d, id, cause, group);
+    else pushRemove(d, id, how.remove, cause, how.position, group);
+  }
+  f.ph = FIELD_COST_PUSHED;
+  f.tmp = { ...f.tmp, sel: ids };
+  return 'jump';
 }
 
 /** "Add N cards from the top (or top or bottom) of your Life cards to your hand" (CR 8-3-1; not damage). */
@@ -633,7 +741,10 @@ function selectRest(
   const g = take(f);
   if (Array.isArray(g)) return split(g);
   const cards = pool(c, { ...sel, from: zones.filter((z) => z !== 'donCostArea') as never }).filter(
-    (id) => !d.card(id).rested,
+    // A card that cannot be rested cannot pay a rest cost (rules-digest 57).
+    (id) =>
+      !d.card(id).rested &&
+      (role !== 'cost' || !restBlocked(dvOf(c, id), d.card(id).owner, 'cost')),
   );
   const don = withDon
     ? Math.max(0, d.ro(donOwner).donActive - (donOwner === f.controller ? reserve : 0))
@@ -681,6 +792,8 @@ function returnDon(
   n: number,
   reserve: number,
   role: 'cost' | 'target',
+  /** Only active cost-area DON!! may go ("return 2 of your active DON!! cards", G9). */
+  activeOnly = false,
 ): Out {
   if (n <= 0) return 'next';
   const p = f.controller;
@@ -699,9 +812,11 @@ function returnDon(
       }
     };
     add({ from: 'costActive' }, ps.donActive - reserve);
-    add({ from: 'costRested' }, ps.donRested);
-    for (const id of [ps.leader, ...ps.characters].slice().sort())
-      add({ from: 'given', card: id }, d.card(id).don);
+    if (!activeOnly) {
+      add({ from: 'costRested' }, ps.donRested);
+      for (const id of [ps.leader, ...ps.characters].slice().sort())
+        add({ from: 'given', card: id }, d.card(id).don);
+    }
     const total = counts.reduce((a, b) => a + b, 0);
     if (total < n) return anomaly(d, f, 'DON!! −');
     if (classes.length === 1 || total === n) {
@@ -755,14 +870,6 @@ function duration(d: Draft, f: EffectFrame, du: DslDuration): Duration {
 
 const FIELD = new Set(['leader', 'characters', 'stage']);
 
-const RESTRICT_KIND = {
-  cannotAttack: 'cannotAttack',
-  cannotActivateBlockerAgainstIt: 'noBlocker',
-  cannotBeRemovedByOpponentEffects: 'cannotBeRemoved',
-  cannotBeKOd: 'cannotBeKOd',
-  cannotDrawByOwnEffects: undefined,
-} as const;
-
 function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
   const c = ctxOf(d, f);
   const you = f.controller;
@@ -773,6 +880,17 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
     // makes for themselves; a rule draw (the Draw Phase) is not an effect.
     if (who === you && cannotDrawByEffect(d.s, you)) return 'next';
     draw(d, who, num(c, a.draw));
+    return 'next';
+  }
+  if ('mill' in a) {
+    // "Trash N cards from the top of your (opponent's) deck" (G4): as many as the deck holds, face
+    // up. The cards leave one at a time, so a deck emptied by it is a defeat at once (RL-26,
+    // CR 9-1-2): milling does not wait for a later draw. The cost form needs all N (CR 8-3-1-3).
+    const who = rel(c, a.mill.player);
+    const k = Math.min(Math.max(0, num(c, a.mill.n)), d.ro(who).deck.length);
+    for (let i = 0; i < k; i++)
+      moveCard(d, d.ro(who).deck[0]!, 'trash', { revealed: true, extra: { reason: 'effect' } });
+    if (k > 0) f.acted = true;
     return 'next';
   }
   if ('trashFromHand' in a) {
@@ -844,7 +962,7 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
       // Cards and DON!! together; DON!! rest by class (E-D4). Only active DON!! can be rested.
       const got = selectRest(d, f, a.rest, 'target');
       if (got === WAIT) return WAIT;
-      for (const id of got.ids) if (FIELD.has(d.card(id).zone)) rest(d, id, 'effect');
+      for (const id of got.ids) if (FIELD.has(d.card(id).zone)) rest(d, id, 'effect', you);
       if (got.don > 0) {
         const p = rel(c, a.rest.owner === 'opponent' ? 'opponent' : 'you');
         const k = Math.min(got.don, d.ro(p).donActive);
@@ -854,7 +972,8 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
     }
     const ids = select(d, f, a.rest, { role: 'target', verb: 'rest' });
     if (ids === WAIT) return WAIT;
-    for (const id of ids) if (FIELD.has(d.card(id).zone) && rest(d, id, 'effect')) f.acted = true;
+    for (const id of ids)
+      if (FIELD.has(d.card(id).zone) && rest(d, id, 'effect', you)) f.acted = true;
     return 'next';
   }
   if ('skipRefresh' in a) {
@@ -874,6 +993,7 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
     return 'next';
   }
   if ('cost' in a) {
+    if (a.cost.duration === 'battle' && !d.s.battle) return 'next'; // see `restrict` below
     const ids = select(d, f, a.cost.target, { role: 'target', verb: 'choose' });
     if (ids === WAIT) return WAIT;
     const du = duration(d, f, a.cost.duration);
@@ -961,11 +1081,14 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
       };
       if (what === 'cannotDrawByOwnEffects')
         addModifier(d, { ...base, kind: 'cannotDraw', amount: 0 });
-      else if (typeof what === 'object')
+      else if (typeof what === 'object' && 'cannotPlay' in what)
         addModifier(d, { ...base, kind: 'cannotPlay', amount: 0, filter: what.cannotPlay });
-      else return unsupported(d, f, `restriction ${what} on a player`);
+      else return unsupported(d, f, `restriction ${JSON.stringify(what)} on a player`);
       return 'next';
     }
+    // "During this battle" with no battle going on (a [Counter] effect activated from a [Trigger]
+    // by effect damage, G5) has nothing to last through: it does nothing, and nothing is chosen.
+    if (spec.duration === 'battle' && !d.s.battle) return 'next';
     const ids = select(d, f, spec.target, { role: 'target', verb: 'choose' });
     if (ids === WAIT) return WAIT;
     const du = duration(d, f, spec.duration);
@@ -980,9 +1103,14 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
       else if ('negate' in a) addModifier(d, { ...base, kind: 'negate', amount: 0 });
       else {
         const what = (a as { restrict: { what: Restriction } }).restrict.what;
-        const kind = typeof what === 'string' ? RESTRICT_KIND[what] : undefined;
-        if (!kind) return unsupported(d, f, `restriction ${JSON.stringify(what)}`);
-        addModifier(d, { ...base, kind, amount: 0 });
+        const spec = restrictionMod(what);
+        if (!spec) return unsupported(d, f, `restriction ${JSON.stringify(what)}`);
+        addModifier(d, {
+          ...base,
+          kind: spec.kind,
+          amount: 0,
+          ...(spec.scope ? { scope: spec.scope } : {}),
+        });
       }
     }
     return 'next';
@@ -1023,9 +1151,19 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
       if (onPlay) pushEffect(d, f.card, f.cardId, onPlay, you, 'effect');
       return 'next';
     }
-    const main = def.abilities.find((x) => hasTiming(x, 'main'));
-    if (main && main.kind === 'activate' && payable(c, main.cost))
-      pushEffect(d, f.card, f.cardId, main, you, 'effect');
+    if (a.activate.ability === 'onKO') {
+      // "[Trigger] Activate this card's [On K.O.] effect" (G5): like [On Play], its conditions are
+      // checked when it resolves and an optional or costed one is asked first.
+      const onKO = def.abilities.find((x) => x.kind === 'auto' && x.when.includes('onKO'));
+      if (onKO) pushEffect(d, f.card, f.cardId, onKO, you, 'effect');
+      return 'next';
+    }
+    // "Activate this card's [Counter] effect" (G5) and "[Main]": the effect's own activation cost
+    // must still be paid (rules-digest 105), so an unpayable one does not activate.
+    const timing = a.activate.ability === 'counter' ? 'counter' : 'main';
+    const own = def.abilities.find((x) => hasTiming(x, timing));
+    if (own && own.kind === 'activate' && payable(c, own.cost))
+      pushEffect(d, f.card, f.cardId, own, you, 'effect');
     return 'next';
   }
   if ('select' in a) {

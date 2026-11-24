@@ -89,7 +89,19 @@ export function modifierWords(e: GameEvent): string {
     case 'skipRefresh':
       return 'stays rested next Refresh Phase';
     case 'cannotBeKOd':
-      return 'cannot be K.O.’d';
+      return e.scope === 'effect'
+        ? 'cannot be K.O.’d by effects'
+        : e.scope === 'opponentEffect'
+          ? 'cannot be K.O.’d by opponent’s effects'
+          : e.scope === 'battle'
+            ? 'cannot be K.O.’d in battle'
+            : 'cannot be K.O.’d';
+    case 'cannotBeRested':
+      return e.scope === 'opponentEffect'
+        ? 'cannot be rested by opponent’s effects'
+        : 'cannot be rested';
+    case 'cannotBlock':
+      return 'cannot activate [Blocker]';
     case 'noBlocker':
       return 'cannot be blocked by [Blocker]';
     case 'cannotBeRemoved':
@@ -216,7 +228,13 @@ export function describeMove(
                   : `${name(e.card)} trashed`,
             );
           else if (c.kind === 'cost' && typeof e.card === 'string')
-            bits.push(`Trash ${name(e.card)} (cost)`);
+            bits.push(
+              to === 'hand'
+                ? `Return ${name(e.card)} to hand (cost)`
+                : to === 'deck'
+                  ? `Place ${name(e.card)} in the deck (cost)`
+                  : `Trash ${name(e.card)} (cost)`,
+            );
         } else if (
           from === 'hand' &&
           to === 'trash' &&
@@ -271,6 +289,9 @@ export function describeMove(
           bits.push(`Turn ${whose(ctx.names, p!)} Life card face-up: ${name(e.card)}`);
         else if (e.reason && e.reason !== 'play' && typeof e.card === 'string')
           bits.push(`Reveal ${name(e.card)}${e.reason === 'cost' ? ' (cost)' : ''}`);
+        break;
+      case 'LifeTurnedFaceDown':
+        bits.push(`Turn ${String(e.count)} of ${whose(ctx.names, p!)} Life cards face-down`);
         break;
       case 'CardsLooked':
         bits.push(
@@ -473,8 +494,13 @@ export function scriptCostText(costs: readonly Cost[] | undefined): string {
       if ('trash' in k || 'reveal' in k) {
         const sel = 'trash' in k ? k.trash : k.reveal;
         const n = sel.pick && 'exactly' in sel.pick ? sel.pick.exactly : 1;
-        return `${'trash' in k ? 'trash' : 'reveal'} ${n} from hand`;
+        const zones = Array.isArray(sel.from) ? sel.from : [sel.from];
+        const where = zones.includes('hand') ? 'from hand' : 'of your Characters';
+        return `${'trash' in k ? 'trash' : 'reveal'} ${n} ${where}`;
       }
+      if ('ko' in k) return 'K.O. 1 of your Characters';
+      if ('giveDon' in k) return `give ${k.giveDon.n} active DON!!`;
+      if ('turnLifeFaceDown' in k) return `turn ${k.turnLifeFaceDown} Life face-down`;
       if ('restSelf' in k) return 'rest this card';
       if ('trashSelf' in k) return 'trash this card';
       return '';

@@ -406,7 +406,7 @@ export function scanAbility(
           // Only the attack-side restrictions are neutral: a barred Counter or Event play is not.
           const what = (body as { what?: unknown }).what;
           if (typeof what !== 'string') ok = false;
-          else if (what === 'cannotActivateBlockerAgainstIt')
+          else if (what === 'cannotActivateBlockerAgainstIt' || what === 'cannotActivateBlocker')
             sc.blockerLoss += k * pickCount((body as { target?: unknown }).target);
         } else if (op === 'negate' || op === 'setBasePower') {
           // Aimed only at the other player's Characters: no effect on their Leader's power or on a hit.
@@ -438,7 +438,10 @@ export function scanAbility(
       else if (k === 'setBasePower') ok = false;
       else if (k === 'restrict') {
         if (typeof (v as { what?: unknown }).what !== 'string') ok = false;
-        else if ((v as { what?: unknown }).what === 'cannotActivateBlockerAgainstIt')
+        else if (
+          (v as { what?: unknown }).what === 'cannotActivateBlockerAgainstIt' ||
+          (v as { what?: unknown }).what === 'cannotActivateBlocker'
+        )
           sc.blockerLoss = Infinity;
       } else if (!['cost', 'playCost', 'counter', 'grant', 'lockAttackTarget'].includes(k))
         ok = false;

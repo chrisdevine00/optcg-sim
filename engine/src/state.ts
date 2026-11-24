@@ -113,6 +113,10 @@ export type ModKind =
   | 'basePower'
   | 'grant'
   | 'cannotBeKOd'
+  /** "cannot be rested" (rules-digest 57): it cannot attack, block, pay a rest cost or be rested. */
+  | 'cannotBeRested'
+  /** This card cannot activate [Blocker] (the blocking side, M6b wave 1 G10). */
+  | 'cannotBlock'
   /** "cannot attack" (OP17-054, OP17-065). */
   | 'cannotAttack'
   /** "negate the effect of" (CR 8-2): the card's abilities and keyword effects do nothing. */
@@ -140,6 +144,11 @@ export interface Modifier {
   keyword?: string;
   /** For `cannotPlay` and `playCost`: which cards. */
   filter?: Filter;
+  /**
+   * For `cannotBeKOd` (`effect`, `opponentEffect`, `battle`) and `cannotBeRested`
+   * (`opponentEffect`): what the restriction covers. Absent: everything (M6b wave 1 G2, G6).
+   */
+  scope?: 'effect' | 'opponentEffect' | 'battle';
   /** For `playCost`: plays it may still change the cost of. */
   uses?: number;
   duration: Duration;

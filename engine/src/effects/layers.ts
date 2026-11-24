@@ -9,11 +9,11 @@
  * +3000 power" sees the +12 cost effects, and "base power becomes 8000 for a Character with 4000
  * base power" sees the printed value. A source with its effects negated (CR 8-2) produces nothing.
  */
-import type { Continuous, Selector } from '@optcg/cards';
+import type { Continuous, Restriction, Selector } from '@optcg/cards';
 import type { InstanceId } from '../api.ts';
 import { deriveAt, type LayerMemo } from '../derive.ts';
 import type { Ability } from '../abilities.ts';
-import { PLAYERS, type Modifier, type State } from '../state.ts';
+import { PLAYERS, type ModKind, type Modifier, type State } from '../state.ts';
 import { allHold, holds, num, pool, type Ctx } from './eval.ts';
 
 type Permanent = Extract<Ability, { kind: 'permanent' }>;
@@ -31,7 +31,25 @@ const RESTRICT_KIND = {
   cannotBeKOd: 'cannotBeKOd',
   cannotBeRemovedByOpponentEffects: 'cannotBeRemoved',
   cannotActivateBlockerAgainstIt: 'noBlocker',
+  cannotBeRested: 'cannotBeRested',
+  cannotActivateBlocker: 'cannotBlock',
 } as const;
+
+/**
+ * The modifier a card restriction makes (permanent and timed alike): its kind and, for the scoped
+ * forms, what it covers. Undefined for a restriction that is not on cards (a player's draw, play).
+ */
+export function restrictionMod(
+  what: Restriction,
+): { kind: ModKind; scope?: NonNullable<Modifier['scope']> } | undefined {
+  if (typeof what === 'string') {
+    const kind = (RESTRICT_KIND as Record<string, ModKind | undefined>)[what];
+    return kind ? { kind } : undefined;
+  }
+  if ('cannotBeKOd' in what) return { kind: 'cannotBeKOd', scope: what.cannotBeKOd.cause };
+  if ('cannotBeRested' in what) return { kind: 'cannotBeRested', scope: what.cannotBeRested.by };
+  return undefined;
+}
 
 /** The applies of an ability that hold now: `tiers` entries are cumulative (OP15-092). */
 function flatten(c: Ctx, apply: readonly Continuous[], out: Continuous[] = []): Continuous[] {
@@ -52,9 +70,7 @@ function stageOfApply(ap: Continuous): number {
   if ('grant' in ap) return STAGE_OF.grant!;
   if ('restrict' in ap) {
     const { target, what } = ap.restrict;
-    return isSel(target) && typeof what === 'string' && what in RESTRICT_KIND
-      ? STAGE_OF.restrict!
-      : 0;
+    return isSel(target) && restrictionMod(what) ? STAGE_OF.restrict! : 0;
   }
   return 0;
 }
@@ -150,10 +166,16 @@ export function computePerms(
           } else if ('restrict' in ap) {
             if (stage !== STAGE_OF.restrict) continue;
             const { target, what } = ap.restrict;
-            if (!isSel(target) || typeof what !== 'string') continue;
-            const kind = RESTRICT_KIND[what as keyof typeof RESTRICT_KIND];
-            if (!kind) continue;
-            for (const id of pool(c, target)) add({ ...base, kind, target: id, amount: 0 });
+            const spec = restrictionMod(what);
+            if (!isSel(target) || !spec) continue;
+            for (const id of pool(c, target))
+              add({
+                ...base,
+                kind: spec.kind,
+                target: id,
+                amount: 0,
+                ...(spec.scope ? { scope: spec.scope } : {}),
+              });
           }
         }
       }

@@ -12,7 +12,7 @@
  * `validateScript` rejects anything the runtime does not implement, so a script can never silently
  * do nothing (see `IMPLEMENTED` in `dsl-validate.ts`).
  */
-import type { CardCategory, Color, Keyword } from './schema.ts';
+import type { Attribute, CardCategory, Color, Keyword } from './schema.ts';
 
 export type { Keyword };
 /** Relative players: `you` controls the ability's source; `opponent` is the other player. */
@@ -209,6 +209,8 @@ export type Filter =
   /** An exact card name (CR 2-1-2). */
   | { name: string }
   | { color: Color }
+  /** A printed attribute: "Characters with the <Slash> attribute" (M6b wave 1, G3). */
+  | { attribute: Attribute }
   | { multicolor: true }
   | { hasTrigger: boolean }
   | { keyword: Keyword }
@@ -234,9 +236,21 @@ export type Cost =
   | { trashSelf: true }
   | { lifeToHand: { from: 'top' | 'topOrBottom'; n: number } }
   | { turnLifeFaceUp: number }
+  /** "Turn N of your Life cards face-down": the top N, which must be face-up (G8). */
+  | { turnLifeFaceDown: number }
   | { mill: number }
-  /** Replacement payloads: "return 1 DON!! card from your field to your DON!! deck instead". */
-  | { returnDon: number }
+  /**
+   * Replacement payloads: "return 1 DON!! card from your field to your DON!! deck instead". The
+   * object form returns active cost-area DON!! only: "return 2 of your active DON!! cards" (G9).
+   */
+  | { returnDon: number | { n: number; state: 'active' } }
+  /** "Give N active DON!! cards to your Leader or 1 of your Characters" as a cost (G7). */
+  | { giveDon: { n: number; state: 'active'; to: Selector } }
+  /**
+   * "K.O. 1 of your Characters": a cost that is a real K.O. of one of your own Characters (G1).
+   * It is part of the effect (CR 8-1-1), so "cannot be K.O.'d by effects" stops it (RL-16).
+   */
+  | { ko: Selector }
   | { move: Selector; to: Dest };
 
 export type Duration =
@@ -272,7 +286,8 @@ export interface Take {
 export type Action =
   | { draw: Num; player?: P; upTo?: true }
   | { trashFromHand: Selector }
-  | { mill: { player: P; n: number } }
+  /** Trash the top n cards of a deck, as many as it holds (G4). */
+  | { mill: { player: P; n: Num } }
   | {
       lookAtTop: {
         n: number;
@@ -299,15 +314,30 @@ export type Action =
   | { grant: { target: Selector; keyword: Keyword; duration: Duration } }
   | { negate: { target: Selector; duration: Duration } }
   | { restrict: { target: Selector | P; what: Restriction; duration: Duration } }
-  | { activate: { ability: 'main' | 'onPlay'; of: 'self' } }
+  | { activate: { ability: 'main' | 'onPlay' | 'onKO' | 'counter'; of: 'self' } }
   | { select: Selector };
+
+/** Which K.O.s a scoped `cannotBeKOd` stops (RL-14); a cost counts as an effect (RL-16). */
+export type KOCause = 'effect' | 'opponentEffect' | 'battle';
 
 export type Restriction =
   | 'cannotAttack'
   | 'cannotActivateBlockerAgainstIt'
   | 'cannotDrawByOwnEffects'
   | 'cannotBeRemovedByOpponentEffects'
+  /** Cannot be K.O.'d at all: by effects and in battle (RL-14). */
   | 'cannotBeKOd'
+  /** "Cannot be K.O.'d by effects" / "by your opponent's effects" / "in battle" (G6). */
+  | { cannotBeKOd: { cause: KOCause } }
+  /**
+   * "Cannot be rested": it cannot attack, activate [Blocker], pay a rest cost or be rested by any
+   * effect (rules-digest 57, G2).
+   */
+  | 'cannotBeRested'
+  /** "Cannot be rested by your opponent's effects": costs, rule rests and your own effects pass. */
+  | { cannotBeRested: { by: 'opponentEffect' } }
+  /** This card cannot activate [Blocker] (the blocking side, G10). */
+  | 'cannotActivateBlocker'
   | { cannotPlay: Filter };
 
 export type Continuous =

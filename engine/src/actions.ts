@@ -220,6 +220,11 @@ export function check(s: State, player: PlayerId, a: Intent | null): Reason | nu
       if (a.blocker === b.target)
         return r("The card being attacked can't use its own [Blocker].", 'CR 10-1-4-1');
       if (c.rested) return r("A rested card can't block.", 'CR 10-1-4-1');
+      // Blocking rests the blocker, so a card that cannot be rested cannot block (rules-digest 57).
+      if (derive(s, a.blocker).cannotBeRested)
+        return r('An effect says this card cannot be rested, so it cannot block.', 'QA-GR');
+      if (derive(s, a.blocker).cannotBlock)
+        return r('An effect says this card cannot activate [Blocker].', 'CR 1-3-3');
       if (derive(s, b.attacker).keywords.includes('Unblockable'))
         return r('This attacker has [Unblockable]: [Blocker] cannot be activated.', 'CR 10-1-7-1');
       if (derive(s, b.attacker).noBlocker)
@@ -309,6 +314,9 @@ function checkAttack(
   if (a.rested) return r('Rested cards cannot attack.', 'CR 7-1-1-1');
   const dv = derive(s, attacker);
   if (dv.cannotAttack) return r('An effect says this card cannot attack.', 'CR 1-3-3');
+  // Attacking rests the attacker, so a card that cannot be rested cannot attack (rules-digest 57).
+  if (dv.cannotBeRested)
+    return r('An effect says this card cannot be rested, so it cannot attack.', 'QA-GR');
   const kw = dv.keywords;
   const isSick = sick(s, attacker);
   if (isSick && !kw.includes('Rush') && !kw.includes('Rush: Character'))

@@ -59,7 +59,10 @@ describe('meta-list cards (PLAN M1 done criteria)', () => {
   // lists them for the next scripting batch instead of failing here.
   const ids = metaIds(
     JSON.parse(
-      readFileSync(new URL('../../ai/test/fixtures/meta-lists.pinned.json', import.meta.url), 'utf8'),
+      readFileSync(
+        new URL('../../ai/test/fixtures/meta-lists.pinned.json', import.meta.url),
+        'utf8',
+      ),
     ),
   );
 

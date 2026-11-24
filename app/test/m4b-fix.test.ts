@@ -25,6 +25,8 @@ describe('every modifier kind has words (review M4b-12)', () => {
     basePower: true,
     grant: true,
     cannotBeKOd: true,
+    cannotBeRested: true,
+    cannotBlock: true,
     cannotAttack: true,
     negate: true,
     noBlocker: true,
