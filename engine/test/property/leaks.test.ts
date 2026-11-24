@@ -35,7 +35,8 @@ import {
   type PlayerId,
 } from '../../src/index.ts';
 import { CARD_FIELDS, INSTANCE_ID_ANYWHERE } from '../../src/draft.ts';
-import { canSee } from '../../src/project.ts';
+import type { ZoneName } from '../../src/api.ts';
+import { canSee, viewOrder } from '../../src/project.ts';
 import { internals, withAbilities } from '../../src/testing.ts';
 import type { State } from '../../src/state.ts';
 import { cards } from '../fixtures/index.ts';
@@ -123,14 +124,8 @@ export function leakGame(
 function hiddenFrom(s: State, viewer: PlayerId): string[] {
   const top = s.stack[s.stack.length - 1];
   const pending = top?.f === 'damage' ? top.pending : null;
-  // A card whose play is in progress was revealed when it was paid for (CR 2-7-2); both players
-  // know it, though it is still in hand until placed (M4a-06).
-  const playing = new Set(s.stack.flatMap((f) => (f.f === 'play' ? [f.card] : [])));
   return Object.keys(s.cards).filter(
-    (id) =>
-      !canSee(s, id, viewer) &&
-      !playing.has(id) &&
-      !(id === pending && s.cards[id]!.owner === viewer),
+    (id) => !canSee(s, id, viewer) && !(id === pending && s.cards[id]!.owner === viewer),
   );
 }
 
@@ -281,10 +276,8 @@ describe.each([false, true])(
                 const view = project(g, v);
                 for (const p of PLAYERS) {
                   for (const [zone, list] of Object.entries(view.zones[p])) {
-                    const ids =
-                      zone === 'leader'
-                        ? [s.players[p].leader]
-                        : ((s.players[p] as unknown as Record<string, string[]>)[zone] ?? []);
+                    // The view lists the other player's hand with a card being played first.
+                    const ids = viewOrder(s, v, p, zone as ZoneName).ids;
                     list.forEach((vc, i) => {
                       const id = ids[i];
                       if (!id) return;
