@@ -22,7 +22,14 @@
 import type { CardId, CardLookup, GameState, InstanceId, PlayerId } from './api.ts';
 import { DefTable } from './defs.ts';
 import { INSTANCE_ID } from './draft.ts';
-import { canSee, GENERIC_PROMPT, handleFor, project, type ProjectedView } from './project.ts';
+import {
+  canSee,
+  GENERIC_PROMPT,
+  handleFor,
+  project,
+  viewOrder,
+  type ProjectedView,
+} from './project.ts';
 import { seedRng } from './rng.ts';
 import { other, PLAYERS, type State } from './state.ts';
 
@@ -51,7 +58,7 @@ const ANY_ID = /\$[a-z0-9]{7}/g;
 const HIDDEN_REF = '$hidden0';
 
 /**
- * Cards the viewer can identify: in an open area, looked at or known (`canSee`), being played (a
+ * Cards the viewer can identify: in an open area, looked at, known, or being played (all `canSee`; a
  * card is revealed when it is paid for, CR 2-7-2), or the viewer's own Life card on a damage
  * decision (they decide on it).
  */
@@ -59,7 +66,6 @@ export function seenBy(s: State, viewer: PlayerId): Set<InstanceId> {
   const out = new Set<InstanceId>();
   for (const id of Object.keys(s.cards)) if (canSee(s, id, viewer)) out.add(id);
   for (const f of s.stack) {
-    if (f.f === 'play') out.add(f.card);
     if (f.f === 'damage' && f.pending && s.cards[f.pending]?.owner === viewer) out.add(f.pending);
   }
   return out;
@@ -83,10 +89,9 @@ export function skeletonOf(s: State, viewer: PlayerId): Skeleton {
     else hidden[cid] = `${p}.${zone}.${i}`;
   };
   for (const p of PLAYERS) {
-    const ps = s.players[p];
     for (const zone of ZONE_ORDER) {
-      const list = zone === 'leader' ? [ps.leader] : ps[zone];
-      list.forEach((id, i) => assign(id, p, zone, i));
+      const { ids: list, lead } = viewOrder(s, viewer, p, zone);
+      list.forEach((id, i) => assign(id, p, zone, i - lead));
     }
   }
   s.resolving.forEach((id, i) => assign(id, s.cards[id]!.owner, 'resolving', i));
@@ -168,7 +173,7 @@ export function skeletonOf(s: State, viewer: PlayerId): Skeleton {
     players[p] = {
       ...ps,
       deck: zone(ps.deck),
-      hand: zone(ps.hand),
+      hand: zone(viewOrder(s, viewer, p, 'hand').ids as InstanceId[]),
       life: zone(ps.life),
       leader: ids.get(ps.leader)!,
       characters: zone(ps.characters),
