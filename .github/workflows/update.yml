@@ -54,7 +54,9 @@ jobs:
           key: meta-${{ github.run_id }}
           restore-keys: meta-
       - run: npm run meta:update -- --refresh --write --report "$RUNNER_TEMP/body.md"
+      # The scripting backlog is ordered by play frequency: re-measure with the new weights.
+      - run: npm run cards:measure
       - name: Open or update the PR
         env:
           GH_TOKEN: ${{ github.token }}
-        run: bash scripts/update-pr.sh update/meta "Meta update" "$RUNNER_TEMP/body.md" docs/research/meta-lists.json cards/data/play-frequency.json
+        run: bash scripts/update-pr.sh update/meta "Meta update" "$RUNNER_TEMP/body.md" docs/research/meta-lists.json cards/data/play-frequency.json cards/data/coverage-report.json
