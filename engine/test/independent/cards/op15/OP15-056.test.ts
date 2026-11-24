@@ -63,6 +63,7 @@ describe('OP15-056 Would You Let Me Eat the Flame-Flame Fruit?: [Main] draw 2, t
   it('control: without the Event the same attack deals 1 damage', () => {
     const g = mine(LD15.lucy, { hand: [EVENT], deck: DRAW });
     attack(g, g.leader('p1'), g.leader('p2'));
+    g.act({ type: 'done' }); // OP15-002 Lucy [When Attacking]: trash none of the Event cards in hand
     noDefence(g);
     expect(g.life('p2')).toBe(3);
   });

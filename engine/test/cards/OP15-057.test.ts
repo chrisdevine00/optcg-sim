@@ -18,6 +18,7 @@ import {
   EVENT,
   EVENT2,
   idsOf,
+  DRESSROSA_LEADER,
   LUCY,
   mine,
   oppAttack,
@@ -42,7 +43,7 @@ describe('OP15-057 Dressrosa Kingdom', () => {
   });
 
   const attacked = (handCards: string[], stage: string | { card: string; rested: boolean } = ID) =>
-    oppAttack({ leader: LUCY, stage, hand: handCards });
+    oppAttack({ leader: DRESSROSA_LEADER, stage, hand: handCards });
 
   it("[On Your Opponent's Attack] rest this Stage and trash an Event or Stage from hand: +2000 power to a Leader or Character this battle", () => {
     const g = attacked([EVENT, V.c1]);
@@ -83,7 +84,7 @@ describe('OP15-057 Dressrosa Kingdom', () => {
   });
 
   it('a Character may receive the +2000 instead of the Leader', () => {
-    const g = oppAttack({ leader: LUCY, stage: ID, hand: [EVENT], characters: [V.c1] });
+    const g = oppAttack({ leader: DRESSROSA_LEADER, stage: ID, hand: [EVENT], characters: [V.c1] });
     accept(g);
     pick(g, [g.find('p1', 'hand', EVENT)]);
     pick(g, [g.find('p1', 'characters', V.c1)]);

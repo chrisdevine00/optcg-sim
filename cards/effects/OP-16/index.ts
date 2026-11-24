@@ -35,6 +35,7 @@ import { OP16_037 } from './OP16-037.ts';
 import { OP16_038 } from './OP16-038.ts';
 import { OP16_039 } from './OP16-039.ts';
 import { OP16_040 } from './OP16-040.ts';
+import { OP16_041 } from './OP16-041.ts';
 import { OP16_042 } from './OP16-042.ts';
 import { OP16_043 } from './OP16-043.ts';
 import { OP16_044 } from './OP16-044.ts';
@@ -64,6 +65,7 @@ import { OP16_070 } from './OP16-070.ts';
 import { OP16_071 } from './OP16-071.ts';
 import { OP16_072 } from './OP16-072.ts';
 import { OP16_073 } from './OP16-073.ts';
+import { OP16_074 } from './OP16-074.ts';
 import { OP16_075 } from './OP16-075.ts';
 import { OP16_076 } from './OP16-076.ts';
 import { OP16_077 } from './OP16-077.ts';
@@ -85,6 +87,7 @@ import { OP16_096 } from './OP16-096.ts';
 import { OP16_097 } from './OP16-097.ts';
 import { OP16_098 } from './OP16-098.ts';
 import { OP16_099 } from './OP16-099.ts';
+import { OP16_100 } from './OP16-100.ts';
 import { OP16_101 } from './OP16-101.ts';
 import { OP16_102 } from './OP16-102.ts';
 import { OP16_103 } from './OP16-103.ts';
@@ -140,6 +143,7 @@ const SET: readonly CardScript[] = [
   OP16_038,
   OP16_039,
   OP16_040,
+  OP16_041,
   OP16_042,
   OP16_043,
   OP16_044,
@@ -169,6 +173,7 @@ const SET: readonly CardScript[] = [
   OP16_071,
   OP16_072,
   OP16_073,
+  OP16_074,
   OP16_075,
   OP16_076,
   OP16_077,
@@ -190,6 +195,7 @@ const SET: readonly CardScript[] = [
   OP16_097,
   OP16_098,
   OP16_099,
+  OP16_100,
   OP16_101,
   OP16_102,
   OP16_103,
