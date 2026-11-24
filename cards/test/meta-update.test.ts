@@ -4,6 +4,7 @@
  * decklist shape the live API returned on 2026-11-23.
  */
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import metaJson from '../../docs/research/meta-lists.json';
@@ -12,12 +13,14 @@ import {
   cardIdOf,
   DEFAULTS,
   deckOf,
+  enrichFrequency,
   frequency,
   pickLists,
   report,
   standardProblem,
   tally,
   type EventData,
+  type FrequencyFile,
   type LimitlessStanding,
   type MetaFile,
   type MetaList,
@@ -181,10 +184,34 @@ describe('meta:update counting', () => {
   it('top 8 per Leader, and the share of all counted decks', () => {
     expect(t.leaders.get('OP17-039')).toMatchObject({ decks: 4, top8: 3 });
     expect(t.leaders.get(kaido[0]!.leader)).toMatchObject({ decks: 2, top8: 2 });
-    const f = frequency(t, OPTS, '2026-11-23');
+    const f = frequency(t, OPTS, '2026-11-23', snapshot);
     expect(f.leaders[0]).toEqual({ id: 'OP17-039', decks: 4, top8: 3, share: 66.7 });
     expect(f.cards.find((c) => c.id === 'OP17-040')).toMatchObject({ decks: 4 });
     expect(f.cards[0]!.decks).toBeGreaterThanOrEqual(f.cards.at(-1)!.decks);
+  });
+
+  it('the play-frequency table carries colours, category and Standard status (M6b-7)', () => {
+    const f = frequency(t, OPTS, '2026-11-23', snapshot);
+    for (const row of f.cards) {
+      const c = snapshot.get(row.id)!;
+      expect(row.colors).toEqual(c.colors);
+      expect(row.category).toBe(c.category);
+      expect(row.standard).toBe(c.legality.standard.status);
+    }
+    // Every Standard-usable Leader of the snapshot has its colours, played or not.
+    expect(f.leaderColors!['OP09-081']).toEqual(snapshot.get('OP09-081')!.colors);
+    for (const id of Object.keys(f.leaderColors!)) {
+      expect(snapshot.get(id)!.category).toBe('Leader');
+      expect(['legal', 'restricted']).toContain(snapshot.get(id)!.legality.standard.status);
+    }
+  });
+
+  it('the committed play-frequency file is the enriched table of the snapshot', () => {
+    const file = JSON.parse(
+      readFileSync(join(ROOT, 'cards/data/play-frequency.json'), 'utf8'),
+    ) as FrequencyFile;
+    expect(enrichFrequency(file, snapshot)).toEqual(file);
+    expect(file.cards.every((r) => r.colors && r.category && r.standard)).toBe(true);
   });
 
   it('picks the best-placed lists, one per event first', () => {

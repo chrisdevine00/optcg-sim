@@ -21,7 +21,13 @@ export function counterExtras(
   cards: ReadonlyMap<string, Card>,
   defenderDon = 10,
 ): { rests: boolean; draws: boolean } {
-  const b = defenceBound(priorCardIds(leader), cards, defenderDon, FALLBACK_COUNTER);
+  const b = defenceBound(
+    priorCardIds(leader),
+    cards,
+    defenderDon,
+    FALLBACK_COUNTER,
+    !!priorFor(leader).synthetic,
+  );
   return { rests: b.rests, draws: b.draws };
 }
 
@@ -68,6 +74,7 @@ export function theyCouldHave(
   }
   const leader = z.leader[0]?.card ?? '';
   const prior = leader ? priorFor(leader) : null;
+  const synthetic = !!prior?.synthetic;
   // One model with `public` lethal: the most one hidden card adds, given the DON!! on their field.
   const dn = view.don[defender];
   const bound = defenceBound(
@@ -75,6 +82,7 @@ export function theyCouldHave(
     cards,
     dn.active + dn.rested + dn.given,
     FALLBACK_COUNTER,
+    synthetic,
   );
   const perCard = bound.perCard;
   const hand = z.hand.length;
@@ -84,7 +92,7 @@ export function theyCouldHave(
     hand,
     perCard,
     total: hand * perCard,
-    assumed: !prior,
+    assumed: !prior || synthetic,
     extras: prior ? { rests: bound.rests, draws: bound.draws } : { rests: false, draws: false },
   };
 }

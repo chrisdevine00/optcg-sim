@@ -9,7 +9,7 @@
  * English, or a source gap); a decklist is skipped when it breaks the current Standard list (banned,
  * rotated, over a restricted limit).
  */
-import type { Card } from '../src/schema.ts';
+import type { Card, CardCategory, Color, Legality } from '../src/schema.ts';
 
 /** `GET /tournaments?game=OP` entry. */
 export interface LimitlessTournament {
@@ -351,30 +351,92 @@ export function candidate(
   };
 }
 
+/** One row of the play-frequency table. The card fields come from the snapshot (M6b-7). */
+export interface FrequencyCard {
+  id: string;
+  decks: number;
+  copies: number;
+  share: number;
+  /** Printed colours, so the AI can fit a card to a Leader (CR 5-1-2-2) without card data loaded. */
+  colors?: Color[];
+  category?: CardCategory;
+  /** Standard status now; the AI's synthetic prior keeps `legal` and `restricted` only. */
+  standard?: Legality['status'];
+  /** Copy limit when restricted. */
+  limit?: number;
+}
+
 export interface FrequencyFile {
   asOf: string;
   window: { from: string; to: string };
   events: number;
   decks: number;
   /** Sorted by decks, then copies. `share` is the percent of counted decks that run the card. */
-  cards: { id: string; decks: number; copies: number; share: number }[];
+  cards: FrequencyCard[];
   leaders: { id: string; decks: number; top8: number; share: number }[];
+  /**
+   * Colours of every Standard-usable Leader in the snapshot (not only the played ones), so the AI
+   * can build a prior for a Leader nobody played in the window.
+   */
+  leaderColors?: Record<string, Color[]>;
 }
 
-export function frequency(t: Tally, opts: Options, today: string): FrequencyFile {
-  const pct = (n: number) => round1((n / (t.decks || 1)) * 100);
+/**
+ * Add the snapshot's colours, category and Standard status to each card row, and the colours of
+ * every Standard-usable Leader. Pure: the same snapshot gives the same file, so a one-off run over
+ * an older table and `meta:update` agree.
+ */
+export function enrichFrequency(
+  f: FrequencyFile,
+  catalog: ReadonlyMap<string, Card>,
+): FrequencyFile {
+  const leaderColors: Record<string, Color[]> = {};
+  for (const c of [...catalog.values()].sort((a, b) => a.id.localeCompare(b.id)))
+    if (
+      c.category === 'Leader' &&
+      (c.legality.standard.status === 'legal' || c.legality.standard.status === 'restricted')
+    )
+      leaderColors[c.id] = [...c.colors];
   return {
-    asOf: today,
-    window: { from: opts.from, to: opts.to },
-    events: t.events.length,
-    decks: t.decks,
-    cards: [...t.cards]
-      .map(([id, c]) => ({ id, ...c, share: pct(c.decks) }))
-      .sort((a, b) => b.decks - a.decks || b.copies - a.copies || a.id.localeCompare(b.id)),
-    leaders: [...t.leaders]
-      .map(([id, l]) => ({ id, decks: l.decks, top8: l.top8, share: pct(l.decks) }))
-      .sort((a, b) => b.top8 - a.top8 || b.decks - a.decks || a.id.localeCompare(b.id)),
+    ...f,
+    cards: f.cards.map((row) => {
+      const c = catalog.get(row.id);
+      if (!c) return row;
+      const { colors: _c, category: _k, standard: _s, limit: _l, ...base } = row;
+      return {
+        ...base,
+        colors: [...c.colors],
+        category: c.category,
+        standard: c.legality.standard.status,
+        ...(c.legality.standard.limit !== undefined ? { limit: c.legality.standard.limit } : {}),
+      };
+    }),
+    leaderColors,
   };
+}
+
+export function frequency(
+  t: Tally,
+  opts: Options,
+  today: string,
+  catalog: ReadonlyMap<string, Card>,
+): FrequencyFile {
+  const pct = (n: number) => round1((n / (t.decks || 1)) * 100);
+  return enrichFrequency(
+    {
+      asOf: today,
+      window: { from: opts.from, to: opts.to },
+      events: t.events.length,
+      decks: t.decks,
+      cards: [...t.cards]
+        .map(([id, c]) => ({ id, ...c, share: pct(c.decks) }))
+        .sort((a, b) => b.decks - a.decks || b.copies - a.copies || a.id.localeCompare(b.id)),
+      leaders: [...t.leaders]
+        .map(([id, l]) => ({ id, decks: l.decks, top8: l.top8, share: pct(l.decks) }))
+        .sort((a, b) => b.top8 - a.top8 || b.decks - a.decks || a.id.localeCompare(b.id)),
+    },
+    catalog,
+  );
 }
 
 /** Days between two ISO dates. */
