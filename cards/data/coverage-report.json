@@ -48,7 +48,7 @@
   {"block":5,"category":"Character","id":"OP17-103","legality":"legal","set":"OP-17","status":"unscripted","tags":["move","play","powerMod","timing:onPlay"],"untagged":0,"weight":256},
   {"block":5,"category":"Character","id":"OP17-104","legality":"legal","set":"OP-17","status":"unscripted","tags":["cost:restDon","move","play","timing:onPlay"],"untagged":0,"weight":199},
   {"block":5,"category":"Character","id":"OP17-031","legality":"legal","set":"OP-17","status":"unscripted","tags":["draw","rest","setActive","timing:endOfYourTurn","timing:onPlay"],"untagged":0,"weight":127},
-  {"block":5,"category":"Character","id":"OP17-027","legality":"legal","set":"OP-17","status":"unscripted","tags":["draw","rest","timing:onPlay"],"untagged":1,"weight":123},
+  {"block":5,"category":"Character","id":"OP17-027","legality":"legal","set":"OP-17","status":"unscripted","tags":["draw","rest","timing:onPlay"],"untagged":0,"weight":123},
   {"block":5,"category":"Character","id":"OP17-032","legality":"legal","set":"OP-17","status":"unscripted","tags":["lookAtTop","timing:onPlay"],"untagged":0,"weight":110},
   {"block":5,"category":"Character","id":"OP17-029","legality":"legal","set":"OP-17","status":"unscripted","tags":["rest","setActive","timing:onPlay"],"untagged":0,"weight":94},
   {"block":5,"category":"Character","id":"OP17-033","legality":"legal","set":"OP-17","status":"unscripted","tags":["cost:trashSelf","lookAtTop","rest","timing:onOpponentAttack","timing:onPlay"],"untagged":0,"weight":85},
@@ -1946,6 +1946,6 @@
    ]
   }
  },
- "tagger": {"cards":2860,"cardsWithText":2571,"clauseTagRate":97.75,"clauses":4185,"clausesTagged":4091},
+ "tagger": {"cards":2860,"cardsWithText":2571,"clauseTagRate":97.78,"clauses":4184,"clausesTagged":4091},
  "weightSource": "play-frequency.json (copies; leaders by decks)"
 }

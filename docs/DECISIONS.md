@@ -2,6 +2,17 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-24 — M6b-2 wave 2: ten more engine gaps (ENGINE_VERSION 0.5.6)
+
+Wave 2 of `docs/research/m6b-runtime-audit.md` §4 (D4 and G11 to G19), built by an agent in a worktree and merged after a full suite run (5,733 unit, 234 e2e); detail and revert results in `docs/research/m6b-wave2.md`; planted tests in `engine/test/cards/m6b-w2/`, each seen to fail with its implementation broken. Goldens re-recorded for the bump; hashes identical.
+
+- **Damage replacement (D4, EB05-052 and Gloriosa's shape)** covers the whole damage, offered before any Life card moves (a Double Attack's two cards are one damage), and is offered at 0 Life too, else the card is useless when it matters. A damage frame at 0 Life is pushed only when the defender has a possible replacement, so every other game runs exactly as before. Rejected: per Life card; only while Life remains; always pushing the frame (golden churn). M6b-Q8 stays open.
+- **K.O. and leave-field causes:** `effect` includes costs (RL-16), `opponentEffect` excludes your own costs (RL-14), `any` covers only removals that go through the engine's frames (rule moves such as making room are never replaced).
+- **Deck-building clauses** (`anyNumberInDeck`, `deckRestriction`) are checked in the single validator `deckIssues`, read from the loaded script or, before scripts load (the deck builder), a static `DECK_RULES` table; a test loads every script and checks the table agrees. Rejected: loading every script in the builder (bundle budget).
+- **`oneOf` cost:** the choice comes first, each alternative is its own list of payments (so later DON!! needs are reserved correctly); refused when nested, in a replacement, or more than once per list.
+- **giveDon each:** "up to N targets, up to M each" gives the full M to each chosen target.
+- Also: `nameIncludes`, distinct-name counts, lookAtTop take to play (through the normal play frames), K.O. on a Stage. Deferred: one Once Per Turn covering two events (OP13-046), the AI deck generator reading deck clauses. Open questions M6b-Q5, Q8, Q9, Q36 left open.
+
 ## 2026-11-24 — The Standard pool verified against Limitless (keyword-only cards play fully)
 
 The EB-05 review (EB05-R6) and the independent testers found that unverified cards which print a keyword (for example [Blocker] on ST08-006) have empty `keywords` in the source data, so the engine ignored the keyword: printed keywords reach the engine only through a verification override (E-D7). `cards:verify-meta -- --set <SET>` now takes a whole product (Standard-legal cards only); it was run over all 52 Standard products with unverified cards (about 2,060 Limitless pages, cached in `.cache/m1/limitless/`, one request a second; robots.txt allows). **1,950 cards matched field for field** and got verified overrides with their printed keywords (the M1 method); 110 disagree in some field and stay unverified until their batch is scripted (the runbook's step d.1 settles them). Verified cards: 183 → 2,013. Standard coverage 19.5% → 20.6% (keyword-only cards now count as playing fully). Alternatives rejected: parsing keywords from optcgapi's text (ADR 0006: text is never parsed into behaviour); waiting for each batch (the keyword-only cards would stay wrong in play for months).
