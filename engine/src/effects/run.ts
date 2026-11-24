@@ -1258,7 +1258,13 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
       if (what === 'cannotDrawByOwnEffects')
         addModifier(d, { ...base, kind: 'cannotDraw', amount: 0 });
       else if (typeof what === 'object' && 'cannotPlay' in what)
-        addModifier(d, { ...base, kind: 'cannotPlay', amount: 0, filter: what.cannotPlay });
+        addModifier(d, {
+          ...base,
+          kind: 'cannotPlay',
+          amount: 0,
+          filter: what.cannotPlay,
+          ...(what.from ? { from: what.from } : {}),
+        });
       else if (typeof what === 'object' && 'cannotSetDonActive' in what)
         addModifier(d, { ...base, kind: 'cannotSetDon', amount: 0 });
       else return unsupported(d, f, `restriction ${JSON.stringify(what)} on a player`);

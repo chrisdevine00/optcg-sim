@@ -35,23 +35,23 @@ export const OP13_108: CardScript = {
                 },
               },
             },
-          ],
-        },
-        {
-          do: {
-            move: {
-              what: {
-                from: 'lifeTop',
-                owner: 'opponent',
-                pick: {
-                  exactly: 1,
+            {
+              do: {
+                move: {
+                  what: {
+                    from: 'lifeTop',
+                    owner: 'opponent',
+                    pick: {
+                      exactly: 1,
+                    },
+                  },
+                  to: {
+                    zone: 'hand',
+                  },
                 },
               },
-              to: {
-                zone: 'hand',
-              },
             },
-          },
+          ],
         },
       ],
     },

@@ -39,23 +39,23 @@ export const OP13_102: CardScript = {
                 draw: 1,
               },
             },
-          ],
-        },
-        {
-          do: {
-            rest: {
-              from: 'characters',
-              owner: 'opponent',
-              filter: {
-                cost: {
-                  lte: 3,
+            {
+              do: {
+                rest: {
+                  from: 'characters',
+                  owner: 'opponent',
+                  filter: {
+                    cost: {
+                      lte: 3,
+                    },
+                  },
+                  pick: {
+                    upTo: 1,
+                  },
                 },
               },
-              pick: {
-                upTo: 1,
-              },
             },
-          },
+          ],
         },
       ],
     },

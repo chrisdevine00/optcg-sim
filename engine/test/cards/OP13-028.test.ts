@@ -1,6 +1,7 @@
 /** OP13-028 Shanks. */
 import { describe, expect, it } from 'vitest';
 import { don, play, V } from './helpers.ts';
+import { OP13_028 } from '../../../cards/effects/OP-13/OP13-028.ts';
 import { mk, MUSIC_EVENT } from './helpers-op13g1.ts';
 
 const ID = 'OP13-028';
@@ -37,5 +38,11 @@ describe('OP13-028 Shanks', () => {
     expect(canPlay(g, 'OP13-022')).toBe(true);
     play(g, ID);
     expect(canPlay(g, 'OP13-022')).toBe(false);
+  });
+
+  it('the bar is scoped to the hand (M6b-Q33): plays from the trash or deck by an effect are not barred', () => {
+    const restrict = JSON.stringify(OP13_028.abilities[0]);
+    expect(restrict).toContain('"cannotPlay"');
+    expect(restrict).toContain('"from":"hand"');
   });
 });

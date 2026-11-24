@@ -519,11 +519,17 @@ export const cannotSetDonByCharacter = (s: State, p: PlayerId): boolean =>
 export const cannotDrawByEffect = (s: State, p: PlayerId): boolean =>
   leaderMods(s, p, 'cannotDraw').length > 0;
 
-/** Is `p` barred from playing this card (a `cannotPlay` filter matches it)? Plays by any means. */
+/**
+ * Is `p` barred from playing this card (a `cannotPlay` filter matches it)? Plays by any means,
+ * unless the restriction says `from: 'hand'`: then only while the card is in the hand.
+ */
 export function playBlocked(s: State, p: PlayerId, card: InstanceId): boolean {
   const leader = s.players[p].leader;
   return leaderMods(s, p, 'cannotPlay').some(
-    (m) => m.filter && matches({ s, you: p, self: leader, live: true }, card, m.filter),
+    (m) =>
+      m.filter &&
+      (m.from !== 'hand' || s.cards[card]?.zone === 'hand') &&
+      matches({ s, you: p, self: leader, live: true }, card, m.filter),
   );
 }
 

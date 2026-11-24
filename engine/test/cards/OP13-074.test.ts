@@ -1,5 +1,7 @@
 /** OP13-074 Hera. */
 import { describe, expect, it } from 'vitest';
+import type { GameState } from '@optcg/engine';
+import { internals } from '../../src/testing.ts';
 import { don, none, play, V } from './helpers.ts';
 import { HOMIES3, HOMIES5, idsOf, mine, pickableCards, pickCard } from './helpers-op13g3.ts';
 
@@ -23,6 +25,24 @@ describe('OP13-074 Hera', () => {
     play(g, ID);
     expect(pickableCards(g)).toEqual([]);
     expect(idsOf(g, 'p1', 'characters')).toEqual([ID]);
+  });
+
+  // No real {Homies} Character has 3001 to 4000 power, so the pool cannot show the "3000 or less"
+  // boundary (OP13-R8); the printed power of the 3000 Homies is raised in a copy of the game's defs.
+  it('boundary: a {Homies} with 3001 power is not offered, with 3000 it is (power 3000 or less)', () => {
+    const power = (n: number) => {
+      const g = start([HOMIES3]);
+      const s = internals(g.state);
+      g.state = {
+        ...s,
+        defs: { ...s.defs, [HOMIES3]: { ...s.defs[HOMIES3]!, power: n } },
+      } as unknown as GameState;
+      play(g, ID);
+      return pickableCards(g);
+    };
+    expect(power(3000)).toEqual([HOMIES3]);
+    expect(power(3001)).toEqual([]);
+    expect(power(4000)).toEqual([]);
   });
 
   it('the Character is played for free (no DON!! spent on it) and enters active', () => {

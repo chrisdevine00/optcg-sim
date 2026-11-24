@@ -427,7 +427,12 @@ export type Restriction =
   | { cannotBeRested: { by: 'opponentEffect' } }
   /** This card cannot activate [Blocker] (the blocking side, G10). */
   | 'cannotActivateBlocker'
-  | { cannotPlay: Filter }
+  /**
+   * "You cannot play <cards> during this turn". Plays by any means unless `from: 'hand'` ("cannot
+   * play cards from your hand", OP13-028): then only plays of a card in the hand are barred and a
+   * play from the trash, deck or Life by an effect is not (M6b-Q33).
+   */
+  | { cannotPlay: Filter; from?: 'hand' }
   /**
    * "You cannot set DON!! cards as active using Character effects" (G21): a restriction on a
    * player. The effects of Leaders, Stages and Events stay allowed.

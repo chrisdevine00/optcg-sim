@@ -137,3 +137,14 @@ export function declineUse(g: TestGame): void {
   need(g, 'optional');
   act(g, { type: 'optional', accept: false });
 }
+
+/**
+ * Answer the "how many DON!! cards will you set as active" count prompt (OP14-R2: a `mode` choice,
+ * most first, "None" last) with `n`.
+ */
+export function answerCount(g: TestGame, n: number): void {
+  need(g, 'choose');
+  const o = decision(g)?.options?.find((x) => x.id === String(n));
+  if (!o) throw new Error(`No count ${n}; offered ${optionLabels(g)}`);
+  act(g, { type: 'pick', choice: { option: o.id } });
+}

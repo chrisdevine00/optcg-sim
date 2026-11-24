@@ -32,11 +32,11 @@ describe('OP13-102 Edison', () => {
     expect(g.zone('p1', 'hand')).toHaveLength(1);
   });
 
-  it('more Life than the opponent: no draw, the rest still happens ("Then" is a separate sentence)', () => {
+  it('more Life than the opponent: no draw and no rest either (a "Then" after a failed "If" does not resolve, M4b-5)', () => {
     const g = run(4, 3, [V.c2]);
-    pick(g, [g.find('p2', 'characters', V.c2)]);
+    expect(dec(g)?.kind).toBe('main');
     expect(g.zone('p1', 'hand')).toHaveLength(0);
-    expect(g.zone('p2', 'characters')[0]!.rested).toBe(true);
+    expect(g.zone('p2', 'characters')[0]!.rested).toBe(false);
   });
 
   it('"up to 1": may rest nothing, and with no target nothing is asked', () => {

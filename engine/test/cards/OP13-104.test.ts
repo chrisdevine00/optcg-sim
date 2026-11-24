@@ -1,5 +1,7 @@
 /** OP13-104 Kouzuki Hiyori. */
 import { describe, expect, it } from 'vitest';
+import { validateScript } from '@optcg/cards';
+import { OP13_104 } from '../../../cards/effects/OP-13/OP13-104.ts';
 import { accept, BLUE, decline, expectDecision, pick, PLAIN_PURPLE, V } from './helpers.ts';
 import { canBlockWith, koByBattle, MULTI_LEADER, names, rep, theirs } from './helpers-op13g4.ts';
 
@@ -48,5 +50,17 @@ describe('OP13-104 Kouzuki Hiyori', () => {
     const g = theirs({ leader: PLAIN_PURPLE, characters: [ID] }, { characters: [V.c7] });
     g.act({ type: 'attack', attacker: g.find('p2', 'characters', V.c7), target: g.leader('p1') });
     expect(canBlockWith(g, g.find('p1', 'characters', ID))).toBe(true);
+  });
+
+  // OP13-R8: the runtime always adds a deck-top card to the top of Life, so the position in the
+  // script is checked here: "to the top of your Life cards" is `top`, and `bottom` is not a legal
+  // script for this move (the validator rejects it).
+  it('the Life add is to the top: the script says top and a bottom variant fails validation', () => {
+    expect(validateScript(OP13_104)).toEqual([]);
+    expect(JSON.stringify(OP13_104.abilities)).toContain('"zone":"life","position":"top"');
+    const bottom = JSON.parse(
+      JSON.stringify(OP13_104).replace('"position":"top"', '"position":"bottom"'),
+    );
+    expect(validateScript(bottom).length).toBeGreaterThan(0);
   });
 });

@@ -43,6 +43,18 @@ describe('OP13-081 Koala', () => {
     expect(g.card(g.leader('p1')).don).toBe(0);
   });
 
+  it('"up to 1": after the cost the DON!! can be declined (the target pick ends with done), OP13-R5', () => {
+    const g = start(OTHER_LEADER);
+    const koala = g.find('p1', 'characters', ID);
+    activate(g, koala, 'give-don');
+    pick(g, [g.find('p1', 'trash', V.c2)]);
+    g.act({ type: 'done' });
+    expectDecision(g, 'main', 'p1');
+    expect(g.card(g.leader('p1')).don).toBe(0);
+    expect(g.card(koala).don).toBe(0);
+    expect(don(g, 'p1')).toMatchObject({ active: 2, rested: 2 });
+  });
+
   it('once per turn: not offered again after use', () => {
     const g = start(OTHER_LEADER, [V.c1]);
     const koala = g.find('p1', 'characters', ID);

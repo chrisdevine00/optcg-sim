@@ -1,6 +1,8 @@
 # OP-13 group D (OP13-089 .. OP13-120): independent test disagreements
 
-Each entry is an `it.fails` in the card's independent test. Severity as in the review docs (1 low, 3 high). Both entries are the same question: a "Then" after a failed "If" (closed in OPEN-QUESTIONS M4b-5 by CR 4-10-1, CR 8-3-3 and the official OP13-118 / OP14-111 / OP14-112 Q&As: the "Then" part does not resolve).
+**Fix round 2026-11-24 (OP-13 review, OP13-R1/R2):** D-1 and D-2 are resolved, the independent author was right. OP13-102 Edison and OP13-108 Jewelry Bonney now have the "Then" step inside the failed-"If" guard; both `it.fails` are plain `it` tests and the author tests that pinned the old reading are flipped.
+
+Each entry (before the fix) is an `it.fails` in the card's independent test. Severity as in the review docs (1 low, 3 high). Both entries are the same question: a "Then" after a failed "If" (closed in OPEN-QUESTIONS M4b-5 by CR 4-10-1, CR 8-3-3 and the official OP13-118 / OP14-111 / OP14-112 Q&As: the "Then" part does not resolve).
 
 | # | Card | Test | Card text / rule | Engine behaviour | Severity |
 | --- | --- | --- | --- | --- | --- |

@@ -110,17 +110,13 @@ describe('OP13-102 Edison: [Activate: Main] may trash this Character: if my Life
   });
 
   // CR 4-10-1 / 8-3-3: "If <cond>, draw 1 card. Then, rest ..." - when the "if" fails the "Then" does
-  // not resolve (OPEN-QUESTIONS M4b-5, closed by the official OP14-111/112 Q&As). The engine asks for
-  // the rest target anyway after a failed condition.
-  it.fails(
-    'boundary: 5 vs 4 Life: the "Then, rest" part does not resolve either (no target is even offered)',
-    () => {
-      const g = start({ own: 5, opp: 4 });
-      run(g);
-      expect(kind(g)).not.toBe('choose');
-      expect(rested(g, SC15.red3)).toBe(false);
-    },
-  );
+  // not resolve (OPEN-QUESTIONS M4b-5, closed by the official OP14-111/112 Q&As).
+  it('boundary: 5 vs 4 Life: the "Then, rest" part does not resolve either (no target is even offered)', () => {
+    const g = start({ own: 5, opp: 4 });
+    run(g);
+    expect(kind(g)).not.toBe('choose');
+    expect(rested(g, SC15.red3)).toBe(false);
+  });
 
   it('Life 0 vs 0 counts as equal', () => {
     const g = start({ own: 0, opp: 0 });

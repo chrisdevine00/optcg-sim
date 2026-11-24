@@ -341,6 +341,77 @@ describe('restrictions', () => {
     expect(plays).toHaveLength(1);
     expect(g.zone('p1', 'characters')).toHaveLength(1);
   });
+
+  // M6b-Q33 (OP13-028 "you cannot play cards from your hand"): `from: 'hand'` bars hand plays only.
+  describe('"cannot play cards from your hand" (cannotPlay with from hand)', () => {
+    const setup = (from: 'hand' | undefined) => {
+      const g = game(
+        { leader: PLAIN_PURPLE, characters: [BLUE], hand: [V.c1], trash: [V.c2] },
+        { leader: PLAIN_BLUE },
+      );
+      g.state = withAbilities(g.state, BLUE, [
+        main([
+          {
+            do: {
+              restrict: {
+                target: 'you',
+                what: { cannotPlay: { category: ['Character'] }, ...(from ? { from } : {}) },
+                duration: 'thisTurn',
+              },
+            },
+          },
+          {
+            do: {
+              play: { what: { from: 'trash', owner: 'you', pick: { upTo: 1 } } },
+            },
+          },
+        ]),
+      ]);
+      run(g);
+      return g;
+    };
+
+    it('the hand is barred but a play from the trash by an effect is not', () => {
+      const g = setup('hand');
+      expect(g.legal().filter((a) => a.type === 'playCard')).toHaveLength(0);
+      pick(g, [g.find('p1', 'trash', V.c2)]);
+      expect(g.zone('p1', 'characters')).toHaveLength(2);
+    });
+
+    it('without the scope the trash play is barred as well', () => {
+      const g = setup(undefined);
+      expect(g.legal().filter((a) => a.type === 'playCard')).toHaveLength(0);
+      expect(dec(g)?.kind).toBe('main'); // the trash card is not a candidate: nothing is asked
+      expect(g.zone('p1', 'characters')).toHaveLength(1);
+    });
+
+    it('the validator accepts only from hand', () => {
+      const bad = {
+        cardId: 'OP02-060',
+        textHash: 'x',
+        verified: { source: 't', date: '2026-11-16' },
+        abilities: [
+          {
+            id: 'a',
+            kind: 'activate',
+            when: 'activateMain',
+            effect: [
+              {
+                do: {
+                  restrict: {
+                    target: 'you',
+                    what: { cannotPlay: { category: ['Character'] }, from: 'trash' },
+                    duration: 'thisTurn',
+                  },
+                },
+              },
+            ],
+          },
+        ],
+      } as unknown as CardScript;
+      expect(validateScript(bad).length).toBeGreaterThan(0);
+    });
+  });
 });
 
 describe('rest cards and DON!!', () => {

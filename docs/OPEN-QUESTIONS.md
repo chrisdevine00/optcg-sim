@@ -127,8 +127,8 @@ Full text, proposed readings, source auditor IDs and what `rulings.md`/`rules-di
 - M6b-Q30. OP14-021/027/028/032/035/119/070: does attacking, blocking or paying a cost count as becoming rested?
 - M6b-Q31. OP14-045/049/056, OP12-040, ST15-001: does a cost count as "by an effect"? (RD 112 and RL-16 conflict with the auditors) *Cost half settled 2026-11-24 (OP-14 fix round, lead decision): a cost is part of the effect (CR 8-1-1, RD 112), so a card trashed as a cost counts ("trashed from your hand by an effect"); OP14-045/049/056 have `includeCosts: true`. DECISIONS 2026-11-24.*
 - M6b-Q32. OP13-003: given DON!! state and the first player's single placement.
-- M6b-Q33. OP13-028: `cannotPlay` has no hand-only scope.
-- M6b-Q34. OP13-066: when is the DON!! added, when set active.
+- M6b-Q33. OP13-028: `cannotPlay` has no hand-only scope. *Settled 2026-11-24 (OP-13 fix round, OP13-R3, engine 0.5.14): `cannotPlay` takes `from: 'hand'`; OP13-028 bars only plays from the hand, so a same-turn play from the trash or deck by an effect is allowed. The other `cannotPlay` scripts (OP13-023, 118, OP14-024, EB05-021, OP17-085, 092) have no zone in their text and keep the any-means bar.*
+- M6b-Q34. OP13-066 Silvers Rayleigh: when is the DON!! added, when set active. *Open (OP-13 review OP13-R4): scripted as the whole add delayed to the end of the turn (the audit's proposal); the other reading is "add now (rested), set active at the end of this turn", which differs while the turn runs (the DON!! count for OP13-068/071 "8 or more DON!!", and rested DON!! can be given, OP13-100, 005). No ruling on file; owner decision.*
 - M6b-Q35. OP11-066/071/073/074/079/081: range, publicity and empty deck for "choose a cost".
 - M6b-Q36. OP10-118: once-per-turn K.O. protection is spent when it prevents.
 - M6b-Q37. OP12-096: "may select cost 6 or less instead" as an if/else.

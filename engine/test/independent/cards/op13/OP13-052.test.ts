@@ -14,7 +14,6 @@ import {
   attack,
   blockers,
   choices,
-  decision,
   dons,
   HANCOCK,
   isMain,
@@ -95,11 +94,18 @@ describe('OP13-052 Boa Marigold: [Blocker]; [On Play] with a [Boa Hancock] Leade
     expect(isMain(g)).toBe(true);
   });
 
-  // DISAGREEMENT B-1 (severity 1, no leak): the hand is empty (public), yet the engine asks an empty pick.
-  it.fails('hidden hand: an empty hand asks nothing', () => {
-    const g = board(WL.hancock, []);
-    playRaw(g, MARIGOLD);
-    expect(decision(g)?.kind).toBe('main');
+  // B-1 (ruling, resolved): a hidden-zone pick is skipped only for an empty zone with no filter and no
+  // restrict; a `play` always carries restrict, so the pick is asked at max 0 in every hand state
+  // (DECISIONS "Empty picks"). An empty hand and a hand with no match look the same to the opponent.
+  it('hidden hand: the empty pick is asked at max 0 with an empty hand and with no match alike', () => {
+    for (const hand of [[], [WV.marco]]) {
+      const g = board(WL.hancock, hand);
+      playRaw(g, MARIGOLD);
+      expect(kind(g)).toBe('choose');
+      expect(choices(g)).toEqual([]);
+      act(g, { type: 'done' });
+      expect(isMain(g)).toBe(true);
+    }
   });
 
   it('the [Boa Hancock] played is not Marigold herself and the cost-4 boundary below is fine', () => {

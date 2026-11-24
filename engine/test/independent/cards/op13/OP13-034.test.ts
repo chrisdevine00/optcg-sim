@@ -8,7 +8,17 @@
  * resolves after the cost is paid, so the DON!! that paid for Brook can be set active again.
  */
 import { describe, expect, it } from 'vitest';
-import { dons, isMain, mine, playRaw, WL, WV } from './kit-op13b.ts';
+import {
+  answerCount,
+  dons,
+  isMain,
+  optionLabels,
+  need,
+  mine,
+  playRaw,
+  WL,
+  WV,
+} from './kit-op13b.ts';
 import type { TestGame } from '../../../fixtures/index.ts';
 
 const BROOK = 'OP13-034';
@@ -26,6 +36,7 @@ describe('OP13-034 Brook: [On Play] with a FILM or Straw Hat Crew Leader, set up
   it('{FILM} Leader: one rested DON!! becomes active', () => {
     const g = board(WL.shanks, 3, 4);
     playRaw(g, BROOK);
+    answerCount(g, 1);
     expect(isMain(g)).toBe(true);
     // 3 rested for the cost + 4 rested before = 7; one is set active
     expect(dons(g)).toMatchObject({ active: 1, rested: 6 });
@@ -34,6 +45,7 @@ describe('OP13-034 Brook: [On Play] with a FILM or Straw Hat Crew Leader, set up
   it('{Straw Hat Crew} Leader: one rested DON!! becomes active', () => {
     const g = board(WL.luffy, 3, 4);
     playRaw(g, BROOK);
+    answerCount(g, 1);
     expect(dons(g)).toMatchObject({ active: 1, rested: 6 });
   });
 
@@ -47,19 +59,32 @@ describe('OP13-034 Brook: [On Play] with a FILM or Straw Hat Crew Leader, set up
   it('only one DON!! is set active ("up to 1")', () => {
     const g = board(WL.shanks, 3, 6);
     playRaw(g, BROOK);
+    answerCount(g, 1);
     expect(dons(g).active).toBe(1);
   });
 
   it('the DON!! that paid for Brook is the one that can come back', () => {
     const g = board(WL.shanks, 3, 0);
     playRaw(g, BROOK);
+    answerCount(g, 1);
     expect(dons(g)).toMatchObject({ active: 1, rested: 2 });
   });
 
-  it('no prompt is needed: it resolves straight to the Main Phase', () => {
+  it('a count is asked (most first, None last); with the answer given it resolves to the Main Phase', () => {
     const g = board(WL.luffy, 5, 0);
     playRaw(g, BROOK);
+    need(g, 'choose', 'p1');
+    expect(optionLabels(g)).toEqual(['1 DON!!', 'None']);
+    answerCount(g, 1);
     expect(isMain(g)).toBe(true);
+  });
+
+  it('"up to 1": answering None sets no DON!!', () => {
+    const g = board(WL.shanks, 3, 4);
+    playRaw(g, BROOK);
+    answerCount(g, 0);
+    expect(isMain(g)).toBe(true);
+    expect(dons(g)).toMatchObject({ active: 0, rested: 7 });
   });
 
   it('the opponent Leader type does not count: my Leader decides', () => {
@@ -76,6 +101,7 @@ describe('OP13-034 Brook: [On Play] with a FILM or Straw Hat Crew Leader, set up
       WL.luffy,
     );
     playRaw(g, BROOK);
+    answerCount(g, 1);
     expect(g.card(g.leader('p1')).don).toBe(2);
     expect(dons(g)).toMatchObject({ active: 1, rested: 2, given: 2 });
   });
@@ -83,6 +109,7 @@ describe('OP13-034 Brook: [On Play] with a FILM or Straw Hat Crew Leader, set up
   it('from 10 active DON!!: 3 rest for the cost, one of them is set active again', () => {
     const g = board(WL.shanks, 10, 0);
     playRaw(g, BROOK);
+    answerCount(g, 1);
     expect(dons(g)).toMatchObject({ active: 8, rested: 2 });
   });
 

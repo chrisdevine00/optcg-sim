@@ -132,3 +132,16 @@ Survivors in both: OP13-074 and OP13-104 (R8). Killed by the author suite only: 
 - The OP-13 independent kits `need` each prompt kind; the two `it.fails` of OP13-050/052 are the only artifact of the helper (the same shape as OP14-052).
 - Of the 94 scripts, text and printed keywords agree with card data and overrides for all (textHash test passes).
 - OP13-099's "black" filter is untestable with the pool (API-GAPS-d 2); the other {Five Elders} Characters are all black, so no observable difference.
+
+## Fix round (2026-11-24, ENGINE_VERSION 0.5.14)
+
+| Finding | Fix | Evidence |
+| --- | --- | --- |
+| Local main red | The 18 independent failures (OP13-024, 034, 035, 038) were the OP14-R2 count prompt for "set up to N DON!! as active". The tests now answer it (`answerCount` in `kit-op13b.ts`, most first) and each card gained a fewer/None test. Notes in DISAGREEMENTS-a and -b. | All 18 pass; the touched-card set (032, 026, 120 duration; 023, 024, 030, 034, 035, 038, 027, 037, 118 setActive) passes. |
+| OP13-R1, R2 (3) | OP13-102 rest step and OP13-108 Life step moved inside the failed-"If" guard. Author tests flipped; independent `it.fails` D-1/D-2 are plain tests; DISAGREEMENTS-d updated. | 4 tests fail on the old scripts (checked), pass on the new. |
+| OP13-R3 (2) | `cannotPlay` takes `from: 'hand'` (validator, runtime, `playBlocked` reads the card's zone); OP13-028 uses it. No other script names the hand. Settles M6b-Q33. | Planted tests in `engine/test/cards/m4b/actions.test.ts`; fails with the zone check removed. |
+| OP13-R4 (2) | No change; OPEN-QUESTIONS Q34 now names OP13-066 and the two readings. | n/a |
+| OP13-R5 (1) | Not changed, BACKLOG section 6: a None per target costs a prompt per target (OP14-105); Koala can already decline (test added). | OP13-081 decline test. |
+| OP13-R6 (1) | OP13-050/052 `it.fails` are plain tests: the empty pick is asked at max 0 with an empty hand and with no match alike. | pass |
+| OP13-R7 (1) | OP13-097 empty-board test (false, M6b-Q21): no K.O. target asked, back at Main. | pass |
+| OP13-R8 (1) | OP13-074: boundary test with the 3000 Homies raised to 3001 and 4000 in a copy of the defs (no real Homies Character is in 3001 to 4000); OP13-104: the runtime adds deck top to the top of Life whatever `position` says, so the review's mutant is unreachable at runtime; a script-level test pins `top` and that a `bottom` variant fails validation (BACKLOG). | Mutants killed: OP13-074 3000 to 3001 fails the new test. |

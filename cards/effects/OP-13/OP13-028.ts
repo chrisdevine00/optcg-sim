@@ -34,6 +34,7 @@ export const OP13_028: CardScript = {
                 cannotPlay: {
                   category: ['Character', 'Event', 'Stage'],
                 },
+                from: 'hand',
               },
               duration: 'thisTurn',
             },

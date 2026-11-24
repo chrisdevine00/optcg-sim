@@ -12,6 +12,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   act,
+  answerCount,
   BLUE,
   choices,
   dons,
@@ -20,6 +21,7 @@ import {
   mine,
   need,
   offeredIds,
+  optionLabels,
   pickInst,
   playRaw,
   theirs,
@@ -70,6 +72,7 @@ describe('OP13-038 Gum-Gum Elephant Gun: [Main] rest a cost 5 or less Character,
     pickInst(g, [g.find('p2', 'characters', WV.marco)]);
     expect(dons(g)).toMatchObject({ active: 3, rested: 7 });
     endTurn(g);
+    answerCount(g, 2);
     need(g, 'main', 'p2');
     expect(dons(g)).toMatchObject({ active: 5, rested: 5 });
   });
@@ -80,6 +83,7 @@ describe('OP13-038 Gum-Gum Elephant Gun: [Main] rest a cost 5 or less Character,
     pickInst(g, [g.find('p2', 'characters', WV.marco)]);
     expect(dons(g)).toMatchObject({ active: 1, rested: 2 });
     endTurn(g);
+    answerCount(g, 2);
     need(g, 'main', 'p2');
     expect(dons(g)).toMatchObject({ active: 3, rested: 0 });
   });
@@ -89,8 +93,27 @@ describe('OP13-038 Gum-Gum Elephant Gun: [Main] rest a cost 5 or less Character,
     playRaw(g, GUN);
     pickInst(g, [g.find('p2', 'characters', WV.marco)]);
     endTurn(g);
+    expect(optionLabels(g)).toEqual(['2 DON!!', '1 DON!!', 'None']);
+    answerCount(g, 2);
     need(g, 'main', 'p2');
     expect(dons(g)).toMatchObject({ active: 2, rested: 8 });
+  });
+
+  it('"up to 2": at the end of the turn the player may set only 1, or None', () => {
+    const g = board([WV.marco]);
+    playRaw(g, GUN);
+    pickInst(g, [g.find('p2', 'characters', WV.marco)]);
+    endTurn(g);
+    answerCount(g, 1);
+    need(g, 'main', 'p2');
+    expect(dons(g)).toMatchObject({ active: 4, rested: 6 });
+    const h = board([WV.marco]);
+    playRaw(h, GUN);
+    pickInst(h, [h.find('p2', 'characters', WV.marco)]);
+    endTurn(h);
+    answerCount(h, 0);
+    need(h, 'main', 'p2');
+    expect(dons(h)).toMatchObject({ active: 3, rested: 7 });
   });
 
   it('"Then": choosing no target still sets the DON!! at the end of the turn', () => {
@@ -100,6 +123,7 @@ describe('OP13-038 Gum-Gum Elephant Gun: [Main] rest a cost 5 or less Character,
     act(g, { type: 'done' });
     expect(g.card(g.find('p2', 'characters', WV.marco)).rested).toBe(false);
     endTurn(g);
+    answerCount(g, 2);
     need(g, 'main', 'p2');
     expect(dons(g)).toMatchObject({ active: 5, rested: 5 });
   });
@@ -114,6 +138,7 @@ describe('OP13-038 Gum-Gum Elephant Gun: [Main] rest a cost 5 or less Character,
     }
     expect(g.card(g.find('p2', 'characters', WV.thatch)).rested).toBe(false);
     endTurn(g);
+    answerCount(g, 2);
     need(g, 'main', 'p2');
     expect(dons(g)).toMatchObject({ active: 5, rested: 5 });
   });

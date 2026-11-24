@@ -47,6 +47,15 @@ describe("OP13-097 The World's Equilibrium Cannot Be Maintained Forever", () => 
     expect(names(g, 'p2', 'characters')).toEqual([V.c3]);
   });
 
+  it('empty board (M6b-Q21 reading): "only {Celestial Dragons}" is false with no Character, no K.O. target is even offered', () => {
+    const g = run([], [V.c3, V.c1]);
+    accept(g);
+    // The "if" fails, so the K.O. step is skipped: nothing is asked, the game is back at the Main Phase.
+    expect(dec(g)?.kind).toBe('main');
+    expect(names(g, 'p2', 'characters').sort()).toEqual([V.c1, V.c3].sort());
+    expect(don(g, 'p1').rested).toBe(6);
+  });
+
   it('declining the optional DON!! rest skips the K.O.; with only 4 spare DON!! it cannot be accepted', () => {
     const g = run([CD2], [V.c3]);
     decline(g);

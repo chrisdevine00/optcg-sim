@@ -32,6 +32,7 @@ import {
   V13,
   yes,
 } from './kit-op13a.ts';
+import { answerCount } from './kit-op13b.ts';
 
 const GORDON = 'OP13-024';
 const FILM = V13.baccarat; // ST05-012 {FILM}
@@ -73,6 +74,7 @@ describe('OP13-024 Gordon: [On Play] you may reveal a Music/FILM card: set up to
     expect(revealedByEffects(g)).toEqual([FILM]);
     expect(don(g)).toEqual(before); // nothing set yet
     endTurn(g);
+    answerCount(g, 2);
     need(g, 'main', 'p2');
     expect(don(g)).toMatchObject({ active: before.active + 2, rested: before.rested - 2 });
   });
@@ -127,8 +129,28 @@ describe('OP13-024 Gordon: [On Play] you may reveal a Music/FILM card: set up to
     yes(g, 'p1');
     payHand(g, [FILM]);
     endTurn(g);
+    answerCount(g, 1);
     need(g, 'main', 'p2');
     expect(don(g)).toMatchObject({ active: 9, rested: 0 });
+  });
+
+  it('"up to 2": at the end of the turn the player may set only 1, or None', () => {
+    const g = start([FILM], { active: 5, rested: 3 });
+    yes(g, 'p1');
+    payHand(g, [FILM]);
+    const before = don(g);
+    endTurn(g);
+    answerCount(g, 1);
+    need(g, 'main', 'p2');
+    expect(don(g)).toMatchObject({ active: before.active + 1, rested: before.rested - 1 });
+    const h = start([FILM], { active: 5, rested: 3 });
+    yes(h, 'p1');
+    payHand(h, [FILM]);
+    const b2 = don(h);
+    endTurn(h);
+    answerCount(h, 0);
+    need(h, 'main', 'p2');
+    expect(don(h)).toEqual(b2);
   });
 
   it('must not: the effect does not ask anything else and the reveal costs no card from hand', () => {

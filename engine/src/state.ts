@@ -146,6 +146,8 @@ export interface Modifier {
   keyword?: string;
   /** For `cannotPlay` and `playCost`: which cards. */
   filter?: Filter;
+  /** For `cannotPlay`: only plays of a card in the hand are barred (M6b-Q33). Absent: any play. */
+  from?: 'hand';
   /**
    * For `cannotBeKOd` (`effect`, `opponentEffect`, `battle`) and `cannotBeRested`
    * (`opponentEffect`): what the restriction covers. Absent: everything (M6b wave 1 G2, G6).

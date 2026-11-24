@@ -34,11 +34,11 @@ describe('OP13-108 Jewelry Bonney', () => {
     expect(names(g, 'p2', 'hand')).toContain(V.c1);
   });
 
-  it('without {Egghead} there is no [Rush], but the opponent still adds a Life card ("Then")', () => {
+  it('without {Egghead} there is no [Rush] and the opponent keeps their Life ("Then" after a failed "If", M4b-5)', () => {
     const g = run(PLAIN_PURPLE);
     const id = g.find('p1', 'characters', ID);
     expect(g.card(id).keywords).not.toContain('Rush');
-    expect(g.life('p2')).toBe(2);
+    expect(g.life('p2')).toBe(3);
   });
 
   it('with an empty Life area nothing is added', () => {

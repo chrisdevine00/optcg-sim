@@ -1123,15 +1123,18 @@ function restriction(c: Ctx, path: string, v: unknown): void {
       err(c, path, `restriction ${v} is not implemented in the runtime yet`);
     return;
   }
-  const k = oneOf(c, path, v, [
-    'cannotPlay',
-    'cannotBeKOd',
-    'cannotBeRested',
-    'cannotSetDonActive',
-  ]);
+  const k = oneOf(
+    c,
+    path,
+    v,
+    ['cannotPlay', 'cannotBeKOd', 'cannotBeRested', 'cannotSetDonActive'],
+    { cannotPlay: ['from'] },
+  );
   if (!k || !isObj(v)) return;
-  if (k === 'cannotPlay') filter(c, `${path}.cannotPlay`, v.cannotPlay);
-  else if (k === 'cannotSetDonActive') {
+  if (k === 'cannotPlay') {
+    filter(c, `${path}.cannotPlay`, v.cannotPlay);
+    if ('from' in v) enumOf(c, `${path}.from`, v.from, ['hand']);
+  } else if (k === 'cannotSetDonActive') {
     // A player restriction (G21): only "using Character effects" is implemented.
     fields(c, `${path}.cannotSetDonActive`, v.cannotSetDonActive, ['by']);
     if (isObj(v.cannotSetDonActive))

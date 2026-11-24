@@ -25,6 +25,11 @@ Details and options: `docs/research/m6b-runtime-audit.md` §3.
 - ~~E-Q11 revisit~~ done 2026-11-24 (`addDon` asks a count).
 
 
+## 6. OP-13 batch (2026-11-24, docs/reviews/m6b-OP-13.md)
+
+- Engine (OP13-R5, severity 1): `giveDon` with `each` and fixed targets (no `upTo` on the target pick: OP13-042 Newgate "your Leader and 1 of your Characters up to 2 rested DON!! each", OP14-105 "each of your Characters") asks a count per target of 1..M, never 0, so a fixed target cannot be given none. The text ("up to") allows 0 per target, and with fixed targets "fewer targets" cannot express it (STB5-R1 rejected a 0 option only where it could). Not done: a None option per target adds a prompt per target (OP14-105 has up to six targets and M = 1, so every target would be asked "1 DON!! / None"), for a case the review calls unobservable in practice (Newgate costs 10, so all DON!! are rested and giving is nearly always better). A cleaner shape wants a design decision: one up-front "how many in total" question for fixed-target gives, or a 0 option only when M is above 1. OP13-081 Koala is already fine: with an exact target and one DON!! the target pick ends with `done` (test added).
+- OP13-104 Hiyori (OP13-R8): the runtime adds a deck-top card to the top of Life whatever `position` says (`run.ts` `move`, deck top to Life). The validator rejects `bottom` for this move, so it is unreachable; a script-level test pins `top`.
+
 ## 5. OP-15 batch (2026-11-24)
 
 - Engine: `play { from: 'self' }` plays the source card from wherever it now is, not from the zone the text names (found by the OP-15 group 2 scripter: OP15-080 Oars, paying the deck-bottom cost with Oars itself, would play it from the deck bottom). OP15-080 uses `from: 'trash'` with `isSelf`; OP17-015, OP16-014, ST30-008 pay hand costs and cannot hit it. Fix: the validator should reject `from: 'self'` play where a cost can move the source, or the runtime should check the source's zone.

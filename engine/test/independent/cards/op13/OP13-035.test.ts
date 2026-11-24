@@ -9,6 +9,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   act,
+  answerCount,
   attackTargets,
   WV,
   dons,
@@ -54,6 +55,7 @@ describe('OP13-035 Bepo: [End of Your Turn] set this Character or up to 1 DON!! 
     const g = board(true, 2, 5);
     endTurn(g);
     pickOption(g, DON);
+    answerCount(g, 1);
     expect(g.card(g.find('p1', 'characters', BEPO)).rested).toBe(true);
     expect(dons(g)).toMatchObject({ active: 3, rested: 4 });
   });
@@ -74,6 +76,7 @@ describe('OP13-035 Bepo: [End of Your Turn] set this Character or up to 1 DON!! 
     const b = mk();
     endTurn(b);
     pickOption(b, DON);
+    answerCount(b, 1);
     need(b, 'main', 'p2');
     const bepoB = b.find('p1', 'characters', BEPO);
     expect(attackTargets(b, b.find('p2', 'characters', WV.thatch))).toContain(bepoB);
@@ -88,6 +91,7 @@ describe('OP13-035 Bepo: [End of Your Turn] set this Character or up to 1 DON!! 
     const h = board(false, 2, 5);
     endTurn(h);
     pickOption(h, DON);
+    answerCount(h, 1);
     expect(dons(h)).toMatchObject({ active: 3, rested: 4 });
   });
 
@@ -97,6 +101,16 @@ describe('OP13-035 Bepo: [End of Your Turn] set this Character or up to 1 DON!! 
     pickOption(g, DON);
     expect(dons(g)).toMatchObject({ active: 7, rested: 0 });
     expect(g.card(g.find('p1', 'characters', BEPO)).rested).toBe(true);
+  });
+
+  it('"DON!!": answering None sets no DON!! and Bepo stays rested', () => {
+    const g = board(true, 2, 5);
+    endTurn(g);
+    pickOption(g, DON);
+    expect(optionLabels(g)).toEqual(['1 DON!!', 'None']);
+    answerCount(g, 0);
+    expect(g.card(g.find('p1', 'characters', BEPO)).rested).toBe(true);
+    expect(dons(g)).toMatchObject({ active: 2, rested: 5 });
   });
 
   it('DON!! given to a card is not set active: only given DON!! and none rested means no change', () => {
@@ -120,6 +134,7 @@ describe('OP13-035 Bepo: [End of Your Turn] set this Character or up to 1 DON!! 
     const g = board(true, 2, 5);
     endTurn(g);
     pickOption(g, DON);
+    answerCount(g, 1);
     endTurn(g); // p2
     need(g, 'main', 'p1');
     // my next turn ends the same way

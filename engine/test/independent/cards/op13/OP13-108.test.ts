@@ -85,14 +85,11 @@ describe('OP13-108 Jewelry Bonney: [On Play] if my Leader is {Egghead}, gains [R
 
   // CR 4-10-1 / 8-3-3: "If ..., gains [Rush]. Then, your opponent adds ..." - after a failed "if" the
   // "Then" does not resolve (OPEN-QUESTIONS M4b-5, official OP13-118 / OP14-111 Q&As).
-  it.fails(
-    'a Leader without {Egghead}: the "Then" part does not resolve either, the opponent keeps all 4 Life cards',
-    () => {
-      const g = start({ leader: LD13.yellow });
-      expect(g.life('p2')).toBe(4);
-      expect(hand(g, 'p2')).toEqual([]);
-    },
-  );
+  it('a Leader without {Egghead}: the "Then" part does not resolve either, the opponent keeps all 4 Life cards', () => {
+    const g = start({ leader: LD13.yellow });
+    expect(g.life('p2')).toBe(4);
+    expect(hand(g, 'p2')).toEqual([]);
+  });
 
   it('{Egghead} also on a mono-colored Leader (ST29-001 Luffy) works', () => {
     const g = start({ leader: LD13.eggMono });
