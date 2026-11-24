@@ -54,7 +54,16 @@ async function get<T>(path: string): Promise<T> {
   last = Date.now();
   const url = `${API}${path}`;
   for (let attempt = 0; ; attempt++) {
-    const res = await fetch(url, { headers: { 'User-Agent': UA, Accept: 'application/json' } });
+    let res: Response;
+    try {
+      res = await fetch(url, { headers: { 'User-Agent': UA, Accept: 'application/json' } });
+    } catch (e) {
+      // A connect timeout or reset: wait and retry, at most three times.
+      if (attempt >= 2) throw e;
+      console.error(`${path}: ${e instanceof Error ? e.message : String(e)}; retrying`);
+      await sleep(30_000 * (attempt + 1));
+      continue;
+    }
     // `ratelimit: "50-in-5min"; r=49; t=300`
     const rl = /r=(\d+);\s*t=(\d+)/.exec(res.headers.get('ratelimit') ?? '');
     if (rl)
