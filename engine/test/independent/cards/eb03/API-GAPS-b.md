@@ -1,0 +1,11 @@
+# API gaps: EB-03 independent tests, group B
+
+None of these stopped a test from being written. Each says what the public API leaves open and how the tests cope.
+
+1. **Cost-reducing scenery is thin.** Scripted printed-cost-0 Characters do not exist, so "a Character with a cost of 0" (EB03-046) is produced by playing OP17-097 ("Give all of your opponent's Characters −1 cost during this turn") on an opposing cost-1 Character. "Base cost" (EB03-036, EB03-056) is separated from current cost with OP17-094 Rodo under an {Elbaph} Leader (base 1, current 13), the only scripted cheap Character with a large cost bonus.
+2. **A losing attacker is never K.O.'d by a Character.** To K.O. a Character on its owner's own turn (EB03-042, EB03-047, to show [Opponent's Turn] / unconditional [On K.O.] timing) the tests use the opponent's Life [Trigger] OP15-115 Impact Dial, whose target prompt is answered only when the engine asks it (a sole candidate may be taken by itself).
+3. **An [Activate: Main] has no "use it?" question.** Activating is the decision to pay (EB03-052, EB03-062), so "decline the cost" is simply "do not activate" and has no test of its own; an unpayable cost is seen as the ability not being offered (EB03-062 with an empty hand).
+4. **Cost picks list only the earliest candidates.** A two-card trash cost (EB03-043) lists picks in canonical order, so the candidate set is read with `reachablePickSets`, not by the first listing. With exactly two candidates the engine pays by itself and goes straight to the order decision.
+5. **A trailing empty "up to" prompt is easy to swallow.** `pickCards` sends `done` after the last pick when nothing is left to choose, which hid EB03-049's second play prompt; those tests use `pickRaw` in `kit-eb03b.ts` (a raw pick with no `done`).
+6. **"Add / set up to N DON!!" counts.** EB03-035, EB03-038 and EB03-061 are answered with `takeDon` when the count prompt is pending; the tests where the count is not the point accept both an asked and an unasked count (`addDonAnswer`).
+7. **The look prompts (EB03-044, 048, 060) may or may not be asked empty.** The tests accept either for the "reveal up to 1" prompt after a look with no candidate (as the earlier describeLook does) and assert strictly only on the hand-pick prompts.
