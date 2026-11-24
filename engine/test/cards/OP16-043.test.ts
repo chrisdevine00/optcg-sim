@@ -6,8 +6,8 @@ import { BLUE_LEADER, IMPEL_LEADER, koedInBattle } from './helpers-op16g2.ts';
 const ID = 'OP16-043';
 /** OP15-039 Rebecca: Blue Leader with the {Dressrosa} type (its [Activate: Main] is inert here). */
 const DRESSROSA_LEADER = 'OP15-039';
-/** OP15-057 Dressrosa Kingdom: a Blue {Dressrosa} Stage. */
-const DRESSROSA_STAGE = 'OP15-057';
+/** OP04-096 Corrida Coliseum: a {Dressrosa} Stage (unscripted, inert scenery; OP15-057 has its own opponent-attack effect now). */
+const DRESSROSA_STAGE = 'OP04-096';
 
 describe('OP16-043 Usopp', () => {
   it('has [Blocker]', () => {

@@ -25,17 +25,40 @@ import { OP15_042 } from './OP15-042.ts';
 import { OP15_043 } from './OP15-043.ts';
 import { OP15_044 } from './OP15-044.ts';
 import { OP15_045 } from './OP15-045.ts';
+import { OP15_047 } from './OP15-047.ts';
+import { OP15_048 } from './OP15-048.ts';
+import { OP15_050 } from './OP15-050.ts';
+import { OP15_051 } from './OP15-051.ts';
+import { OP15_052 } from './OP15-052.ts';
+import { OP15_053 } from './OP15-053.ts';
+import { OP15_054 } from './OP15-054.ts';
+import { OP15_055 } from './OP15-055.ts';
+import { OP15_056 } from './OP15-056.ts';
+import { OP15_057 } from './OP15-057.ts';
 import { OP15_058 } from './OP15-058.ts';
+import { OP15_060 } from './OP15-060.ts';
 import { OP15_061 } from './OP15-061.ts';
+import { OP15_063 } from './OP15-063.ts';
+import { OP15_064 } from './OP15-064.ts';
+import { OP15_065 } from './OP15-065.ts';
 import { OP15_066 } from './OP15-066.ts';
 import { OP15_067 } from './OP15-067.ts';
+import { OP15_068 } from './OP15-068.ts';
 import { OP15_069 } from './OP15-069.ts';
+import { OP15_070 } from './OP15-070.ts';
 import { OP15_071 } from './OP15-071.ts';
+import { OP15_072 } from './OP15-072.ts';
+import { OP15_073 } from './OP15-073.ts';
 import { OP15_074 } from './OP15-074.ts';
 import { OP15_075 } from './OP15-075.ts';
 import { OP15_076 } from './OP15-076.ts';
 import { OP15_077 } from './OP15-077.ts';
 import { OP15_078 } from './OP15-078.ts';
+import { OP15_079 } from './OP15-079.ts';
+import { OP15_080 } from './OP15-080.ts';
+import { OP15_081 } from './OP15-081.ts';
+import { OP15_082 } from './OP15-082.ts';
+import { OP15_083 } from './OP15-083.ts';
 import { OP15_088 } from './OP15-088.ts';
 import { OP15_092 } from './OP15-092.ts';
 import { OP15_101 } from './OP15-101.ts';
@@ -72,17 +95,40 @@ const SET: readonly CardScript[] = [
   OP15_043,
   OP15_044,
   OP15_045,
+  OP15_047,
+  OP15_048,
+  OP15_050,
+  OP15_051,
+  OP15_052,
+  OP15_053,
+  OP15_054,
+  OP15_055,
+  OP15_056,
+  OP15_057,
   OP15_058,
+  OP15_060,
   OP15_061,
+  OP15_063,
+  OP15_064,
+  OP15_065,
   OP15_066,
   OP15_067,
+  OP15_068,
   OP15_069,
+  OP15_070,
   OP15_071,
+  OP15_072,
+  OP15_073,
   OP15_074,
   OP15_075,
   OP15_076,
   OP15_077,
   OP15_078,
+  OP15_079,
+  OP15_080,
+  OP15_081,
+  OP15_082,
+  OP15_083,
   OP15_088,
   OP15_092,
   OP15_101,
