@@ -1,0 +1,20 @@
+{
+  "id": "OP16-043",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP16-043",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": ["Blocker"],
+  "fields": {
+    "effectText": {
+      "value": "[Blocker]\n[On K.O.] You may rest 1 of your {Dressrosa} type Leader or Stage cards: Return up to 1 of your opponent's Characters with a cost of 5 or less to the owner's hand.",
+      "upstream": "[Blocker]\n\n[On K.O.] Return up to 1 of tour opponent's Characters with a cost of 5 or less to the owner's hand.",
+      "source": "https://onepiece.limitlesstcg.com/cards/OP16-043"
+    }
+  },
+  "note": "optcgapi is missing the [On K.O.] cost (\"You may rest 1 of your {Dressrosa} type Leader or Stage cards:\") and has \"tour\" for \"your\". Settled on Limitless (official list not reachable 2026-11-24); a clear upstream defect, not a reading."
+}

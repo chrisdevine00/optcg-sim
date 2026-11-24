@@ -1,0 +1,20 @@
+{
+  "id": "OP16-003",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP16-003",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "fields": {
+    "types": {
+      "value": ["The Four Emperors", "Whitebeard Pirates"],
+      "upstream": ["Whitebeard Pirates"],
+      "source": "https://onepiece.limitlesstcg.com/cards/OP16-003"
+    }
+  },
+  "note": "optcgapi drops the {The Four Emperors} type. Settled on Limitless (official list not reachable 2026-11-24); a clear upstream defect, not a reading."
+}

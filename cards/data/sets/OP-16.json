@@ -143,6 +143,7 @@
     "Special"
    ],
    "types": [
+    "The Four Emperors",
     "Whitebeard Pirates"
    ],
    "rarity": "SR",
@@ -151,9 +152,23 @@
    "effectText": "[Your Turn] Your Leader gains [Double Attack] and +2000 power. [On Play] You may reveal 2 Character cards with 8000 power from your hand: Give up to 1 of your opponent's Characters −6000 power during this turn.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
-   "textFixes": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/OP16-003",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "types",
+     "kind": "override",
+     "from": "[\"Whitebeard Pirates\"]",
+     "to": "[\"The Four Emperors\",\"Whitebeard Pirates\"]",
+     "source": "https://onepiece.limitlesstcg.com/cards/OP16-003"
+    }
+   ],
    "artworks": [
     {
      "artworkId": "OP16-003",
@@ -663,12 +678,28 @@
    "rarity": "R",
    "set": "OP-16",
    "block": 5,
-   "effectText": "[Blocker] [On Play] You may rest 1 of your DON!! cards: If your Leader has the {Red-Haired Pirates} type and have 10 DON!! cards on your field, play up to 1 [Shanks] from your hand.",
+   "effectText": "[Blocker]\n[On Play] You may rest 1 of your DON!! cards: If your Leader has the {Red-Haired Pirates} type and you have 10 DON!! cards on your field, play up to 1 [Shanks] from your hand.",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
-   "textFixes": [],
+   "keywords": [
+    "Blocker"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/OP16-012",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "override",
+     "from": "[Blocker] [On Play] You may rest 1 of your DON!! cards: If your Leader has the {Red-Haired Pirates} type and have 10 DON!! cards on your field, play up to 1 [Shanks] from your hand.",
+     "to": "[Blocker]\n[On Play] You may rest 1 of your DON!! cards: If your Leader has the {Red-Haired Pirates} type and you have 10 DON!! cards on your field, play up to 1 [Shanks] from your hand.",
+     "source": "https://onepiece.limitlesstcg.com/cards/OP16-012"
+    }
+   ],
    "artworks": [
     {
      "artworkId": "OP16-012",
@@ -1101,7 +1132,7 @@
   },
   {
    "id": "OP16-020",
-   "name": "If You're Coming with Me...Kiss Your Lives Goodbye!!",
+   "name": "If You're Coming with Me... Kiss Your Lives Goodbye!!",
    "category": "Event",
    "colors": [
     "Red"
@@ -1121,9 +1152,23 @@
    "effectText": "[Main] You may rest 1 of your DON!! cards and reveal 1 Character card with 8000 power from your hand: Draw 1 card. [Counter] You may trash 1 card from your hand: Up to 1 of your Leader or Character cards gains +3000 power during this battle.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
-   "textFixes": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/OP16-020",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "name",
+     "kind": "override",
+     "from": "If You're Coming with Me...Kiss Your Lives Goodbye!!",
+     "to": "If You're Coming with Me... Kiss Your Lives Goodbye!!",
+     "source": "https://onepiece.limitlesstcg.com/cards/OP16-020"
+    }
+   ],
    "artworks": [
     {
      "artworkId": "OP16-020",
@@ -1930,7 +1975,9 @@
    "power": 0,
    "counter": 1000,
    "life": null,
-   "attributes": [],
+   "attributes": [
+    "Strike"
+   ],
    "types": [
     "Straw Hat Crew",
     "Impel Down"
@@ -1941,9 +1988,23 @@
    "effectText": "[DON!! x1] [Your Turn] This Character gains +1000 power for each of your Characters with a different card name.\n\n[On Play] Look at 3 cards from the top of your deck; reveal up to 1 {Impel Down} type card and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
-   "textFixes": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/OP16-034",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "attributes",
+     "kind": "override",
+     "from": "[]",
+     "to": "[\"Strike\"]",
+     "source": "https://onepiece.limitlesstcg.com/cards/OP16-034"
+    }
+   ],
    "artworks": [
     {
      "artworkId": "OP16-034",
@@ -2146,7 +2207,7 @@
   },
   {
    "id": "OP16-038",
-   "name": "Let's Go!! To the Navy Headquarters..",
+   "name": "Let's Go!! To the Navy Headquarters!!",
    "category": "Event",
    "colors": [
     "Green"
@@ -2166,9 +2227,23 @@
    "effectText": "[Main] You may rest 6 of your DON!! cards: If you have 5 {Impel Down} type Characters with different card names, set your Leader and all of your Characters as active.\n\n[Counter] Your Leader gains +3000 power during this battle.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
-   "textFixes": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/OP16-038",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "name",
+     "kind": "override",
+     "from": "Let's Go!! To the Navy Headquarters..",
+     "to": "Let's Go!! To the Navy Headquarters!!",
+     "source": "https://onepiece.limitlesstcg.com/cards/OP16-038"
+    }
+   ],
    "artworks": [
     {
      "artworkId": "OP16-038",
@@ -2211,12 +2286,26 @@
    "rarity": "C",
    "set": "OP-16",
    "block": 5,
-   "effectText": "[Main] Up to 1 of your [Monkey.D.Luffy] cards gains [Double Attack] during this turn. Then, if your Leader has the {Impel Down} type, rest up to 2 of your opponent's Characters with a cost or 3 or less.",
+   "effectText": "[Main] Up to 1 of your [Monkey.D.Luffy] cards gains [Double Attack] during this turn. Then, if your Leader has the {Impel Down} type, rest up to 2 of your opponent's Characters with a cost of 3 or less.",
    "triggerText": "Rest your opponent's Leader.",
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
-   "textFixes": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/OP16-039",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "override",
+     "from": "[Main] Up to 1 of your [Monkey.D.Luffy] cards gains [Double Attack] during this turn. Then, if your Leader has the {Impel Down} type, rest up to 2 of your opponent's Characters with a cost or 3 or less.",
+     "to": "[Main] Up to 1 of your [Monkey.D.Luffy] cards gains [Double Attack] during this turn. Then, if your Leader has the {Impel Down} type, rest up to 2 of your opponent's Characters with a cost of 3 or less.",
+     "source": "https://onepiece.limitlesstcg.com/cards/OP16-039"
+    }
+   ],
    "artworks": [
     {
      "artworkId": "OP16-039",
@@ -2436,12 +2525,28 @@
    "rarity": "UC",
    "set": "OP-16",
    "block": 5,
-   "effectText": "[Blocker]\n\n[On K.O.] Return up to 1 of tour opponent's Characters with a cost of 5 or less to the owner's hand.",
+   "effectText": "[Blocker]\n[On K.O.] You may rest 1 of your {Dressrosa} type Leader or Stage cards: Return up to 1 of your opponent's Characters with a cost of 5 or less to the owner's hand.",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
-   "textFixes": [],
+   "keywords": [
+    "Blocker"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/OP16-043",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "override",
+     "from": "[Blocker]\n\n[On K.O.] Return up to 1 of tour opponent's Characters with a cost of 5 or less to the owner's hand.",
+     "to": "[Blocker]\n[On K.O.] You may rest 1 of your {Dressrosa} type Leader or Stage cards: Return up to 1 of your opponent's Characters with a cost of 5 or less to the owner's hand.",
+     "source": "https://onepiece.limitlesstcg.com/cards/OP16-043"
+    }
+   ],
    "artworks": [
     {
      "artworkId": "OP16-043",
@@ -6823,12 +6928,26 @@
    "rarity": "SEC",
    "set": "OP-16",
    "block": 5,
-   "effectText": "The counter of all of your Character cards with 8000 power in your hand becomes +2000.\n[On Play]/[On K.O.] Look at 5 cards from the top of your deck; reveal up to 1 [Monkey.D.Luffy] or up to 1 card with a type including \"Whitebeard Pirates\" and add it to your hand. Then, place the rest a the bottom of your deck in any order.",
+   "effectText": "The counter of all of your Character cards with 8000 power in your hand becomes +2000.\n[On Play]/[On K.O.] Look at 5 cards from the top of your deck; reveal up to 1 [Monkey.D.Luffy] or up to 1 card with a type including \"Whitebeard Pirates\" and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
-   "textFixes": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://onepiece.limitlesstcg.com/cards/OP16-118",
+     "date": "2026-11-24",
+     "use": "cross-check"
+    }
+   ],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "override",
+     "from": "The counter of all of your Character cards with 8000 power in your hand becomes +2000.\n[On Play]/[On K.O.] Look at 5 cards from the top of your deck; reveal up to 1 [Monkey.D.Luffy] or up to 1 card with a type including \"Whitebeard Pirates\" and add it to your hand. Then, place the rest a the bottom of your deck in any order.",
+     "to": "The counter of all of your Character cards with 8000 power in your hand becomes +2000.\n[On Play]/[On K.O.] Look at 5 cards from the top of your deck; reveal up to 1 [Monkey.D.Luffy] or up to 1 card with a type including \"Whitebeard Pirates\" and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+     "source": "https://onepiece.limitlesstcg.com/cards/OP16-118"
+    }
+   ],
    "artworks": [
     {
      "artworkId": "OP16-118",

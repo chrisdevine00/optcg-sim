@@ -1,0 +1,20 @@
+{
+  "id": "OP16-118",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP16-118",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "fields": {
+    "effectText": {
+      "value": "The counter of all of your Character cards with 8000 power in your hand becomes +2000.\n[On Play]/[On K.O.] Look at 5 cards from the top of your deck; reveal up to 1 [Monkey.D.Luffy] or up to 1 card with a type including \"Whitebeard Pirates\" and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+      "upstream": "The counter of all of your Character cards with 8000 power in your hand becomes +2000.\n[On Play]/[On K.O.] Look at 5 cards from the top of your deck; reveal up to 1 [Monkey.D.Luffy] or up to 1 card with a type including \"Whitebeard Pirates\" and add it to your hand. Then, place the rest a the bottom of your deck in any order.",
+      "source": "https://onepiece.limitlesstcg.com/cards/OP16-118"
+    }
+  },
+  "note": "optcgapi typo \"a the bottom\" for \"at the bottom\". Settled on Limitless (official list not reachable 2026-11-24); a clear upstream defect, not a reading."
+}

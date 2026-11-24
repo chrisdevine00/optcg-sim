@@ -2,11 +2,11 @@
   "source": "optcgapi.com (normalized; see cards/README.md)",
   "sourceUrl": "https://optcgapi.com",
   "fetchedAt": "2026-11-17T16:20:56.544Z",
-  "generatedAt": "2026-11-24T02:44:45.085Z",
+  "generatedAt": "2026-11-24T04:26:41.664Z",
   "cardCount": 2860,
   "printingCount": 5175,
   "newestSet": "OP-17",
-  "verifiedCount": 2017,
+  "verifiedCount": 2025,
   "sets": [
     {
       "code": "OP-01",
@@ -451,14 +451,15 @@
     "types deduplicated": 5,
     "trigger: marker restored": 1,
     "cleanup: reprint disclaimer": 1,
-    "override: printed keywords": 2017,
-    "override: verified": 2017,
-    "override: name": 7,
+    "override: printed keywords": 2025,
+    "override: verified": 2025,
+    "override: name": 9,
     "override: triggerText": 3,
     "override: effectText patch": 7,
-    "override: types": 9,
+    "override: types": 10,
     "override: cost": 4,
-    "override: attributes": 6,
+    "override: attributes": 7,
+    "override: effectText": 4,
     "override: power": 1
   }
 }

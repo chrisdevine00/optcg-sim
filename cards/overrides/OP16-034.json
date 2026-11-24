@@ -1,0 +1,20 @@
+{
+  "id": "OP16-034",
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://onepiece.limitlesstcg.com/cards/OP16-034",
+      "date": "2026-11-24",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
+  "fields": {
+    "attributes": {
+      "value": ["Strike"],
+      "upstream": [],
+      "source": "https://onepiece.limitlesstcg.com/cards/OP16-034"
+    }
+  },
+  "note": "optcgapi has no attribute; Limitless shows (Strike). Settled on Limitless (official list not reachable 2026-11-24); a clear upstream defect, not a reading."
+}
