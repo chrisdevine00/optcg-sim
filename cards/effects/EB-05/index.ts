@@ -45,6 +45,7 @@ import { EB05_048 } from './EB05-048.ts';
 import { EB05_049 } from './EB05-049.ts';
 import { EB05_050 } from './EB05-050.ts';
 import { EB05_051 } from './EB05-051.ts';
+import { EB05_052 } from './EB05-052.ts';
 import { EB05_053 } from './EB05-053.ts';
 import { EB05_054 } from './EB05-054.ts';
 import { EB05_055 } from './EB05-055.ts';
@@ -100,6 +101,7 @@ const SET: readonly CardScript[] = [
   EB05_049,
   EB05_050,
   EB05_051,
+  EB05_052,
   EB05_053,
   EB05_054,
   EB05_055,

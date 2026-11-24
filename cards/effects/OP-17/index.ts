@@ -16,7 +16,9 @@ import { OP17_014 } from './OP17-014.ts';
 import { OP17_015 } from './OP17-015.ts';
 import { OP17_016 } from './OP17-016.ts';
 import { OP17_017 } from './OP17-017.ts';
+import { OP17_018 } from './OP17-018.ts';
 import { OP17_019 } from './OP17-019.ts';
+import { OP17_020 } from './OP17-020.ts';
 import { OP17_021 } from './OP17-021.ts';
 import { OP17_022 } from './OP17-022.ts';
 import { OP17_023 } from './OP17-023.ts';
@@ -38,6 +40,7 @@ import { OP17_039 } from './OP17-039.ts';
 import { OP17_040 } from './OP17-040.ts';
 import { OP17_041 } from './OP17-041.ts';
 import { OP17_042 } from './OP17-042.ts';
+import { OP17_043 } from './OP17-043.ts';
 import { OP17_044 } from './OP17-044.ts';
 import { OP17_045 } from './OP17-045.ts';
 import { OP17_046 } from './OP17-046.ts';
@@ -106,6 +109,7 @@ import { OP17_112 } from './OP17-112.ts';
 import { OP17_113 } from './OP17-113.ts';
 import { OP17_114 } from './OP17-114.ts';
 import { OP17_115 } from './OP17-115.ts';
+import { OP17_116 } from './OP17-116.ts';
 import { OP17_117 } from './OP17-117.ts';
 import { OP17_118 } from './OP17-118.ts';
 import { OP17_119 } from './OP17-119.ts';
@@ -127,7 +131,9 @@ const SET: readonly CardScript[] = [
   OP17_015,
   OP17_016,
   OP17_017,
+  OP17_018,
   OP17_019,
+  OP17_020,
   OP17_021,
   OP17_022,
   OP17_023,
@@ -149,6 +155,7 @@ const SET: readonly CardScript[] = [
   OP17_040,
   OP17_041,
   OP17_042,
+  OP17_043,
   OP17_044,
   OP17_045,
   OP17_046,
@@ -217,6 +224,7 @@ const SET: readonly CardScript[] = [
   OP17_113,
   OP17_114,
   OP17_115,
+  OP17_116,
   OP17_117,
   OP17_118,
   OP17_119,
