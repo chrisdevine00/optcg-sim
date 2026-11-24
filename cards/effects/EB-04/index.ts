@@ -9,6 +9,7 @@ import { EB04_038 } from './EB04-038.ts';
 import { EB04_040 } from './EB04-040.ts';
 import { EB04_058 } from './EB04-058.ts';
 import { EB04_059 } from './EB04-059.ts';
+import { EB04_061 } from './EB04-061.ts';
 
 const SET: readonly CardScript[] = [
   EB04_002,
@@ -20,5 +21,6 @@ const SET: readonly CardScript[] = [
   EB04_040,
   EB04_058,
   EB04_059,
+  EB04_061,
 ];
 export default SET;
