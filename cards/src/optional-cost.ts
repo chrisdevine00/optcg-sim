@@ -18,7 +18,7 @@
 import type { Ability, Cost } from './dsl.ts';
 
 const HEADERS =
-  "On Play|Main|Counter|Activate:\\s*Main|When Attacking|On Your Opponent's Attack|On Block|On K\\.O\\.|Once Per Turn|Your Turn|Opponent's Turn|End of Your Turn|End of Your Opponent's Turn";
+  "DON!!\\s*x\\d+|On Play|Main|Counter|Activate:\\s*Main|When Attacking|On Your Opponent's Attack|On Block|On K\\.O\\.|Once Per Turn|Your Turn|Opponent's Turn|End of Your Turn|End of Your Opponent's Turn";
 const SPLIT = new RegExp(`(?<!/\\s?)(?<!\\]\\s?)(?=\\[(?:${HEADERS})\\])`, 'g');
 const TIMING_TAG: Record<string, RegExp> = {
   onPlay: /\[On Play\]/,
