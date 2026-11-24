@@ -1,0 +1,11 @@
+# API gaps: EB-05 independent tests, group B (EB05-030 .. EB05-061)
+
+None of these stopped a test from being written. Each says what the public API leaves open and how the tests cope.
+
+1. **Exact-N picks list only the canonical-first candidates.** For "trash 2 cards from your hand" with 3 cards (EB05-042) the `choose` decision offers only the picks that can start a canonical (instance-id order) selection, so `choiceCards` shows 2 of 3 cards. Tests read the reachable pairs with `reachablePickSets` instead. Wanted: a way to read the whole candidate set.
+2. **Empty "choose" decisions with min = max = 0.** When "play up to 1 ... from your hand" has no candidate (EB05-059 Trigger, EB05-061 [On Play]) the engine still asks a forced `done`. Tests answer it with `finishEmpty`. It tells an observer that nothing qualified.
+3. **A [Trigger] with a "you may" cost has no separate "decline the cost" step.** Activating the Trigger is choosing to pay (EB05-053, EB05-055); if the cost cannot be paid (empty hand) the `trigger` action with `activate: true` is simply not legal. Tests assert that, and declining the whole Trigger.
+4. **Cost-reduced and cost-0 Characters can only be made by scripted cards.** No printed Character has cost 0 and, among scripted cards, only EB05-049 Special Hollow lowers an opposing cost. EB05-044 and EB05-048 use it to build a cost-0 Character (stated in their headers); if EB05-049 breaks, those tests break with it.
+5. **Scenery must be scripted.** Unscripted Events cannot be played and unscripted [Trigger] cards cannot activate (OP02-117, OP06-019, OP17-097 do nothing here). The [Blocker] keyword is only read from the card data for the cards that carry a `keywords` entry (OP17-074 and OP09-072 do; OP01-019 does not). The tests use EB01-059, OP06-058, OP09-077, OP17-074 and OP09-072 as scenery for that reason.
+6. **[Once Per Turn] [When Attacking] cannot be exercised twice.** A Character attacks once per turn and nothing in the scenario API untaps it, so the once-per-turn limit of EB05-053 Praline is not tested (the [Once Per Turn] of EB05-057 Nojiko and EB05-061 Nami are).
+7. **Battle K.O. as "removed from the field by your opponent" (EB05-061).** The printed text has no "effect"; whether a battle K.O. is replaced is open (M6b-Q7), so no test asserts it either way.
