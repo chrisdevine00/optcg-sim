@@ -66,7 +66,11 @@ describe('OP17-043 Ganzui', () => {
   it('is not offered with fewer than 2 cards in hand', () => {
     const g = board([V.c1]);
     battle(g);
-    expect(dec(g)?.kind).not.toBe('optional');
+    // The cost is paid from hand, so the offer is still made (a pause must not reveal the hand),
+    // with accepting unavailable.
+    expect(dec(g)).toMatchObject({ kind: 'optional' });
+    expect(() => g.act({ type: 'optional', accept: true })).toThrow();
+    g.act({ type: 'optional', accept: false });
     expect(g.zone('p1', 'characters')).toHaveLength(0);
     expect(hand(g, 'p1')).toEqual([V.c1]);
   });

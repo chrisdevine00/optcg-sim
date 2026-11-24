@@ -55,6 +55,10 @@ describe('OP17-045 Kyo', () => {
 
   it('QA-OP17 OP17-045: with 1 card in hand it cannot be used', () => {
     const g = koByEffect([BLUE]);
+    // Offered anyway (a hand-paid cost must not show in whether the game pauses); accept is off.
+    expectDecision(g, 'optional', 'p1');
+    expect(() => g.act({ type: 'optional', accept: true })).toThrow();
+    g.act({ type: 'optional', accept: false });
     expect(g.zone('p1', 'characters').map((c) => c.card)).not.toContain(V.c4);
     expectDecision(g, 'main', 'p2');
   });

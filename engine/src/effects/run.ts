@@ -1242,10 +1242,11 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
       return 'next';
     }
     // "Activate this card's [Counter] effect" (G5) and "[Main]": the effect's own activation cost
-    // must still be paid (rules-digest 105), so an unpayable one does not activate.
+    // must still be paid (rules-digest 105), so an unpayable one does not activate. A cost paid
+    // from a hidden zone is asked anyway, accept unavailable, so the pause leaks nothing.
     const timing = a.activate.ability === 'counter' ? 'counter' : 'main';
     const own = def.abilities.find((x) => hasTiming(x, timing));
-    if (own && own.kind === 'activate' && payable(c, own.cost))
+    if (own && own.kind === 'activate' && (payable(c, own.cost) || costIsSecret(own.cost)))
       pushEffect(d, f.card, f.cardId, own, you, 'effect');
     return 'next';
   }

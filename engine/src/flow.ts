@@ -9,7 +9,15 @@ import type { InstanceId, PlayerId } from './api.ts';
 import type { Ability, AutoTiming, InternalStep } from './abilities.ts';
 import { hasTiming, isInternal } from './abilities.ts';
 import { deriveLive, isNegated, koProtected } from './derive.ts';
-import { allHold, matches, payable, playCostOf, pool, type Ctx } from './effects/eval.ts';
+import {
+  allHold,
+  costIsSecret,
+  matches,
+  payable,
+  playCostOf,
+  pool,
+  type Ctx,
+} from './effects/eval.ts';
 import { answerEffect, pushEffect, runEffect } from './effects/run.ts';
 import type { Draft } from './draft.ts';
 import { OPENING_HAND } from './defs.ts';
@@ -718,6 +726,7 @@ function offerReplacement(
       purpose: 'replacement',
       role: 'replacement',
       source: sourceInfo(d.s, r.card, d.card(r.card).card, r.ability, ab.label),
+      ...secretCostFlags(d, r, ab),
     });
     return true;
   }
@@ -851,7 +860,7 @@ export function collectReplacements(
 
         if (!pool(c, sel).includes(card)) continue;
         if (!allHold(c, ab.conditions)) continue;
-        if (!possible(c, ab.instead)) continue;
+        if (!possible(c, ab.instead, ab.optional)) continue;
         const rank = id === card ? 0 : p === s.active ? 1 : 2;
         out.push({ card: id, ability: ab.id, controller: p, rank });
       }
@@ -900,7 +909,7 @@ export function collectDamageReplacements(
       if (considered.includes(key)) continue;
       if (ab.oncePerTurn && s.oncePerTurn.includes(key)) continue;
       if (!allHold(c, ab.conditions)) continue;
-      if (!possible(c, ab.instead)) continue;
+      if (!possible(c, ab.instead, ab.optional)) continue;
       out.push({ card: id, ability: ab.id, controller: player });
     }
   }
@@ -922,6 +931,7 @@ function offerDamageReplacement(d: Draft, f: Extract<Frame, { f: 'damage' }>): b
       purpose: 'replacement',
       role: 'replacement',
       source: sourceInfo(d.s, r.card, d.card(r.card).card, r.ability, ab.label),
+      ...secretCostFlags(d, r, ab),
     });
     return true;
   }
@@ -930,7 +940,7 @@ function offerDamageReplacement(d: Draft, f: Extract<Frame, { f: 'damage' }>): b
 }
 
 /** An impossible replacement cannot be applied (CR 8-1-3-4-5): its payload must be payable. */
-function possible(c: Ctx, instead: readonly unknown[]): boolean {
+function possible(c: Ctx, instead: readonly unknown[], optional?: boolean): boolean {
   if (instead.some(isInternal)) {
     for (const st of instead as InternalStep[]) {
       if (st.op === 'lifeToHand' && c.s.players[c.you].life.length < st.n) return false;
@@ -938,7 +948,34 @@ function possible(c: Ctx, instead: readonly unknown[]): boolean {
     return true;
   }
   if (isEffect(instead)) return true;
-  return payable(c, instead as Cost[]);
+  const costs = instead as Cost[];
+  // An optional replacement paid from a hidden zone is offered whenever its public conditions hold
+  // (accept unavailable if the cost cannot be paid), so whether the game pauses never tells the
+  // opponent what the hand holds (ADR 0005, `costIsSecret`). Only the public part gates the offer.
+  if (optional && costIsSecret(costs))
+    return payable(
+      c,
+      costs.filter((k) => !costIsSecret([k])),
+    );
+  return payable(c, costs);
+}
+
+/** Flags for an offered replacement whose cost is secret: `secret`, and `noAccept` if unpayable. */
+function secretCostFlags(
+  d: Draft,
+  r: ReplacementRef,
+  ab: Ability,
+): { secret?: true; noAccept?: true } {
+  if (ab.kind !== 'replacement' || isEffect(ab.instead) || !costIsSecret(ab.instead as Cost[]))
+    return {};
+  return replacementPayable(d, r, ab) ? { secret: true } : { secret: true, noAccept: true };
+}
+
+/** Can this replacement's cost be paid now? An unpayable secret cost is offered with accept off. */
+function replacementPayable(d: Draft, r: ReplacementRef, ab: Ability): boolean {
+  if (ab.kind !== 'replacement' || isEffect(ab.instead)) return true;
+  if (ab.instead.some(isInternal)) return true;
+  return payable({ s: d.s, you: r.controller, self: r.card, live: true }, ab.instead as Cost[]);
 }
 
 export function applyReplacement(d: Draft, r: ReplacementRef): void {
