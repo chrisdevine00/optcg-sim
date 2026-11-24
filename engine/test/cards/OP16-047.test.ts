@@ -32,6 +32,9 @@ describe('OP16-047 Donquixote Doflamingo', () => {
     // The opponent chooses their own cards.
     expect(dec(g)?.player).toBe('p2');
     pick(g, [g.find('p2', 'hand', BLUE, 0), g.find('p2', 'hand', BLUE, 1)]);
+    // The two go to the bottom in an order their owner picks.
+    expect(dec(g)?.kind).toBe('order');
+    g.act(g.legal().find((a) => a.type === 'order')!);
     expect(hand(g, 'p2')).toHaveLength(6);
     expect(
       g
@@ -54,6 +57,7 @@ describe('OP16-047 Donquixote Doflamingo', () => {
     const g = start(10);
     act(g);
     pick(g, [g.find('p2', 'hand', BLUE, 0), g.find('p2', 'hand', BLUE, 1)]);
+    g.act(g.legal().find((a) => a.type === 'order')!);
     expect(hand(g, 'p2')).toHaveLength(8);
   });
 

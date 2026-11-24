@@ -51,6 +51,8 @@ describe('OP16-047 Donquixote Doflamingo: [Activate:Main] rest this: if the oppo
     need(g, 'choose', 'p2');
     expect(decider(g)).toBe('p2');
     pickInst(g, [inst(g, 'p2', 'hand', SCN.c6), inst(g, 'p2', 'hand', SCN.c2)]);
+    need(g, 'order', 'p2');
+    g.act(g.legal().find((a) => a.type === 'order')!);
     expect(hand(g, 'p2')).toHaveLength(6);
     expect(hand(g, 'p2')).not.toContain(SCN.c6);
     expect(deck(g, 'p2')).toHaveLength(12);
@@ -70,6 +72,8 @@ describe('OP16-047 Donquixote Doflamingo: [Activate:Main] rest this: if the oppo
     useAbility(g, doffyOf(g));
     need(g, 'choose', 'p2');
     pickInst(g, [inst(g, 'p2', 'hand', SCN.c1), inst(g, 'p2', 'hand', SCN.c2)]);
+    need(g, 'order', 'p2');
+    g.act(g.legal().find((a) => a.type === 'order')!);
     expect(hand(g, 'p2')).toHaveLength(7);
     expect(deck(g, 'p2')).toHaveLength(12);
   });
@@ -90,19 +94,18 @@ describe('OP16-047 Donquixote Doflamingo: [Activate:Main] rest this: if the oppo
     expect(choices(g).length).toBeGreaterThanOrEqual(7);
     expect(g.legal().some((a) => a.type === 'done')).toBe(false);
     pickInst(g, [inst(g, 'p2', 'hand', SCN.c1), inst(g, 'p2', 'hand', SCN.c2)]);
+    need(g, 'order', 'p2');
+    g.act(g.legal().find((a) => a.type === 'order')!);
     expect(kind(g)).toBe('main');
     expect(hand(g, 'p2')).toHaveLength(6);
   });
 
-  it.fails(
-    '"in any order": both orders of the two cards at the bottom are reachable by the opponent',
-    () => {
-      const g = start(HAND8);
-      useAbility(g, doffyOf(g));
-      const tails = outcomes(g, 'p2', (x) => deck(x, 'p2').slice(-2).join('>'), 6);
-      expect(tails.has(`${SCN.c1}>${SCN.c2}`) && tails.has(`${SCN.c2}>${SCN.c1}`)).toBe(true);
-    },
-  );
+  it('"in any order": both orders of the two cards at the bottom are reachable by the opponent', () => {
+    const g = start(HAND8);
+    useAbility(g, doffyOf(g));
+    const tails = outcomes(g, 'p2', (x) => deck(x, 'p2').slice(-2).join('>'), 6);
+    expect(tails.has(`${SCN.c1}>${SCN.c2}`) && tails.has(`${SCN.c2}>${SCN.c1}`)).toBe(true);
+  });
 
   it('a rested Doflamingo cannot activate (the cost needs it active)', () => {
     const g = start(HAND8, { card: DOFFY, rested: true });

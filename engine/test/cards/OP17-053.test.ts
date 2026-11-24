@@ -11,6 +11,7 @@ describe('OP17-053 Barbell', () => {
     const g = koedInBattle(ID, { leader: OTHER_LEADER }, { hand: [V.c1, V.c2, V.c3] });
     expectDecision(g, 'choose', 'p2');
     pick(g, [g.find('p2', 'hand', V.c1), g.find('p2', 'hand', V.c3)]);
+    g.act(g.legal().find((a) => a.type === 'order')!);
     expect(hand(g, 'p2')).toEqual([V.c2]);
     expect(cardsOf(g, 'p2', 'deck').slice(-2).sort()).toEqual([V.c1, V.c3].sort());
     expect(cardsOf(g, 'p2', 'deck')).toHaveLength(12);

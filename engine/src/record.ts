@@ -24,7 +24,7 @@ import type { State } from './state.ts';
  * card leaves old records live; a golden re-record is allowed without an engine bump only when that
  * game's own scripts changed (golden.test.ts, review M4b-17).
  */
-export const ENGINE_VERSION = '0.5.7';
+export const ENGINE_VERSION = '0.5.8';
 
 export class RecordVersionMismatch extends Error {
   constructor(

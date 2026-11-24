@@ -212,6 +212,9 @@ describe('move cost and the replacements that pay with the new costs', () => {
       g.find('p1', 'trash', V.c2),
       g.find('p1', 'trash', V.c3),
     ]);
+    expectDecision(g, 'order', 'p1');
+    // Three cards: two answers fix the order (the last card is the one left).
+    for (let i = 0; i < 2; i++) g.act(g.legal().find((a) => a.type === 'order')!);
     expect(g.zone('p1', 'characters')).toHaveLength(1);
     expect(g.zone('p1', 'trash').map((c) => c.card)).toEqual([V.c4]);
     expect(

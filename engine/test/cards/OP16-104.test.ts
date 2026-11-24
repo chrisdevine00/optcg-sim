@@ -1,5 +1,6 @@
 /** OP16-104 Catarina Devon. */
 import { describe, expect, it } from 'vitest';
+import { applyOp } from '../../src/testing.ts';
 import { expectDecision, game, hand, none, pick, PLAIN_BLUE, V } from './helpers.ts';
 import { BB_4, names, RED_1 } from './helpers-op16g4.ts';
 import { damageWith } from './triggers.ts';
@@ -19,6 +20,31 @@ describe('OP16-104 Catarina Devon', () => {
       const g = attackWith([V.c7, V.c1]);
       pick(g, [g.find('p2', 'characters', V.c7)]);
       expect(g.power(g.find('p1', 'characters', ID))).toBe(9000);
+    });
+
+    it("reads the selected Character's power with its modifiers, not its base power (R7)", () => {
+      const raised = (amount: number) => {
+        const g = game(
+          { leader: PLAIN_BLUE, characters: [ID] },
+          { leader: PLAIN_BLUE, characters: [V.c4] },
+        );
+        g.state = applyOp(g.state, {
+          op: 'modifier',
+          mod: {
+            kind: 'power',
+            target: g.find('p2', 'characters', V.c4),
+            amount,
+            duration: { kind: 'thisTurn', turn: 3 },
+            controller: 'p2',
+          },
+        }).state;
+        g.act({ type: 'attack', attacker: g.find('p1', 'characters', ID), target: g.leader('p2') });
+        pick(g, [g.find('p2', 'characters', V.c4)]);
+        return g.power(g.find('p1', 'characters', ID));
+      };
+      // The cost 4 vanilla has 6000 base power: +2000 reads as 8000, -3000 as 3000.
+      expect(raised(2000)).toBe(8000);
+      expect(raised(-3000)).toBe(3000);
     });
 
     it('a lower selected power lowers it too ("becomes the same")', () => {

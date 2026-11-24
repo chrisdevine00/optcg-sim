@@ -47,6 +47,9 @@ describe('OP17-095 Roronoa Zoro', () => {
       g.find('p1', 'trash', V.c1),
       g.find('p1', 'trash', BLUE, 0),
     ]);
+    expectDecision(g, 'order', 'p1');
+    // Three cards: two answers fix the order (the last card is the one left).
+    for (let i = 0; i < 2; i++) g.act(g.legal().find((a) => a.type === 'order')!);
     expect(g.zone('p1', 'characters').map((c) => c.card)).toContain(V.c4);
     expect(trash(g, 'p1')).toEqual([BLUE]);
     expect(
@@ -67,6 +70,10 @@ describe('OP17-095 Roronoa Zoro', () => {
         g,
         g.zone('p1', 'trash').map((c) => c.instance),
       );
+    // The three still go to the bottom in an order their owner picks.
+    expectDecision(g, 'order', 'p1');
+    // Three cards: two answers fix the order (the last card is the one left).
+    for (let i = 0; i < 2; i++) g.act(g.legal().find((a) => a.type === 'order')!);
     expect(g.zone('p1', 'characters').map((c) => c.card)).toContain('OP17-095');
     expect(trash(g, 'p1')).toEqual([]);
   });

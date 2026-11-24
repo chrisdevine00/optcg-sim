@@ -107,6 +107,8 @@ describe('OP17-053 Barbell: [On K.O.] the opponent places 2 cards from their han
     pickCards(g, [BARBELL]);
     need(g, 'choose', 'p2');
     pickCards(g, [SCN.c2, SCN.c3]);
+    need(g, 'order', 'p2');
+    g.act(g.legal().find((a) => a.type === 'order')!);
     expect(deck(g, 'p2').slice(-2).sort()).toEqual([SCN.c2, SCN.c3].sort());
     expect(hand(g, 'p2')).toEqual([SCN.c4]);
   });

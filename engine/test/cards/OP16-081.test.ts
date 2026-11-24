@@ -1,6 +1,6 @@
 /** OP16-081 Otama. */
 import { describe, expect, it } from 'vitest';
-import { game, none, pick, PLAIN_BLUE, V } from './helpers.ts';
+import { expectDecision, game, none, pick, PLAIN_BLUE, V } from './helpers.ts';
 import { NOT_NAVY, WANO_8 } from './helpers-op16g3.ts';
 
 const ID = 'OP16-081';
@@ -21,8 +21,19 @@ describe('OP16-081 Otama', () => {
   it('a Character with cost 7 is not enough: the cost is paid and nothing happens', () => {
     const g = start([V.c7]);
     use(g);
+    // No target is asked for (a pick would still be pending if cost 7 counted), and no power moved.
+    expectDecision(g, 'main', 'p1');
     expect(g.power(g.find('p2', 'characters', V.c4))).toBe(6000);
     expect(g.card(g.find('p1', 'characters', ID)).rested).toBe(true);
+  });
+
+  it('the boundary: a cost 8 Character asks for the target, a cost 7 one does not', () => {
+    const at8 = start([WANO_8]);
+    use(at8);
+    expectDecision(at8, 'choose', 'p1');
+    const at7 = start([V.c7]);
+    use(at7);
+    expectDecision(at7, 'main', 'p1');
   });
 
   it('Otama herself (cost 2) does not satisfy the condition', () => {

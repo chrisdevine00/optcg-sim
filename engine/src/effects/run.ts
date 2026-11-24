@@ -631,8 +631,16 @@ function payCost(d: Draft, f: EffectFrame, k: Cost, reserve: number): Out {
         remove: k.to.zone as 'hand' | 'deck' | 'trash',
         ...(k.to.zone === 'deck' ? { position: k.to.position === 'top' ? 'top' : 'bottom' } : {}),
       } as FieldCostHow);
-    const ids = select(d, f, k.move, { role: 'cost', verb: 'move' });
-    if (ids === WAIT) return WAIT;
+    const bottom = k.to.zone === 'deck' && k.to.position === 'bottom';
+    let ids: InstanceId[];
+    if (bottom && f.tmp?.sel) {
+      ids = f.tmp.sel; // already chosen; waiting for the owner's order
+    } else {
+      const picked = select(d, f, k.move, { role: 'cost', verb: 'move' });
+      if (picked === WAIT) return WAIT;
+      ids = picked;
+    }
+    if (bottom && ids.length > 1) return placeHandTrash(d, f, ids, k.to as Dest, 'cost');
     placeCards(d, ids, k.to, 'cost');
     return 'next';
   }
@@ -1461,14 +1469,7 @@ function move(
     return 'next';
   }
   if (zones.every((z) => z === 'trash' || z === 'hand')) {
-    for (const id of ids)
-      moveCard(d, id, to.zone as 'hand', {
-        revealed: true,
-        // The declared deck position is honoured (M4a-07); hand and trash take the default.
-        position: to.zone === 'deck' ? (to.position === 'bottom' ? 'bottom' : 'top') : undefined,
-        extra: { reason: 'effect' },
-      });
-    return 'next';
+    return placeHandTrash(d, f, ids, to as Dest, 'effect');
   }
   if (!zones.every((z) => z === 'characters' || z === 'stage') || to.zone === 'life')
     return unsupported(d, f, `move from ${zones.join('/')} to ${to.zone}`);
@@ -1480,29 +1481,9 @@ function move(
   // below it (`rank`). With cards of both players there is one each: nothing to order.
   let ranks: Map<InstanceId, number> | undefined;
   if (dest === 'deck' && to.position === 'bottom' && ids.length > 1) {
-    const owner = d.card(ids[0]!).owner;
-    if (ids.every((id) => d.card(id).owner === owner)) {
-      const order = [...(f.tmp?.order ?? [])];
-      const g = take(f);
-      if (typeof g === 'string') order.push(g);
-      const left = ids.filter((id) => !order.includes(id));
-      if (left.length >= 2) {
-        f.tmp = { ...f.tmp, sel: ids, order };
-        return ask(d, f, {
-          kind: 'order',
-          player: owner,
-          prompt: `${nameOf(d, f)}: choose the next card to place at the bottom of your deck (it ends up above the ones after it).`,
-          candidates: left.slice().sort(),
-          role: 'order',
-          options: left
-            .slice()
-            .sort()
-            .map((id) => ({ id, label: d.s.defs[d.card(id).card]!.name })),
-        });
-      }
-      order.push(...left);
-      ranks = new Map(order.map((id, i) => [id, i]));
-    }
+    const o = bottomOrder(d, f, ids);
+    if (o === WAIT) return WAIT;
+    ranks = o;
   }
   for (const id of ids.slice().reverse()) {
     if (!FIELD.has(d.card(id).zone)) continue;
@@ -1517,6 +1498,79 @@ function move(
     );
   }
   return 'next';
+}
+
+/**
+ * Cards from a hand or trash to a zone, for a cost or an effect. Several to a deck bottom: the
+ * owner orders them, hidden from the other player. The cards move in a fixed order, each slotted
+ * above those owed below it, so neither the event order nor a revealed identity (a hand card going
+ * into the deck is not revealed) leaks it.
+ */
+function placeHandTrash(
+  d: Draft,
+  f: EffectFrame,
+  ids: InstanceId[],
+  to: Dest,
+  reason: string,
+): Out {
+  let ranks: Map<InstanceId, number> | undefined;
+  if (to.zone === 'deck' && to.position === 'bottom' && ids.length > 1) {
+    const o = bottomOrder(d, f, ids);
+    if (o === WAIT) return WAIT;
+    ranks = o;
+  }
+  const placed: InstanceId[] = [];
+  for (const id of ranks ? ids.slice().sort() : ids) {
+    const above = ranks ? placed.filter((p) => ranks!.get(p)! > ranks!.get(id)!).length : 0;
+    const wasHand = d.card(id).zone === 'hand';
+    moveCard(d, id, to.zone as 'hand', {
+      revealed: !(wasHand && to.zone === 'deck'),
+      // The declared deck position is honoured (M4a-07); hand and trash take the default.
+      position: to.zone === 'deck' ? (to.position === 'bottom' ? 'bottom' : 'top') : undefined,
+      ...(above > 0 ? { above } : {}),
+      extra: { reason },
+    });
+    placed.push(id);
+  }
+  return 'next';
+}
+
+/**
+ * Several of one player's cards placed at the bottom of their deck "in any order" (OP06-058, and
+ * from a hand or trash: OP16-047, OP17-053, OP17-095): the owner orders them (official OP06 Q&A),
+ * and the other player must not learn the order. The cards leave in a fixed order, so the events
+ * say nothing; each is slotted above the ones owed below it (`rank`). With cards of both players
+ * there is one each: nothing to order. Returns the ranks, undefined when there is nothing to
+ * order, or WAIT after asking the owner for the next card.
+ */
+function bottomOrder(
+  d: Draft,
+  f: EffectFrame,
+  ids: InstanceId[],
+): Map<InstanceId, number> | undefined | typeof WAIT {
+  const owner = d.card(ids[0]!).owner;
+  if (!ids.every((id) => d.card(id).owner === owner)) return undefined;
+  const order = [...(f.tmp?.order ?? [])];
+  const g = take(f);
+  if (typeof g === 'string') order.push(g);
+  const left = ids.filter((id) => !order.includes(id));
+  if (left.length >= 2) {
+    f.tmp = { ...f.tmp, sel: ids, order };
+    ask(d, f, {
+      kind: 'order',
+      player: owner,
+      prompt: `${nameOf(d, f)}: choose the next card to place at the bottom of your deck (it ends up above the ones after it).`,
+      candidates: left.slice().sort(),
+      role: 'order',
+      options: left
+        .slice()
+        .sort()
+        .map((id) => ({ id, label: d.s.defs[d.card(id).card]!.name })),
+    });
+    return WAIT;
+  }
+  order.push(...left);
+  return new Map(order.map((id, i) => [id, i]));
 }
 
 /**
