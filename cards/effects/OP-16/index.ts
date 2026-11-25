@@ -71,6 +71,7 @@ import { OP16_075 } from './OP16-075.ts';
 import { OP16_076 } from './OP16-076.ts';
 import { OP16_077 } from './OP16-077.ts';
 import { OP16_078 } from './OP16-078.ts';
+import { OP16_080 } from './OP16-080.ts';
 import { OP16_081 } from './OP16-081.ts';
 import { OP16_082 } from './OP16-082.ts';
 import { OP16_083 } from './OP16-083.ts';
@@ -180,6 +181,7 @@ const SET: readonly CardScript[] = [
   OP16_076,
   OP16_077,
   OP16_078,
+  OP16_080,
   OP16_081,
   OP16_082,
   OP16_083,

@@ -75,6 +75,8 @@ describe('ST27-004 Sanjuan.Wolf', () => {
         attacker: g.find('p2', 'characters', V.c7),
         target: g.leader('p1'),
       });
+      // The Leader's own [On Your Opponent's Attack] (OP16-080, scripted) asks first: decline it.
+      if (g.legal().some((a) => a.type === 'optional')) g.act({ type: 'optional', accept: false });
       const wolf = g.find('p1', 'characters', ID);
       expect(g.legal().some((a) => a.type === 'block' && a.blocker === wolf)).toBe(canBlock);
     }
