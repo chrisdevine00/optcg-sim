@@ -2,6 +2,7 @@
 import type { CardScript } from '../../src/dsl.ts';
 import { OP14_001 } from './OP14-001.ts';
 import { OP14_002 } from './OP14-002.ts';
+import { OP14_003 } from './OP14-003.ts';
 import { OP14_004 } from './OP14-004.ts';
 import { OP14_005 } from './OP14-005.ts';
 import { OP14_006 } from './OP14-006.ts';
@@ -110,6 +111,7 @@ import { OP14_120 } from './OP14-120.ts';
 const SET: readonly CardScript[] = [
   OP14_001,
   OP14_002,
+  OP14_003,
   OP14_004,
   OP14_005,
   OP14_006,

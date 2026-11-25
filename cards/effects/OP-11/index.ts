@@ -3,6 +3,7 @@ import type { CardScript } from '../../src/dsl.ts';
 import { OP11_001 } from './OP11-001.ts';
 import { OP11_002 } from './OP11-002.ts';
 import { OP11_004 } from './OP11-004.ts';
+import { OP11_005 } from './OP11-005.ts';
 import { OP11_007 } from './OP11-007.ts';
 import { OP11_008 } from './OP11-008.ts';
 import { OP11_009 } from './OP11-009.ts';
@@ -48,14 +49,20 @@ import { OP11_061 } from './OP11-061.ts';
 import { OP11_062 } from './OP11-062.ts';
 import { OP11_063 } from './OP11-063.ts';
 import { OP11_065 } from './OP11-065.ts';
+import { OP11_066 } from './OP11-066.ts';
 import { OP11_067 } from './OP11-067.ts';
 import { OP11_069 } from './OP11-069.ts';
 import { OP11_070 } from './OP11-070.ts';
+import { OP11_071 } from './OP11-071.ts';
 import { OP11_072 } from './OP11-072.ts';
+import { OP11_073 } from './OP11-073.ts';
+import { OP11_074 } from './OP11-074.ts';
 import { OP11_075 } from './OP11-075.ts';
 import { OP11_076 } from './OP11-076.ts';
 import { OP11_077 } from './OP11-077.ts';
+import { OP11_079 } from './OP11-079.ts';
 import { OP11_080 } from './OP11-080.ts';
+import { OP11_081 } from './OP11-081.ts';
 import { OP11_082 } from './OP11-082.ts';
 import { OP11_083 } from './OP11-083.ts';
 import { OP11_084 } from './OP11-084.ts';
@@ -63,6 +70,7 @@ import { OP11_085 } from './OP11-085.ts';
 import { OP11_086 } from './OP11-086.ts';
 import { OP11_090 } from './OP11-090.ts';
 import { OP11_091 } from './OP11-091.ts';
+import { OP11_092 } from './OP11-092.ts';
 import { OP11_095 } from './OP11-095.ts';
 import { OP11_096 } from './OP11-096.ts';
 import { OP11_097 } from './OP11-097.ts';
@@ -87,6 +95,7 @@ const SET: readonly CardScript[] = [
   OP11_001,
   OP11_002,
   OP11_004,
+  OP11_005,
   OP11_007,
   OP11_008,
   OP11_009,
@@ -132,14 +141,20 @@ const SET: readonly CardScript[] = [
   OP11_062,
   OP11_063,
   OP11_065,
+  OP11_066,
   OP11_067,
   OP11_069,
   OP11_070,
+  OP11_071,
   OP11_072,
+  OP11_073,
+  OP11_074,
   OP11_075,
   OP11_076,
   OP11_077,
+  OP11_079,
   OP11_080,
+  OP11_081,
   OP11_082,
   OP11_083,
   OP11_084,
@@ -147,6 +162,7 @@ const SET: readonly CardScript[] = [
   OP11_086,
   OP11_090,
   OP11_091,
+  OP11_092,
   OP11_095,
   OP11_096,
   OP11_097,
