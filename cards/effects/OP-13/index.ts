@@ -54,6 +54,7 @@ import { OP13_060 } from './OP13-060.ts';
 import { OP13_061 } from './OP13-061.ts';
 import { OP13_062 } from './OP13-062.ts';
 import { OP13_063 } from './OP13-063.ts';
+import { OP13_064 } from './OP13-064.ts';
 import { OP13_065 } from './OP13-065.ts';
 import { OP13_066 } from './OP13-066.ts';
 import { OP13_067 } from './OP13-067.ts';
@@ -85,6 +86,7 @@ import { OP13_099 } from './OP13-099.ts';
 import { OP13_100 } from './OP13-100.ts';
 import { OP13_102 } from './OP13-102.ts';
 import { OP13_104 } from './OP13-104.ts';
+import { OP13_105 } from './OP13-105.ts';
 import { OP13_106 } from './OP13-106.ts';
 import { OP13_108 } from './OP13-108.ts';
 import { OP13_109 } from './OP13-109.ts';
@@ -154,6 +156,7 @@ const SET: readonly CardScript[] = [
   OP13_061,
   OP13_062,
   OP13_063,
+  OP13_064,
   OP13_065,
   OP13_066,
   OP13_067,
@@ -185,6 +188,7 @@ const SET: readonly CardScript[] = [
   OP13_100,
   OP13_102,
   OP13_104,
+  OP13_105,
   OP13_106,
   OP13_108,
   OP13_109,

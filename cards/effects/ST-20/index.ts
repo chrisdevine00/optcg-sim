@@ -2,8 +2,9 @@
 import type { CardScript } from '../../src/dsl.ts';
 import { ST20_001 } from './ST20-001.ts';
 import { ST20_002 } from './ST20-002.ts';
+import { ST20_003 } from './ST20-003.ts';
 import { ST20_004 } from './ST20-004.ts';
 import { ST20_005 } from './ST20-005.ts';
 
-const SET: readonly CardScript[] = [ST20_001, ST20_002, ST20_004, ST20_005];
+const SET: readonly CardScript[] = [ST20_001, ST20_002, ST20_003, ST20_004, ST20_005];
 export default SET;

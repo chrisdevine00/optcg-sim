@@ -21,6 +21,7 @@ import { OP12_029 } from './OP12-029.ts';
 import { OP12_030 } from './OP12-030.ts';
 import { OP12_031 } from './OP12-031.ts';
 import { OP12_033 } from './OP12-033.ts';
+import { OP12_036 } from './OP12-036.ts';
 import { OP12_037 } from './OP12-037.ts';
 import { OP12_038 } from './OP12-038.ts';
 import { OP12_039 } from './OP12-039.ts';
@@ -83,6 +84,7 @@ import { OP12_112 } from './OP12-112.ts';
 import { OP12_113 } from './OP12-113.ts';
 import { OP12_115 } from './OP12-115.ts';
 import { OP12_116 } from './OP12-116.ts';
+import { OP12_117 } from './OP12-117.ts';
 import { OP12_118 } from './OP12-118.ts';
 import { OP12_119 } from './OP12-119.ts';
 
@@ -108,6 +110,7 @@ const SET: readonly CardScript[] = [
   OP12_030,
   OP12_031,
   OP12_033,
+  OP12_036,
   OP12_037,
   OP12_038,
   OP12_039,
@@ -170,6 +173,7 @@ const SET: readonly CardScript[] = [
   OP12_113,
   OP12_115,
   OP12_116,
+  OP12_117,
   OP12_118,
   OP12_119,
 ];

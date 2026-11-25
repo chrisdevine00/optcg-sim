@@ -11,6 +11,7 @@ import {
   type PlayerId,
   type PlayerSpec,
 } from '@optcg/engine';
+import { withAbilities } from '../../../../src/testing.ts';
 import { act, attack, cardIds, decision, fill, noDefence, passBlock, play } from '../../helpers.ts';
 import type { TestGame } from '../../../fixtures/index.ts';
 import {
@@ -123,10 +124,27 @@ export function mine(
   p2: Partial<PlayerSpec> = {},
   p2Leader: string = LEAD.luffy,
 ): TestGame {
-  return myTurn(
-    { ...side('ST01-001', BLUE, { costArea: { active: 10, rested: 0 }, ...spec }), leader },
-    side(p2Leader, RED, p2),
+  return inertScenery(
+    myTurn(
+      { ...side('ST01-001', BLUE, { costArea: { active: 10, rested: 0 }, ...spec }), leader },
+      side(p2Leader, RED, p2),
+    ),
   );
+}
+
+/**
+ * OP16-080 Teach and OP14-060 Doflamingo are scripted now (wave 7); these tests use them as bare
+ * {Blackbeard Pirates} / {Donquixote Pirates} Leaders, so their own text is removed here.
+ */
+function inertScenery(g: TestGame): TestGame {
+  for (const id of ['OP16-080', 'OP14-060']) {
+    try {
+      g.state = withAbilities(g.state, id, []);
+    } catch {
+      // The card is not in this game.
+    }
+  }
+  return g;
 }
 
 /** p2's Main Phase (turn 4); p1 defends. */
@@ -136,9 +154,11 @@ export function theirs(
   p2: Partial<PlayerSpec> = {},
   p2Leader: string = LEAD.luffy,
 ): TestGame {
-  return theirTurn(
-    side(leader, BLUE, { costArea: { active: 0, rested: 0 }, ...spec }),
-    side(p2Leader, RED, { costArea: { active: 10, rested: 0 }, ...p2 }),
+  return inertScenery(
+    theirTurn(
+      side(leader, BLUE, { costArea: { active: 0, rested: 0 }, ...spec }),
+      side(p2Leader, RED, { costArea: { active: 10, rested: 0 }, ...p2 }),
+    ),
   );
 }
 
