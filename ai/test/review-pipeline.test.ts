@@ -609,7 +609,10 @@ describe('missed lethal on real games: the pipeline agrees with the sequential r
       const old = reviewMissedLethal(g.record, lookup, cards, { seats: ['p1'], cap });
       const r = reviewRecord(g.record, g.cards, { seats: ['p1'], nodes: 3000 });
       expect(
-        r.results.flatMap((x) => x.flags).map((f) => [f.turn, f.decisionIndex, f.severity]),
+        r.results
+          .flatMap((x) => x.flags)
+          .filter((f) => f.kind === 'missed-lethal')
+          .map((f) => [f.turn, f.decisionIndex, f.severity]),
       ).toEqual(
         old
           .filter((o) => o.kind === 'missed-lethal')
