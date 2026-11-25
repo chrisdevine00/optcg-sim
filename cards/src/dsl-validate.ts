@@ -34,6 +34,8 @@ export const IMPLEMENTED = {
     'event:lifeRemoved',
     'event:lifeBecameZero',
     'event:koed',
+    // M6b wave 5 (G43).
+    'event:damageTaken',
     // M6b wave 3 (G22, G24, G29).
     'event:trashedFromHand',
     'event:rested',
@@ -52,6 +54,8 @@ export const IMPLEMENTED = {
     'donCostArea',
     // Only as the source of a `move` (the top Life card to a hand): see `selector`.
     'lifeTop',
+    // Only as the source of a `move` to your hand (G45): you choose the top or the bottom.
+    'lifeTopOrBottom',
   ],
   picks: ['upTo', 'exactly', 'any'],
   costs: [
@@ -100,6 +104,9 @@ export const IMPLEMENTED = {
     'giveDon',
     'skipRefresh',
     'trashLifeUntil',
+    // M6b wave 5 (G41, G44).
+    'turnLifeFaceDown',
+    'chooseNumber',
     // M6b wave 4 (G33, G32, G35, G36, D6).
     'damage',
     'winGame',
@@ -143,6 +150,9 @@ export const IMPLEMENTED = {
     'eventCount',
     'donGivenToTarget',
     'targetPower',
+    // M6b wave 5 (G41, G44).
+    'lifeFaceUp',
+    'chosen',
   ],
 } as const;
 
@@ -162,6 +172,8 @@ interface Ctx {
   koOk?: boolean;
   /** Inside the amount of a `power` or `cost` action, which has a target to read (G34). */
   perTarget?: boolean;
+  /** Names a `chooseNumber` action has bound so far (G44). */
+  chosen: Set<string>;
 }
 
 const isObj = (v: unknown): v is Obj => !!v && typeof v === 'object' && !Array.isArray(v);
@@ -271,6 +283,8 @@ function num(c: Ctx, path: string, v: unknown): void {
       'eventCount',
       'donGivenToTarget',
       'targetPower',
+      'lifeFaceUp',
+      'chosen',
     ],
     { donOnField: ['state'], refStat: ['stat'], count: ['distinctNames'] },
   );
@@ -289,6 +303,7 @@ function num(c: Ctx, path: string, v: unknown): void {
     case 'trash':
     case 'deck':
     case 'donGiven':
+    case 'lifeFaceUp':
     case 'turnIndex':
       return enumOf(c, `${path}.${k}`, o[k], P);
     case 'donOnField':
@@ -297,6 +312,12 @@ function num(c: Ctx, path: string, v: unknown): void {
       return;
     case 'refCount':
       return ref(c, `${path}.refCount`, o.refCount);
+    case 'chosen':
+      // The number a `chooseNumber` bound (G44).
+      str(c, `${path}.chosen`, o.chosen);
+      if (typeof o.chosen === 'string' && !c.chosen.has(o.chosen))
+        err(c, `${path}.chosen`, `refers to "${o.chosen}", which no earlier chooseNumber binds`);
+      return;
     case 'refStat':
       ref(c, `${path}.refStat`, o.refStat);
       return enumOf(c, `${path}.stat`, o.stat, ['cost', 'power', 'basePower', 'donGiven']);
@@ -452,8 +473,8 @@ function selector(c: Ctx, path: string, v: unknown): void {
     enumOf(c, `${path}.from`, z, ZONES);
     if (typeof z === 'string' && ZONES.includes(z) && !has(IMPLEMENTED.zones, z))
       err(c, `${path}.from`, `zone ${z} is not implemented in the runtime yet`);
-    if (z === 'lifeTop' && !c.lifeOk)
-      err(c, `${path}.from`, 'lifeTop can only be the source of a move to a hand or the trash');
+    if ((z === 'lifeTop' || z === 'lifeTopOrBottom') && !c.lifeOk)
+      err(c, `${path}.from`, `${z} can only be the source of a move to a hand or the trash`);
   }
   enumOf(c, `${path}.owner`, v.owner, [...P, 'any']);
   if (v.filter !== undefined) filter(c, `${path}.filter`, v.filter);
@@ -607,7 +628,15 @@ function cost(c: Ctx, path: string, v: unknown): void {
       return;
     case 'returnDon':
       // A number: DON!! from anywhere on the field. `{ n, state: 'active' }`: active cost-area DON!! (G9).
-      if (isObj(o.returnDon)) {
+      if (isObj(o.returnDon) && 'atLeast' in o.returnDon) {
+        // "Return 1 or more DON!! cards" (G42): the player chooses how many. A cost of an ability
+        // (it is chosen, which a replacement's payload does not ask).
+        fields(c, p, o.returnDon, ['atLeast']);
+        int(c, `${p}.atLeast`, o.returnDon.atLeast);
+        if (typeof o.returnDon.atLeast === 'number' && o.returnDon.atLeast < 1)
+          err(c, `${p}.atLeast`, 'must be at least 1');
+        if (c.noAlt) err(c, p, 'a replacement payload returns a fixed number of DON!!');
+      } else if (isObj(o.returnDon)) {
         fields(c, p, o.returnDon, ['n', 'state']);
         int(c, `${p}.n`, o.returnDon.n);
         enumOf(c, `${p}.state`, o.returnDon.state, ['active']);
@@ -828,6 +857,8 @@ function action(c: Ctx, path: string, v: unknown): void {
       'reveal',
       'move',
       'trashLifeUntil',
+      'turnLifeFaceDown',
+      'chooseNumber',
       'play',
       'ko',
       'rest',
@@ -897,6 +928,8 @@ function action(c: Ctx, path: string, v: unknown): void {
         'the runtime sets active field cards or cost-area DON!! only',
       );
     case 'skipRefresh':
+      selector(c, p, x);
+      return skipRefreshDon(c, p, x);
     case 'select':
       return selector(c, p, x);
     case 'mill':
@@ -943,12 +976,35 @@ function action(c: Ctx, path: string, v: unknown): void {
       ]);
     }
     case 'reveal':
-      fields(c, p, x, ['from', 'n', 'bind']);
+      fields(c, p, x, ['from', 'n', 'bind'], ['player']);
       if (!isObj(x)) return;
       enumOf(c, `${p}.from`, x.from, ['deckTop', 'lifeTop']);
       if (x.n !== 1) err(c, `${p}.n`, 'only n = 1 is implemented');
+      // The top card of the opponent's deck, shown to both (G44): never the opponent's Life.
+      if (x.player !== undefined) {
+        if (x.player !== 'opponent') err(c, `${p}.player`, 'expected "opponent"');
+        else if (x.from !== 'deckTop')
+          err(c, `${p}.player`, "only the top card of the opponent's deck is revealed");
+      }
       str(c, `${p}.bind`, x.bind);
       if (typeof x.bind === 'string') c.bound.add(x.bind);
+      return;
+    case 'chooseNumber':
+      // "Choose a cost" (G44): a whole number in a small range, bound by name.
+      fields(c, p, x, ['min', 'max', 'bind']);
+      if (!isObj(x)) return;
+      int(c, `${p}.min`, x.min);
+      int(c, `${p}.max`, x.max);
+      if (typeof x.min === 'number' && typeof x.max === 'number') {
+        if (x.min < 0 || x.max > 10 || x.min > x.max)
+          err(c, p, 'the range is 0 to 10, with min no more than max');
+      }
+      str(c, `${p}.bind`, x.bind);
+      if (typeof x.bind === 'string') {
+        if (c.chosen.has(x.bind) || c.bound.has(x.bind))
+          err(c, `${p}.bind`, `"${x.bind}" is already bound`);
+        c.chosen.add(x.bind);
+      }
       return;
     case 'move':
       fields(c, p, x, ['what', 'to']);
@@ -960,6 +1016,10 @@ function action(c: Ctx, path: string, v: unknown): void {
       return moveShape(c, p, x.what, x.to);
     case 'trashLifeUntil':
       return int(c, p, x);
+    case 'turnLifeFaceDown':
+      // G41: only "all of your Life cards" (the cost form turns the top N).
+      if (x !== 'all') err(c, p, "expected 'all'");
+      return;
     case 'play':
       fields(c, p, x, ['what'], ['rested']);
       if (!isObj(x)) return;
@@ -1091,6 +1151,14 @@ function action(c: Ctx, path: string, v: unknown): void {
           err(c, `${p}.what`, 'that restriction applies to a player, not to cards');
       }
       restriction(c, `${p}.what`, x.what);
+      if (isObj(x.what) && 'cannotAttackTarget' in x.what && typeof x.target !== 'string')
+        zonesIn(
+          c,
+          `${p}.target`,
+          x.target,
+          ['leader', 'characters', 'field', 'self'],
+          'only a Leader or Character attacks',
+        );
       return enumOf(c, `${p}.duration`, x.duration, DURATIONS);
     case 'damage':
       // Real damage (G36): the Life card taken may carry a [Trigger], and 0 Life defeats (RL-22).
@@ -1157,6 +1225,34 @@ function action(c: Ctx, path: string, v: unknown): void {
   }
 }
 
+/**
+ * `skipRefresh` of DON!! (G48): your opponent's rested cost-area DON!!, a count of 1 or more. A
+ * mixed zone list, another owner or state, or a pick that chooses cards would do something other
+ * than the card says, so they are refused.
+ */
+function skipRefreshDon(c: Ctx, path: string, sel: unknown): void {
+  if (!isObj(sel)) return;
+  const zones = Array.isArray(sel.from) ? sel.from : [sel.from];
+  if (!zones.includes('donCostArea')) return;
+  if (zones.length !== 1) err(c, `${path}.from`, 'DON!! and cards cannot be skipped together');
+  if (sel.owner !== 'opponent')
+    err(
+      c,
+      `${path}.owner`,
+      'only your opponent\'s rested DON!! are held back: owner must be "opponent"',
+    );
+  const f = sel.filter;
+  if (!isObj(f) || f.state !== 'rested' || Object.keys(f).length !== 1)
+    err(
+      c,
+      `${path}.filter`,
+      "DON!! held back are the rested ones: filter must be { state: 'rested' }",
+    );
+  const pk = sel.pick;
+  if (!isObj(pk) || !('upTo' in pk || 'exactly' in pk))
+    err(c, `${path}.pick`, 'a count of DON!!: pick { upTo: n } or { exactly: n }');
+}
+
 const FIELD_ZONES = ['leader', 'characters', 'stage', 'field', 'self'];
 
 /** Every zone of a selector must be one of `allowed` (the runtime would mishandle others, M4a-07). */
@@ -1190,6 +1286,18 @@ function moveShape(c: Ctx, path: string, what: unknown, to: unknown): void {
         `${path}.what.pick`,
         'a move from the deck top needs { upTo: 1 } or { exactly: 1 } (exactly: mandatory, CR 8-1-2)',
       );
+    return;
+  }
+  if (zones.includes('lifeTopOrBottom')) {
+    // "Add 1 card from the top or bottom of your Life cards to your hand" (G45): your own Life, to
+    // your hand, exactly 1 (the choice of end is the controller's).
+    const pk = what.pick as Record<string, unknown> | undefined;
+    if (zones.length !== 1 || dz !== 'hand' || pos !== undefined || to.faceUp !== undefined)
+      return err(c, path, 'a move from the top or bottom of Life is implemented only to your hand');
+    if (what.owner !== 'you')
+      err(c, `${path}.what.owner`, 'the top or bottom of your own Life cards: owner must be "you"');
+    if (!pk || pk.exactly !== 1)
+      err(c, `${path}.what.pick`, 'a move from the top or bottom of Life needs { exactly: 1 }');
     return;
   }
   if (zones.includes('lifeTop')) {
@@ -1264,13 +1372,22 @@ function restriction(c: Ctx, path: string, v: unknown): void {
     c,
     path,
     v,
-    ['cannotPlay', 'cannotBeKOd', 'cannotBeRested', 'cannotSetDonActive'],
+    ['cannotPlay', 'cannotBeKOd', 'cannotBeRested', 'cannotSetDonActive', 'cannotAttackTarget'],
     { cannotPlay: ['from'] },
   );
   if (!k || !isObj(v)) return;
   if (k === 'cannotPlay') {
     filter(c, `${path}.cannotPlay`, v.cannotPlay);
     if ('from' in v) enumOf(c, `${path}.from`, v.from, ['hand']);
+  } else if (k === 'cannotAttackTarget') {
+    // G47: the card cannot attack a card matching the filter (read on that card alone).
+    deckFilter(
+      c,
+      `${path}.cannotAttackTarget`,
+      v.cannotAttackTarget,
+      SOURCE_FILTER_KEYS,
+      'a target filter reads only the card that would be attacked',
+    );
   } else if (k === 'cannotSetDonActive') {
     // A player restriction (G21): only "using Character effects" is implemented.
     fields(c, `${path}.cannotSetDonActive`, v.cannotSetDonActive, ['by']);
@@ -1278,13 +1395,23 @@ function restriction(c: Ctx, path: string, v: unknown): void {
       enumOf(c, `${path}.cannotSetDonActive.by`, v.cannotSetDonActive.by, ['characterEffects']);
   } else if (k === 'cannotBeKOd') {
     // Scoped by cause (G6): "by effects", "by your opponent's effects", "in battle".
-    fields(c, `${path}.cannotBeKOd`, v.cannotBeKOd, ['cause']);
-    if (isObj(v.cannotBeKOd))
+    fields(c, `${path}.cannotBeKOd`, v.cannotBeKOd, ['cause'], ['by']);
+    if (isObj(v.cannotBeKOd)) {
       enumOf(c, `${path}.cannotBeKOd.cause`, v.cannotBeKOd.cause, [
         'effect',
         'opponentEffect',
         'battle',
       ]);
+      // G46: only K.O.s by a source matching the filter; it reads that card alone.
+      if (v.cannotBeKOd.by !== undefined)
+        deckFilter(
+          c,
+          `${path}.cannotBeKOd.by`,
+          v.cannotBeKOd.by,
+          SOURCE_FILTER_KEYS,
+          "a source filter reads only the K.O.'s source card",
+        );
+    }
   } else {
     // Scoped by source (G2): only "by your opponent's effects" is implemented.
     fields(c, `${path}.cannotBeRested`, v.cannotBeRested, ['by']);
@@ -1369,7 +1496,16 @@ function continuous(c: Ctx, path: string, v: unknown): void {
         err(c, `${p}.what`, 'a permanent cannot restrict setting DON!! active');
       else if (x.what === 'cannotDrawByOwnEffects')
         err(c, `${p}.what`, 'a permanent cannot restrict drawing');
-      else restriction(c, `${p}.what`, x.what);
+      else if (isObj(x.what) && 'cannotAttackTarget' in x.what) {
+        restriction(c, `${p}.what`, x.what);
+        zonesIn(
+          c,
+          `${p}.target`,
+          x.target,
+          ['leader', 'characters', 'field', 'self'],
+          'only a Leader or Character attacks',
+        );
+      } else restriction(c, `${p}.what`, x.what);
       return;
     case 'tiers':
       return arr(c, p, x, (t, q) => {
@@ -1403,6 +1539,7 @@ function timing(c: Ctx, path: string, v: unknown): void {
       'includeCosts',
       'cause',
       'to',
+      'min',
     ],
   );
   if (!isObj(v)) return;
@@ -1416,8 +1553,9 @@ function timing(c: Ctx, path: string, v: unknown): void {
     rested: ['sourceFilter', 'by'],
     removed: ['cause', 'to'],
     leftField: ['cause', 'to'],
+    donReturned: ['min', 'cause'],
   };
-  for (const k of ['from', 'via', 'sourceFilter', 'includeCosts', 'cause', 'to'])
+  for (const k of ['from', 'via', 'sourceFilter', 'includeCosts', 'cause', 'to', 'min'])
     if (k in v && !(own[String(v.event)] ?? []).includes(k))
       err(c, `${path}.${k}`, `${k} does not apply to a ${String(v.event)} event`);
   if (v.event === 'attack') {
@@ -1463,6 +1601,16 @@ function timing(c: Ctx, path: string, v: unknown): void {
     if (v.owner !== undefined) enumOf(c, `${path}.owner`, v.owner, P);
   } else if (v.event === 'lifeRemoved') {
     enumOf(c, `${path}.owner`, v.owner, [...P, 'any']);
+  } else if (v.event === 'donReturned') {
+    // G40: 2 or more returned at once, and whose effect returned them.
+    enumOf(c, `${path}.owner`, v.owner, P);
+    if (v.min !== undefined) {
+      int(c, `${path}.min`, v.min);
+      if (typeof v.min === 'number' && v.min < 2)
+        err(c, `${path}.min`, 'min is 2 or more (every return is at least 1)');
+    }
+    if (v.cause !== undefined)
+      enumOf(c, `${path}.cause`, v.cause, ['effect', 'yourEffect', 'opponentEffect']);
   } else {
     enumOf(c, `${path}.owner`, v.owner, P);
   }
@@ -1474,6 +1622,7 @@ function ability(c: Ctx, path: string, v: unknown, ids: Set<string>): void {
   if (!isObj(v)) return err(c, path, 'expected an object');
   c.bound = new Set();
   c.labels = new Set();
+  c.chosen = new Set();
   c.evCount =
     v.kind === 'auto' &&
     Array.isArray(v.when) &&
@@ -1604,15 +1753,26 @@ const DECK_FILTER_KEYS = [
   'not',
 ];
 
-function deckFilter(c: Ctx, path: string, v: unknown): void {
+/**
+ * A `cannotBeKOd` source filter (G46) reads the card that K.O.s, wherever it is: the printed
+ * values, its keywords and whether it is rested, and nothing relative to the protected card.
+ */
+const SOURCE_FILTER_KEYS = [...DECK_FILTER_KEYS, 'keyword', 'state'];
+
+function deckFilter(
+  c: Ctx,
+  path: string,
+  v: unknown,
+  keys: readonly string[] = DECK_FILTER_KEYS,
+  why = 'a deck restriction reads printed card values only',
+): void {
   if (!isObj(v)) return err(c, path, 'expected a filter');
   const k = Object.keys(v)[0];
-  if (k !== undefined && !DECK_FILTER_KEYS.includes(k))
-    return err(c, path, `${k}: a deck restriction reads printed card values only`);
+  if (k !== undefined && !keys.includes(k)) return err(c, path, `${k}: ${why}`);
   filter(c, path, v);
   if (k === 'all' || k === 'any')
-    (v[k] as unknown[]).forEach((x, i) => deckFilter(c, `${path}.${k}[${i}]`, x));
-  else if (k === 'not') deckFilter(c, `${path}.not`, v.not);
+    (v[k] as unknown[]).forEach((x, i) => deckFilter(c, `${path}.${k}[${i}]`, x, keys, why));
+  else if (k === 'not') deckFilter(c, `${path}.not`, v.not, keys, why);
   else if (k && ['cost', 'baseCost', 'power', 'basePower'].includes(k)) {
     const cm = v[k];
     const kind = isObj(cm) ? Object.keys(cm)[0] : undefined;
@@ -1623,7 +1783,13 @@ function deckFilter(c: Ctx, path: string, v: unknown): void {
 
 /** Problems with a script; an empty list means it is valid. */
 export function validateScript(script: unknown): string[] {
-  const c: Ctx = { errors: [], bound: new Set(), labels: new Set(), inCost: false };
+  const c: Ctx = {
+    errors: [],
+    bound: new Set(),
+    labels: new Set(),
+    chosen: new Set(),
+    inCost: false,
+  };
   const path = isObj(script) && typeof script.cardId === 'string' ? script.cardId : 'script';
   fields(
     c,

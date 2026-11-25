@@ -16,10 +16,16 @@
  * derived power (OP15-013, OP15-102), and nothing reads a stage above its own, so no cycle.
  * A game whose cards have no such permanent skips all of it.
  */
-import type { Continuous } from '@optcg/cards';
+import type { Continuous, Filter } from '@optcg/cards';
 import type { InstanceId } from './api.ts';
 import { computePerms } from './effects/layers.ts';
 import type { Modifier, State } from './state.ts';
+
+/** A "cannot be K.O.'d" that stops only K.O.s by a source matching `by` (G46). */
+export interface KoGuard {
+  scope: NonNullable<Modifier['scope']>;
+  by: Filter;
+}
 
 export interface Derived {
   power: number | null;
@@ -40,6 +46,8 @@ export interface Derived {
    * by the opponent's effects only, in battle only. `cannotBeKOd` stays the unscoped one.
    */
   koShield: number;
+  /** The scoped protections with a source filter (G46): empty for nearly every card. */
+  koBy: readonly KoGuard[];
   /** "Cannot be rested" (rules-digest 57, G2): attack, block, rest costs and every rest effect. */
   cannotBeRested: boolean;
   /** "Cannot be rested by your opponent's effects" (G2): only an opponent's effect is stopped. */
@@ -48,6 +56,8 @@ export interface Derived {
   cannotBlock: boolean;
   /** This card can also attack active Characters (G32). */
   attackActive: boolean;
+  /** This card cannot attack a card matching one of these (G47); empty for nearly every card. */
+  cannotAttackTarget: readonly Filter[];
 }
 
 /** `Derived.koShield` bits. */
@@ -64,8 +74,20 @@ export function koProtected(
   dv: Derived,
   cause: { kind: 'battle' | 'effect' | 'rule' | 'cost'; by: string },
   owner: string,
+  /** Does the K.O.'s source card match this filter? Absent: the source is not known (G46). */
+  source?: (by: Filter) => boolean,
 ): boolean {
   if (dv.cannotBeKOd) return true;
+  // A protection with a source filter stops only the K.O.s it covers whose source matches (G46).
+  for (const g of dv.koBy) {
+    const covers =
+      g.scope === 'battle'
+        ? cause.kind === 'battle'
+        : g.scope === 'effect'
+          ? cause.kind !== 'battle'
+          : cause.kind !== 'battle' && cause.by !== owner;
+    if (covers && source?.(g.by)) return true;
+  }
   if (cause.kind === 'battle') return (dv.koShield & KO_BATTLE) !== 0;
   if (dv.koShield & KO_EFFECT) return true;
   return (dv.koShield & KO_OPPONENT_EFFECT) !== 0 && cause.by !== owner;
@@ -211,6 +233,9 @@ export function isNegated(s: State, id: InstanceId): boolean {
   return s.mods.some((m) => m.kind === 'negate' && m.target === id && active(s, m));
 }
 
+const NO_KO_BY: readonly KoGuard[] = [];
+const NO_FILTERS: readonly Filter[] = [];
+
 function compute(s: State, id: InstanceId, mods: Modifier[] | undefined): Derived {
   const c = s.cards[id];
   if (!c) throw new Error(`Unknown card instance ${id}`);
@@ -226,10 +251,12 @@ function compute(s: State, id: InstanceId, mods: Modifier[] | undefined): Derive
   let removalProof = false;
   let noBlocker = false;
   let koShield = 0;
+  let koBy: KoGuard[] | null = null;
   let cannotBeRested = false;
   let cannotBeRestedByOpp = false;
   let cannotBlock = false;
   let attackActive = false;
+  let noTarget: Filter[] | null = null;
   if (mods && mods.length > 0) {
     let extra = 0;
     let costDelta = 0;
@@ -251,10 +278,14 @@ function compute(s: State, id: InstanceId, mods: Modifier[] | undefined): Derive
           if (m.keyword && !grants?.includes(m.keyword)) (grants ??= []).push(m.keyword);
           break;
         case 'cannotBeKOd':
-          if (m.scope === 'effect') koShield |= KO_EFFECT;
+          if (m.by && m.scope) (koBy ??= []).push({ scope: m.scope, by: m.by });
+          else if (m.scope === 'effect') koShield |= KO_EFFECT;
           else if (m.scope === 'opponentEffect') koShield |= KO_OPPONENT_EFFECT;
           else if (m.scope === 'battle') koShield |= KO_BATTLE;
           else cannotBeKOd = true;
+          break;
+        case 'cannotAttackTarget':
+          if (m.filter) (noTarget ??= []).push(m.filter);
           break;
         case 'cannotBeRested':
           if (m.scope === 'opponentEffect') cannotBeRestedByOpp = true;
@@ -308,10 +339,12 @@ function compute(s: State, id: InstanceId, mods: Modifier[] | undefined): Derive
     removalProof,
     noBlocker,
     koShield,
+    koBy: koBy ?? NO_KO_BY,
     cannotBeRested,
     cannotBeRestedByOpp,
     cannotBlock,
     attackActive,
+    cannotAttackTarget: noTarget ?? NO_FILTERS,
   };
 }
 

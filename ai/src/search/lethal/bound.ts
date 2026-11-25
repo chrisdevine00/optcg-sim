@@ -390,7 +390,9 @@ function numBound(n: unknown): number {
   // A floor division by 1 or more is at most the number (M6b wave 3, G23).
   if ('div' in o) return numBound((o.div as [unknown, number])[0]);
   if ('count' in o || 'hand' in o) return 20;
-  if ('life' in o) return 6;
+  // Face-up Life cards are Life cards (M6b wave 5, G41); a chosen cost is 0 to 10 (G44).
+  if ('life' in o || 'lifeFaceUp' in o) return 6;
+  if ('chosen' in o) return 10;
   if ('trash' in o || 'deck' in o) return 50;
   // DON!! given to one card: at most the 10 a player owns (M6b wave 4, G34).
   if ('donOnField' in o || 'donGiven' in o || 'donGivenToTarget' in o) return 10;

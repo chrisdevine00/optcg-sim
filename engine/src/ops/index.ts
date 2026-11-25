@@ -348,8 +348,14 @@ export function untapAll(d: Draft, p: PlayerId): void {
   }
   if (ps.donRested > 0) {
     const w = d.pl(p);
-    w.donActive += w.donRested;
-    w.donRested = 0;
+    // "Will not become active in your next Refresh Phase" for rested DON!! (G48, OP10-033): DON!!
+    // are interchangeable, so that many of them simply stay rested.
+    const held = d.s.mods
+      .filter((m) => m.kind === 'skipRefreshDon' && m.target === ps.leader)
+      .reduce((n, m) => n + m.amount, 0);
+    const stay = Math.min(held, w.donRested);
+    w.donActive += w.donRested - stay;
+    w.donRested = stay;
   }
   d.emit({ type: 'Refreshed', player: p });
 }

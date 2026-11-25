@@ -81,7 +81,12 @@ function action(a: Action): boolean {
   if ('mill' in a) return false; // trashed face up
   if ('lookAtTop' in a) return true;
   if ('reveal' in a) return true;
+  // Only a number the controller names, told to both players (G44).
+  if ('chooseNumber' in a) return false;
   if ('trashLifeUntil' in a) return false; // trashed face up
+  // Turns the face-up cards of your own Life face-down: reads no hidden card, and what it hides
+  // was public (G41).
+  if ('turnLifeFaceDown' in a) return false;
   // Damage takes the top Life card without reading it; what the damaged player does with a
   // [Trigger] is their own decision (G36). Winning the game reads nothing (G35).
   if ('damage' in a) return num(a.damage.n);

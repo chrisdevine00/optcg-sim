@@ -205,6 +205,9 @@ function numOf(c: Ctx, n: Num): number {
     return n.life === 'both'
       ? s.players.p1.life.length + s.players.p2.life.length
       : s.players[rel(c, n.life)].life.length;
+  // Face-up Life cards (G41): public, as a face-up card is shown to both players.
+  if ('lifeFaceUp' in n)
+    return s.players[rel(c, n.lifeFaceUp)].life.filter((id) => s.cards[id]!.faceUp).length;
   if ('hand' in n) return s.players[rel(c, n.hand)].hand.length;
   if ('trash' in n) return s.players[rel(c, n.trash)].trash.length;
   if ('deck' in n) return s.players[rel(c, n.deck)].deck.length;
@@ -214,6 +217,8 @@ function numOf(c: Ctx, n: Num): number {
     const p = rel(c, n.turnIndex);
     return p === s.first ? Math.ceil(s.turn / 2) : Math.floor(s.turn / 2);
   }
+  // The number a `chooseNumber` action bound (G44).
+  if ('chosen' in n) return c.n?.[n.chosen] ?? 0;
   if ('refCount' in n)
     return c.n?.[n.refCount] ?? (c.b?.[n.refCount] ?? []).filter((id) => s.cards[id]).length;
   if ('refStat' in n) {
@@ -327,9 +332,13 @@ export function payable(c: Ctx, costs: readonly Cost[] | undefined, o: PayOption
     if ('donMinus' in k) returns += k.donMinus;
     else if ('returnDon' in k) {
       // The object form returns active cost-area DON!! only (G9).
-      const n = typeof k.returnDon === 'number' ? k.returnDon : k.returnDon.n;
-      returns += n;
-      if (typeof k.returnDon !== 'number') activeReturns += n;
+      // `{ atLeast: n }` (G42) needs n, the least the player may return.
+      if (typeof k.returnDon === 'number') returns += k.returnDon;
+      else if ('atLeast' in k.returnDon) returns += k.returnDon.atLeast;
+      else {
+        returns += k.returnDon.n;
+        activeReturns += k.returnDon.n;
+      }
     } else if ('giveDon' in k) {
       if ('from' in k.giveDon && k.giveDon.from === 'opponent') {
         // The opponent's rested DON!! go to the opponent's cards (G20): nothing of yours is spent.
@@ -424,7 +433,8 @@ export function reservedActive(costs: readonly Cost[], from: number): number {
     if ('restDon' in k && k.restDon !== 'any') n += k.restDon;
     // Later costs that need active DON!! of their own (G7, G9).
     else if ('giveDon' in k && !('from' in k.giveDon)) n += k.giveDon.n;
-    else if ('returnDon' in k && typeof k.returnDon !== 'number') n += k.returnDon.n;
+    else if ('returnDon' in k && typeof k.returnDon === 'object' && 'state' in k.returnDon)
+      n += k.returnDon.n;
   }
   return n;
 }
