@@ -20,6 +20,7 @@ import { OP13_021 } from './OP13-021.ts';
 import { OP13_022 } from './OP13-022.ts';
 import { OP13_023 } from './OP13-023.ts';
 import { OP13_024 } from './OP13-024.ts';
+import { OP13_025 } from './OP13-025.ts';
 import { OP13_026 } from './OP13-026.ts';
 import { OP13_027 } from './OP13-027.ts';
 import { OP13_028 } from './OP13-028.ts';
@@ -122,6 +123,7 @@ const SET: readonly CardScript[] = [
   OP13_022,
   OP13_023,
   OP13_024,
+  OP13_025,
   OP13_026,
   OP13_027,
   OP13_028,

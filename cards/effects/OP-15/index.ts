@@ -90,6 +90,7 @@ import { OP15_095 } from './OP15-095.ts';
 import { OP15_096 } from './OP15-096.ts';
 import { OP15_097 } from './OP15-097.ts';
 import { OP15_098 } from './OP15-098.ts';
+import { OP15_099 } from './OP15-099.ts';
 import { OP15_100 } from './OP15-100.ts';
 import { OP15_101 } from './OP15-101.ts';
 import { OP15_102 } from './OP15-102.ts';
@@ -201,6 +202,7 @@ const SET: readonly CardScript[] = [
   OP15_096,
   OP15_097,
   OP15_098,
+  OP15_099,
   OP15_100,
   OP15_101,
   OP15_102,
