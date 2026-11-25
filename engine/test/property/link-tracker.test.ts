@@ -68,4 +68,31 @@ describe('LinkTracker', () => {
     t.hiddenInView('p1', '$b', 'life');
     expect(() => t.note('p1', '$b', 'g1', 'y')).toThrow(/relinked/);
   });
+
+  it('a deck top revealed in place keeps its handle when it is milled or played later (exempt, once)', () => {
+    const t = new LinkTracker('t');
+    t.note('p1', '$a', 'h1', 'revealed');
+    t.revealed('p1', '$a', 'h1', 'deck');
+    t.hiddenInView('p1', '$a', 'deck'); // the view shows the position hidden again
+    t.note('p1', '$a', 'h1', 'event CardMoved.newInstance'); // the same card, milled now
+    expect(t.exempted).toBe(1);
+    expect(t.relinks).toBe(0);
+  });
+
+  it('PLANTED LEAK: a revealed deck top that was shuffled away and comes back under its old handle is a relink', () => {
+    const t = new LinkTracker('t');
+    t.note('p1', '$a', 'h1', 'revealed');
+    t.revealed('p1', '$a', 'h1', 'deck');
+    t.hiddenInView('p1', '$a', 'deck');
+    t.note('p1', '$a', 'h2', 'moved after a shuffle: a fresh key'); // new handle, no exemption used
+    t.hiddenInView('p1', '$a', 'life');
+    expect(() => t.note('p1', '$a', 'h1', 'the revealed handle again')).toThrow(/relinked/);
+  });
+
+  it('PLANTED LEAK: a card never revealed from the deck gets no deck exemption', () => {
+    const t = new LinkTracker('t');
+    t.note('p1', '$a', 'h1', 'seen');
+    t.hiddenInView('p1', '$a', 'deck');
+    expect(() => t.note('p1', '$a', 'h1', 'returns')).toThrow(/relinked/);
+  });
 });
