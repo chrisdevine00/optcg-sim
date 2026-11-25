@@ -10,6 +10,7 @@ import { answerLethal, insertByPriority } from './search/lethal/request.ts';
 import type { AiRequest, AiResponse, GameInfo } from './protocol.ts';
 import { AiSession } from './session.ts';
 import { answerCoach, priorityOf, type Work } from './coach/dispatch.ts';
+import { answerHint } from './coach/hint.ts';
 
 const cards = new Map<string, Card>();
 /** Scripts of the cards received so far (they load per set, M6b-0); work waits for them. */
@@ -48,8 +49,14 @@ function run(req: Work): void {
       post(res);
       return;
     }
-    if (req.type === 'hint' || req.type === 'score' || req.type === 'threat') {
-      // WP0 stub: WP1 (hint), WP2 (score) and WP3 (threat) replace this.
+    if (req.type === 'hint') {
+      const res = answerHint(req, cards, game);
+      if (cancelled.delete(req.id)) return;
+      post(res);
+      return;
+    }
+    if (req.type === 'score' || req.type === 'threat') {
+      // WP0 stub: WP2 (score) and WP3 (threat) replace this.
       const res = answerCoach(req, performance.now() - t0);
       if (cancelled.delete(req.id)) return;
       post(res);

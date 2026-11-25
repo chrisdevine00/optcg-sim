@@ -103,7 +103,11 @@ const replanBudget = (b: WarlordBudgets): Budget => b.replan ?? scaled(b.turn, 0
 // ------------------------------------------------------------------------------------------------
 
 /** A proven line (every hidden hand loses) as view actions, or null. */
-function provenLine(view: SearchView, setup: WarlordSetup, b: WarlordBudgets): Action[] | null {
+export function provenLine(
+  view: SearchView,
+  setup: WarlordSetup,
+  b: WarlordBudgets,
+): Action[] | null {
   const cap = b.lethal ?? ('iterations' in b.turn ? { nodes: 6000 } : { ms: 150 });
   let r: ReturnType<typeof lethal>;
   try {
@@ -120,7 +124,7 @@ function provenLine(view: SearchView, setup: WarlordSetup, b: WarlordBudgets): A
 // The turn tree
 // ------------------------------------------------------------------------------------------------
 
-function ctxFor(view: SearchView, setup: WarlordSetup) {
+export function ctxFor(view: SearchView, setup: WarlordSetup) {
   return { ...simContext(view, setup), ...(setup.quickPlays ? { quickPlays: true } : {}) };
 }
 
@@ -143,6 +147,15 @@ function newTree(view: SearchView, setup: WarlordSetup, seed: number, mem: Warlo
 }
 
 /**
+ * An optional out-parameter of `planTurn` (M7 WP1, additive): the root's moves by visits, each with
+ * its macro's actions (the determinized states' ids) and its node in the tree, so the coach can read
+ * the alternatives to the best first move. Nothing changes when it is left out.
+ */
+export interface PlanOut {
+  rootRanking?: { kid: TreeNode; n: number; mean: number; raw: number; actions: Action[] }[];
+}
+
+/**
  * Plan the turn ahead of its first decision (the worker calls this while animations play).
  * Returns the rollouts spent and whether a lethal line was found.
  */
@@ -152,6 +165,7 @@ export function planTurn(
   budgets: WarlordBudgets,
   seed: number,
   mem: WarlordMemory,
+  out?: PlanOut,
 ): { rollouts: number; lethal: boolean } {
   mem.replans = 0;
   const line = provenLine(view, setup, budgets);
@@ -163,6 +177,8 @@ export function planTurn(
   }
   const tree = newTree(view, setup, seed, mem);
   tree.search(budgets.turn);
+  if (out)
+    out.rootRanking = tree.ranked(tree.root).map((r) => ({ ...r, actions: r.kid.cand!.actions }));
   return { rollouts: tree.iterations, lethal: false };
 }
 
@@ -299,7 +315,7 @@ function takeQueue(
 // Everything else: a flat search over the legal answers
 // ------------------------------------------------------------------------------------------------
 
-interface FlatResult {
+export interface FlatResult {
   c: Candidate;
   n: number;
   raw: number;
@@ -310,7 +326,7 @@ interface FlatResult {
  * answer and the quick policies to the start of the next turn. The playbook's bias joins each
  * score. Returns the answers by visits.
  */
-function flat(
+export function flat(
   states: GameState[],
   cands: Candidate[],
   me: PlayerId,

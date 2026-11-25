@@ -980,12 +980,21 @@ export function counterCandidates(s: GameState, me: PlayerId, setup: PirateSetup
 // Entry points
 // ------------------------------------------------------------------------------------------------
 
+/**
+ * An optional out-parameter of `planTurn` (M7 WP1, additive): the first decision's candidates, best
+ * first, with their mean values and heuristic breakdowns. Nothing changes when it is left out.
+ */
+export interface PlanOut {
+  rootRanking?: { actions: Action[]; mean: number; n: number; breakdown: Breakdown }[];
+}
+
 /** Plan the AI's turn from its Main Phase (ARCHITECTURE §4.1 `planTurn`). */
 export function planTurn(
   view: SearchView,
   setup: PirateSetup,
   budget: Budget,
   seed: number,
+  out?: PlanOut,
 ): {
   plan: TurnPlan;
   stats: SimContext['stats'];
@@ -1020,6 +1029,13 @@ export function planTurn(
       ranked.map((r) => ({ actions: r.c.actions, mean: r.mean, n: r.n, breakdown: r.breakdown })),
     );
     if (clock.cut) incomplete = true;
+    if (n === 0 && out)
+      out.rootRanking = ranked.map((r) => ({
+        actions: r.c.actions,
+        mean: r.mean,
+        n: r.n,
+        breakdown: r.breakdown,
+      }));
     let chosen: Candidate;
     if (ranked.length === 0) {
       chosen = { actions: [quickAction(root, ctx)] };
