@@ -6,7 +6,7 @@
  *
  * Rules: CR 4-6-3 / CR 10-1-5 (a [Trigger] is activated instead of adding the Life card to hand;
  * afterwards the card is trashed), CR 8-1-2 ("up to"), "during this turn" ends with the turn.
- * A "[Portgas.D.Ace] card" is any of my cards with that exact name: Leader (OP13-002) or Character
+ * A "[Portgas.D.Ace] card" is any of my cards with that exact name: Leader (ST13-002) or Character
  * (P-119).
  */
 import { describe, expect, it } from 'vitest';
@@ -76,7 +76,7 @@ describe('OP13-014 Portgas.D.Rouge: [Trigger] up to 1 of my [Portgas.D.Ace] card
     expect(hand(g)).toEqual([]);
   });
 
-  it('a [Portgas.D.Ace] Leader is also a legal recipient (OP13-002, 6000 -> 9000)', () => {
+  it('a [Portgas.D.Ace] Leader is also a legal recipient (ST13-002, 5000 -> 8000)', () => {
     const g = hit(L13.ace, [V13.ace]);
     activateTrigger(g);
     need(g, 'choose', 'p1');
@@ -84,7 +84,7 @@ describe('OP13-014 Portgas.D.Rouge: [Trigger] up to 1 of my [Portgas.D.Ace] card
       [g.leader('p1'), at(g, 'p1', 'characters', V13.ace)].sort(),
     );
     pickInst(g, [g.leader('p1')]);
-    expect(g.power(g.leader('p1'))).toBe(9000);
+    expect(g.power(g.leader('p1'))).toBe(8000);
     expect(g.power(at(g, 'p1', 'characters', V13.ace))).toBe(6000);
   });
 
@@ -110,7 +110,7 @@ describe('OP13-014 Portgas.D.Rouge: [Trigger] up to 1 of my [Portgas.D.Ace] card
     activateTrigger(g);
     pickInst(g, [at(g, 'p1', 'characters', V13.ace)]);
     expect(g.power(at(g, 'p1', 'characters', V13.ace))).toBe(9000);
-    expect(g.power(g.leader('p1'))).toBe(6000);
+    expect(g.power(g.leader('p1'))).toBe(5000);
   });
 
   it('declining the [Trigger]: Rouge goes to hand and nothing is boosted', () => {

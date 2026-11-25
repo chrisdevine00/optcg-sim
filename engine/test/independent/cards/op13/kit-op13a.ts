@@ -31,8 +31,8 @@ export const L13 = {
   luffy: 'ST01-001',
   /** ST05-001 Shanks: Purple, 5000, 5 Life, {FILM}. [Activate: Main] only. Name is neither Sabo, Ace nor Luffy. */
   shanks: 'ST05-001',
-  /** OP13-002 Portgas.D.Ace: Blue/Red, 6000, 3 Life. [On Your Opponent's Attack] only. Name [Portgas.D.Ace]. */
-  ace: 'OP13-002',
+  /** ST13-002 Portgas.D.Ace: Blue/Yellow, 5000, 4 Life. Unscripted (OP13-002, 6000, is scripted since wave 5 group 2). Name [Portgas.D.Ace]. */
+  ace: 'ST13-002',
   /** OP13-004 Sabo: Red/Black, 5000 (4000 with 4+ Life), 5 Life. Name [Sabo]. */
   sabo: 'OP13-004',
   /** ST03-001 Crocodile: Blue, 5000, 5 Life. [Activate: Main] only. */
