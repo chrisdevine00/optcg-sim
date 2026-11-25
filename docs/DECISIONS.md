@@ -2,6 +2,12 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-25 — M8: a turn whose public lethal check is refuted counts as checked even if the hindsight search runs out (M8-1)
+
+- **Context:** the WP1 bench reviewed a 303-decision game in about 24 s but marked 6 of 9 turns "Not fully checked" (target ≤ 10%). In every case the `public` check (what the player could see) refuted lethal quickly; only the `actual` hindsight search over the opponent's real cards ran out of nodes on mid-game boards.
+- **Decision (lead):** when the `public` check is refuted, the turn is checked for missed lethal. If the `actual` search then caps, the turn gets a quiet note "Hindsight check not finished: with their real cards there may have been a win you could not have seen" and no marker. A "Not fully checked" marker stays only when the `public` check itself caps (or another detector caps on a judgement it makes). The marker-rate gate (≤ 10%) counts markers, not hindsight notes. OPEN-QUESTIONS M8-1 closed.
+- **Rejected:** dropping the hindsight search (loses real Hindsight flags where it finishes); marking every capped hindsight search (most turns would read as unchecked although the player-visible question is answered); a larger node cap (more time did not help in the bench).
+
 ## 2026-11-25 — M8 WP1 pipeline: item conventions, shards, caps, and what a 300-decision review costs
 
 - **Context:** WP1 builds the planner, runner, scheduler, worker loop and pool that every M8 detector runs in (`ai/src/search/review/{plan,run,schedule,did}.ts`, `app/src/play/review/{pool,analyse,review-worker}.ts`).
