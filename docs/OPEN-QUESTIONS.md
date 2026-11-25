@@ -12,6 +12,7 @@ Unresolved ambiguities with the current best answer. Remove an entry when it is 
 Settled by Track F from official sources: R1 (reveal → pay → trash 1 → place), R2 (effect-plays into a full area use the same trash procedure), R4, R5, R6, R7, R8, R9 (a Leader can block: OP05-022), R10, R11 (moot), R12, R14 (permanent-effect layering), S3, S4, B4. The engine encodes each as `engine/test/rulings/RL-xx.test.ts`.
 
 - R3 / Q-T3. Effect damage of 2 or more when Life runs out partway. No card and no ruling exist yet. Best answer: each point is separate, so a point taken at 0 Life defeats.
+- R14 (M7 WP1). **Pick order is hidden from views.** The engine takes the picks of an unordered set in candidate order, which is by instance id (`pool` sorts), so a view action list offers every pick of a set at its first step and only the later ones after it, and a staged set (the hint's "Do step 1") must be applied by taking whichever pick the legal list offers next. Best answer: keep it, and let the staging code do that. If it proves awkward for the board, offer the picks of a set in view-handle order in `legalActions` (an engine change, versioned).
 - R13. Tournament procedure (cuts, time limits) is not enforced in v1.
 - Q-T1. Order of "at the start of the game" effects: CR 5-2-1-5-1 says the chooser goes first; the QA-OP13 entry for OP13-079 says the player going first. Best answer: follow the CR, and tag the test `@ruling-conflict`.
 - Q-T2. OP13-001 Luffy's +2000 per rested DON!!: one recipient, or a choice per DON!!? Best answer: one recipient.
