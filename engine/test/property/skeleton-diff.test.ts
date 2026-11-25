@@ -31,6 +31,7 @@ import { internals, withAbilities } from '../../src/testing.ts';
 import { cards } from '../fixtures/index.ts';
 import { metaDecks, standardDecksFor } from '../support/decks.ts';
 import { pickAction } from '../support/random-game.ts';
+import { checkForeignDecision } from '../support/foreign-decision.ts';
 
 const PLAYERS: PlayerId[] = ['p1', 'p2'];
 const SEEDS = Math.max(24, Math.ceil(Number(process.env.ENGINE_GAMES ?? 500) / 12));
@@ -131,6 +132,8 @@ describe.each([false, true])(
         const leaks: string[] = [];
         let compared = 0;
         let foreign = 0;
+        let foreignMain = 0;
+        const shapes: string[] = [];
         // Random Standard decks diverge sooner (their views split at the first differing draw),
         // so they get twice the seeds to keep the sample above the floor below.
         for (let seed = 1; seed <= (standard ? 2 * SEEDS : SEEDS); seed++) {
@@ -140,6 +143,14 @@ describe.each([false, true])(
               if (JSON.stringify(project(A, viewer)) !== JSON.stringify(project(B, viewer))) break;
               compared++;
               if (internals(A).decision && internals(A).decision!.player !== viewer) foreign++;
+              // M7 WP3: a foreign Main (empty stack) is searchable, in the view's public shape;
+              // every other foreign decision is opaque.
+              const shape = checkForeignDecision(A, viewer);
+              if (shape.kind === 'main') foreignMain++;
+              if (shape.problems.length && shapes.length < 5)
+                shapes.push(
+                  `seed ${seed} viewer ${viewer} step ${step}: ${shape.problems.join(' | ')}`,
+                );
               const d = diffPaths(projectForSearch(A, viewer), projectForSearch(B, viewer));
               if (d.length && leaks.length < 5)
                 leaks.push(
@@ -160,6 +171,8 @@ describe.each([false, true])(
         }
         expect(compared).toBeGreaterThan(200);
         expect(foreign).toBeGreaterThan(20);
+        expect(foreignMain).toBeGreaterThan(10);
+        expect(shapes).toEqual([]);
         expect(leaks).toEqual([]);
       }, 600_000);
     }

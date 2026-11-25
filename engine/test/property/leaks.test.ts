@@ -43,6 +43,7 @@ import { cards } from '../fixtures/index.ts';
 import { metaDecks, standardDecksFor } from '../support/decks.ts';
 import { playFrom, type RandomGame } from '../support/random-game.ts';
 import { LinkTracker } from '../support/link-tracker.ts';
+import { checkForeignDecision } from '../support/foreign-decision.ts';
 import { BASE_SEED, propertySeed } from '../support/seed.ts';
 
 const RUNS = Math.max(30, Math.ceil(Number(process.env.ENGINE_GAMES ?? 500) / 15));
@@ -186,6 +187,7 @@ describe.each([false, true])(
       let damageStates = 0;
       let secretChoices = 0;
       let forcedChecks = 0;
+      let foreignMains = 0;
       fc.assert(
         fc.property(
           fc.integer({ min: 1, max: 0x7fffffff }),
@@ -210,6 +212,11 @@ describe.each([false, true])(
                   expect(JSON.stringify(projectForSearch(other, viewer).skeleton)).toBe(
                     JSON.stringify(projectForSearch(g, viewer).skeleton),
                   );
+                  // M7 WP3: the skeleton of a foreign decision is the view's public shape (a foreign
+                  // Main stays searchable), never the decision itself.
+                  const shape = checkForeignDecision(g, viewer);
+                  if (shape.kind === 'main') foreignMains++;
+                  expect(shape.problems).toEqual([]);
                   if (s.decision && s.decision.player !== viewer)
                     expect(autoSkip(other, { observedByOtherHuman: true })).toEqual(
                       autoSkip(g, { observedByOtherHuman: true }),
@@ -260,6 +267,7 @@ describe.each([false, true])(
       // Choices over hidden zones were exercised, including observed autoSkip on them (M2-19).
       if (SCRIPTED_IDS.has('OP17-039')) expect(secretChoices).toBeGreaterThan(0);
       expect(forcedChecks).toBeGreaterThan(0);
+      expect(foreignMains).toBeGreaterThan(0);
     }, 600_000);
 
     it('a handle never links a card across a zone hidden from the viewer, and no projected event holds a raw id (M2-03, M2-17)', () => {

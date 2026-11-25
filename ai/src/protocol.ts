@@ -66,7 +66,19 @@ export type AiRequest =
    */
   | { type: 'hint'; id: number; view: SearchView; budgetMs: number }
   | { type: 'score'; id: number; view: SearchView; budgetMs: number }
-  | { type: 'threat'; id: number; view: SearchView; capMs: number }
+  /**
+   * `ownDeck` (WP3, optional): the asking player's own main-deck card ids. It is the player's own
+   * list, never the opponent's: it lets the check state the chance a face-down Life card is a [Trigger].
+   * `nodes` is a deterministic cap for tests.
+   */
+  | {
+      type: 'threat';
+      id: number;
+      view: SearchView;
+      capMs: number;
+      ownDeck?: string[];
+      nodes?: number;
+    }
   | { type: 'cancel'; id: number }
   /** Forget the turn plan and battle memory (the player rewound). */
   | { type: 'reset' };

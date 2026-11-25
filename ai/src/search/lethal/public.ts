@@ -32,7 +32,7 @@ export const BLANK = '$BLANK';
 /** The assumed biggest Counter when the opponent's leader has no sourced list. */
 export const FALLBACK_COUNTER = 4000;
 
-function placeholder(
+export function placeholder(
   id: string,
   name: string,
   category: 'Character' | 'Event',

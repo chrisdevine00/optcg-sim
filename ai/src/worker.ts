@@ -7,6 +7,7 @@
 import { loadScripts, type Card } from '@optcg/cards';
 import { chooseAction } from './choose.ts';
 import { answerLethal, insertByPriority } from './search/lethal/request.ts';
+import { answerThreat } from './search/lethal/threat.ts';
 import type { AiRequest, AiResponse, GameInfo } from './protocol.ts';
 import { AiSession } from './session.ts';
 import { answerCoach, priorityOf, type Work } from './coach/dispatch.ts';
@@ -48,8 +49,14 @@ function run(req: Work): void {
       post(res);
       return;
     }
-    if (req.type === 'hint' || req.type === 'score' || req.type === 'threat') {
-      // WP0 stub: WP1 (hint), WP2 (score) and WP3 (threat) replace this.
+    if (req.type === 'threat') {
+      const res = answerThreat(req, cards);
+      if (cancelled.delete(req.id)) return;
+      post(res);
+      return;
+    }
+    if (req.type === 'hint' || req.type === 'score') {
+      // WP0 stub: WP1 (hint) and WP2 (score) replace this.
       const res = answerCoach(req, performance.now() - t0);
       if (cancelled.delete(req.id)) return;
       post(res);

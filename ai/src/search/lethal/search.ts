@@ -42,6 +42,17 @@ export interface Cap {
    * searched, not idle (L-12). In `public` mode the deck draws blanks (A3).
    */
   deckKnown?: boolean;
+  /**
+   * `ignored`: the attacker's hand is not played from (M7 WP3, the opponent's-turn threat check: their
+   * hand is hidden, so what the search finds is what their board alone threatens). Characters and
+   * Events in the attacker's hand are never offered as a move; abilities on its field still are.
+   */
+  attackerHand?: 'ignored';
+  /**
+   * `none`: the defender takes every hit (no Block, no Counter, no Trigger, "may" effects declined).
+   * The threat check uses it to ask what the board threatens before the defender's cards answer.
+   */
+  defence?: 'none';
 }
 
 export class CapReached extends Error {
@@ -256,7 +267,11 @@ class Searcher {
       for (const a of acts) {
         if (a.type === 'activate' && playMatters(queries.card(s, a.card), this.cap.deckKnown))
           moves.push([a]);
-        else if (a.type === 'playCard' && playMatters(queries.card(s, a.card), this.cap.deckKnown))
+        else if (
+          a.type === 'playCard' &&
+          !(this.cap.attackerHand === 'ignored' && queries.card(s, a.card).zone === 'hand') &&
+          playMatters(queries.card(s, a.card), this.cap.deckKnown)
+        )
           moves.push([a]);
       }
     return moves;
@@ -264,7 +279,8 @@ class Searcher {
 
   /** The defender's legal answers, strongest first, identical cards as one choice. */
   protected defenderAnswers(s: GameState): Action[] {
-    const acts = prunePlaceholderBoosts(s, dedupe(s, this.legal(s)));
+    const all = prunePlaceholderBoosts(s, dedupe(s, this.legal(s)));
+    const acts = this.cap.defence === 'none' ? takesTheHit(all) : all;
     const rank = (a: Action): number => {
       if (a.type === 'block') return a.blocker === null ? 90 : 0;
       if (a.type === 'endCounter') return 90;
@@ -330,6 +346,18 @@ const playMatters = (c: { card: string; keywords: string[] }, deckKnown = false)
 /** A Character target is worth an attack only if it blocks or has a scripted ability. */
 function worthAttacking(cardId: string, keywords: string[]): boolean {
   return keywords.includes('Blocker') || (SCRIPTS[cardId]?.abilities.length ?? 0) > 0;
+}
+
+/** The answers that take the hit: no Block, no Counter, no Trigger, "may" declined; other choices stay. */
+function takesTheHit(acts: Action[]): Action[] {
+  const kept = acts.filter((a) => {
+    if (a.type === 'block') return a.blocker === null;
+    if (a.type === 'counter') return false;
+    if (a.type === 'trigger') return !a.activate;
+    if (a.type === 'optional') return !a.accept;
+    return true;
+  });
+  return kept.length > 0 ? kept : acts;
 }
 
 /**

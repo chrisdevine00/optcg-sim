@@ -71,6 +71,15 @@ export function seenBy(s: State, viewer: PlayerId): Set<InstanceId> {
   return out;
 }
 
+/**
+ * The resolution stack holds nothing but the turn frame waiting in its Main step: no effect, battle
+ * or damage is part-way through, so nothing on the stack can name a hidden card.
+ */
+function atTurnMain(s: State): boolean {
+  const top = s.stack[s.stack.length - 1];
+  return s.stack.length === 1 && top?.f === 'turn' && top.step === 'main';
+}
+
 const canonical = (n: number): string => '$k' + n.toString(36).padStart(6, '0');
 
 /** The search skeleton of `s` for `viewer` (see the file comment). */
@@ -139,9 +148,14 @@ export function skeletonOf(s: State, viewer: PlayerId): Skeleton {
   // card's name in a damage prompt, looked-at cards in order labels, how many hidden cards
   // qualify). The viewer gets only its public shape, as `project` gives it, and the skeleton is
   // opaque: nothing can be searched from it (review M5a-02).
+  // One exception (M7 WP3, the opponent's-turn threat check): a Main decision with an empty
+  // resolution stack is the opponent's turn waiting for its next action. It is built from no card
+  // (its shape is its kind, its player and a fixed prompt), so the skeleton keeps it, in the same
+  // public shape, and is searchable. Every other foreign decision stays opaque.
   const owed = s.decision;
   const foreign = owed !== null && owed.player !== viewer;
-  if (foreign) opaque = true;
+  const foreignMain = foreign && owed.kind === 'main' && atTurnMain(s);
+  if (foreign && !foreignMain) opaque = true;
   const decision = foreign
     ? ({
         kind: owed.kind,

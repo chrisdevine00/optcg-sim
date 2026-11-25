@@ -50,7 +50,10 @@ export interface LethalPort {
 export interface CoachPort extends LethalPort {
   hint(view: SearchView, opts: { budgetMs: number }): { id: number; result: Promise<HintAnswer> };
   score(view: SearchView, opts: { budgetMs: number }): { id: number; result: Promise<ScoreAnswer> };
-  threat(view: SearchView, opts: { capMs: number }): { id: number; result: Promise<ThreatAnswer> };
+  threat(
+    view: SearchView,
+    opts: { capMs: number; ownDeck?: string[] },
+  ): { id: number; result: Promise<ThreatAnswer> };
 }
 
 export interface HintAnswer {
@@ -222,9 +225,18 @@ export class AiClient implements CoachPort {
   }
 
   /** Does the opponent's board threaten lethal on their turn. */
-  threat(view: SearchView, opts: { capMs: number }): { id: number; result: Promise<ThreatAnswer> } {
+  threat(
+    view: SearchView,
+    opts: { capMs: number; ownDeck?: string[] },
+  ): { id: number; result: Promise<ThreatAnswer> } {
     const id = this.nextId++;
-    const result = this.send({ type: 'threat', id, view, capMs: opts.capMs }).then((r) => {
+    const result = this.send({
+      type: 'threat',
+      id,
+      view,
+      capMs: opts.capMs,
+      ...(opts.ownDeck ? { ownDeck: opts.ownDeck } : {}),
+    }).then((r) => {
       if (r.type !== 'threat') throw new Error('The worker answered the wrong request.');
       return { result: r.result, ms: r.ms };
     });

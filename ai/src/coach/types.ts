@@ -76,12 +76,24 @@ export interface ScoreTable {
 
 /** The opponent's-turn threat check (learning-ui §3.1 "Both players"). */
 export interface ThreatResult {
-  /** `proven`: lethal on their turn whatever you hold; `refuted`: it is not; `unknown`: cap hit. */
+  /**
+   * `proven`: their board threatens lethal (it wins if you take every hit); `refuted`: it does not;
+   * `unknown`: the cap was hit. Their hidden hand is never counted (M7 WP3).
+   */
   status: 'proven' | 'refuted' | 'unknown';
   /** Their line, when proven. */
   line?: Move[];
   explanation: Explanation;
   certainty: Certainty;
+  /**
+   * Added by WP3 (additive). Proven only: your hand and Blockers, as they are, stop it (`true`) or
+   * cannot (`false`).
+   */
+  holds?: boolean;
+  /** Added by WP3. Proven only: "you must stop `stop` of their `of` attacks" (omitted with Double Attack). */
+  mustStop?: { stop: number; of: number };
+  /** Added by WP3. Chance at least one face-down Life card of yours is a [Trigger] (null: not known). */
+  triggerChance?: number | null;
 }
 
 /** What the worker answers until a request is built (the WP0 stubs). */
