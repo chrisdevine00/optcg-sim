@@ -1,0 +1,24 @@
+# ST-26 and ST-27 scripting: readings
+
+Ten cards, all `verified: true`, no wave 5+ gap and no design item needed (G23 `div` and the DON!! donor work are in waves 1 to 3). One line each, with the card text.
+
+## ST-26
+
+- **ST26-001 Soba Mask**, "If you have a [San-Gorou] or [Sanji] Character with 7000 base power or more, give this card in your hand −5 cost. [On Play] Return all of your [San-Gorou] and [Sanji] Characters to the owner's hand." A hand-zone permanent (cost -5, printed 7, so 2): the condition reads BASE power, inclusive at 7000 (a 6000 Sanji with a given DON!! is 7000 current and does not count), exact names, your Characters only. The [On Play] is mandatory, no pick: every [San-Gorou] and [Sanji] Character of yours (Soba Mask is neither). The sign is printed in the data (no textFix; the OP11-023 gap does not apply).
+- **ST26-002 Tony Tony.Chopper**, "[Blocker] [On Play] DON!! −2: Rest up to 1 of your opponent's DON!! cards or Characters with a cost of 1 or less." One selector over the opponent's Characters and cost-area DON!!; the cost filter qualifies the Characters only (as EB03-012). Only active DON!! can be rested; rested-only targets are a public empty pick and no prompt is asked. [Blocker] comes from the override.
+- **ST26-003 Nico Robin**, "[On Play] DON!! −2: Add up to 1 DON!! card from your DON!! deck and set it as active." `addDon` 1 active, up to: asks a count (1 or 0); the DON!! -2 is paid first, so the deck always has a card.
+- **ST26-004 General Franky**, "[On Play] DON!! −2: Give up to 2 of your opponent's Characters −2000 power during this turn." Up to 2 picks (0, 1 or 2 Characters), not clamped, ends with the turn.
+- **ST26-005 Monkey.D.Luffy**, "[On Play] / [When Attacking] DON!! −2: If your Leader is multicolored and your opponent has 5 or more DON!! cards on their field, your "Straw Hat Crew" type Leader's base power becomes 7000 until the end of your opponent's next End Phase." The "If" follows the cost colon, so it is an effect condition (the DON!! -2 is paid and nothing happens when it fails). The opponent's DON!! count is the whole field (cost area plus given, rested included), inclusive at 5. `setBasePower` on the Leader with `untilEndOfOpponentsNextTurn`; given DON!! still add 1000 on top of the 7000 base. The same Leader must be multicolored and {Straw Hat Crew} (a mono-color {Straw Hat Crew} Leader and a multicolored Leader of another type are both left alone).
+
+## ST-27
+
+- **ST27-001 Avalo Pizarro**, "[Activate:Main] [Once Per Turn] You may rest 1 of your [Fullalead] cards: If your Leader has the "Blackbeard Pirates" type, this Character gains +4000 power during this turn. [On K.O.] Draw 1 card." The cost rests 1 of your [Fullalead] cards (a Stage in practice; the selector accepts Leader, Characters and Stage by exact name), exactly 1 and active. The "If" follows the colon: with another Leader the card is rested, Once Per Turn is spent and nothing happens.
+- **ST27-002 Catarina Devon**, "[Activate:Main] You may trash this Character: If your Leader has the "Blackbeard Pirates" type, give up to 1 of your opponent's Characters −1 cost during this turn. [On K.O.] Draw 1 card." `trashSelf` cost, then an effect `if`; trashing as a cost is not a K.O., so there is no draw. The -1 is not clamped (the engine reports the current cost).
+- **ST27-003 Kuzan**, "[Blocker] [On K.O.] Play up to 1 "Blackbeard Pirates" type Character card with a cost of 5 or less from your trash rested." Public zone and an unguarded "up to 1" pick; cost 5 inclusive, Character category only; Kuzan (cost 6) is not a candidate; played rested. [Blocker] comes from the override.
+- **ST27-004 Sanjuan.Wolf**, "If your Leader has the "Blackbeard Pirates" type, this Character gains [Blocker] and +1 cost for every 4 cards in your trash. [On Play] Trash 1 card from your hand." One permanent with two applies under the Leader-type condition: `grant Blocker` and `cost +div(trash, 4)` (floor: 4, 8, 12 are the steps, your own trash only). The [On Play] is mandatory (`trashFromHand`, exactly 1).
+- **ST27-005 Marshall.D.Teach**, "[Activate:Main] You may rest this Character: K.O. up to 1 Character with a cost of 3 or less. [On K.O.] Add up to 1 black card from your trash to your hand." `restSelf` cost; the K.O. target is either side's Character (your own included), cost 3 inclusive, "up to 1". The [On K.O.] reads the trash after Teach is in it, so Teach himself (black) is a legal pick; "black card" is any category with Black among its colors (a Black Event qualifies).
+
+## Notes for review
+
+- M6b-Q-style choice: a pick over a public zone with no candidates is not asked (Chopper with only rested targets, Kuzan with an empty trash filter); no hidden-zone gating is involved anywhere in these ten.
+- The Fullalead cost uses `from: ['leader','characters','stage']` with a name filter rather than the Stage zone alone, so a future Character named [Fullalead] would also pay.
