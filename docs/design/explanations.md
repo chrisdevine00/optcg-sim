@@ -68,6 +68,7 @@ The chip's words depend on where the explanation appears, not only on its `certa
 | Live coach: hint, lethal detector, DON!! math | "Works against any hand" | "Depends on their hand" | "Best found, not fully checked" |
 | AI "Why" (E12–E14, E16) | "Public information only" | "Public information only · depends on your hand" | "Best found in its time" |
 | Guide-sourced answer: mulligan trainer, mulligan hint (E10, E11) | "From the Rocks guide (sourced)" (the archetype's name) | not used | not used |
+| Review flag, mulligan (E10, E11) | "From the <Leader> guide (sourced)" (the Leader's guide name, as in the row above) | not used | not used |
 | Drill answer from a search (lethal puzzle, counter or take, DON!! allocation) | "Works against any hand" | "Their real hand: one way to see it" | "Best found, not fully checked" |
 
 - **Estimates are labelled as estimates.** An outcome that depends on a choice the opponent has not made yet states the condition ("unless they spend 6000 of counters") or carries an "Estimate" chip. "Likely" is never used beside "Works against any hand".

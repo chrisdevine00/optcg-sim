@@ -10,6 +10,7 @@ const PlayRoute = lazy(() => import('./play/PlayRoute.tsx'));
 const DecksRoute = lazy(() => import('./decks/DecksRoute.tsx'));
 const TutorialRoute = lazy(() => import('./tutorial/TutorialRoute.tsx'));
 const SettingsRoute = lazy(() => import('./settings/SettingsRoute.tsx'));
+const ReviewsRoute = lazy(() => import('./play/review/ReviewsRoute.tsx'));
 
 export function App() {
   const path = usePath();
@@ -59,6 +60,10 @@ export function App() {
       ) : path === '/settings' ? (
         <Suspense fallback={<main className="page" id="main" aria-busy="true" />}>
           <SettingsRoute />
+        </Suspense>
+      ) : path === '/reviews' || path.startsWith('/reviews/') ? (
+        <Suspense fallback={<main className="page" id="main" aria-busy="true" />}>
+          <ReviewsRoute path={path} />
         </Suspense>
       ) : path === '/' ? (
         <Home />

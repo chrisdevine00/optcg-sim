@@ -15,6 +15,7 @@ import { deckById, deckByLeader, loadCards } from './setup/decks.ts';
 import { priorCardIds } from '@optcg/ai';
 import { SCENARIOS, scenarioCardIds } from './setup/scenarios.ts';
 import { applyFirstGame } from '../tutorial/preset.ts';
+import { gameSaver, type SaveSource } from './save-game.ts';
 import './play.css';
 
 /** A named scenario, or one described in the URL as `json:<base64url of the spec>`. */
@@ -40,6 +41,24 @@ function scenarioFrom(name: string): (typeof SCENARIOS)[string] {
   if (!o.p1?.leader || !o.p2?.leader)
     throw new Error('The scenario in the address needs a Leader for each player.');
   return o as (typeof SCENARIOS)[string];
+}
+
+/** The save seam's view of a controller (M8 WP0). */
+export function sourceOf(ctl: GameController, deckName?: string): SaveSource {
+  const leaderOf = (p: PlayerId) => {
+    const id = ctl.session.view(p).zones[p].leader[0]?.card;
+    return (id && ctl.cards.get(id)?.name) || '';
+  };
+  return {
+    mode: ctl.config.mode,
+    me: ctl.me,
+    tier: ctl.config.tier,
+    result: ctl.session.view('p1').result,
+    record: () => ctl.session.exportRecord(),
+    leaderOf,
+    ...(deckName ? { deckName } : {}),
+    turn: () => ctl.session.view('p1').turn.number,
+  };
 }
 
 function seedNow(): number {
@@ -159,6 +178,17 @@ export default function PlayRoute() {
   };
 
   useEffect(() => () => ctl?.dispose(), [ctl]);
+
+  // The save seam: a finished game against the AI is saved once (WP5 swaps the store for IndexedDB).
+  useEffect(() => {
+    if (!ctl) return;
+    const save = () => {
+      const deck = last.current ? deckById(last.current.myDeck)?.name : undefined;
+      void gameSaver.observe(ctl, sourceOf(ctl, deck));
+    };
+    save();
+    return ctl.subscribe(save);
+  }, [ctl]);
 
   useEffect(() => {
     document.title = ctl ? 'Game · OPTCG Sim' : 'New game · OPTCG Sim';

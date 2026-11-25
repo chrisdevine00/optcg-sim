@@ -896,7 +896,7 @@ kbd {
     gap: var(--space-1) var(--space-3);
     padding: var(--space-2) var(--space-3);
   }
-  /* Five links since Settings: the nav wraps inside the header too. */
+  /* Six links since Reviews: the nav wraps inside the header too. */
   .app-nav {
     flex-wrap: wrap;
   }

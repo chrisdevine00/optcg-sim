@@ -102,3 +102,5 @@ export {
   type ThreatResult,
 } from './coach/types.ts';
 export { priorityOf, answerCoach, type Work } from './coach/dispatch.ts';
+// M8 WP0: review contracts, detector registry, LethalFlag adapter.
+export * from './search/review/index.ts';

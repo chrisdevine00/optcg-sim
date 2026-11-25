@@ -2,6 +2,12 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-25 — M8 WP0 contracts: item ids, flat store, one save per finished vs-AI game
+
+- **Context:** WP0 fixes the seams WP1–WP7 build on (`ai/src/search/review/`, `app/src/store/`, `app/src/play/save-game.ts`).
+- **Decisions:** (1) `ReviewRecord` is declared structurally in `ai/` (`GameRecord` plus `seats`, `auto`, `rewinds`) so `ai/` never imports `app/`; the app's `SessionRecord` satisfies it. (2) Detectors share one signature `(item, ctx) => TurnResult | null`; `ctx.stateAt(index)` is the runner's replay cache (WP1), so a detector never replays on its own. `TurnResult.itemId` is the item that produced it. (3) The L-slice `LethalFlag` stays as is; `lethalToReviewFlag` / `lethalToTurnResult` adapt it (a `not-fully-checked` flag becomes a `ReviewMarker`, never a flag). (4) `ReviewStore` uses flat game and review methods (`saveGame`, `getReview`, …) with `timing`, `progress` and `meta` as small key-value stores; `importAll` takes an already validated bundle (WP5's validator sits in front). The in-memory store enforces `MAX_GAMES` (200) with a `StoreQuotaError` and never deletes silently. (5) The save seam is a `GameSaver` keyed by controller identity: one `saveGame` per finished game against the AI, none for hotseat or unfinished games; a failed save is reported to a callback and never blocks the game. Game ids are `g<endedAt base36>-<seed base36>`.
+- **Rejected:** importing `SessionRecord` into `ai/` (layering); a per-turn save (a game is saved once, at its end; the resume slot is WP5's).
+
 ## 2026-11-25 — M8 plan: seven flag kinds, a 55 s scheduled pipeline, IndexedDB with `verifyReplay`
 
 - **Context:** M8 (PLAN row 19, 30 h) widens the review to every flag category PROMPT.md lists and adds local save. A planning pass produced `docs/design/m8-plan.md` (eight work packages, about 40 h, with a cut order).
