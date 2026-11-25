@@ -266,6 +266,12 @@ const LIFE_SAFE_OPS = new Set([
   'restrict',
   'activate',
   'select',
+  // M6b wave 7: they reorder Life without adding or taking a card (`lookAtLife`), move DON!! already
+  // given between your own cards (`moveDon`) or change who an opponent's attack hits, which
+  // happens in their turn (`redirectAttack`): none changes a Life count or decides the game.
+  'lookAtLife',
+  'moveDon',
+  'redirectAttack',
 ]);
 
 const LIFE_ZONES = new Set(['lifeTop', 'lifeTopOrBottom', 'life']);
@@ -294,6 +300,8 @@ export function winsByEffect(cardId: string): boolean {
             const w = (body as { what?: { from?: unknown } }).what;
             const from = (Array.isArray(w?.from) ? w.from : [w?.from]) as unknown[];
             if (from.some((z) => typeof z !== 'string' || LIFE_ZONES.has(z))) r = true;
+            // A Character placed into a Life area changes that player's Life count (G61).
+            if ((body as { to?: { zone?: unknown } }).to?.zone === 'life') r = true;
           } else if (op === 'draw') {
             if (d.player === 'opponent') r = true;
           } else if (op === 'mill') {
@@ -527,7 +535,12 @@ export function scanAbility(
         } else if (op === 'ko' || op === 'rest') {
           // Aimed at their Characters it can remove a Blocker (rest: it cannot block while rested).
           if ((body as { owner?: unknown }).owner !== 'you') sc.blockerLoss += k * pickCount(body);
+        } else if (op === 'grant') {
+          // An attribute granted (M6b wave 7, G59) can switch on an effect that reads it: not classified.
+          if ('attribute' in (body as Loose)) ok = false;
         } else if (op === 'move') {
+          // A Character moved into a Life area (G61) changes a Life count and can remove a Blocker.
+          if ((body as { to?: { zone?: unknown } }).to?.zone === 'life') ok = false;
           // A move that could take cards out of the other player's hand or Life is not classified.
           const w = (body as { what?: { from?: unknown } }).what;
           const from = (Array.isArray(w?.from) ? w.from : [w?.from]) as unknown[];

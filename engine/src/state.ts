@@ -120,6 +120,10 @@ export type ModKind =
   | 'cost'
   | 'basePower'
   | 'grant'
+  /** "gains the <Slash> attribute" (M6b wave 7 G59): `attribute` is added to the printed ones. */
+  | 'grantAttribute'
+  /** "cannot be played by effects" (G63): a card in a hand, from its own permanent. */
+  | 'cannotPlayByEffect'
   | 'cannotBeKOd'
   /** "cannot be rested" (rules-digest 57): it cannot attack, block, pay a rest cost or be rested. */
   | 'cannotBeRested'
@@ -137,6 +141,8 @@ export type ModKind =
   | 'cannotBeRemoved'
   /** On a player's Leader: that player cannot draw cards using their own effects (OP12-099). */
   | 'cannotDraw'
+  /** On a player's Leader: that player cannot add Life cards to their hand using their own effects (G60). */
+  | 'cannotLifeToHand'
   /** On a player's Leader: that player cannot set DON!! active using Character effects (G21). */
   | 'cannotSetDon'
   /** On a player's Leader: that player cannot play cards matching `filter` (OP13-118). */
@@ -166,6 +172,8 @@ export interface Modifier {
   amount: number;
   /** For `grant`: the keyword. */
   keyword?: string;
+  /** For `grantAttribute`: the attribute (G59). */
+  attribute?: string;
   /** For `cannotPlay`, `playCost` and `cannotAttackTarget`: which cards. */
   filter?: Filter;
   /** For `replacement`: the replacement ability, whose id is `mod-<id>` (D6). */
@@ -342,10 +350,12 @@ export type Frame =
       f: 'remove';
       /** A card leaving the field by an effect other than K.O. (E-D3): replacements first. */
       card: InstanceId;
-      dest: 'hand' | 'deck' | 'trash';
+      dest: 'hand' | 'deck' | 'trash' | 'life';
       position?: 'top' | 'bottom';
       cause: Cause;
       considered: string[];
+      /** A Character placed into its owner's Life (`dest: 'life'`, G61): its face state. */
+      faceUp?: boolean;
       /** Removals made by one effect share a group: one replacement answers for all it covers. */
       group?: number;
       /**
@@ -380,6 +390,8 @@ export interface Scratch {
   act?: number;
   /** A cost `returnDon { atLeast }`: how many DON!! the player chose to return (G42). */
   ret?: number;
+  /** `lookAtLife`: whose Life area the player chose to look at (G64). */
+  lifeOwner?: PlayerId;
 }
 
 /** An auto effect that has activated and waits to resolve (CR 8-6). */

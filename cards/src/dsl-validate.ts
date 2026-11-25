@@ -80,6 +80,8 @@ export const IMPLEMENTED = {
     'oneOf',
     // M6b wave 4 (G30).
     'trashLife',
+    // M6b wave 7 (G62).
+    'power',
   ],
   steps: ['do', 'if', 'may', 'ifDid', 'chooseOne', 'delayed', 'forEach'],
   actions: [
@@ -116,6 +118,10 @@ export const IMPLEMENTED = {
     'swapBasePower',
     'canAttackActive',
     'addReplacement',
+    // M6b wave 7 (G64, G65, D3).
+    'lookAtLife',
+    'moveDon',
+    'redirectAttack',
   ],
   continuous: [
     'counter',
@@ -128,6 +134,8 @@ export const IMPLEMENTED = {
     'tiers',
     // M6b wave 6 (G50).
     'playRested',
+    // M6b wave 7 (G66).
+    'negate',
   ],
   restrictions: [
     'cannotAttack',
@@ -137,6 +145,9 @@ export const IMPLEMENTED = {
     'cannotBeKOd',
     'cannotBeRested',
     'cannotActivateBlocker',
+    // M6b wave 7 (G60, G63).
+    'cannotAddLifeToHandByOwnEffects',
+    'cannotBePlayedByEffects',
   ],
   nums: [
     'count',
@@ -158,6 +169,9 @@ export const IMPLEMENTED = {
     // M6b wave 5 (G41, G44).
     'lifeFaceUp',
     'chosen',
+    // M6b wave 7 (G67).
+    'statOf',
+    'totalCost',
   ],
 } as const;
 
@@ -183,6 +197,10 @@ interface Ctx {
   revealed: Set<string>;
   /** The kind of the ability being validated (a move of "this card" means different things). */
   abKind?: string;
+  /** The ability is a permanent that works from the hand (G63). */
+  abHand?: boolean;
+  /** The ability is an auto on [On Your Opponent's Attack] (D3: only it has an attack to redirect). */
+  onOppAttack?: boolean;
 }
 
 const isObj = (v: unknown): v is Obj => !!v && typeof v === 'object' && !Array.isArray(v);
@@ -294,8 +312,10 @@ function num(c: Ctx, path: string, v: unknown): void {
       'targetPower',
       'lifeFaceUp',
       'chosen',
+      'statOf',
+      'totalCost',
     ],
-    { donOnField: ['state'], refStat: ['stat'], count: ['distinctNames'] },
+    { donOnField: ['state'], refStat: ['stat'], count: ['distinctNames'], statOf: ['stat'] },
   );
   if (!k) return;
   const o = v as Obj;
@@ -330,6 +350,30 @@ function num(c: Ctx, path: string, v: unknown): void {
     case 'refStat':
       ref(c, `${path}.refStat`, o.refStat);
       return enumOf(c, `${path}.stat`, o.stat, ['cost', 'power', 'basePower', 'donGiven']);
+    case 'statOf': {
+      // A stat of the one card a zone holds (G67): the Leader, or this card. No pick, nothing bound.
+      selector(c, `${path}.statOf`, o.statOf);
+      enumOf(c, `${path}.stat`, o.stat, ['cost', 'power', 'basePower']);
+      const sel = o.statOf;
+      if (isObj(sel)) {
+        const zs = Array.isArray(sel.from) ? sel.from : [sel.from];
+        if (zs.length !== 1 || (zs[0] !== 'leader' && zs[0] !== 'self'))
+          err(c, `${path}.statOf.from`, "statOf reads one card: from 'leader' or 'self'");
+        if (sel.pick !== undefined || sel.bind !== undefined)
+          err(c, `${path}.statOf`, 'statOf names its card by zone: no pick, no bind');
+        if (sel.owner === 'any') err(c, `${path}.statOf.owner`, 'owner is "you" or "opponent"');
+      }
+      return;
+    }
+    case 'totalCost': {
+      // The costs of every card the selector names (G67): a count over the field, no choice.
+      selector(c, `${path}.totalCost`, o.totalCost);
+      zonesIn(c, `${path}.totalCost`, o.totalCost, FIELD_ZONES, 'a total cost reads the field');
+      const sel = o.totalCost;
+      if (isObj(sel) && (sel.pick !== undefined || sel.bind !== undefined))
+        err(c, `${path}.totalCost`, 'totalCost adds up every match: no pick, no bind');
+      return;
+    }
     case 'sum':
       return arr(c, `${path}.sum`, o.sum, (x, p) => num(c, p, x));
     case 'mul': {
@@ -637,6 +681,7 @@ function cost(c: Ctx, path: string, v: unknown): void {
       'move',
       'oneOf',
       'trashLife',
+      'power',
     ],
     { move: ['to'] },
   );
@@ -726,6 +771,22 @@ function cost(c: Ctx, path: string, v: unknown): void {
     case 'trashSelf':
       if (o[k] !== true) err(c, p, 'expected true');
       return;
+    case 'power': {
+      // "Give your active Leader -5000 power during this turn" (G62): a power change paid on your
+      // Leader. Narrow on purpose: your Leader, one card, a fixed amount.
+      fields(c, p, o.power, ['target', 'amount', 'duration']);
+      const g = o.power;
+      if (!isObj(g)) return;
+      selector(c, `${p}.target`, g.target);
+      zonesIn(c, `${p}.target`, g.target, ['leader'], 'a power cost is paid on your Leader');
+      ownerYou(c, `${p}.target`, g.target, 'a power cost is paid on your own Leader');
+      if (isObj(g.target) && !(isObj(g.target.pick) && g.target.pick.exactly === 1))
+        err(c, `${p}.target.pick`, 'a power cost takes pick { exactly: 1 }');
+      int(c, `${p}.amount`, g.amount);
+      if (g.amount === 0) err(c, `${p}.amount`, 'a power cost changes the power');
+      enumOf(c, `${p}.duration`, g.duration, DURATIONS);
+      return;
+    }
     case 'oneOf': {
       // "A or B" (G19): a list of at least two alternatives, each a list of plain costs. Only an
       // ability's own cost may offer a choice: a replacement's payload has no place to ask.
@@ -755,14 +816,19 @@ function cost(c: Ctx, path: string, v: unknown): void {
     case 'move': {
       selector(c, p, o.move);
       if (isObj(o.move) && !(o.move as Obj).pick) err(c, p, 'a cost selector needs a pick');
-      const fieldSide = fieldOrHand(c, p, o.move, 'a move cost', ['hand', 'trash'], true);
+      // A Character may also go into its owner's Life, an opponent's too (G61, OP09-101).
+      const toLife = isObj(o.to) && o.to.zone === 'life';
+      const fieldSide = fieldOrHand(c, p, o.move, 'a move cost', ['hand', 'trash'], true, toLife);
       dest(c, `${path}.to`, o.to);
       if (fieldSide && isObj(o.to)) {
         // Your own Character or Stage goes to your hand, to the top or bottom of your deck, or to
         // the trash (a removal with the cause `cost`, G1). One card only: several cards going to a
         // deck would need an order, which a cost does not ask for.
-        if (o.to.zone === 'life')
-          err(c, `${path}.to`, 'a cost does not move a field card into Life');
+        if (o.to.zone === 'life') {
+          const pk = isObj(o.move) && isObj(o.move.pick) ? o.move.pick : undefined;
+          if (pk?.exactly !== 1)
+            err(c, `${p}.pick`, 'a cost that puts a Character into Life takes exactly 1');
+        }
         const pk = isObj(o.move) && isObj(o.move.pick) ? o.move.pick : undefined;
         if (o.to.zone === 'deck' && pk?.exactly !== 1)
           err(c, `${p}.pick`, 'a cost that puts a field card into the deck takes exactly 1');
@@ -794,6 +860,8 @@ function fieldOrHand(
   what: string,
   handSide: string[] = ['hand'],
   self = false,
+  /** The cards may be your opponent's: a Character placed into its owner's Life (G61). */
+  anyOwner = false,
 ): boolean {
   if (!isObj(sel)) return false;
   const zones = (Array.isArray(sel.from) ? sel.from : [sel.from]) as string[];
@@ -806,7 +874,12 @@ function fieldOrHand(
       `${path}.from`,
       `${what} reads ${handSide.join(' or ')}, or your Characters or Stage, not ${zones.join(', ')}`,
     );
-  if (field) ownerYou(c, path, sel, `${what} from the field takes your own cards`);
+  if (field && anyOwner) {
+    if (sel.owner === 'any')
+      err(c, `${path}.owner`, `${what} names a player: owner must be "you" or "opponent"`);
+    if (zones.some((z) => z !== 'characters'))
+      err(c, `${path}.from`, `${what} into Life moves Characters only`);
+  } else if (field) ownerYou(c, path, sel, `${what} from the field takes your own cards`);
   return field && !hand;
 }
 
@@ -920,6 +993,9 @@ function action(c: Ctx, path: string, v: unknown): void {
       'swapBasePower',
       'canAttackActive',
       'addReplacement',
+      'lookAtLife',
+      'moveDon',
+      'redirectAttack',
     ],
     { draw: ['player', 'upTo'], addDon: ['player'] },
   );
@@ -1204,12 +1280,69 @@ function action(c: Ctx, path: string, v: unknown): void {
       if (x.n !== 'toMatchOpponent') num(c, `${p}.n`, x.n);
       return;
     case 'grant':
-      fields(c, p, x, ['target', 'keyword', 'duration']);
+      fields(c, p, x, ['target', 'duration'], ['keyword', 'attribute']);
       if (!isObj(x)) return;
       selector(c, `${p}.target`, x.target);
       zonesIn(c, `${p}.target`, x.target, FIELD_ZONES, 'modifiers apply to cards on the field');
-      enumOf(c, `${p}.keyword`, x.keyword, KEYWORDS);
+      // A keyword and/or an attribute (G59): at least one, or the grant says nothing.
+      if (x.keyword === undefined && x.attribute === undefined)
+        err(c, p, 'a grant gives a keyword, an attribute, or both');
+      if (x.keyword !== undefined) enumOf(c, `${p}.keyword`, x.keyword, KEYWORDS);
+      if (x.attribute !== undefined) enumOf(c, `${p}.attribute`, x.attribute, ATTRIBUTES);
       return enumOf(c, `${p}.duration`, x.duration, DURATIONS);
+    case 'lookAtLife': {
+      // Two shapes (G64): look at one card of either Life area and place it top or bottom, or look
+      // at all of your own Life cards and put them back in any order.
+      fields(c, p, x, ['owner', 'n', 'place']);
+      if (!isObj(x)) return;
+      if (x.n === 'all') {
+        if (x.owner !== 'you' || x.place !== 'anyOrder')
+          err(c, p, "looking at all Life cards is { owner: 'you', n: 'all', place: 'anyOrder' }");
+      } else {
+        enumOf(c, `${p}.owner`, x.owner, [...P, 'any']);
+        if (x.n !== 1) err(c, `${p}.n`, "expected 1 or 'all'");
+        if (x.place !== 'topOrBottom')
+          err(c, `${p}.place`, "a look at one card places it 'topOrBottom'");
+      }
+      return;
+    }
+    case 'moveDon': {
+      // Give DON!! that are already given to another of your cards (G65): never the same card.
+      fields(c, p, x, ['n', 'from', 'to']);
+      if (!isObj(x)) return;
+      int(c, `${p}.n`, x.n);
+      if (typeof x.n === 'number' && x.n < 1) err(c, `${p}.n`, 'must be at least 1');
+      for (const side of ['from', 'to'] as const) {
+        selector(c, `${p}.${side}`, x[side]);
+        zonesIn(
+          c,
+          `${p}.${side}`,
+          x[side],
+          ['leader', 'characters'],
+          'only a Leader or Character has DON!! given',
+        );
+        ownerYou(c, `${p}.${side}`, x[side], 'DON!! move between your own cards');
+      }
+      const f = x.from;
+      if (isObj(f) && !(isObj(f.pick) && (f.pick.exactly === 1 || f.pick.upTo === 1)))
+        err(c, `${p}.from.pick`, 'the source is one card: pick { upTo: 1 } or { exactly: 1 }');
+      const t = x.to;
+      if (isObj(t) && !(isObj(t.pick) && t.pick.exactly === 1))
+        err(c, `${p}.to.pick`, 'the DON!! go to one card: pick { exactly: 1 }');
+      return;
+    }
+    case 'redirectAttack': {
+      // Only an [On Your Opponent's Attack] has an attack whose target can change (D3).
+      fields(c, p, x, ['to']);
+      if (!isObj(x)) return;
+      if (!c.onOppAttack) err(c, p, "redirectAttack is for an auto ability on 'onOpponentAttack'");
+      selector(c, `${p}.to`, x.to);
+      zonesIn(c, `${p}.to`, x.to, ['leader', 'characters'], 'only your Leader or a Character');
+      ownerYou(c, `${p}.to`, x.to, 'the attack is redirected to your own card');
+      if (isObj(x.to) && !(isObj(x.to.pick) && x.to.pick.exactly === 1))
+        err(c, `${p}.to.pick`, 'the new target is chosen: pick { exactly: 1 }');
+      return;
+    }
     case 'negate':
       fields(c, p, x, ['target', 'duration']);
       if (!isObj(x)) return;
@@ -1224,21 +1357,29 @@ function action(c: Ctx, path: string, v: unknown): void {
         const w = x.what;
         if (
           w !== 'cannotDrawByOwnEffects' &&
+          w !== 'cannotAddLifeToHandByOwnEffects' &&
           !(isObj(w) && ('cannotPlay' in w || 'cannotSetDonActive' in w))
         )
           err(
             c,
             `${p}.what`,
-            'a restriction on a player is cannotDrawByOwnEffects, cannotPlay or cannotSetDonActive',
+            'a restriction on a player is cannotDrawByOwnEffects, cannotAddLifeToHandByOwnEffects, cannotPlay or cannotSetDonActive',
           );
+        // Your own effects (G60): only you can be barred from your own effects' Life moves.
+        if (w === 'cannotAddLifeToHandByOwnEffects' && x.target !== 'you')
+          err(c, `${p}.target`, 'cannotAddLifeToHandByOwnEffects restricts you');
       } else {
         selector(c, `${p}.target`, x.target);
         zonesIn(c, `${p}.target`, x.target, FIELD_ZONES, 'modifiers apply to cards on the field');
         if (
           x.what === 'cannotDrawByOwnEffects' ||
+          x.what === 'cannotAddLifeToHandByOwnEffects' ||
           (isObj(x.what) && ('cannotPlay' in x.what || 'cannotSetDonActive' in x.what))
         )
           err(c, `${p}.what`, 'that restriction applies to a player, not to cards');
+        // A card in a hand is barred by its own permanent, never by an effect for a while (G63).
+        if (x.what === 'cannotBePlayedByEffects')
+          err(c, `${p}.what`, 'cannotBePlayedByEffects is a permanent of a card in your hand');
       }
       restriction(c, `${p}.what`, x.what);
       if (isObj(x.what) && 'cannotAttackTarget' in x.what && typeof x.target !== 'string')
@@ -1454,9 +1595,26 @@ function moveShape(c: Ctx, path: string, what: unknown, to: unknown): void {
     err(c, `${path}.to.faceUp`, 'faceUp applies only to Life');
   if (!all(['hand', 'trash']) && !all(['characters', 'stage']))
     return err(c, `${path}.what.from`, `moving from ${zones.join(', ')} is not implemented yet`);
+  // A Stage does not go into Life (G61); a replaced card names itself with { ref: 'replaced' }.
+  if (dz === 'life' && zones.includes('stage'))
+    return err(c, `${path}.what.from`, 'only a Character moves into Life');
   if (dz === 'life') {
+    if (all(['characters'])) {
+      // A Character into its owner's Life (G61): at an end of the Life area, face-down unless the
+      // text says face-up (rules-digest 107). One card; an opponent's goes to the opponent's Life.
+      const pk = what.pick as Record<string, unknown> | undefined;
+      if (pos !== 'top' && pos !== 'bottom' && pos !== 'topOrBottom')
+        err(
+          c,
+          `${path}.to.position`,
+          'a Character enters Life at the "top", "bottom" or "topOrBottom"',
+        );
+      if (!pk || (pk.exactly !== 1 && pk.upTo !== 1))
+        err(c, `${path}.what.pick`, 'a Character moved into Life is { upTo: 1 } or { exactly: 1 }');
+      return;
+    }
     if (!all(['hand', 'trash']))
-      return err(c, `${path}.to`, 'only a hand or trash card moves into Life');
+      return err(c, `${path}.to`, 'only a hand, trash or Character card moves into Life');
     if (pos !== undefined && pos !== 'top')
       err(c, `${path}.to.position`, 'a card enters Life at the top');
     return;
@@ -1478,6 +1636,8 @@ function restriction(c: Ctx, path: string, v: unknown): void {
     'cannotAttack',
     'cannotActivateBlockerAgainstIt',
     'cannotDrawByOwnEffects',
+    'cannotAddLifeToHandByOwnEffects',
+    'cannotBePlayedByEffects',
     'cannotBeRemovedByOpponentEffects',
     'cannotBeKOd',
     'cannotBeRested',
@@ -1553,6 +1713,7 @@ function continuous(c: Ctx, path: string, v: unknown): void {
     'lockAttackTarget',
     'tiers',
     'playRested',
+    'negate',
   ]);
   if (!k) return;
   const x = (v as Obj)[k];
@@ -1560,6 +1721,28 @@ function continuous(c: Ctx, path: string, v: unknown): void {
   if (!has(IMPLEMENTED.continuous, k))
     return err(c, path, `permanent ${k} is not implemented in the runtime yet`);
   switch (k) {
+    case 'negate': {
+      // "Your Leader and Characters without a type including X have their effects negated" (G66):
+      // read before any other stage, so the filter reads printed values and nothing chosen.
+      fields(c, p, x, ['target']);
+      if (!isObj(x)) return;
+      selector(c, `${p}.target`, x.target);
+      zonesIn(c, `${p}.target`, x.target, FIELD_ZONES, 'a permanent negates cards on the field');
+      const t = x.target;
+      if (isObj(t)) {
+        if (t.pick !== undefined || t.bind !== undefined || t.chooser !== undefined)
+          err(c, `${p}.target`, 'a permanent negation names every match: no pick, bind or chooser');
+        if (t.filter !== undefined)
+          deckFilter(
+            c,
+            `${p}.target.filter`,
+            t.filter,
+            DECK_FILTER_KEYS,
+            'a negation filter reads printed values: it is read before the layers',
+          );
+      }
+      return;
+    }
     case 'playRested':
       // "Your Character cards are played rested" (G50): read on the card being played, in hand or
       // trash or wherever it comes from, so printed values only (nothing relative, no state).
@@ -1622,7 +1805,19 @@ function continuous(c: Ctx, path: string, v: unknown): void {
       }
       // A permanent restriction is a card restriction: a player restriction ({ cannotPlay }) and
       // the draw restriction are modifiers on a Leader, which a permanent does not produce.
-      if (isObj(x.what) && 'cannotPlay' in x.what)
+      if (x.what === 'cannotBePlayedByEffects') {
+        // A card in your hand bars itself (G63): `zone: 'hand'`, the card alone.
+        if (!c.abHand) err(c, `${p}.what`, "cannotBePlayedByEffects is a permanent of zone 'hand'");
+        const t = x.target;
+        if (isObj(t) && (t.from !== 'self' || t.filter !== undefined || t.pick !== undefined))
+          err(
+            c,
+            `${p}.target`,
+            "cannotBePlayedByEffects names this card: { from: 'self', owner: 'you' }",
+          );
+      } else if (x.what === 'cannotAddLifeToHandByOwnEffects')
+        err(c, `${p}.what`, 'a permanent cannot restrict adding Life to the hand');
+      else if (isObj(x.what) && 'cannotPlay' in x.what)
         err(c, `${p}.what`, 'a permanent cannot restrict what a player may play');
       else if (isObj(x.what) && 'cannotSetDonActive' in x.what)
         err(c, `${p}.what`, 'a permanent cannot restrict setting DON!! active');
@@ -1760,6 +1955,8 @@ function ability(c: Ctx, path: string, v: unknown, ids: Set<string>): void {
   c.chosen = new Set();
   c.revealed = new Set();
   c.abKind = typeof v.kind === 'string' ? v.kind : undefined;
+  c.abHand = v.kind === 'permanent' && v.zone === 'hand';
+  c.onOppAttack = v.kind === 'auto' && Array.isArray(v.when) && v.when.includes('onOpponentAttack');
   c.evCount =
     v.kind === 'auto' &&
     Array.isArray(v.when) &&
@@ -1852,11 +2049,16 @@ function replacesEvent(c: Ctx, path: string, v: unknown): void {
 function replacementBody(c: Ctx, path: string, optional: unknown, instead: unknown): void {
   const was = c.noAlt;
   c.noAlt = true;
+  // The card the replacement covers is "the replaced card" of its payload: `{ ref: 'replaced' }`
+  // names it (G61, OP11-101: "add it to the top of your Life cards face-down instead").
+  const hadReplaced = c.bound.has('replaced');
+  c.bound.add('replaced');
   if (typeof optional !== 'boolean') err(c, `${path}.optional`, 'expected a boolean');
   if (!Array.isArray(instead)) err(c, `${path}.instead`, 'expected an array');
   else if (isEffect(instead)) steps(c, `${path}.instead`, instead);
   else costs(c, `${path}.instead`, instead);
   c.noAlt = was;
+  if (!hadReplaced) c.bound.delete('replaced');
 }
 
 const STEP_KEYS = ['do', 'if', 'may', 'ifDid', 'chooseOne', 'forEach', 'delayed'];

@@ -30,7 +30,9 @@ import {
   lifeToHand,
   markKnown,
   moveCard,
+  orderLife,
   payDon,
+  placeLife,
   rest,
   setActive,
 } from '../ops/index.ts';
@@ -49,6 +51,7 @@ import { restrictionMod } from './layers.ts';
 import {
   allHold,
   cannotDrawByEffect,
+  cannotLifeToHandByEffect,
   cannotSetDonByCharacter,
   costIsSecret,
   dvOf,
@@ -223,6 +226,8 @@ export function costText(costs: readonly Cost[] | undefined): string {
         : `give ${k.giveDon.n} active DON!!`;
     if ('ko' in k) return 'K.O. 1 of your Characters';
     if ('turnLifeFaceDown' in k) return `turn ${k.turnLifeFaceDown} of your Life cards face-down`;
+    if ('power' in k)
+      return `give your Leader ${k.power.amount > 0 ? '+' : '\u2212'}${Math.abs(k.power.amount)} power`;
     if ('restDon' in k) return `rest ${String(k.restDon)} DON!!`;
     if ('trash' in k || 'reveal' in k) {
       const sel = 'trash' in k ? k.trash : k.reveal;
@@ -700,7 +705,27 @@ function payCost(d: Draft, f: EffectFrame, k: Cost, reserve: number): Out {
     leaveField(d, f.card, 'trash', { kind: 'cost', by: f.controller });
     return 'next';
   }
-  if ('lifeToHand' in k) return lifeToHandCost(d, f, k.lifeToHand);
+  if ('power' in k) {
+    // "Give your active Leader -5000 power during this turn" (G62): the modifier is the payment.
+    const ids = select(d, f, k.power.target, { role: 'cost', verb: 'give power to' });
+    if (ids === WAIT) return WAIT;
+    const id = ids[0];
+    if (id === undefined || d.card(id).zone !== 'leader') return anomaly(d, f, 'power');
+    addModifier(d, {
+      kind: 'power',
+      target: id,
+      amount: k.power.amount,
+      duration: duration(d, f, k.power.duration),
+      controller: f.controller,
+      source: f.card,
+    });
+    return 'next';
+  }
+  if ('lifeToHand' in k) {
+    // "You cannot add Life cards to your hand using your own effects" covers a cost (G60).
+    if (cannotLifeToHandByEffect(d.s, f.controller)) return anomaly(d, f, 'lifeToHand');
+    return lifeToHandCost(d, f, k.lifeToHand);
+  }
   if ('turnLifeFaceUp' in k) {
     for (let i = 0; i < k.turnLifeFaceUp; i++) {
       const top = d.ro(f.controller).life[i];
@@ -750,8 +775,12 @@ function payCost(d: Draft, f: EffectFrame, k: Cost, reserve: number): Out {
     // cause `cost`, so replacements and last-known information see it.
     if (onFieldZones(k.move))
       return fieldCost(d, f, k.move, {
-        remove: k.to.zone as 'hand' | 'deck' | 'trash',
+        remove: k.to.zone as 'hand' | 'deck' | 'trash' | 'life',
         ...(k.to.zone === 'deck' ? { position: k.to.position === 'top' ? 'top' : 'bottom' } : {}),
+        // A Character into its owner's Life (G61, OP09-101): the end, asked when it is "top or bottom".
+        ...(k.to.zone === 'life'
+          ? { position: k.to.position ?? 'top', faceUp: k.to.faceUp === true }
+          : {}),
       } as FieldCostHow);
     const bottom = k.to.zone === 'deck' && k.to.position === 'bottom';
     let ids: InstanceId[];
@@ -773,7 +802,12 @@ function payCost(d: Draft, f: EffectFrame, k: Cost, reserve: number): Out {
 }
 
 type FieldCostHow =
-  { ko: true } | { remove: 'hand' | 'deck' | 'trash'; position?: 'top' | 'bottom' };
+  | { ko: true }
+  | {
+      remove: 'hand' | 'deck' | 'trash' | 'life';
+      position?: 'top' | 'bottom' | 'topOrBottom';
+      faceUp?: boolean;
+    };
 
 /** Does the selector read only Characters and Stage (a cost paid from the field)? */
 function onFieldZones(sel: Selector): boolean {
@@ -807,14 +841,41 @@ function fieldCost(d: Draft, f: EffectFrame, sel: Selector, how: FieldCostHow): 
     });
     return 'stop';
   }
-  const ids = select(d, f, sel, { role: 'cost', verb: 'ko' in how ? 'K.O.' : 'move' });
-  if (ids === WAIT) return WAIT;
+  // A selection already made waits for the end of the Life area the controller picks (G61).
+  let ids = f.tmp?.sel;
+  if (!ids) {
+    const picked = select(d, f, sel, { role: 'cost', verb: 'ko' in how ? 'K.O.' : 'move' });
+    if (picked === WAIT) return WAIT;
+    ids = picked;
+  }
   if (ids.length === 0) return anomaly(d, f, 'field cost');
+  let end: 'top' | 'bottom' | undefined =
+    'ko' in how || how.position === 'topOrBottom' ? undefined : how.position;
+  if (!('ko' in how) && how.position === 'topOrBottom') {
+    f.tmp = { ...f.tmp, sel: ids };
+    const e = lifeEnd(
+      d,
+      f,
+      `${nameOf(d, f)}: place the Character at the top or the bottom of its owner's Life cards?`,
+    );
+    if (e === WAIT) return WAIT;
+    end = e;
+  }
   const group = ids.length > 1 ? d.s.nextMod++ : undefined;
   for (const id of ids.slice().reverse()) {
     const cause = { kind: 'cost', by: f.controller } as const;
     if ('ko' in how) pushKo(d, id, cause, group, f.card);
-    else pushRemove(d, id, how.remove, cause, how.position, group);
+    else
+      pushRemove(
+        d,
+        id,
+        how.remove,
+        cause,
+        end,
+        group,
+        undefined,
+        how.remove === 'life' ? how.faceUp === true : undefined,
+      );
   }
   f.ph = FIELD_COST_PUSHED;
   f.tmp = { ...f.tmp, sel: ids };
@@ -849,13 +910,15 @@ function lifeToHandCost(
  * "The top or bottom of your Life cards": the controller picks the end, blind (Life is face-down,
  * so the choice tells nobody anything). Waits for the answer, then returns it.
  */
-function lifeEnd(d: Draft, f: EffectFrame): 'top' | 'bottom' | typeof WAIT {
+function lifeEnd(d: Draft, f: EffectFrame, prompt?: string): 'top' | 'bottom' | typeof WAIT {
   const g = take(f);
   if (!Array.isArray(g))
     return ask(d, f, {
       kind: 'choose',
       player: f.controller,
-      prompt: `${nameOf(d, f)}: add the top or the bottom card of your Life cards to your hand?`,
+      prompt:
+        prompt ??
+        `${nameOf(d, f)}: add the top or the bottom card of your Life cards to your hand?`,
       min: 1,
       max: 1,
       candidates: [{ option: 'top' }, { option: 'bottom' }] as never,
@@ -1225,6 +1288,8 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
       restrict: (id) => {
         const cat = d.s.defs[d.card(id).card]!.category;
         if (zonesOf.includes('self') && d.card(id).zone !== selfZone) return false;
+        // "This card in your hand cannot be played by effects" (G63).
+        if (d.card(id).zone === 'hand' && dvOf(c, id).noEffectPlay) return false;
         return (cat === 'Character' || cat === 'Stage') && !playBlocked(d.s, player, id);
       },
     });
@@ -1560,6 +1625,8 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
       };
       if (what === 'cannotDrawByOwnEffects')
         addModifier(d, { ...base, kind: 'cannotDraw', amount: 0 });
+      else if (what === 'cannotAddLifeToHandByOwnEffects')
+        addModifier(d, { ...base, kind: 'cannotLifeToHand', amount: 0 });
       else if (typeof what === 'object' && 'cannotPlay' in what)
         addModifier(d, {
           ...base,
@@ -1590,9 +1657,18 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
         });
       else if ('setBasePower' in a)
         addModifier(d, { ...base, kind: 'basePower', amount: num(c, a.setBasePower.value) });
-      else if ('grant' in a)
-        addModifier(d, { ...base, kind: 'grant', amount: 0, keyword: a.grant.keyword });
-      else if ('negate' in a) addModifier(d, { ...base, kind: 'negate', amount: 0 });
+      else if ('grant' in a) {
+        // A keyword and/or an attribute (G59), each its own modifier.
+        if (a.grant.keyword)
+          addModifier(d, { ...base, kind: 'grant', amount: 0, keyword: a.grant.keyword });
+        if (a.grant.attribute)
+          addModifier(d, {
+            ...base,
+            kind: 'grantAttribute',
+            amount: 0,
+            attribute: a.grant.attribute,
+          });
+      } else if ('negate' in a) addModifier(d, { ...base, kind: 'negate', amount: 0 });
       else {
         const what = (a as { restrict: { what: Restriction } }).restrict.what;
         const spec = restrictionMod(what);
@@ -1692,6 +1768,82 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
     const own = def.abilities.find((x) => hasTiming(x, timing));
     if (own && own.kind === 'activate' && (payable(c, own.cost) || costIsSecret(own.cost)))
       pushEffect(d, f.card, f.cardId, own, you, 'effect');
+    return 'next';
+  }
+  if ('lookAtLife' in a) return lookAtLife(d, f, a.lookAtLife);
+  if ('moveDon' in a) {
+    // "Give up to 1 of your currently given DON!! cards to 1 of your Characters" (G65): the source
+    // card is chosen first (one that has DON!! given), then the card that receives them.
+    const md = a.moveDon;
+    if (f.ph !== 1) {
+      const first = select(d, f, md.from, {
+        role: 'target',
+        verb: 'take DON!! from',
+        restrict: (id) => FIELD.has(d.card(id).zone) && d.card(id).don > 0,
+      });
+      if (first === WAIT) return WAIT;
+      if (first.length === 0) return 'next';
+      f.tmp = { ...f.tmp, sel: first };
+      f.ph = 1;
+    }
+    const from = f.tmp?.sel?.[0];
+    if (from === undefined) return 'next';
+    const second = select(d, f, md.to, {
+      role: 'target',
+      verb: 'give DON!! to',
+      restrict: (id) => id !== from,
+    });
+    if (second === WAIT) return WAIT;
+    const to = second[0];
+    if (to === undefined || !FIELD.has(d.card(from).zone) || !FIELD.has(d.card(to).zone))
+      return 'next';
+    const k = Math.min(md.n, d.card(from).don);
+    if (k <= 0) return 'next';
+    d.wcard(from).don -= k;
+    d.wcard(to).don += k;
+    f.acted = true;
+    d.emit({
+      type: 'DonMoved',
+      player: you,
+      from,
+      target: to,
+      count: k,
+      card: d.card(to).card,
+      fromCard: d.card(from).card,
+    });
+    return 'next';
+  }
+  if ('redirectAttack' in a) {
+    // "Change the attack target to the selected card" (D3): an opponent's attack, before the Damage
+    // Step. The new target is chosen among your Leader and Characters, whatever their state (QA-EB01
+    // EB01-029); an effect may redirect an [Unblockable] attack (QA-ST29 ST29-016).
+    const b = d.s.battle;
+    if (
+      !b ||
+      b.attackerOwner === you ||
+      ['damage', 'damageEnd', 'end', 'endExpire'].includes(b.step)
+    )
+      return 'next';
+    const ids = select(d, f, a.redirectAttack.to, {
+      role: 'target',
+      verb: 'make the new target of the attack',
+      restrict: (id) =>
+        (d.card(id).zone === 'leader' || d.card(id).zone === 'characters') &&
+        d.card(id).owner === you,
+    });
+    if (ids === WAIT) return WAIT;
+    const id = ids[0];
+    const now = d.s.battle;
+    if (id === undefined || !now || id === now.target || now.blocker !== null) return 'next';
+    d.s.battle = { ...now, target: id, keys: { ...now.keys, target: d.card(id).key } };
+    f.acted = true;
+    d.emit({
+      type: 'AttackRedirected',
+      attacker: now.attacker,
+      target: id,
+      player: you,
+      card: d.card(id).card,
+    });
     return 'next';
   }
   if ('select' in a) {
@@ -1924,9 +2076,48 @@ function move(
       });
     return 'next';
   }
+  if (to.zone === 'life' && zones.length === 1 && zones[0] === 'characters') {
+    // A Character into its owner's Life (G61): at the top or bottom, face-up or face-down, whoever
+    // owns it. A chosen card waits for the controller's answer on which end (`top or bottom`).
+    let ids = f.tmp?.sel;
+    if (!ids) {
+      const picked = select(d, f, what, { role: 'target', verb: 'place into Life' });
+      if (picked === WAIT) return WAIT;
+      ids = picked;
+    }
+    if (ids.length === 0) return 'next';
+    let end: 'top' | 'bottom' = to.position === 'bottom' ? 'bottom' : 'top';
+    if (to.position === 'topOrBottom') {
+      f.tmp = { ...f.tmp, sel: ids };
+      const e = lifeEnd(
+        d,
+        f,
+        `${nameOf(d, f)}: place ${ids.length === 1 ? 'the Character' : 'the Characters'} at the top or the bottom of ${ids.length === 1 ? "its owner's" : "their owners'"} Life cards?`,
+      );
+      if (e === WAIT) return WAIT;
+      end = e;
+    }
+    f.acted = true;
+    const group = ids.length > 1 ? d.s.nextMod++ : undefined;
+    for (const id of ids.slice().reverse())
+      if (FIELD.has(d.card(id).zone))
+        pushRemove(
+          d,
+          id,
+          'life',
+          { kind: 'effect', by: you },
+          end,
+          group,
+          undefined,
+          to.faceUp === true,
+        );
+    return 'next';
+  }
   if (zones.length === 1 && zones[0] === 'lifeTopOrBottom') {
     // "Add 1 card from the top or bottom of your Life cards to your hand" (G45, OP09-104): your own
     // Life, mandatory; with one card there is nothing to choose. Not damage: no [Trigger] (QA-GR).
+    // "You cannot add Life cards to your hand using your own effects" (G60) stops it.
+    if (cannotLifeToHandByEffect(d.s, you)) return 'next';
     const life = d.ro(you).life;
     if (life.length === 0) return 'next';
     let bottom = false;
@@ -1950,6 +2141,8 @@ function move(
         ? [you, other(you)]
         : [rel(ctxOf(d, f), what.owner === 'opponent' ? 'opponent' : 'you')];
     const owner = owners[0]!;
+    // Your own Life card to your own hand by your own effect (G60); an opponent's goes to theirs.
+    if (!toTrash && owner === you && cannotLifeToHandByEffect(d.s, you)) return 'next';
     const mandatory = !what.pick || 'exactly' in what.pick;
     // With every player's Life in play, only the players that have a Life card are asked about.
     if (owners.every((p) => d.ro(p).life.length === 0)) return 'next';
@@ -2301,6 +2494,121 @@ function lookAtTop(
   return 'next';
 }
 
+/**
+ * "Look at up to 1 card from the top of your or your opponent's Life cards and place it at the top
+ * or bottom of the Life cards", and "look at all of your Life cards and place them back in any
+ * order" (G64). The cards never leave their owner's Life (rules-digest 108): they keep their face
+ * state, and nothing is removed, so no Life watcher fires. Only the controller sees them (the
+ * `looking` list of the projection) and remembers them (`known`); the other player is told that a
+ * look happened and which end a card went back to, which anyone watching the Life area would see.
+ * The decisions asked are public facts only (whose Life, which end, the order of a known count).
+ */
+function lookAtLife(
+  d: Draft,
+  f: EffectFrame,
+  spec: Extract<EffectAction, { lookAtLife: unknown }>['lookAtLife'],
+): Out {
+  const you = f.controller;
+  if (spec.n === 'all') {
+    // Your whole Life area, in an order you choose (top first).
+    if (f.ph === undefined) {
+      const ids = d.ro(you).life.slice();
+      if (ids.length === 0) return 'next';
+      f.look = ids;
+      f.ph = 2;
+      f.tmp = { order: [] };
+      markKnown(d, ids, [you]);
+      d.emit({ type: 'CardsLooked', player: you, owner: you, count: ids.length, zone: 'life' });
+    }
+    const look = f.look ?? [];
+    const order = [...(f.tmp?.order ?? [])];
+    const g = take(f);
+    if (typeof g === 'string') order.push(g);
+    const left = look.filter((id) => !order.includes(id));
+    if (left.length >= 2) {
+      f.tmp = { ...f.tmp, order };
+      const sorted = left.slice().sort();
+      return ask(d, f, {
+        kind: 'order',
+        player: you,
+        prompt: `${nameOf(d, f)}: choose the next card from the top of your Life cards.`,
+        candidates: sorted,
+        role: 'order',
+        options: sorted.map((id) => ({ id, label: d.s.defs[d.card(id).card]!.name })),
+      });
+    }
+    order.push(...left);
+    orderLife(d, you, order);
+    markKnown(d, order, [you]);
+    delete f.look;
+    return 'next';
+  }
+  // One card: whose Life (a choice, with the option to look at none, for "your or your opponent's"),
+  // then which end it goes back to.
+  if (f.ph === undefined) {
+    const holders = (
+      spec.owner === 'any' ? [you, other(you)] : [spec.owner === 'you' ? you : other(you)]
+    ).filter((p) => d.ro(p).life.length > 0);
+    if (holders.length === 0) return 'next';
+    let owner = holders[0]!;
+    if (spec.owner === 'any') {
+      const g = take(f);
+      if (!Array.isArray(g)) {
+        const options = [
+          ...holders.map((p) => ({
+            id: p === you ? 'you' : 'opponent',
+            label: p === you ? 'Your Life cards' : "Your opponent's Life cards",
+          })),
+          { id: 'none', label: 'Do not look' },
+        ];
+        return ask(d, f, {
+          kind: 'choose',
+          player: you,
+          prompt: `${nameOf(d, f)}: look at the top card of whose Life cards (up to 1)?`,
+          min: 1,
+          max: 1,
+          candidates: options.map((o) => ({ option: o.id })) as never,
+          picked: [],
+          role: 'mode',
+          options,
+        });
+      }
+      const pickedId = (g[0] as { option: string }).option;
+      if (pickedId === 'none') return 'next';
+      owner = pickedId === 'you' ? you : other(you);
+      if (!holders.includes(owner)) return 'next';
+    }
+    const top = d.ro(owner).life[0]!;
+    f.look = [top];
+    f.ph = 1;
+    f.tmp = { lifeOwner: owner };
+    markKnown(d, top, [you]);
+    d.emit({ type: 'CardsLooked', player: you, owner, count: 1, zone: 'life' });
+  }
+  const owner = f.tmp?.lifeOwner ?? you;
+  const seen = f.look?.[0];
+  if (seen === undefined || d.ro(owner).life[0] !== seen) {
+    delete f.look;
+    return 'next';
+  }
+  let end: 'top' | 'bottom' = 'top';
+  // With one Life card there is no other end to choose (the count is public).
+  if (d.ro(owner).life.length > 1) {
+    const e = lifeEnd(
+      d,
+      f,
+      `${nameOf(d, f)}: place the card you looked at at the top or the bottom of ${owner === you ? 'your' : "your opponent's"} Life cards?`,
+    );
+    if (e === WAIT) return WAIT;
+    end = e;
+  }
+  placeLife(d, owner, seen, end);
+  markKnown(d, seen, [you]);
+  delete f.look;
+  f.acted = true;
+  return 'next';
+}
+
 function runInternal(d: Draft, f: EffectFrame, st: InternalStep): void {
   const you = f.controller;
   switch (st.op) {
@@ -2311,7 +2619,7 @@ function runInternal(d: Draft, f: EffectFrame, st: InternalStep): void {
       draw(d, you, st.n);
       return;
     case 'lifeToHand':
-      lifeToHand(d, you, st.n);
+      if (!cannotLifeToHandByEffect(d.s, you)) lifeToHand(d, you, st.n);
       return;
     case 'damage': {
       const p = st.player === 'you' ? you : other(you);

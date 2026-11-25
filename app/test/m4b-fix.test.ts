@@ -40,6 +40,9 @@ describe('every modifier kind has words (review M4b-12)', () => {
     cannotAttackTarget: true,
     skipRefreshDon: true,
     replacement: true,
+    grantAttribute: true,
+    cannotPlayByEffect: true,
+    cannotLifeToHand: true,
   };
   it.each(Object.keys(kinds).filter((k) => k !== 'power'))('%s', (kind) => {
     const words = modifierWords(ev('ModifierAdded', { kind, amount: 2000, keyword: 'Rush' }));

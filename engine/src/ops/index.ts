@@ -244,6 +244,27 @@ export function shuffleDeck(d: Draft, p: PlayerId): void {
   d.emit({ type: 'Shuffled', player: p, zone: 'deck' });
 }
 
+/**
+ * A Life card looked at goes back to the top or the bottom of its owner's Life (G64, rules-digest
+ * 108). It never leaves the Life area, so nothing is removed and it keeps its face state and handle;
+ * what the other player is told is only the end it went to.
+ */
+export function placeLife(d: Draft, owner: PlayerId, id: InstanceId, end: 'top' | 'bottom'): void {
+  const life = d.pl(owner).life;
+  const i = life.indexOf(id);
+  if (i < 0) throw new Error(`Card ${id} is not in ${owner}'s Life`);
+  life.splice(i, 1);
+  if (end === 'top') life.unshift(id);
+  else life.push(id);
+  d.emit({ type: 'LifeCardPlaced', player: owner, position: end });
+}
+
+/** Put the whole Life area back in this order, top first (G64: "in any order"). */
+export function orderLife(d: Draft, owner: PlayerId, ids: InstanceId[]): void {
+  d.pl(owner).life = ids.slice();
+  d.emit({ type: 'LifeReordered', player: owner, count: ids.length });
+}
+
 /** Move the top Life card to its owner's hand without damage (no [Trigger], QA-GR). */
 export function lifeToHand(d: Draft, p: PlayerId, n: number): number {
   let moved = 0;

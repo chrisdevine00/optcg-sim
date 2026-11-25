@@ -19,6 +19,7 @@
 import type { Continuous, Filter } from '@optcg/cards';
 import type { InstanceId } from './api.ts';
 import { computePerms } from './effects/layers.ts';
+import { allHold, holds, pool, type Ctx } from './effects/eval.ts';
 import type { Modifier, State } from './state.ts';
 
 /** A "cannot be K.O.'d" that stops only K.O.s by a source matching `by` (G46). */
@@ -58,6 +59,10 @@ export interface Derived {
   attackActive: boolean;
   /** This card cannot attack a card matching one of these (G47); empty for nearly every card. */
   cannotAttackTarget: readonly Filter[];
+  /** Its attributes: the printed ones, and any a timed effect gave it (G59). */
+  attributes: readonly string[];
+  /** "This card in your hand cannot be played by effects" (G63). */
+  noEffectPlay: boolean;
 }
 
 /** `Derived.koShield` bits. */
@@ -108,6 +113,8 @@ export function restBlocked(
 export interface LayerMemo {
   perms: Map<number, Map<InstanceId, Modifier[]>>;
   derived: Map<number, Map<InstanceId, Derived>>;
+  /** The cards a permanent `negate` names (G66), once read for this memo. */
+  neg?: ReadonlySet<InstanceId>;
 }
 export const newMemo = (): LayerMemo => ({ perms: new Map(), derived: new Map() });
 export const LAST_STAGE = 6;
@@ -201,6 +208,9 @@ export function deriveAt(
   const hit = per.get(id);
   if (hit) return hit;
   let mods = live ? s.mods.filter((m) => m.target === id && active(s, m)) : modsFor(s, id);
+  // A card a permanent `negate` names (G66) is negated at every stage, before any other effect.
+  if (negating(s) && negationOf(s, memo, live).has(id))
+    mods = mods ? [...mods, negateMod(id)] : [negateMod(id)];
   if (upto > 0 && layered(s)) {
     for (let k = 1; k <= upto; k++) {
       const extra = permsAt(s, k, memo, live).get(id);
@@ -221,18 +231,83 @@ function permsAt(s: State, stage: number, memo: LayerMemo, live: boolean) {
   return m;
 }
 
-/**
- * `isNegated` skips the permanent layer because no permanent can negate (no `negate` shape in
- * `Continuous`). A permanent negate would make it wrong, so adding one is a compile error here:
- * route negation through `computePerms` first, then remove this guard.
- */
-type AllContinuousKeys = Continuous extends infer C ? (C extends unknown ? keyof C : never) : never;
-const NO_PERMANENT_NEGATE: 'negate' extends AllContinuousKeys ? never : true = true;
-void NO_PERMANENT_NEGATE;
+/** Does any card of this game carry a permanent that negates other cards (G66)? */
+const negatingDefs = new WeakMap<object, boolean>();
+function negating(s: State): boolean {
+  let v = negatingDefs.get(s.defs);
+  if (v === undefined) {
+    v = Object.values(s.defs).some((d) =>
+      d.abilities.some((a) => a.kind === 'permanent' && a.apply.some(applyNegates)),
+    );
+    negatingDefs.set(s.defs, v);
+  }
+  return v;
+}
+const applyNegates = (c: Continuous): boolean =>
+  'negate' in c || ('tiers' in c && c.tiers.some((t) => t.apply.some(applyNegates)));
 
-/** Is the card negated by a modifier (CR 8-2)? Cheap: no permanent layer is involved. */
+const negateMod = (target: InstanceId): Modifier => ({
+  id: -1,
+  kind: 'negate',
+  target,
+  amount: 0,
+  duration: { kind: 'whileSource', source: target },
+  controller: 'p1',
+  source: null,
+});
+
+/**
+ * The cards a permanent `negate` names (G66), read once per memo. It is the first stage: a source
+ * negated by a stored modifier (a timed `negate`) names nothing, and the filters it reads are
+ * printed values, so nothing below it is needed. Two sources that negate each other both do
+ * (the question is a cycle, which the layers cannot answer); a source never negates itself.
+ */
+function negationOf(s: State, memo: LayerMemo, live: boolean): ReadonlySet<InstanceId> {
+  if (memo.neg) return memo.neg;
+  // A scratch memo for the reading: its own negation set is empty, so no read can recurse here.
+  const scratch = newMemo();
+  scratch.neg = NO_CARDS;
+  memo.neg = NO_CARDS;
+  const out = new Set<InstanceId>();
+  for (const p of ['p1', 'p2'] as const) {
+    const ps = s.players[p];
+    for (const src of [ps.leader, ...ps.characters, ...ps.stage]) {
+      const def = s.defs[s.cards[src]!.card]!;
+      for (const ab of def.abilities) {
+        if (ab.kind !== 'permanent' || (ab.zone ?? 'field') !== 'field') continue;
+        if (!ab.apply.some(applyNegates)) continue;
+        if (deriveAt(s, src, 0, scratch, live).negated) break;
+        const c: Ctx = { s, you: p, self: src, live, lay: { upto: 0, memo: scratch } };
+        if (!allHold(c, ab.conditions)) continue;
+        const walk = (aps: readonly Continuous[]): void => {
+          for (const ap of aps) {
+            if ('negate' in ap) {
+              for (const id of pool(c, ap.negate.target)) if (id !== src) out.add(id);
+            } else if ('tiers' in ap) for (const t of ap.tiers) if (holds(c, t.when)) walk(t.apply);
+          }
+        };
+        walk(ab.apply);
+      }
+    }
+  }
+  memo.neg = out;
+  return out;
+}
+const NO_CARDS: ReadonlySet<InstanceId> = new Set();
+
+const finishedNeg = new WeakMap<State, ReadonlySet<InstanceId>>();
+
+/** Is the card negated by a modifier (CR 8-2) or by a permanent `negate` (G66)? */
 export function isNegated(s: State, id: InstanceId): boolean {
-  return s.mods.some((m) => m.kind === 'negate' && m.target === id && active(s, m));
+  if (s.mods.some((m) => m.kind === 'negate' && m.target === id && active(s, m))) return true;
+  if (!negating(s)) return false;
+  if (drafting.has(s)) return negationOf(s, newMemo(), true).has(id);
+  let set = finishedNeg.get(s);
+  if (!set) {
+    set = negationOf(s, newMemo(), false);
+    finishedNeg.set(s, set);
+  }
+  return set.has(id);
 }
 
 const NO_KO_BY: readonly KoGuard[] = [];
@@ -259,6 +334,8 @@ function compute(s: State, id: InstanceId, mods: Modifier[] | undefined): Derive
   let cannotBlock = false;
   let attackActive = false;
   let noTarget: Filter[] | null = null;
+  let attributes: readonly string[] = def.attributes;
+  let noEffectPlay = false;
   if (mods && mods.length > 0) {
     let extra = 0;
     let costDelta = 0;
@@ -298,6 +375,13 @@ function compute(s: State, id: InstanceId, mods: Modifier[] | undefined): Derive
           break;
         case 'attackActive':
           attackActive = true;
+          break;
+        case 'grantAttribute':
+          if (m.attribute && !attributes.includes(m.attribute))
+            attributes = [...attributes, m.attribute];
+          break;
+        case 'cannotPlayByEffect':
+          noEffectPlay = true;
           break;
         case 'cannotAttack':
           cannotAttack = true;
@@ -347,6 +431,8 @@ function compute(s: State, id: InstanceId, mods: Modifier[] | undefined): Derive
     cannotBlock,
     attackActive,
     cannotAttackTarget: noTarget ?? NO_FILTERS,
+    attributes,
+    noEffectPlay,
   };
 }
 
