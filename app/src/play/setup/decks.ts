@@ -9,6 +9,7 @@ import type { DeckSpec } from '@optcg/engine';
 import { SCRIPTED } from '../../cards/scripts.ts';
 import meta from '../../../../docs/research/meta-lists.json';
 import { savedDeck, savedDecks, type SavedDeck } from '../../decks/store.ts';
+import { TUTORIAL_DECK_IDS, TUTORIAL_DECK_ST21, TUTORIAL_DECK_ST22 } from '../../tutorial/decks.ts';
 
 export interface DeckOption {
   id: string;
@@ -59,6 +60,33 @@ export const DECKS: DeckOption[] = ARCHETYPES.flatMap((a) =>
 /** The archetype value of saved decks in Setup's pickers. */
 export const SAVED = 'saved';
 
+/** The archetype value of the two tutorial decks (M7 WP6): Starter Decks ST-21 and ST-22. */
+export const TUTORIAL = 'tutorial';
+
+/** The tutorial decks as playable options: the first game after the tutorial uses them (flows F2). */
+export const TUTORIAL_DECKS: DeckOption[] = [
+  {
+    id: TUTORIAL_DECK_IDS.mine,
+    archetype: TUTORIAL,
+    leader: TUTORIAL_DECK_ST21.leader,
+    name: 'Starter Deck ST-21 · Monkey.D.Luffy',
+    colors: ['Red'],
+    source: 'The tutorial deck',
+    url: '',
+    spec: TUTORIAL_DECK_ST21,
+  },
+  {
+    id: TUTORIAL_DECK_IDS.theirs,
+    archetype: TUTORIAL,
+    leader: TUTORIAL_DECK_ST22.leader,
+    name: 'Starter Deck ST-22 · Ace & Newgate',
+    colors: ['Blue'],
+    source: 'The tutorial deck',
+    url: '',
+    spec: TUTORIAL_DECK_ST22,
+  },
+];
+
 function savedOption(d: SavedDeck | undefined): DeckOption | undefined {
   if (!d?.leader) return undefined;
   return {
@@ -82,6 +110,7 @@ export const savedOptions = (): DeckOption[] =>
 /** A meta list (`OP17-039-rocks#1`) or a saved deck (`saved:...`). */
 export const deckById = (id: string): DeckOption | undefined =>
   DECKS.find((d) => d.id === id) ??
+  TUTORIAL_DECKS.find((d) => d.id === id) ??
   (id.startsWith('saved:') ? savedOption(savedDeck(id)) : undefined);
 
 /** The format a deck is checked in: a saved deck's own, Standard for the meta lists. */

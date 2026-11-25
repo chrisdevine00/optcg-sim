@@ -19,7 +19,10 @@ import {
   loadCards,
   SAVED,
   savedOptions,
+  TUTORIAL,
+  TUTORIAL_DECKS,
 } from './decks.ts';
+import { TUTORIAL_DECK_IDS } from '../../tutorial/decks.ts';
 import { SCENARIOS } from './scenarios.ts';
 
 /**
@@ -45,6 +48,11 @@ export interface SetupChoice {
   speed: Speed;
   seed: number | undefined;
   scenario?: string;
+  /**
+   * The first full game after the tutorial (M7 WP6, flows F2 step 6): the tutorial decks, Rookie,
+   * Learner verbosity and the tier-1 lethal detector always on, for this one game only.
+   */
+  firstGame?: boolean;
   paused?: boolean;
   /** Tests: `iterations` makes the AI's search the same on every machine (`?aibudget=`). */
   aiBudgets?: 'iterations' | 'ms';
@@ -82,6 +90,13 @@ function fromUrl(): Partial<SetupChoice> & { start?: boolean } {
   // A named scenario, or `json:<base64url>` with a described position (tests, shared positions).
   if (sc && (SCENARIOS[sc] || sc.startsWith('json:'))) out.scenario = sc;
   if (q.get('start') === '1') out.start = true;
+  // The first-game preset (flows F2 step 6): the tutorial decks against Rookie, named on screen.
+  if (q.get('preset') === 'first') {
+    out.myDeck = TUTORIAL_DECK_IDS.mine;
+    out.theirDeck = TUTORIAL_DECK_IDS.theirs;
+    out.opponent = 'rookie';
+    out.firstGame = true;
+  }
   return out;
 }
 
@@ -108,6 +123,8 @@ export function Setup({
   const [alwaysSkip, setAlwaysSkip] = useState(url.alwaysSkip ?? false);
   const [seed, setSeed] = useState(url.seed !== undefined ? String(url.seed) : '');
   const speed = url.speed ?? 1;
+  // The first-game coach defaults stay for this game whatever the player changes here.
+  const firstGame = url.firstGame === true;
 
   // Card data for the two chosen decks, so the automation copy can tell cards with no effect from
   // cards whose effect is not scripted. The line appears once the sets have loaded.
@@ -158,6 +175,7 @@ export function Setup({
     speed,
     seed: /^\d+$/.test(seed) ? Number(seed) : undefined,
     ...(url.scenario ? { scenario: url.scenario } : {}),
+    ...(firstGame ? { firstGame: true } : {}),
     ...(url.paused ? { paused: true } : {}),
     ...(url.aiBudgets ? { aiBudgets: url.aiBudgets } : {}),
   });
@@ -172,6 +190,13 @@ export function Setup({
   return (
     <main className="page setup" id="main">
       <h1>New game</h1>
+      {firstGame && (
+        <p className="notice" role="note" data-testid="first-game-note">
+          <b>Your first full game.</b> Set for your first game: the tutorial decks, the Rookie AI,
+          the coach explaining in full (Learner) and the lethal detector always on. Change in
+          Settings later.
+        </p>
+      )}
       <p className="lede">
         Pick two decks (the twelve meta decks, or your own from Decks), an opponent and who goes
         first.
@@ -410,7 +435,11 @@ function DeckPicker({
   const saved = savedOptions();
   const current = deckById(value) ?? DECKS[0]!;
   const inGroup =
-    current.archetype === SAVED ? saved : DECKS.filter((d) => d.archetype === current.archetype);
+    current.archetype === SAVED
+      ? saved
+      : current.archetype === TUTORIAL
+        ? TUTORIAL_DECKS
+        : DECKS.filter((d) => d.archetype === current.archetype);
   return (
     <fieldset className={`setup-col deck-picker ${compact ? 'compact' : ''}`}>
       <legend>{legend}</legend>
@@ -423,12 +452,15 @@ function DeckPicker({
             onChange(
               e.target.value === SAVED
                 ? saved[0]!.id
-                : DECKS.find((d) => d.archetype === e.target.value)!.id,
+                : e.target.value === TUTORIAL
+                  ? TUTORIAL_DECKS[name === 'theirs' ? 1 : 0]!.id
+                  : DECKS.find((d) => d.archetype === e.target.value)!.id,
             )
           }
           name={`${name}-archetype`}
         >
           {saved.length > 0 && <option value={SAVED}>Your decks ({saved.length})</option>}
+          <option value={TUTORIAL}>Tutorial decks (Starter Decks ST-21 and ST-22)</option>
           {ARCHETYPES.map((a) => (
             <option key={a.id} value={a.id}>
               {a.name} ({a.leaderId}) · {a.colors.map((c) => COLOR_WORD[c] ?? c).join('/')}
@@ -446,7 +478,9 @@ function DeckPicker({
         >
           {inGroup.map((d, i) => (
             <option key={d.id} value={d.id}>
-              {d.archetype === SAVED ? `${d.name} · ${d.leader}` : `List ${i + 1}: ${d.source}`}
+              {d.archetype === SAVED || d.archetype === TUTORIAL
+                ? `${d.name} · ${d.leader}`
+                : `List ${i + 1}: ${d.source}`}
             </option>
           ))}
         </select>
@@ -455,6 +489,8 @@ function DeckPicker({
         {current.spec.main.length} cards · {current.name} ·{' '}
         {current.archetype === SAVED ? (
           <Link to={`/decks/${current.id.replace(/^saved:/, '')}`}>edit in the deck builder</Link>
+        ) : current.archetype === TUTORIAL ? (
+          <span>the counts are approximate: the product list is not checked yet</span>
         ) : (
           <a href={current.url} target="_blank" rel="noreferrer">
             source decklist
