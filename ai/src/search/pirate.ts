@@ -36,6 +36,7 @@ import { counterValueOf, type Prior } from '../knowledge.ts';
 import { ownTurn, type Playbook } from '../playbook.ts';
 import { playOnlyIfMet } from './conditions.ts';
 import { evaluate, total, type Breakdown, type Weights } from './heuristic.ts';
+import { mulliganVerdict } from './mulligan.ts';
 import { determinizations } from './sample.ts';
 import { explainAction, playConditionHolds, type WhyContext } from './why.ts';
 import {
@@ -1126,27 +1127,7 @@ function mulligan(view: PlayerView, setup: PirateSetup): PirateDecision {
   const pb = setup.playbook;
   const hand = view.zones[view.player].hand.map((c) => setup.cards.get(c.card ?? ''));
   const first = view.turn.activePlayer === view.player;
-  let keep = true;
-  if (pb) {
-    const m = pb.mulligan;
-    const left = hand.filter((c): c is Card => !!c);
-    const met: Record<string, boolean> = {};
-    for (const piece of m.pieces) {
-      let n = 0;
-      for (let i = 0; i < left.length && n < piece.min;) {
-        const c = left[i]!;
-        const fits = piece.cards ? piece.cards.includes(c.id) : counterValueOf(c) > 0;
-        if (fits) {
-          left.splice(i, 1);
-          n++;
-        } else i++;
-      }
-      met[piece.name] = n >= piece.min;
-    }
-    const missing = m.pieces.filter((p) => !met[p.name]).length;
-    keep = missing <= (first ? 0 : m.secondShort);
-    if (first && m.requireGoingFirst.some((name) => !met[name])) keep = false;
-  }
+  const keep = pb ? mulliganVerdict(hand, pb.mulligan, first).keep : true;
   const action = view.actions.find((a) => a.type === 'mulligan' && a.redraw === !keep)!;
   const m = pb?.mulligan;
   // The guide's rule, one line for what it keeps and one for the seat allowance (copy: <= 30 words).

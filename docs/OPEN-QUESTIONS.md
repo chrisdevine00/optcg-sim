@@ -18,6 +18,9 @@ Settled by Track F from official sources: R1 (reveal → pay → trash 1 → pla
 - Q-T2. OP13-001 Luffy's +2000 per rested DON!!: one recipient, or a choice per DON!!? Best answer: one recipient.
 - Q-T4. OP15-058 Enel's "your second turn". Best answer: the owner's own second turn.
 
+- M8-WP2-1. **The counter-wasted bound ignores some ways to attack again.** The public upper bound counts board attackers `legalActions` offers, plus one per hand card that is a Rush Character or an effect that sets a rested Character active (read from the prior's lists and public scripts). It does not count a card that draws into one the same turn, a Rush granted by an Event, or an attacker made active by an effect on a Character already in play. A flag is `any-hand` only when the bound still holds without them; an opponent could still have found one. Best answer: keep, and treat "not needed" as the guide's advice at high Life, not a proof; widen the scan when a card shows it.
+- M8-WP2-2. **A mulligan guide's "sourced" test is the presence of an `SH-` tag.** Guides whose rule says "no sourced rule" (OP05-098, OP08-098) give no mulligan flag. Best answer: keep until the owner writes those rules from a source.
+
 ## Strategy (from Track D part 2; detail in docs/research/strategy-concepts.md "Open questions")
 
 - S1. TCGplayer "How to Swing for Lethal" and a Blue-Green Luffy guide were read only as search snippets (pages rendered without text). Best answer: do not use their claims as coach content until a page is read in full; coach lethal math rests on the CR and on freely readable sources allowed by robots.txt (onepiece.gg is excluded; see the 2026-10-28 robots decision).

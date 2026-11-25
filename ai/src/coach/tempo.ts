@@ -192,8 +192,10 @@ export function explainUnused(
    * (M7-R7). The blunder warning keeps the suggestion.
    */
   ledgerOnly = false,
+  /** The review flags from one unused DON!! (M8 WP2); the live coach keeps `UNUSED_FLAG_AT`. */
+  threshold: number = UNUSED_FLAG_AT,
 ): Explanation | null {
-  if (ledger.unused < UNUSED_FLAG_AT) return null;
+  if (ledger.unused < threshold) return null;
   const me = view.player;
   const opp = me === 'p1' ? 'p2' : 'p1';
   const n = ledger.unused;
@@ -210,8 +212,8 @@ export function explainUnused(
     {
       text:
         tense === 'left'
-          ? `You ended your turn with ${ledger.active} active DON!!. ${why}, so those ${n} did nothing.`
-          : `You have ${ledger.active} active DON!!. ${why}, so those ${n} would do nothing.`,
+          ? `You ended your turn with ${ledger.active} active DON!!. ${why}, so ${n === 1 ? 'that 1 did' : `those ${n} did`} nothing.`
+          : `You have ${ledger.active} active DON!!. ${why}, so ${n === 1 ? 'that 1 would' : `those ${n} would`} do nothing.`,
       figures: { activeDonAtEnd: ledger.active, usableOnTheirTurn: ledger.held.n },
     },
   ];
