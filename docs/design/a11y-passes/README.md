@@ -27,11 +27,12 @@ reader said, and what the app wrote to its live regions. It is its own package (
 workspace), so normal CI never installs Guidepup.
 
 - `src/m3.ts` is the §11.3 script, on the `a11y-m3` scenario (`app/src/play/setup/a11y-scenarios.ts`).
-  `src/l.ts` is the §11.4 script (the learning slice), described below.
+  `src/l.ts` is the §11.4 script (the learning slice), described below. `src/m7.ts` is the §11.5
+  script (the tutorial and the coach), described after it.
   When the plain keyboard path does not reach the place a step needs, the harness moves focus itself
   and writes a **harness assist** into the record, so nothing is hidden.
 - Output: `app/a11y/results/<project>/<script>.md` (a table per step) and `<script>.json`, where
-  `<script>` is `m3` or `l`.
+  `<script>` is `m3`, `l` or `m7`.
 - Projects: `nvda-chrome`, `nvda-firefox` (Windows only), `voiceover-webkit` (macOS only), and `dry`
   (Playwright keys, no screen reader, for checking the harness).
 - The script is deterministic: the scenario's seed and the script's own moves fix Rookie's moves.
@@ -47,8 +48,9 @@ gh run download <run id>                                     # artifacts a11y-nv
 ```
 
 The workflow builds the app at that commit, serves it with `vite preview`, installs NVDA with
-`npx @guidepup/setup install nvda`, and runs the chosen script (default `l`; `m3` and `both` are
-kept) in the chosen browser projects. It runs only by hand (never on
+`npx @guidepup/setup install nvda`, and runs the chosen script (`-f script=l|m3|m7|both|all`;
+default `l`; `both` is M3 and L, `all` is M3, L and M7) in the chosen browser projects. The M7 pass:
+`gh workflow run a11y-nvda.yml --ref <branch> -f browsers=both -f script=m7`. It runs only by hand (never on
 push). Firefox is Playwright's Firefox build ("Nightly"), not a branded release.
 
 ### Dry run (any machine)
@@ -59,9 +61,10 @@ npm run build -w @optcg/app
 cd app/a11y && npm ci
 A11Y_BASE_URL=http://localhost:4199/optcg-sim/ npx playwright test --project=dry              # both scripts
 A11Y_BASE_URL=http://localhost:4199/optcg-sim/ npx playwright test --project=dry l.dry.spec.ts # the L script only
+A11Y_BASE_URL=http://localhost:4199/optcg-sim/ npx playwright test --project=dry m7.dry.spec.ts # the M7 script only
 ```
 
-The L script takes about five minutes.
+The L script takes about five minutes, the M7 script about two (dry).
 
 ### The L script (§11.4)
 
@@ -97,6 +100,26 @@ Scenario and record:
   guided count, and the Hint, DON!! math and Tempo sections, are not built either (STATUS.md).
 - Judge each step against the spoken log, as for M3; the "Expect" column in the record holds the
   built behaviour where §11.4 has none.
+
+### The M7 script (§11.5)
+
+`src/m7.ts`, run by `m7.nvda.spec.ts`, `m7.voiceover.spec.ts` and `m7.dry.spec.ts`. One browser
+context, four parts, each loading its own page (so the tutorial's progress and timing log carry from
+part T to Settings):
+
+| Step | What it does |
+| --- | --- |
+| T0 | The tutorial's first step loads: focus is on the step text (a group named "Step 1 of 8: The zones"), which is read. |
+| T1 to T3 | Steps `t1-zones`, `t2-first-turn`, `t3-don-and-power` by the keys the step text names (`G` then `L` or `H`, the arrows, Enter, `P`, `+`); each is done when the done line is spoken and **focus is on Next**; Enter on Next starts the next step. T3 also checks `P` (focus to the step text) and Read again. |
+| T4 | Leave tutorial, Home's "Continue the tutorial (step 4 of 8)", Enter: step 4 reopens with focus on its step text. |
+| H1, H2 | `ub-hint-1`: `H` from the board moves focus to the hint region and the polite "Hint: thinking." then "Hint ready: ..." are written; the region is read in browse mode; Down and Up walk the "Show step N" buttons; Enter plays nothing. |
+| S1, S2 | Settings: the Blunder warning checkbox (Space; its polite status line) and the Tutorial timing list with its Export and Delete buttons (nothing is exported or deleted). |
+| B1, B2 | `ub-blunder-1`, with the warning switched on in S1: End turn is held, a polite "Warning: ..." is written, the button reads "Commit anyway" and is described by the note, focus stays, and there is no dialog and no assertive line; a second Enter commits. |
+
+Letter keys (`G`, `H`, `P`) may be taken by NVDA's browse mode when focus is on the step text; the
+step then records what happened and moves focus itself (a harness assist), like the L script. The
+steps' Expect text is in accessibility.md §11.5. Where something §11.5 once named was not built (a
+"Show me" control, Settings → Opponent moves) the section says so.
 
 ## VoiceOver passes (the owner's Mac)
 

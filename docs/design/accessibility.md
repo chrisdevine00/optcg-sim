@@ -75,7 +75,7 @@ When an engine decision arrives that the human owes (`block`, `counter`, `trigge
 | Left / Right | Previous or next card in the zone. It stops at the ends and does not wrap, so the edge is unambiguous. |
 | Home / End | First or last card in the zone. |
 | Up / Down | The zone visually above or below. The card in the closest column gets focus. This is a sighted-user accelerator; Tab is the canonical order. |
-| `G`, then a letter | **Go to.** A small popover lists the letters and waits with no timeout until the next key or Escape. Lowercase means yours; Shift means the opponent's. `h` hand, `c` Characters, `l` Leader, `s` Stage, `d` DON!! (cost area), `n` DON!! deck, `k` deck, `t` trash, `f` Life, `m` midline band, `b` battle panel, `p` decision panel, `o` coach, `g` game log. |
+| `G`, then a letter | **Go to.** A small popover lists the letters and waits with no timeout until the next key or Escape. Lowercase means yours; Shift means the opponent's. `h` hand, `c` Characters, `m` midline band, `p` decision panel, `b` battle panel (the decision panel, where the battle is shown), `g` game log. The letters for the Leader row's other items, `l` Leader, `s` Stage, `d` DON!! (cost area), `n` DON!! deck, `k` deck, `t` trash and `f` Life, all go to your **Leader row**, the zone of the Tab order (§3.1), on its first item; Left and Right then reach the item (the row's order is DON!! deck, active DON!!, rested DON!!, Life, Leader, Stage, deck, trash). The same letters in capitals go to the opponent's row, `C` to their Characters and `H` to their name. The coach has no go-to letter: `C` opens it and `H`, `L`, `W` ask it (M7-V3, settled in M7 WP7). |
 | `P` | Jump to the current decision: focus goes to the decision panel's heading, which is read, and Tab then reaches its choices (so `P` then Enter never commits or rewinds by accident; UX-V6). Works from page load and from the skip link. |
 | `Q` | Speak a status summary (§9.2). `Shift+Q` speaks both boards in full. |
 
@@ -584,17 +584,23 @@ Scenario: `a11y-l` (Rocks vs Kaido, a planted position with lethal available, th
 
 ### 11.5 Script: M7 (tutorial and coach)
 
+Run by `app/a11y/src/m7.ts` (`m7.dry.spec.ts`, `m7.nvda.spec.ts`, `m7.voiceover.spec.ts`; the dry run checks the harness with Playwright keys and no screen reader). The NVDA run is dispatched by hand: `gh workflow run a11y-nvda.yml --ref <branch> -f browsers=both -f script=m7` (`script=all` runs M3, L and M7). Four parts in one browser context, each loading its own page: **T** the tutorial (`tutorial?restart=1`), **H** the hint (`play?scenario=ub-hint-1&speed=step&opp=pirate&aibudget=iterations&start=1`), **S** Settings, **B** the blunder note (`ub-blunder-1`, the same query). The record is `app/a11y/results/<project>/m7.md`, judged against the Expect column as for M3 and L.
+
 | # | Do | Expect |
 | --- | --- | --- |
-| 1 | First launch, choose the beginner path, start the tutorial | The step text is read; `P` moves focus to it (it is the current decision) and **Read again** repeats it; no timers anywhere |
-| 2 | Each of the 8 steps: follow the instructions using only keys from the step text and the shortcut sheet | Each constrained step offers only the taught action; "Show me" moves focus to it; the step completes |
-| 3 | Exit at step 4; reload; resume | Resumes at step 4 with focus on the step text |
-| 4 | Finish the tutorial; start a game vs Rookie | Game starts; nothing explains it except the app |
-| 5 | `H` during your Main Phase | "Hint ready: …"; `C` reads the line and reason |
-| 6 | Let the AI move; `W` | The explanation for the last AI move |
-| 7 | Switch on the blunder warning; make the planted blunder | The warning is part of the confirm dialog's description, read with it; it never auto-dismisses |
-| 8 | Tempo meter on | Its value is in the coach panel as text, not announced unless "Coach alerts" is on |
-| 9 | Settings → Opponent moves: Turn summary only; play one AI turn at 2× | Only the end-of-turn summary, plus any decision prompt |
+| T0 | Load the tutorial from its first step | Focus is on the step text, a group named "Step 1 of 8: The zones"; the title, the two-sentence intro and the instruction ("Do this: ..." with the keys) are read; Read again, Back (disabled) and Leave tutorial follow it; no timers anywhere |
+| T1 | `G`, `L`, then the arrows through your side (step `t1-zones`) | Each zone is spoken as focus lands; the first visit of a zone adds its one line, politely; when nine are visited the done line and "Press Next to go on." are spoken and **focus is on Next** |
+| T2 | Enter on Next; `G`, `H`, Enter, `P` (step `t2-first-turn`) | Enter on Next starts the step and focus goes to its text, "Step 2 of 8: Your first turn"; Jinbe is played; done line spoken; focus on Next |
+| T3 | Enter on Next; `P` from the board; Read again; `G`, `L`, Right to the Leader, `+`, Enter (step `t3-don-and-power`) | `P` moves focus to the step text; Read again speaks it once more and returns focus to it; the Leader reads 6000; the done line states the number; focus on Next |
+| T4 | Leave tutorial; on Home, "Continue the tutorial (step 4 of 8)"; Enter | Home offers the step; Enter reopens step 4 with focus on its step text (the step restarts, it does not resume mid-step) |
+| H1 | From the board, `H` | Nothing was asked by itself. Focus moves to the hint region (a group named "Hint"); a polite "Hint: thinking." then "Hint ready: Play Yamato, attack their Leader, and end with 5 DON!! active. 4 steps. Step 1: ..."; focus stays on the region while the result arrives; no assertive line |
+| H2 | Read the region in browse mode; Tab to "Show step 1 on the board"; Down, Up, Enter | The claim, the certainty ("Works against any hand"), the numbered steps and the outcome are read; Down and Up move between the "Show step N on the board: ..." buttons, each named with its step; Enter shows a step and plays nothing |
+| S1 | Settings: headings; Tab to "Blunder warning"; Space | A Settings heading and a Coach section; the checkbox's description is its hint; Space checks it and a polite status says "Blunder warning: on." |
+| S2 | Tab on to "Tutorial timing" | A list named "Tutorial runs" ("...: N of M steps, X min active, not finished"); buttons "Export JSON for <date>", "Export CSV for <date>", "Delete the run of <date>" |
+| B1 | On a lethal turn, Tab to End turn; Enter | The turn does not end. A polite "Warning: You have lethal this turn, and this move gives it up. ..." is spoken once; the End turn button is now "Commit anyway" and its description is the note; focus stays on it; no dialog, no assertive line |
+| B2 | Enter again | "Commit anyway": the note goes and the turn ends |
+
+Not built, so not scripted: a **Show me** control in a constrained step (the step lights the cards it names and its text carries the keys); **Settings → Opponent moves: Turn summary only** (M8); the tempo meter's own switch (it is a silent meter, always shown, and is read by `C` in browse mode, not announced). Left to the owner's listening pass: a whole game after the tutorial and `W` after an AI move (S2-kit.md, task 2.4), which the harness cannot judge.
 
 ### 11.6 M10 audit
 

@@ -221,7 +221,7 @@ Q1 to Q8 are the **tutorial battery**. Each tutorial step has at least one quest
 
 ### 7.1 The local timing log
 
-ARCHITECTURE §5 already lists "a per-step tutorial timing log" in IndexedDB. This section specifies it.
+ARCHITECTURE §5 already lists "a per-step tutorial timing log". This section specifies it. As built (M7), the log is in `localStorage` (`optcg.tutorial.timing.v1`, the last 20 runs) behind a storage adapter; the move to IndexedDB is M8.
 
 **What is recorded**, one record per tutorial run:
 
@@ -254,7 +254,7 @@ type TutorialTimingLog = {
 
 **What is never recorded:** names, free text, card choices outside the tutorial, IP addresses or device identifiers. There is nothing to identify a person.
 
-**Export.** Settings → Progress → "Tutorial timing" lists runs with their totals. Each run has "Export JSON", "Export CSV" (one row per step) and "Delete". The log is also in the full progress export (ARCHITECTURE §5). The participant sends the file to the owner, or the owner copies it from his own machine, by hand.
+**Export.** Settings → "Tutorial timing" (a section of the Settings page, header link "Settings") lists runs with their totals, and the tutorial's completion screen offers the same two exports for the run just finished. Each run has "Export JSON", "Export CSV" (one row per step) and "Delete". The log will also be in the full progress export (ARCHITECTURE §5, M8). Files are named `optcg-tutorial-timing-<runId>.json` and `.csv`. The participant sends the file to the owner, or the owner copies it from his own machine, by hand.
 
 **No network.**
 - A Playwright test records every request during a full tutorial run and fails on any request to an origin other than the app's own and the configured art sources.
@@ -266,17 +266,17 @@ type TutorialTimingLog = {
 - **Pass:** `totalActiveMs` < 20:00 for a beginner (or "expert proxy" for the owner, §2.3), **and** the tutorial teach-back battery averages ≥ 1.5. A fast tutorial that teaches nothing does not pass.
 - **Per-step budget.** It gives the analyst a way to find which step is slow. The step content and IDs belong to `learning-ui.md`, and this table is updated to match it.
 
-| Step (PROMPT.md order) | Budget |
-| --- | --- |
-| 1 Zones and what each is for | 2:00 |
-| 2 Your first turn: draw, DON!!, play a Character | 3:00 |
-| 3 Attaching DON!! and reading power | 2:30 |
-| 4 Attacking the Leader | 2:30 |
-| 5 Being attacked: Blocker, Counter, or take it | 3:30 |
-| 6 Triggers | 2:00 |
-| 7 Leader abilities | 2:00 |
-| 8 Winning | 2:00 |
-| **Total** | **19:30** |
+| Step (PROMPT.md order) | ID (`learning-ui.md` §10) | Budget |
+| --- | --- | --- |
+| 1 Zones and what each is for | `t1-zones` | 2:00 |
+| 2 Your first turn: draw, DON!!, play a Character | `t2-first-turn` | 3:00 |
+| 3 Attaching DON!! and reading power | `t3-don-and-power` | 2:30 |
+| 4 Attacking the Leader | `t4-attack` | 2:30 |
+| 5 Being attacked: Blocker, Counter, or take it | `t5-defend` | 3:30 |
+| 6 Triggers | `t6-trigger` | 2:00 |
+| 7 Leader abilities | `t7-leader` | 2:00 |
+| 8 Winning | `t8-winning` | 2:00 |
+| **Total** | | **19:30** |
 
 A step over budget by more than 50%, or with three or more blocked attempts, is a finding of at least severity 2.
 

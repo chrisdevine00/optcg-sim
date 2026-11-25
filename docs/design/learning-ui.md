@@ -1,6 +1,6 @@
 # Learning UI
 
-**As of:** 2026-10-28 (Phase 4, revision 2: review-1 fixes)
+**As of:** 2026-10-28 (Phase 4, revision 2: review-1 fixes); §10 (tutorial step IDs) added 2026-11-25 (M7)
 **Inputs:** `PROMPT.md` (Learning layer, AI opponent, Phase 4 "Learning UI"); `docs/plan-review-1.md` (UX-1, UX-3, UX-4, UX-9, UX-12); `docs/ARCHITECTURE.md` §4.4 (lethal search), §4.5 (`Explanation`), §5 (worker priorities, 300 ms blunder cap); `docs/content/curriculum.md` (lesson IDs, untimed exit criteria); `docs/research/strategy-concepts.md` (concept slugs).
 **Companions:** `flows.md` (how each screen is reached and operated, keyboard paths, announcements), `explanations.md` (finished copy for 20 explanations, used as snapshot tests). Layout dimensions and tokens belong to `board.md` and `visual-system.md`.
 
@@ -364,3 +364,20 @@ The "Reviews" nav item. Wireframe: `wireframes/20-history.html` (`#list`, `#empt
 - **Keyboard:** the list is a table with row headers; Enter on a row opens its review. **SR:** "Lost to Kaido, Pirate, 28 October, 13 turns, 1 severe flag. Review."
 
 Progress (§6) is wireframed in `wireframes/19-progress.html` (`#progress`, and `#new` for a player with fewer than 3 reviewed games). Errors and empty states for the learning pages (stale review, analysis failed, art failed, storage full) are in `wireframes/21-errors.html`.
+
+## 10. Tutorial steps (M7)
+
+The guided tutorial is a separate mode of the board, not part of the coach: the coach, Rewind and the shortcut-free moves stay out of it (`flows.md` F2 says how a step is operated, `docs/content/tutorial.md` holds the finished words, `usability-plan.md` §7.2 the time budgets). It has eight steps, one fixed-seed scenario each, played as Starter Deck ST-21 (Monkey.D.Luffy) going second against a scripted ST-22 opponent. The **step IDs below are stable**: they are the keys of the timing log (`stepId`), of the tutorial progress record and of the content file, and the budgets in `usability-plan.md` §7.2 follow them.
+
+| ID | Step | What the player does, and the one thing it teaches | Rule |
+| --- | --- | --- | --- |
+| `t1-zones` | The zones | Visits the nine zones on their side; each visit shows that zone's one-line job. | CR 3-1-1 |
+| `t2-first-turn` | Your first turn | Plays Jinbe: a card costs as many DON!! as its cost, and nobody attacks on their own first turn. | CR 6-5-3-1 |
+| `t3-don-and-power` | DON!! and power | Gives 1 DON!! to the Leader: +1000 power, on your own turn only. | CR 6-5-5-2 |
+| `t4-attack` | Attacking the Leader | Attacks their Leader with theirs: a tie goes to the attacker, and a hit takes a Life card into their hand. | CR 7-1-4-1 |
+| `t5-defend` | Being attacked | Counters their attack with Jinbe's +1000: the Leader must end up higher than the attacker. | CR 7-1-3-1 |
+| `t6-trigger` | Triggers | Takes a hit that turns up a [Trigger], then activates it or adds the card to hand. | CR 10-1-5-1 |
+| `t7-leader` | Your Leader's ability | Uses Luffy's [Activate: Main]: gives 2 rested DON!! to a Character, once a turn, with 1 DON!! on him. | CR 6-5-4 |
+| `t8-winning` | Winning | Wins with no hints: one hit more than they have Life, and a hit at 0 Life wins. Ending the turn without winning restarts the step. | CR 7-1-4-1-1-1 |
+
+Teach-back questions map to these IDs (`usability-plan.md` §6): Q5 to `t2-first-turn`, Q2 and Q7 to `t3-don-and-power`, Q4 to `t4-attack`, Q3 and Q8 to `t5-defend`, Q6 to `t6-trigger`, "What does your Leader do?" to `t7-leader`, Q1 to `t8-winning`; `t1-zones` has none (lesson L01 and the five-second test cover it).

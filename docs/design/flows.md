@@ -108,19 +108,19 @@ One speed control everywhere: **Step · 0.5× · 1× (default) · 2× · 4×** (
 
 1. **State:** the visitor opens the URL. No account, no cookie banner (there are no cookies or analytics).
    **System:** loads the shell (initial JS under 300 KB), shows the home screen with the footer disclaimer ("Unofficial fan tool. Not affiliated with or endorsed by Bandai, Shueisha or Toei Animation. One Piece and all card names, text and art belong to their respective owners."). Card data loads in the background for the two default decks only.
-   **SR (polite):** "OPTCG Sim. Have you played One Piece Card Game before?"
+   **SR:** read from the page itself: the heading "OPTCG Sim", then the question as a heading. Home writes nothing to a live region.
 
 2. **State:** the home screen asks one question with two large choices and one small link:
    - **"I know the rules: start a game"**, with the sub-line "Rocks vs Kaido, Pirate AI. Change anything first if you like."
    - **"I'm new: teach me"**, with the sub-line "About 20 minutes. You can leave and come back."
    - Small link: "Just look around" (card browser, meta explorer, rules).
    **Keys:** focus starts on the first choice. Up/Down or Tab moves; Enter selects. `?` opens the shortcut sheet from here on.
-   **Edge:** a returning visitor with a saved game sees "Resume your game" as the first choice instead and the question moves below it. A visitor who completed the tutorial never sees the question again; Settings → "Show the welcome question" brings it back.
+   **Edge:** a returning visitor with a saved game sees "Resume your game" as the first choice instead and the question moves below it. A visitor who completed the tutorial never sees the question again; Settings → "Show the welcome question" brings it back. (Built in M7: "Resume your game" is not, because saved games arrive with M8. While a tutorial is half done, Home shows "Continue the tutorial (step N of 8)" and "Start the tutorial again" above the page's other links and the question is not asked.)
 
 3. **Branch A, "I know the rules".**
    **System:** opens Setup (F3) with everything preselected: your deck Rocks (OP17-039), AI deck Kaido (OP17-058), tier Pirate, first player "Roll for it" (F3b). The Start button has focus.
    **Player:** presses Start (or changes something first).
-   **System:** starts the game. The coach panel is collapsed to its rail. A single line in the decision panel, shown once per profile: "Coach is on the right (C) when you want it. H for a hint." It does not move focus and disappears at the first move.
+   **System:** starts the game. The coach panel is collapsed to its rail. A single line in the decision panel, shown once per profile: "Coach is on the right (C) when you want it. H for a hint." It does not move focus and disappears at the first move. (Not built in M7: the coach strip, with its Hint button, is on the screen from the first move, and `?` opens the shortcut sheet.)
    **SR (polite):** "Game started. You won the roll: go first or second?" (or "Kaido won the roll.")
    **Edge:** if the default decks' card data has not finished loading, Start shows "Loading cards… 70%" in its label and stays enabled; pressing it queues the start.
 
@@ -157,7 +157,7 @@ The decks are Starter Deck ST-21 (Monkey.D.Luffy, yours: you always go second) a
    **Player:** performs the highlighted action.
    **System:** applies it through `reduce`, plays the animation, then shows "Next" (Enter). Each step records start and end time to the timing log.
    **Keys:** the step text is the current decision (it lives in the decision panel), so `P` focuses it as it focuses any decision; a **Read again** button repeats it to the screen reader. There is no separate "re-read" key (UX-R36). Tab order is the normal board order; the highlighted zone holds the roving focus when the step starts. "Leave tutorial" is in the decision panel footer.
-   **SR (polite):** the step title and both sentences, then the instruction as shown, for example "Highlighted: your active DON!! and your Leader. Focus your Leader and press plus to give it 1 DON!!."
+   **SR (polite), as built:** one line when the step starts, "Step 3 of 8: DON!! and power." then the two sentences and the pointer instruction (the keys are in the step text, which holds focus, a group named by its title, so browse mode or the next Tab reaches them). **Read again** speaks the same line and puts focus back on the step text. When the step is done: the done line, then "Press Next to go on.", and focus is on Next.
 
 2. **Edge, the player tries something else.** A non-highlighted card or control does nothing except show, in the explanation card: "Not yet. First, give 1 DON!! to your Leader." (from the step's script, not from `whyNot`, because the action may be legal in a real game). No error sound, no shake.
 
@@ -168,10 +168,10 @@ The decks are Starter Deck ST-21 (Monkey.D.Luffy, yours: you always go second) a
 5. **Completion** (wireframed with T1 and T5 in `wireframes/15-tutorial.html`).
    **State:** T8 won.
    **System:** shows "Tutorial complete in 17 min" (from the timing log), and two choices: **"Play your first full game"** (focused) and "Back to Home". Progress records lesson L01–L07 tutorial credit.
-   **SR (polite):** "Tutorial complete. Play your first full game?"
+   **Built:** the page title and the heading ("Tutorial complete in N min") name it, a status paragraph holds the words, focus is on "Play your first full game", and the completion screen also offers Export JSON and Export CSV for the run (the same files as Settings → "Tutorial timing"; they stay on the device).
 
 6. **First full game.**
-   **System:** opens Setup with the tutorial decks preselected, AI tier Rookie, coach verbosity "Learner", and the lethal detector set to tier 1 always-on (it says "lethal on board" but not how). These defaults are set for this one game and named on the setup screen ("Set for your first game. Change in Settings later."). The game then runs as F4.
+   **System:** opens Setup with the tutorial decks preselected, AI tier Rookie, coach verbosity "Learner", and the lethal detector set to tier 1 always-on (it says "lethal on board" but not how). These defaults are set for this one game and named on the setup screen ("Your first full game. Set for your first game: the tutorial decks, the Rookie AI, the coach explaining in full (Learner) and the lethal detector always on. Change in Settings later."; reached as `/play?preset=first`). The game then runs as F4.
    **Edge:** if the player switches to Pirate or Warlord, the learner defaults remain; nothing else changes.
 
 ---
@@ -758,15 +758,19 @@ Settings are one page with sections; every change applies at once and is stored 
 | Coach | Coach verbosity | Learner (evidence open, "next time" shown), Standard (claim, certainty, line and outcome; the rest behind "More"), Terse (claim and outcome) | Standard (Learner for the first game after the tutorial) |
 | Coach | Lethal detector | Off, Tier 1 always on, Tier 2 always on, Ask me | Ask me |
 | Coach | Blunder warning | On, Off | Off |
+| Coach | DON!! math on the board | On, Off | Off |
+| Coach | Threat alerts ("Tell me when their board threatens lethal") | On, Off | Off |
 | Coach | Tempo meter | On, Off | On |
 | Drills | Time allowed | Untimed, 50%, 100%, 200%, 400%, 1000% of the base time | Untimed |
 | Cards | Art variant | Per card in the deck builder; global "Prefer base art" | Base art |
 | Cards | Show card text on the board | Always, On hover/focus | On hover/focus |
 | Keyboard | Single-key shortcuts | On, Off, remap (WCAG 2.1.4) | On |
+| Tutorial | Timing log: list, Export JSON, Export CSV, Delete (M7, `localStorage`; IndexedDB and the full export are M8) | | Stored runs: last 20 |
+| Welcome | Show the welcome question again | | |
 | Data | Export everything / Import / Delete all | | |
 | About | Sources, licences, disclaimer | | |
 
-**Built in M7 (WP5), at `/settings`:** the Coach rows (verbosity, lethal detector, blunder warning, DON!! math on the board, threat alerts, the muted warnings), "Tutorial timing" (stored runs, Export JSON and CSV, Delete) and "Show the welcome question". The Game, Cards, Keyboard and Data rows wait for M8.
+**Built in M7 (WP5), at `/settings`:** the Coach rows (verbosity, lethal detector, blunder warning, DON!! math on the board, threat alerts, the muted warnings), "Tutorial timing" (stored runs, Export JSON and CSV, Delete with an inline "Delete for good / Keep it") and "Show the welcome question", reached from the header link "Settings". The lethal detector's options there are "Ask me", "Tier 1 always on" and "Tier 2 always on" (there is no "Off": "Ask me" is the quiet default), and the Tempo meter has no switch (it is a silent meter, always shown). The Game, Cards, Keyboard and Data rows wait for M8.
 
 **SR (polite) on each change:** "Opponent speed: 2×."
 **Edge:** "Delete all" is a dialog that names what will be lost and offers "Export first".

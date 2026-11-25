@@ -1,5 +1,5 @@
 # Scripted NVDA screen-reader pass (docs/design/accessibility.md §11.2, step 1 of "Who runs them").
-# Manual only: Guidepup drives NVDA on a Windows runner through the §11.3 (M3) or §11.4 (L) script,
+# Manual only: Guidepup drives NVDA on a Windows runner through the §11.3 (M3), §11.4 (L) or §11.5 (M7) script,
 # once with Chrome and once with Firefox, and uploads the spoken-phrase logs. Never runs on push.
 # Each browser runs in its own job on a fresh runner: in one job, NVDA's speech relay went silent
 # for the second browser (L pass r3 and r4: Firefox after Chrome heard nothing; alone it spoke).
@@ -13,9 +13,9 @@ on:
         options: [both, chrome, firefox]
         default: both
       script:
-        description: Which script to run (m3 is accessibility.md §11.3, l is §11.4)
+        description: Which script to run (m3 is accessibility.md §11.3, l is §11.4, m7 is §11.5; both is m3 and l, all is all three)
         type: choice
-        options: [l, m3, both]
+        options: [l, m3, m7, both, all]
         default: l
 jobs:
   nvda:
@@ -67,7 +67,7 @@ jobs:
       # The spec files for the chosen script (playwright takes file-name patterns).
       - name: Pick the spec files
         run: |
-          $specs = switch ('${{ inputs.script }}') { 'm3' { 'm3\.nvda' } 'both' { 'm3\.nvda l\.nvda' } default { 'l\.nvda' } }
+          $specs = switch ('${{ inputs.script }}') { 'm3' { 'm3\.nvda' } 'm7' { 'm7\.nvda' } 'both' { 'm3\.nvda l\.nvda' } 'all' { 'm3\.nvda l\.nvda m7\.nvda' } default { 'l\.nvda' } }
           "A11Y_SPECS=$specs" >> $env:GITHUB_ENV
       - name: NVDA + ${{ matrix.browser }}
         continue-on-error: true
