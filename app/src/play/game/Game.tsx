@@ -31,6 +31,7 @@ import {
 } from '../rail/Decision.tsx';
 import { GameLog, RailHeader } from '../rail/Rail.tsx';
 import { CoachPanel, STRIP_H, type CoachMode } from '../coach/Coach.tsx';
+import { BLUNDER_NOTE_ID, BlunderNote, blunderCommitLabel } from '../coach/BlunderNote.tsx';
 import { HintBody, StagedNote } from '../coach/HintSection.tsx';
 import type { GameController } from './controller.ts';
 import { useFocusRescue } from './focus.ts';
@@ -1256,8 +1257,14 @@ export function Game({
                     bodyHidden={cmode === 'tall'}
                     {...(!tutorialOn && !ctl.hotseat && !ctl.readOnly
                       ? {
+                          ...(blunderCommitLabel(g) !== undefined
+                            ? { commitLabel: blunderCommitLabel(g)! }
+                            : {}),
+                          ...(ctl.blunder.note ? { commitDescribedBy: BLUNDER_NOTE_ID } : {}),
+                          onCommitIntent: () => ctl.blunder.prime(),
                           noteSlot: (
                             <>
+                              <BlunderNote g={g} />
                               <StagedNote g={g} />
                               {/* The decision panel owns the rail (a defence, a choice): the hint shows here. */}
                               {coachRoom &&

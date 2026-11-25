@@ -5,6 +5,7 @@ const NAV = [
   { to: '/play', label: 'Play' },
   { to: '/decks', label: 'Decks' },
   { to: '/cards', label: 'Cards' },
+  { to: '/settings', label: 'Settings' },
 ];
 
 export function Header() {

@@ -71,6 +71,8 @@ export interface CoachHost {
   legalActions(): Action[];
   /** Line one action up for the player to confirm (the controller's `stage`). */
   stage(action: Action | null): boolean;
+  /** The profile changed (the blunder guard switches its gate on or off). */
+  profileChanged?(): void;
   /**
    * The coach's worker, started on first use with `init` data (card data the player may see, their
    * own list) and, when the player's own list is known, the game (own deck, both Leaders).
@@ -263,6 +265,11 @@ export class Coach {
     for (const c of this.priorCards(view)) cards.push(c);
     port.reveal(cards);
     return port;
+  }
+
+  /** The coach's worker, for the blunder guard's `score` requests (priority 3 in the worker). */
+  scorePort(): CoachPort {
+    return this.portFor(this.host.session.view(this.host.me));
   }
 
   private request(auto: boolean, capMs: number = auto ? CAP_MS.auto : CAP_MS.press): void {
@@ -770,6 +777,7 @@ export class Coach {
           tier: Math.max(this.lethal.tier, p.alwaysOn) as Tier,
         };
     }
+    this.host.profileChanged?.();
     this.host.notify();
   }
 

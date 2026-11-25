@@ -344,6 +344,17 @@
 .staged-note p {
   margin: 0;
 }
+/* The blunder warning's note: a border and a heading shape, never colour alone. */
+.blunder-note {
+  margin: 8px 0;
+  padding: 6px 8px;
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius-1);
+  background: var(--color-surface-1);
+}
+.blunder-note p {
+  margin: 0 0 6px;
+}
 .lookaway {
   margin: 4px 0;
   font-weight: var(--weight-semibold);

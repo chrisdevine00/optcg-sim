@@ -21,6 +21,7 @@ import {
   type Start,
 } from '../../session/index.ts';
 import { AiClient, type AiDecision, type CoachPort } from './ai-client.ts';
+import { BlunderGuard } from '../coach/blunder.ts';
 import { Coach } from '../coach/coach.ts';
 import { PoliteQueue } from './politeQueue.ts';
 import { readsHiddenZone, type VeiledProps } from './veiled.tsx';
@@ -93,7 +94,7 @@ export interface TutorialFilter {
 }
 
 /** A commit gate's answer: carry on, or hold the action (the blunder warning shows, M7 WP5). */
-export type CommitGate = (action: Action) => 'go' | 'hold';
+export type CommitGate = (action: Action, intentId?: string) => 'go' | 'hold';
 
 /** What the controller needs from the AI worker client (AiClient, or a test double). */
 export interface AiPort {
@@ -187,6 +188,8 @@ export class GameController {
   readonly puzzle: { turn: number } | null;
   /** The coach: its lethal detector and its panel state (learning-ui §2, §3). */
   readonly coach: Coach;
+  /** The blunder warning before a commit (M7 WP5); inert unless the player switched it on. */
+  readonly blunder: BlunderGuard;
   private ai: AiPort | null;
   private listeners = new Set<() => void>();
   version = 0;
@@ -261,17 +264,54 @@ export class GameController {
       cards,
       session: this.session,
       myDecision: () => this.myDecision(),
-      announce: (t) => this.announce(t),
+      announce: (t) => this.announce(t, 'coach'),
       notify: () => this.notifyRaw(),
       tutorial: !!config.tutorial,
       opponentName: () => config.names[config.human === 'p1' ? 'p2' : 'p1'] || 'the opponent',
       legalActions: () => this.actions(),
       stage: (a) => this.stage(a),
+      profileChanged: () => this.blunder?.sync(),
       ownDeck: config.myDeck ?? [],
       makePort: (init, game) =>
         config.coachPort ? config.coachPort(init, game) : new AiClient(init, game),
     });
-    this.session.subscribe(() => this.coach.sync());
+    this.blunder = new BlunderGuard({
+      enabled: () => this.coach.profile.blunder && this.coach.hintSupported,
+      muted: () => this.coach.profile.muted,
+      mute: (k) => {
+        if (!this.coach.profile.muted.includes(k))
+          this.coach.setProfile({ muted: [...this.coach.profile.muted, k] });
+      },
+      decision: () => {
+        if (!this.myDecision()) return null;
+        const v = this.session.view(this.config.human);
+        if (v.result || !v.decision) return null;
+        return {
+          key: `${this.session.actionCount}:${v.decision.kind}`,
+          kind: v.decision.kind,
+          ownTurn: v.turn.activePlayer === this.config.human,
+        };
+      },
+      searchView: () => this.session.searchView(this.config.human),
+      port: () => this.coach.scorePort(),
+      legal: () => this.actions(),
+      commit: (a, id) => void this.act(a, id, { skipGate: true }),
+      setGate: (g) => {
+        this.commitGate = g;
+        if (!g) this.heldAction = null;
+      },
+      release: () => {
+        this.heldAction = null;
+        this.heldIntent = undefined;
+        this.notifyRaw();
+      },
+      announce: (t) => this.announce(t, 'coach'),
+      notify: () => this.notifyRaw(),
+    });
+    this.session.subscribe(() => {
+      this.coach.sync();
+      this.blunder.sync();
+    });
     this.seat = config.mode === 'hotseat' ? (this.session.decider() ?? 'p1') : config.human;
     this.ai = null;
     if (config.mode === 'ai') {
@@ -313,6 +353,7 @@ export class GameController {
 
   private bump(): void {
     this.coach.sync();
+    this.blunder.sync();
     this.checkPuzzle();
     this.notifyRaw();
   }
@@ -345,6 +386,7 @@ export class GameController {
     this.politeQueue.clear();
     this.gen++;
     this.coach.dispose();
+    this.blunder.dispose();
     this.ai?.terminate();
     this.wake?.();
   }
@@ -1036,15 +1078,26 @@ export class GameController {
     this.bump();
   });
 
-  private say(text: string): void {
+  private say(text: string, source: 'game' | 'coach' = 'game'): void {
+    this.onAnnounce?.({ text, kind: 'polite', source });
     this.politeQueue.push(text);
   }
 
   /** A polite announcement from the UI (whyNot reasons, the status summary, speed changes). */
-  announce(text: string): void {
-    this.say(text);
+  announce(text: string, source: 'game' | 'coach' = 'game'): void {
+    this.say(text, source);
     this.bump();
   }
+
+  /**
+   * Every announcement the controller makes, tagged with where it came from (the interruption
+   * contract test reads it: with every coach setting at its default the coach announces nothing).
+   */
+  onAnnounce?: (a: {
+    text: string;
+    kind: 'polite' | 'assertive';
+    source: 'game' | 'coach';
+  }) => void;
 
   /**
    * Speak the last rewind again. A rewind chosen from the list closes a dialog and moves focus in
@@ -1055,7 +1108,8 @@ export class GameController {
   }
 
   /** An assertive announcement: a decision owed during the opponent's turn (flows F6.1). */
-  alert(text: string): void {
+  alert(text: string, source: 'game' | 'coach' = 'game'): void {
+    this.onAnnounce?.({ text, kind: 'assertive', source });
     this.assertive = { text, seq: this.assertive.seq + 1 };
     this.bump();
   }
@@ -1177,6 +1231,7 @@ export class GameController {
    */
   commitGate?: CommitGate;
   heldAction: Action | null = null;
+  heldIntent: string | undefined;
   staged: Action | null = null;
 
   stage(action: Action | null): boolean {
@@ -1202,12 +1257,14 @@ export class GameController {
       t.onBlocked(action);
       return false;
     }
-    if (this.commitGate && !opts?.skipGate && this.commitGate(action) === 'hold') {
+    if (this.commitGate && !opts?.skipGate && this.commitGate(action, intentId) === 'hold') {
       this.heldAction = action;
+      this.heldIntent = intentId;
       this.bump();
       return false;
     }
     this.heldAction = null;
+    this.heldIntent = undefined;
     this.staged = null;
     const before = this.session.actionCount;
     if (action.type === 'playCard') {

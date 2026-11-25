@@ -766,6 +766,8 @@ Settings are one page with sections; every change applies at once and is stored 
 | Data | Export everything / Import / Delete all | | |
 | About | Sources, licences, disclaimer | | |
 
+**Built in M7 (WP5), at `/settings`:** the Coach rows (verbosity, lethal detector, blunder warning, DON!! math on the board, threat alerts, the muted warnings), "Tutorial timing" (stored runs, Export JSON and CSV, Delete) and "Show the welcome question". The Game, Cards, Keyboard and Data rows wait for M8.
+
 **SR (polite) on each change:** "Opponent speed: 2×."
 **Edge:** "Delete all" is a dialog that names what will be lost and offers "Export first".
 

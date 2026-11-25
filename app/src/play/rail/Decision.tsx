@@ -73,6 +73,8 @@ export function DecisionPanel({
   bodyHidden = false,
   noteSlot,
   commitLabel,
+  commitDescribedBy,
+  onCommitIntent,
   tutorial = false,
   tutorialSlot,
 }: {
@@ -86,6 +88,10 @@ export function DecisionPanel({
   noteSlot?: ReactNode;
   /** M7: replaces the primary footer button's label ("Commit anyway"). Default: unchanged. */
   commitLabel?: string;
+  /** M7 WP5: id of the note that is the primary button's accessible description (the blunder note). */
+  commitDescribedBy?: string;
+  /** M7 WP5: the pointer or focus reached the decision's commit controls (the blunder guard primes). */
+  onCommitIntent?: () => void;
   /**
    * M7 WP6, the guided tutorial: no Rewind (the tutorial steps back by whole steps) and no
    * "New game / Rematch" at the end (the completion screen follows).
@@ -108,8 +114,24 @@ export function DecisionPanel({
       }
     : base0;
   const content =
-    commitLabel !== undefined && base.foot.primary
-      ? { ...base, foot: { ...base.foot, primary: { ...base.foot.primary, label: commitLabel } } }
+    (commitLabel !== undefined || commitDescribedBy !== undefined) && base.foot.primary
+      ? {
+          ...base,
+          foot: {
+            ...base.foot,
+            primary: {
+              ...base.foot.primary,
+              ...(commitLabel !== undefined ? { label: commitLabel } : {}),
+              ...(commitDescribedBy !== undefined
+                ? {
+                    describedBy: [base.foot.primary.describedBy, commitDescribedBy]
+                      .filter(Boolean)
+                      .join(' '),
+                  }
+                : {}),
+            },
+          },
+        }
       : base;
   useEffect(() => {
     if (focusSignal === 0) return;
@@ -182,6 +204,8 @@ export function DecisionPanel({
       <div
         className={`dec-foot ${content.foot.equal ? 'equal' : ''}`}
         style={{ height: fh }}
+        onPointerEnter={onCommitIntent}
+        onFocusCapture={onCommitIntent}
         // Buttons only: focus mode here lets NVDA pass single-key shortcuts (`.`, `E`, `S`) to the
         // page instead of reading them as browse-mode keys (M3 pass F2; DECISIONS 2026-11-05).
         role={content.foot.primary || content.foot.secondary ? 'application' : undefined}
