@@ -12,6 +12,7 @@ import type {
   PlayerId,
 } from '@optcg/engine';
 import type { Explanation, Move } from '../../explanation.ts';
+import type { LethalResult } from '../lethal/lethal.ts';
 import type { Cap } from '../lethal/search.ts';
 
 export type FlagKind =
@@ -56,6 +57,17 @@ export interface ReviewFlag {
   /** "What you did", built in ai/ from the record. */
   did: Move[];
   practice?: { judge: PracticeJudge; turn: number };
+  /** M8 WP1 (additive): the missed-lethal proofs, which Study (the line's handles) and Practice read. */
+  lethal?: LethalProof;
+}
+
+/** The `public` check of a missed-lethal turn, and the `actual` one when it was needed. */
+export interface LethalProof {
+  public: LethalResult;
+  actual: LethalResult | null;
+  /** Whose Main it was, and where the check started (the L-slice `LethalFlag`'s fields). */
+  player: PlayerId;
+  actionIndex: number;
 }
 
 export const flagId = (kind: FlagKind, turn: number, decisionIndex: number): string =>
@@ -68,6 +80,8 @@ export interface ReviewMarker {
   kind: FlagKind | null;
   reason: 'search-incomplete' | 'deadline' | 'not-run';
   explanation?: Explanation;
+  /** M8 WP1 (additive): the unfinished missed-lethal check, kept for the L-slice review screen. */
+  lethal?: LethalProof;
 }
 
 /** What running one item (or merging a turn's items) yields. */
@@ -130,6 +144,11 @@ export type ReviewRequest =
       nodes?: number;
       /** Whole-review deadline in ms; default 55 000. */
       deadlineMs?: number;
+      /**
+       * M8 WP1 (additive): deal the plan to a pool. This worker runs the items whose position within
+       * their phase is `index` modulo `count`; every worker plans the same record the same way.
+       */
+      shard?: { index: number; count: number };
     }
   | { type: 'cancel' }
   /** "Analyse now": run this turn's items next. */
