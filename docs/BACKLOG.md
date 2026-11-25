@@ -48,3 +48,8 @@ Details and options: `docs/research/m6b-runtime-audit.md` §3.
 - B3B-R13: ST20-004 mutation `lte: 3` was not run by the review (its pattern did not match); the cost bound is covered by the author suite. Run it when the mutation harness is next used.
 - B3C-R4: OP09-041 "set up to 2 of your Characters as active" offers every Character, active ones included (legal but pointless choices). Filtering `state: 'rested'` would shorten the prompt; the text does not say "rested", so no rules change.
 - B3C-R5: EB02-023 Crocodile "(a cost of yours counts as an effect)" (M6b-Q20): no scripted card returns an opponent's Character as a cost, so the reading cannot be observed yet; revisit when one is scripted.
+
+## 8. Waves 5 to 7 fix round, engine part (docs/reviews/m6b-waves5-7.md)
+
+- W57-R11 (severity 1): G48 (OP10-033 Nami, M6b-Q69) holds a count of rested DON!!, not particular ones. If the opponent returns rested DON!! before their Refresh (a DON!! -N cost or an effect), the count is capped by the rested DON!! left and another rested one stays held. The rules would hold the chosen one, which would then be gone. DON!! are not individual objects in the engine (the cost area is two counts), so the fix is a design change (identity for held DON!!), not a one-liner. Rare: the held DON!! would have to be returned in the one turn between the effect and the Refresh.
+- Other self-leaving costs (a `move` cost of this card, G52) do not carry the source into a later K.O. by the same effect (W57-R6 covers `trashSelf` only). No scripted card does it.

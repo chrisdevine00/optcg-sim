@@ -26,6 +26,7 @@ import {
   addModifier,
   draw,
   endGame,
+  lastKnown,
   leaveField,
   lifeToHand,
   markKnown,
@@ -578,9 +579,10 @@ function selectCards(
   if (secret && !sel.filter && zones.length === 1 && zones[0] === 'hand' && !o.restrict)
     dec.publicCount = true;
   if ('upTo' in pk && pk.totalPower) {
-    // "A total power of 4000 or less" (G55): the chosen cards' current power (never below 0) adds up.
+    // "A total power of 4000 or less" (G55): the chosen cards' current power adds up; a
+    // negative power counts as it is (official Q&A, OP09-018: -2000 and 6000 make 4000).
     dec.limits = {
-      costs: cands.map((id) => Math.max(0, dvOf(c, id).power ?? 0)),
+      costs: cands.map((id) => dvOf(c, id).power ?? 0),
       total: num(c, pk.totalPower.lte),
       what: 'power',
     };
@@ -709,7 +711,11 @@ function payCost(d: Draft, f: EffectFrame, k: Cost, reserve: number): Out {
   if ('trashSelf' in k) {
     const me = d.s.cards[f.card];
     if (!me || (me.zone !== 'characters' && me.zone !== 'stage')) return anomaly(d, f, 'trashSelf');
-    leaveField(d, f.card, 'trash', { kind: 'cost', by: f.controller });
+    const cause = { kind: 'cost', by: f.controller } as const;
+    const lki = lastKnown(d, f.card, cause);
+    const nid = leaveField(d, f.card, 'trash', cause);
+    // A K.O. this effect makes afterwards still names this card as its source (G46).
+    f.left = { id: nid, power: lki.power, basePower: lki.basePower, cost: lki.cost };
     return 'next';
   }
   if ('power' in k) {
@@ -888,7 +894,7 @@ function fieldCost(d: Draft, f: EffectFrame, sel: Selector, how: FieldCostHow): 
   const group = ids.length > 1 ? d.s.nextMod++ : undefined;
   for (const id of ids.slice().reverse()) {
     const cause = { kind: 'cost', by: f.controller } as const;
-    if ('ko' in how) pushKo(d, id, cause, group, f.card);
+    if ('ko' in how) pushKo(d, id, cause, group, f.left?.id ?? f.card, f.left);
     else
       pushRemove(
         d,
@@ -1366,7 +1372,7 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
     const group = ids.length > 1 ? d.s.nextMod++ : undefined;
     if (ids.length) f.acted = true;
     for (const id of ids.slice().reverse())
-      pushKo(d, id, { kind: 'effect', by: you }, group, f.card);
+      pushKo(d, id, { kind: 'effect', by: you }, group, f.left?.id ?? f.card, f.left);
     return 'next';
   }
   if ('rest' in a) {

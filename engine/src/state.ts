@@ -303,6 +303,8 @@ export type Frame =
        * Kept on the frame, not in the `cause`, which events carry and which must name no instance.
        */
       src?: InstanceId;
+      /** The source left the field by a self-trash cost: its last-known power and cost (G46). */
+      srcLki?: { power: number | null; basePower: number | null; cost: number | null };
     }
   /**
    * A rest by an effect, held while a replacement for it may be offered (G37). `by` is the player
@@ -345,6 +347,16 @@ export type Frame =
       look?: InstanceId[];
       /** What the triggering event told this ability (`koCause`, `eventCount`). */
       ev?: Ev;
+      /**
+       * This card trashed itself as a cost: where it is now, and what it was on the field. A K.O.
+       * the effect then makes names it as its source (G46, M6b-Q68).
+       */
+      left?: {
+        id: InstanceId;
+        power: number | null;
+        basePower: number | null;
+        cost: number | null;
+      };
     }
   | {
       f: 'remove';

@@ -321,3 +321,26 @@ describe('checkInvariants', () => {
     expect(checkInvariants(six as never).join('\n')).toMatch(/max 5/);
   });
 });
+
+describe('cardsVersionOf and the printed text (W57-R8)', () => {
+  const def = (baseEffect: string) => ({
+    name: 'x',
+    cost: 1,
+    abilities: [],
+    baseEffect,
+    printed: [],
+  });
+  const make = (ids: string[], text: string) =>
+    ({ defs: Object.fromEntries(ids.map((id) => [id, def(text)])) }) as never;
+
+  it('a text correction moves the version of a game whose scripts read the printed text', () => {
+    // EB02-022 reads hasBaseEffect: the text of any card in the game changes how it plays.
+    const ids = ['EB02-022', 'OP01-001'];
+    expect(cardsVersionOf(make(ids, 'other'))).not.toBe(cardsVersionOf(make(ids, 'text')));
+  });
+
+  it('a game that no script reads the text of keeps its version, whatever the text says', () => {
+    const ids = ['OP01-001', 'OP01-002'];
+    expect(cardsVersionOf(make(ids, 'other'))).toBe(cardsVersionOf(make(ids, 'text')));
+  });
+});

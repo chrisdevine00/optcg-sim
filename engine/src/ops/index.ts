@@ -28,7 +28,10 @@ export const hooks: {
     source: InstanceId | undefined,
   ) => void;
   /** A Character or Stage left the field; `card` is its new object (G29). */
-  removed?: (d: Draft, info: { card: InstanceId; owner: PlayerId; to: Zone; cause: Cause }) => void;
+  removed?: (
+    d: Draft,
+    info: { card: InstanceId; owner: PlayerId; to: Zone; cause: Cause; lki: Lki },
+  ) => void;
 } = {};
 
 const FIELD: ReadonlySet<Zone> = new Set(['leader', 'characters', 'stage']);
@@ -46,6 +49,23 @@ export interface Lki {
   don: number;
   rested: boolean;
   cause: Cause;
+}
+
+/** What a card on the field was just before it leaves: the last-known information (CR 8-1-3). */
+export function lastKnown(d: Draft, id: InstanceId, cause: Cause): Lki {
+  const c = d.card(id);
+  const dv = deriveLive(d.s, id);
+  return {
+    card: c.card,
+    owner: c.owner,
+    power: dv.power,
+    basePower: dv.basePower,
+    cost: dv.cost,
+    types: d.s.defs[c.card]!.types,
+    don: c.don,
+    rested: c.rested,
+    cause,
+  };
 }
 
 function zoneArray(ps: PlayerState, z: Zone): InstanceId[] | null {
@@ -108,18 +128,7 @@ export function moveCard(d: Draft, id: InstanceId, to: Zone, opts: MoveOptions =
   let lki: Lki | undefined;
   const leavesField = FIELD.has(from);
   if (leavesField) {
-    const dv = deriveLive(d.s, id);
-    lki = {
-      card: c.card,
-      owner,
-      power: dv.power,
-      basePower: dv.basePower,
-      cost: dv.cost,
-      types: d.s.defs[c.card]!.types,
-      don: c.don,
-      rested: c.rested,
-      cause: opts.cause ?? { kind: 'rule', by: owner },
-    };
+    lki = lastKnown(d, id, opts.cause ?? { kind: 'rule', by: owner });
     if (c.don > 0) {
       ps.donRested += c.don;
       d.emit({ type: 'DonReturned', player: owner, count: c.don, to: 'costRested', from: id });
@@ -170,7 +179,7 @@ export function moveCard(d: Draft, id: InstanceId, to: Zone, opts: MoveOptions =
   d.emit(e);
   if (from === 'deck') touchDeck(d, owner);
   if (from === 'life') hooks.lifeRemoved?.(d, owner);
-  if (lki) hooks.removed?.(d, { card: nid, owner, to, cause: lki.cause });
+  if (lki) hooks.removed?.(d, { card: nid, owner, to, cause: lki.cause, lki });
   return nid;
 }
 

@@ -24,7 +24,7 @@ import type { State } from './state.ts';
  * card leaves old records live; a golden re-record is allowed without an engine bump only when that
  * game's own scripts changed (golden.test.ts, review M4b-17).
  */
-export const ENGINE_VERSION = '0.5.16';
+export const ENGINE_VERSION = '0.5.17';
 
 export class RecordVersionMismatch extends Error {
   constructor(
@@ -61,6 +61,18 @@ export function scriptsVersionOf(state: GameState): string {
   return 'scripts-' + hashString(JSON.stringify(scripts)).slice(0, 16);
 }
 
+const textReaders = new Map<string, boolean>();
+/** Does this card's script filter on printed text (`hasBaseEffect`, `hasTiming`)? */
+function scriptReadsText(id: string): boolean {
+  let v = textReaders.get(id);
+  if (v === undefined) {
+    const sc = SCRIPTS[id];
+    v = sc !== undefined && /"has(BaseEffect|Timing)"/.test(JSON.stringify(sc));
+    textReaders.set(id, v);
+  }
+  return v;
+}
+
 /**
  * The card-data version of a game: a hash of the game fields of every card in it (ADR 0004).
  * Replay recomputes it from the lookup it is given, so a record made against other card data is
@@ -68,14 +80,16 @@ export function scriptsVersionOf(state: GameState): string {
  */
 export function cardsVersionOf(state: GameState): string {
   const s = state as unknown as State;
-  const fields = Object.keys(s.defs)
-    .sort()
-    .map((id) => {
-      // `baseEffect` and `printed` (G49) are read off the card text, which this hash does not cover
-      // otherwise; leaving them out keeps every recorded game's card-data version as it was.
-      const { abilities: _a, baseEffect: _b, printed: _p, ...game } = s.defs[id]!;
-      return game;
-    });
+  const ids = Object.keys(s.defs).sort();
+  // `baseEffect` and `printed` (G49) are the card text, which play reads only through a script's
+  // `hasBaseEffect` or `hasTiming` filter. A game with such a script in it hashes them for every
+  // card in it, so a text correction cannot change play unseen (W57-R8); every other game hashes as
+  // before, so an old record stays live after an unrelated card is scripted or its text corrected.
+  const readsText = ids.some((id) => scriptReadsText(id));
+  const fields = ids.map((id) => {
+    const { abilities: _a, baseEffect, printed, ...game } = s.defs[id]!;
+    return readsText ? { ...game, baseEffect: baseEffect ?? null, printed: printed ?? null } : game;
+  });
   return 'cards-' + hashString(JSON.stringify(fields)).slice(0, 16);
 }
 

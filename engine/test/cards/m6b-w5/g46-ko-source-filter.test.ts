@@ -207,4 +207,42 @@ describe('G46 by effects of a source', () => {
     expect(dec(g)?.kind).toBe('main');
     expect(g.zone('p1', 'characters').map((c) => c.card)).toEqual([V.c3]);
   });
+
+  it('a source that trashed itself as a cost is still the source: read by its last-known values (W57-R6)', () => {
+    const run = (g1: Ability, src: string) => {
+      const g = game(
+        { leader: PLAIN_PURPLE, characters: [BLUE] },
+        { leader: PLAIN_BLUE, characters: [src] },
+        { activePlayer: 'p2', turn: 4 },
+      );
+      g.state = withAbilities(g.state, BLUE, [g1]);
+      g.state = withAbilities(g.state, src, [
+        main(
+          [
+            {
+              do: {
+                ko: {
+                  from: 'characters',
+                  owner: 'opponent',
+                  filter: { type: 'Buggy Pirates' },
+                  pick: { exactly: 1 },
+                },
+              },
+            },
+          ] as never,
+          [{ trashSelf: true }] as never,
+        ),
+      ]);
+      g.act({ type: 'activate', card: g.find('p2', 'characters', src), ability: 'a' });
+      return g;
+    };
+    const smoker = guard('effect', notSpecialCharacter);
+    expect(survives(run(smoker, V.c1) as never)).toBe(true); // Slash Character: stopped
+    expect(survives(run(smoker, V.c6) as never)).toBe(false); // Special Character: K.O.'d
+    // Last-known base power: V.c3 (5000) is in the trash now and still counts as a 5000 Character.
+    const bege = guard('opponentEffect', {
+      all: [{ category: ['Character'] }, { basePower: { lte: 5000 } }],
+    });
+    expect(survives(run(bege, V.c3) as never)).toBe(true);
+  });
 });

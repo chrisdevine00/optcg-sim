@@ -410,6 +410,30 @@ describe('G29 removed / leftField', () => {
     expect(watch(gone({ filter: { category: ['Stage'] } }), op('ko', 'p2'))).toBe(0);
   });
 
+  it('the filter reads the card as it was on the field: last-known power, not the printed one (M4b-14)', () => {
+    const lift = (g: ReturnType<typeof game>) => {
+      g.state = applyOp(g.state, {
+        op: 'modifier',
+        mod: {
+          kind: 'power',
+          target: g.find('p1', 'characters', V.c1),
+          amount: 2000,
+          duration: { kind: 'thisTurn', turn: 3 },
+          controller: 'p1',
+        },
+      }).state;
+    };
+    const strong = gone({ filter: { power: { gte: 5000 } } });
+    // 3000 printed, 5000 on the field: it counts; the control stays at its printed 3000.
+    expect(
+      watch(strong, (g) => {
+        lift(g);
+        return op('bounce', 'p2')(g);
+      }),
+    ).toBe(1);
+    expect(watch(strong, op('bounce', 'p2'))).toBe(0);
+  });
+
   it('only the owner’s cards: the other player’s removal does not fire "owner: you"', () => {
     const g = game(
       { leader: PLAIN_PURPLE, characters: [BLUE] },

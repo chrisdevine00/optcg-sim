@@ -64,6 +64,36 @@ describe('OP09-018 Get Out of Here!', () => {
     expect(canPick(h, h.find('p2', 'characters', V.c3))).toBe(true);
   });
 
+  // Official Q&A (qa_op09): "K.O. 1 Character with -2000 power and 1 Character with 6000 power?
+  // Yes, you can." Negative power counts as it is (W57-R2), whichever way the candidates list.
+  it.each([
+    ['the -2000 Character listed first', 0, 1],
+    ['the 6000 Character listed first', 1, 0],
+  ])('a -2000 and a 6000 Character together make 4000: %s', (_n, neg, pos) => {
+    const g = mk([V.c1, V.c1]);
+    boost(g, g.find('p2', 'characters', V.c1, neg), -5000); // 3000 -> -2000
+    boost(g, g.find('p2', 'characters', V.c1, pos), 3000); // 3000 -> 6000
+    play(g, ID);
+    const first = g.find('p2', 'characters', V.c1, 0);
+    const second = g.find('p2', 'characters', V.c1, 1);
+    expect(canPick(g, first)).toBe(true);
+    g.act({ type: 'pick', choice: first });
+    expect(canPick(g, second)).toBe(true);
+    // Done is not offered while the total (6000 alone) is over the bound.
+    if (pos === 0) {
+      expect(g.legal().some((a) => a.type === 'done')).toBe(false);
+    }
+    g.act({ type: 'pick', choice: second });
+    expect(left(g)).toEqual([]);
+  });
+
+  it('a 6000 Character alone is refused (done is not legal over the bound); with a 5000 Character after it nothing fits', () => {
+    const g = mk([V.c1, V.c3]);
+    boost(g, g.find('p2', 'characters', V.c1), 3000); // 6000, and no negative later
+    play(g, ID);
+    expect(canPick(g, g.find('p2', 'characters', V.c1))).toBe(false);
+  });
+
   it('"up to 2": may K.O. nothing', () => {
     const g = mk([P2000]);
     play(g, ID);
