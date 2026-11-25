@@ -7,7 +7,10 @@
  *   so it works against any hand they could have held (E01).
  * - **`needed-hidden-info`** (hindsight, never severe): only the `actual` proof holds, against the
  *   hand they really held (E02).
- * - **`search-incomplete`**: neither mode finished; a "Not fully checked" marker, not a flag (E03).
+ * - **`search-incomplete`**: the `public` check did not finish; a "Not fully checked" marker, not a
+ *   flag (E03).
+ * - A refuted `public` check followed by an `actual` search that ran out (M8-1): the turn is checked;
+ *   `checkLethalTurn` returns a note ("Hindsight check not finished"), no flag and no marker.
  *
  * A turn the seat won is never flagged. Turns where the seat plainly cannot reach Life + 1 hits are
  * skipped without a search (`prefilter`): see `attackersPossible`.
@@ -106,6 +109,37 @@ export function planLethalItems(
   return out;
 }
 
+/** M8-1: the note for a turn whose `public` check was refuted but whose hindsight search ran out. */
+export function hindsightNote(act: LethalResult, side: 'yours' | 'theirs' = 'yours'): Explanation {
+  return {
+    conceptId: 'lethal-math',
+    claim: 'Hindsight check not finished',
+    evidence: [
+      {
+        text: `The check against their real hand stopped after ${act.nodes} lines.`,
+        figures: { linesChecked: act.nodes },
+      },
+    ],
+    line: null,
+    outcome:
+      side === 'yours'
+        ? 'With their real cards there may have been a win you could not have seen.'
+        : 'With their real cards they may have had a win whatever you did.',
+    certainty: 'search-incomplete',
+    nextTime: '',
+    lessonId: 'L16-reading-counters',
+    sources: ['CR 7-1-2-1', 'CR 7-1-3-1'],
+  };
+}
+
+const NONE: LethalTurnCheck = { flag: null, note: null };
+
+/** One candidate's check: a flag or marker, or (M8-1) a note that the hindsight search ran out. */
+export interface LethalTurnCheck {
+  flag: LethalFlag | null;
+  note: Explanation | null;
+}
+
 /**
  * Check one candidate. `state` is the state at `c.index`; the rest of the turn is read from
  * `actions` (what the seat did with it, and whether it won). Null: nothing to flag.
@@ -118,6 +152,17 @@ export function checkLethalItem(
   cap: Cap,
   prefilter = true,
 ): LethalFlag | null {
+  return checkLethalTurn(c, actions, state, cards, cap, prefilter).flag;
+}
+
+export function checkLethalTurn(
+  c: LethalCandidate,
+  actions: readonly Action[],
+  state: GameState,
+  cards: ReadonlyMap<string, Card>,
+  cap: Cap,
+  prefilter = true,
+): LethalTurnCheck {
   // The seat's attacks on their Leader that turn, in order, with the attacker's power; whether it
   // won; and, when it ended the turn, the cards that could still have attacked their Leader.
   const attacked: { card: string; power: number }[] = [];
@@ -147,8 +192,8 @@ export function checkLethalItem(
       break;
     }
   }
-  if (won) return null;
-  if (prefilter && !attackersPossible(state, c.player, cards)) return null;
+  if (won) return NONE;
+  if (prefilter && !attackersPossible(state, c.player, cards)) return NONE;
   const pub = lethal({ mode: 'public', view: projectForSearch(state, c.player) }, cards, cap);
   if (pub.status === 'proven') {
     // The seat played the proof's attacks and still did not win: a Life Trigger (or a Counter
@@ -169,47 +214,60 @@ export function checkLethalItem(
       attacked.length > 0 &&
       prefixOk &&
       (rest.length === 0 || (canStillAttack !== null && !canStillAttack.includes(rest[0]!.card)));
-    if (playedIt) return null;
+    if (playedIt) return NONE;
     return {
-      kind: 'missed-lethal',
-      turn: c.turn,
-      player: c.player,
-      actionIndex: c.index,
-      severity: pub.certainty === 'any-hand' ? 'severe' : 'hindsight',
-      explanation: explainLethal(pub, cards, 'review'),
-      public: pub,
-      actual: null,
+      flag: {
+        kind: 'missed-lethal',
+        turn: c.turn,
+        player: c.player,
+        actionIndex: c.index,
+        severity: pub.certainty === 'any-hand' ? 'severe' : 'hindsight',
+        explanation: explainLethal(pub, cards, 'review'),
+        public: pub,
+        actual: null,
+      },
+      note: null,
     };
   }
   // A refutation that holds against any hand holds against the one they had: no `actual` search can
   // prove it wrong, so none is run (it could only end as a spurious "not fully checked").
-  if (pub.status === 'refuted' && pub.certainty === 'any-hand') return null;
+  if (pub.status === 'refuted' && pub.certainty === 'any-hand') return NONE;
   const act = lethal({ mode: 'actual', state }, cards, cap);
   if (act.status === 'proven')
     return {
-      kind: 'missed-lethal',
-      turn: c.turn,
-      player: c.player,
-      actionIndex: c.index,
-      severity: 'hindsight',
-      explanation: explainLethal(act, cards, 'review', pub),
-      public: pub,
-      actual: act,
+      flag: {
+        kind: 'missed-lethal',
+        turn: c.turn,
+        player: c.player,
+        actionIndex: c.index,
+        severity: 'hindsight',
+        explanation: explainLethal(act, cards, 'review', pub),
+        public: pub,
+        actual: act,
+      },
+      note: null,
     };
-  if (pub.status === 'unknown' || act.status === 'unknown') {
-    const unknown = pub.status === 'unknown' ? pub : act;
+  // M8-1: the `public` check was answered (refuted), so the turn is checked; only the hindsight
+  // search ran out. A note, no marker.
+  if (pub.status === 'refuted' && act.status === 'unknown')
+    return { flag: null, note: hindsightNote(act) };
+  if (pub.status === 'unknown') {
+    const unknown = pub;
     return {
-      kind: 'not-fully-checked',
-      turn: c.turn,
-      player: c.player,
-      actionIndex: c.index,
-      severity: 'marker',
-      explanation: explainLethal(unknown, cards, 'review'),
-      public: pub,
-      actual: act,
+      flag: {
+        kind: 'not-fully-checked',
+        turn: c.turn,
+        player: c.player,
+        actionIndex: c.index,
+        severity: 'marker',
+        explanation: explainLethal(unknown, cards, 'review'),
+        public: pub,
+        actual: act,
+      },
+      note: null,
     };
   }
-  return null;
+  return NONE;
 }
 
 /** Replay `record` and flag every turn where a seat had lethal and did not win. */
