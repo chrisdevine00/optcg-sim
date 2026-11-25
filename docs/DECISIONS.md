@@ -2,6 +2,17 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-25 — M8 plan: seven flag kinds, a 55 s scheduled pipeline, IndexedDB with `verifyReplay`
+
+- **Context:** M8 (PLAN row 19, 30 h) widens the review to every flag category PROMPT.md lists and adds local save. A planning pass produced `docs/design/m8-plan.md` (eight work packages, about 40 h, with a cut order).
+- **Decisions (lead):**
+  - **Lethal given away** means: on your turn you made a move that let their board alone win on their next turn, and the same turn without that move would not have. M8 checks Blocker attacks as the candidate moves; certainty is `any-hand` only when both threat checks are board-only.
+  - **`verifyReplay`** (engine): a saved record whose ENGINE_VERSION string differs is still live if replaying it reproduces every `TurnSnapshot.hash`; otherwise it is read-only with the F16 copy. Without it every engine bump would turn every saved game read-only.
+  - **Lesson links** open a minimal `/learn/:lessonId` page built from curriculum.md (title, concept, drill, exit criterion); the full Learn hub stays with M9.
+  - **Persistent storage** (`navigator.storage.persist`) is offered in Settings → Data, never requested automatically.
+  - Only sourced guides judge a mulligan; Hindsight flags are never severe; a search cap yields a "Not fully checked" marker, never a clean turn.
+- **Rejected:** judging mulligans against the default playbook (a guessed rule); flagging within-turn attack order separately (missed lethal covers the case that matters); requesting persistent storage on first save.
+
 ## 2026-11-25 — M7 fix round: the review's R1 to R8 (docs/reviews/m7-review.md, "Fix round")
 
 - **Context:** the independent M7 review failed on M7-R1 (severity 3) and listed five severity 2 findings.
