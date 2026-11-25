@@ -46,13 +46,22 @@ vi.setConfig({ testTimeout: 600_000 });
 // so the public bound could not rule them out and the answer was 'needed-hidden-info'. Scripted,
 // none is payable there (0 DON!!, empty hand) and the answer becomes 'any-hand'; the test pins the
 // wording for the hidden-info certainty, so it keeps them unscripted.
-asVanilla('OP13-001', 'OP13-027', 'OP13-118', 'OP04-016', 'OP14-096', 'OP17-096', 'OP17-098');
+asVanilla(
+  'OP13-001',
+  'OP13-027',
+  'OP13-118',
+  'OP04-016',
+  'OP14-096',
+  'OP17-096',
+  'OP17-098',
+  'OP10-046',
+);
 
 const cards = cardMap();
 const ROCKS = 'OP17-039';
 const KAIDO = 'OP17-058';
 const LUFFY = 'OP13-001'; // plain 5000 Leader
-const ZORO = 'OP10-046'; // 9000, no Counter, unscripted (a stand-in for a vanilla card; EB04-007 was scripted in M4b)
+const ZORO = 'OP10-046'; // 9000, no Counter; scripted in block 3, read as vanilla here (asVanilla)
 const DRAKE = 'OP17-075'; // [On Play] DON!! -2: trash 1 card from your opponent's hand
 const LINLIN = 'OP17-049'; // [On Play] your opponent chooses: you draw 2, or they trash 2
 const TORCH = 'EB04-040'; // Event, [Main] +3000, cost 1
