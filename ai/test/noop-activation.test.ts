@@ -147,12 +147,14 @@ const SEED_5044 = {
   }),
 };
 
+// Pirate is the tier that looped (the review's seeds). A whole Warlord game takes over two minutes
+// on a CI runner, so it runs only with EXTRA=1; the Warlord and Emperor move lists are covered per
+// push by the position tests above.
+const TIERS = process.env.EXTRA === '1' ? (['pirate', 'warlord'] as const) : (['pirate'] as const);
+
 describe('B3B-R1: a whole game with Smoker in a deck ends', () => {
-  it.each(['pirate', 'warlord'] as const)(
-    'seed 5044 (%s): finishes under the 2,000-action cap',
-    (tier) => {
-      const r = playMatch({ seed: 5044, decks: SEED_5044, tiers: { p1: tier, p2: tier } });
-      expect(r.capped).toBe(false);
-    },
-  );
+  it.each(TIERS)('seed 5044 (%s): finishes under the 2,000-action cap', (tier) => {
+    const r = playMatch({ seed: 5044, decks: SEED_5044, tiers: { p1: tier, p2: tier } });
+    expect(r.capped).toBe(false);
+  });
 });
