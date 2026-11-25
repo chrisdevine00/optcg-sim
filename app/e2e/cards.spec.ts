@@ -23,17 +23,31 @@ const load = (code: string) =>
 const op17 = load('OP-17');
 const NEWEST = 'OP-17 (newest set)';
 const SCRIPTED = new Set(SCRIPTED_ID_LIST);
+/** Cards that do not play fully (the coverage report's backlog): keyword-only cards such as a
+ * plain [Blocker] have effect text but play fully without a script, so effect text alone is not
+ * enough. */
+const BACKLOG = new Set(
+  (
+    JSON.parse(
+      readFileSync(new URL('../../cards/data/coverage-report.json', import.meta.url), 'utf8'),
+    ) as { backlog: { id: string }[] }
+  ).backlog.map((c) => c.id),
+);
 /** An unscripted card with effect text and a next card in its set, chosen from the data (M6b
  * scripts cards set by set, so a fixed example goes stale). */
 const UNSCRIPTED = (() => {
-  for (const code of ['OP-16', 'OP-15', 'OP-14', 'OP-13']) {
+  for (const code of ['OP-16', 'OP-15', 'OP-14', 'OP-13', 'OP-12', 'OP-11', 'OP-10', 'OP-09']) {
     const cards = load(code);
     const i = cards.findIndex(
-      (c, k) => c.effectText.trim() !== '' && !SCRIPTED.has(c.id) && k + 1 < cards.length,
+      (c, k) =>
+        c.effectText.trim() !== '' &&
+        !SCRIPTED.has(c.id) &&
+        BACKLOG.has(c.id) &&
+        k + 1 < cards.length,
     );
     if (i >= 0) return { set: code, card: cards[i]!, next: cards[i + 1]! };
   }
-  throw new Error('no unscripted card left in OP-13 to OP-16');
+  throw new Error('no unscripted card left in OP-09 to OP-16');
 })();
 
 // A generated 1x1 PNG stands in for card art: tests never touch the network or Bandai art.
