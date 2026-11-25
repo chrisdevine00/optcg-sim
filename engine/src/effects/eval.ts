@@ -346,6 +346,9 @@ function holdsOf(c: Ctx, k: Condition): boolean {
     return cause.kind === 'effect' || cause.kind === 'cost';
   }
   if ('koedThisTurn' in k) return historyOf(s).koed[rel(c, k.koedThisTurn)] > 0;
+  if ('attackerIs' in k) return !!s.battle && matches(c, s.battle.attacker, k.attackerIs);
+  if ('handTrashedThisTurn' in k)
+    return (historyOf(s).handTrashed?.[rel(c, k.handTrashedThisTurn)] ?? 0) > 0;
   if ('eventsActivatedThisTurn' in k) {
     const by = rel(c, k.eventsActivatedThisTurn);
     const bc = k.baseCost;
@@ -436,6 +439,9 @@ export function payable(c: Ctx, costs: readonly Cost[] | undefined, o: PayOption
         returns += k.returnDon.n;
         activeReturns += k.returnDon.n;
       }
+    } else if ('returnGivenDon' in k) {
+      // "Return 2 total of your currently given DON!! cards to your cost area rested" (G70).
+      if (givenDon(s, c.you) < k.returnGivenDon) return false;
     } else if ('giveDon' in k) {
       if ('from' in k.giveDon && k.giveDon.from === 'opponent') {
         // The opponent's rested DON!! go to the opponent's cards (G20): nothing of yours is spent.

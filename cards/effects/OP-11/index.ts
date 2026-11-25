@@ -68,6 +68,7 @@ import { OP11_083 } from './OP11-083.ts';
 import { OP11_084 } from './OP11-084.ts';
 import { OP11_085 } from './OP11-085.ts';
 import { OP11_086 } from './OP11-086.ts';
+import { OP11_088 } from './OP11-088.ts';
 import { OP11_090 } from './OP11-090.ts';
 import { OP11_091 } from './OP11-091.ts';
 import { OP11_092 } from './OP11-092.ts';
@@ -163,6 +164,7 @@ const SET: readonly CardScript[] = [
   OP11_084,
   OP11_085,
   OP11_086,
+  OP11_088,
   OP11_090,
   OP11_091,
   OP11_092,

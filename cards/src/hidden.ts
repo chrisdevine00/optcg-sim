@@ -72,7 +72,7 @@ function cost(k: Cost): boolean {
   if ('power' in k) return selector(k.power.target);
   if ('move' in k) return selector(k.move) || destHidden(k.to.zone);
   if ('oneOf' in k) return k.oneOf.some((a) => a.some(cost));
-  // lifeToHand, mill, turnLifeFaceDown, giveDon, returnDon: no hidden card is read; a Life card
+  // lifeToHand, mill, turnLifeFaceDown, giveDon, returnDon, returnGivenDon (G70): no hidden card is read; a Life card
   // turned face-down is hidden from then on, not read. turnLifeFaceUp/Down at the top, the bottom
   // or a chosen end (G68) read only which cards are face-up, which both players see; the choice of
   // end is public. trashLife (G30) takes the top Life card

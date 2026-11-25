@@ -221,6 +221,20 @@ export type Condition =
   | { koCause: 'opponentEffect' | 'effect' }
   /** "A Character of P has been K.O.'d during this turn" (G26): any cause, either player's doing. */
   | { koedThisTurn: P }
+  /**
+   * "A card in P's hand was trashed by an effect during this turn" (G69): a card trashed from P's
+   * hand by an effect of either player or as a cost (a cost is part of the effect, M6b-Q31), at any
+   * earlier point of the turn, whatever the ability that reads it.
+   */
+  | { handTrashedThisTurn: P }
+  /**
+   * "The attacking card is …" (G71): the card attacking in the battle that triggered this ability
+   * matches the filter, read at its current attributes and cost. Only in an auto ability whose
+   * every timing is `onOpponentAttack`, as an ability condition ("when your opponent's Character
+   * attacks") or in an effect's `if` ("if that Character has <Slash>"). False when there is no
+   * battle.
+   */
+  | { attackerIs: Filter }
   /** "P has activated an Event [with a base cost …] during this turn" (G26). */
   | { eventsActivatedThisTurn: P; baseCost?: Cmp };
 export type CmpOp = '<=' | '>=' | '=' | '<' | '>';
@@ -411,6 +425,13 @@ export type Cost =
    * `donReturned` event for the whole number. Not a replacement payload.
    */
   | { returnDon: number | { n: number; state: 'active' } | { atLeast: number } }
+  /**
+   * "Return N total of your currently given DON!! cards to your cost area rested" (G70): the DON!!
+   * leave the cards they are given to (the player chooses which, N may come from several cards) and
+   * go rested to the cost area; they stay on the field, so nothing returns to the DON!! deck and no
+   * `donReturned` watcher fires. Payable with N or more DON!! given to your Leader and Characters.
+   */
+  | { returnGivenDon: number }
   /** "Give N active DON!! cards to your Leader or 1 of your Characters" as a cost (G7). */
   | { giveDon: { n: number; state: 'active'; to: Selector } }
   /** "Give 1 of your opponent's rested DON!! cards to 1 of your opponent's Characters" (G20). */
