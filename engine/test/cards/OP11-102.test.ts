@@ -17,6 +17,7 @@ import {
   V,
 } from './helpers.ts';
 import { COUNTER_EVENT, ids } from './helpers-w6c2.ts';
+import { acceptUse, declineUse } from './helpers-w57.ts';
 
 const ID = 'OP11-102';
 const trigger = { id: 't', kind: 'trigger', effect: [{ do: { draw: 1 } }] } as Ability;
@@ -44,8 +45,13 @@ const mk = (p1: Partial<PlayerSpec> = {}, p2: Partial<PlayerSpec> = {}) => {
   if (dec(g)?.kind === 'block') passBlock(g);
   return g;
 };
-const counter = (g: ReturnType<typeof mk>) =>
+const counterOnly = (g: ReturnType<typeof mk>) =>
   g.act({ type: 'activate', card: g.find('p2', 'hand', COUNTER_EVENT), ability: 'counter' });
+/** The Event, then yes to the optional use ("This effect can be activated when ...", W57-R5). */
+const counter = (g: ReturnType<typeof mk>) => {
+  counterOnly(g);
+  acceptUse(g, ID);
+};
 
 describe('OP11-102 Camie', () => {
   it('when the opponent activates an Event on your turn, the top Life card of each player is trashed', () => {
@@ -68,6 +74,19 @@ describe('OP11-102 Camie', () => {
     counter(g);
     expect(g.zone('p2', 'life')).toHaveLength(3);
     expect(g.zone('p1', 'life')).toHaveLength(2);
+  });
+
+  it('W57-R5: "can be activated" is optional: declining trashes no Life card and does not spend the Once Per Turn', () => {
+    const g = mk({}, { life: [PURPLE, BLUE, V.c1, V.c1] });
+    counterOnly(g);
+    declineUse(g, ID);
+    expect(g.zone('p1', 'life')).toHaveLength(3);
+    expect(g.zone('p2', 'life')).toHaveLength(4);
+    expectDecision(g, 'counter', 'p2');
+    counterOnly(g);
+    expect(acceptUse(g, ID)).toBe(true);
+    expect(g.zone('p1', 'life')).toHaveLength(2);
+    expect(g.zone('p2', 'life')).toHaveLength(3);
   });
 
   it('needs 2 or more Life cards for the opponent: at 2 it fires (to 1), at 1 nothing happens', () => {
@@ -98,6 +117,7 @@ describe('OP11-102 Camie', () => {
     expectDecision(g, 'trigger', 'p2');
     const handBefore = hand(g, 'p2').length;
     g.act({ type: 'trigger', activate: true });
+    acceptUse(g, ID);
     // The [Trigger] drew; then 3 - 1 (damage) = 2 Life cards were left: Camie fires.
     expect(hand(g, 'p2').length).toBe(handBefore + 1);
     expect(g.zone('p2', 'life')).toHaveLength(1);

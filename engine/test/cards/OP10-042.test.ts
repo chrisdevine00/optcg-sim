@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { applyOp } from '../../src/testing.ts';
 import { dec, expectDecision, hand, pick, V } from './helpers.ts';
+import { acceptUse, asksUse, declineUse } from './helpers-w57.ts';
 import { DR, koedInBattle, mk, OPP, plantOpponentEffect } from './helpers-a10g1.ts';
 
 const ID = 'OP10-042';
@@ -19,6 +20,7 @@ const remove = (g: ReturnType<typeof mk>, target: string, action: object = KO) =
   const id = g.find('p1', 'characters', target);
   plantOpponentEffect(g, action as Record<string, unknown>);
   if (dec(g)?.kind === 'choose') pick(g, [id]);
+  acceptUse(g, ID); // "can be activated" is optional (W57-R5)
 };
 /** p2's turn; p2's planted effect `action` hits p1's `target` (a Dressrosa Character by default). */
 const hit = (
@@ -75,6 +77,7 @@ describe('OP10-042 Usopp', () => {
 
   it('a K.O. in battle counts ("K.O.\'d" has any cause)', () => {
     const g = koedInBattle(DR.c3, { leader: ID, hand: HAND5 });
+    acceptUse(g, ID);
     expect(g.zone('p1', 'hand')).toHaveLength(6);
     expect(g.zone('p1', 'trash').map((c) => c.card)).toEqual([DR.c3]);
   });
@@ -85,6 +88,21 @@ describe('OP10-042 Usopp', () => {
     remove(g, DR.c2);
     expect(handSize(g)).toBe(6);
     expect(g.zone('p1', 'trash').map((c) => c.card)).toEqual([DR.c2, DR.c3]); // top first
+  });
+
+  it('W57-R5: "can be activated" is optional: declining does not spend the Once Per Turn, a later removal asks again', () => {
+    const g = mk({ leader: ID, characters: [DR.c3, DR.c2], hand: HAND5 }, {}, OPP);
+    plantOpponentEffect(g, KO as Record<string, unknown>);
+    pick(g, [g.find('p1', 'characters', DR.c3)]);
+    declineUse(g, ID);
+    // The K.O. is both a removal and a K.O.: the ability's second event asks again.
+    declineUse(g, ID);
+    expect(handSize(g)).toBe(5);
+    expectDecision(g, 'main', 'p2');
+    plantOpponentEffect(g, KO as Record<string, unknown>);
+    expect(asksUse(g, ID)).toBe(true);
+    g.act({ type: 'optional', accept: true });
+    expect(handSize(g)).toBe(6);
   });
 
   it('must not draw when the removed Character is not a Dressrosa Character', () => {

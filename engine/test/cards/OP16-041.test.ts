@@ -3,9 +3,16 @@ import { describe, expect, it } from 'vitest';
 import { project, projectEvents } from '../../src/index.ts';
 import { withAbilities, type Ability } from '../../src/testing.ts';
 import { BLUE, expectDecision, game, hand, none, pick, PLAIN_BLUE, PURPLE, V } from './helpers.ts';
-import { activate, canPick, IMPEL_4, IMPEL_5, koBy, PRISONER } from './helpers-w3s.ts';
+import { activate, canPick, IMPEL_4, IMPEL_5, koBy as koByOnly, PRISONER } from './helpers-w3s.ts';
+import { acceptUse, declineUse } from './helpers-w57.ts';
 
 const ID = 'OP16-041';
+
+/** The removal, then yes to the optional use ("This effect can be activated when ...", W57-R5). */
+const koBy = (...a: Parameters<typeof koByOnly>) => {
+  koByOnly(...a);
+  acceptUse(a[0], ID);
+};
 
 describe('OP16-041 Buggy', () => {
   const start = (opts: { don?: number; hand?: string[]; chars?: string[]; opp?: string[] } = {}) =>
@@ -50,10 +57,21 @@ describe('OP16-041 Buggy', () => {
     ]);
     g.act({ type: 'endTurn' });
     activate(g, g.find('p2', 'characters', PURPLE), 'b');
+    acceptUse(g, ID);
     expectDecision(g, 'choose', 'p1');
     pick(g, [g.find('p1', 'hand', PRISONER)]);
     expect(onField(g)).toEqual([PRISONER]);
     expect(hand(g, 'p1')).toEqual([IMPEL_4]);
+  });
+
+  it('W57-R5: "can be activated" is optional: declining plays nothing and does not spend the Once Per Turn', () => {
+    const g = start({ hand: [PRISONER, PRISONER], chars: [IMPEL_4, IMPEL_5] });
+    koByOnly(g, 'p1', IMPEL_4, 'p2');
+    declineUse(g, ID);
+    expect(onField(g)).toEqual([IMPEL_5]);
+    koBy(g, 'p1', IMPEL_5, 'p2');
+    pick(g, [g.find('p1', 'hand', PRISONER)]);
+    expect(onField(g)).toEqual([PRISONER]);
   });
 
   it('"up to 1": nothing needs to be played', () => {

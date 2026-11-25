@@ -61,6 +61,7 @@ export const OP12_081: CardScript = {
       label:
         'Once per turn, when your opponent plays a Character with base cost 8+ or plays a Character with a Character effect: they add 1 top Life card to their hand',
       kind: 'auto',
+      optional: true,
       oncePerTurn: true,
       when: [
         {

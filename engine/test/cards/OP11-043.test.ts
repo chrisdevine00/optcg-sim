@@ -11,14 +11,20 @@ import {
   trash,
   V,
 } from './helpers.ts';
+import { acceptUse, declineUse } from './helpers-w57.ts';
 import { canPick, cardsOf, GERMA, mk } from './helpers-op11g2.ts';
 
 const ID = 'OP11-043';
 const deck = [V.c1, V.c2, V.c3, V.c4, ...times(4, V.c5)];
 const under = (characters: string[], attackers: string[] = [V.c7]) =>
   mk({ characters, deck }, { characters: attackers }, { turn: 4, activePlayer: 'p2' });
-const attack = (g: ReturnType<typeof mk>, c: string) =>
+const attackOnly = (g: ReturnType<typeof mk>, c: string) =>
   g.act({ type: 'attack', attacker: g.find('p2', 'characters', c), target: g.leader('p1') });
+/** The attack, then yes to the optional use ("This effect can be activated when ...", W57-R5). */
+const attack = (g: ReturnType<typeof mk>, c: string) => {
+  attackOnly(g, c);
+  acceptUse(g, ID);
+};
 
 describe('OP11-043 Vinsmoke Ichiji', () => {
   it("[On Your Opponent's Attack] with only {GERMA} Characters: +1000 power to a Leader or Character during this battle, then trashes 2 cards from the top of the deck", () => {
@@ -69,6 +75,21 @@ describe('OP11-043 Vinsmoke Ichiji', () => {
     takeDamage(g);
     attack(g, V.c6);
     expectDecision(g, 'block', 'p1');
+    expect(trash(g, 'p1')).toHaveLength(2);
+  });
+
+  it('W57-R5: "can be activated" is optional: declining trashes nothing and does not spend the Once Per Turn', () => {
+    const g = under([ID], [V.c7, V.c6]);
+    attackOnly(g, V.c7);
+    declineUse(g, ID);
+    expect(trash(g, 'p1')).toEqual([]);
+    expect(g.power(g.leader('p1'))).toBe(5000);
+    passBlock(g);
+    endCounter(g);
+    takeDamage(g);
+    attackOnly(g, V.c6);
+    expect(acceptUse(g, ID)).toBe(true);
+    pick(g, [g.leader('p1')]);
     expect(trash(g, 'p1')).toHaveLength(2);
   });
 

@@ -52,6 +52,7 @@ export const OP16_048: CardScript = {
       id: 'opp-attack',
       label: 'Up to 1 of your [Prisoner of Impel Down] cards gains [Blocker] during this turn',
       kind: 'auto',
+      optional: true,
       when: ['onOpponentAttack'],
       oncePerTurn: true,
       effect: [

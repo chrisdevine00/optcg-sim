@@ -14,6 +14,7 @@ export const OP09_001: CardScript = {
       label:
         "Once per turn, when your opponent attacks: give up to 1 of your opponent's Leader or Character cards -1000 power during this turn",
       kind: 'auto',
+      optional: true,
       when: ['onOpponentAttack'],
       oncePerTurn: true,
       effect: [

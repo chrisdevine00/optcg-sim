@@ -1,6 +1,7 @@
 /** OP17-034 Rockstar. */
 import { describe, expect, it } from 'vitest';
 import { don, game, option, setMost } from './helpers.ts';
+import { declineUse } from './helpers-w57.ts';
 import { OTHER_LEADER, SHANKS_LEADER } from './helpers-op17g2.ts';
 
 const ID = 'OP17-034';
@@ -30,6 +31,8 @@ describe('OP17-034 Rockstar', () => {
     activate(g);
     setMost(g);
     g.act({ type: 'endTurn' });
+    // OP11-040's start-of-turn effect is optional (W57-R5): p2 declines it.
+    declineUse(g, BIG_LEADER);
     expect(g.power(g.leader('p1'))).toBe(6000);
     g.act({ type: 'endTurn' });
     expect(g.power(g.leader('p1'))).toBe(5000);

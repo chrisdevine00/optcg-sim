@@ -1,6 +1,7 @@
 /** OP11-040 Monkey.D.Luffy (Leader). */
 import { describe, expect, it } from 'vitest';
 import { BLUE, dec, expectDecision, hand, none, option, pick, times, V } from './helpers.ts';
+import { acceptUse, declineUse } from './helpers-w57.ts';
 import { canPick, cardsOf, finishOrder, mk, SHC1, SHC4 } from './helpers-op11g2.ts';
 
 const ID = 'OP11-040';
@@ -12,6 +13,7 @@ const deck = [...top5, SHC1, ...times(6, BLUE)];
 const startOfTurn = (don: { active: number; rested: number }, d = deck) => {
   const g = mk({ leader: ID, deck: d, costArea: don }, {}, { turn: 2, activePlayer: 'p2' });
   g.act({ type: 'endTurn' });
+  acceptUse(g, ID); // "This effect can be activated at the start of your turn" is optional (W57-R5)
   return g;
 };
 
@@ -62,6 +64,7 @@ describe('OP11-040 Monkey.D.Luffy (Leader)', () => {
       { turn: 2, activePlayer: 'p2' },
     );
     g.act({ type: 'endTurn' });
+    acceptUse(g, ID);
     expectDecision(g, 'choose', 'p1');
   });
 
@@ -73,6 +76,19 @@ describe('OP11-040 Monkey.D.Luffy (Leader)', () => {
     expect(cardsOf(g, 'p1', 'deck')).toHaveLength(deck.length - 1);
     // The 6th card (a {Straw Hat Crew}) was on top after the look and is the card drawn.
     expect(hand(g, 'p1')).toEqual([SHC1]);
+  });
+
+  it('W57-R5: "can be activated" is optional: declining looks at nothing, and the turn goes on', () => {
+    const g = mk(
+      { leader: ID, deck, costArea: { active: 0, rested: 8 } },
+      {},
+      { turn: 2, activePlayer: 'p2' },
+    );
+    g.act({ type: 'endTurn' });
+    declineUse(g, ID);
+    expectDecision(g, 'main', 'p1');
+    expect(hand(g, 'p1')).toEqual([SHC1]); // only the Draw Phase card
+    expect(cardsOf(g, 'p1', 'deck')).toHaveLength(deck.length - 1);
   });
 
   it('only at the start of YOUR turn: p1 ending its own turn with 8 DON!! does not look', () => {

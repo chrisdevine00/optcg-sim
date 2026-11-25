@@ -1,9 +1,10 @@
 /** OP12-081 Koala (Leader). */
 import { describe, expect, it } from 'vitest';
 import { withAbilities, type Ability } from '../../src/testing.ts';
-import { endCounter, game, hand, passBlock, pick, play, V } from './helpers.ts';
+import { dec, endCounter, game, hand, passBlock, pick, play, V } from './helpers.ts';
 import { C8, PLAIN_BLUE, RA8, cardsIn } from './helpers-op12g3.ts';
 import type { TestGame } from '../fixtures/index.ts';
+import { acceptUse, declineUse } from './helpers-w57.ts';
 
 const ID = 'OP12-081';
 const BIG = [C8, C8];
@@ -60,6 +61,7 @@ describe('OP12-081 Koala', () => {
       { turn: 4, activePlayer: 'p2' },
     );
     play(g, C8);
+    acceptUse(g, ID); // "This effect can be activated when ..." is optional (W57-R5)
     expect(g.life('p2')).toBe(2);
     expect(hand(g, 'p2')).toEqual([V.c1]);
     expect(g.life('p1')).toBe(3);
@@ -92,6 +94,7 @@ describe('OP12-081 Koala', () => {
       { turn: 4, activePlayer: 'p2' },
     );
     play(g, C8);
+    acceptUse(g, ID);
     // 10 DON!! pay 8 once; give the second one its cost back by planting a refund is not needed:
     // the second play needs 8 more, so only one is affordable; plant a free play instead.
     expect(g.life('p2')).toBe(2);
@@ -118,8 +121,40 @@ describe('OP12-081 Koala', () => {
     ]);
     play(g, V.c1);
     pick(g, [g.find('p2', 'hand', V.c2)]);
+    acceptUse(g, ID);
     // The played Character (cost 2) came from V.c1's effect: Life 3 -> 2.
     expect(cardsIn(g, 'p2', 'characters').sort()).toEqual([V.c1, V.c2].sort());
+    expect(g.life('p2')).toBe(2);
+    expect(hand(g, 'p2')).toEqual([V.c1]);
+  });
+
+  it('W57-R5: "can be activated" is optional: declining takes no Life card and does not spend the Once Per Turn (the official Q&A: use it later)', () => {
+    const g = game(
+      { leader: ID },
+      {
+        leader: PLAIN_BLUE,
+        hand: [C8, C8],
+        life: [V.c1, V.c2, V.c3],
+        costArea: { active: 10, rested: 0 },
+      },
+      { turn: 4, activePlayer: 'p2' },
+    );
+    play(g, C8);
+    declineUse(g, ID);
+    expect(g.life('p2')).toBe(3);
+    // A later qualifying play the same turn (a second 8 cost needs DON!!: plant a free refund).
+    g.state = withAbilities(g.state, PLAIN_BLUE, [
+      {
+        id: 'planted',
+        kind: 'activate',
+        when: 'activateMain',
+        effect: [{ do: { play: { what: { from: 'hand', owner: 'you', pick: { exactly: 1 } } } } }],
+      } as unknown as Ability,
+    ]);
+    g.act({ type: 'activate', card: g.leader('p2'), ability: 'planted' });
+    // Played by a Leader's effect: only the base cost 8 clause applies, and C8 qualifies.
+    pick(g, [g.find('p2', 'hand', C8)]);
+    expect(acceptUse(g, ID)).toBe(true);
     expect(g.life('p2')).toBe(2);
     expect(hand(g, 'p2')).toEqual([V.c1]);
   });
@@ -147,5 +182,21 @@ describe('OP12-081 Koala', () => {
     pick(g, [g.find('p2', 'hand', V.c2)]);
     expect(cardsIn(g, 'p2', 'characters')).toEqual([V.c2]);
     expect(g.life('p2')).toBe(3);
+  });
+
+  it("W57-R4: a Character played by its own [Trigger] (OP13-106 Conney) is not played by a Character's effect", () => {
+    const g = game(
+      { leader: ID, costArea: { active: 5, rested: 0 } },
+      { leader: PLAIN_BLUE, life: ['OP13-106', V.c2, V.c3, V.c4] },
+    );
+    g.act({ type: 'attack', attacker: g.leader('p1'), target: g.leader('p2') });
+    passBlock(g);
+    endCounter(g);
+    expect(dec(g)?.kind).toBe('trigger');
+    g.act({ type: 'trigger', activate: true });
+    // Conney (base cost 1) is played by its [Trigger]: official OP12-081 answer "No".
+    expect(cardsIn(g, 'p2', 'characters')).toEqual(['OP13-106']);
+    expect(g.life('p2')).toBe(3);
+    expect(hand(g, 'p2')).toEqual([]);
   });
 });

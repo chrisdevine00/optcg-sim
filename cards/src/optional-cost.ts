@@ -9,8 +9,15 @@
  * - `activate` on anything else ([Activate: Main]): activation is the player's choice already, and
  *   `costOptional` would change legality (an unpayable cost could be "declined"), so the flag must
  *   be absent whatever the text says.
- * - `auto`: a cost makes it optional by construction (CR 8-3-1-4), so the text must say "you may"
- *   before the colon; and an auto with no cost must have no "you may ... :" clause.
+ * - `auto`: a cost makes it optional by construction (CR 8-3-1-4: the player may decline to pay
+ *   it, and the card is still played, official general-rules Q&A "play a Character card with an
+ *   [On Play] effect without activating", rules-digest 112). The text before the colon is that
+ *   cost whether or not it says "you may" (W57-R1, OP09-101 Kuzan), so an auto with a colon cost
+ *   clause needs no "you may". What is still checked: a script cost needs a cost clause in the
+ *   text, and any colon cost clause (with or without "you may") needs a script cost, except
+ *   "choose one:" (not a cost). The fix-round scan of every scripted auto found OP09-101 only.
+ *   "This effect can be activated when ..." makes an auto optional ("can", W57-R5): with no cost
+ *   the script needs `optional: true` (or a `may` step).
  * - `replacement`: `optional` equals "you may" in the replacement sentence.
  * - DON!! −X alone is always optional (RL-52, its reminder text says "You may return"), so a cost
  *   made only of DON!! −X is not judged against the wording.
@@ -118,9 +125,31 @@ export function optionalCostProblems(
     }
     const clause = costClause(unit);
     const judged = nonDon(ab.cost);
+    // "This effect can be activated when ...": "can" makes the auto optional (rules-digest 112;
+    // the official OP12-081 Koala Q&A: "you may decline and use it later"), W57-R5. With a cost it
+    // is optional by construction; without one the script says so, or opens with a `may` step.
+    if (
+      ab.kind === 'auto' &&
+      !ab.cost?.length &&
+      /\bcan be activated\b/i.test(unit) &&
+      ab.optional !== true &&
+      !ab.effect.some((st) => 'may' in st)
+    )
+      out.push(
+        `${at}: the text says "This effect can be activated ..." but the auto is not optional`,
+      );
     if (!ab.cost?.length) {
       if (clause !== undefined && hasYouMay(clause))
         out.push(`${at}: the text has a "you may ... :" cost clause but the script has no cost`);
+      else if (
+        clause !== undefined &&
+        ab.kind === 'auto' &&
+        !/\bchooses? one\b/i.test(clause) &&
+        !/to activate this effect/i.test(unit)
+      )
+        // The mirror of the "you may" rule (W57-R1): a colon clause is a cost, declinable, so a
+        // script that spends it as the first step of a mandatory effect misplays the decline.
+        out.push(`${at}: the text has a cost clause before a colon but the script has no cost`);
       continue;
     }
     if (clause === undefined) {
@@ -128,11 +157,8 @@ export function optionalCostProblems(
       continue;
     }
     const you = hasYouMay(clause);
-    if (ab.kind === 'auto') {
-      if (judged && !you)
-        out.push(`${at}: auto with a cost, but the text does not say "you may" before the colon`);
-      continue;
-    }
+    // An auto with a cost: optional by construction, "you may" or not (see the header).
+    if (ab.kind === 'auto') continue;
     // activate
     const event = card.category === 'Event';
     if (!event) {

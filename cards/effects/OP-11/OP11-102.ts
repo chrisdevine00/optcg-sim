@@ -14,6 +14,7 @@ export const OP11_102: CardScript = {
       label:
         "[Your Turn] [Once Per Turn] When your opponent activates an Event or [Trigger]: if your opponent has 2 or more Life cards, trash 1 card from the top of each of your and your opponent's Life cards",
       kind: 'auto',
+      optional: true,
       when: [
         { event: 'eventActivated', by: 'opponent' },
         { event: 'triggerActivated', by: 'opponent' },

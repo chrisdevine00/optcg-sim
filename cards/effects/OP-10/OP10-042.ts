@@ -42,6 +42,7 @@ export const OP10_042: CardScript = {
       label:
         "Opponent's turn, once per turn: when your \"Dressrosa\" Character is removed by your opponent's effect or K.O.'d, with 5 or less cards in hand, draw 1 card",
       kind: 'auto',
+      optional: true,
       when: [
         {
           event: 'removed',

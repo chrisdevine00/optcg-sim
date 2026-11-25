@@ -14,6 +14,7 @@ export const OP16_041: CardScript = {
       label:
         'When your {Impel Down} Character is removed from the field, play up to 1 [Prisoner of Impel Down] from your hand',
       kind: 'auto',
+      optional: true,
       when: [
         {
           event: 'removed',

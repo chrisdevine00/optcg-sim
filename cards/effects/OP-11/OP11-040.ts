@@ -14,6 +14,7 @@ export const OP11_040: CardScript = {
       label:
         'At the start of your turn, with 8 or more DON!!: look at 5; reveal up to 1 {Straw Hat Crew} card and add it to your hand; rest to the top or bottom',
       kind: 'auto',
+      optional: true,
       when: ['startOfYourTurn'],
       effect: [
         {

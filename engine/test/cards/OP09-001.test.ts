@@ -1,12 +1,18 @@
 /** OP09-001 Shanks (Leader). */
 import { describe, expect, it } from 'vitest';
-import { dec, expectDecision, none, pick, V } from './helpers.ts';
+import { accept, dec, decline, expectDecision, none, pick, V } from './helpers.ts';
 import { canPick, finishBattle, mk, p2Attacks } from './helpers-a09g1.ts';
 
 const ID = 'OP09-001';
 /** p2's 6000 Character (V.c4) attacks p1's Shanks Leader; p2 also has a second, active 7000 Character. */
-const start = (p1: object = {}) =>
+const attacked = (p1: object = {}) =>
   p2Attacks({ leader: ID, characters: [V.c1], ...p1 }, V.c4, [V.c4, V.c5]);
+/** "This effect can be activated when ..." is optional (W57-R5): the use is asked, answered yes. */
+const start = (p1: object = {}) => {
+  const g = attacked(p1);
+  accept(g);
+  return g;
+};
 
 describe('OP09-001 Shanks', () => {
   it('[Once Per Turn] when your opponent attacks: -1000 power to up to 1 of their Leader or Characters, this turn', () => {
@@ -57,6 +63,23 @@ describe('OP09-001 Shanks', () => {
       target: g.leader('p1'),
     });
     expect(dec(g)?.kind).toBe('block');
+  });
+
+  it('W57-R5: "can be activated" is optional: declining does not spend the Once Per Turn, the next attack asks again', () => {
+    const g = attacked();
+    decline(g);
+    expect(g.power(g.find('p2', 'characters', V.c4))).toBe(6000);
+    finishBattle(g);
+    expect(dec(g)?.kind).toBe('main');
+    g.act({
+      type: 'attack',
+      attacker: g.find('p2', 'characters', V.c5),
+      target: g.leader('p1'),
+    });
+    expectDecision(g, 'optional', 'p1');
+    accept(g);
+    pick(g, [g.find('p2', 'characters', V.c5)]);
+    expect(g.power(g.find('p2', 'characters', V.c5))).toBe(6000);
   });
 
   it("must not fire on your own attack (it needs your opponent's)", () => {

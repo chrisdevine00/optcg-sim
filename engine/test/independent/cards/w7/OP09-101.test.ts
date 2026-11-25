@@ -38,6 +38,7 @@ import {
   S7,
   unusable,
 } from './kit-w7a.ts';
+import { payHand, yes } from '../op17/kit-op17b.ts';
 
 const ID = 'OP09-101';
 
@@ -53,10 +54,11 @@ function start(o: Partial<PlayerSpec> = {}, opp: Partial<PlayerSpec> = {}) {
   );
 }
 
-/** Play Kuzan (the cost is paid by the pick), choose `target` and the end; stops at the opponent's trash choice. */
+/** Play Kuzan, agree to pay the cost (W57-R1: it may be declined), choose `target` and the end; stops at the opponent's trash choice. */
 function place(g: ReturnType<typeof start>, target: CardId, end: 'top' | 'bottom') {
   put(g, ID);
-  if (offeredIds(g).length) pickCards(g, [target]); // a single candidate is chosen without a prompt
+  yes(g, 'p1');
+  if (offeredIds(g).length) payHand(g, [target]); // (a cost pick) a single candidate is chosen without a prompt
   pickOption(g, end);
 }
 
@@ -89,6 +91,7 @@ describe('OP09-101 Kuzan: [On Play] place an opposing Character (cost 3 or less)
   it('cost 3 is enough, cost 4 is too high: only the cost 2 and cost 3 Characters are offered', () => {
     const g = start();
     put(g, ID);
+    yes(g, 'p1');
     need(g, 'choose', 'p1');
     expect(offeredIds(g).sort()).toEqual([S7.c2, S7.c3].sort());
   });
@@ -96,25 +99,34 @@ describe('OP09-101 Kuzan: [On Play] place an opposing Character (cost 3 or less)
   it('the placement is a cost, not "up to": exactly 1 Character, no way to place none once paying', () => {
     const g = start();
     put(g, ID);
+    yes(g, 'p1');
     need(g, 'choose', 'p1');
     expect(mayChooseNone(g)).toBe(false);
   });
 
-  // DISAGREEMENT D-1 (see DISAGREEMENTS-a.md): rules-digest 112 says an [On Play] with a cost may be
-  // declined (QA-GR); the engine asks no question and the cost pick has no way out.
-  it.fails(
-    'declining the cost (rules-digest 112): nothing is placed, the opponent trashes nothing, Kuzan stays in play',
-    () => {
-      const g = start();
-      put(g, ID);
-      no(g, 'p1');
-      expect(decision(g)?.kind).toBe('main');
-      expect(g.life('p2')).toBe(3);
-      expect(handOf(g, 'p2')).toEqual([S7.c1, S7.c7].sort());
-      expect(g.zone('p2', 'characters')).toHaveLength(3);
-      expect(g.find('p1', 'characters', ID)).toBeTruthy();
-    },
-  );
+  // Was DISAGREEMENT D-1 (an `it.fails`): settled by the W57 review (W57-R1), the official
+  // general-rules Q&A and rules-digest 112 are right: the text before the colon is a cost, which
+  // may be declined while the card is still played.
+  it('declining the cost (rules-digest 112): nothing is placed, the opponent trashes nothing, Kuzan stays in play', () => {
+    const g = start();
+    put(g, ID);
+    no(g, 'p1');
+    expect(decision(g)?.kind).toBe('main');
+    expect(g.life('p2')).toBe(3);
+    expect(handOf(g, 'p2')).toEqual([S7.c1, S7.c7].sort());
+    expect(g.zone('p2', 'characters')).toHaveLength(3);
+    expect(g.find('p1', 'characters', ID)).toBeTruthy();
+  });
+
+  it('the cost is only asked once, and a declined cost leaves every opposing Character where it was', () => {
+    const g = start();
+    put(g, ID);
+    no(g, 'p1');
+    expect(decision(g)?.kind).toBe('main');
+    expect(ofZone(g, 'p2', 'characters')).toEqual([S7.c2, S7.c3, S7.c4].sort());
+    expect(lifeOf(g, 'p2')).toEqual([S7.c4, S7.c5, S7.c6]);
+    expect(ofZone(g, 'p2', 'trash')).toEqual([]);
+  });
 
   it('no opposing Character with cost 3 or less: the cost cannot be paid, so the opponent trashes nothing', () => {
     const g = start({}, { characters: [S7.c4, S7.c5] });
@@ -128,6 +140,7 @@ describe('OP09-101 Kuzan: [On Play] place an opposing Character (cost 3 or less)
   it('my own cheap Characters are not offered', () => {
     const g = start({ characters: [S7.c1, S7.c2] }, { characters: [S7.c3, S7.c5] });
     put(g, ID);
+    yes(g, 'p1');
     // One candidate: an exact pick may be resolved without a prompt.
     if (offeredIds(g).length) {
       expect(offeredIds(g)).toEqual([S7.c3]);

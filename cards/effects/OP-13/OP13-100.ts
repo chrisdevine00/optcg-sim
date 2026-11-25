@@ -14,6 +14,7 @@ export const OP13_100: CardScript = {
       label:
         'Your Turn, Once Per Turn, when you play a Character with a [Trigger]: give up to 2 rested DON!! to your Leader or 1 Character',
       kind: 'auto',
+      optional: true,
       oncePerTurn: true,
       conditions: [
         {

@@ -2,7 +2,18 @@
 import { describe, expect, it } from 'vitest';
 import { withAbilities, type Ability } from '../../src/testing.ts';
 import { expectValid } from './m6b-w1/probe.ts';
-import { dec, game, option, pick, PLAIN_BLUE, PLAIN_PURPLE, PURPLE, V } from './helpers.ts';
+import {
+  accept,
+  dec,
+  expectDecision,
+  game,
+  option,
+  pick,
+  PLAIN_BLUE,
+  PLAIN_PURPLE,
+  PURPLE,
+  V,
+} from './helpers.ts';
 import { atMain, ids, optionIds, pickableCardIds } from './helpers-w7c1.ts';
 
 const ID = 'OP09-101';
@@ -19,7 +30,12 @@ describe('OP09-101 Kuzan', () => {
         ...p2,
       },
     );
-  const play = (g: ReturnType<typeof mk>) =>
+  /** Play Kuzan and, when the placement (the cost, W57-R1) can be paid, agree to pay it. */
+  const play = (g: ReturnType<typeof mk>) => {
+    g.act({ type: 'playCard', card: g.find('p1', 'hand', ID) });
+    if (dec(g)?.kind === 'optional') accept(g);
+  };
+  const playOnly = (g: ReturnType<typeof mk>) =>
     g.act({ type: 'playCard', card: g.find('p1', 'hand', ID) });
 
   it('[On Play]: place an opponent Character (cost 3 or less) at the top of their Life face-up, then they trash 1 card of their choice', () => {
@@ -83,7 +99,7 @@ describe('OP09-101 Kuzan', () => {
     const g = mk({}, { characters: [PURPLE] });
     g.state = withAbilities(g.state, PURPLE, [guard]);
     play(g);
-    // The end is asked before the removal is tried; the protection then stops it.
+    // The cost is asked and the end is asked before the removal is tried; the protection then stops it: the cost is not paid, so the effect does not resolve.
     option(g, 'top');
     expect(atMain(g)).toBe(true);
     expect(ids(g, 'p2', 'characters')).toEqual([PURPLE]);
@@ -99,6 +115,27 @@ describe('OP09-101 Kuzan', () => {
     option(g, 'top');
     expect(g.life('p2')).toBe(4);
     expect(ids(g, 'p2', 'trash')).toEqual([]);
+    expect(atMain(g)).toBe(true);
+  });
+
+  it('W57-R1: the placement is a cost and may be declined: Kuzan is played, nothing is placed, nothing trashed', () => {
+    const g = mk();
+    playOnly(g);
+    expectDecision(g, 'optional');
+    expect(dec(g)!.player).toBe('p1');
+    g.act({ type: 'optional', accept: false });
+    expect(atMain(g)).toBe(true);
+    expect(g.find('p1', 'characters', ID)).toBeTruthy();
+    expect(g.life('p2')).toBe(3);
+    expect(ids(g, 'p2', 'characters')).toEqual([V.c3, V.c4]);
+    expect(ids(g, 'p2', 'hand')).toEqual([V.c1, V.c2]);
+    expect(ids(g, 'p2', 'trash')).toEqual([]);
+  });
+
+  it('W57-R1: with no Character of cost 3 or less the cost is not payable: no question, nothing happens', () => {
+    const g = mk({}, { characters: [V.c4] });
+    playOnly(g);
+    expect(dec(g)?.kind).not.toBe('optional');
     expect(atMain(g)).toBe(true);
   });
 });

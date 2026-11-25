@@ -85,8 +85,14 @@ export function ctxOf(d: Draft, f: EffectFrame): Ctx {
   };
 }
 
-/** How an effect's play of a card reads for a `cardPlayed` watcher: by a Character or not (G25). */
+/**
+ * How an effect's play of a card reads for a `cardPlayed` watcher: by a Character or not (G25).
+ * A [Trigger] is not "a Character's effect" even on a Character card: playing a Character with a
+ * Character card's [Trigger] effect is not playing it using a Character effect (official OP12-081
+ * Koala Q&A, W57-R4), so a frame of a `trigger` ability reads as `effect`.
+ */
 function viaOf(d: Draft, f: EffectFrame): 'effect' | 'characterEffect' {
+  if (abilityOf(d.s, f.cardId, f.ability)?.kind === 'trigger') return 'effect';
   return d.s.defs[f.cardId]?.category === 'Character' ? 'characterEffect' : 'effect';
 }
 
@@ -171,6 +177,17 @@ export function runEffect(d: Draft, f: EffectFrame): void {
   }
   d.ops++;
   if (f.stage === 'ask') {
+    // A [Once Per Turn] already spent (two events of one action queued the same ability, W57-R5):
+    // nothing to ask, the effect would be skipped on acceptance anyway.
+    if (
+      f.got === undefined &&
+      f.part === 'effect' &&
+      ab.oncePerTurn &&
+      d.s.oncePerTurn.includes(`${f.card}/${ab.id}`)
+    ) {
+      pop(d);
+      return;
+    }
     askUse(d, f, ab);
     return;
   }

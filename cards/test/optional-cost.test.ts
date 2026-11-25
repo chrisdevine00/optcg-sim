@@ -58,21 +58,37 @@ describe('the check fails on planted mismatches', () => {
       ),
     ).toEqual([]);
   });
-  it('an auto with a cost whose text is mandatory', () => {
-    const ab = {
-      id: 'x',
-      kind: 'auto',
-      when: ['onPlay'],
-      cost: [{ trash: { from: 'hand', owner: 'you', pick: { exactly: 1 } } }],
-      effect: [],
-    } as unknown as Ability;
+  const cost1 = [{ trash: { from: 'hand', owner: 'you', pick: { exactly: 1 } } }];
+  const auto = (extra: object): Ability =>
+    ({ id: 'x', kind: 'auto', when: ['onPlay'], effect: [], ...extra }) as unknown as Ability;
+  const chr = (effectText: string) => ({ category: 'Character', effectText, triggerText: null });
+  it('an auto with a colon cost and no "you may" is accepted (W57-R1: the cost may be declined)', () => {
+    expect(
+      optionalCostProblems(
+        { cardId: 'T-1', abilities: [auto({ cost: cost1 })] },
+        chr('[On Play] Trash 1 card from your hand: Draw 1 card.'),
+      ),
+    ).toEqual([]);
+  });
+  it('an auto whose text has a colon cost with no "you may" but whose script has no cost is refused', () => {
     const p = optionalCostProblems(
-      { cardId: 'T-1', abilities: [ab] },
-      {
-        category: 'Character',
-        effectText: '[On Play] Trash 1 card from your hand: Draw 1 card.',
-        triggerText: null,
-      },
+      { cardId: 'T-1', abilities: [auto({})] },
+      chr('[On Play] Trash 1 card from your hand: Draw 1 card.'),
+    );
+    expect(p).toHaveLength(1);
+  });
+  it('"choose one:" is not a cost', () => {
+    expect(
+      optionalCostProblems(
+        { cardId: 'T-1', abilities: [auto({})] },
+        chr('[On Play] Choose one: • Draw 1 card. • Trash 1 card.'),
+      ),
+    ).toEqual([]);
+  });
+  it('an auto with a script cost and no cost clause in the text is refused', () => {
+    const p = optionalCostProblems(
+      { cardId: 'T-1', abilities: [auto({ cost: cost1 })] },
+      chr('[On Play] Draw 1 card.'),
     );
     expect(p).toHaveLength(1);
   });
@@ -139,12 +155,43 @@ describe('the start-of-turn printed window ("This effect can be activated at the
     expect(problems(`[Once Per Turn] ${text}`)).toEqual([]);
   });
 
-  it('judges the cost clause of that unit: a mandatory cost is reported, not "no text unit found"', () => {
-    const p = problems(
-      'This effect can be activated at the start of your turn. Trash 1 card from your hand: Draw 1 card.',
+  it('judges the cost clause of that unit: a cost with no "you may" is now accepted (W57-R1), and found', () => {
+    expect(
+      problems(
+        'This effect can be activated at the start of your turn. Trash 1 card from your hand: Draw 1 card.',
+      ),
+    ).toEqual([]);
+    // A script with no cost against the same text proves the unit was found and judged.
+    const none = { ...start, cost: undefined } as unknown as Ability;
+    const p = optionalCostProblems(
+      { cardId: 'T-1', abilities: [none] },
+      card(
+        'This effect can be activated at the start of your turn. Trash 1 card from your hand: Draw 1 card.',
+      ),
     );
-    expect(p).toHaveLength(1);
-    expect(p[0]).toContain('does not say "you may"');
+    expect(p.filter((x) => x.includes('cost clause'))).toHaveLength(1);
+  });
+
+  it('W57-R5: "This effect can be activated ..." with no cost needs optional: true (or a may step)', () => {
+    const text =
+      '[Once Per Turn] This effect can be activated when your opponent attacks. Draw 1 card.';
+    const mk = (extra: object, effect: object[] = []) =>
+      ({
+        id: 'x',
+        kind: 'auto',
+        when: ['onOpponentAttack'],
+        oncePerTurn: true,
+        effect,
+        ...extra,
+      }) as unknown as Ability;
+    const run = (ab: Ability) =>
+      optionalCostProblems(
+        { cardId: 'T-1', abilities: [ab] },
+        { category: 'Leader', effectText: text, triggerText: null },
+      );
+    expect(run(mk({}))).toHaveLength(1);
+    expect(run(mk({ optional: true }))).toEqual([]);
+    expect(run(mk({}, [{ may: [], label: 'x' }]))).toEqual([]);
   });
 
   it('does not match a unit that opens with another tag', () => {

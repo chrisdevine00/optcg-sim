@@ -14,6 +14,7 @@ export const OP11_041: CardScript = {
       label:
         "[Your Turn] When a card is removed from your or your opponent's Life: with 7 or less cards in hand, draw 1",
       kind: 'auto',
+      optional: true,
       oncePerTurn: true,
       conditions: [
         {

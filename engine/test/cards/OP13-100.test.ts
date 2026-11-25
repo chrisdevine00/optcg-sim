@@ -1,6 +1,7 @@
 /** OP13-100 Jewelry Bonney (Leader). */
 import { describe, expect, it } from 'vitest';
 import { addMost, dec, don, pick, play, V } from './helpers.ts';
+import { acceptUse, declineUse } from './helpers-w57.ts';
 import { canPick, mine, TRIG2, TRIG5 } from './helpers-op13g4.ts';
 import { queries } from '@optcg/engine';
 
@@ -13,6 +14,7 @@ describe('OP13-100 Jewelry Bonney', () => {
   it('when you play a Character with a [Trigger]: gives up to 2 rested DON!! to 1 Leader or Character', () => {
     const g = run([TRIG2]);
     play(g, TRIG2);
+    acceptUse(g, ID); // \"can be activated\" is optional (W57-R5)
     addMost(g);
     expect(canPick(g, g.leader('p1'))).toBe(true);
     expect(canPick(g, g.find('p1', 'characters', V.c1))).toBe(true);
@@ -24,11 +26,24 @@ describe('OP13-100 Jewelry Bonney', () => {
   it('"up to 2": the count may be less (asks 2, 1 or 0)', () => {
     const g = run([TRIG2]);
     play(g, TRIG2);
+    acceptUse(g, ID); // \"can be activated\" is optional (W57-R5)
     const d = dec(g)!;
     expect(d.options).toHaveLength(3);
     g.act({ type: 'pick', choice: { option: d.options![1]!.id } });
     pick(g, [g.find('p1', 'characters', V.c1)]);
     expect(queries.don(g.state, 'p1')).toMatchObject({ given: 1 });
+  });
+
+  it('W57-R5: "can be activated" is optional: declining gives no DON!! and does not spend the Once Per Turn', () => {
+    const g = run([TRIG2, TRIG5], 2, 8);
+    play(g, TRIG2);
+    declineUse(g, ID);
+    expect(queries.don(g.state, 'p1')).toMatchObject({ given: 0 });
+    play(g, TRIG5);
+    expect(acceptUse(g, ID)).toBe(true);
+    addMost(g);
+    pick(g, [g.leader('p1')]);
+    expect(queries.don(g.state, 'p1')).toMatchObject({ given: 2 });
   });
 
   it('a Character without a [Trigger] does not activate it', () => {
@@ -41,9 +56,11 @@ describe('OP13-100 Jewelry Bonney', () => {
   it('Once Per Turn: a second Character with a [Trigger] gives nothing', () => {
     const g = run([TRIG2, TRIG5], 2, 8);
     play(g, TRIG2);
+    acceptUse(g, ID); // \"can be activated\" is optional (W57-R5)
     addMost(g);
     pick(g, [g.leader('p1')]);
     play(g, TRIG5);
+    acceptUse(g, ID); // \"can be activated\" is optional (W57-R5)
     expect(dec(g)?.kind).toBe('main');
     expect(queries.don(g.state, 'p1')).toMatchObject({ given: 2 });
   });
@@ -51,6 +68,7 @@ describe('OP13-100 Jewelry Bonney', () => {
   it('the DON!! paid for the played Character are rested and can be given (no pre-rested DON!!)', () => {
     const g = run([TRIG2], 0, 2);
     play(g, TRIG2);
+    acceptUse(g, ID); // \"can be activated\" is optional (W57-R5)
     expect(don(g, 'p1').rested).toBe(2);
     addMost(g);
     pick(g, [g.leader('p1')]);

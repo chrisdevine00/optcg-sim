@@ -13,6 +13,7 @@ import {
   takeDamage,
   V,
 } from './helpers.ts';
+import { acceptUse, declineUse } from './helpers-w57.ts';
 import { BLUE_LEADER, IMPEL_LEADER, mine, PRISONER } from './helpers-op16g2.ts';
 
 const ID = 'OP16-048';
@@ -61,9 +62,15 @@ describe('OP16-048 Buggy', () => {
     g.act({ type: 'attack', attacker: g.find('p2', 'characters', V.c6), target: g.leader('p1') });
     return g;
   };
+  /** "This effect can be activated when ..." is optional (W57-R5): answer yes to the use. */
+  const defendYes = (chars: string[]) => {
+    const g = defend(chars);
+    acceptUse(g, ID);
+    return g;
+  };
 
   it("[On Your Opponent's Attack] up to 1 of your [Prisoner of Impel Down] cards gains [Blocker] during this turn", () => {
-    const g = defend([ID, PRISONER]);
+    const g = defendYes([ID, PRISONER]);
     pick(g, [g.find('p1', 'characters', PRISONER)]);
     const prisoner = g.find('p1', 'characters', PRISONER);
     expect(g.card(prisoner).keywords).toContain('Blocker');
@@ -72,7 +79,7 @@ describe('OP16-048 Buggy', () => {
   });
 
   it('is Once Per Turn: the next attack of the turn does not offer it again', () => {
-    const g = defend([ID, PRISONER]);
+    const g = defendYes([ID, PRISONER]);
     pick(g, [g.find('p1', 'characters', PRISONER)]);
     passBlock(g);
     endCounter(g);
@@ -81,8 +88,22 @@ describe('OP16-048 Buggy', () => {
     expect(dec(g)?.kind).toBe('block');
   });
 
+  it('W57-R5: "can be activated" is optional: declining gives no [Blocker] and does not spend the Once Per Turn', () => {
+    const g = defend([ID, PRISONER]);
+    declineUse(g, ID);
+    expectDecision(g, 'block', 'p1');
+    expect(g.card(g.find('p1', 'characters', PRISONER)).keywords).not.toContain('Blocker');
+    passBlock(g);
+    endCounter(g);
+    takeDamage(g);
+    g.act({ type: 'attack', attacker: g.find('p2', 'characters', V.c5), target: g.leader('p1') });
+    expect(acceptUse(g, ID)).toBe(true);
+    pick(g, [g.find('p1', 'characters', PRISONER)]);
+    expect(g.card(g.find('p1', 'characters', PRISONER)).keywords).toContain('Blocker');
+  });
+
   it('without a [Prisoner of Impel Down] on the field there is nothing to give [Blocker] to', () => {
-    const g = defend([ID]);
+    const g = defendYes([ID]);
     expectDecision(g, 'block', 'p1');
     expect(
       g.isLegal({ type: 'block', blocker: g.find('p1', 'characters', ID), player: 'p1' }),

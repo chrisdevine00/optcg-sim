@@ -15,6 +15,7 @@ export const OP11_043: CardScript = {
       label:
         'With only {GERMA} Characters: a Leader or Character gains +1000 power during this battle; then trash 2 cards from the top of your deck',
       kind: 'auto',
+      optional: true,
       oncePerTurn: true,
       when: ['onOpponentAttack'],
       conditions: [

@@ -18,6 +18,7 @@ import {
 } from './helpers.ts';
 import { finishBattle } from './helpers-op14g1.ts';
 import { mk } from './helpers-op11g2.ts';
+import { acceptUse, declineUse } from './helpers-w57.ts';
 
 const ID = 'OP11-041';
 
@@ -26,6 +27,7 @@ const attackAll = (g: ReturnType<typeof mk>, ...attackers: string[]) => {
   for (const a of attackers) {
     g.act({ type: 'attack', attacker: g.find('p1', 'characters', a), target: g.leader('p2') });
     finishBattle(g);
+    acceptUse(g, ID); // "This effect can be activated when ..." is optional (W57-R5)
   }
 };
 
@@ -34,6 +36,23 @@ describe('OP11-041 Nami (Leader)', () => {
     const g = mk({ leader: ID, characters: [V.c7], hand: times(7, BLUE), deck: times(5, BLUE) });
     attackAll(g, V.c7);
     expect(g.life('p2')).toBe(2);
+    expect(hand(g, 'p1')).toHaveLength(8);
+  });
+
+  it('W57-R5: "can be activated" is optional: declining does not spend the Once Per Turn, the next Life card asks again', () => {
+    const g = mk({
+      leader: ID,
+      characters: [V.c7, V.c6],
+      hand: times(7, BLUE),
+      deck: times(5, BLUE),
+    });
+    g.act({ type: 'attack', attacker: g.find('p1', 'characters', V.c7), target: g.leader('p2') });
+    finishBattle(g);
+    declineUse(g, ID);
+    expect(hand(g, 'p1')).toHaveLength(7);
+    g.act({ type: 'attack', attacker: g.find('p1', 'characters', V.c6), target: g.leader('p2') });
+    finishBattle(g);
+    expect(acceptUse(g, ID)).toBe(true);
     expect(hand(g, 'p1')).toHaveLength(8);
   });
 
