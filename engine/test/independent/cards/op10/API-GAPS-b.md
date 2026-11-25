@@ -1,0 +1,10 @@
+# API gaps: OP-10 independent tests, group B
+
+None of these stopped a test from being written. Each says what the public API leaves open and how the tests cope.
+
+1. **A sole cost candidate is paid by the engine.** "Rest 1 of your {Dressrosa} Leader or Stage" (OP10-043/044/048/057), the return cost of OP10-047 Koala and the two-part cost of OP10-056 Mansherry ask a cost `choose` only when there is more than one candidate. The shared `describeRestBounce` and `payParts` / `payCost` accept a pending cost pick and do nothing when none is pending; a test that wants a particular candidate names it by card id (resolved at the pick, not before, because the card may already be gone).
+2. **"Set / add up to N DON!!" asks a count even for N = 1.** OP10-036 Perona asks "1 DON!!" or "None"; OP10-071 and OP10-072 list their counts most first (`['2','1','0']`). The tests answer with `answerCount` and assert the offered ids once per card.
+3. **Cards revealed from the hand by an effect (OP10-058 Rebecca) leave no `CardRevealed` event unless they are played.** See DISAGREEMENTS-b.md 1. Whether a card is revealed can only be read from the event stream.
+4. **Costs of the form "rest N of your DON!!" and "DON!! -N" pay themselves when every own DON!! is in one state.** `payDon` picks a DON!! class only when the pick is pending; tests with mixed states (active and rested, or DON!! given to the attacker) pick explicitly (`costActive`, `costRested`).
+5. **Scenery.** OP09-077 Gum-Gum Lightning (K.O. an opposing Character of 6000 power or less; it cannot target my own Characters), OP10-046 Kyros (returns any Character of cost 5 or less, either side) and EB05-012 Camie (rests an opposing Character) are the only opposing or own effects used; OP10-044 Cub serves as the opposing "return a cost-1 Character" effect for OP10-037 Lim.
+6. **Leader scenery with a standing effect.** OP10-042 Usopp (the only Leader named [Usopp]) raises the cost of {Dressrosa} Characters of cost 2 or more, so it is used only for OP10-057 Leo and one OP10-058 Rebecca test, where the cost does not change the outcome.
