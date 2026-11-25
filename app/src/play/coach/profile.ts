@@ -3,6 +3,8 @@
  * Every read and write is guarded: private windows and blocked storage must not break the game.
  */
 import type { Verbosity } from './ExplanationView.tsx';
+import { synced } from '../../store/open.ts';
+import { LETHAL_KEY } from '../../store/validate.ts';
 
 export type AlwaysOn = 0 | 1 | 2;
 
@@ -111,19 +113,26 @@ const ORDER: TierNeeded[] = ['tier1', 'tier2', 'count', 'tier3'];
 /** Remember the furthest step used on one lethal opportunity (a turn of a game). */
 export function recordLethalProgress(game: number, turn: number, step: TierNeeded): void {
   try {
-    const all = JSON.parse(window.localStorage.getItem(PROGRESS) ?? '[]') as LethalProgressEntry[];
+    const all = readLethalProgress();
     const at = all.findIndex((e) => e.game === game && e.turn === turn);
     if (at >= 0) {
       if (ORDER.indexOf(step) > ORDER.indexOf(all[at]!.furthest)) all[at]!.furthest = step;
     } else all.push({ game, turn, furthest: step });
-    window.localStorage.setItem(PROGRESS, JSON.stringify(all.slice(-200)));
+    const keep = all.slice(-200);
+    if (synced.progress) synced.progress.set(LETHAL_KEY, keep);
+    else window.localStorage.setItem(PROGRESS, JSON.stringify(keep));
   } catch {
     /* progress is a convenience */
   }
 }
 
+/** IndexedDB `progress` since M8 (read into memory at boot); localStorage if it is unavailable. */
 export function readLethalProgress(): LethalProgressEntry[] {
   try {
+    if (synced.progress) {
+      const v = synced.progress.get(LETHAL_KEY);
+      return Array.isArray(v) ? (v as LethalProgressEntry[]) : [];
+    }
     return JSON.parse(window.localStorage.getItem(PROGRESS) ?? '[]') as LethalProgressEntry[];
   } catch {
     return [];

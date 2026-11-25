@@ -4,34 +4,14 @@
  * the welcome question on Home; reduced motion shows no pulse; a lit card is lit.
  */
 import { expect, test, type Page } from '@playwright/test';
-import {
-  card,
-  check,
-  fresh,
-  hand,
-  myTurn,
-  next,
-  PROGRESS,
-  startAt,
-  TIMING,
-} from './tutorial-support.ts';
+import { timingRuns } from './idb-support.ts';
+import { card, check, fresh, hand, myTurn, next, PROGRESS, startAt } from './tutorial-support.ts';
 
 test.beforeEach(async ({ page }) => {
   await fresh(page);
 });
 
-const stored = (page: Page) =>
-  page.evaluate((k) => JSON.parse(window.localStorage.getItem(k) ?? '[]'), TIMING) as Promise<
-    {
-      runId: string;
-      steps: {
-        stepId: string;
-        blockedAttempts: number;
-        exits: number;
-        inputs: { pointer: number; keyboard: number };
-      }[];
-    }[]
-  >;
+const stored = (page: Page) => timingRuns(page);
 
 test.describe('a wrong move', () => {
   test('a card that is not lit says "Not yet…" and adds a blocked attempt', async ({

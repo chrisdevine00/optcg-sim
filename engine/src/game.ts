@@ -33,7 +33,12 @@ import {
   projectEvents as projectEventsFor,
 } from './project.ts';
 import { queries as q } from './queries.ts';
-import { replayWith } from './record.ts';
+import {
+  replayWith,
+  verifyReplayWith,
+  type RecordWithSnapshots,
+  type VerifyResult,
+} from './record.ts';
 import { createFromScenario as fromScenario, createGame as fromSetup } from './setup.ts';
 import { other, type State } from './state.ts';
 import { projectForSearch as projectForSearchState, type SearchView } from './determinize.ts';
@@ -80,6 +85,10 @@ export const preview = (state: GameState, action: Action): Preview =>
 
 export const replay = (record: GameRecord, cards: CardLookup, upTo?: number): Step =>
   replayWith({ createGame, createFromScenario, reduce }, record, cards, upTo);
+
+/** Is this saved record still live, though the engine's version string may differ? (record.ts) */
+export const verifyReplay = (record: RecordWithSnapshots, cards: CardLookup): VerifyResult =>
+  verifyReplayWith({ createGame, createFromScenario, reduce }, record, cards);
 
 export const checkInvariants = (state: GameState): string[] => invariants(st(state));
 

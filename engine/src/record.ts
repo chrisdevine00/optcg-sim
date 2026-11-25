@@ -176,3 +176,66 @@ export function replayWith(
   }
   return { state: step.state, events };
 }
+
+/** Why `verifyReplay` could not vouch for a record. */
+export type VerifyFailure =
+  | { ok: false; reason: 'cards' | 'scripts' | 'error' | 'no-snapshots' }
+  | { ok: false; reason: 'hash'; turn: number; actionIndex: number };
+
+export type VerifyResult = { ok: true; engineDiffers: boolean } | VerifyFailure;
+
+/**
+ * Does this build still play this record the way it was recorded? Unlike `replayWith`, an
+ * ENGINE_VERSION string difference is not refused: the record is replayed from its start and the
+ * state's summary hash is compared with every `TurnSnapshot.hash` at its `actionIndex`. If they all
+ * match, an engine bump did not change this game and the record stays live (M8 plan). The game's
+ * own card data and scripts versions must still match, so a re-scripted card is a failure with its
+ * own reason. Pure; it changes no hash and no replay.
+ */
+export function verifyReplayWith(
+  fns: Starter,
+  record: RecordWithSnapshots,
+  cards: CardLookup,
+): VerifyResult {
+  if (!Array.isArray(record.snapshots) || record.snapshots.length === 0)
+    return { ok: false, reason: 'no-snapshots' };
+  let step: Step;
+  try {
+    step =
+      'setup' in record.start
+        ? fns.createGame({ ...record.start.setup, cards })
+        : fns.createFromScenario({ ...record.start.scenario, cards });
+  } catch {
+    return { ok: false, reason: 'error' };
+  }
+  if (cardsVersionOf(step.state) !== record.versions.cards) return { ok: false, reason: 'cards' };
+  if (scriptsVersionOf(step.state) !== record.versions.scripts)
+    return { ok: false, reason: 'scripts' };
+  const byIndex = new Map<number, TurnSnapshot[]>();
+  for (const snap of record.snapshots) {
+    const list = byIndex.get(snap.actionIndex);
+    if (list) list.push(snap);
+    else byIndex.set(snap.actionIndex, [snap]);
+  }
+  const check = (index: number): VerifyFailure | null => {
+    for (const snap of byIndex.get(index) ?? [])
+      if (summaryHash(step.state as unknown as State) !== snap.hash)
+        return { ok: false, reason: 'hash', turn: snap.turn, actionIndex: index };
+    return null;
+  };
+  let bad = check(0);
+  if (bad) return bad;
+  for (let i = 0; i < record.actions.length; i++) {
+    try {
+      step = fns.reduce(step.state, record.actions[i]!);
+    } catch {
+      return { ok: false, reason: 'error' };
+    }
+    bad = check(i + 1);
+    if (bad) return bad;
+  }
+  // A snapshot past the last action cannot be matched: the record is not what it says.
+  for (const idx of byIndex.keys())
+    if (idx > record.actions.length) return { ok: false, reason: 'error' };
+  return { ok: true, engineDiffers: record.versions.engine !== ENGINE_VERSION };
+}

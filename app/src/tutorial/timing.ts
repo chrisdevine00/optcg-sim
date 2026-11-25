@@ -1,14 +1,18 @@
 /**
  * The tutorial's local timing log (docs/design/usability-plan.md §7.1). One `TutorialTimingLog` per
  * run: active, hidden and idle time per step, blocked attempts, inputs and exits. It is kept in
- * this browser only (`optcg.tutorial.timing.v1`, the last 20 runs, behind `TimingStore` so M8 can
- * move it to IndexedDB), exported as JSON or CSV through a Blob, and never sent anywhere. Nothing
+ * this browser only (IndexedDB `timing` since M8, behind `TimingStore`; the old localStorage key
+ * `optcg.tutorial.timing.v1` is migrated once, and still used if IndexedDB is unavailable; the last
+ * 20 runs), exported as JSON or CSV through a Blob, and never sent anywhere. Nothing
  * in it identifies a person: no names, no free text, no card choices.
  *
  * The clock is injected (`performance.now` in the app, a fake in tests). Time is accounted on every
  * event by `advance`, so a step's wall time splits exactly into active and hidden, and the time the
  * player spent outside the tutorial (between "Leave" and "Continue") is never counted at all.
  */
+import { synced } from '../store/open.ts';
+import type { SyncKv } from '../store/sync.ts';
+import { sanitizeTimingLog } from '../store/validate.ts';
 import type { TutorialTimingLog } from './types.ts';
 
 export type StepRecord = TutorialTimingLog['steps'][number];
@@ -31,7 +35,7 @@ export interface TimingEnv {
   settings: TutorialTimingLog['settings'];
 }
 
-/** Where finished and in-progress runs are kept. localStorage today; IndexedDB in M8. */
+/** Where finished and in-progress runs are kept: IndexedDB (`IdbTimingStore`), or localStorage as a fallback. */
 export interface TimingStore {
   load(): TutorialTimingLog[];
   save(runs: TutorialTimingLog[]): void;
@@ -60,6 +64,36 @@ export class LocalTimingStore implements TimingStore {
       /* storage is blocked or full: the log lasts for this session only */
     }
   }
+}
+
+/**
+ * The IndexedDB `timing` store behind the same synchronous interface: one record per run id, read
+ * into memory at boot (`initStore`) and written behind. The last `KEEP_RUNS` runs are kept.
+ */
+export class IdbTimingStore implements TimingStore {
+  constructor(private readonly kv: SyncKv) {}
+  load(): TutorialTimingLog[] {
+    const runs: TutorialTimingLog[] = [];
+    for (const v of this.kv.values()) {
+      try {
+        runs.push(sanitizeTimingLog(v));
+      } catch {
+        /* an unreadable run is skipped */
+      }
+    }
+    return runs.sort((a, b) => a.startedAt.localeCompare(b.startedAt));
+  }
+  save(runs: TutorialTimingLog[]): void {
+    const keep = runs.slice(-KEEP_RUNS);
+    const ids = new Set(keep.map((r) => r.runId));
+    for (const r of keep) this.kv.set(r.runId, r);
+    for (const k of this.kv.keys()) if (!ids.has(k)) this.kv.delete(k);
+  }
+}
+
+/** The app's timing store: IndexedDB when the store opened on it, else localStorage as before. */
+export function timingStore(): TimingStore {
+  return synced.timing ? new IdbTimingStore(synced.timing) : new LocalTimingStore();
 }
 
 export class MemoryTimingStore implements TimingStore {

@@ -10,6 +10,7 @@ import {
   legalActions,
   reduce,
   replay,
+  verifyReplay,
   RecordVersionMismatch,
   startRecord,
   summaryHash,
@@ -342,5 +343,57 @@ describe('cardsVersionOf and the printed text (W57-R8)', () => {
   it('a game that no script reads the text of keeps its version, whatever the text says', () => {
     const ids = ['OP01-001', 'OP01-002'];
     expect(cardsVersionOf(make(ids, 'other'))).toBe(cardsVersionOf(make(ids, 'text')));
+  });
+});
+
+describe('verifyReplay (M8 WP5)', () => {
+  const recorded = (seed: number) => {
+    const g = playRandomGame({ seed, keepStates: true });
+    let rec = startRecord(g.record.start, g.states[0]!);
+    g.record.actions.forEach((a, i) => {
+      rec = appendAction(rec, a, g.states[i + 1]!);
+    });
+    return rec;
+  };
+
+  it('a record with matching hashes is live; an engine string bump alone keeps it live', () => {
+    const rec = recorded(31);
+    expect(rec.snapshots.length).toBeGreaterThan(2);
+    expect(verifyReplay(rec, cards())).toEqual({ ok: true, engineDiffers: false });
+    const old = { ...rec, versions: { ...rec.versions, engine: '0.0.1' } };
+    expect(() => replay(old, cards())).toThrow(RecordVersionMismatch);
+    expect(verifyReplay(old, cards())).toEqual({ ok: true, engineDiffers: true });
+  });
+
+  it('a changed hash, a changed card or script, and a bad record are each refused with a reason', () => {
+    const rec = recorded(32);
+    const i = 2;
+    const snaps = rec.snapshots.map((s, k) => (k === i ? { ...s, hash: 'x' + s.hash } : s));
+    expect(verifyReplay({ ...rec, snapshots: snaps }, cards())).toMatchObject({
+      ok: false,
+      reason: 'hash',
+      turn: rec.snapshots[i]!.turn,
+    });
+    expect(
+      verifyReplay({ ...rec, versions: { ...rec.versions, cards: 'cards-0' } }, cards()),
+    ).toMatchObject({ ok: false, reason: 'cards' });
+    expect(
+      verifyReplay({ ...rec, versions: { ...rec.versions, scripts: 'scripts-0' } }, cards()),
+    ).toMatchObject({ ok: false, reason: 'scripts' });
+    expect(verifyReplay({ ...rec, snapshots: [] }, cards())).toMatchObject({
+      ok: false,
+      reason: 'no-snapshots',
+    });
+    const bogus = { ...rec, actions: [{ type: 'nope' } as never, ...rec.actions] };
+    expect(verifyReplay(bogus, cards())).toMatchObject({ ok: false });
+  });
+
+  it('changes nothing: the record, its hashes and a replay are the same after a verify', () => {
+    const rec = recorded(33);
+    const before = JSON.stringify(rec);
+    const h = summaryHash(replay(rec, cards()).state);
+    verifyReplay(rec, cards());
+    expect(JSON.stringify(rec)).toBe(before);
+    expect(summaryHash(replay(rec, cards()).state)).toBe(h);
   });
 });
