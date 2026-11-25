@@ -1,8 +1,8 @@
 # Disagreements: OP-09 independent tests, group C
 
-One disagreement, left as an `it.fails` for the review to settle.
+One disagreement, closed in the block 3 batch B fix round (B3C-R3).
 
-- **C-1 OP09-095 Laffitte (severity 1 or 2, low confidence).** The text says `reveal up to 1 "Blackbeard Pirates" type card`. The rules digest (item 27, CR 2-4-3-1) reads a quoted `"text"` as a substring match on types, so OP09-094 Peachbeard (types {Peachbeard Pirates}/{Blackbeard Pirates Allies}) should be offered among the top 5. The script offers only exact {Blackbeard Pirates} cards. Test: `OP09-095 ... "type including" ...` (`it.fails`). If the quotes in the verified text are only a rendering of the printed {Blackbeard Pirates} (the other OP-09 cards print their types in quotes in the same data), the exact reading is right and the test should be dropped; the card text on file does not say which. No other card in this group has a type variant of its quoted type, so the same question has no other observable effect here.
+- **C-1 OP09-095 Laffitte (closed, B3C-R3).** The first reading was that the quoted `"Blackbeard Pirates" type` matches by substring, so OP09-094 Peachbeard ({Blackbeard Pirates Allies}) would be offered; the `it.fails` is now a plain test that it is not. Reason: optcgapi renders the official `{X} type` as `"X" type` (docs/research/data-sources.md rows 43 and 54), while the substring form is always printed `type including "X"`. The script (exact type) is right.
 
 Readings the tests deliberately do not assert, because the rules on file leave them open:
 

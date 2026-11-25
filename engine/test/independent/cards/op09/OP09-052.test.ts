@@ -9,6 +9,7 @@
  * (accept illegal), CR 8-4 (exact 1 card).
  */
 import { describe, expect, it } from 'vitest';
+import { withAbilities, type Ability } from '../../../../src/testing.ts';
 import {
   at,
   atMain,
@@ -99,6 +100,33 @@ describe("OP09-052 Marco: [Opponent's Turn] you may trash 1 card from hand: when
     expect(atMain(g, 'p2')).toBe(true);
     expect(chars(g)).toEqual([]);
     expect(trash(g)).toEqual([MARCO]);
+    expect(hand(g)).toEqual([V9.c2, V9.c3].sort());
+  });
+
+  it("must not apply to a K.O. by your own effect on the opponent's turn: nothing is asked and Marco stays in the trash", () => {
+    // Planted scenery: p1's Leader has an [On Your Opponent's Attack] that K.O.s one of p1's own Characters.
+    const g = theirs(
+      L9.neutral,
+      { characters: [MARCO], hand: [V9.c2, V9.c3] },
+      { characters: [V9.c8] },
+    );
+    g.state = withAbilities(g.state, g.card(g.leader('p1')).card, [
+      {
+        id: 'own',
+        kind: 'auto',
+        when: ['onOpponentAttack'],
+        effect: [{ do: { ko: { from: 'characters', owner: 'you', pick: { exactly: 1 } } } }],
+      } as unknown as Ability,
+    ]);
+    g.act({
+      type: 'attack',
+      attacker: at(g, 'p2', 'characters', V9.c8),
+      target: g.leader('p1'),
+    });
+    if (kind(g) === 'choose') g.act(g.legal().find((a) => a.type === 'pick')!);
+    expect(trash(g)).toEqual([MARCO]);
+    expect(chars(g)).toEqual([]);
+    expect(g.legal().some((a) => a.type === 'optional')).toBe(false);
     expect(hand(g)).toEqual([V9.c2, V9.c3].sort());
   });
 

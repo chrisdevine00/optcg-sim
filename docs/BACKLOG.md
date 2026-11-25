@@ -46,3 +46,5 @@ Details and options: `docs/research/m6b-runtime-audit.md` §3.
 - B3B-R11: OP10-035 Brook, the Leader is always eligible for "cost 5 or less" (M6b-Q48, open; consistent with OP15-024).
 - B3B-R12: OP10-036 Perona, the Once Per Turn is spent by the first rest by your effect whether or not a DON!! can be set active (M6b-Q30, open); a rest paid as a cost does not count.
 - B3B-R13: ST20-004 mutation `lte: 3` was not run by the review (its pattern did not match); the cost bound is covered by the author suite. Run it when the mutation harness is next used.
+- B3C-R4: OP09-041 "set up to 2 of your Characters as active" offers every Character, active ones included (legal but pointless choices). Filtering `state: 'rested'` would shorten the prompt; the text does not say "rested", so no rules change.
+- B3C-R5: EB02-023 Crocodile "(a cost of yours counts as an effect)" (M6b-Q20): no scripted card returns an opponent's Character as a cost, so the reading cannot be observed yet; revisit when one is scripted.

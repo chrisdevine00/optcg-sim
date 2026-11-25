@@ -85,12 +85,15 @@ describe('EB02-044 Sengoku: [On Play] play a black "Navy" Character with cost 4 
     none(g);
   });
 
-  // DISAGREEMENT (DISAGREEMENTS-b.md, EB02-044 #1): the engine offers nothing for a "Former Navy" card.
-  it.fails('"type including": a "Former Navy" Character with printed cost 4 qualifies', () => {
-    const g = start([FORMER_NAVY, SE.laboon]);
-    need(g, 'choose', 'p1');
-    expect(offeredIds(g)).toEqual([FORMER_NAVY]);
+  // A quoted type is printed for the exact {Navy} type; a type that only contains the text is written
+  // `type including "X"` (data-sources rows 43 and 54), so a {Former Navy} Character is not offered.
+  it('exact type: a "Former Navy" Character with printed cost 4 is not offered', () => {
+    const g = start([FORMER_NAVY, SE.momonga4]);
+    expect(offeredIds(g)).toEqual([SE.momonga4]);
     none(g);
+    const h = start([FORMER_NAVY, SE.laboon]);
+    skipEmptyPick(h);
+    expect(trash(h)).toEqual([FORMER_NAVY, SE.laboon].sort());
   });
 
   it('"up to 1": may play nothing; the trash is untouched', () => {

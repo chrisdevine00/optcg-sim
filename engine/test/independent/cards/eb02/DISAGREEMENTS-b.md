@@ -2,7 +2,7 @@
 
 Cards: EB02-038, 044, 045, 046, 047, 048, 049, 054, 055, 056, 061, 007, 008, 020, 031, 040, 050, 051, 058, 059, 041, 060.
 
-1. **EB02-044 Sengoku, "type including" (`it.fails` in `EB02-044.test.ts`).** The text says `black "Navy" type Character card with a cost of 4 or less`. A quoted type matches any type including the text (CR 2-4-3-1; rules-digest item 27), so OP17-089 Jaguar.D.Saul (Black, printed cost 4 in the trash, types {Giant}/{Former Navy}/{Elbaph}) should be offered. The engine offers nothing for it (no prompt at all; the trash card's cost reads 4, so the "+12 cost" static is not the cause). Cards with the exact type {Navy} are offered correctly. Severity 2 (a rare edge; the only black "Former Navy" Character is OP17-089).
+1. **EB02-044 Sengoku, "type including" (closed, B3C-R3).** The first reading was that `black "Navy" type` matches by substring, so OP17-089 ({Former Navy}) would be offered; the `it.fails` is now a plain test that it is not. Reason: optcgapi renders the official `{Navy}` as `"Navy"` (docs/research/data-sources.md rows 43 and 54); the substring form is printed `type including "X"`. The script (exact type) is right.
 
 Readings the tests assume, so the review can check them:
 

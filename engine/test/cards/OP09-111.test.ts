@@ -7,6 +7,7 @@ import {
   hitWith,
   idsOf,
   OTHER_LEADER,
+  pending,
   pick,
   times,
   V,
@@ -37,6 +38,8 @@ describe('OP09-111 Brook [Trigger]', () => {
   it('must not fire with 5 cards in their hand', () => {
     const g = hitWith(ID, EGG_LEADER, {}, { hand: OPP_HAND.slice(0, 5) });
     g.act({ type: 'trigger', activate: true });
+    // Boundary: with 5 the "6 or more" condition fails, so no trash prompt is asked at all.
+    expect(pending(g, 'choose')).toBe(false);
     expect(handIds(g, 'p2')).toHaveLength(5);
     expect(idsOf(g, 'p2', 'trash')).toEqual([]);
   });

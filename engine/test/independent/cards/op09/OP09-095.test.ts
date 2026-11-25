@@ -5,9 +5,8 @@
  * from the top of your deck; reveal up to 1 "Blackbeard Pirates" type card and add it to your hand.
  * Then, place the rest at the bottom of your deck in any order."
  *
- * Rules: the cost is resting 1 active DON!! and this Character. A quoted `"text"` type matches any
- * type containing the text (CR 2-4-3-1: "Blackbeard Pirates" also matches {Blackbeard Pirates
- * Allies}); the type filter applies to every card category. The deck is hidden, so the pick is asked
+ * Rules: the cost is resting 1 active DON!! and this Character. A quoted `"text"` type is the exact
+ * type (the substring form is printed `type including "X"`; data-sources rows 43 and 54); the type filter applies to every card category. The deck is hidden, so the pick is asked
  * even when nothing in the top 5 qualifies (max 0). The revealed card is public (CR 11-2-1).
  */
 import { describe, expect, it } from 'vitest';
@@ -146,16 +145,16 @@ describe('OP09-095 Laffitte: [Activate: Main] rest 1 DON!! + this: look at 5, ad
     expect(tail(deck(g), 5)).toEqual(pad(5));
   });
 
-  // DISAGREEMENTS-c.md C-1: the card text quotes the type, and CR 2-4-3-1 reads a quoted type as a
-  // substring match. The script appears to match the exact type only.
-  it.fails(
-    '"type including": a {Blackbeard Pirates Allies} card (Peachbeard) qualifies for the quoted type',
-    () => {
-      const g = start([BBP.allies, MISS, MISS, MISS, MISS]);
-      need(g, 'choose', 'p1');
-      expect(offeredIds(g)).toEqual([BBP.allies]);
-    },
-  );
+  // The quoted type is the exact {Blackbeard Pirates} (data-sources rows 43 and 54: optcgapi renders
+  // `{X} type` as `"X" type`; the substring form is printed `type including "X"`). A card whose type
+  // only contains the text ({Blackbeard Pirates Allies}, Peachbeard) is not offered; the deck is
+  // hidden, so the pick is still asked with nothing to choose.
+  it('exact type: a {Blackbeard Pirates Allies} card (Peachbeard) is not offered', () => {
+    const g = start([BBP.allies, MISS, MISS, MISS, MISS]);
+    askedEmpty(g);
+    finish(g);
+    expect(hand(g)).toEqual([]);
+  });
 
   it('a card of another type (cost 1 Character without the type) is not offered', () => {
     const g = start([SC9.c1, SC9.tb1, SC9.gordon, MISS, MISS]);

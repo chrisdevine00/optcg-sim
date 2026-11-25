@@ -20,6 +20,7 @@ import {
   SHC4,
   V,
 } from './helpers-a09g4.ts';
+import { withAbilities, type Ability } from '../../src/testing.ts';
 
 const ID = 'OP09-080';
 const OPP = { turn: 4, activePlayer: 'p2' } as const;
@@ -109,6 +110,34 @@ describe("OP09-080 Thousand Sunny: [Opponent's Turn]", () => {
     const g = start(rested(ID));
     hit(g, SHC4);
     expectDecision(g, 'main', 'p2');
+    expect(don(g, 'p1').deck).toBe(7);
+  });
+
+  it("must not fire when your own effect removes the Character on your opponent's turn", () => {
+    // A planted [On Your Opponent's Attack] of p1's own Leader K.O.s one of p1's own Characters.
+    const g = game(
+      {
+        leader: OTHER_LEADER,
+        stage: ID,
+        characters: [SHC4, V.c3],
+        costArea: { active: 3, rested: 0 },
+      },
+      { leader: PLAIN_BLUE, characters: [V.c7] },
+      OPP,
+    );
+    g.state = withAbilities(g.state, OTHER_LEADER, [
+      {
+        id: 'own',
+        kind: 'auto',
+        when: ['onOpponentAttack'],
+        effect: [{ do: { ko: { from: 'characters', owner: 'you', pick: { exactly: 1 } } } }],
+      } as unknown as Ability,
+    ]);
+    g.act({ type: 'attack', attacker: g.find('p2', 'characters', V.c7), target: g.leader('p1') });
+    pick(g, [g.find('p1', 'characters', SHC4)]);
+    expect(idsOf(g, 'p1', 'trash')).toEqual([SHC4]);
+    expect(dec(g)?.kind).not.toBe('optional');
+    expect(g.card(g.find('p1', 'stage', ID)).rested).toBe(false);
     expect(don(g, 'p1').deck).toBe(7);
   });
 

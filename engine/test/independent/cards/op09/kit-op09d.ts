@@ -150,6 +150,7 @@ export function useEvent(g: TestGame, id: CardId): void {
 
 /** True if the Event `id` in p1's hand can be activated now (any timing). */
 export function playable(g: TestGame, id: CardId): boolean {
+  expect(g.decider).toBe('p1');
   const inst = g.find('p1', 'hand', id);
   return g.legal().some((a) => (a.type === 'playCard' || a.type === 'activate') && a.card === inst);
 }
