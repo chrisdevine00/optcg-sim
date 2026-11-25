@@ -175,7 +175,9 @@ describe('the missed-lethal review', () => {
         if (e.isDirectory()) walk(u);
         else if (
           /\.tsx?$/.test(e.name) &&
-          /'actual'|reviewMissedLethal/.test(readFileSync(u, 'utf8'))
+          /'actual'|reviewMissedLethal|reviewRecord|ReviewJob|planReview/.test(
+            readFileSync(u, 'utf8'),
+          )
         )
           hits.push(u.pathname.split('/src/')[1]!);
       }

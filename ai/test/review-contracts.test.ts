@@ -23,7 +23,8 @@ const ctx = {} as DetectorContext;
 describe('review registry', () => {
   it('has exactly one detector per kind and each stub returns null', () => {
     expect(Object.keys(DETECTORS).sort()).toEqual([...FLAG_KINDS].sort());
-    for (const kind of FLAG_KINDS) {
+    // A kind leaves this list when its package lands (M8 WP1: missed-lethal; it has its own tests).
+    for (const kind of FLAG_KINDS.filter((k) => k !== 'missed-lethal')) {
       const item: ReviewItem = { id: `${kind}:1:0`, kind, turn: 1, index: 0, cost: 'cheap' };
       expect(runDetector(item, ctx), kind).toBeNull();
     }

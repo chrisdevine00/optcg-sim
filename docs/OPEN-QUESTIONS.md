@@ -92,6 +92,10 @@ Settled by Track F from official sources: R1 (reveal → pay → trash 1 → pla
 
 - M2-16. Single-elimination loss rule (TRM §5.2: on a simultaneous loss, the turn player loses; RL-27). It needs a new `GameSetup` option, and `GameSetup` is a frozen shape. Best answer: add an optional `lossRule: 'bothLose' | 'turnPlayerLoses'` when a tournament mode is built (backlog). Casual play records `bothLost` and shows a draw.
 
+## M8 review pipeline (2026-11-25)
+
+- M8-1. **Marker rate of the missed-lethal review on real mid-game boards.** On the 300-decision fixture (Pirate vs Pirate, seed 70012) six of the seat's nine reviewed turns end "Not fully checked": the `public` check is refuted by the hand bound at once on three of them, but the `actual` search (needed to catch Hindsight lethal) does not finish in 150,000 nodes (about 8 s) on a board with 3 to 4 Characters and 6 to 10 DON!!. The plan's target is 10% or less. Time is not the limit (more of it does not settle these), the search is. Best answer: ship the markers (they are honest and "Analyse deeper" is there), and tune the `actual` search's move ordering or give it a sound hand-aware bound in M9; a bound written for the real hand needs each hand card's least contribution, which refutes little. The owner may prefer the `actual` search to be skipped when the `public` refutation used the hand bound (no Hindsight lethal then, fewer markers).
+
 ## M6b-1 runtime audit (2026-11-23)
 
 Full text, proposed readings, source auditor IDs and what `rulings.md`/`rules-digest.md` already say are in `docs/research/m6b-runtime-audit.md` §7 (per-card evidence in `docs/research/m6b-audit/block{5,4,3}.md`). One line per question; the 15 cards held for design decisions D1 to D9 are in §3 of the same file.

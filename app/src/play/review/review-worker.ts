@@ -1,19 +1,25 @@
 /// <reference lib="webworker" />
 /**
- * The review worker: the missed-lethal check over a finished game (learning-ui §4.2). It receives
- * the whole record and every card of the game, which is fine only because the game is over.
+ * The review worker (M8 WP1): a `ReviewJob` behind `onmessage`. It receives the whole record and
+ * every card of the game, which is fine only because the game is over. `start` plans and runs the
+ * review item by item, yielding a macrotask between items, so a `cancel`, `prioritise` ("Analyse
+ * now") or `deeper` that arrives mid-review is handled before the next item. Results stream back as
+ * `items`, with `progress`, and a final `done` with the "Not fully checked" markers.
  */
 import { loadScripts } from '@optcg/cards';
-import { reviewInline, type ReviewInput, type ReviewMessage } from './analyse.ts';
+import { ReviewJob, type ReviewRequest, type ReviewResponse } from '@optcg/ai';
 
-const post = (m: ReviewMessage) => (self as unknown as DedicatedWorkerGlobalScope).postMessage(m);
+const post = (m: ReviewResponse) => (self as unknown as DedicatedWorkerGlobalScope).postMessage(m);
+const job = new ReviewJob(post);
 
-self.onmessage = async (e: MessageEvent<ReviewInput>) => {
+self.onmessage = async (e: MessageEvent<ReviewRequest>) => {
+  const req = e.data;
+  if (req.type !== 'start') return job.handle(req);
   try {
     // Scripts load per set (M6b-0): this worker has its own copy of the registry.
-    await loadScripts(e.data.cards.map((c) => c.id));
-    post({ type: 'flags', flags: reviewInline(e.data) });
+    await loadScripts(req.cards.map((c) => c.id));
   } catch (err) {
-    post({ type: 'error', message: err instanceof Error ? err.message : String(err) });
+    return post({ type: 'error', message: err instanceof Error ? err.message : String(err) });
   }
+  await job.start(req);
 };
