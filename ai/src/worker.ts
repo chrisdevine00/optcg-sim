@@ -9,6 +9,7 @@ import { chooseAction } from './choose.ts';
 import { answerLethal, insertByPriority } from './search/lethal/request.ts';
 import type { AiRequest, AiResponse, GameInfo } from './protocol.ts';
 import { AiSession } from './session.ts';
+import { answerScore } from './coach/blunder.ts';
 import { answerCoach, priorityOf, type Work } from './coach/dispatch.ts';
 
 const cards = new Map<string, Card>();
@@ -48,8 +49,14 @@ function run(req: Work): void {
       post(res);
       return;
     }
-    if (req.type === 'hint' || req.type === 'score' || req.type === 'threat') {
-      // WP0 stub: WP1 (hint), WP2 (score) and WP3 (threat) replace this.
+    if (req.type === 'score') {
+      const res = answerScore(req, cards, game);
+      if (cancelled.delete(req.id)) return;
+      post(res);
+      return;
+    }
+    if (req.type === 'hint' || req.type === 'threat') {
+      // WP0 stub: WP1 (hint) and WP3 (threat) replace this.
       const res = answerCoach(req, performance.now() - t0);
       if (cancelled.delete(req.id)) return;
       post(res);

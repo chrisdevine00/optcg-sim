@@ -110,6 +110,7 @@ Producer-specific values that the scenario can't fix (search line counts, timing
 | E04 | Wasted counter | Review flag | Kaido vs Rocks | `counter-or-take` |
 | E05 | Hit that should have been countered | Review flag | Rocks vs Kaido | `counter-or-take` |
 | E06 | DON!! left unused | Review flag, tempo meter | Rocks vs Kaido | `don-efficiency` |
+| E06b | DON!! left unused, before you end the turn | Blunder warning (M7) | Rocks vs Kaido | `don-efficiency` |
 | E07 | Holding DON!! was correct (OP13-001) | Tempo meter, review "not flagged" note | Luffy OP13-001 vs Rocks | `don-efficiency` |
 | E08 | Board over face | Review flag | Kaido vs Rocks | `board-vs-face` |
 | E09 | Face over board | Review flag | Rocks vs Kaido | `board-vs-face` |
@@ -352,6 +353,38 @@ Rocks (OP17-039) and Kaido (OP17-058) dominate because they are the slice decks 
 ```
 
 **Check.** Going second, game turn 8 (your 4th): 2 + 2 + 2 + 2 = 8 DON!!. Linlin 5 → 3 left. 5000 vs 5000 is a tie, a hit unless they add 1000. With 3 DON!!: 8000 − 5000 + 1000 = 4000. Kaido's +4000 Events (Kundali Dragon Swarm, Flame Dragon Torch) are "[Counter] DON!! −1", hence "also costs them a DON!!". Kaido's leader −2000 cannot target your Leader (RL-45).
+
+---
+
+## E06b. DON!! left unused, before you end the turn
+
+**Where:** Blunder warning when you press End turn with the setting on (learning-ui §2.8, kind `unused-don`). Also the shape of the tempo meter's end-of-turn text: the meter shows E06's claim and first evidence row (`tense: 'left'`); the history rows of E06 (what your attack did) belong to the review, which has the turn's record. The coach has only the view, so this example has none.
+
+**Position.** Game turn 8 (your 4th), going second: 8 DON!!, 3 active and 5 rested. You: Rocks.D.Xebec (OP17-039) Leader, active, no DON!! given. Your hand: Rocks Pirates (OP17-055) and There's No Authority… (OP17-056), both cost 0, and two Characters. Them: Kaido (OP17-058) Leader, 5000. You press End turn. An attack by your Leader is still legal.
+
+```ts
+{
+  conceptId: 'don-efficiency',
+  claim: 'Ending your turn leaves 3 DON!! unused.',
+  evidence: [
+    { text: 'You have 3 active DON!!. Your Counter Events cost 0, and nothing else of yours uses DON!! on their turn, so those 3 would do nothing.',
+      figures: { activeDonAtEnd: 3, usableOnTheirTurn: 0 } },
+    { text: 'Your Leader attacks at 5000. With 3 DON!! it attacks at 8000, and stopping it takes 8000 − 5000 + 1000 = 4000 instead of 1000.',
+      figures: { attackPower: 5000, attackWithDon: 8000, defencePower: 5000, stopNeeded: 1000, stopNeededWithDon: 4000 } },
+  ],
+  line: [
+    { kind: 'giveDon', text: 'Give 3 DON!! to your Leader (8000) before it attacks.', card: 'OP17-039', count: 3 },
+    { kind: 'attack', text: 'Attack their Leader.', card: 'OP17-039', target: 'leader' },
+  ],
+  outcome: 'They need 3000 more power of counters to stop it.',
+  certainty: 'any-hand',
+  nextTime: 'Before you end your turn, spend every DON!! that nothing will use on their turn. Give it to an attacker before the attack, not after.',
+  lessonId: 'L09-don-efficiency',
+  sources: ['CR 6-5-5-2', 'CR 7-1-4-1', 'SH-DON', 'SH-MIS'],
+}
+```
+
+**Check.** 2 + 2 + 2 + 2 = 8 DON!!; 3 active, 5 rested. Both Counter Events cost 0 and nothing on your side rests DON!! on their turn, so `held` is 0 and `unused` is 3 (the ledger's rule). 5000 vs 5000 is a tie, a hit unless they add 1000; with 3 DON!!: 8000 − 5000 + 1000 = 4000, 4000 − 1000 = 3000 more. The warning appears only when an attack and a DON!! give are still legal (the DON!! could still be used now); with no attacker left the same DON!! are only counted by the review.
 
 ---
 
