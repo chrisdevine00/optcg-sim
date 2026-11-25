@@ -130,6 +130,16 @@ export function pool(c: Ctx, sel: Selector): InstanceId[] {
 
 function poolOf(c: Ctx, sel: Selector): InstanceId[] {
   const zones = Array.isArray(sel.from) ? sel.from : [sel.from];
+  // "That Character" (D9): only the card the event is about, while it is still there and passes.
+  if (sel.lki === 'subject') {
+    const subject = c.ev?.subject;
+    if (subject === undefined) return [];
+    return zonesPool(c, sel, zones).filter((id) => id === subject);
+  }
+  return zonesPool(c, sel, zones);
+}
+
+function zonesPool(c: Ctx, sel: Selector, zones: readonly SZone[]): InstanceId[] {
   const out: InstanceId[] = [];
   for (const p of ownersOf(c, sel.owner)) {
     for (const z of zones) {

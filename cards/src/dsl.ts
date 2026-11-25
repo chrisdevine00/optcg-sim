@@ -326,7 +326,11 @@ export interface Selector {
   reveal?: true;
   /** Store the chosen instances in the frame for a later `{ ref }`. */
   bind?: Name;
-  /** Event-triggered autos: read the last-known snapshot of the event's subject. */
+  /**
+   * Event-triggered autos (D9): only the card the event is about, the one just played for a
+   * `cardPlayed` timing ("that Character"), and only while it is still in the zones the selector
+   * names and passes its filter. Without `pick` the pool (the one card, or none) is bound whole.
+   */
   lki?: 'subject';
 }
 
@@ -468,7 +472,13 @@ export type Step =
    */
   | { chooseOne: Step[][]; chooser?: P; labels: string[]; neutral?: string[] }
   | { forEach: Num; do: Step[] }
-  | { delayed: { at: 'endOfThisTurn' }; do: Step[] };
+  /**
+   * `endOfThisTurn`: after this turn's [End of Your Turn] effects. `startOfOpponentsNextMainPhase`
+   * (D8): at the start of the Main Phase of the other player's next turn, after that Main Phase's
+   * own "start of Main Phase" effects; conditions written outside the `delayed` step are read when
+   * it is created, not then (official PRB02 Q&A for PRB02-005).
+   */
+  | { delayed: { at: 'endOfThisTurn' | 'startOfOpponentsNextMainPhase' }; do: Step[] };
 export type Effect = Step[];
 
 export interface Take {
@@ -601,7 +611,18 @@ export type Action =
   | { grant: { target: Selector; keyword?: Keyword; attribute?: Attribute; duration: Duration } }
   | { negate: { target: Selector; duration: Duration } }
   | { restrict: { target: Selector | P; what: Restriction; duration: Duration } }
-  | { activate: { ability: 'main' | 'onPlay' | 'onKO' | 'counter'; of: 'self' } }
+  | {
+      activate:
+        | { ability: 'main' | 'onPlay' | 'onKO' | 'counter'; of: 'self' }
+        /**
+         * "Activate up to 1 Event ... from your hand" / "activate the [Main] effect of an Event
+         * ... in your trash" (D2). From the hand: the Event is revealed and trashed without paying
+         * its printed cost, its [Main] runs with its own activation costs, and it counts as an Event
+         * activation for watchers. From the trash: only its [Main] runs, the card stays, and no
+         * watcher sees an Event activated (official OP12, OP15, EB03 Q&A).
+         */
+        | { ability: 'main'; of: Selector };
+    }
   /**
    * "Look at up to 1 card from the top of your or your opponent's Life cards and place it at the top
    * or bottom of the Life cards" (`owner: 'any'`: you choose whose, or none; with `you` or

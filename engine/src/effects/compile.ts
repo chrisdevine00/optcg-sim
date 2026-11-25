@@ -29,7 +29,7 @@ export type Instr =
   /** Ask `chooser` for a mode, then jump to that mode's code. */
   | { k: 'mode'; chooser: P; labels: string[]; neutral?: string[]; to: number[] }
   /** Register a delayed body starting at the next instruction; continue at `to`. */
-  | { k: 'delay'; to: number }
+  | { k: 'delay'; to: number; at?: 'startOfOpponentsNextMainPhase' }
   /** `forEach`: count `n` now; run the body that many times, or jump to `to` for none. */
   | { k: 'fe'; n: Num; to: number }
   /** End of a `forEach` body: run it again (from `start`) while runs are left. */
@@ -160,6 +160,7 @@ function step(out: Instr[], st: EStep): void {
   }
   if ('delayed' in st) {
     const d: Instr = { k: 'delay', to: -1 };
+    if (st.delayed.at === 'startOfOpponentsNextMainPhase') d.at = st.delayed.at;
     out.push(d);
     steps(out, st.do);
     out.push({ k: 'end' });

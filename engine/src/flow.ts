@@ -264,6 +264,8 @@ function runTurn(d: Draft, f: Extract<Frame, { f: 'turn' }>): void {
       setPhase(d, 'main');
       f.step = 'main';
       fireFor(d, [p, other(p)], 'startOfMainPhase', (q) => fieldCards(d, q));
+      // "At the start of your opponent's next Main Phase" (D8): after the Main Phase's own start effects.
+      fireDelayedMain(d, p, d.s.nextMod++);
       return;
     case 'main':
       ask(d, {
@@ -355,9 +357,13 @@ function runPlay(d: Draft, f: Extract<Frame, { f: 'play' }>): void {
         reason: 'play',
       });
       if (def.category === 'Event') {
-        const pc = playCostOf(d.s, f.player, f.card, true);
-        payCost(d, f.player, pc.cost);
-        spendPlayCost(d, pc.used);
+        // An Event activated by an effect (D2) does not pay the cost printed on it, only the
+        // activation costs of its [Main] (official OP12-041 Q&A).
+        if (!f.free) {
+          const pc = playCostOf(d.s, f.player, f.card, true);
+          payCost(d, f.player, pc.cost);
+          spendPlayCost(d, pc.used);
+        }
         // CR 8-4-2: trash the Event, then carry out its effect: [Main] in the Main Phase, [Counter]
         // in the Counter Step (CR 7-1-3-1-2). Its activation costs are paid by the effect frame.
         const nid = moveCard(d, f.card, 'trash', { revealed: true, extra: { reason: 'event' } });
@@ -440,6 +446,9 @@ function runPlay(d: Draft, f: Extract<Frame, { f: 'play' }>): void {
                 : f.via === 'characterEffect')) &&
           (!w.filter || matches({ s: d.s, you: p, self: card, live: true }, f.card, w.filter)),
         'cardPlayed',
+        undefined,
+        undefined,
+        f.card,
       );
       return;
     }
@@ -1262,6 +1271,17 @@ export function fieldCards(d: Draft, p: PlayerId): InstanceId[] {
 
 type TimingMatch = (when: AutoTiming, card: InstanceId, controller: PlayerId) => boolean;
 
+const subjectMemo = new WeakMap<object, boolean>();
+/** Does an ability select the event's subject (`lki: 'subject'`, D9)? Read once per ability. */
+function readsSubject(ab: Ability): boolean {
+  let r = subjectMemo.get(ab);
+  if (r === undefined) {
+    r = JSON.stringify(ab).includes('"lki":"subject"');
+    subjectMemo.set(ab, r);
+  }
+  return r;
+}
+
 /**
  * Activate every auto ability on the given cards whose timing matches: they join the pending queue
  * as one batch, players in `order` (pass the turn player first, CR 8-6-1). An ability whose
@@ -1276,6 +1296,7 @@ export function fire(
   label: string,
   shared?: number,
   ev?: Ev,
+  subject?: InstanceId,
 ): void {
   let added: State['pending'] | null = null;
   let batch = shared ?? -1;
@@ -1289,7 +1310,10 @@ export function fire(
       for (const ab of abilities) {
         if (ab.kind !== 'auto' || !ab.when.some((w) => match(w, id, p))) continue;
         if (ab.oncePerTurn && d.s.oncePerTurn.includes(`${id}/${ab.id}`)) continue;
-        if (!allHold({ s: d.s, you: p, self: id, live: true, ev }, ab.conditions)) continue;
+        // The card the event is about travels with the pending effect only when the ability reads it
+        // (`lki: 'subject'`, D9), so the state of every other game is exactly as it was.
+        const here = subject !== undefined && readsSubject(ab) ? { ...ev, subject } : ev;
+        if (!allHold({ s: d.s, you: p, self: id, live: true, ev: here }, ab.conditions)) continue;
         if (batch < 0) batch = d.s.nextMod++;
         (added ??= []).push({
           batch,
@@ -1299,7 +1323,7 @@ export function fire(
           ability: ab.id,
           controller: p,
           timing: label,
-          ...(ev ? { ev } : {}),
+          ...(here ? { ev: here } : {}),
         });
       }
     }
@@ -1500,7 +1524,9 @@ export function attackMatch(
  * delayed effects of this turn form the End Phase batch after the [End of Your Turn] one (see `endTriggers`).
  */
 function fireDelayed(d: Draft, controller: PlayerId, batch: number): void {
-  const now = d.s.delayed.filter((x) => x.turn === d.s.turn && x.controller === controller);
+  const now = d.s.delayed.filter(
+    (x) => !x.at && x.turn === d.s.turn && x.controller === controller,
+  );
   if (now.length === 0) return;
   d.s.delayed = d.s.delayed.filter((x) => !now.includes(x));
   d.s.pending = [
@@ -1513,6 +1539,33 @@ function fireDelayed(d: Draft, controller: PlayerId, batch: number): void {
       ability: x.ability,
       controller: x.controller,
       timing: 'endOfThisTurn',
+      start: x.start,
+      ...(x.b ? { b: x.b } : {}),
+    })),
+  ];
+}
+
+/**
+ * "At the start of your opponent's next Main Phase" (D8): the delayed effects of the player whose
+ * opponent `active` is, made in an earlier turn, run now. Their conditions were read when they
+ * were created (official PRB02 Q&A for PRB02-005), so nothing is checked here.
+ */
+function fireDelayedMain(d: Draft, active: PlayerId, batch: number): void {
+  const now = d.s.delayed.filter(
+    (x) => x.at === 'startOfOpponentsNextMainPhase' && x.controller !== active && x.turn < d.s.turn,
+  );
+  if (now.length === 0) return;
+  d.s.delayed = d.s.delayed.filter((x) => !now.includes(x));
+  d.s.pending = [
+    ...d.s.pending,
+    ...now.map((x) => ({
+      batch,
+      card: x.card,
+      key: x.key,
+      cardId: x.cardId,
+      ability: x.ability,
+      controller: x.controller,
+      timing: 'startOfOpponentsNextMainPhase',
       start: x.start,
       ...(x.b ? { b: x.b } : {}),
     })),

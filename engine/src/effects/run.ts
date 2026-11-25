@@ -118,6 +118,54 @@ function handTrashed(
 const heldOf = (d: Draft, ids: InstanceId[]): { owner: PlayerId; wasHand: boolean }[] =>
   ids.map((id) => ({ owner: d.card(id).owner, wasHand: d.card(id).zone === 'hand' }));
 
+/**
+ * "Activate up to 1 Event ... from your hand" / "activate the [Main] effect of an Event ... in your
+ * trash" (D2). A candidate has a [Main] whose activation costs can be paid now (the Event itself is
+ * not a card to pay them with); a chooser who cannot pick any simply activates nothing.
+ *
+ * From the hand the Event goes through the play frame, free of its printed cost: revealed, trashed,
+ * its [Main] run, and watchers of "when you activate an Event" and the history see an activation
+ * (official OP12-041 Q&A). From the trash only the [Main] runs and the card stays; no watcher sees
+ * an Event activated (official EB03-031 Q&A: it "differs from activating the Event card itself").
+ */
+function activateEvent(d: Draft, f: EffectFrame, what: Selector): Out {
+  const c = ctxOf(d, f);
+  const you = f.controller;
+  const ids = select(d, f, what, {
+    role: 'target',
+    verb: 'activate',
+    restrict: (id) => {
+      const def = d.s.defs[d.card(id).card]!;
+      if (def.category !== 'Event') return false;
+      const main = def.abilities.find((x) => hasTiming(x, 'main'));
+      if (!main) return false;
+      const costs = main.kind === 'activate' && !optionalCost(main) ? main.cost : undefined;
+      return payable({ ...c, self: id }, costs, { exclude: id });
+    },
+  });
+  if (ids === WAIT) return WAIT;
+  const id = ids[0];
+  if (id === undefined) return 'next';
+  f.acted = true;
+  if (d.card(id).zone === 'hand') {
+    push(d, { f: 'play', card: id, player: you, step: 'pay', free: true });
+    return 'next';
+  }
+  const cardId = d.card(id).card;
+  const main = d.s.defs[cardId]!.abilities.find((x) => hasTiming(x, 'main'))!;
+  d.emit({
+    type: 'EffectActivated',
+    player: you,
+    instance: id,
+    card: cardId,
+    ability: main.id,
+    timing: 'main',
+    keys: { instance: d.card(id).key },
+  });
+  pushEffect(d, id, cardId, main, you, 'effect');
+  return 'next';
+}
+
 /** Push an effect frame for an ability (an activation, a pending auto, a payload). */
 export function pushEffect(
   d: Draft,
@@ -472,6 +520,7 @@ function exec(d: Draft, f: EffectFrame, ins: Instr, ab: Ability): Out {
           ability: f.ability,
           controller: f.controller,
           start: f.ip + 1,
+          ...(ins.at ? { at: ins.at } : {}),
           ...(f.b ? { b: f.b } : {}),
         },
       ];
@@ -1877,6 +1926,7 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
         : num(c, a.returnDon.n);
     return returnDon(d, f, n, 0, 'target');
   }
+  if ('activate' in a && a.activate.of !== 'self') return activateEvent(d, f, a.activate.of);
   if ('activate' in a) {
     // "[Trigger] Activate this card's [Main] effect" (QA-OP03 OP03-074: its own costs are paid).
     const def = d.s.defs[f.cardId]!;

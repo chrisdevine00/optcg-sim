@@ -125,6 +125,8 @@ function actionPrompts(a: Action, out: string[]): void {
   else if ('negate' in a) selPrompts(a.negate.target, out);
   else if ('restrict' in a) selPrompts(a.restrict.target, out);
   else if ('select' in a) selPrompts(a.select, out);
+  // The Event chosen to be activated is a prompt when it is a choice (D2).
+  else if ('activate' in a) selPrompts(a.activate.of === 'self' ? undefined : a.activate.of, out);
   else if ('swapBasePower' in a) {
     selPrompts(a.swapBasePower.a, out);
     selPrompts(a.swapBasePower.b, out);

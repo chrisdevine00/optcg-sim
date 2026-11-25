@@ -302,6 +302,10 @@ export function winsByEffect(cardId: string): boolean {
             if (from.some((z) => typeof z !== 'string' || LIFE_ZONES.has(z))) r = true;
             // A Character placed into a Life area changes that player's Life count (G61).
             if ((body as { to?: { zone?: unknown } }).to?.zone === 'life') r = true;
+          } else if (op === 'activate') {
+            // Another card's [Main] (D2) runs a script this walk does not see: unclassified. The
+            // card's own ability is walked as itself.
+            if ((body as { of?: unknown }).of !== 'self') r = true;
           } else if (op === 'draw') {
             if (d.player === 'opponent') r = true;
           } else if (op === 'mill') {

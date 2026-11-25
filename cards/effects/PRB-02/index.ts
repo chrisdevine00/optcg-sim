@@ -4,6 +4,7 @@ import { PRB02_001 } from './PRB02-001.ts';
 import { PRB02_002 } from './PRB02-002.ts';
 import { PRB02_003 } from './PRB02-003.ts';
 import { PRB02_004 } from './PRB02-004.ts';
+import { PRB02_005 } from './PRB02-005.ts';
 import { PRB02_006 } from './PRB02-006.ts';
 import { PRB02_007 } from './PRB02-007.ts';
 import { PRB02_008 } from './PRB02-008.ts';
@@ -22,6 +23,7 @@ const SET: readonly CardScript[] = [
   PRB02_002,
   PRB02_003,
   PRB02_004,
+  PRB02_005,
   PRB02_006,
   PRB02_007,
   PRB02_008,

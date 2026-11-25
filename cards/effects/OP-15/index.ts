@@ -13,6 +13,7 @@ import { OP15_010 } from './OP15-010.ts';
 import { OP15_011 } from './OP15-011.ts';
 import { OP15_012 } from './OP15-012.ts';
 import { OP15_013 } from './OP15-013.ts';
+import { OP15_014 } from './OP15-014.ts';
 import { OP15_015 } from './OP15-015.ts';
 import { OP15_017 } from './OP15-017.ts';
 import { OP15_018 } from './OP15-018.ts';
@@ -41,6 +42,7 @@ import { OP15_042 } from './OP15-042.ts';
 import { OP15_043 } from './OP15-043.ts';
 import { OP15_044 } from './OP15-044.ts';
 import { OP15_045 } from './OP15-045.ts';
+import { OP15_046 } from './OP15-046.ts';
 import { OP15_047 } from './OP15-047.ts';
 import { OP15_048 } from './OP15-048.ts';
 import { OP15_050 } from './OP15-050.ts';
@@ -125,6 +127,7 @@ const SET: readonly CardScript[] = [
   OP15_011,
   OP15_012,
   OP15_013,
+  OP15_014,
   OP15_015,
   OP15_017,
   OP15_018,
@@ -153,6 +156,7 @@ const SET: readonly CardScript[] = [
   OP15_043,
   OP15_044,
   OP15_045,
+  OP15_046,
   OP15_047,
   OP15_048,
   OP15_050,

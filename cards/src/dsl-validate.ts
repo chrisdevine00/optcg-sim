@@ -204,6 +204,8 @@ interface Ctx {
   onOppAttack?: boolean;
   /** Every timing of the auto ability is `onOpponentAttack`, so there is an attacker to read (G71). */
   attackerOk?: boolean;
+  /** Every timing of the auto ability is a `cardPlayed` event, so the played card is the subject (D9). */
+  subjectOk?: boolean;
 }
 
 const isObj = (v: unknown): v is Obj => !!v && typeof v === 'object' && !Array.isArray(v);
@@ -561,7 +563,20 @@ function selector(c: Ctx, path: string, v: unknown): void {
     else if (v.from !== 'hand' || v.owner !== 'you')
       err(c, `${path}.reveal`, "only for cards in your own hand ({ from: 'hand', owner: 'you' })");
   }
-  if (v.lki !== undefined) err(c, `${path}.lki`, 'lki is not implemented in the runtime yet');
+  if (v.lki !== undefined) {
+    // The event's subject (D9): "that Character" after a card is played. Only an auto whose timings
+    // are all `cardPlayed` has a played card to read, and the one card needs no choice.
+    if (v.lki !== 'subject') err(c, `${path}.lki`, "expected 'subject'");
+    else if (!c.subjectOk)
+      err(
+        c,
+        `${path}.lki`,
+        "lki 'subject' is read by an auto ability whose timings are all cardPlayed",
+      );
+    if (isObj(v.pick) && v.pick.exactly !== 1)
+      err(c, `${path}.pick`, 'the subject is one card: no pick, or exactly 1');
+    if (v.blind !== undefined) err(c, `${path}.blind`, 'the subject is not chosen blind');
+  }
   if (v.bind !== undefined) {
     str(c, `${path}.bind`, v.bind);
     if (typeof v.bind === 'string') c.bound.add(v.bind);
@@ -980,7 +995,11 @@ function step(c: Ctx, path: string, v: unknown): void {
       return steps(c, `${path}.do`, o.do);
     case 'delayed':
       fields(c, `${path}.delayed`, o.delayed, ['at']);
-      if (isObj(o.delayed)) enumOf(c, `${path}.delayed.at`, o.delayed.at, ['endOfThisTurn']);
+      if (isObj(o.delayed))
+        enumOf(c, `${path}.delayed.at`, o.delayed.at, [
+          'endOfThisTurn',
+          'startOfOpponentsNextMainPhase',
+        ]);
       return steps(c, `${path}.do`, o.do);
   }
 }
@@ -1481,8 +1500,51 @@ function action(c: Ctx, path: string, v: unknown): void {
       fields(c, p, x, ['ability', 'of']);
       if (!isObj(x)) return;
       enumOf(c, `${p}.ability`, x.ability, ['main', 'onPlay', 'onKO', 'counter']);
+      if (isObj(x.of)) return activateEvent(c, p, x);
       return enumOf(c, `${p}.of`, x.of, ['self']);
   }
+}
+
+/** Does the filter require an Event card (top level, or inside `all`)? */
+function requiresEvent(f: unknown): boolean {
+  if (!isObj(f)) return false;
+  if (Array.isArray(f.category)) return f.category.length === 1 && f.category[0] === 'Event';
+  return Array.isArray(f.all) && f.all.some(requiresEvent);
+}
+
+/**
+ * `activate` of an Event chosen by a selector (D2): only the [Main] of one Event card you own, from
+ * your hand or your trash. Anything else would do something other than the card says: a second
+ * zone, the opponent's cards, a count other than one, a [Counter] or [Trigger] (official OP12-041
+ * Q&A: only [Main] effects), or a filter that could name a Character.
+ */
+function activateEvent(c: Ctx, path: string, x: Obj): void {
+  const o = `${path}.of`;
+  const sel = x.of as Obj;
+  selector(c, o, sel);
+  if (x.ability !== 'main')
+    err(c, `${path}.ability`, 'an Event chosen by a selector is activated by its [Main] only');
+  if (sel.from !== 'hand' && sel.from !== 'trash')
+    err(c, `${o}.from`, "activating an Event takes it from 'hand' or from 'trash' (one zone)");
+  if (sel.owner !== 'you') err(c, `${o}.owner`, "only your own cards ('you')");
+  const pk = sel.pick;
+  if (!isObj(pk) || !(pk.upTo === 1 || pk.exactly === 1))
+    err(c, `${o}.pick`, 'activate one Event: pick { upTo: 1 } or { exactly: 1 }');
+  else if (
+    pk.totalCost !== undefined ||
+    pk.totalPower !== undefined ||
+    pk.distinctNames !== undefined
+  )
+    err(c, `${o}.pick`, 'no totals on a single Event');
+  if (!requiresEvent(sel.filter))
+    err(
+      c,
+      `${o}.filter`,
+      "the filter must name Event cards ({ category: ['Event'] }, alone or in an all)",
+    );
+  if (c.inCost) err(c, path, 'activating an Event is an effect, not a cost');
+  for (const k of ['chooser', 'blind', 'reveal', 'bind', 'lki'])
+    if (k in sel) err(c, `${o}.${k}`, `${k} does not apply to an activated Event`);
 }
 
 /**
@@ -1991,6 +2053,11 @@ function ability(c: Ctx, path: string, v: unknown, ids: Set<string>): void {
     Array.isArray(v.when) &&
     v.when.length > 0 &&
     v.when.every((w) => w === 'onOpponentAttack');
+  c.subjectOk =
+    v.kind === 'auto' &&
+    Array.isArray(v.when) &&
+    v.when.length > 0 &&
+    v.when.every((w) => isObj(w) && w.event === 'cardPlayed');
   c.evCount =
     v.kind === 'auto' &&
     Array.isArray(v.when) &&

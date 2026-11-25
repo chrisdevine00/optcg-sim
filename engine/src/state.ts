@@ -221,6 +221,8 @@ export interface Ev {
   n?: number;
   /** The DON!! given to the K.O.'d card when it left the field, for `[DON!! xN] [On K.O.]`. */
   don?: number;
+  /** The card the event is about: the one just played, for a `cardPlayed` watcher (D9). */
+  subject?: InstanceId;
 }
 
 /**
@@ -556,6 +558,11 @@ export interface Delayed {
   controller: PlayerId;
   /** First instruction of the delayed body in the ability's program. */
   start: number;
+  /**
+   * When it runs, if not at the end of `turn`: `startOfOpponentsNextMainPhase` (D8) runs when the
+   * Main Phase of a later turn of `controller`'s opponent begins. Absent: the end of `turn`.
+   */
+  at?: 'startOfOpponentsNextMainPhase';
   /**
    * The selections the creating effect had bound by then (`bind`), restored when the body runs
    * so it can read them with `{ ref }` (G39). Absent when nothing was bound.

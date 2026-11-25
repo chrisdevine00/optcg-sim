@@ -122,7 +122,8 @@ function action(a: Action): boolean {
   if ('grant' in a) return selector(a.grant.target);
   if ('negate' in a) return selector(a.negate.target);
   if ('restrict' in a) return sel(a.restrict.target);
-  if ('activate' in a) return false;
+  // An Event chosen from your hand reads a hidden zone; from your trash, or the card itself, no (D2).
+  if ('activate' in a) return typeof a.activate.of === 'object' && selector(a.activate.of);
   if ('select' in a) return selector(a.select);
   return assertNever(a);
 }
