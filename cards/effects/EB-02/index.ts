@@ -6,6 +6,7 @@ import { EB02_005 } from './EB02-005.ts';
 import { EB02_006 } from './EB02-006.ts';
 import { EB02_007 } from './EB02-007.ts';
 import { EB02_008 } from './EB02-008.ts';
+import { EB02_009 } from './EB02-009.ts';
 import { EB02_010 } from './EB02-010.ts';
 import { EB02_011 } from './EB02-011.ts';
 import { EB02_012 } from './EB02-012.ts';
@@ -44,9 +45,11 @@ import { EB02_049 } from './EB02-049.ts';
 import { EB02_050 } from './EB02-050.ts';
 import { EB02_051 } from './EB02-051.ts';
 import { EB02_052 } from './EB02-052.ts';
+import { EB02_053 } from './EB02-053.ts';
 import { EB02_054 } from './EB02-054.ts';
 import { EB02_055 } from './EB02-055.ts';
 import { EB02_056 } from './EB02-056.ts';
+import { EB02_057 } from './EB02-057.ts';
 import { EB02_058 } from './EB02-058.ts';
 import { EB02_059 } from './EB02-059.ts';
 import { EB02_060 } from './EB02-060.ts';
@@ -59,6 +62,7 @@ const SET: readonly CardScript[] = [
   EB02_006,
   EB02_007,
   EB02_008,
+  EB02_009,
   EB02_010,
   EB02_011,
   EB02_012,
@@ -97,9 +101,11 @@ const SET: readonly CardScript[] = [
   EB02_050,
   EB02_051,
   EB02_052,
+  EB02_053,
   EB02_054,
   EB02_055,
   EB02_056,
+  EB02_057,
   EB02_058,
   EB02_059,
   EB02_060,

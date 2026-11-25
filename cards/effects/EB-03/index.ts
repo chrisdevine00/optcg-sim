@@ -4,6 +4,7 @@ import { EB03_001 } from './EB03-001.ts';
 import { EB03_003 } from './EB03-003.ts';
 import { EB03_004 } from './EB03-004.ts';
 import { EB03_005 } from './EB03-005.ts';
+import { EB03_006 } from './EB03-006.ts';
 import { EB03_007 } from './EB03-007.ts';
 import { EB03_008 } from './EB03-008.ts';
 import { EB03_009 } from './EB03-009.ts';
@@ -61,6 +62,7 @@ const SET: readonly CardScript[] = [
   EB03_003,
   EB03_004,
   EB03_005,
+  EB03_006,
   EB03_007,
   EB03_008,
   EB03_009,
