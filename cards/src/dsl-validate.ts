@@ -69,6 +69,7 @@ export const IMPLEMENTED = {
     'restSelf',
     'trashSelf',
     'returnDon',
+    'returnGivenDon',
     'lifeToHand',
     'turnLifeFaceUp',
     'turnLifeFaceDown',
@@ -201,6 +202,8 @@ interface Ctx {
   abHand?: boolean;
   /** The ability is an auto on [On Your Opponent's Attack] (D3: only it has an attack to redirect). */
   onOppAttack?: boolean;
+  /** Every timing of the auto ability is `onOpponentAttack`, so there is an attacker to read (G71). */
+  attackerOk?: boolean;
 }
 
 const isObj = (v: unknown): v is Obj => !!v && typeof v === 'object' && !Array.isArray(v);
@@ -586,6 +589,8 @@ function condition(c: Ctx, path: string, v: unknown): void {
       'not',
       'koCause',
       'koedThisTurn',
+      'handTrashedThisTurn',
+      'attackerIs',
       'eventsActivatedThisTurn',
     ],
     { ref: ['matches'], eventsActivatedThisTurn: ['baseCost'] },
@@ -632,6 +637,12 @@ function condition(c: Ctx, path: string, v: unknown): void {
       return;
     case 'koedThisTurn':
       return enumOf(c, p, o.koedThisTurn, P);
+    case 'attackerIs':
+      if (!c.attackerOk)
+        err(c, p, "attackerIs is read by an auto ability whose timings are all 'onOpponentAttack'");
+      return filter(c, p, o.attackerIs);
+    case 'handTrashedThisTurn':
+      return enumOf(c, p, o.handTrashedThisTurn, P);
     case 'eventsActivatedThisTurn':
       enumOf(c, p, o.eventsActivatedThisTurn, P);
       if (o.baseCost !== undefined) cmp(c, `${path}.baseCost`, o.baseCost);
@@ -676,6 +687,7 @@ function cost(c: Ctx, path: string, v: unknown): void {
       'turnLifeFaceDown',
       'mill',
       'returnDon',
+      'returnGivenDon',
       'giveDon',
       'ko',
       'move',
@@ -725,6 +737,12 @@ function cost(c: Ctx, path: string, v: unknown): void {
         int(c, `${p}.n`, o.returnDon.n);
         enumOf(c, `${p}.state`, o.returnDon.state, ['active']);
       } else int(c, p, o.returnDon);
+      return;
+    case 'returnGivenDon':
+      int(c, p, o.returnGivenDon);
+      if (typeof o.returnGivenDon === 'number' && o.returnGivenDon < 1)
+        err(c, p, 'must be at least 1');
+      if (c.noAlt) err(c, p, 'a replacement payload does not return given DON!!');
       return;
     case 'restDon':
       if (o.restDon !== 'any') int(c, p, o.restDon);
@@ -1968,6 +1986,11 @@ function ability(c: Ctx, path: string, v: unknown, ids: Set<string>): void {
   c.abKind = typeof v.kind === 'string' ? v.kind : undefined;
   c.abHand = v.kind === 'permanent' && v.zone === 'hand';
   c.onOppAttack = v.kind === 'auto' && Array.isArray(v.when) && v.when.includes('onOpponentAttack');
+  c.attackerOk =
+    v.kind === 'auto' &&
+    Array.isArray(v.when) &&
+    v.when.length > 0 &&
+    v.when.every((w) => w === 'onOpponentAttack');
   c.evCount =
     v.kind === 'auto' &&
     Array.isArray(v.when) &&

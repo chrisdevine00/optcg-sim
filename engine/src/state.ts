@@ -226,6 +226,8 @@ export interface Ev {
 export interface History {
   turn: number;
   koed: Record<PlayerId, number>;
+  /** Cards trashed from each player's hand by an effect or cost this turn (G69); absent until one is. */
+  handTrashed?: Record<PlayerId, number>;
   events: { by: PlayerId; baseCost: number | null }[];
 }
 

@@ -20,7 +20,11 @@ export function tracksHistory(s: State): boolean {
     v = Object.values(s.defs).some((def) => {
       if (def.abilities.length === 0) return false;
       const text = JSON.stringify(def.abilities);
-      return text.includes('"koedThisTurn"') || text.includes('"eventsActivatedThisTurn"');
+      return (
+        text.includes('"koedThisTurn"') ||
+        text.includes('"eventsActivatedThisTurn"') ||
+        text.includes('"handTrashedThisTurn"')
+      );
     });
     memo.set(s.defs, v);
   }
@@ -46,4 +50,12 @@ export function recordEvent(d: Draft, by: PlayerId, baseCost: number | null): vo
   if (!tracksHistory(d.s)) return;
   const h = historyOf(d.s);
   d.s.hist = { ...h, events: [...h.events, { by, baseCost }] };
+}
+
+/** `n` cards of `owner`'s hand were trashed by an effect (or a cost, part of the effect) (G69). */
+export function recordHandTrashed(d: Draft, owner: PlayerId, n: number): void {
+  if (n <= 0 || !tracksHistory(d.s)) return;
+  const h = historyOf(d.s);
+  const was = h.handTrashed ?? { p1: 0, p2: 0 };
+  d.s.hist = { ...h, handTrashed: { ...was, [owner]: was[owner] + n } };
 }

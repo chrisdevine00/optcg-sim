@@ -10,6 +10,7 @@ import type { DonClass, InstanceId, PlayerId } from '../api.ts';
 import type { Ability, InternalStep } from '../abilities.ts';
 import { hasTiming, optionalCost } from '../abilities.ts';
 import type { Draft } from '../draft.ts';
+import { recordHandTrashed } from '../history.ts';
 import {
   abilityOf,
   collectReplacements,
@@ -109,6 +110,7 @@ function handTrashed(
 ): void {
   for (const p of ['p1', 'p2'] as const) {
     const n = held.filter((x) => x.wasHand && x.owner === p).length;
+    if (n > 0) recordHandTrashed(d, p, n);
     if (n > 0) fireTrashedFromHand(d, p, n, f.card, f.controller, cost);
   }
 }
@@ -239,6 +241,8 @@ export function costText(costs: readonly Cost[] | undefined): string {
         : 'atLeast' in k.returnDon
           ? `return ${k.returnDon.atLeast} or more DON!!`
           : `return ${k.returnDon.n} active DON!!`;
+    if ('returnGivenDon' in k)
+      return `return ${k.returnGivenDon} given DON!! to your cost area rested`;
     if ('giveDon' in k)
       return 'from' in k.giveDon
         ? `give ${k.giveDon.n} of your opponent's rested DON!!`
@@ -663,6 +667,7 @@ function payCost(d: Draft, f: EffectFrame, k: Cost, reserve: number): Out {
       return returnDon(d, f, k.returnDon.n, reserve, 'cost', true);
     return returnDon(d, f, k.returnDon, reserve, 'cost');
   }
+  if ('returnGivenDon' in k) return returnGivenDon(d, f, k.returnGivenDon);
   if ('restDon' in k) {
     const n = k.restDon === 'any' ? 0 : k.restDon;
     if (d.ro(f.controller).donActive < n) return anomaly(d, f, 'restDon');
@@ -1225,6 +1230,58 @@ function returnDon(
   if (asMany && picks.length > 0) f.acted = true;
   // "When a DON!! card on your field is returned to your DON!! deck" (OP17-062).
   fireDonReturned(d, p, picks.length, f.controller);
+  return 'next';
+}
+
+/**
+ * "Return N total of your currently given DON!! cards to your cost area rested" (G70): the player
+ * chooses which cards give them up and how many each (the DON!! of a card are not told apart, so
+ * the choice is a count per card, as for DON!! −N). They stay on the field, rested: not a return
+ * to the DON!! deck, so no `donReturned` watcher fires. One choice only when it is a choice.
+ */
+function returnGivenDon(d: Draft, f: EffectFrame, n: number): Out {
+  const p = f.controller;
+  const g = take(f);
+  let picks: DonClass[];
+  if (Array.isArray(g)) picks = g as DonClass[];
+  else {
+    const ps = d.ro(p);
+    const classes: DonClass[] = [];
+    const counts: number[] = [];
+    for (const id of [ps.leader, ...ps.characters].slice().sort()) {
+      if (d.card(id).don > 0) {
+        classes.push({ from: 'given', card: id });
+        counts.push(d.card(id).don);
+      }
+    }
+    const total = counts.reduce((a, b) => a + b, 0);
+    if (total < n) return anomaly(d, f, 'returnGivenDon');
+    if (classes.length === 1 || total === n) {
+      picks = [];
+      classes.forEach((cl, i) => {
+        for (let j = 0; j < counts[i]! && picks.length < n; j++) picks.push(cl);
+      });
+    } else {
+      return ask(d, f, {
+        kind: 'choose',
+        player: p,
+        prompt: `${nameOf(d, f)}: choose ${n} given DON!! to return to your cost area rested.`,
+        min: n,
+        max: n,
+        candidates: classes,
+        counts,
+        picked: [],
+        role: 'cost',
+      });
+    }
+  }
+  const by = new Map<InstanceId, number>();
+  for (const cl of picks) if (cl.from === 'given') by.set(cl.card, (by.get(cl.card) ?? 0) + 1);
+  for (const [id, k] of by) {
+    d.wcard(id).don -= k;
+    d.pl(p).donRested += k;
+    d.emit({ type: 'DonReturned', player: p, count: k, to: 'costRested', from: id });
+  }
   return 'next';
 }
 

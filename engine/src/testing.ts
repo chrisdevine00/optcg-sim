@@ -54,6 +54,8 @@ export interface ModSpec {
   target: InstanceId;
   amount?: number;
   keyword?: string;
+  /** For `grantAttribute` (G59). */
+  attribute?: string;
   /** For the scoped restrictions (`cannotBeKOd`, `cannotBeRested`), see `Modifier.scope`. */
   scope?: Modifier['scope'];
   duration: Duration;
@@ -126,6 +128,7 @@ export function applyOp(state: GameState, op: TestOp): Step {
         target: op.mod.target,
         amount: op.mod.amount ?? 0,
         keyword: op.mod.keyword,
+        ...(op.mod.attribute ? { attribute: op.mod.attribute } : {}),
         ...(op.mod.scope ? { scope: op.mod.scope } : {}),
         duration: op.mod.duration,
         controller: op.mod.controller,
