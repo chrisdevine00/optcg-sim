@@ -2,6 +2,15 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-25 — Leak property: a deck top revealed in place repeats its handle by design (ENGINE_VERSION stays 0.5.16)
+
+- **Context:** the standard-decks leak property failed at seed 1045752502 (PROPERTY_SEED 298648808): p1 "relinked" `$cbefi8i` by handle in `CardMoved.newInstance`. Replay: p1's OP11-073 reveals the top card of p2's deck (G44, `reveal ... player: 'opponent'`: `CardRevealed` from `deck`, fresh key, card stays on top, `markKnown` for both players); several actions later p2's OP14-081 [On Play] mills 3, the first being that card, which leaves the deck to the trash (face up, so the key is not re-rolled) with the handle it was revealed under. `State.known` still held it for both players just before the move.
+- **Finding:** not a hidden-information leak. The card never left the deck or was shuffled (a move into a hidden zone, a shuffle and `ops.moveCard` out of the deck's order all re-roll the key), and the engine records the viewer as knowing which card sits at that deck position (`known` map in the view). Seeing the same handle when it is milled tells p1 only what p1 was already shown. The engine behaves as ADR 0005 states; the test tracker only knew the Life "revealed in place" exemption (M4b-09) and treated the deck top as a hidden stretch.
+- **Decision:** `LinkTracker` generalises the in-place exemption (`revealedInPlace`) to a `CardRevealed` from `deck` as well as `life`: that handle only, for the very next sighting (any sighting of the card now spends it, so a later return under an old handle still fails). Planted tests in `link-tracker.test.ts`: the deck repeat passes, a shuffled-then-returned old handle fails, a never-revealed card gets no exemption; seed 1045752502 is pinned as a fast-check example in the standard leak property. Reverting the tracker change fails the pinned seed and the new tracker test.
+- **origin/main (dd89651):** same engine and scripts path (G44 and both scripts are in it) but the property run `PROPERTY_SEED=298648808 ENGINE_GAMES=2000` passes there (the games diverge, the pattern is simply not sampled); the replayed seed passes too. No deployed behaviour is affected, since nothing in `engine/src` or the scripts changed.
+- **Alternatives rejected:** re-rolling the key when a known deck card is milled (the handle would then differ from the reveal the viewer saw, breaking the UI's reveal-to-trash continuity for no information gain); exempting every `known` card regardless of handle (weaker: it would also let an old handle through after a re-key).
+- **ENGINE_VERSION:** no bump. Only test support and tests changed; no recorded game or hash changes, goldens untouched.
+
 ## 2026-11-25 — G68: turn the top or bottom Life card face-up or face-down (ENGINE_VERSION stays 0.5.16)
 
 - **Context:** ST36-005 Eustass "Captain" Kid pays two costs by turning "1 card from the top or bottom of your Life cards" face-down or face-up, which the G8 cost (the top N) cannot say.

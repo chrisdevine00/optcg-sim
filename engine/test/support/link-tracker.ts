@@ -6,9 +6,15 @@
  * - a card revealed from a player's hand stays known while it stays there (`revealedInHand`);
  * - a Life card revealed in place (OP15-119, OP15-114 style) keeps its handle, because the card
  *   did not move: the viewer saw "this handle is that card", the view shows it hidden again, and
- *   when that same card later moves or is revealed again the handle repeats (`revealedInLife`,
+ *   when that same card later moves or is revealed again the handle repeats (`revealedInPlace`,
  *   review M4b-09). The exemption covers exactly that handle, is spent by the next sighting, and
  *   a card that was never revealed in Life gets none.
+ * - the same holds for a deck top revealed in place (OP11-073 "reveal the top card of your
+ *   opponent's deck", G44): the card stays on top, the engine records both players as knowing it
+ *   (`State.known`) and keeps its projection key until it moves out of the deck or the deck is
+ *   shuffled (either re-rolls the key). The view shows its position hidden again; when the same
+ *   card is later milled or played from there, the handle repeats, and the viewer learns nothing,
+ *   as they were told which card sat there. Same narrow rules: that handle only, spent once.
  */
 import type { PlayerId } from '../../src/index.ts';
 
@@ -16,8 +22,11 @@ export class LinkTracker {
   readonly seen: Record<PlayerId, Map<string, Set<string>>> = { p1: new Map(), p2: new Map() };
   readonly hiddenSince: Record<PlayerId, Set<string>> = { p1: new Set(), p2: new Set() };
   readonly revealedInHand: Record<PlayerId, Set<string>> = { p1: new Set(), p2: new Set() };
-  /** Life cards revealed in place, with the handle the viewer was shown. */
-  readonly revealedInLife: Record<PlayerId, Map<string, string>> = { p1: new Map(), p2: new Map() };
+  /** Life or deck cards revealed in place, with the handle the viewer was shown. */
+  readonly revealedInPlace: Record<PlayerId, Map<string, string>> = {
+    p1: new Map(),
+    p2: new Map(),
+  };
   relinks = 0;
   returns = 0;
   /** How many repeats the Life exemption allowed (so a test can see it is exercised). */
@@ -31,8 +40,7 @@ export class LinkTracker {
     if (this.hiddenSince[v].has(id)) {
       this.returns++;
       if (set.has(h)) {
-        if (this.revealedInLife[v].get(id) === h) {
-          this.revealedInLife[v].delete(id); // spent: the same card, in the same place
+        if (this.revealedInPlace[v].get(id) === h) {
           this.exempted++;
         } else {
           this.relinks++;
@@ -40,6 +48,8 @@ export class LinkTracker {
         }
       }
     }
+    // Any sighting spends the exemption: it covers the very next one only (`revealed` re-arms it).
+    this.revealedInPlace[v].delete(id);
     set.add(h);
     this.seen[v].set(id, set);
     this.hiddenSince[v].delete(id);
@@ -48,7 +58,7 @@ export class LinkTracker {
   /** A `CardRevealed` event showed the viewer card `id` (handle `h`) from `from`. */
   revealed(v: PlayerId, id: string, h: string, from: string | undefined): void {
     this.revealedInHand[v].add(id);
-    if (from === 'life') this.revealedInLife[v].set(id, h);
+    if (from === 'life' || from === 'deck') this.revealedInPlace[v].set(id, h);
   }
 
   /** The viewer's view shows card `id` face-down in `zone`. */

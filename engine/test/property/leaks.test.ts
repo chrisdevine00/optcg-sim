@@ -315,7 +315,14 @@ describe.each([false, true])(
             exempted += t.exempted;
           }),
         ),
-        { numRuns: RUNS, seed: propertySeed(standard ? 310 : 300), endOnFailure: standard },
+        {
+          numRuns: RUNS,
+          seed: propertySeed(standard ? 310 : 300),
+          endOnFailure: standard,
+          // Pinned: a deck top revealed in place by OP11-073 (G44) and milled later by OP14-081
+          // repeats its handle, which the tracker must allow (it is a known card, not a relink).
+          examples: standard ? [[1045752502]] : [],
+        },
       );
       expect(exempted).toBeGreaterThanOrEqual(0);
       expect(returns).toBeGreaterThan(0); // cards did come back from hidden zones
