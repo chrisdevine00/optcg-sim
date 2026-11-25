@@ -690,14 +690,25 @@ function cost(c: Ctx, path: string, v: unknown): void {
   const p = `${path}.${k}`;
   if (!has(IMPLEMENTED.costs, k)) err(c, path, `cost ${k} is not implemented in the runtime yet`);
   switch (k) {
-    case 'donMinus':
     case 'turnLifeFaceUp':
     case 'turnLifeFaceDown':
+      if (isObj(o[k])) {
+        // "Turn 1 card from the top or bottom of your Life cards face-up/down" (G68).
+        const spec = o[k] as Obj;
+        fields(c, p, spec, ['n', 'from']);
+        enumOf(c, `${p}.from`, spec.from, ['top', 'bottom', 'topOrBottom']);
+        int(c, `${p}.n`, spec.n);
+        if (spec.n !== 1) err(c, `${p}.n`, 'only n = 1 is implemented');
+        return;
+      }
+      int(c, p, o[k]);
+      if (k === 'turnLifeFaceDown' && (o[k] as number) < 1) err(c, p, 'must be at least 1');
+      return;
+    case 'donMinus':
     case 'trashLife':
     case 'mill':
       int(c, p, o[k]);
-      if ((k === 'turnLifeFaceDown' || k === 'trashLife') && (o[k] as number) < 1)
-        err(c, p, 'must be at least 1');
+      if (k === 'trashLife' && (o[k] as number) < 1) err(c, p, 'must be at least 1');
       return;
     case 'returnDon':
       // A number: DON!! from anywhere on the field. `{ n, state: 'active' }`: active cost-area DON!! (G9).

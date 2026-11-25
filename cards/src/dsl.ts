@@ -381,14 +381,22 @@ export type Cost =
   | { restSelf: true }
   | { trashSelf: true }
   | { lifeToHand: { from: 'top' | 'topOrBottom'; n: number } }
-  | { turnLifeFaceUp: number }
+  /**
+   * "Turn N of your Life cards face-up": the top N, which must be face-down. The object form (G68)
+   * is "turn 1 card from the top or bottom of your Life cards face-up": one card at the named end
+   * (`topOrBottom`: the player picks an end whose card is face-down; the choice is public).
+   */
+  | { turnLifeFaceUp: number | { n: 1; from: 'top' | 'bottom' | 'topOrBottom' } }
   /**
    * "Give your active Leader -5000 power during this turn" as a cost (G62): a modifier on the card
    * a cost selector names (your Leader), paid only while that card matches (an active Leader).
    */
   | { power: { target: Selector; amount: number; duration: Duration } }
-  /** "Turn N of your Life cards face-down": the top N, which must be face-up (G8). */
-  | { turnLifeFaceDown: number }
+  /**
+   * "Turn N of your Life cards face-down": the top N, which must be face-up (G8). The object form
+   * (G68) names the end, as `turnLifeFaceUp` does, and needs a face-up card at it.
+   */
+  | { turnLifeFaceDown: number | { n: 1; from: 'top' | 'bottom' | 'topOrBottom' } }
   | { mill: number }
   /**
    * "Trash N cards from the top of your Life cards" (G30): not damage, so no [Trigger]; the card

@@ -315,7 +315,10 @@ export const COST_SRC: ReadonlyArray<readonly [string, string]> = [
   ['cost:trashSelf', String.raw`trash this (?:Character|Stage|card)`],
   ['cost:revealFromHand', String.raw`reveal \d+ `],
   ['cost:lifeToHand', String.raw`add \d+ cards? from the top (?:or bottom )?of your Life`],
-  ['cost:lifeFaceUp', String.raw`turn \d+ cards? from the top of your Life cards face-up`],
+  [
+    'cost:lifeFaceUp',
+    String.raw`turn \d+ cards? from the top(?: or bottom)? of your Life cards face-(?:up|down)`,
+  ],
   ['cost:mill', String.raw`trash \d+ cards? from the top of your deck`],
   ['cost:restOwnCharacters', String.raw`rest \d+ of your Characters|rest \d+ of your cards`],
   [

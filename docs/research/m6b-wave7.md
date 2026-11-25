@@ -61,7 +61,7 @@ Each is an open question with the competing reading (docs/OPEN-QUESTIONS.md M6b-
 
 ## Deferred
 
-- **ST36-005** (Eustass "Captain" Kid, in the lead's list for D3) is not expressible after this wave: both its costs turn the top **or bottom** Life card face-down or face-up, a cost form the DSL does not have (`turnLifeFaceDown` and `turnLifeFaceUp` are the top N). It is not one of the audit's gaps. The redirect it needs is built.
+- **ST36-005** (Eustass "Captain" Kid, in the lead's list for D3) was not expressible after G59 to G67 and D3: both its costs turn the top **or bottom** Life card face-down or face-up. Built afterwards as G68 (below) and scripted.
 - **EB01-029 and EB01-038** (a [Counter] that changes an attack's target) would need `redirectAttack` in a [Counter] timing; the validator allows only `onOpponentAttack`, as the audit's cards need.
 - `redirectAttack` does not restart or repeat anything: a redirect after a Blocker was declared does nothing.
 - Two permanents that negate each other are read as both negating (no card makes one). `negate` filters read printed values only.
@@ -83,6 +83,18 @@ Each is an open question with the competing reading (docs/OPEN-QUESTIONS.md M6b-
 - **ST-20:** ST20-003 (G64, with wave 6's G57).
 
 20 cards (the audit's count). Cumulative with waves 1 to 6: 1,164 of 1,175 once they are scripted.
+
+## G68: a Life card at the top or bottom turned face-up or face-down (ST36-005)
+
+ST36-005 Eustass "Captain" Kid pays both its costs by turning "1 card from the top or bottom of your Life cards" face-down (its [On Your Opponent's Attack]) or face-up (its [Activate: Main]). The G8 cost takes the top N only, so the card was left out of the wave. Built by extending the G8 cost, not adding one:
+
+- **DSL:** `turnLifeFaceUp` and `turnLifeFaceDown` take a number (the top N, as before) or `{ n: 1, from: 'top' | 'bottom' | 'topOrBottom' }`. The validator refuses `n` other than 1, an unknown or missing `from`, and extra fields. No effect form: the G41 action `turnLifeFaceDown: 'all'` is unchanged, and no card needs an end for an effect.
+- **Rule (M6b-Q59 applied to an end):** the card at the chosen end must be in the opposite face state (face-up to turn down, face-down to turn up). `topOrBottom` lets the player choose either end that can be paid, so a face-down top does not stop a face-up bottom. With one payable end it is used without asking; with two, a `choose` (role `mode`, options `top`, `bottom`) is asked; one Life card is one end. The ends are the first and last of the Life list, never a middle card.
+- **Runtime:** `lifeFaceEnds` in `eval.ts` (the payable ends, shared by `payable` and the payment), `faceCostEnd` and the object branches of `payCost` in `run.ts` (the existing `lifeEnd` prompt, `turnFaceDown` for a fresh handle, `turnFaceUp` for the public reveal); `costText` names the end.
+- **Hidden information:** the payable test reads only `faceUp`, which both players see; the choice of end is public; a turned-down card is hidden under a fresh handle as in G8, a turned-up card becomes public as in G8's mirror. `hidden.ts` `cost()` returns false (a note records why); `hidden-gate.ts` needs no entry (no `exists` or count over Life gates a prompt: the optional-cost prompt shows whether the cost can be paid, which is a public face state).
+- **Lethal bound:** `scanAbility` never reads costs, and a Life turn changes no Life count, so the shape stays classified by its effects (here `redirectAttack` and `giveDon`, both already allowed); `ai/test/m6b-w7-bound.test.ts` is not changed.
+- **Test:** `engine/test/cards/m6b-w7/g68-life-face-end.test.ts` (7 tests). With `eval.ts` and `run.ts` reverted, 6 of 7 fail (the seventh is the validator test), and the 5 ST36-005 tests fail with them (11 of 12 together).
+- **Measure:** the `cost:lifeFaceUp` pattern now also matches "from the top or bottom" and "face-down"; ST-36 is 5 of 5 scripted (overall coverage report regenerated), and OP15-099 and OP08-063 move from `cost:other` to `cost:lifeFaceUp` (both costs are implemented).
 
 ## Results
 

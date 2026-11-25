@@ -356,6 +356,40 @@ export const allHold = (c: Ctx, ks: readonly Condition[] | undefined): boolean =
 // Costs (CR 8-3-1, effect-dsl §4.5, E-D6)
 // ---------------------------------------------------------------------------------------------
 
+/**
+ * The ends of your Life cards a face-turning cost can use (G68): `ends` is the end (or the ends)
+ * whose card is in the face state the cost needs (face-down to turn up, face-up to turn down).
+ * Only the public face state is read, never a card.
+ */
+export function lifeFaceEnds(
+  s: State,
+  p: PlayerId,
+  from: 'top' | 'bottom' | 'topOrBottom',
+  wantFaceUp: boolean,
+): ('top' | 'bottom')[] {
+  const life = s.players[p].life;
+  if (life.length === 0) return [];
+  const ok = (id: InstanceId): boolean => s.cards[id]!.faceUp === wantFaceUp;
+  const out: ('top' | 'bottom')[] = [];
+  if (from !== 'bottom' && ok(life[0]!)) out.push('top');
+  if (from !== 'top' && ok(life[life.length - 1]!)) out.push('bottom');
+  // One Life card is both ends: there is nothing to choose.
+  if (life.length === 1 && out.length === 2) out.pop();
+  return out;
+}
+
+/** Is a face-turning cost payable? A number turns the top N, all in the needed state (G8). */
+function lifeFaceCost(
+  s: State,
+  p: PlayerId,
+  spec: number | { n: 1; from: 'top' | 'bottom' | 'topOrBottom' },
+  needFaceUp: boolean,
+): boolean {
+  if (typeof spec !== 'number') return lifeFaceEnds(s, p, spec.from, needFaceUp).length > 0;
+  const top = s.players[p].life.slice(0, spec);
+  return top.length >= spec && top.every((id) => s.cards[id]!.faceUp === needFaceUp);
+}
+
 export interface PayOptions {
   /** A play cost paid first from active cost-area DON!! (an Event's own cost, CR 2-7-3). */
   playCost?: number;
@@ -426,13 +460,11 @@ export function payable(c: Ctx, costs: readonly Cost[] | undefined, o: PayOption
       lifeNeeds += k.lifeToHand.n;
     } else if ('trashLife' in k) lifeNeeds += k.trashLife;
     else if ('turnLifeFaceUp' in k) {
-      // The top Life card is turned: it must be there and face-down.
-      const top = ps.life.slice(0, k.turnLifeFaceUp);
-      if (top.length < k.turnLifeFaceUp || top.some((id) => s.cards[id]!.faceUp)) return false;
+      // The top Life card is turned: it must be there and face-down (an end, G68).
+      if (!lifeFaceCost(s, c.you, k.turnLifeFaceUp, false)) return false;
     } else if ('turnLifeFaceDown' in k) {
-      // The mirror: the top Life cards must be there and face-up (G8).
-      const top = ps.life.slice(0, k.turnLifeFaceDown);
-      if (top.length < k.turnLifeFaceDown || top.some((id) => !s.cards[id]!.faceUp)) return false;
+      // The mirror: the Life cards must be there and face-up (G8, G68).
+      if (!lifeFaceCost(s, c.you, k.turnLifeFaceDown, true)) return false;
     } else if ('mill' in k) millNeeds += k.mill;
     else if ('rest' in k)
       restNeeds.push({

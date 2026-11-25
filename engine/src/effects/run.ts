@@ -57,6 +57,7 @@ import {
   dvOf,
   hiddenPool,
   holds,
+  lifeFaceEnds,
   matches,
   num,
   payable,
@@ -225,7 +226,10 @@ export function costText(costs: readonly Cost[] | undefined): string {
         ? `give ${k.giveDon.n} of your opponent's rested DON!!`
         : `give ${k.giveDon.n} active DON!!`;
     if ('ko' in k) return 'K.O. 1 of your Characters';
-    if ('turnLifeFaceDown' in k) return `turn ${k.turnLifeFaceDown} of your Life cards face-down`;
+    if ('turnLifeFaceDown' in k)
+      return typeof k.turnLifeFaceDown === 'number'
+        ? `turn ${k.turnLifeFaceDown} of your Life cards face-down`
+        : `turn the ${endWords(k.turnLifeFaceDown.from)} of your Life cards face-down`;
     if ('power' in k)
       return `give your Leader ${k.power.amount > 0 ? '+' : '\u2212'}${Math.abs(k.power.amount)} power`;
     if ('restDon' in k) return `rest ${String(k.restDon)} DON!!`;
@@ -245,7 +249,10 @@ export function costText(costs: readonly Cost[] | undefined): string {
     if ('restSelf' in k) return 'rest this card';
     if ('trashSelf' in k) return 'trash this card';
     if ('lifeToHand' in k) return `add ${k.lifeToHand.n} of your Life cards to your hand`;
-    if ('turnLifeFaceUp' in k) return `turn ${k.turnLifeFaceUp} of your Life cards face-up`;
+    if ('turnLifeFaceUp' in k)
+      return typeof k.turnLifeFaceUp === 'number'
+        ? `turn ${k.turnLifeFaceUp} of your Life cards face-up`
+        : `turn the ${endWords(k.turnLifeFaceUp.from)} of your Life cards face-up`;
     if ('mill' in k) return `trash ${k.mill} cards from the top of your deck`;
     if ('rest' in k) {
       const n = k.rest.pick && 'exactly' in k.rest.pick ? k.rest.pick.exactly : 1;
@@ -726,8 +733,25 @@ function payCost(d: Draft, f: EffectFrame, k: Cost, reserve: number): Out {
     if (cannotLifeToHandByEffect(d.s, f.controller)) return anomaly(d, f, 'lifeToHand');
     return lifeToHandCost(d, f, k.lifeToHand);
   }
+  if ('turnLifeFaceUp' in k && typeof k.turnLifeFaceUp !== 'number') {
+    // One card at the top, the bottom or an end of your choice (G68).
+    const end = faceCostEnd(d, f, k.turnLifeFaceUp.from, false);
+    if (end === WAIT) return WAIT;
+    if (end === undefined) return anomaly(d, f, 'turnLifeFaceUp');
+    const life = d.ro(f.controller).life;
+    turnFaceUp(d, end === 'top' ? life[0]! : life[life.length - 1]!, f.controller);
+    return 'next';
+  }
+  if ('turnLifeFaceDown' in k && typeof k.turnLifeFaceDown !== 'number') {
+    const end = faceCostEnd(d, f, k.turnLifeFaceDown.from, true);
+    if (end === WAIT) return WAIT;
+    if (end === undefined) return anomaly(d, f, 'turnLifeFaceDown');
+    const life = d.ro(f.controller).life;
+    turnFaceDown(d, [end === 'top' ? life[0]! : life[life.length - 1]!], f.controller);
+    return 'next';
+  }
   if ('turnLifeFaceUp' in k) {
-    for (let i = 0; i < k.turnLifeFaceUp; i++) {
+    for (let i = 0; i < (k.turnLifeFaceUp as number); i++) {
       const top = d.ro(f.controller).life[i];
       if (top === undefined || d.card(top).faceUp) return anomaly(d, f, 'turnLifeFaceUp');
       turnFaceUp(d, top, f.controller);
@@ -737,8 +761,8 @@ function payCost(d: Draft, f: EffectFrame, k: Cost, reserve: number): Out {
   if ('turnLifeFaceDown' in k) {
     // The top N Life cards, all face-up, go face-down (G8). A fresh key: the card is hidden again,
     // and nothing the viewers saw while it was face-up links to it (CR 3-2-6-1 areas).
-    const ids = d.ro(f.controller).life.slice(0, k.turnLifeFaceDown);
-    if (ids.length < k.turnLifeFaceDown || ids.some((id) => !d.card(id).faceUp))
+    const ids = d.ro(f.controller).life.slice(0, k.turnLifeFaceDown as number);
+    if (ids.length < (k.turnLifeFaceDown as number) || ids.some((id) => !d.card(id).faceUp))
       return anomaly(d, f, 'turnLifeFaceDown');
     turnFaceDown(d, ids, f.controller);
     return 'next';
@@ -930,6 +954,29 @@ function lifeEnd(d: Draft, f: EffectFrame, prompt?: string): 'top' | 'bottom' | 
       ],
     });
   return (g[0] as { option: string }).option === 'bottom' ? 'bottom' : 'top';
+}
+
+const endWords = (from: 'top' | 'bottom' | 'topOrBottom'): string =>
+  from === 'topOrBottom' ? 'top or bottom card' : `${from} card`;
+
+/**
+ * The end of your Life cards a face-turning cost uses (G68). Only the ends whose card is in the
+ * needed face state can be chosen (a public fact); with two the controller picks one, which the
+ * opponent sees. `undefined` when neither can be paid.
+ */
+function faceCostEnd(
+  d: Draft,
+  f: EffectFrame,
+  from: 'top' | 'bottom' | 'topOrBottom',
+  needFaceUp: boolean,
+): 'top' | 'bottom' | undefined | typeof WAIT {
+  const ends = lifeFaceEnds(d.s, f.controller, from, needFaceUp);
+  if (ends.length < 2) return ends[0];
+  return lifeEnd(
+    d,
+    f,
+    `${nameOf(d, f)}: turn the top or the bottom card of your Life cards face-${needFaceUp ? 'down' : 'up'}?`,
+  );
 }
 
 /**
