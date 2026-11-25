@@ -1642,8 +1642,14 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
     // controller's Leader, read by `collectReplacements` like a printed one (ability `mod-<id>`).
     const r = a.addReplacement;
     const id = d.s.nextMod;
+    // The cards it covers are the ones that match now (LF-R1): a Character played later is not.
+    const rp = r.replaces;
+    const sel =
+      'ko' in rp ? rp.ko : 'leaveField' in rp ? rp.leaveField : 'rest' in rp ? rp.rest : null;
+    const covers = sel ? pool(ctxOf(d, f), sel) : undefined;
     addModifier(d, {
       kind: 'replacement',
+      ...(covers ? { covers } : {}),
       target: d.ro(you).leader,
       amount: 0,
       duration: duration(d, f, r.duration),

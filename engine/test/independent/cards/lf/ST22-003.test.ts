@@ -96,6 +96,7 @@ describe('ST22-003 Edward.Newgate: [On Play] reveal the top card; if Whitebeard 
   it('must not happen: on the turn it is played it cannot attack (no [Rush])', () => {
     const g = play([MISS, MISS]);
     const edward = g.find('p1', 'characters', ID);
+    expect(g.decider).toBe('p1');
     expect(g.legal().some((a) => a.type === 'attack' && a.attacker === edward)).toBe(false);
     expect(passBlock).toBeTypeOf('function');
   });

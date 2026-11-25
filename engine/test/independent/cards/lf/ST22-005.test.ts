@@ -213,6 +213,7 @@ describe("ST22-005 Kouzuki Oden: replacement for removal by the opponent's effec
     const g = field([SL.c2]);
     oppKo(g, at(g, 'p1', 'characters', ID));
     if (kind(g) === 'optional') {
+      expect(g.decider).toBe('p1');
       expect(g.legal().some((a) => a.type === 'optional' && a.accept)).toBe(false);
       act(g, { type: 'optional', accept: false });
     }

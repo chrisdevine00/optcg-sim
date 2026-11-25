@@ -171,6 +171,65 @@ describe("EB02-030 And That's When Somebody Makes Fun of Their Friend's Dream!!!
     expect(g.zone('p1', 'characters')).toHaveLength(0);
   });
 
+  /**
+   * LF-R1, official EB-02 Q&A: a Character played after the Counter is not covered. p1's top Life
+   * card is OP14-106 Salome (Blocker, [Trigger] "Play this card"): the first attack on the Leader
+   * makes p1 play her after the Event; her later block-and-K.O. is not replaced.
+   */
+  const salomeProbe = () => {
+    const g = game(
+      {
+        leader: PLAIN_PURPLE,
+        life: ['OP14-106', V.c4],
+        hand: [ID, V.c3],
+        costArea: { active: 2, rested: 0 },
+        characters: [{ card: V.c1, rested: true }],
+      },
+      { leader: PLAIN_BLUE, characters: [V.c7, V.c6] },
+      { activePlayer: 'p2', turn: 4 },
+    );
+    g.act({ type: 'attack', attacker: g.find('p2', 'characters', V.c7), target: g.leader('p1') });
+    passBlock(g);
+    useCounter(g, ID);
+    endCounter(g);
+    expectDecision(g, 'trigger', 'p1');
+    g.act({ type: 'trigger', activate: true });
+    return g;
+  };
+
+  it('LF-R1: a Character played after the Counter is not covered (Salome, official Q&A)', () => {
+    const g = salomeProbe();
+    const salome = g.find('p1', 'characters', 'OP14-106');
+    g.act({ type: 'attack', attacker: g.find('p2', 'characters', V.c6), target: g.leader('p1') });
+    expectDecision(g, 'block', 'p1');
+    g.act({ type: 'block', blocker: salome });
+    endCounter(g);
+    expect(asked(g)).toBe(false);
+    expect(g.zone('p1', 'characters').map((c) => c.card)).toEqual([V.c1]);
+    expect(trash(g, 'p1')).toContain('OP14-106');
+    expect(hand(g, 'p1')).toEqual([V.c3]);
+  });
+
+  it('LF-R1 control: a Character on the field before the Counter is still covered after Salome is played', () => {
+    const g = salomeProbe();
+    g.act({
+      type: 'attack',
+      attacker: g.find('p2', 'characters', V.c6),
+      target: g.find('p1', 'characters', V.c1),
+    });
+    passBlock(g);
+    endCounter(g);
+    expect(asked(g)).toBe(true);
+    accept(g);
+    pick(g, [g.find('p1', 'hand', V.c3)]);
+    expect(
+      g
+        .zone('p1', 'characters')
+        .map((c) => c.card)
+        .sort(),
+    ).toEqual(['OP14-106', V.c1].sort());
+  });
+
   it('[Trigger] draws 1 card', () => {
     const g = damageWithP2(ID, { hand: [V.c3] });
     g.act({ type: 'trigger', activate: true });

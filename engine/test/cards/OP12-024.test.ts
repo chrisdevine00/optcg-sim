@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { dec, expectDecision, none, pick, PLAIN_BLUE, V } from './helpers.ts';
 import { koBy, mine, offered, OTHER_LEADER, plantOpponentEffect, theirs } from './helpers-lfa.ts';
+import { raiseCost } from './helpers-lfc.ts';
 
 const ID = 'OP12-024';
 
@@ -82,6 +83,19 @@ describe('OP12-024 Gyukimaru', () => {
       none(g);
       expect(restedOf(g, V.c6)).toBe(false);
       expect(dec(g)?.kind).toBe('block');
+    });
+
+    it('LF-R3: the BASE cost is read, not the current one (a raised 6 is in, a lowered 7 is out)', () => {
+      const g = mine(
+        OTHER_LEADER,
+        { characters: [{ card: ID, don: 3 }] },
+        { characters: [V.c6, V.c7] },
+        5,
+      );
+      raiseCost(g, g.find('p2', 'characters', V.c6), 2); // current 8, base 6
+      raiseCost(g, g.find('p2', 'characters', V.c7), -2); // current 5, base 7
+      g.act({ type: 'attack', attacker: g.find('p1', 'characters', ID), target: g.leader('p2') });
+      expect(offered(g)).toEqual([g.find('p2', 'characters', V.c6)]);
     });
 
     it('only opposing Characters: your own are not offered', () => {

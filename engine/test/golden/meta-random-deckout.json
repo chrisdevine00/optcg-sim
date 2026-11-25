@@ -1,8 +1,8 @@
 {
-  "note": "Random legal game, seed 1005, passive policy. Engine 0.5.17.",
+  "note": "Random legal game, seed 1005, passive policy. Engine 0.5.18.",
   "record": {
     "versions": {
-      "engine": "0.5.17",
+      "engine": "0.5.18",
       "cards": "cards-0435927c54d8b315",
       "scripts": "scripts-13db9aefbf290316"
     },

@@ -125,6 +125,7 @@ describe('ST25-004 Buggy: [Activate: Main] trash a card and this Character: with
     if (offered.length > 0) {
       act(g, { type: 'activate', card: buggy, ability: offered[0]! });
       if (kind(g) === 'optional') {
+        expect(g.decider).toBe('p1');
         expect(g.legal().some((a) => a.type === 'optional' && a.accept)).toBe(false);
         act(g, { type: 'optional', accept: false });
       }

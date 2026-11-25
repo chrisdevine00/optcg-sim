@@ -37,6 +37,6 @@ export const EB02_030: CardScript = {
   ],
   rulings: [
     "reading (M6b-Q54): the replacement lasts to the end of the turn and is offered for every Character of yours that would be K.O.'d in battle, each time, not only the first; each acceptance trashes 1 more card from the hand",
-    'reading: "any of your Characters" is every Character on your field when the K.O. happens, including one played after the Event; your Leader is not a Character and is not covered',
+    'official EB-02 Q&A (LF-R1): "any of your Characters" is the Characters you have when the Event resolves; one played after it is not covered (the engine fixes the covered cards when the replacement is created); your Leader is not a Character and is not covered',
   ],
 };

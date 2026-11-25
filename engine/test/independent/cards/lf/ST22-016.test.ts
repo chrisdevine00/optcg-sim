@@ -149,6 +149,7 @@ describe('ST22-016 Take That Back!!: [Counter] reveal the top card; if Whitebear
     const g = mine(LB.neutral, { hand: [ID] });
     expect(atMain(g)).toBe(true);
     const card = g.find('p1', 'hand', ID);
+    expect(g.decider).toBe('p1');
     expect(g.legal().some((a) => a.type === 'playCard' && a.card === card)).toBe(false);
     expect(canCounterNow(g, card)).toBe(false);
   });

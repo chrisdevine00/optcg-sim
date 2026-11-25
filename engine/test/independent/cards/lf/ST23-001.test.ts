@@ -49,6 +49,7 @@ function hold(o: {
 
 const canPlay = (g: ReturnType<typeof hold>) => {
   const card = g.find('p1', 'hand', ID);
+  expect(g.decider).toBe('p1');
   return g.legal().some((a) => a.type === 'playCard' && a.card === card);
 };
 

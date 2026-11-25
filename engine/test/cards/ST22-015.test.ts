@@ -76,6 +76,18 @@ describe('ST22-015 I Am Whitebeard!!', () => {
     expect(g.life('p1')).toBe(3);
   });
 
+  it('LF-R3 boundary: with exactly 1 Life card the step is offered and takes it (the gate is 1 or more)', () => {
+    const g = start([EDWARD], WB_LEADER, [V.c2]);
+    playEdward(g);
+    expectDecision(g, 'optional', 'p1');
+    accept(g);
+    // The only Life card is the top and the bottom one: answer whatever is asked with its first pick.
+    while (dec(g)?.kind === 'choose') g.act(g.legal().find((a) => a.type === 'pick')!);
+    expect(g.life('p1')).toBe(0);
+    expect(hand(g, 'p1')).toEqual([V.c2]);
+    expect(g.power(g.leader('p1'))).toBe(7000);
+  });
+
   it('with no Life cards the Life step is skipped', () => {
     const g = start([EDWARD], WB_LEADER, []);
     playEdward(g);

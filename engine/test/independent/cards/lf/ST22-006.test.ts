@@ -68,6 +68,7 @@ describe('ST22-006 Jozu: [On Play] reveal the top card; if Whitebeard Pirates, d
     const g = play([SL.wb4, SL.c2, SL.c4], [SL.c1]);
     need(g, 'choose', 'p1');
     expect(choices(g).length).toBeGreaterThan(0);
+    expect(g.decider).toBe('p1');
     expect(g.legal().some((a) => a.type === 'done')).toBe(false);
   });
 

@@ -63,6 +63,7 @@ describe('ST28-004 Kouzuki Momonosuke', () => {
       const g = mk(1, 1, 0, { playedThisTurn: true });
       const before = don(g, 'p1');
       const power = pw(g, me(g));
+      expect(g.decider).toBe('p1');
       expect(g.legal().some((a) => a.type === 'attack' && a.attacker === me(g))).toBe(false);
       act(g);
       expect(given(g)).toEqual({ leader: 0, me: 0, other: 0 });

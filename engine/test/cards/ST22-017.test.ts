@@ -70,6 +70,7 @@ describe('ST22-017 Fire Fist', () => {
     const h = start([WB4, V.c1, V.c2]);
     play(h, ID);
     if (dec(h)?.kind === 'optional') {
+      expect(h.decider).toBe('p1');
       expect(h.legal().some((a) => a.type === 'optional' && a.accept)).toBe(false);
       decline(h);
     }

@@ -112,8 +112,10 @@ describe('OP11-023 Arlong', () => {
 
   it('boundary: 3 active DON!! cannot play the reduced Arlong; without the reduction 4 cannot either', () => {
     const g = handGame({ active: 3 });
+    expect(g.decider).toBe('p1');
     expect(g.legal().some((x) => x.type === 'playCard')).toBe(false);
     const h = handGame({ active: 4, myLife: 4 });
+    expect(h.decider).toBe('p1');
     expect(h.legal().some((x) => x.type === 'playCard')).toBe(false);
   });
 

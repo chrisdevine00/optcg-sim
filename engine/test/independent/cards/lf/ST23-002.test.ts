@@ -44,6 +44,7 @@ function hold(leader: string, o: { active: number; p2chars?: string[]; chars?: s
 const cost = (g: ReturnType<typeof hold>) => g.card(g.find('p1', 'hand', ID)).cost;
 const canPlay = (g: ReturnType<typeof hold>) => {
   const card = g.find('p1', 'hand', ID);
+  expect(g.decider).toBe('p1');
   return g.legal().some((a) => a.type === 'playCard' && a.card === card);
 };
 

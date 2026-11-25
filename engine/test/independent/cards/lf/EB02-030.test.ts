@@ -81,7 +81,9 @@ describe("EB02-030 And That's When Somebody Makes Fun of Their Friend's Dream!!!
     const g = mine('ST01-001', { hand: [EVENT] });
     const e = at(g, 'p1', 'hand', EVENT);
     expect(g.card(e).cost).toBe(2);
+    expect(g.decider).toBe('p1');
     expect(g.legal().some((a) => a.type === 'playCard' && a.card === e)).toBe(false);
+    expect(g.decider).toBe('p1');
     expect(g.legal().some((a) => a.type === 'activate' && a.card === e)).toBe(false);
   });
 
@@ -164,6 +166,43 @@ describe("EB02-030 And That's When Somebody Makes Fun of Their Friend's Dream!!!
     expect(atMain(g, 'p2')).toBe(true);
     // Second attack: on the rested Marco. The replacement is offered although the Event was used earlier.
     attack(g, at(g, 'p2', 'characters', thatch, 1), at(g, 'p1', 'characters', marco));
+    noDefence(g);
+    need(g, 'optional', 'p1');
+    yes(g, 'p1');
+    payHand(g, [mohji]);
+    expect(chars(g)).toEqual([marco]);
+  });
+
+  it('LF-R1 (official EB-02 Q&A): a Character played after the Event is not covered; one already on the field is', () => {
+    const SALOME = 'OP14-106'; // Blocker; [Trigger] Play this card
+    const g = theirs(
+      'ST01-001',
+      {
+        hand: [EVENT, sai, mohji],
+        characters: [{ card: marco, rested: true }],
+        life: [SALOME, mohji, mohji],
+        costArea: { active: 5, rested: 0 },
+      },
+      { characters: [thatch, thatch, thatch] },
+    );
+    // First attack on the Leader: the Event is used, then the damage reveals Salome and she is played.
+    attack(g, at(g, 'p2', 'characters', thatch, 0), g.leader('p1'));
+    passBlock(g);
+    activateCounter(g, at(g, 'p1', 'hand', EVENT));
+    passCounter(g);
+    need(g, 'trigger', 'p1');
+    activateTrigger(g);
+    const salome = at(g, 'p1', 'characters', SALOME);
+    // Second attack: Salome blocks and is K.O.'d in battle. Nothing is offered.
+    attack(g, at(g, 'p2', 'characters', thatch, 1), g.leader('p1'));
+    block(g, salome);
+    passCounter(g);
+    expect(kind(g)).toBe('main');
+    expect(chars(g)).toEqual([marco]);
+    expect(trash(g)).toContain(SALOME);
+    expect(hand(g).sort()).toEqual([sai, mohji].sort());
+    // Third attack: Marco was on the field when the Event resolved, so he is still covered.
+    attack(g, at(g, 'p2', 'characters', thatch, 2), at(g, 'p1', 'characters', marco));
     noDefence(g);
     need(g, 'optional', 'p1');
     yes(g, 'p1');

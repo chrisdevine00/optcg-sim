@@ -274,24 +274,23 @@ function runTurn(d: Draft, f: Extract<Frame, { f: 'turn' }>): void {
       return;
     case 'endTriggers':
       setPhase(d, 'end');
-      // 6-6-1-1, 8-6-1: [End of Your Turn], "at the end of this turn" delayed effects and [End of
-      // Your Opponent's Turn] are all activated at once, so they are ONE batch per player: the turn
-      // player's first (their [End of Your Turn] and delayed effects, which they order among
-      // themselves), then the non-turn player's.
+      // 6-6-1-1, 8-6-1: a player's [End of Your Turn] (or [End of Your Opponent's Turn]) effects are
+      // activated at once, one batch per player, the turn player's first. "At the end of this turn"
+      // delayed effects resolve after ALL of that player's [End of Your Turn] effects (official
+      // ST-23 to ST-28 Q&A for ST24-005, LF-R2), so they are a later batch of the same player,
+      // still before the other player's effects.
       f.step = 'endExpire';
-      {
-        const batch = d.s.nextMod++;
-        for (const q of [p, other(p)]) {
-          fire(
-            d,
-            [q],
-            (x) => fieldCards(d, x),
-            (w) => w === (q === p ? 'endOfYourTurn' : 'endOfOpponentsTurn'),
-            q === p ? 'endOfYourTurn' : 'endOfOpponentsTurn',
-            batch,
-          );
-          fireDelayed(d, q, batch);
-        }
+      for (const q of [p, other(p)]) {
+        const w = q === p ? 'endOfYourTurn' : 'endOfOpponentsTurn';
+        fire(
+          d,
+          [q],
+          (x) => fieldCards(d, x),
+          (t) => t === w,
+          w,
+          d.s.nextMod++,
+        );
+        fireDelayed(d, q, d.s.nextMod++);
       }
       return;
     case 'endExpire':
@@ -987,7 +986,9 @@ export function collectReplacements(
     p: PlayerId,
     ab: Extract<Ability, { kind: 'replacement' }>,
     c: Ctx,
+    snap?: InstanceId[],
   ): void => {
+    if (snap && !snap.includes(card)) return;
     const key = `${id}/${ab.id}`;
     if (considered.includes(key)) return;
     if (ab.oncePerTurn && s.oncePerTurn.includes(key)) return;
@@ -1015,7 +1016,7 @@ export function collectReplacements(
     if (m.kind !== 'replacement' || !m.ab || m.ab.kind !== 'replacement') continue;
     const p = m.controller;
     const id = m.source && s.cards[m.source] ? m.source : s.players[p].leader;
-    consider(id, p, m.ab, { s, you: p, self: id, live: true });
+    consider(id, p, m.ab, { s, you: p, self: id, live: true }, m.covers);
   }
   out.sort((a, b) => a.rank - b.rank);
   return out.map(({ rank: _r, ...r }) => r);
@@ -1496,7 +1497,7 @@ export function attackMatch(
 
 /**
  * A delayed effect's registration point: "at the end of this turn" (CR 6-6-1-1). `controller`'s
- * delayed effects of this turn join the End Phase `batch` (see `endTriggers`).
+ * delayed effects of this turn form the End Phase batch after the [End of Your Turn] one (see `endTriggers`).
  */
 function fireDelayed(d: Draft, controller: PlayerId, batch: number): void {
   const now = d.s.delayed.filter((x) => x.turn === d.s.turn && x.controller === controller);

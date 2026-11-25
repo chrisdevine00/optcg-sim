@@ -207,6 +207,7 @@ describe('ST25-003 Crocodile & Mihawk: [On Play] draw 2, trash 1, play a Cross G
     const g = zapGame([]);
     opponentKOs(g, inst(g, 'p1', 'characters', SCL.cg5b));
     if (kind(g) === 'optional') {
+      expect(g.decider).toBe('p1');
       expect(g.legal().some((a) => a.type === 'optional' && a.accept)).toBe(false);
       act(g, { type: 'optional', accept: false });
     }

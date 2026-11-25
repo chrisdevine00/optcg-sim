@@ -70,6 +70,7 @@ describe('ST22-012 Marco', () => {
       const empty = start([]);
       koEffect(empty);
       if (asked(empty)) {
+        expect(empty.decider).toBe('p2');
         expect(empty.legal().some((a) => a.type === 'optional' && a.accept)).toBe(false);
         empty.act({ type: 'optional', accept: false });
       }

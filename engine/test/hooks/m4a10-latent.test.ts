@@ -144,23 +144,17 @@ describe('M4a-10b and c: the End Phase', () => {
     return g;
   };
 
-  it('(b) the turn player orders a delayed effect against their [End of Your Turn] one', () => {
+  // LF-R2 (official ST-23 to ST-28 Q&A, ST24-005): a delayed "at the end of this turn" effect
+  // resolves after the turn player's [End of Your Turn] effects, so there is nothing to order.
+  it("(b) the delayed effect comes after the turn player's [End of Your Turn] one, with no order choice", () => {
     const g = position();
-    const d = expectDecision(g, 'order', 'p1');
-    expect(d.options).toHaveLength(2);
-    // Put the delayed one first: the order is the player's, in either direction.
-    const delayed = d.options!.find((o) => /end of this turn/.test(o.label))!;
-    g.act({ type: 'order', first: delayed.id } as never);
-    // The opponent's [End of Your Opponent's Turn] follows, after both of the turn player's.
-    expect(activated(g).slice(-3)).toEqual(['later', 'mine', 'theirs']);
     expectDecision(g, 'main', 'p2');
+    // The opponent's [End of Your Opponent's Turn] follows both of the turn player's.
+    expect(activated(g).slice(-3)).toEqual(['mine', 'later', 'theirs']);
   });
 
   it("(b) the turn player's effects all come before the opponent's", () => {
     const g = position();
-    expectDecision(g, 'order', 'p1');
-    const first = (g.legal().find((a) => a.type === 'order') ?? null) as { first: string } | null;
-    g.act({ type: 'order', first: first!.first } as never);
     expect(activated(g).at(-1)).toBe('theirs');
   });
 

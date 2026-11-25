@@ -178,6 +178,11 @@ export interface Modifier {
   filter?: Filter;
   /** For `replacement`: the replacement ability, whose id is `mod-<id>` (D6). */
   ab?: Ability;
+  /**
+   * For `replacement`: the cards the replacement covers, fixed when the effect resolved (LF-R1,
+   * official EB-02 Q&A for EB02-030: a Character played afterwards is not covered).
+   */
+  covers?: InstanceId[];
   /** For `cannotPlay`: only plays of a card in the hand are barred (M6b-Q33). Absent: any play. */
   from?: 'hand';
   /**

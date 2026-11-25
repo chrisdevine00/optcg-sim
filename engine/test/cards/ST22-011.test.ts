@@ -71,6 +71,7 @@ describe('ST22-011 Whitey Bay', () => {
     play(g, ID);
     if (dec(g)?.kind === 'optional') {
       // Offered (a hand filter is not told), but accepting is not legal.
+      expect(g.decider).toBe('p1');
       expect(g.legal().some((a) => a.type === 'optional' && a.accept)).toBe(false);
       decline(g);
     }
