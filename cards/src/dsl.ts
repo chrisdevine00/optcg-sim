@@ -12,6 +12,7 @@
  * `validateScript` rejects anything the runtime does not implement, so a script can never silently
  * do nothing (see `IMPLEMENTED` in `dsl-validate.ts`).
  */
+import type { PrintedTiming } from './printed.ts';
 import type { Attribute, CardCategory, Color, Keyword } from './schema.ts';
 
 export type { Keyword };
@@ -124,6 +125,13 @@ export type AutoTiming =
     }
   | { event: 'eventActivated'; by: P }
   | { event: 'blockerActivated'; by: P }
+  /**
+   * "When a [Trigger] activates" (G56): a Life card's [Trigger] is activated (the damaged player
+   * chose to reveal and use it), not merely added to a hand. `by` is the player whose [Trigger]
+   * it is, relative to the watcher; `any` is either player's. The effect resolves after the
+   * [Trigger] has (pending effects wait for the damage processing to end).
+   */
+  | { event: 'triggerActivated'; by: P | 'any' }
   /** "When your Leader … attacks" (`attacker`) or "… is attacked" (`target`). */
   | { event: 'attack'; attacker?: Selector; target?: Selector }
   /**
@@ -297,7 +305,11 @@ export interface Selector {
 }
 
 export type Pick =
-  | { upTo: number; totalCost?: Cmp; distinctNames?: true }
+  /**
+   * `totalCost`: the chosen cards' costs add up to at most this; `totalPower` (G55): their powers
+   * do, "with a total power of 4000 or less" (current power, as `totalCost` reads current cost).
+   */
+  | { upTo: number; totalCost?: Cmp; totalPower?: { lte: Num }; distinctNames?: true }
   | { exactly: number }
   | { any: true }
   | { groups: { filter: Filter; upTo: number }[] };
@@ -324,6 +336,13 @@ export type Filter =
   | { attribute: Attribute }
   | { multicolor: true }
   | { hasTrigger: boolean }
+  /**
+   * Printed text (G49), read from the card's verified text, not its script: `hasBaseEffect: false`
+   * is "with no base effect" (a card with only keywords has none; a [Trigger] is an effect,
+   * M6b-Q70); `hasTiming` is "with an [On Play] effect" ("without": `{ not: { hasTiming } }`).
+   */
+  | { hasBaseEffect: boolean }
+  | { hasTiming: PrintedTiming }
   | { keyword: Keyword }
   | { state: 'active' | 'rested' }
   | { isSelf: boolean }
@@ -332,6 +351,8 @@ export type Filter =
   /** The number of DON!! cards given to the card: "with a DON!! card given" (gte 1), G34. */
   | { donGiven: Cmp }
   | { ref: Name }
+  /** "With the same card name as" the card a selector bound (G54); a card that is gone matches nothing. */
+  | { sameNameAs: Name }
   | { all: Filter[] }
   | { any: Filter[] }
   | { not: Filter };
@@ -484,7 +505,13 @@ export type Action =
         duration: 'thisTurn';
       };
     }
-  | { play: { what: Selector; rested?: true } }
+  /**
+   * `player: 'opponent'` (G51): your opponent plays the card, from their own hand, and chooses it
+   * ("your opponent plays up to 1 Character card with a cost of 4 or less from their hand"); the
+   * selector then names their hand and `chooser: 'opponent'`. `what` may also read the top card of
+   * your deck or Life that an earlier `reveal` bound (`filter: { ref }`, G53).
+   */
+  | { play: { what: Selector; rested?: true; player?: 'opponent' } }
   | { ko: Selector }
   | { rest: Selector }
   | { setActive: Selector }
@@ -513,7 +540,8 @@ export type Action =
         from?: 'opponent';
       };
     }
-  | { addDon: { n: number; state: 'active' | 'rested'; upTo?: true }[] }
+  /** `player: 'opponent'` (G51): the DON!! come from the opponent's DON!! deck onto their field. */
+  | { addDon: { n: number; state: 'active' | 'rested'; upTo?: true }[]; player?: 'opponent' }
   /**
    * `player: 'opponent'`: the opponent returns n DON!! from their field (they choose which, as many
    * as they have); `from: 'active'` limits it to their active cost-area DON!! (G27).
@@ -579,6 +607,11 @@ export type Continuous =
   | { counter: { target: Selector; value: number; onlyIfNone?: true } }
   | { grant: { target: Selector; keyword: Keyword } }
   | { restrict: { target: Selector | P; what: Restriction } }
+  /**
+   * "Your Character cards are played rested" (G50): every card of yours matching the filter that
+   * enters the field by a play, from a hand or by an effect, is rested.
+   */
+  | { playRested: Filter }
   /** "Your opponent cannot attack any card other than …" (OP17-044). */
   | { lockAttackTarget: { attacker: P; only: Selector } }
   | { tiers: { when: Condition; apply: Continuous[] }[] };

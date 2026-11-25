@@ -15,6 +15,7 @@ import {
   matches,
   payable,
   playCostOf,
+  playsRested,
   pool,
   type Ctx,
 } from './effects/eval.ts';
@@ -404,10 +405,12 @@ function runPlay(d: Draft, f: Extract<Frame, { f: 'play' }>): void {
       const to = def.category === 'Stage' ? 'stage' : 'characters';
       // Where it is played from (G25): a card taken from a look at the deck is in the deck.
       const origin = c.zone;
+      // "Your Character cards are played rested" (G50) is read before the card moves.
+      const enters = f.rested === true || playsRested(d.s, f.player, f.card);
       moveCard(d, f.card, to, { revealed: true, extra: { reason: 'play' } });
       const w = d.wcard(f.card);
       w.played = d.s.turn;
-      if (f.rested) w.rested = true;
+      if (enters) w.rested = true;
       d.emit({ type: 'CardPlayed', instance: f.card, card: c.card, player: f.player, zone: to });
       f.step = 'done';
       fire(
@@ -687,6 +690,17 @@ export function answerTrigger(d: Draft, activate: boolean): void {
   }
   const nid = moveCard(d, card, 'resolving', { revealed: true, extra: { reason: 'trigger' } });
   d.emit({ type: 'TriggerRevealed', instance: nid, card: c.card, player: f.player });
+  // "When a [Trigger] activates" (G56): the watchers queue now and resolve after the [Trigger] has.
+  fire(
+    d,
+    [d.s.active, other(d.s.active)],
+    (q) => fieldCards(d, q),
+    (w, _card, p) =>
+      typeof w === 'object' &&
+      w.event === 'triggerActivated' &&
+      (w.by === 'any' || (w.by === 'you') === (p === f.player)),
+    'triggerActivated',
+  );
   push(d, { f: 'trigger', card: nid, player: f.player, step: 'run' });
 }
 
@@ -1476,6 +1490,7 @@ const TIMING_WORDS: Record<string, string> = {
   startOfYourTurn: '(start of turn)',
   rested: '(when rested)',
   removed: '(removed from the field)',
+  triggerActivated: '(a [Trigger] activated)',
   trashedFromHand: '(card trashed from hand)',
 };
 

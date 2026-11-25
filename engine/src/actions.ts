@@ -389,7 +389,8 @@ function checkPick(s: State, choice: Choice): Reason | null {
       return r('The cards must have different card names.', 'OP17-118');
     if (lim.total !== undefined) {
       const total = idx.reduce((a, j) => a + (lim.costs[j] ?? 0), 0) + (lim.costs[i] ?? 0);
-      if (total > lim.total) return r(`Their total cost must be ${lim.total} or less.`);
+      if (total > lim.total)
+        return r(`Their total ${lim.what ?? 'cost'} must be ${lim.total} or less.`);
     }
   }
   // Completability lookahead: enough candidates must remain to reach the minimum.

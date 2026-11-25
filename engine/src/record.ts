@@ -71,7 +71,9 @@ export function cardsVersionOf(state: GameState): string {
   const fields = Object.keys(s.defs)
     .sort()
     .map((id) => {
-      const { abilities: _a, ...game } = s.defs[id]!;
+      // `baseEffect` and `printed` (G49) are read off the card text, which this hash does not cover
+      // otherwise; leaving them out keeps every recorded game's card-data version as it was.
+      const { abilities: _a, baseEffect: _b, printed: _p, ...game } = s.defs[id]!;
       return game;
     });
   return 'cards-' + hashString(JSON.stringify(fields)).slice(0, 16);

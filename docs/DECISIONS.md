@@ -2,6 +2,32 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-25 — M6b-2 wave 6: G49 to G58 (ENGINE_VERSION stays 0.5.16)
+
+- **Context:** wave 6 of the M6b-1 audit (`docs/research/m6b-wave6.md`): filters on printed text, "played rested", effects the opponent performs, a place-this-card cost, play of a revealed top card, `sameNameAs`, `Pick.totalPower`, the `triggerActivated` timing, "add this card to your hand" in a [Trigger] and the variable-count hand trash. 22 cards become expressible; none is scripted.
+- **Decision:**
+  - **G49** is two filters read from the verified card text, not from the script (`cards/src/printed.ts`, `Def.baseEffect`, `Def.printed`): `hasBaseEffect` (keywords and reminder text are not an effect, M6b-Q29; a [Trigger] is, M6b-Q70) and `hasTiming` over the eight printed timings. A bracket followed by "effect" is a reference, not a printed timing. The two `Def` fields are left out of `cardsVersionOf`, so no recorded game's card-data version moves.
+  - **G50** is a continuous `playRested: Filter` read by the play when it places the card (`playsRested`), not a layer.
+  - **G51** extends two actions instead of adding new ones: `play` and `addDon` take `player: 'opponent'`. The opponent's choice and the "may" are the existing selector `chooser` and `chooseOne { chooser: 'opponent' }`. The validator ties `play`'s `player` to their hand, owner and chooser.
+  - **G52** is the existing field cost (G1) with `from: 'self'` accepted: the card leaves through a `remove` frame with the cause `cost`. "In any order" with another card (OP10-026, OP10-027) is two costs in the order written (M6b-Q73).
+  - **G53** is the existing `play` reading `deckTop` or `lifeTop` with a `{ ref }` filter naming a `reveal`; the validator accepts the top of a deck or Life only in that form. A pool that is only a bound top card is not secret (`hiddenPool`), so no extra question is asked. A Life card played fires `lifeRemoved` (M6b-Q40).
+  - **G54** is a filter `sameNameAs: Name`; cost selectors already bind, so no compile change was needed.
+  - **G55** adds `totalPower: { lte: Num }` beside `totalCost` on an `upTo` pick, through the same `Decision.limits` (`what: 'power'`) and `checkPick` (M6b-Q71).
+  - **G56** is a timing `{ event: 'triggerActivated', by: P | 'any' }` fired in `answerTrigger`, after the revealed [Trigger] is announced and before it resolves, so the watchers queue behind it (M6b-Q72). `any` is for OP13-106, which names no player.
+  - **G57** is `move` of `self` to your hand, allowed only in a [Trigger]; the card in the `resolving` slot goes to the hand and `runTrigger` already skips the trash.
+  - **G58** needed no change: the text has no colon, so it is an effect, and `trashFromHand` with `pick: { any: true }`, `bind` and `refCount` (OP15-002) already reads it. The audit's gap came from reading the trash as a cost. A test pins the shape.
+  - The lethal bound: `play` and `addDon` by the opponent and the permanent `playRested` are unclassified (searched); a cost that moves this card counts in `bouncesOf`.
+  - **ENGINE_VERSION is not bumped and the goldens are not re-recorded:** no scripted card uses a new shape, and the changes to paths scripted cards run are invisible to them (see the wave write-up); the golden games and a 2,000-game property run replay with identical hashes.
+- **Rejected:**
+  - Reading `hasBaseEffect` from `Def.abilities`: an unscripted card has none, so the filter would call every unscripted card "no base effect" (audit section 5.2).
+  - A new action for "your opponent plays" and one for "your opponent adds DON!!": a `player` field on the two actions reuses their frames, and the opponent's choice is already expressible.
+  - A new `place` cost for this card: the field `move` cost already carries the removal frame, the cause and the checks; only `self` was missing.
+  - A new action "play the revealed card": the `play` action and a `{ ref }` filter say it, and the validator keeps the top of a deck or Life playable only in that form.
+  - Asking the order of the two Kin'emon cards placed "in any order": it adds a decision for no observable difference (same name, hidden deck).
+  - Changing the card-data version for the new `Def` fields: it would have invalidated every golden for a derived value.
+  - A `Pick` of its own for G58 or a cost with a variable count: the card is not a cost.
+  - Settling M6b-Q70 to Q75 now.
+
 ## 2026-11-25 — M6b-2 wave 5: G39 to G48 (ENGINE_VERSION stays 0.5.16)
 
 - **Context:** wave 5 of the M6b-1 audit (`docs/research/m6b-wave5.md`): `delayed` steps that remember bound cards, `donReturned` qualifiers, Life face state, `returnDon` with a variable count, `damageTaken`, "choose a cost" with a reveal of the opponent's deck top, a move from the top or bottom of Life to the hand, K.O. protection by source, `cannotAttackTarget`, and `skipRefresh` for DON!!. 25 cards become expressible; none is scripted.
