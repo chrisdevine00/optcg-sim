@@ -62,6 +62,17 @@ export function actionKey(a: Action): string {
   return JSON.stringify(sort(a));
 }
 
+/**
+ * One warning on one action (M7 WP2, additive to the WP0 contract): the kind, the explanation in
+ * the coach's voice (explanations.md E06, E17, E20) and the better action, in the view's handles.
+ */
+export interface BlunderWarning {
+  kind: BlunderKind;
+  explanation: Explanation;
+  /** The action to offer instead ("Use the better choice"), or null when none is better. */
+  better: Action | null;
+}
+
 /** Every legal action valued from the asking seat's side, and which ones are blunders and why. */
 export interface ScoreTable {
   /** `actionKey` of the best-valued action. */
@@ -70,6 +81,8 @@ export interface ScoreTable {
   values: Record<string, number>;
   /** By `actionKey`: the blunder kinds that apply to that action (absent or empty: none). */
   kinds: Record<string, BlunderKind[]>;
+  /** By `actionKey`: the explanation of each flag. Present for every key in `kinds`. */
+  warnings?: Record<string, BlunderWarning[]>;
   certainty: Certainty;
   incomplete: boolean;
 }

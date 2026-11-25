@@ -38,6 +38,24 @@ export {
 } from './knowledge.ts';
 export { LESSON, MINUS } from './explain.ts';
 export { fingerprint } from './search/pirate.ts';
+// M7 WP2: blunder scoring and the DON!! tempo ledger (the app's tempo meter and M8's review import these).
+export {
+  answerScore,
+  scoreDecision,
+  warningsOf,
+  GAP_THRESHOLD,
+  type ScoreContext,
+} from './coach/blunder.ts';
+export {
+  donLedger,
+  explainHeld,
+  explainUnused,
+  ledgerLabel,
+  UNUSED_FLAG_AT,
+  type DonLedger,
+  type HeldReason,
+} from './coach/tempo.ts';
+export type { BlunderWarning } from './coach/types.ts';
 export {
   lethal,
   attackersPossible,

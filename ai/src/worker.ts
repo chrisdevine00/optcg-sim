@@ -10,7 +10,8 @@ import { answerLethal, insertByPriority } from './search/lethal/request.ts';
 import { answerThreat } from './search/lethal/threat.ts';
 import type { AiRequest, AiResponse, GameInfo } from './protocol.ts';
 import { AiSession } from './session.ts';
-import { answerCoach, priorityOf, type Work } from './coach/dispatch.ts';
+import { answerScore } from './coach/blunder.ts';
+import { priorityOf, type Work } from './coach/dispatch.ts';
 import { answerHint } from './coach/hint.ts';
 
 const cards = new Map<string, Card>();
@@ -63,8 +64,7 @@ function run(req: Work): void {
       return;
     }
     if (req.type === 'score') {
-      // WP0 stub: WP2 (score) replaces this.
-      const res = answerCoach(req, performance.now() - t0);
+      const res = answerScore(req, cards, game);
       if (cancelled.delete(req.id)) return;
       post(res);
       return;
