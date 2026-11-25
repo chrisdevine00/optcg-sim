@@ -10,6 +10,7 @@ Newest first. One dated paragraph per decision: context, decision, alternatives 
 - **Certainty:** `proven` is `any-hand` only when your list says no face-down Life card can be a [Trigger]; otherwise `needed-hidden-info`. `refuted` is always `needed-hidden-info` (their hand could add attackers). The copy says "This does not count the cards in their hand."
 - **Contract changes (additive):** `ThreatResult` gains optional `holds`, `mustStop`, `triggerChance`; the `threat` request gains optional `ownDeck` and `nodes`; `CoachPort.threat` opts gain optional `ownDeck`; `placeholder` in `public.ts` is exported. The worker's `threat` branch calls `answerThreat`; `answerCoach` in `dispatch.ts` still holds the WP0 stub so the contract test stands.
 - **Rejected:** a threat that reads the real state (actual mode) in a live game (cheating by construction); filling their hand with the prior's worst-case cards (it answers "could they", not "does the board"); a skeleton carve-out for any foreign decision with no hidden reference (the review M5a-02 failure was exactly those).
+
 ## 2026-11-25 — M7 WP1: the hint is a line from Warlord's own turn search, with a fresh memory
 
 - **Context:** WP0 fixed `HintResult` (a line, the view actions of its first step, an E15 explanation, at most two alternatives, a certainty) and left the worker answering "not implemented". The hint must answer from the player's own view only, never touch the AI seat's session, and give one answer to one position.
