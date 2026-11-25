@@ -1,6 +1,6 @@
 /** OP11-092 Helmeppo. */
 import { describe, expect, it } from 'vitest';
-import { applyOp } from '../../src/testing.ts';
+import { applyOp, internals } from '../../src/testing.ts';
 import {
   accept,
   BLUE,
@@ -54,6 +54,19 @@ describe('OP11-092 Helmeppo', () => {
     expect(chars(g)).toEqual([ID]);
     // Placed at the bottom of its owner's deck.
     expect(g.zone('p1', 'deck').at(-1)?.card).toBe(SWORD6);
+  });
+
+  it('W57-R9 boundary: a {SWORD} Character of cost 9 is not offered (kills cost lte 8 to 9)', () => {
+    const g = mk([SWORD6, KOBY8]);
+    // No printed {SWORD} Character costs 9: raise [Koby]'s printed cost for this game.
+    const s = internals(g.state);
+    g.state = {
+      ...s,
+      defs: { ...s.defs, [KOBY8]: { ...s.defs[KOBY8]!, cost: 9 } },
+    } as unknown as typeof g.state;
+    start(g);
+    expect(canPick(g, g.find('p1', 'trash', SWORD6))).toBe(true);
+    expect(canPick(g, g.find('p1', 'trash', KOBY8))).toBe(false);
   });
 
   it('offers {SWORD} Characters of cost 8 or less only, and never [Helmeppo]', () => {

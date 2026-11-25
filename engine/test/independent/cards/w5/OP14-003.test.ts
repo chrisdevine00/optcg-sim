@@ -13,6 +13,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { act } from '../../helpers.ts';
+import { withAbilities, type Ability } from '../../../../src/testing.ts';
 import {
   at,
   attack,
@@ -21,6 +22,7 @@ import {
   choices,
   kind,
   LW,
+  mine,
   need,
   none,
   passBlock,
@@ -155,5 +157,32 @@ describe('OP14-003 Capone"Gang"Bege: cannot be K.O.\'d by effects of opposing Ch
     toTarget(g, SHANKS5);
     aimAt(g, KUMACY);
     expect(chars(g, 'p1')).toEqual([BEGE]);
+  });
+
+  it("W57-R9: only an OPPONENT's effect is stopped: my own 4000-base Character's effect K.O.s Bege (kills cause 'opponentEffect' to 'effect')", () => {
+    const g = mine(LW.luffy, { characters: [BEGE, HACK] }, {});
+
+    g.state = withAbilities(g.state, HACK, [
+      {
+        id: 'k',
+        kind: 'activate',
+        when: 'activateMain',
+        effect: [
+          {
+            do: {
+              ko: {
+                from: 'characters',
+                owner: 'you',
+                filter: { name: 'Capone"Gang"Bege' },
+                pick: { exactly: 1 },
+              },
+            },
+          },
+        ],
+      } as Ability,
+    ]);
+    act(g, { type: 'activate', card: g.find('p1', 'characters', HACK), ability: 'k' });
+    expect(chars(g, 'p1')).toEqual([HACK]);
+    expect(trash(g, 'p1')).toEqual([BEGE]);
   });
 });

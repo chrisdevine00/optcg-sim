@@ -12,6 +12,7 @@
  * CR 10-2-13; "up to" allows 0 (CR 8-4-4-1); playing by an effect pays no cost.
  */
 import { describe, expect, it } from 'vitest';
+import { decision } from '../../helpers.ts';
 import {
   act,
   atMain,
@@ -29,6 +30,7 @@ import {
   mine,
   theirsLeader,
   W3C,
+  no,
   yes,
 } from './kit-w3.ts';
 
@@ -50,12 +52,21 @@ function myTurn(spec: Spec = {}, withDon = true) {
     { characters: [W3C.sai], costArea: { active: 0, rested: 0 } },
   );
 }
+/**
+ * "This effect can be activated when ..." is optional (W57-R5, the official Koala Q&A): the use is
+ * asked, and these tests use it. Only Buggy's question is answered.
+ */
+function use(g: ReturnType<typeof myTurn>) {
+  const d = decision(g);
+  if (d?.kind === 'optional' && d.source?.card === BUGGY) yes(g, 'p1');
+}
 /** I play the Rocks Pirates Event (rest 5 DON!!: return up to 1 Character with cost 6 or less) on `card`. */
 function bounce(g: ReturnType<typeof myTurn>, who: 'p1' | 'p2', card: string) {
   const target = g.find(who, 'characters', card);
   act(g, { type: 'playCard', card: g.find('p1', 'hand', W3C.bounce) });
   yes(g, 'p1');
   pickInst(g, [target]);
+  use(g);
 }
 
 describe('OP16-041 Buggy: [DON!! x1] [Once Per Turn] when my {Impel Down} Character is removed, play [Prisoner of Impel Down]', () => {
@@ -126,6 +137,7 @@ describe('OP16-041 Buggy: [DON!! x1] [Once Per Turn] when my {Impel Down} Charac
     );
     act(g, { type: 'playCard', card: g.find('p2', 'hand', W3C.impactDial) });
     pickInst(g, [g.find('p1', 'characters', BLUGORI)]);
+    use(g as never);
     need(g, 'choose', 'p1');
     pickInst(g, [g.find('p1', 'hand', PRISONER)]);
     expect(cardIds(g, 'p1', 'characters')).toEqual([PRISONER]);
@@ -140,6 +152,7 @@ describe('OP16-041 Buggy: [DON!! x1] [Once Per Turn] when my {Impel Down} Charac
     attack(g, g.find('p2', 'characters', W3C.thatch), g.find('p1', 'characters', BLUGORI));
     passBlock(g);
     act(g, { type: 'endCounter' });
+    use(g as never);
     need(g, 'choose', 'p1');
     expect(offeredIds(g)).toEqual([PRISONER]);
     pickInst(g, [g.find('p1', 'hand', PRISONER)]);
@@ -154,15 +167,36 @@ describe('OP16-041 Buggy: [DON!! x1] [Once Per Turn] when my {Impel Down} Charac
     );
     act(g, { type: 'playCard', card: g.find('p2', 'hand', W3C.impactDial) });
     pickInst(g, [g.find('p1', 'characters', BLUGORI)]);
+    use(g as never);
     need(g, 'choose', 'p1');
     pickInst(g, [g.find('p1', 'hand', PRISONER)]);
     expect(atMain(g, 'p2')).toBe(true);
     act(g, { type: 'playCard', card: g.find('p2', 'hand', W3C.impactDial) });
     pickInst(g, [g.find('p1', 'characters', W3C.sphinx)]);
+    use(g as never);
     expect(atMain(g, 'p2')).toBe(true);
     expect(cardIds(g, 'p1', 'characters')).toEqual([PRISONER]);
     expect(hand(g)).toEqual([PRISONER]);
     void choices;
+  });
+
+  it('W57-R5: "can be activated" is optional: declining plays nothing and does not spend the Once Per Turn', () => {
+    const g = theirsLeader(
+      { card: BUGGY, don: 1 },
+      { characters: [BLUGORI, W3C.sphinx], hand: [PRISONER] },
+      { hand: [W3C.impactDial, W3C.impactDial], characters: [W3C.thatch] },
+    );
+    act(g, { type: 'playCard', card: g.find('p2', 'hand', W3C.impactDial) });
+    pickInst(g, [g.find('p1', 'characters', BLUGORI)]);
+    no(g, 'p1');
+    expect(atMain(g, 'p2')).toBe(true);
+    expect(cardIds(g, 'p1', 'characters')).toEqual([W3C.sphinx]);
+    act(g, { type: 'playCard', card: g.find('p2', 'hand', W3C.impactDial) });
+    pickInst(g, [g.find('p1', 'characters', W3C.sphinx)]);
+    yes(g, 'p1');
+    need(g, 'choose', 'p1');
+    pickInst(g, [g.find('p1', 'hand', PRISONER)]);
+    expect(cardIds(g, 'p1', 'characters')).toEqual([PRISONER]);
   });
 
   it('with no Prisoner in hand nothing can be played', () => {

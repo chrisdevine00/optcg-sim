@@ -57,6 +57,9 @@ function turnStart(
     side(L11.mono, RED, {}),
   );
   act(g, { type: 'endTurn' });
+  // "This effect can be activated at the start of your turn" is optional (W57-R5, the official
+  // Koala Q&A: "you may decline"): the use is asked, and these tests use it.
+  if (kind(g) === 'optional') act(g, { type: 'optional', accept: true });
   return g;
 }
 

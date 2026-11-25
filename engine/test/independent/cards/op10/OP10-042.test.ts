@@ -13,6 +13,7 @@
  * complete (a Character returned to my hand is already in my hand). K.O. is not "trash" (RL-15).
  */
 import { describe, expect, it } from 'vitest';
+import { yes } from '../op17/kit-op17b.ts';
 import {
   at,
   attack,
@@ -39,6 +40,14 @@ const USOPP = 'OP10-042';
 const CUB1 = 'OP10-044';
 /** OP14-048 Shiryu: Blue, cost 8, 10000. [On Play] Return up to 1 of your opponent's Characters to the owner's hand. Then, trash all cards from your hand. */
 const SHIRYU = 'OP14-048';
+
+/**
+ * "This effect can be activated when ..." is optional (W57-R5, the official Koala Q&A): the use is
+ * asked of me, and these tests want the draw, so say yes when it is asked.
+ */
+const use = (g: Parameters<typeof yes>[0]): void => {
+  if (kind(g) === 'optional') yes(g, 'p1');
+};
 
 const HAND = (n: number): string[] => Array.from({ length: n }, () => VAN.sai);
 
@@ -102,6 +111,7 @@ describe("OP10-042 Usopp: [Opponent's Turn] [Once Per Turn] a {Dressrosa} Charac
     const g = ambush([restedOf(V10.bellamy2)], HAND(3));
     attack(g, at(g, 'p2', 'characters', VAN.kingdew), at(g, 'p1', 'characters', V10.bellamy2));
     noDefence(g);
+    use(g);
     expect(cardIds(g, 'p1', 'characters')).toEqual([]);
     expect(cardIds(g, 'p1', 'hand')).toHaveLength(4);
   });
@@ -113,6 +123,7 @@ describe("OP10-042 Usopp: [Opponent's Turn] [Once Per Turn] a {Dressrosa} Charac
       { hand: [KINGDOM_COME], life: [VAN.marco, VAN.marco, VAN.marco, VAN.marco] },
     );
     opponentKingdomCome(g, at(g, 'p1', 'characters', V10.bellamy2));
+    use(g);
     expect(cardIds(g, 'p1', 'characters')).toEqual([]);
     expect(cardIds(g, 'p1', 'hand')).toHaveLength(4);
   });
@@ -122,6 +133,7 @@ describe("OP10-042 Usopp: [Opponent's Turn] [Once Per Turn] a {Dressrosa} Charac
     playRaw(g, SHIRYU);
     need(g, 'choose', 'p2');
     pickInst(g, [at(g, 'p1', 'characters', V10.bellamy2)]);
+    use(g);
     // Bellamy came back to the hand (3 + 1), then the draw (4 + 1).
     expect(cardIds(g, 'p1', 'hand')).toHaveLength(5);
     expect(cardIds(g, 'p1', 'hand')).toContain(V10.bellamy2);
@@ -131,6 +143,7 @@ describe("OP10-042 Usopp: [Opponent's Turn] [Once Per Turn] a {Dressrosa} Charac
     const g = ambush([restedOf(V10.bellamy2)], HAND(5));
     attack(g, at(g, 'p2', 'characters', VAN.kingdew), at(g, 'p1', 'characters', V10.bellamy2));
     noDefence(g);
+    use(g);
     expect(cardIds(g, 'p1', 'hand')).toHaveLength(6);
   });
 
@@ -138,6 +151,7 @@ describe("OP10-042 Usopp: [Opponent's Turn] [Once Per Turn] a {Dressrosa} Charac
     const g = ambush([restedOf(V10.bellamy2)], HAND(6));
     attack(g, at(g, 'p2', 'characters', VAN.kingdew), at(g, 'p1', 'characters', V10.bellamy2));
     noDefence(g);
+    use(g);
     expect(cardIds(g, 'p1', 'characters')).toEqual([]);
     expect(cardIds(g, 'p1', 'hand')).toHaveLength(6);
   });
@@ -147,6 +161,7 @@ describe("OP10-042 Usopp: [Opponent's Turn] [Once Per Turn] a {Dressrosa} Charac
     playRaw(g, SHIRYU);
     need(g, 'choose', 'p2');
     pickInst(g, [at(g, 'p1', 'characters', V10.bellamy2)]);
+    use(g);
     expect(cardIds(g, 'p1', 'hand')).toHaveLength(6);
   });
 
@@ -154,9 +169,11 @@ describe("OP10-042 Usopp: [Opponent's Turn] [Once Per Turn] a {Dressrosa} Charac
     const g = ambush([restedOf(V10.bellamy2), restedOf(V10.gilly3)], HAND(2));
     attack(g, at(g, 'p2', 'characters', VAN.kingdew), at(g, 'p1', 'characters', V10.bellamy2));
     noDefence(g);
+    use(g);
     expect(cardIds(g, 'p1', 'hand')).toHaveLength(3);
     attack(g, at(g, 'p2', 'characters', VAN.thatch), at(g, 'p1', 'characters', V10.gilly3));
     noDefence(g);
+    use(g);
     expect(cardIds(g, 'p1', 'characters')).toEqual([]);
     expect(cardIds(g, 'p1', 'hand')).toHaveLength(3);
   });
@@ -165,6 +182,7 @@ describe("OP10-042 Usopp: [Opponent's Turn] [Once Per Turn] a {Dressrosa} Charac
     const g = ambush([restedOf(VAN.marco)], HAND(3));
     attack(g, at(g, 'p2', 'characters', VAN.kingdew), at(g, 'p1', 'characters', VAN.marco));
     noDefence(g);
+    use(g);
     expect(cardIds(g, 'p1', 'characters')).toEqual([]);
     expect(cardIds(g, 'p1', 'hand')).toHaveLength(3);
   });
@@ -202,6 +220,7 @@ describe("OP10-042 Usopp: [Opponent's Turn] [Once Per Turn] a {Dressrosa} Charac
       { hand: [KINGDOM_COME], life: [VAN.marco, VAN.marco, VAN.marco, VAN.marco] },
     );
     opponentKingdomCome(g, at(g, 'p1', 'characters', 'OP10-090'));
+    use(g);
     need(g, 'choose', 'p1');
     pickInst(g, [at(g, 'p1', 'trash', 'EB03-048')]);
     // Rebecca's [On Play] is now pending: the draw of Usopp has already happened.
@@ -230,6 +249,7 @@ describe("OP10-042 Usopp: [Opponent's Turn] [Once Per Turn] a {Dressrosa} Charac
       { hand: [KINGDOM_COME], life: [VAN.marco, VAN.marco, VAN.marco, VAN.marco] },
     );
     opponentKingdomCome(g, at(g, 'p1', 'characters', V10.bellamy2));
+    use(g);
     expect(cardIds(g, 'p1', 'hand')).toHaveLength(4);
   });
 });

@@ -71,6 +71,22 @@ describe('ST36-005 Eustass"Captain"Kid', () => {
     expect(g.life('p1')).toBe(3);
   });
 
+  it('W57-R9 boundary: another Kid with exactly 5000 base power is a redirect target, one with 4000 is not (kills basePower gte 5000 to 6000)', () => {
+    const KID5000 = 'OP09-075';
+    const KID4000 = 'P-003';
+    const g = defend([DOWN, DOWN, UP], [ID, KID5000, KID4000]);
+    accept(g);
+    expectDecision(g, 'choose', 'p1');
+    const offered = g
+      .legal()
+      .filter((x) => x.type === 'pick' && typeof x.choice === 'string')
+      .map((x) => (x as { choice: string }).choice)
+      .sort();
+    expect(offered).toEqual(
+      [g.find('p1', 'characters', ID), g.find('p1', 'characters', KID5000)].sort(),
+    );
+  });
+
   it('with both ends face-up the controller chooses the end; the other stays face-up', () => {
     const g = defend([UP, DOWN, UP]);
     accept(g);

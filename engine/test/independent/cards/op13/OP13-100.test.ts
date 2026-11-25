@@ -11,6 +11,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import type { TestGame } from '../../../fixtures/index.ts';
+import { no, yes } from '../op17/kit-op17b.ts';
 import {
   activateTrigger,
   at,
@@ -55,7 +56,17 @@ function start(
   );
 }
 
-const play = (g: TestGame, card: string) => playRaw(g, g.find('p1', 'hand', card));
+/**
+ * "This effect can be activated when ..." is optional (W57-R5, the official Koala Q&A): the use is
+ * asked, and most tests use it.
+ */
+const use = (g: TestGame): void => {
+  if (kind(g) === 'optional') yes(g, 'p1');
+};
+const play = (g: TestGame, card: string) => {
+  playRaw(g, g.find('p1', 'hand', card));
+  use(g);
+};
 const counts = (g: TestGame) => (decision(g)?.options ?? []).map((o) => o.id);
 
 describe('OP13-100 Jewelry Bonney: [Your Turn] [Once Per Turn] when I play a Character with a [Trigger], give up to 2 rested DON!!', () => {
@@ -126,6 +137,19 @@ describe('OP13-100 Jewelry Bonney: [Your Turn] [Once Per Turn] when I play a Cha
     expect(don(g)).toMatchObject({ active: 9, rested: 0 });
   });
 
+  it('W57-R5: "can be activated" is optional: declining gives nothing and does not spend the Once Per Turn', () => {
+    const g = start();
+    playRaw(g, g.find('p1', 'hand', SPEED));
+    no(g, 'p1');
+    expect(atMain(g)).toBe(true);
+    expect(g.card(g.leader('p1')).don).toBe(0);
+    play(g, RABIYAN);
+    need(g, 'choose', 'p1');
+    giveCount(g, 1);
+    pickRaw(g, g.leader('p1'));
+    expect(g.card(g.leader('p1')).don).toBe(1);
+  });
+
   it('a Character without a [Trigger] does not activate it: no prompt', () => {
     const g = start();
     play(g, GENBO);
@@ -152,6 +176,7 @@ describe('OP13-100 Jewelry Bonney: [Your Turn] [Once Per Turn] when I play a Cha
     for (let i = 0; i < 4 && kind(g) === 'choose' && counts(g).length === 0; i++) {
       pickRaw(g, at(g, 'p1', 'hand', SPEED));
     }
+    use(g);
     need(g, 'choose', 'p1');
     expect(counts(g)).toContain('2');
     giveCount(g, 2);

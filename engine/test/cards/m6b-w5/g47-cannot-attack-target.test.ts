@@ -34,12 +34,19 @@ const mk = () =>
     },
   );
 /** The cards `attacker` can attack now, as p2's cards. */
-const targets = (g: ReturnType<typeof mk>, attacker: string): string[] =>
-  g
+const targets = (g: ReturnType<typeof mk>, attacker: string): string[] => {
+  // W57-R12: an empty list is only meaningful when the attacker's owner is the one to decide.
+  const owner =
+    g.zone('p1', 'characters').some((c) => c.instance === attacker) || attacker === g.leader('p1')
+      ? 'p1'
+      : 'p2';
+  expect(g.decider).toBe(owner);
+  return g
     .legal()
     .filter((a) => a.type === 'attack' && a.attacker === attacker)
     .map((a) => (a.type === 'attack' ? g.card(a.target).card : ''))
     .sort();
+};
 
 describe('G47 cannotAttackTarget', () => {
   it('validates, and refuses what a target filter cannot read or who cannot attack', () => {

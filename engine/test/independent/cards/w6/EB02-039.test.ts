@@ -137,6 +137,16 @@ describe('EB02-039 GERMA 66: [Main] you may trash a GERMA 66 Character (4000-): 
     expect(ofZone(g, 'p1', 'characters')).toEqual([]);
   });
 
+  it('W57-R9 boundary: a GERMA 66 Character of exactly 5000 power (Yonji) cannot be trashed either (4000 or less; kills power lte 4000 to 5000)', () => {
+    const g = start({ hand: [YONJI_5], trash: [YONJI_5] });
+    put(g, ID);
+    expect(canUse(g)).toBe(false);
+    unusable(g, 'p1');
+    expect(decision(g)?.kind).toBe('main');
+    expect(ofZone(g, 'p1', 'hand')).toEqual([YONJI_5]);
+    expect(ofZone(g, 'p1', 'characters')).toEqual([]);
+  });
+
   it('cost filter: a {Kingdom of GERMA} Character is not a "GERMA 66" type card (exact type)', () => {
     const g = start({ hand: [REIJU_KOG], trash: [REIJU_2] });
     put(g, ID);

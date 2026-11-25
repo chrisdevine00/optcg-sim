@@ -15,6 +15,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { act } from '../../helpers.ts';
+import { no, yes } from '../op17/kit-op17b.ts';
 import {
   at,
   atMain,
@@ -56,6 +57,14 @@ function attackBoard(own: string[], p2chars: Place[] = []) {
     { characters: p2chars, life: [V13.marco, V13.mohji, V13.mohji, V13.mohji] },
   );
 }
+
+/**
+ * "This effect can be activated when ..." is optional (W57-R5, the official Koala Q&A): the use is
+ * asked of Koala's controller, and most tests use it.
+ */
+const use = (g: Parameters<typeof kind>[0]): void => {
+  if (kind(g) === 'optional') yes(g, 'p1');
+};
 
 /** p2's turn: Koala defends; p2 holds `hand` and 10 active DON!!. */
 function defend(hand: string[], p2: Spec = {}) {
@@ -119,6 +128,7 @@ describe('OP12-081 Koala: draw on a Leader attack with two cost 8+ Characters; t
   it('their Character with a base cost of 8 or more makes them add their top Life card to their hand', () => {
     const g = defend([C8]);
     playRaw(g, C8);
+    use(g);
     expect(atMain(g, 'p2')).toBe(true);
     expect(lifeCards(g, 'p2')).toHaveLength(3);
     expect(hand(g, 'p2')).toEqual([V13.marco]);
@@ -137,6 +147,7 @@ describe('OP12-081 Koala: draw on a Leader attack with two cost 8+ Characters; t
     playRaw(g, MAGELLAN);
     need(g, 'choose', 'p2');
     pickCards(g, [BLUGORI]);
+    use(g);
     expect(chars(g, 'p2').sort()).toEqual([BLUGORI, MAGELLAN].sort());
     expect(lifeCards(g, 'p2')).toHaveLength(3);
     expect(hand(g, 'p2')).toEqual([V13.marco]);
@@ -156,9 +167,25 @@ describe('OP12-081 Koala: draw on a Leader attack with two cost 8+ Characters; t
     const g = defend([MAGELLAN, MAGELLAN, BLUGORI, BLUGORI]);
     playRaw(g, MAGELLAN);
     pickCards(g, [BLUGORI]);
+    use(g);
     playRaw(g, MAGELLAN);
     pickCards(g, [BLUGORI]);
+    use(g);
     expect(chars(g, 'p2')).toHaveLength(4);
+    expect(lifeCards(g, 'p2')).toHaveLength(3);
+    expect(hand(g, 'p2')).toEqual([V13.marco]);
+  });
+
+  it('W57-R5: "can be activated" is optional: declining keeps the Life card and the Once Per Turn, so a later play may use it', () => {
+    const g = defend([MAGELLAN, MAGELLAN, BLUGORI, BLUGORI]);
+    playRaw(g, MAGELLAN);
+    pickCards(g, [BLUGORI]);
+    no(g, 'p1');
+    expect(lifeCards(g, 'p2')).toHaveLength(4);
+    expect(hand(g, 'p2')).toEqual([MAGELLAN, BLUGORI].sort());
+    playRaw(g, MAGELLAN);
+    pickCards(g, [BLUGORI]);
+    yes(g, 'p1');
     expect(lifeCards(g, 'p2')).toHaveLength(3);
     expect(hand(g, 'p2')).toEqual([V13.marco]);
   });

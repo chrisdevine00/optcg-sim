@@ -17,6 +17,7 @@
 import { describe, expect, it } from 'vitest';
 import type { PlayerSpec } from '@optcg/engine';
 import { act, attack, decision } from '../../helpers.ts';
+import { withAbilities, type Ability } from '../../../../src/testing.ts';
 import { myTurn, side, theirTurn } from '../kit.ts';
 import {
   activateCounter,
@@ -198,5 +199,22 @@ describe("EB03-033 Charlotte Brulee: [Opponent's Turn][Once Per Turn] DON!! retu
     expect(d.active).toBe(1);
     expect([2, 3]).toContain(d.rested);
     expect(d.rested + d.deck + d.active).toBe(10);
+  });
+
+  it("W57-R9: only MY effect counts: the opponent making me return a DON!! on their turn adds nothing (kills cause 'yourEffect' to 'effect')", () => {
+    const g = theirs(LW.bigMom, { kaidos: 0 });
+    g.state = withAbilities(g.state, LW.luffy, [
+      {
+        id: 'r',
+        kind: 'activate',
+        when: 'activateMain',
+        effect: [{ do: { returnDon: { n: 1, player: 'opponent' } } }],
+      } as Ability,
+    ]);
+    act(g, { type: 'activate', card: g.leader('p2'), ability: 'r' });
+    expect(asksCount(g)).toBe(false);
+    need(g, 'main', 'p2');
+    expect(donOf(g)).toMatchObject({ active: 2, rested: 0 });
+    expect(g.eventsOfType('DonReturned').length).toBeGreaterThan(0);
   });
 });

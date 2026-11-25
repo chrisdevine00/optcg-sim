@@ -27,6 +27,7 @@ import {
   LW,
   mine,
   need,
+  no,
   none,
   passBlock,
   payDon,
@@ -66,6 +67,14 @@ function game(o: { p2Life?: string[]; p1Life?: string[]; beams?: number } = {}) 
 
 type G = ReturnType<typeof game>;
 
+/**
+ * "This effect can be activated when ..." is optional (W57-R5, the official Koala Q&A): the use is
+ * asked of Camie's controller, and most tests use it.
+ */
+function use(g: G) {
+  if (kind(g) === 'optional') yes(g, 'p1');
+}
+
 /** p1's nth Hajrudin attacks p2's Leader; p2 does not block and is now in the Counter Step. */
 function attackLeader(g: G, nth = 0) {
   attack(g, at(g, 'p1', 'characters', V13.hajrudin, nth), g.leader('p2'));
@@ -81,6 +90,7 @@ function beamCounter(g: G) {
   if (donChoices(g).length) payDon(g, 1);
   pickInst(g, [g.leader('p2')]);
   none(g);
+  use(g);
 }
 
 function endCounter(g: G) {
@@ -131,6 +141,7 @@ describe('OP11-102 Camie: when the opponent activates an Event or [Trigger], tra
     act(g, { type: 'endCounter' });
     need(g, 'trigger', 'p2');
     act(g, { type: 'trigger', activate: true });
+    use(g);
     // Everything pending resolves; whoever owes a decision, no prompt belongs to Camie (no "may").
     expect(atMain(g), snap(g)).toBe(true);
     expect(chars(g, 'p2')).toEqual([W6.trig]);
@@ -145,6 +156,7 @@ describe('OP11-102 Camie: when the opponent activates an Event or [Trigger], tra
     act(g, { type: 'endCounter' });
     need(g, 'trigger', 'p2');
     act(g, { type: 'trigger', activate: true });
+    use(g);
     expect(atMain(g), snap(g)).toBe(true);
     expect(chars(g, 'p2')).toEqual([W6.trig]);
     expect(g.life('p2')).toBe(1);
@@ -163,6 +175,25 @@ describe('OP11-102 Camie: when the opponent activates an Event or [Trigger], tra
     expect(chars(g, 'p2')).toEqual([]);
     expect(g.life('p2')).toBe(2);
     expect(g.life('p1')).toBe(4);
+  });
+
+  it('W57-R5: "can be activated" is optional: declining trashes no Life card and does not spend the Once Per Turn', () => {
+    const g = game({ beams: 2, p2Life: [...LIFE_P2, ...LIFE_P2.slice(0, 1)] });
+    attackLeader(g, 0);
+    activateCounter(g, g.find('p2', 'hand', W6.beamSword));
+    yes(g, 'p2');
+    if (donChoices(g).length) payDon(g, 1);
+    pickInst(g, [g.leader('p2')]);
+    none(g);
+    no(g, 'p1');
+    endCounter(g);
+    expect(g.life('p2')).toBe(5);
+    expect(g.life('p1')).toBe(4);
+    attackLeader(g, 1);
+    beamCounter(g);
+    endCounter(g);
+    expect(g.life('p2')).toBe(4);
+    expect(g.life('p1')).toBe(3);
   });
 
   it('[Once Per Turn]: a second Event in the same turn does nothing', () => {

@@ -30,6 +30,7 @@ import {
   hasEvent,
   kind,
   LW,
+  mine,
   need,
   none,
   offeredInsts,
@@ -69,11 +70,21 @@ describe('OP11-079 half-hearted assistance: [Counter] choose a cost, on a match 
   });
 
   it('is usable in the Counter Step, and not as a [Main] on my own turn (it has no [Main])', () => {
+    // W57-R12: `board` is p2's turn, where p1 has no actions at all, so the absence of a [Main] use
+    // is read on p1's own Main Phase, with a guard that it really is p1's decision.
+    const own = mine(
+      LW.luffy,
+      { hand: [EVT], costArea: { active: 2, rested: 0 } },
+      { deck: deckWith(COST.c3) },
+    );
+    expect(own.decider).toBe('p1');
+    expect(own.legal().some((a) => a.type === 'endTurn')).toBe(true);
+    const mine1 = at(own, 'p1', 'hand', EVT);
+    expect(
+      own.legal().some((a) => (a.type === 'activate' || a.type === 'counter') && a.card === mine1),
+    ).toBe(false);
     const g = board(COST.c3);
     const e = at(g, 'p1', 'hand', EVT);
-    expect(
-      g.legal().some((a) => (a.type === 'activate' || a.type === 'counter') && a.card === e),
-    ).toBe(false);
     intoCounter(g);
     expect(canCounterNow(g, e)).toBe(true);
   });

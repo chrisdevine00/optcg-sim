@@ -40,6 +40,7 @@ import {
   endTurn,
 } from './kit-op16b.ts';
 import type { TestGame } from '../../../fixtures/index.ts';
+import { no, yes } from '../op17/kit-op17b.ts';
 
 const BUGGY = 'OP16-048';
 const PRISONER = 'OP16-042';
@@ -117,6 +118,9 @@ describe('OP16-048 Buggy: [On Play] {Impel Down} Leader: draw 1, play a [Prisone
       { characters: opts.p2 ?? [SCN.c3] },
     );
     attack(g, inst(g, 'p2', 'characters', SCN.c3), g.leader('p1'));
+    // "This effect can be activated when ..." is optional (W57-R5, the official Koala Q&A): the use
+    // is asked, and these tests use it.
+    yes(g, 'p1');
     return g;
   }
 
@@ -154,6 +158,25 @@ describe('OP16-048 Buggy: [On Play] {Impel Down} Leader: draw 1, play a [Prisone
     attack(g, inst(g, 'p2', 'characters', SCN.c4), g.leader('p1'));
     expect(kind(g)).toBe('block');
     expect(choices(g)).toEqual([]);
+  });
+
+  it('W57-R5: "can be activated" is optional: declining gives no [Blocker] and does not spend the Once Per Turn', () => {
+    const g = theirs(
+      LDR.luffy,
+      { characters: [BUGGY, PRISONER] },
+      { characters: [SCN.c3, SCN.c4] },
+    );
+    attack(g, inst(g, 'p2', 'characters', SCN.c3), g.leader('p1'));
+    no(g, 'p1');
+    expect(kind(g)).toBe('block');
+    expect(blockers(g)).toEqual([]);
+    passBlock(g);
+    passCounter(g);
+    need(g, 'main', 'p2');
+    attack(g, inst(g, 'p2', 'characters', SCN.c4), g.leader('p1'));
+    yes(g, 'p1');
+    pickInst(g, [at(g, 'p1', 'characters', PRISONER)]);
+    expect(blockers(g)).toEqual([at(g, 'p1', 'characters', PRISONER)]);
   });
 
   it('"during this turn": the [Blocker] is gone on my next turn', () => {

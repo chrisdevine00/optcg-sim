@@ -125,6 +125,8 @@ describe('G50 Characters you play enter rested', () => {
     const g = mk();
     play(g, V.c2);
     const id = g.find('p1', 'characters', V.c2);
+    // W57-R12: the absence below is only meaningful when it is p1's decision.
+    expect(g.decider).toBe('p1');
     expect(g.legal().some((a) => a.type === 'attack' && a.attacker === id)).toBe(false);
   });
 });

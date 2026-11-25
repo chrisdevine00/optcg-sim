@@ -11,6 +11,7 @@
  * needs 1 DON!! on this Leader and an optional hand cost; it lasts until the end of the turn.
  */
 import { describe, expect, it } from 'vitest';
+import { decision } from '../../helpers.ts';
 import {
   at,
   attack,
@@ -42,6 +43,16 @@ import {
 
 const NAMI = L11.nami41;
 
+/**
+ * "This effect can be activated when a card is removed from your or your opponent's Life cards" is
+ * optional (W57-R5, the official Koala Q&A): the use is asked; these tests use it. Only that
+ * ability's question is answered.
+ */
+const use = (g: Parameters<typeof yes>[0]): void => {
+  const d = decision(g);
+  if (d?.kind === 'optional' && d.source?.ability === 'life-removed') yes(g);
+};
+
 /** My turn: Nami's Leader hits the opposing Leader; `handSize` cards in my hand. */
 function hit(handSize: number, extraAttacker = false) {
   const g = mine(
@@ -55,6 +66,7 @@ function hit(handSize: number, extraAttacker = false) {
   );
   attack(g, g.leader('p1'), g.leader('p2'));
   noDefence(g);
+  use(g);
   return g;
 }
 
@@ -85,6 +97,7 @@ describe('OP11-041 Nami: [Your Turn] [Once Per Turn] when a Life card is removed
     expect(kind(g)).toBe('main');
     attack(g, at(g, 'p1', 'characters', C11.c3), g.leader('p2'));
     noDefence(g);
+    use(g);
     expect(g.life('p2')).toBe(2);
     expect(hand(g)).toHaveLength(3);
   });
@@ -110,6 +123,7 @@ describe('OP11-041 Nami: [Your Turn] [Once Per Turn] when a Life card is removed
     playCard(g, 'OP11-069');
     yes(g);
     if (kind(g) === 'choose') takeDon(g, 0);
+    use(g);
     expect(g.life('p1')).toBe(3);
     // the Life card entered the hand (cost) and Nami drew 1: hand = BLUE + Life card + drawn card
     expect(hand(g)).toHaveLength(3);

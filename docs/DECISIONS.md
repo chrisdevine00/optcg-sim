@@ -2,6 +2,16 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-25 — Waves 5 to 7 fix round, scripts part: an auto with a colon cost needs no "you may", "can be activated" autos are optional (W57-R1, W57-R5; R4 `viaOf`)
+
+- **Context:** the review (docs/reviews/m6b-waves5-7.md) found two rules readings contradicted by the official Q&A: R1, an [On Play] whose text before the colon is a cost may be declined with or without "you may" (general-rules Q&A "play a Character card with an [On Play] effect without activating", rules-digest 112; the OP09 Q&A for Kuzan treats the placement as a cost); R5, "This effect can be activated when ..." makes the auto optional (rules-digest 112, the OP12-081 Koala Q&A: "you may decline and use it later").
+- **R1 decision:** `optionalCostProblems` no longer requires "you may" before the colon of an auto with a cost (the cost is optional by construction, CR 8-3-1-4). It still refuses a script cost with no cost clause in the text, and now also refuses a colon clause with no script cost (every colon clause, "you may" or not; "choose one:" excluded), so no scripted auto can spend a declinable cost as a mandatory first step. OP09-101 is scripted with the placement as the cost. The 2026-10-29 reading (a cost without "may" is mandatory when payable) is withdrawn for autos; it stays for an Event's `costOptional`, which is the player's choice to play the card. Scan of all scripted cards: OP09-101 was the only one.
+- **R5 decision:** `optional: true` on OP12-081, OP11-102, OP09-001, OP10-042, OP11-040, OP11-041 (the [Your Turn] draw), OP11-043, OP13-100, OP16-041, OP16-048 (the [Once Per Turn] Blocker); the checker requires it for any auto whose text says "can be activated" and that has no cost and no `may` step. PRB02-009 is a `may` already. A declined use does not spend the [Once Per Turn] (the engine spends it at the start of resolution after the answer). The use is asked before the effect's own `if` is read, so a use whose `if` then fails (hand size over the bound) spends the once-per-turn, as before.
+- **Engine detail:** the ask stage of `runEffect` drops a queued optional auto whose [Once Per Turn] is already spent (a K.O. that is a removal and a K.O. queues two uses; accepting the first no longer asks the second).
+- **R4:** `viaOf` returns `effect` for a frame of a `trigger` ability: a Character's own [Trigger] "play this card" is not "a Character's effect" (the OP12-081 Koala Q&A).
+- **Alternatives rejected:** keeping "you may" required and adding a per-card exception for Kuzan (the checker would stay wrong for the unscripted cards with a bare colon cost, about 25 in OP-01 to OP-08); asking the optional use only when its `if` holds (the effect body's conditions are not readable at the ask).
+- **ENGINE_VERSION:** no further bump (0.5.17 covers this fix round); the goldens hold none of these cards and were not re-recorded.
+
 ## 2026-11-25 — Waves 5 to 7 fix round, engine part: W57-R2, R3, R6, R8, R11 (ENGINE_VERSION 0.5.16 to 0.5.17)
 
 - **Context:** the waves 5 to 7 review (docs/reviews/m6b-waves5-7.md) failed on five severity 3. This part fixes the engine ones that are not the Kuzan/Koala/Camie script and checker changes (another agent has R1, R4, R5, R9, R10, R12).

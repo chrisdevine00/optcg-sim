@@ -22,6 +22,7 @@ import {
   kind,
   L11,
   need,
+  no,
   none,
   offeredIds,
   passBlock,
@@ -29,6 +30,7 @@ import {
   pickInst,
   theirs,
   trash,
+  yes,
 } from './kit-op11b.ts';
 
 const ICHIJI = 'OP11-043';
@@ -46,6 +48,9 @@ function defend(
     { characters: [C11.c3] },
   );
   attack(g, at(g, 'p2', 'characters', C11.c3), g.leader('p1'));
+  // "This effect can be activated when ..." is optional (W57-R5, the official Koala Q&A): the use
+  // is asked once its condition holds; these tests use it.
+  if (kind(g) === 'optional') yes(g, 'p1');
   return g;
 }
 
@@ -120,12 +125,31 @@ describe("OP11-043 Vinsmoke Ichiji: [Blocker]; [On Your Opponent's Attack] +1000
       { characters: [C11.c3, C11.c4] },
     );
     attack(g, at(g, 'p2', 'characters', C11.c3), g.leader('p1'));
+    yes(g, 'p1');
     pickInst(g, [g.leader('p1')]);
     passBlock(g);
     passCounter(g);
     attack(g, at(g, 'p2', 'characters', C11.c4), g.leader('p1'));
     expect(kind(g)).toBe('block');
     expect(trash(g)).toHaveLength(2);
+  });
+
+  it('W57-R5: "can be activated" is optional: declining trashes nothing and does not spend the Once Per Turn', () => {
+    const g = theirs(
+      L11.mono,
+      { characters: [ICHIJI], deck: [C11.c1, C11.c2, ...D(10)] },
+      { characters: [C11.c3, C11.c4] },
+    );
+    attack(g, at(g, 'p2', 'characters', C11.c3), g.leader('p1'));
+    no(g, 'p1');
+    expect(kind(g)).toBe('block');
+    expect(trash(g)).toEqual([]);
+    expect(g.power(g.leader('p1'))).toBe(5000);
+    passBlock(g);
+    passCounter(g);
+    attack(g, at(g, 'p2', 'characters', C11.c4), g.leader('p1'));
+    yes(g, 'p1');
+    need(g, 'choose', 'p1');
   });
 
   it('has [Blocker] and can block the attack', () => {

@@ -13,6 +13,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { act, decision } from '../../helpers.ts';
+import { withAbilities, type Ability } from '../../../../src/testing.ts';
 import {
   at,
   attack,
@@ -23,6 +24,7 @@ import {
   kind,
   kw,
   LW,
+  mine,
   need,
   none,
   passBlock,
@@ -159,5 +161,60 @@ describe("OP11-005 Smoker: [Blocker]; with [DON!! x1] it cannot be K.O.'d by eff
     aimAt(g, KUMACY);
     expect(chars(g, 'p1')).toEqual([SMOKER]);
     expect(kind(g)).toBe('main');
+  });
+
+  it("W57-R9: \"effects\" is either player's: Smoker's own non-<Special> Character cannot K.O. it either (kills cause 'effect' to 'opponentEffect')", () => {
+    const g = mine(
+      LW.luffy,
+      { characters: [{ card: SMOKER, don: 1 }, SQUARD], costArea: { active: 9, rested: 0 } },
+      {},
+    );
+
+    g.state = withAbilities(g.state, SQUARD, [
+      {
+        id: 'k',
+        kind: 'activate',
+        when: 'activateMain',
+        effect: [
+          {
+            do: {
+              ko: {
+                from: 'characters',
+                owner: 'you',
+                filter: { name: 'Smoker' },
+                pick: { exactly: 1 },
+              },
+            },
+          },
+        ],
+      } as Ability,
+    ]);
+    act(g, { type: 'activate', card: g.find('p1', 'characters', SQUARD), ability: 'k' });
+    expect(chars(g, 'p1').sort()).toEqual([SMOKER, SQUARD].sort());
+    expect(trash(g, 'p1')).toEqual([]);
+    // Control: with no DON!! given the same effect K.O.s it.
+    const c = mine(LW.luffy, { characters: [{ card: SMOKER, don: 0 }, SQUARD] }, {});
+
+    c.state = withAbilities(c.state, SQUARD, [
+      {
+        id: 'k',
+        kind: 'activate',
+        when: 'activateMain',
+        effect: [
+          {
+            do: {
+              ko: {
+                from: 'characters',
+                owner: 'you',
+                filter: { name: 'Smoker' },
+                pick: { exactly: 1 },
+              },
+            },
+          },
+        ],
+      } as Ability,
+    ]);
+    act(c, { type: 'activate', card: c.find('p1', 'characters', SQUARD), ability: 'k' });
+    expect(chars(c, 'p1')).toEqual([SQUARD]);
   });
 });

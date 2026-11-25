@@ -77,6 +77,8 @@ describe('OP11-081 Cognac Mama-Mash: [Main] choose a cost, K.O. a base cost 8 or
 
   it('cannot be played with 5 active DON!! (cost 6)', () => {
     const g = board(COST.c3, [], { costArea: { active: 5, rested: 0 } });
+    // W57-R12: the absence below is only meaningful when it is p1's decision.
+    expect(g.decider).toBe('p1');
     expect(
       g.legal().some((a) => a.type === 'playCard' && a.card === at(g, 'p1', 'hand', MAMA)),
     ).toBe(false);

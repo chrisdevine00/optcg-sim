@@ -2,6 +2,7 @@
 
 One disagreement. Every other test in this group passes against the scripts as written.
 
+- **D-1 RESOLVED (W57 fix round, W57-R1): the test was right, the engine reading was wrong.** The `it.fails` is now a plain test; OP09-101 is scripted with the placement as a cost, the checker (`cards/src/optional-cost.ts`) accepts a colon cost with no "you may" on an auto, and the `place` helper answers the "pay this cost?" question. The original note follows.
 - **D-1 (OP09-101 Kuzan, severity 2, rules reading).** "[On Play] Place 1 of your opponent's Characters ... face-up: Your opponent trashes 1 card from their hand." has a cost and no "you may". Rules-digest 112 (CR 8-1-2 with QA-GR "play a Character card with an [On Play] effect without activating") says an [On Play] with a cost may be declined and the card is still played. The engine asks no question: after the play the cost pick (exactly 1, no `done`) is the first prompt, so the effect cannot be declined once an eligible Character exists. Pinned as `it.fails` "declining the cost (rules-digest 112)". The competing reading (a cost without "may" is mandatory when payable, CR 8-3-1-4 and DECISIONS 2026-10-29) is the one built; the review settles it. A non-severe reading, no card text is misplayed when the player would pay anyway.
 
 Readings the tests rely on (each is also in the test header):

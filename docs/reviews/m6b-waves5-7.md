@@ -107,3 +107,22 @@ Date 2026-11-25. Findings fixed here: W57-R2, R3, R6, R8; R11 listed. R1, R4, R5
 | W57-R11 (1) | not fixed: DON!! are counts, holding a particular one needs identity (BACKLOG 8) | none |
 
 **ENGINE_VERSION 0.5.16 to 0.5.17**, goldens re-recorded (hashes unchanged; none holds these cards). Re-review: the five probes of R2, R3 and R6 above are now the planted tests.
+
+## Fix round (scripts part)
+
+Date 2026-11-25. Findings fixed here: W57-R1, R4, R5, R9, R10, R12. The engine part (R2, R3, R6, R8, R11) is the section above. Each fix has a test that fails on the old code (reverted, watched fail, restored).
+
+| Finding | Fix | Test (fails on the old code) |
+| --- | --- | --- |
+| W57-R1 (3) | `optional-cost.ts` accepts an auto with a colon cost and no "you may" (the cost may be declined, official general-rules Q&A, rules-digest 112) and refuses an auto whose text has a colon cost clause but whose script has no cost (except "choose one:"); OP09-101 rescripted with the placement as a cost; D-1 turned into a plain test | `cards/test/optional-cost.test.ts` (3 new, 1 rewritten), `OP09-101.test.ts` author (decline, unpayable), independent `w7/OP09-101.test.ts` (D-1 plain, decline): 15 fail with checker and script reverted |
+| W57-R4 (3) | `viaOf` returns `effect` for a frame of a `trigger` ability | `m6b-w7/w57-r4-trigger-via.test.ts` (planted), `OP12-081.test.ts` Conney case: 2 fail with the line removed |
+| W57-R5 (3) | `optional: true` on 10 autos (below); `optional-cost.ts` requires it for "This effect can be activated ..." without a cost; the ask stage of `runEffect` skips a use whose [Once Per Turn] is already spent | one decline test per card (16 tests in the author and independent suites): all fail with `optional: true` removed |
+| W57-R9 (2) | six boundary tests | each fails with its mutant (OP11-092 cost 9, OP11-005 and OP14-003 and EB03-033 cause, EB02-039 power 5000, ST36-005 basePower 6000) |
+| W57-R10 (1) | recorded in OPEN-QUESTIONS (Q73, Q83, Q85; the Q85 citation is OP17-039, not OP03-001, whose entries say the opposite order) | n/a |
+| W57-R12 (1) | `g.decider` guards on the named absence assertions. One was vacuous: the independent OP11-079 "not usable as a [Main] on my own turn" read p2's legal actions (the board is p2's turn); it now reads p1's own Main Phase | the guards |
+
+R1 cards: OP09-101 only (the scan of every scripted auto for a colon clause with no script cost found nothing else; OP17-049 and OP17-112 are "choose one" and are excluded). R5 cards: OP12-081 (`opp-play-life`), OP11-102 (`watch`), OP09-001, OP10-042 (`removed`), OP11-040, OP11-041 (`life-removed`), OP11-043, OP13-100, OP16-041, OP16-048 (`opp-attack`). PRB02-009 already asks: its "You may trash this Character and draw 2 cards" is a `may` step and has no [Once Per Turn], so a second `optional` would only double the question; its decline is tested already.
+
+Independent tests that assumed the old behaviour (no question) were test errors against the Q&A and were updated to answer the question: OP10-042, OP11-040, OP11-041, OP11-043, OP13-100, OP16-048, OP16-041, OP12-081 (w5), OP11-102 (w6), and the author tests of the same cards plus OP17-034 (its p2 Leader OP11-040 now asks at the start of p2's turn).
+
+Play changes (for ENGINE_VERSION, already 0.5.17 for this round): R4 changes `cardPlayed` `via` for Character [Trigger] plays; R5 adds a question to 10 cards and one engine change (a queued optional auto whose [Once Per Turn] was spent by an earlier one is no longer asked; before it was asked and then skipped); R1 changes OP09-101 (new question, and the script version of the card). Recorded games with these cards replay differently. See the DECISIONS entry. A K.O. that is both a removal and a K.O. offers an optional auto listing both events twice after a decline (the second event asks again): noted, not changed.
