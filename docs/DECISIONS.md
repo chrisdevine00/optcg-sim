@@ -2,6 +2,12 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-25 — M7 plan: eight work packages, starter decks for the tutorial, the coach keeps its own worker
+
+- **Context:** M7 (PLAN row 18, 40 h) builds the guided tutorial and the rest of the coach. A planning pass over PROMPT.md, the design docs and the L-slice code produced `docs/design/m7-plan.md`: WP0 contracts first, then WP1 hint, WP2 blunder scoring and tempo ledger, WP3 opponent's-turn threat check, WP6 tutorial in parallel, then WP4 coach panel, WP5 blunder gate, Settings and the interruption-contract test, WP7 S2 kit and review. Honest estimate about 52 h; the cut order is in the plan.
+- **Decision (lead):** the tutorial uses real starter decks, **ST-21** (Monkey.D.Luffy: a `[DON!! x1] [Activate: Main]` Leader, so step t7 teaches a true Activate: Main) for the player and **ST-22** for the opponent; both are fully playable since M6b. Each step is a fixed scenario naming exact cards; the complete product decklists are an owner check on the official site (OPEN-QUESTIONS). The coach keeps its own worker holding only the player's data (DECISIONS 2026-11-05), so ARCHITECTURE §5 is amended; `H` moves focus to the hint result (L-11), so accessibility.md §3.12's `H` row is corrected. The tutorial timing log lives in `localStorage` behind a storage adapter (IndexedDB moved to M8).
+- **Rejected:** reduced Rocks and Kaido lists for the tutorial (their Leaders have no Activate: Main, so t7 would teach an optional [When Attacking] cost instead); one shared worker for the AI and the coach (the coach would see the AI seat's data).
+
 ## 2026-11-25 — M6b-2 wave 8 fix round: W8-R1 lazy batch id, W8-R4 exact turn test (ENGINE_VERSION stays 0.5.18)
 
 - **Decision:** `fireDelayedMain` takes `d.s.nextMod++` only when an entry fires, so a Main Phase with nothing delayed consumes no modifier id: the `mod-<id>` of EB02-030's replacement (and the hash of games recorded at 0.5.18 before wave 8) is what it was (`mod-5` in the review's position). Its turn test is now `x.turn <= d.s.turn` (it runs once, as the Main Phase begins, so an entry of the same turn was made before it): an entry made in the opponent's Refresh, Draw or DON!! Phase runs at that Main Phase instead of a turn later. No scripted card makes one, so no play changes. `TIMING_WORDS` names the new timing in the order prompt.
