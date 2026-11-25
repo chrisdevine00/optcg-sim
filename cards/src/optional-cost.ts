@@ -69,7 +69,9 @@ function unitFor(ab: Ability, units: string[]): string | undefined {
       (first === 'onOpponentAttack' &&
         /^\[Once Per Turn\]\s*This effect can be activated when your opponent attacks/.test(u)) ||
       (first === 'onKO' &&
-        /^(?:\[(?:Opponent's Turn|Your Turn)\]\s*)?When this Character is K\.O\.'d\b/.test(u)) ||
+        /^(?:\[(?:Opponent's Turn|Your Turn)\]\s*)?(?:You may [^:]*:\s*)?When this Character is K\.O\.'d\b/.test(
+          u,
+        )) ||
       // "This effect can be activated at the start of your turn." (OP11-040) is the printed form of
       // a start-of-turn auto.
       (first === 'startOfYourTurn' &&
