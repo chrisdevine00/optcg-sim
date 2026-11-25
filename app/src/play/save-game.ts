@@ -7,6 +7,7 @@ import type { GameResult, PlayerId } from '@optcg/engine';
 import type { AiTier } from '@optcg/ai';
 import type { SessionRecord } from '../session/index.ts';
 import { getStore } from '../store/index.ts';
+import { reportStoreError } from '../store/open.ts';
 import type { GameMeta, ReviewStore } from '../store/types.ts';
 
 /** What the saver reads from a game: a `GameController` fits through `sourceOf`. */
@@ -45,7 +46,7 @@ export class GameSaver {
     private readonly store: () => ReviewStore = getStore,
     private readonly now: () => number = Date.now,
     /** Called when a save fails (quota, storage off); the game itself is unaffected. */
-    private readonly onError: (e: unknown) => void = () => undefined,
+    private readonly onError: (e: unknown) => void = reportStoreError,
   ) {}
 
   /** The saved id of this game, once saved. */

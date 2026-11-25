@@ -17,15 +17,14 @@ import { clearWelcome, loadWelcome } from '../tutorial/progress.ts';
 import {
   download,
   exportName,
-  LocalTimingStore,
   minutesWords,
+  timingStore,
   toCsv,
   toJson,
 } from '../tutorial/timing.ts';
 import type { TutorialTimingLog } from '../tutorial/types.ts';
+import { DataSection } from './DataSection.tsx';
 import './settings.css';
-
-const store = new LocalTimingStore();
 
 const VERBOSITY: { v: Verbosity; label: string }[] = [
   { v: 'learner', label: 'Learner: evidence open, “next time” shown' },
@@ -47,6 +46,7 @@ function when(log: TutorialTimingLog): string {
 }
 
 export default function SettingsRoute() {
+  const [store] = useState(timingStore);
   const [profile, setProfile] = useState<CoachProfile>(loadProfile);
   const [runs, setRuns] = useState<TutorialTimingLog[]>(() => store.load());
   const [welcomeAsked, setWelcomeAsked] = useState(() => loadWelcome() !== null);
@@ -245,6 +245,8 @@ export default function SettingsRoute() {
           </ul>
         )}
       </section>
+
+      <DataSection say={setSaid} onChanged={() => setRuns(timingStore().load())} />
 
       <section aria-labelledby="set-welcome">
         <h2 id="set-welcome">Welcome</h2>
