@@ -1,0 +1,16 @@
+# Disagreements: OP-09 independent tests, group B
+
+Cards: OP09-031, 032, 034, 035, 036, 037, 043, 044, 046, 047, 048, 050, 051, 052, 053, 054, 056, 064, 066, 069, 071, 074.
+
+None. Every test passes; no `it.fails` was needed.
+
+Readings the tests assume or leave open, so the review can check them:
+
+- **OP09-032 Rosinante, [Once Per Turn] when already active.** Not asserted whether the use is spent when the Character is already active at the first opposing attack (no ruling). The tests only use a rested Rosinante for the spent-use case.
+- **OP09-051 Buggy, second sentence after a placement that did nothing.** "Then, if you do not have 5 Characters with a cost of 5 or more, place this Character ..." when no opposing Character was placed (the pick was declined or the opponent has none): the tests assert only the cases every reading shares (the check passes, so Buggy stays). The failing-check case after a declined or empty placement is not asserted (CR 4-10-2 / M4b-5 wording).
+- **OP09-047 Oden, [Double Attack] against 1 Life.** The tests follow RL-20 (it does not win; Life goes to 0 and the game continues).
+- **OP09-048 Mihawk, deck of exactly 2.** The tests follow RL-26 (drawing the last card loses at once, no trash step).
+- **OP09-052 Marco, a K.O. on my own turn.** No scripted source of an own-side K.O. of one's own Character exists in the repo, so "[Opponent's Turn] only" is not tested from the own-turn side; only the battle K.O. (not an effect) is tested as a non-trigger.
+- **OP09-074 Bepo, "[Your Turn]" from the other side.** An opposing DON!! return on the opponent's turn is tested to prompt nobody about Bepo; a DON!! return of mine on the opponent's turn has no scripted source.
+- **OP09-074 Bepo, whether a declined "up to 1" pick spends the [Once Per Turn].** Not asserted.
+- **Prompt order.** Which of Bepo's pick and Lightning's or Killer's own pick comes first is not asserted.
