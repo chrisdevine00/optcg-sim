@@ -39,8 +39,8 @@ const ID = 'EB04-052';
 const NEWGATE = 'OP02-001';
 /** EB04-056 Pacifista: Yellow, cost 1, 1000, Counter +2000. */
 const PACIFISTA = 'EB04-056';
-/** EB02-054 Sanji (another card): Yellow, cost 5, 6000, [Blocker]. */
-const YELLOW6000 = 'EB02-054';
+/** OP03-106 Charlotte Opera: Yellow, cost 4, 6000, vanilla (EB02-054 Sanji is scripted now). */
+const YELLOW6000 = 'OP03-106';
 /** EB04-051 Emet: Yellow, cost 8, 7000. */
 const YELLOW7000 = 'EB04-051';
 const SAI = 'OP01-012'; // Red, cost 2, 4000
