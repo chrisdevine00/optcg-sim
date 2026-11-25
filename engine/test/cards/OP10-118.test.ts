@@ -18,7 +18,11 @@ describe('OP10-118 Monkey.D.Luffy', () => {
   it('[When Attacking]: place 3 trash cards at the bottom of the deck; with 5+ cards in hand the opponent trashes 1', () => {
     const g = attacking(times(5, V.c1).concat([]));
     accept(g);
-    pick(g, [g.find('p1', 'trash', V.c1), g.find('p1', 'trash', V.c2), g.find('p1', 'trash', V.c3)]);
+    pick(g, [
+      g.find('p1', 'trash', V.c1),
+      g.find('p1', 'trash', V.c2),
+      g.find('p1', 'trash', V.c3),
+    ]);
     while (dec(g)?.kind === 'order') g.act(g.legal().find((a) => a.type === 'order')!);
     expect(trash(g, 'p1')).toEqual([V.c4]);
     expect(g.zone('p1', 'deck')).toHaveLength(4);
@@ -32,7 +36,11 @@ describe('OP10-118 Monkey.D.Luffy', () => {
   it('the opponent with exactly 4 cards in hand trashes nothing (boundary), though the cost is paid', () => {
     const g = attacking(times(4, V.c1));
     accept(g);
-    pick(g, [g.find('p1', 'trash', V.c1), g.find('p1', 'trash', V.c2), g.find('p1', 'trash', V.c3)]);
+    pick(g, [
+      g.find('p1', 'trash', V.c1),
+      g.find('p1', 'trash', V.c2),
+      g.find('p1', 'trash', V.c3),
+    ]);
     while (dec(g)?.kind === 'order') g.act(g.legal().find((a) => a.type === 'order')!);
     expect(trash(g, 'p1')).toEqual([V.c4]);
     expect(hand(g, 'p2')).toHaveLength(4);
@@ -60,7 +68,11 @@ describe('OP10-118 Monkey.D.Luffy', () => {
 
   it("the protection covers only the opponent's effects: your own K.O. effect works, and it renews next turn", () => {
     const own = start({ characters: [ID] });
-    own.state = applyOp(own.state, { op: 'ko', card: own.find('p1', 'characters', ID), by: 'p1' }).state;
+    own.state = applyOp(own.state, {
+      op: 'ko',
+      card: own.find('p1', 'characters', ID),
+      by: 'p1',
+    }).state;
     expect(cardsOf(own, 'p1', 'characters')).toEqual([]);
 
     const g = start({ characters: [ID], leader: SN_LEADER }, { characters: [V.c2] });

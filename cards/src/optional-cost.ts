@@ -55,7 +55,8 @@ function timings(ab: Ability): (string | object)[] {
 const lead = (u: string): string => /^(?:\[[^\]]*\]\s*\/?\s*)+/.exec(u)?.[0] ?? '';
 
 function unitFor(ab: Ability, units: string[]): string | undefined {
-  if (ab.kind === 'replacement') return units.find((u) => /would (?:be|take)/.test(u));
+  if (ab.kind === 'replacement')
+    return units.find((u) => /would (?:be|take)|cannot be K\.O\.'d/.test(u));
   const ts = timings(ab);
   const first = ts[0];
   if (typeof first === 'string') {
@@ -67,7 +68,8 @@ function unitFor(ab: Ability, units: string[]): string | undefined {
     const printedWindow = (u: string) =>
       (first === 'onOpponentAttack' &&
         /^\[Once Per Turn\]\s*This effect can be activated when your opponent attacks/.test(u)) ||
-      (first === 'onKO' && /^When this Character is K\.O\.'d\b/.test(u)) ||
+      (first === 'onKO' &&
+        /^(?:\[(?:Opponent's Turn|Your Turn)\]\s*)?When this Character is K\.O\.'d\b/.test(u)) ||
       // "This effect can be activated at the start of your turn." (OP11-040) is the printed form of
       // a start-of-turn auto.
       (first === 'startOfYourTurn' &&

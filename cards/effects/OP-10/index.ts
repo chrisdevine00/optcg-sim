@@ -97,6 +97,7 @@ import { OP10_113 } from './OP10-113.ts';
 import { OP10_114 } from './OP10-114.ts';
 import { OP10_115 } from './OP10-115.ts';
 import { OP10_117 } from './OP10-117.ts';
+import { OP10_118 } from './OP10-118.ts';
 import { OP10_119 } from './OP10-119.ts';
 
 const SET: readonly CardScript[] = [
@@ -197,6 +198,7 @@ const SET: readonly CardScript[] = [
   OP10_114,
   OP10_115,
   OP10_117,
+  OP10_118,
   OP10_119,
 ];
 export default SET;
