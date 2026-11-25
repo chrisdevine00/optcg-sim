@@ -6,6 +6,7 @@ import { OP09_003 } from './OP09-003.ts';
 import { OP09_004 } from './OP09-004.ts';
 import { OP09_005 } from './OP09-005.ts';
 import { OP09_007 } from './OP09-007.ts';
+import { OP09_008 } from './OP09-008.ts';
 import { OP09_009 } from './OP09-009.ts';
 import { OP09_010 } from './OP09-010.ts';
 import { OP09_011 } from './OP09-011.ts';
@@ -14,9 +15,11 @@ import { OP09_013 } from './OP09-013.ts';
 import { OP09_014 } from './OP09-014.ts';
 import { OP09_015 } from './OP09-015.ts';
 import { OP09_017 } from './OP09-017.ts';
+import { OP09_018 } from './OP09-018.ts';
 import { OP09_019 } from './OP09-019.ts';
 import { OP09_020 } from './OP09-020.ts';
 import { OP09_021 } from './OP09-021.ts';
+import { OP09_022 } from './OP09-022.ts';
 import { OP09_023 } from './OP09-023.ts';
 import { OP09_024 } from './OP09-024.ts';
 import { OP09_025 } from './OP09-025.ts';
@@ -109,6 +112,7 @@ const SET: readonly CardScript[] = [
   OP09_004,
   OP09_005,
   OP09_007,
+  OP09_008,
   OP09_009,
   OP09_010,
   OP09_011,
@@ -117,9 +121,11 @@ const SET: readonly CardScript[] = [
   OP09_014,
   OP09_015,
   OP09_017,
+  OP09_018,
   OP09_019,
   OP09_020,
   OP09_021,
+  OP09_022,
   OP09_023,
   OP09_024,
   OP09_025,
