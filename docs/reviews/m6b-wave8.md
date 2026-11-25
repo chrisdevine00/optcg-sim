@@ -71,3 +71,16 @@ The `faq_op15-eb04.txt` rows for OP15-119 settle two readings of this wave in th
 
 ## Fix round suggestion
 W8-R1 (the lazy batch and a planted test), then W8-R2 (five tests: base cost for Sanji, [Your Turn] for Reiju and Luffy, the optional-cost candidate, the exclusion, `acted`), then W8-R3 to W8-R7. Re-review: the Q92 probe and the `mod-5` position.
+
+## Fix round
+
+Tests are in `engine/test/cards/m6b-w8/` (`w8-fix-round.test.ts`, `w8-fix-round-r2.test.ts`, one test added to `d8-delayed-main-phase.test.ts`). Each was run against its mutant or the reverted code and failed there.
+
+- **W8-R1 (2) fixed.** `fireDelayedMain(d, p)` takes `d.s.nextMod++` only after the `now.length === 0` return. Planted test: the review's EB02-030 position gives ability `mod-5`, `nextMod` 6, and `mod-5` inside the hashed `summary().mods`. With the old code it fails (`mod-6`). **`ENGINE_VERSION` stays 0.5.18:** the id is what it was before wave 8; the goldens and `ENGINE_GAMES=2000` property run (10 files, 32 tests) replay with identical hashes.
+- **W8-R2 (2) pinned.** Each fails with its mutant: OP12-041 `baseCost` to `cost` (base-cost-1 Event with a +5 cost modifier is still offered); `conditions: [{ yourTurn: true }]` removed from EB03-031 (DON!! -1 must not be offered) and from PRB02-005 (no delayed entry), both reached by a planted [Counter] that plays the Character on the opponent's turn; M6b-Q92 (`!optionalCost(main) ? main.cost : undefined` to `main.cost`: DON!! -2 Event is offered, picked, accept unavailable); `{ exclude: id }` removed from `payable` (a lone Event with a hand-trash cost is not offered); `f.acted = true` removed (a planted "if you do" `did` label after an activation).
+- **W8-R3 (1) fixed.** `TIMING_WORDS` (it lives in `engine/src/flow.ts`) names `startOfOpponentsNextMainPhase`; test on two delayed entries' `order` options (fails on the old code: "Mohji : effect").
+- **W8-R4 (1) fixed.** `fireDelayedMain` runs once, as the Main Phase begins, so `x.turn <= d.s.turn` is exact (an entry of the same turn was made before the phase). Test stamps an entry as made in the opponent's turn; fails with `<`.
+- **W8-R5 (1) partly.** Added OP12-041's boundary (base cost 3 offered, 4 not; fails with `lte: 4`) and "choose none" (fails with `exactly: 1`). OP15-014 `baseCost`, OP16-079 duration and OP12-041 DON!! add `upTo`: BACKLOG W8-N3.
+- **W8-R6 (1).** OPEN-QUESTIONS W8-V1 (ST14-014 truncated name and type); no card data edited.
+- **W8-R7 (1).** OP15-119 rows cited in `docs/research/m6b-wave8.md` and OPEN-QUESTIONS M6b-Q28; two confirming tests (Sabo hand activation: opponent asked; Reiju trash activation: not). They pass on the old code too (they confirm a reading rather than close a gap).
+- **DECISIONS:** one entry (lazy batch id, exact turn test).

@@ -265,7 +265,7 @@ function runTurn(d: Draft, f: Extract<Frame, { f: 'turn' }>): void {
       f.step = 'main';
       fireFor(d, [p, other(p)], 'startOfMainPhase', (q) => fieldCards(d, q));
       // "At the start of your opponent's next Main Phase" (D8): after the Main Phase's own start effects.
-      fireDelayedMain(d, p, d.s.nextMod++);
+      fireDelayedMain(d, p);
       return;
     case 'main':
       ask(d, {
@@ -1548,13 +1548,18 @@ function fireDelayed(d: Draft, controller: PlayerId, batch: number): void {
 /**
  * "At the start of your opponent's next Main Phase" (D8): the delayed effects of the player whose
  * opponent `active` is, made in an earlier turn, run now. Their conditions were read when they
- * were created (official PRB02 Q&A for PRB02-005), so nothing is checked here.
+ * were created (official PRB02 Q&A for PRB02-005), so nothing is checked here. This runs once, as the
+ * Main Phase begins, so an entry of the same turn was made before it began (W8-R4: `<=`, not `<`).
  */
-function fireDelayedMain(d: Draft, active: PlayerId, batch: number): void {
+function fireDelayedMain(d: Draft, active: PlayerId): void {
   const now = d.s.delayed.filter(
-    (x) => x.at === 'startOfOpponentsNextMainPhase' && x.controller !== active && x.turn < d.s.turn,
+    (x) =>
+      x.at === 'startOfOpponentsNextMainPhase' && x.controller !== active && x.turn <= d.s.turn,
   );
   if (now.length === 0) return;
+  // Taken only when something fires: a counter bump at every Main Phase would move the `mod-<id>` of
+  // later created modifiers and so the state hash of games recorded before D8 (W8-R1).
+  const batch = d.s.nextMod++;
   d.s.delayed = d.s.delayed.filter((x) => !now.includes(x));
   d.s.pending = [
     ...d.s.pending,
@@ -1592,6 +1597,7 @@ const TIMING_WORDS: Record<string, string> = {
   endOfYourTurn: '[End of Your Turn]',
   endOfOpponentsTurn: "[End of Your Opponent's Turn]",
   endOfThisTurn: '(at the end of this turn)',
+  startOfOpponentsNextMainPhase: "(at the start of the opponent's next Main Phase)",
   donReturned: '(DON!! returned)',
   onBlock: '[On Block]',
   startOfYourTurn: '(start of turn)',

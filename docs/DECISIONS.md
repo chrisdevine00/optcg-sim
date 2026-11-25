@@ -2,6 +2,11 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-25 — M6b-2 wave 8 fix round: W8-R1 lazy batch id, W8-R4 exact turn test (ENGINE_VERSION stays 0.5.18)
+
+- **Decision:** `fireDelayedMain` takes `d.s.nextMod++` only when an entry fires, so a Main Phase with nothing delayed consumes no modifier id: the `mod-<id>` of EB02-030's replacement (and the hash of games recorded at 0.5.18 before wave 8) is what it was (`mod-5` in the review's position). Its turn test is now `x.turn <= d.s.turn` (it runs once, as the Main Phase begins, so an entry of the same turn was made before it): an entry made in the opponent's Refresh, Draw or DON!! Phase runs at that Main Phase instead of a turn later. No scripted card makes one, so no play changes. `TIMING_WORDS` names the new timing in the order prompt.
+- **Version:** unchanged, since the lazy allocation restores the pre-wave ids; goldens and the 2,000-game property run replay with the same hashes (see docs/reviews/m6b-wave8.md, Fix round).
+
 ## 2026-11-25 — M6b-2 wave 8: D2, D8, D9 (ENGINE_VERSION stays 0.5.18)
 
 - **Context:** DECISIONS 2026-11-23 "M6b-1 decisions" approved D2 (activate an Event from the hand or trash by an effect), D8 (a delayed effect at the start of the opponent's next Main Phase) and D9 (an effect acting on the event's subject) for wave 8 after their rulings; D1, D5 and D7 stay stats-only. Write-up `docs/research/m6b-wave8.md`; card readings `docs/research/wave8-scripting.md`.

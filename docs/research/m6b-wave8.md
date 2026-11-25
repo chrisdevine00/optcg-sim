@@ -62,3 +62,7 @@ Every gap they need is built and none is a D-item now: **OP12-041** Sanji (D2), 
 ## Results
 
 Gate results are in the DECISIONS entry "M6b-2 wave 8: D2, D8, D9". **`ENGINE_VERSION` stays 0.5.18, goldens not re-recorded.** No recorded game plays out differently: the new `Delayed.at`, `Ev.subject` and `free` Events are reached only by the new actions and by the six newly scripted cards; `fire` passes the subject only to an ability that selects it; the selector `lki` was rejected by the validator before, so no script used it; the `play` frame with `free` was reachable before only for Characters and Stages. The golden games and the 2,000-game property run replay with the same hashes with the version unchanged; a record containing one of the six cards carries a different per-game scripts hash and opens as the old one did (`scriptsVersionOf`).
+
+## Fix round: the OP15-119 Q&A rows (W8-R7)
+
+`faq_op15-eb04.txt`, OP15-119 Monkey.D.Luffy ("When your opponent activates an Event"): Sabo's [On Play] activating an Event from the hand counts (yes); Reiju activating the [Main] of an Event in the trash does not (no). Both agree with D2 as built and are pinned in `engine/test/cards/m6b-w8/w8-fix-round-r2.test.ts`.

@@ -108,4 +108,18 @@ describe('D8 delayed at the start of the opponent’s next Main Phase', () => {
     passTurn(g);
     expect(p2don(g).rested).toBe(1);
   });
+
+  it('an entry made earlier in the same turn, before the Main Phase began, runs at that Main Phase (W8-R4)', () => {
+    // No scripted card makes one in the opponent's Refresh, Draw or DON!! Phase today: stamp an entry
+    // as if p1's effect had resolved in p2's turn, before p2's Main Phase. It must not wait a whole turn.
+    const g = mk();
+    run(g);
+    const e = internals(g.state).delayed[0]!;
+    e.turn += 1;
+    g.act({ type: 'endTurn' });
+    expect(internals(g.state).turn).toBe(e.turn);
+    payDon(g);
+    expect(p2don(g)).toMatchObject({ active: 6, rested: 1 });
+    expect(internals(g.state).delayed).toHaveLength(0);
+  });
 });
