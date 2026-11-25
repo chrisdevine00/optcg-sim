@@ -1309,6 +1309,7 @@ export const SCRIPTED_ID_LIST: readonly string[] = [
   'ST36-002',
   'ST36-003',
   'ST36-004',
+  'ST36-005',
 ];
 
 /** One loader per set folder; the app gets one chunk per set. */

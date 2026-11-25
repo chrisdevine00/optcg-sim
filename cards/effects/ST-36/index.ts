@@ -4,6 +4,7 @@ import { ST36_001 } from './ST36-001.ts';
 import { ST36_002 } from './ST36-002.ts';
 import { ST36_003 } from './ST36-003.ts';
 import { ST36_004 } from './ST36-004.ts';
+import { ST36_005 } from './ST36-005.ts';
 
-const SET: readonly CardScript[] = [ST36_001, ST36_002, ST36_003, ST36_004];
+const SET: readonly CardScript[] = [ST36_001, ST36_002, ST36_003, ST36_004, ST36_005];
 export default SET;

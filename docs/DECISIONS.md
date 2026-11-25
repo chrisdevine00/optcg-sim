@@ -2,6 +2,13 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-25 — G68: turn the top or bottom Life card face-up or face-down (ENGINE_VERSION stays 0.5.16)
+
+- **Context:** ST36-005 Eustass "Captain" Kid pays two costs by turning "1 card from the top or bottom of your Life cards" face-down or face-up, which the G8 cost (the top N) cannot say.
+- **Decision:** extend `turnLifeFaceUp` and `turnLifeFaceDown` with `{ n: 1, from: 'top' | 'bottom' | 'topOrBottom' }` instead of a new cost. The card at the end must be in the opposite face state (M6b-Q59); "top or bottom" lets the player choose either end that can be paid, asked only when both can (a public choice; only the public face state is read). The Life card turned down is hidden under a fresh handle, the one turned up becomes public. ST36-005 is scripted with it and `redirectAttack` (D3). Reading recorded as M6b-Q86.
+- **Alternatives rejected:** a separate `turnLifeFace` cost (two shapes for one rule); reading "top or bottom" as "the top, else the bottom" or as a free choice of end even when its card is already in the target state (the second would make the cost payable as a no-op, the M6b-Q59 competing reading); an `n` above 1 (no card needs it).
+- **ENGINE_VERSION:** no bump. The number form is unchanged; the object form is new, used by no script until ST36-005, and no recorded game has that card, so every golden and property game replays with the same hashes.
+
 ## 2026-11-25 — M6b-2 wave 7: G59 to G67 and D3 (ENGINE_VERSION stays 0.5.16)
 
 - **Context:** wave 7 of the M6b-1 audit (`docs/research/m6b-wave7.md`): a timed attribute grant, the player restriction on adding Life to the hand, a Character placed into a Life area, a power cost on your Leader, "cannot be played by effects" for a card in the hand, looking at Life cards and placing them back, moving a given DON!!, a permanent negate, a stat of a selector as a `Num`, and (D3, decided 2026-11-23) the narrow `redirectAttack`. 20 cards become expressible; none is scripted.
