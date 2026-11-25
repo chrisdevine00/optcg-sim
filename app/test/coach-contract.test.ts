@@ -6,6 +6,7 @@
  * columns: tier-1 always-on (a badge and a polite line only), the blunder warning (only at a commit,
  * only politely). The watcher is itself tested: it catches a coach made to steal focus or expand.
  */
+import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { Card } from '@optcg/cards';
 import { rookie } from '@optcg/ai';
@@ -220,5 +221,26 @@ describe('the interruption contract (learning-ui §2.2)', () => {
     expect(ctl.coach.hintFocus).toBe(1);
     expect(ctl.coach.profile.expanded).toBe(true);
     ctl.dispose();
+  });
+
+  it('every line the coach UI speaks is tagged `coach` (M7-R3), so the watcher can see it', async () => {
+    const port = new CountingCoachPort();
+    const ctl = newGame(port);
+    const w = watch(ctl);
+    ctl.coachAnnounce('Tip: press H for a hint.');
+    ctl.announce('A game line.');
+    expect(w.coachSpoken().map((s) => s.text)).toEqual(['Tip: press H for a hint.']);
+    // A planted unprompted polite coach line makes the default-game assertion fail.
+    expect(() => expect(w.coachSpoken()).toEqual([])).toThrow();
+    ctl.dispose();
+  });
+
+  it('no coach component speaks through the untagged channel', () => {
+    const dir = new URL('../src/play/coach/', import.meta.url);
+    for (const f of readdirSync(dir).filter((x) => x.endsWith('.tsx'))) {
+      const src = readFileSync(new URL(f, dir), 'utf8');
+      expect(/\.announce\(/.test(src), `${f} calls .announce( (use coachAnnounce)`).toBe(false);
+      expect(/\.alert\([^,)]*\)/.test(src), `${f} calls .alert( without a source`).toBe(false);
+    }
   });
 });

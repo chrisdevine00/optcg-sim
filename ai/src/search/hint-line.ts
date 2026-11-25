@@ -218,6 +218,21 @@ function applySet(s: GameState, picks: Action[], ctx: ReturnType<typeof ctxFor>)
   return null;
 }
 
+/** Quick policies for every pending decision until the turn counter moves past `turnBefore`. */
+export function settleToTurnChange(
+  s0: GameState,
+  turnBefore: number,
+  ctx: ReturnType<typeof ctxFor>,
+): GameState {
+  let s = s0;
+  for (let i = 0; i < 200; i++) {
+    if (queries.result(s) || queries.turn(s).number !== turnBefore) return s;
+    if (!queries.decision(s)) return s;
+    s = apply(s, quickAction(s, ctx), ctx);
+  }
+  return s;
+}
+
 /**
  * Replay a line (view handles) on one determinized state and read the numbers the copy needs: the
  * powers an attack meets, the DON!! kept at the end. Only own and public quantities are read; names
@@ -303,9 +318,15 @@ function factsOf(
         targetPower: tg.power ?? 0,
       } satisfies AttackFact);
     }
+    const turnBefore = queries.turn(s).number;
     s = apply(s, a, ctx);
-    if (line[i + 1]?.type !== 'pick') s = settle(s, me, ctx);
-    if (a.type === 'endTurn') facts.activeAtEnd = queries.don(s, me).active;
+    if (a.type === 'endTurn') {
+      // The DON!! still active when the turn passes: end-of-turn effects have resolved, none of the
+      // next turn has run (no Refresh, no DON!! Phase, nothing of theirs). Settling to the player's
+      // next Main instead would count the next turn's DON!!.
+      s = settleToTurnChange(s, turnBefore, ctx);
+      facts.activeAtEnd = queries.don(s, me).active;
+    } else if (line[i + 1]?.type !== 'pick') s = settle(s, me, ctx);
   }
   return facts;
 }
@@ -459,10 +480,14 @@ function macroMove(m: Move[]): Move {
 
 const lower = (s: string): string => s.charAt(0).toLowerCase() + s.slice(1);
 
-/** One sentence on why an alternative is worse, from the heuristic's own terms. */
-function whyWorse(best: Leaf | null, alt: Leaf | null, move: Move): string {
+/**
+ * One sentence on why an alternative is worse, from the heuristic's own terms; null when the
+ * breakdown gives no specific reason (the alternative is then left out, never explained by "it
+ * ranked lower", M7-R6).
+ */
+function whyWorse(best: Leaf | null, alt: Leaf | null, move: Move): string | null {
   const head = `Instead, ${lower(move.text.replace(/\.$/, ''))}`;
-  if (!best || !alt) return `${head}: it ranked lower in the games the search played out.`;
+  if (!best || !alt) return null;
   const d = (k: keyof Breakdown) => best.b[k] - alt.b[k];
   const terms: [keyof Breakdown, number][] = [
     ['result', d('result')],
@@ -504,7 +529,7 @@ function whyWorse(best: Leaf | null, alt: Leaf | null, move: Move): string {
         return `${head}: it holds less defence in your hand.`;
     }
   }
-  return `${head}: it ranked lower in the games the search played out.`;
+  return null;
 }
 
 function mainHint(
@@ -554,7 +579,11 @@ function mainHint(
     // A different macro that reads the same (another answer to the same prompt) is not another line.
     const move = macroMove(m);
     if (move.text === bestFirst) return;
-    alternatives.push({ move, why: whyWorse(found.best, found.leaves[i] ?? null, move) });
+    // A move that is already a step of the main line is not an alternative to it (the same attack
+    // after the same plays), M7-R6.
+    if (moves.some((x) => x.text === move.text)) return;
+    const why = whyWorse(found.best, found.leaves[i] ?? null, move);
+    if (why !== null) alternatives.push({ move, why });
   });
   return {
     line: moves,
@@ -741,9 +770,12 @@ function defenceHint(
     const m = describeActions(vs as Action[], who);
     if (m.length === 0) continue;
     const text = m.map((x) => lower(x.text.replace(/\.$/, ''))).join(', ');
+    // Only a measured margin is a reason; "it ranked lower" alone says nothing (M7-R6).
+    if (bestV - r.raw < 0.5) continue;
+    if (moves.some((x) => x.text === m[0]!.text)) continue;
     alternatives.push({
       move: m[0]!,
-      why: `Instead, ${lower(text)}: it ranked lower in the games the search played out${bestV - r.raw >= 0.5 ? ` (${(bestV - r.raw).toFixed(1)} cards behind)` : ''}.`,
+      why: `Instead, ${lower(text)}: it ranked lower in the games the search played out (${(bestV - r.raw).toFixed(1)} cards behind).`,
     });
   }
   return {
@@ -857,6 +889,15 @@ function choiceHint(
 // ------------------------------------------------------------------------------------------------
 // Entry points
 // ------------------------------------------------------------------------------------------------
+
+/**
+ * The Main Phase line `hint` would give, as view actions (for tests that replay it through the
+ * engine). Same setup, budget and seed as `hint`, so the same line.
+ */
+export function mainLineOf(view: SearchView, opts: HintOptions): Action[] {
+  const budget: Budget = opts.budget ?? { ms: 2000 };
+  return searchMain(view, hintSetup(view, opts), budget, hintSeed(view)).line;
+}
 
 /** The hint for the asking seat's decision. */
 export function hint(view: SearchView, opts: HintOptions): HintResult {

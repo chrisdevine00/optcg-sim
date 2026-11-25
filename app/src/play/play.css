@@ -635,15 +635,25 @@
   left: 8px;
   top: 0;
   bottom: 0;
-  max-width: 30%;
+  /* Never reaches the turn and phase words: they are centred on the axis and, in a battle, 560 px
+     wide (M7-R5, board.md §3.8). Left of them there is room for two short lines, not one long one. */
+  max-width: max(96px, calc(50% - 296px));
   display: flex !important;
   align-items: center;
   gap: 6px;
   font-size: var(--text-sm);
+  line-height: 1.15;
   color: var(--color-opponent-text);
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  white-space: normal;
+}
+.mid-left .vis {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
 }
 .mid-centre {
   position: absolute;

@@ -2,6 +2,18 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-25 — M7 fix round: the review's R1 to R8 (docs/reviews/m7-review.md, "Fix round")
+
+- **Context:** the independent M7 review failed on M7-R1 (severity 3) and listed five severity 2 findings.
+- **Changed readings:**
+  - **"End your turn with N DON!! active" is read when the turn passes (M7-R1).** `facts` captures the turn number before `endTurn` and settles only until the turn counter moves (`settleToTurnChange`), then reads `queries.don(s, me).active`: end-of-turn effects (E15's Nami) have resolved, no Refresh, no DON!! Phase and nothing of theirs has run. The old read came after a whole turn of theirs and counted the next turn's DON!!. E15's injected line still says 5 (Nami); `ub-hint-1` now says 0 (4 DON!!: 3 for Yamato, 1 given), so its lesson is board-vs-face, not don-efficiency. S2-kit task 2.3 is corrected.
+  - **While a decision is tall, Why, Math and Tempo are unavailable (M7-R2),** not stored: `aria-disabled` with a reason (title and a described-by line), `aria-pressed` false, no profile write, so nothing opens when the decision ends. Hint keeps working (it shows in the decision body). Rejected: rendering the three tabs inside the decision body (the rail has no room, and Math and Tempo need the board visible).
+  - **Every coach line is tagged `coach` (M7-R3).** `ctl.coachAnnounce` for the coach components, an ESLint rule on `app/src/play/coach/**/*.tsx`, and a source scan in the unit test; the polite and assertive live regions carry `data-source`, which the e2e records. The polite queue keeps the source of each line (a merged line is `coach` if any part is).
+  - **The Trash popover (M7-R4):** the tutorial's scrim and popover stop above the step card; Escape closes it from anywhere unless a nested dialog is open.
+  - **The midline caption (M7-R5):** `.mid-left` is limited to the room left of the centred turn words (two lines, clamped), board.md §3.8's 520 px centre being 560 px in a battle.
+  - **Other lines (M7-R6):** an alternative that equals a step of the main line is dropped; one with no specific reason (the heuristic's differences, or a measured margin for a defence) is left out rather than "it ranked lower". More hints will show no "Other lines".
+  - **Tempo (M7-R7):** the tab states the ledger as the board stands now (no attack evidence, no "Give N DON!!" line) and points to the hint for a plan; the blunder warning keeps its suggestion. **M7-R8:** `CR 6-5-4` added to tutorial.md's sources, with a test that every cited rule is listed. **M7-R9** stays as documented.
+
 ## 2026-11-25 — M7 WP7: the S2 kit, three scenarios, the M7 screen-reader script and the doc fixes
 
 - **Context:** M7's last work package before the independent review: everything the owner's session 2 needs (usability-plan §5.3, §7), the screen-reader script (accessibility.md §11.5) and the doc conflicts the plan listed. Code: `app/src/play/setup/usability-scenarios.ts`, `app/a11y/src/m7.ts`, the `a11y-nvda` workflow. Docs: `docs/design/usability/S2-kit.md`, `learning-ui.md` §10, `accessibility.md` §3.3 and §11.5, `flows.md` F1/F2/F20, `usability-plan.md` §7.

@@ -41,6 +41,23 @@ describe('PoliteQueue (accessibility §9.3, L-SR20)', () => {
     expect(out).toEqual(['a', 'b', 'c', 'd e f']);
   });
 
+  it('never merges a coach line into a game line (the contract tests read it by itself)', () => {
+    const out: Array<[string, string]> = [];
+    const q = new PoliteQueue((t, s) => out.push([t, s]), 300);
+    for (const t of ['a', 'b', 'c', 'd']) q.push(t);
+    q.push('Warning: x', 'coach');
+    q.push('e');
+    vi.advanceTimersByTime(5000);
+    expect(out).toEqual([
+      ['a', 'game'],
+      ['b', 'game'],
+      ['c', 'game'],
+      ['d', 'game'],
+      ['Warning: x', 'coach'],
+      ['e', 'game'],
+    ]);
+  });
+
   it('forgets what is waiting when cleared', () => {
     const out: string[] = [];
     const q = new PoliteQueue((t) => out.push(t), 300);

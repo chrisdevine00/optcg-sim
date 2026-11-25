@@ -186,6 +186,12 @@ export function explainUnused(
   ledger: DonLedger,
   cards: ReadonlyMap<string, Card>,
   tense: 'left' | 'ending' = 'left',
+  /**
+   * The Tempo tab describes the ledger as the board stands now and recommends no play: no attack
+   * to give DON!! to and no line, so it cannot disagree with a hint that plans a different turn
+   * (M7-R7). The blunder warning keeps the suggestion.
+   */
+  ledgerOnly = false,
 ): Explanation | null {
   if (ledger.unused < UNUSED_FLAG_AT) return null;
   const me = view.player;
@@ -210,9 +216,11 @@ export function explainUnused(
     },
   ];
   let line: Move[] | null = null;
-  let outcome = 'Giving them before an attack makes it harder to stop.';
+  let outcome = ledgerOnly
+    ? 'This counts the DON!! as the board stands now, before anything you play. Ask for a hint to see a plan for the whole turn.'
+    : 'Giving them before an attack makes it harder to stop.';
   const best =
-    tense === 'ending'
+    tense === 'ending' && !ledgerOnly
       ? attackersAvailable(view)
           .filter((c) => c.power !== null)
           .sort((a, b) => (b.power ?? 0) - (a.power ?? 0))[0]

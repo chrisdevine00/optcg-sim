@@ -143,8 +143,24 @@ function TrashViewer({ g, player, onClose }: { g: G; player: PlayerId; onClose: 
   useEffect(() => {
     ref.current?.querySelector<HTMLElement>('button')?.focus();
   }, []);
+  // Escape closes it from anywhere, also after a click elsewhere moved focus out (M7-R4). An open
+  // nested dialog (the card inspector) takes the key first.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape' || e.defaultPrevented) return;
+      if (document.querySelector('dialog[open]')) return;
+      e.preventDefault();
+      e.stopPropagation();
+      onClose();
+    };
+    document.addEventListener('keydown', onKey, true);
+    return () => document.removeEventListener('keydown', onKey, true);
+  }, [onClose]);
   const trash = g.view.zones[player].trash;
   const rail = g.L.rail;
+  // The tutorial's step card lives in the tall decision panel: the viewer and its scrim stop above
+  // it, so Next and the done words are never covered (M7-R4).
+  const floor = g.ctl.config.tutorial ? rail.tall.top : rail.decision.top;
   const whose = g.names.hotseat
     ? `${g.names.player[player]}’s`
     : player === g.me
@@ -158,7 +174,12 @@ function TrashViewer({ g, player, onClose }: { g: G; player: PlayerId; onClose: 
       <div
         className="rail-scrim"
         // The rail notice (the disclaimer) stays clear of the scrim (board.md §3.1, M3-21).
-        style={{ left: rail.x, width: rail.w, top: rail.head + rail.notice }}
+        style={{
+          left: rail.x,
+          width: rail.w,
+          top: rail.head + rail.notice,
+          ...(g.ctl.config.tutorial ? { bottom: g.L.H - floor } : {}),
+        }}
         aria-hidden="true"
         onClick={onClose}
       />
@@ -171,7 +192,7 @@ function TrashViewer({ g, player, onClose }: { g: G; player: PlayerId; onClose: 
           left: rail.x + 8,
           width: rail.w - 16,
           top: rail.head + rail.notice + 4,
-          height: rail.decision.top - rail.head - rail.notice - 8,
+          height: floor - rail.head - rail.notice - 8,
         }}
         onKeyDown={(e) => {
           if (e.key === 'Escape') {

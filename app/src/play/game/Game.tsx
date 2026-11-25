@@ -1332,6 +1332,7 @@ export function Game({
                         top={coachTop}
                         height={coachH}
                         mode={cmode}
+                        decisionTall={tall}
                         onWhy={() => {
                           const i = ctl.lastWhy();
                           if (i !== null) {
@@ -1821,8 +1822,8 @@ function Announcer({
   polite,
   assertive,
 }: {
-  polite: { text: string; seq: number };
-  assertive: { text: string; seq: number };
+  polite: { text: string; seq: number; source?: 'game' | 'coach' };
+  assertive: { text: string; seq: number; source?: 'game' | 'coach' };
 }) {
   const a = polite.seq % 2 === 0;
   const [spent, setSpent] = useState(0);
@@ -1833,13 +1834,19 @@ function Announcer({
   }, [assertive.seq, assertive.text]);
   return (
     <>
-      <div id="announce-polite" className="sr-only" role="status" aria-live="polite">
+      <div
+        id="announce-polite"
+        className="sr-only"
+        role="status"
+        aria-live="polite"
+        data-source={polite.source ?? 'game'}
+      >
         <span>{a ? spokenArrows(polite.text) : ''}</span>
         <span>{a ? '' : spokenArrows(polite.text)}</span>
       </div>
       <div id="announce-assertive" className="sr-only" aria-live="assertive" aria-atomic="false">
         {assertive.text && spent !== assertive.seq ? (
-          <p key={assertive.seq} data-seq={assertive.seq}>
+          <p key={assertive.seq} data-seq={assertive.seq} data-source={assertive.source ?? 'game'}>
             {spokenArrows(assertive.text)}
           </p>
         ) : null}

@@ -34,5 +34,6 @@ export function tempoExplanation(
   cards: ReadonlyMap<string, Card>,
   tense: 'left' | 'ending',
 ): Explanation | null {
-  return explainUnused(view, l, cards, tense) ?? explainHeld(view, l, cards);
+  // The tab states the ledger only (M7-R7): the plan for the turn is the hint's.
+  return explainUnused(view, l, cards, tense, true) ?? explainHeld(view, l, cards);
 }

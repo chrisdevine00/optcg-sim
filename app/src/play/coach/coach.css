@@ -41,6 +41,14 @@
   background: var(--color-surface-3);
   border-color: var(--color-accent);
 }
+.coach-btn[data-busy='true'] {
+  color: var(--color-text-muted);
+  border-style: dashed;
+  cursor: not-allowed;
+}
+.coach-btn[data-busy='true']:hover {
+  background: transparent;
+}
 .coach-btn kbd {
   font-size: 11px;
   color: var(--color-text-muted);

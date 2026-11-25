@@ -155,6 +155,25 @@ export default tseslint.config(
     },
   },
   {
+    // M7-R3: every line the coach UI speaks is tagged `coach`, so the interruption-contract tests
+    // can see it (the default source is `game`, which they treat as the game talking).
+    files: ['app/src/play/coach/**/*.tsx'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        noDynamicEngine,
+        {
+          selector: "CallExpression[callee.property.name='announce']",
+          message: 'The coach UI speaks through ctl.coachAnnounce(text) (source coach), M7-R3.',
+        },
+        {
+          selector: "CallExpression[callee.property.name='alert'][arguments.length=1]",
+          message: "The coach UI alerts with source 'coach': ctl.alert(text, 'coach'), M7-R3.",
+        },
+      ],
+    },
+  },
+  {
     files: ['app/src/art/**/*.{ts,tsx}', 'app/src/sw.ts'],
     rules: { 'no-restricted-globals': 'off' },
   },

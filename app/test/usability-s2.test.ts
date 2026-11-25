@@ -22,6 +22,7 @@ import {
 import {
   actionFromView,
   createFromScenario,
+  project,
   projectForSearch,
   reduce,
   type Action,
@@ -30,7 +31,9 @@ import {
   type ScenarioSpec,
   type SearchView,
 } from '@optcg/engine';
-import { hint } from '../../ai/src/search/hint-line.ts';
+import { hint, mainLineOf } from '../../ai/src/search/hint-line.ts';
+import { engineEndOfTurnDon } from '../../ai/test/support/line-oracle.ts';
+import { ledgerOf, tempoExplanation } from '../src/play/coach/tempo.ts';
 import { GameController, type AiPort } from '../src/play/game/controller.ts';
 import type { CoachPort } from '../src/play/game/ai-client.ts';
 import { SCENARIOS } from '../src/play/setup/scenarios.ts';
@@ -111,6 +114,42 @@ describe('ub-hint-1: the hint returns a clear line', () => {
       s = reduce(s, actionFromView(s, 'p1', a)).state;
     }
     expect(s).not.toBe(state);
+  });
+
+  it('says the DON!! count the engine shows at the start of the next turn (M7-R1)', () => {
+    const opts = { cards: cardMap(), budget: { iterations: 4000 }, game };
+    const oracle = engineEndOfTurnDon(state, 'p1', mainLineOf(view, opts));
+    const m = /End your turn with (\d+) DON!! active/.exec(r.line.at(-1)!.text);
+    expect(m, r.line.at(-1)!.text).not.toBeNull();
+    expect(Number(m![1])).toBe(oracle);
+    // 4 active DON!!, Yamato costs 3, one is given: at most 1 is active when the turn ends.
+    expect(oracle).toBeLessThanOrEqual(1);
+    const text = [r.explanation.outcome, ...r.explanation.evidence.map((e) => e.text)].join(' ');
+    expect(text).toContain(`${oracle} DON!! active`);
+  });
+
+  it('Other lines: no alternative repeats a step of the line, each has a specific reason (M7-R6)', () => {
+    const steps = r.line.map((m) => m.text);
+    for (const a of r.alternatives) {
+      expect(steps).not.toContain(a.move.text);
+      expect(a.why).not.toMatch(/ranked lower in the games the search played out\.$/);
+    }
+    // The old output was "Attack their Leader with your Leader" (step 3) as its own alternative.
+    expect(r.alternatives.map((a) => a.move.text)).not.toContain(
+      'Attack their Leader with your Leader.',
+    );
+  });
+
+  it('the Tempo tab states the ledger and recommends no play, so it cannot contradict the hint (M7-R7)', () => {
+    const pv = project(state, 'p1');
+    const ex = tempoExplanation(pv, ledgerOf(pv, cardMap()), cardMap(), 'ending');
+    expect(ex).not.toBeNull();
+    expect(ex!.line).toBeNull();
+    const text = [ex!.claim, ex!.outcome, ...ex!.evidence.map((e) => e.text)].join(' ');
+    expect(text).not.toMatch(/Give \d+ DON!!|before it attacks/);
+    expect(text).toMatch(/as the board stands now/);
+    // The hint plans the turn; the tab describes the board before it.
+    expect(r.line.some((m) => m.kind === 'play')).toBe(true);
   });
 
   it('is the same answer when asked again (one position, one answer)', () => {

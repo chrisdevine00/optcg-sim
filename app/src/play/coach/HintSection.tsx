@@ -27,7 +27,7 @@ function stageDefence(g: G, r: HintResult): void {
   );
   g.setStaging({ blocker, counters });
   const n = counters.length;
-  g.ctl.announce(
+  g.ctl.coachAnnounce(
     `Staged the hint: ${blocker ? `block with ${g.nameOf(blocker)}` : 'no block'}, ${n} ${n === 1 ? 'Counter' : 'Counters'}. Check it in the decision panel, then commit.`,
   );
 }
@@ -163,7 +163,7 @@ function HintResultView({ g, result, ask }: { g: G; result: HintResult; ask: Rea
     if (prog.stale) return;
     if (defence) stageDefence(g, result);
     else if (coach.stageNext()) {
-      g.ctl.announce('Lined up. Press Do it in the decision panel to commit, or Clear.');
+      g.ctl.coachAnnounce('Lined up. Press Do it in the decision panel to commit, or Clear.');
       setTimeout(() => document.getElementById('coach-staged-commit')?.focus(), 60);
     }
   };

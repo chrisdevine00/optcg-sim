@@ -152,6 +152,13 @@ describe('the words (docs/content/tutorial.md)', () => {
     for (const z of TUTORIAL_ZONES) expect(COPY[`t1-zones.zone.${z}`], z).toBeTruthy();
   });
 
+  it('every rule a step cites is listed in the front matter sources (M7-R8)', () => {
+    for (const step of STEPS) {
+      const rule = COPY[`${step.id}.rule`]!;
+      expect(CONTENT_META.sources, `${step.id} cites ${rule}`).toContain(rule);
+    }
+  });
+
   it('every {number} slot is one the runner fills from the board', () => {
     const { r } = runner();
     const known = new Set(Object.keys(r.vars()));

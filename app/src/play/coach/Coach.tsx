@@ -40,17 +40,26 @@ function threatBadge(g: G): Badge | null {
   return { glyph: '▲', text: 'Threat' };
 }
 
+const BUSY_REASON = 'Not available while a decision is open. Finish the decision, then press it.';
+
 export function CoachPanel({
   g,
   top,
   height,
   mode,
+  decisionTall = false,
   onWhy,
 }: {
   g: G;
   top: number;
   height: number;
   mode: CoachMode;
+  /**
+   * A tall decision panel owns the rail (M7-R2): Why, Math and Tempo have no room to show their
+   * content, so their buttons say so and do nothing (no profile write, nothing opens later). The
+   * hint shows inside the decision body and the Lethal button says where its line will be.
+   */
+  decisionTall?: boolean;
   /** Open the last AI move's explanation (W). */
   onWhy: () => void;
 }) {
@@ -79,9 +88,20 @@ export function CoachPanel({
   }, [signal]);
 
   const pick = (t: CoachTab) => {
+    if (decisionTall && t !== 'hint') return;
     if (open && profile.tab === t) coach.toggle();
     else coach.setProfile({ expanded: true, tab: t });
   };
+
+  // Not available while a decision is tall: said to a screen reader and on hover, never silent.
+  const busyProps = decisionTall
+    ? ({
+        'aria-disabled': true,
+        'aria-describedby': 'coach-busy',
+        title: BUSY_REASON,
+        'data-busy': 'true',
+      } as const)
+    : {};
 
   return (
     <section
@@ -113,7 +133,8 @@ export function CoachPanel({
           <button
             type="button"
             className="coach-btn"
-            aria-pressed={open && tab === 'why'}
+            aria-pressed={open && !decisionTall && tab === 'why'}
+            {...busyProps}
             onClick={() => pick('why')}
           >
             Why
@@ -145,7 +166,8 @@ export function CoachPanel({
             type="button"
             className="coach-btn"
             id="coach-math"
-            aria-pressed={open && tab === 'math'}
+            aria-pressed={open && !decisionTall && tab === 'math'}
+            {...busyProps}
             onClick={() => pick('math')}
           >
             Math
@@ -156,7 +178,8 @@ export function CoachPanel({
             type="button"
             className="coach-btn"
             id="coach-tempo"
-            aria-pressed={open && tab === 'tempo'}
+            aria-pressed={open && !decisionTall && tab === 'tempo'}
+            {...busyProps}
             onClick={() => pick('tempo')}
           >
             Tempo
@@ -166,6 +189,11 @@ export function CoachPanel({
               </span>
             )}
           </button>
+        )}
+        {decisionTall && (
+          <span id="coach-busy" className="sr-only">
+            {BUSY_REASON}
+          </span>
         )}
         {/* NVDA takes H, L and C once focus is in the coach (L-SR12): say where they work. */}
         {canHint && (
@@ -504,7 +532,7 @@ function GuidedCount({ g, guided }: { g: G; guided: GuidedState }) {
       const refs = guided.picked.length > 0 ? guided.picked : d.attackers.map((a) => a.ref);
       coach.guide({ step: s, split: refs.map((ref) => ({ ref, don: 0 })) });
     } else coach.guide({ step: s });
-    g.ctl.announce(`Question ${s}: ${QUESTIONS[s - 1]}`);
+    g.ctl.coachAnnounce(`Question ${s}: ${QUESTIONS[s - 1]}`);
   };
   const check = guided.check;
   const mark = (ok: boolean | undefined) => (ok === undefined ? '' : ok ? '✓ ' : '✕ ');
@@ -519,7 +547,7 @@ function GuidedCount({ g, guided }: { g: G; guided: GuidedState }) {
     const x = next[i];
     if (x) {
       const who = g.cardOf(x.ref)?.zone === 'leader' ? 'Your Leader' : g.nameOf(x.ref);
-      g.ctl.announce(`${who}: ${x.don} DON!!, attack ${i + 1}.`);
+      g.ctl.coachAnnounce(`${who}: ${x.don} DON!!, attack ${i + 1}.`);
     }
   };
   const move = (i: number, dir: -1 | 1) => {
@@ -531,7 +559,7 @@ function GuidedCount({ g, guided }: { g: G; guided: GuidedState }) {
     const x = next[j];
     if (x) {
       const who = g.cardOf(x.ref)?.zone === 'leader' ? 'Your Leader' : g.nameOf(x.ref);
-      g.ctl.announce(`${who}: now attack ${j + 1} of ${next.length}.`);
+      g.ctl.coachAnnounce(`${who}: now attack ${j + 1} of ${next.length}.`);
     }
   };
   return (

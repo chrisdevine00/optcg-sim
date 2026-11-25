@@ -114,6 +114,8 @@ export interface AiPort {
 export interface Announcement {
   text: string;
   seq: number;
+  /** Who spoke: the game, or the coach (the interruption contract reads it in the DOM). */
+  source?: 'game' | 'coach';
 }
 
 /** Pacing at 1× (board.md §5.2, tokens.css). */
@@ -1072,15 +1074,20 @@ export class GameController {
   }
 
   /** Polite lines are spaced out so a later write never replaces an earlier one (L-SR20). */
-  private readonly politeQueue = new PoliteQueue((text) => {
+  private readonly politeQueue = new PoliteQueue((text, source) => {
     if (this.disposed) return;
-    this.polite = { text, seq: this.polite.seq + 1 };
+    this.polite = { text, seq: this.polite.seq + 1, source };
     this.bump();
   });
 
   private say(text: string, source: 'game' | 'coach' = 'game'): void {
     this.onAnnounce?.({ text, kind: 'polite', source });
-    this.politeQueue.push(text);
+    this.politeQueue.push(text, source);
+  }
+
+  /** A polite line from the coach's UI (always tagged `coach`: the interruption contract). */
+  coachAnnounce(text: string): void {
+    this.announce(text, 'coach');
   }
 
   /** A polite announcement from the UI (whyNot reasons, the status summary, speed changes). */
@@ -1110,7 +1117,7 @@ export class GameController {
   /** An assertive announcement: a decision owed during the opponent's turn (flows F6.1). */
   alert(text: string, source: 'game' | 'coach' = 'game'): void {
     this.onAnnounce?.({ text, kind: 'assertive', source });
-    this.assertive = { text, seq: this.assertive.seq + 1 };
+    this.assertive = { text, seq: this.assertive.seq + 1, source };
     this.bump();
   }
 

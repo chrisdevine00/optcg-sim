@@ -6,25 +6,30 @@
  */
 const MAX_WAITING = 3;
 
+export type Source = 'game' | 'coach';
+
 export class PoliteQueue {
-  private queue: string[] = [];
+  private queue: { text: string; source: Source }[] = [];
   private lastAt = Number.NEGATIVE_INFINITY;
   private timer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
-    private readonly write: (text: string) => void,
+    private readonly write: (text: string, source: Source) => void,
     private readonly gap = 300,
   ) {}
 
-  push(text: string): void {
+  push(text: string, source: Source = 'game'): void {
     if (!this.queue.length && Date.now() - this.lastAt >= this.gap) {
-      this.emit(text);
+      this.emit(text, source);
       return;
     }
     // A long backlog (a fast AI turn) would make every line late: past three waiting lines, the
     // rest join the last one. Nothing is dropped and the order holds.
-    if (this.queue.length >= MAX_WAITING) this.queue[this.queue.length - 1] += ` ${text}`;
-    else this.queue.push(text);
+    // Lines of different sources are never merged: a coach line stays its own line, so the
+    // interruption-contract tests can read it by itself.
+    const last = this.queue[this.queue.length - 1];
+    if (this.queue.length >= MAX_WAITING && last && last.source === source) last.text += ` ${text}`;
+    else this.queue.push({ text, source });
     this.schedule();
   }
 
@@ -36,9 +41,9 @@ export class PoliteQueue {
     this.lastAt = Number.NEGATIVE_INFINITY;
   }
 
-  private emit(text: string): void {
+  private emit(text: string, source: Source): void {
     this.lastAt = Date.now();
-    this.write(text);
+    this.write(text, source);
   }
 
   private schedule(): void {
@@ -47,7 +52,7 @@ export class PoliteQueue {
       () => {
         this.timer = null;
         const next = this.queue.shift();
-        if (next !== undefined) this.emit(next);
+        if (next !== undefined) this.emit(next.text, next.source);
         this.schedule();
       },
       Math.max(0, this.gap - (Date.now() - this.lastAt)),

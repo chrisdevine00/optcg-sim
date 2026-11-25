@@ -14,7 +14,10 @@ interface Recorded {
   modes: string[];
   assertive: string[];
   notes: number;
+  /** Polite lines the coach spoke (the live region's `data-source` is `coach`). */
   politeCoach: string[];
+  /** Assertive lines the coach spoke, by source rather than by wording. */
+  assertiveCoach: string[];
 }
 
 /** Install the recorders before the page's own scripts run. */
@@ -35,6 +38,8 @@ async function record(page: Page, profile: Record<string, unknown> = {}) {
       modes: [] as string[],
       assertive: [] as string[],
       notes: 0,
+      politeCoach: [] as string[],
+      assertiveCoach: [] as string[],
     };
     (window as unknown as { __rec: typeof rec }).__rec = rec;
     document.addEventListener(
@@ -52,6 +57,11 @@ async function record(page: Page, profile: Record<string, unknown> = {}) {
       }
       const a = document.getElementById('announce-assertive')?.textContent?.trim();
       if (a) rec.assertive.push(a);
+      const ac = document.querySelector('#announce-assertive [data-source="coach"]');
+      if (ac?.textContent?.trim()) rec.assertiveCoach.push(ac.textContent.trim());
+      const pol = document.getElementById('announce-polite');
+      const pt = pol?.getAttribute('data-source') === 'coach' ? pol.textContent?.trim() : '';
+      if (pt && rec.politeCoach[rec.politeCoach.length - 1] !== pt) rec.politeCoach.push(pt);
       if (document.querySelector('.blunder-note')) rec.notes++;
       const inside = document.activeElement?.closest?.('[aria-label="Coach"]');
       if (inside) rec.focus.push('activeElement');
@@ -77,7 +87,8 @@ async function read(page: Page): Promise<Recorded> {
       modes: [...r.modes],
       assertive: [...r.assertive],
       notes: r.notes,
-      politeCoach: [],
+      politeCoach: [...r.politeCoach],
+      assertiveCoach: [...r.assertiveCoach],
     };
   });
 }
@@ -98,6 +109,9 @@ test.describe('the coach never interrupts (full game vs Rookie)', () => {
     expect(r.focus).toEqual([]);
     expect(r.modes).toEqual([]);
     expect(r.assertive.filter((t) => COACH_WORDS.test(t))).toEqual([]);
+    // M7-R3: by source, not by wording: the coach says nothing at all, politely or assertively.
+    expect(r.politeCoach).toEqual([]);
+    expect(r.assertiveCoach).toEqual([]);
     await expect(page.locator('[aria-label="Coach"]')).toHaveAttribute('data-mode', 'strip');
     // Nothing was computed on the player's behalf: no hint or lethal badge (the tempo bar is a meter).
     await expect(page.getByTestId('hint-badge')).toHaveCount(0);
@@ -112,6 +126,7 @@ test.describe('the coach never interrupts (full game vs Rookie)', () => {
     expect(r.focus).toEqual([]);
     expect(r.modes).toEqual([]);
     expect(r.assertive.filter((t) => COACH_WORDS.test(t))).toEqual([]);
+    expect(r.assertiveCoach).toEqual([]);
   });
 
   test('blunder warning on: a note only at a commit, never an expansion or a focus move', async ({
@@ -158,6 +173,10 @@ test.describe('the coach never interrupts (full game vs Rookie)', () => {
     // The warning did speak at commits (ending with DON!! unused), and only there.
     expect(notes).toBeGreaterThan(0);
     expect(r.notes).toBeGreaterThan(0);
+    expect(r.assertiveCoach).toEqual([]);
+    // Polite, and only the warning itself.
+    expect(r.politeCoach.length).toBeGreaterThan(0);
+    for (const line of r.politeCoach) expect(line).toMatch(/^Warning:/);
   });
 
   test('the recorder is not blind: H opens the coach and moves focus into it', async ({ page }) => {
@@ -172,5 +191,7 @@ test.describe('the coach never interrupts (full game vs Rookie)', () => {
     const r = await read(page);
     expect(r.modes).toContain('open');
     expect(r.focus.length).toBeGreaterThan(0);
+    // The polite recorder is not blind either: the press is spoken, tagged as the coach.
+    expect(r.politeCoach.length).toBeGreaterThan(0);
   });
 });
