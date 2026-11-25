@@ -262,6 +262,13 @@ export interface Selector {
    * the engine picks uniformly at random with the seeded RNG, which is the same information.
    */
   blind?: true;
+  /**
+   * "Reveal up to N ... from your hand" (block 3 batch A review, B3B-R3): the chosen cards are
+   * shown to the opponent (a `CardRevealed` event, reason `effect`) once chosen. Only for cards in
+   * your own hand (`from: 'hand'`, `owner: 'you'`); the cost `{ reveal: Selector }` already shows
+   * the cards of a cost.
+   */
+  reveal?: true;
   /** Store the chosen instances in the frame for a later `{ ref }`. */
   bind?: Name;
   /** Event-triggered autos: read the last-known snapshot of the event's subject. */

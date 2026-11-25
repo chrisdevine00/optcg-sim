@@ -62,6 +62,7 @@ export const OP10_058: CardScript = {
                   pick: {
                     upTo: 2,
                   },
+                  reveal: true,
                   bind: 'revealed',
                 },
               },
@@ -118,6 +119,6 @@ export const OP10_058: CardScript = {
   ],
   rulings: [
     'reading: the reveal-and-play half is inside the cost-8 guard ("Then" after a failed "If" does not resolve, M4b-5); the Character that is not played stays in hand when its cost is 5 or more; with two revealed cards of cost 4 or less the player picks which one is played active and the other is played rested',
-    'reading: the reveal has no engine event of its own (cosmetic); the cost-8 check counts a Character of either player (Rebecca herself is cost 7)',
+    'reading: the revealed cards are shown to the opponent (a CardRevealed event for each, reason effect; B3B-R3); the cost-8 check counts a Character of either player (Rebecca herself is cost 7)',
   ],
 };

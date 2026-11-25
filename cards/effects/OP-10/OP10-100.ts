@@ -82,6 +82,6 @@ export const OP10_100: CardScript = {
     },
   ],
   rulings: [
-    'reading: the total is read when the effect resolves (Life of both players, this attack\'s damage not yet dealt); the [Trigger] "If" has no colon, so it is an effect condition and the card goes to the hand when it fails',
+    'reading: the total is read when the effect resolves (Life of both players, this attack\'s damage not yet dealt); the [Trigger] "If" has no colon, so it is an effect condition: an activated [Trigger] whose "If" fails still resolves, and the card goes to the trash (an activated [Trigger] card is trashed after it resolves); only declining the [Trigger] puts the card in the hand (B3B-R6)',
   ],
 };

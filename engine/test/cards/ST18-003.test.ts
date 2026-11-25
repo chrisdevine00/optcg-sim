@@ -1,6 +1,7 @@
 /** ST18-003 San-Gorou. */
 import { describe, expect, it } from 'vitest';
-import { dec, hand, V } from './helpers.ts';
+import { dec, hand, pick, V } from './helpers.ts';
+import { withAbilities, type Ability } from '../../src/testing.ts';
 import { attack, finishBattle, mk } from './helpers-st1821.ts';
 
 const ID = 'ST18-003';
@@ -41,6 +42,30 @@ describe('ST18-003 San-Gorou', () => {
     expect(hand(g, 'p1')).toHaveLength(1);
     expect(dec(g)?.kind).toBe('block');
     finishBattle(g);
+  });
+
+  it('[Once Per Turn] (B3B-R5): a second attack by the same San-Gorou in one turn draws nothing', () => {
+    const g = start(8);
+    const sg = g.find('p1', 'characters', ID);
+    attack(g, sg);
+    finishBattle(g);
+    expect(hand(g, 'p1')).toEqual([V.c3]);
+    // Set San-Gorou active again (a planted Leader effect) and attack a second time.
+    const leader = g.leader('p1');
+    g.state = withAbilities(g.state, g.card(leader).card, [
+      {
+        id: 'planted',
+        kind: 'activate',
+        when: 'activateMain',
+        effect: [{ do: { setActive: { from: 'characters', owner: 'you', pick: { upTo: 1 } } } }],
+      } as unknown as Ability,
+    ]);
+    g.act({ type: 'activate', card: leader, ability: 'planted' });
+    pick(g, [sg]);
+    expect(g.card(sg).rested).toBe(false);
+    attack(g, sg);
+    finishBattle(g);
+    expect(hand(g, 'p1')).toEqual([V.c3]);
   });
 
   it('each San-Gorou has its own Once Per Turn: two of them each draw when they attack', () => {

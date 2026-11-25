@@ -67,10 +67,9 @@ describe('OP10-119 Law [On Play]: add up to 1 {Supernovas} Character from hand t
     expect(offeredIds(g)).toEqual([SC10.sn6dr]);
   });
 
-  // DISAGREEMENT D-1 (DISAGREEMENTS-d.md): the text says "Reveal", but the engine moves the card from
-  // the hand to the Life area with no CardRevealed event and no `revealed` flag, so the opponent's
-  // projected events never name the card (look/search reveals do: OP10-039, OP10-059).
-  it.fails("the card is revealed (CR 11-2-1): the opponent's view of the events names it", () => {
+  // Was DISAGREEMENT D-1 (DISAGREEMENTS-d.md), fixed in the B3B-R3 fix round: the chosen card is
+  // announced by a CardRevealed event (a selector `reveal`), so the opponent's events name it.
+  it("the card is revealed (CR 11-2-1): the opponent's view of the events names it", () => {
     const g = played(LD10.supernovas, [SC10.sn4]);
     pickCards(g, [SC10.sn4]);
     const seen = projectEvents(g.events, 'p2').some(

@@ -38,7 +38,15 @@ import { playOnlyIfMet } from './conditions.ts';
 import { evaluate, total, type Breakdown, type Weights } from './heuristic.ts';
 import { determinizations } from './sample.ts';
 import { explainAction, playConditionHolds, type WhyContext } from './why.ts';
-import { apply, battleNumbers, quickAction, rolloutValue, settle, type SimContext } from './sim.ts';
+import {
+  apply,
+  battleNumbers,
+  isNoOpActivation,
+  quickAction,
+  rolloutValue,
+  settle,
+  type SimContext,
+} from './sim.ts';
 
 export type Budget = { iterations: number } | { ms: number };
 
@@ -842,7 +850,12 @@ export function unneededDiscount(
   return false;
 }
 
-export function mainCandidates(s: GameState, me: PlayerId, setup: PirateSetup): Candidate[] {
+export function mainCandidates(
+  s: GameState,
+  me: PlayerId,
+  setup: PirateSetup,
+  ctx?: SimContext,
+): Candidate[] {
   const acts = legalActions(s).filter((a) => a.type !== 'concede');
   const don = queries.don(s, me).active;
   const attackers = new Set(acts.flatMap((a) => (a.type === 'attack' ? [a.attacker] : [])));
@@ -867,6 +880,8 @@ export function mainCandidates(s: GameState, me: PlayerId, setup: PirateSetup): 
         out.push({ actions: [a] });
     } else if (unneededDiscount(s, me, a, setup)) {
       // Left out: a DON!! -1 no card in hand needs ends up in rollouts as a free extra turn.
+    } else if (ctx && isNoOpActivation(s, a, me, ctx)) {
+      // Left out: a repeatable ability that changes nothing (B3B-R1) would tie, and win, over ending.
     } else out.push({ actions: [a] });
   }
   // "Use the ability, then play the card" as one move (Rosinante's discount, then the Law): the
@@ -989,7 +1004,7 @@ export function planTurn(
     if (!dec || dec.kind !== 'main' || dec.player !== me || queries.result(root)) break;
     const fp = n === 0 ? fingerprint(view) : fingerprint(project(root, me));
     if (n > 0 && states.some((s) => fingerprint(project(s, me)) !== fp)) break;
-    const cands = holdDon(mainCandidates(root, me, setup), root, me, ctx, setup);
+    const cands = holdDon(mainCandidates(root, me, setup, ctx), root, me, ctx, setup);
     const ranked = score(
       states,
       cands,

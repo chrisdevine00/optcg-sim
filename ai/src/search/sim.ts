@@ -19,6 +19,7 @@ import {
   legalActions,
   queries,
   reduce,
+  summaryHash,
   type Action,
   type CardView,
   type GameState,
@@ -70,6 +71,46 @@ const other = (p: PlayerId): PlayerId => (p === 'p1' ? 'p2' : 'p1');
 export function apply(s: GameState, a: Action, ctx: SimContext): GameState {
   ctx.stats.actions++;
   return reduce(s, a).state;
+}
+
+/** `isNoOpActivation` explores at most this many leaves, prompts deep, answers wide (else: "not a no-op"). */
+const NOOP_LEAVES = 40;
+const NOOP_DEPTH = 4;
+const NOOP_WIDTH = 8;
+
+/**
+ * Does activating `a` (an [Activate: Main]) leave the game exactly as it was, whatever the answers?
+ * The activation is played out through every answer to the prompts it raises (a bounded search:
+ * 40 leaves, 4 prompts deep, 8 answers wide; past that it says "no") and each end state at the
+ * Main decision is compared with the state before by the semantic hash, reading modifiers as a set
+ * (so a second identical "cannot ..." restriction counts as nothing). Only when every answer
+ * changes nothing is it a no-op. An unlimited ability with no cost and no effect left to have, like
+ * OP10-030 Smoker's DON!! set-active with every DON!! already active, is legal again and again; the
+ * planners must not rank it above ending the turn (review B3B-R1: the Pirate repeated it until the
+ * 2,000-action cap). Anything that spent a cost, moved a card, set a counter or ended in a decision
+ * for the other seat is not a no-op.
+ */
+export function isNoOpActivation(s: GameState, a: Action, me: PlayerId, ctx: SimContext): boolean {
+  if (a.type !== 'activate' || a.ability === 'counter') return false;
+  const before = summaryHash(s, true);
+  let leaves = 0;
+  const same = (t: GameState, depth: number): boolean => {
+    const d = queries.decision(t);
+    if (!d || d.player !== me || queries.result(t)) return false;
+    if (d.kind === 'main') {
+      if (++leaves > NOOP_LEAVES) return false;
+      return summaryHash(t, true) === before;
+    }
+    if (depth >= NOOP_DEPTH) return false;
+    const answers = legalActions(t).filter((x) => x.type !== 'concede');
+    if (answers.length === 0 || answers.length > NOOP_WIDTH) return false;
+    return answers.every((x) => same(apply(t, x, ctx), depth + 1));
+  };
+  try {
+    return same(apply(s, a, ctx), 0);
+  } catch {
+    return false;
+  }
 }
 
 function decider(s: GameState): PlayerId | null {

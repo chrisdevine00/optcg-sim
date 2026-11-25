@@ -35,6 +35,7 @@ export const OP10_119: CardScript = {
                 pick: {
                   upTo: 1,
                 },
+                reveal: true,
               },
               to: {
                 zone: 'life',
@@ -66,7 +67,7 @@ export const OP10_119: CardScript = {
   ],
   rulings: [
     'reading: "Then" is not "If you do": the DON!! is given even when no Character was added; the pick is asked at max 0 when no match is in hand (hidden-gate)',
-    'reading: the reveal of the hand card is not modelled (a hand card moved to Life is not revealed by the engine); it goes face-down as the text says',
+    'reading: the chosen card is revealed to the opponent (a CardRevealed event, reason effect) and then goes face-down to the top of Life as the text says (B3B-R3)',
     'reading: the rested DON!! comes from the cost area; it does nothing when the Leader is not {Supernovas} or no rested DON!! is available',
   ],
 };

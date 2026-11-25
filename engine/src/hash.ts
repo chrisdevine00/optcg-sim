@@ -9,7 +9,7 @@ import { PLAYERS, type State } from './state.ts';
 
 const ZONES = ['leader', 'characters', 'stage', 'hand', 'deck', 'life', 'trash'] as const;
 
-export function summary(s: State): unknown {
+export function summary(s: State, dedupeMods = false): unknown {
   const pos = new Map<InstanceId, string>();
   const players: Record<string, unknown> = {};
   for (const p of PLAYERS) {
@@ -54,6 +54,8 @@ export function summary(s: State): unknown {
       return JSON.stringify(canon(rest));
     })
     .sort();
+  // `dedupeMods` reads the modifiers as a set: a second identical restriction changes nothing.
+  const modSet = dedupeMods ? [...new Set(mods)] : mods;
   const dec = s.decision;
   return {
     turn: s.turn,
@@ -88,7 +90,7 @@ export function summary(s: State): unknown {
     known: Object.fromEntries(
       PLAYERS.map((p) => [p, (s.known?.[p] ?? []).map((id) => pos.get(id) ?? 'gone').sort()]),
     ),
-    mods,
+    mods: modSet,
     oncePerTurn: s.oncePerTurn.map(canon),
     // This turn's K.O.s and Event activations, only in a game where a card reads them (G26).
     hist: s.hist && s.hist.turn === s.turn ? s.hist : undefined,
@@ -129,6 +131,11 @@ export function hashString(str: string): string {
   return fin(a1, a2) + fin(b1, b2);
 }
 
-export function summaryHash(s: State): string {
-  return hashString(JSON.stringify(summary(s)));
+/**
+ * The semantic hash. `dedupeMods` (default false: goldens and records are unchanged) reads the
+ * modifiers as a set, so a state that differs only by a repeated identical modifier hashes equal;
+ * the AI uses it to tell a repeatable no-op activation from a real one.
+ */
+export function summaryHash(s: State, dedupeMods = false): string {
+  return hashString(JSON.stringify(summary(s, dedupeMods)));
 }

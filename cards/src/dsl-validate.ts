@@ -439,7 +439,13 @@ function pick(c: Ctx, path: string, v: unknown): void {
 }
 
 function selector(c: Ctx, path: string, v: unknown): void {
-  fields(c, path, v, ['from', 'owner'], ['filter', 'pick', 'chooser', 'blind', 'bind', 'lki']);
+  fields(
+    c,
+    path,
+    v,
+    ['from', 'owner'],
+    ['filter', 'pick', 'chooser', 'blind', 'reveal', 'bind', 'lki'],
+  );
   if (!isObj(v)) return;
   const zones = Array.isArray(v.from) ? v.from : [v.from];
   for (const z of zones) {
@@ -454,6 +460,11 @@ function selector(c: Ctx, path: string, v: unknown): void {
   if (v.pick !== undefined) pick(c, `${path}.pick`, v.pick);
   if (v.chooser !== undefined) enumOf(c, `${path}.chooser`, v.chooser, P);
   if (v.blind !== undefined && v.blind !== true) err(c, `${path}.blind`, 'expected true');
+  if (v.reveal !== undefined) {
+    if (v.reveal !== true) err(c, `${path}.reveal`, 'expected true');
+    else if (v.from !== 'hand' || v.owner !== 'you')
+      err(c, `${path}.reveal`, "only for cards in your own hand ({ from: 'hand', owner: 'you' })");
+  }
   if (v.lki !== undefined) err(c, `${path}.lki`, 'lki is not implemented in the runtime yet');
   if (v.bind !== undefined) {
     str(c, `${path}.bind`, v.bind);

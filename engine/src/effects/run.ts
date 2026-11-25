@@ -487,6 +487,28 @@ function select(
   sel: Selector,
   o: SelectOpts,
 ): InstanceId[] | typeof WAIT {
+  const ids = selectCards(d, f, sel, o);
+  // "Reveal up to N ... from your hand" (OP10-119, OP10-058): the chosen cards are shown to the
+  // opponent (CR 11-2-1), as a cost `reveal` shows them. Nothing is shown while a choice waits.
+  if (ids !== WAIT && sel.reveal)
+    for (const id of ids)
+      d.emit({
+        type: 'CardRevealed',
+        instance: id,
+        card: d.card(id).card,
+        player: f.controller,
+        from: 'hand',
+        reason: 'effect',
+      });
+  return ids;
+}
+
+function selectCards(
+  d: Draft,
+  f: EffectFrame,
+  sel: Selector,
+  o: SelectOpts,
+): InstanceId[] | typeof WAIT {
   const c = ctxOf(d, f);
   const g = take(f);
   if (Array.isArray(g))

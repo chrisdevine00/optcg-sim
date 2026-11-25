@@ -31,6 +31,14 @@ describe('ST15-003 Kingdew', () => {
     expect(g.power(g.leader('p1'))).toBe(7000);
   });
 
+  it("B3B-R5: also when K.O.'d by an effect of its own controller on the opponent's turn (any effect, not only the opponent's)", () => {
+    const g = start();
+    koBy(g, 'p1', ID, 'p1');
+    pick(g, [g.leader('p1')]);
+    expect(g.zone('p1', 'characters')).toHaveLength(0);
+    expect(g.power(g.leader('p1'))).toBe(7000);
+  });
+
   it("must not fire: K.O.'d in battle gives nothing", () => {
     const g = start(opp, { characters: [{ card: ID, rested: true }] }, { characters: [V.c7] });
     g.act({

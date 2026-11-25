@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { accept, BLUE, decline, dec, expectDecision, pick, V } from './helpers.ts';
 import { mk, plantCharEffect, plantLeaderEffect } from './helpers-prbst.ts';
 import { withAbilities, type Ability } from '../../src/testing.ts';
+import { errorsOf } from './m6b-w1/probe.ts';
 
 const ID = 'PRB02-006';
 const REST_MINE = { rest: { from: 'characters', owner: 'opponent', pick: { exactly: 1 } } };
@@ -49,6 +50,31 @@ describe('PRB02-006 Roronoa Zoro', () => {
     pick(g, [zoro(g)]);
     expect(dec(g)?.kind).toBe('main');
     expect(isRested(g, ID)).toBe(true);
+  });
+
+  it('B3B-R5: the rest replacement takes no cause but "opponentCharacterEffect" (a wider cause is not a valid script)', () => {
+    // The review's mutant (`opponentEffect`) survived because the runtime reads no cause value for a
+    // `rest` replacement (only the source's category, tested above with a Leader); the validator is
+    // what keeps the cause fixed, and it refuses the wider values.
+    const rep = (cause: string) => ({
+      id: 'r',
+      kind: 'replacement',
+      replaces: { rest: { from: 'characters', owner: 'you', filter: { isSelf: true } }, cause },
+      optional: true,
+      instead: [
+        {
+          rest: {
+            from: 'characters',
+            owner: 'you',
+            filter: { not: { isSelf: true } },
+            pick: { exactly: 1 },
+          },
+        },
+      ],
+    });
+    expect(errorsOf(rep('opponentCharacterEffect'))).toEqual([]);
+    for (const wider of ['opponentEffect', 'effect', 'any'])
+      expect(errorsOf(rep(wider))).not.toEqual([]);
   });
 
   it("must not fire: on your own turn (it is an [Opponent's Turn] effect)", () => {

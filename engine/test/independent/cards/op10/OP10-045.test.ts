@@ -8,6 +8,7 @@
  * trashing are one effect ("and"), CR 3-7 (the trashed card goes to its owner's trash).
  */
 import { describe, expect, it } from 'vitest';
+import { withAbilities, type Ability } from '../../../../src/testing.ts';
 import { act, attack, endTurn, noDefence } from '../../helpers.ts';
 import {
   atMain,
@@ -103,6 +104,31 @@ describe('OP10-045 Cavendish: [When Attacking] [Once Per Turn] draw 2, trash 1 f
     expectMain(g);
     expect(hand(g)).toEqual([C10.marco]);
     expect(deck(g)).toHaveLength(6);
+  });
+
+  it('B3B-R8: [Once Per Turn] holds within a turn: set active again, a second attack draws nothing', () => {
+    const g = board();
+    swing(g);
+    pickRaw(g, g.find('p1', 'hand', C10.thatch));
+    noDefence(g);
+    expect(atMain(g)).toBe(true);
+    const cav = inst(g, 'p1', 'characters', CAV);
+    const leader = g.leader('p1');
+    g.state = withAbilities(g.state, g.card(leader).card, [
+      {
+        id: 'planted',
+        kind: 'activate',
+        when: 'activateMain',
+        effect: [{ do: { setActive: { from: 'characters', owner: 'you', pick: { upTo: 1 } } } }],
+      } as unknown as Ability,
+    ]);
+    act(g, { type: 'activate', card: leader, ability: 'planted' });
+    pickRaw(g, cav);
+    expect(g.card(cav).rested).toBe(false);
+    const before = hand(g).length;
+    swing(g);
+    expect(kind(g)).not.toBe('choose');
+    expect(hand(g)).toHaveLength(before);
   });
 
   it('[Once Per Turn] renews: on my next turn the next attack draws 2 and trashes 1 again', () => {

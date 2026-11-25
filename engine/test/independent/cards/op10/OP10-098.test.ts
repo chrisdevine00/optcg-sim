@@ -43,12 +43,12 @@ function main(p2: string[], own: string[] = []) {
 }
 
 describe('OP10-098 Liberation [Main]: with 2 fewer Characters, K.O. up to 1 (base cost 6 or less) and up to 1 (base cost 4 or less)', () => {
-  it('2 Characters against 0: the condition holds; both K.O.s are made, one per Character', () => {
+  it('2 Characters against 0: the condition holds; both K.O.s are made, one per Character (cost 4 asked first, B3B-R2)', () => {
     const g = main([SC10.c6, SC10.c4]);
     need(g, 'choose', 'p1');
-    pickInst(g, [g.find('p2', 'characters', SC10.c6)]);
-    need(g, 'choose', 'p1');
     pickInst(g, [g.find('p2', 'characters', SC10.c4)]);
+    need(g, 'choose', 'p1');
+    pickInst(g, [g.find('p2', 'characters', SC10.c6)]);
     expect(g.zone('p2', 'characters')).toHaveLength(0);
     expect(trash(g, 'p2')).toEqual([SC10.c4, SC10.c6].sort());
     expect(trash(g)).toEqual([ID]);
@@ -76,21 +76,27 @@ describe('OP10-098 Liberation [Main]: with 2 fewer Characters, K.O. up to 1 (bas
     expect(more.zone('p2', 'characters')).toHaveLength(1);
   });
 
-  it('the cost-6 pick offers Characters of base cost 6 or less; cost 7 is not a candidate', () => {
-    const g = main([SC10.c7, SC10.c6, SC10.c4]);
-    need(g, 'choose', 'p1');
-    expect(offeredInst(g)).toEqual(
-      [g.find('p2', 'characters', SC10.c6), g.find('p2', 'characters', SC10.c4)].sort(),
-    );
-  });
-
-  it('the cost-4 pick offers base cost 4 or less: cost 5 and 6 are not candidates', () => {
+  it('the first pick offers base cost 4 or less: cost 5, 6 and 7 are not candidates', () => {
     const g = main([SC10.c6, SC10.c5, SC10.c4, SC10.c3]);
-    pickInst(g, [g.find('p2', 'characters', SC10.c6)]);
     need(g, 'choose', 'p1');
     expect(offeredInst(g)).toEqual(
       [g.find('p2', 'characters', SC10.c4), g.find('p2', 'characters', SC10.c3)].sort(),
     );
+  });
+
+  it('the second pick offers base cost 6 or less (the other cards left); cost 7 is not a candidate', () => {
+    const g = main([SC10.c7, SC10.c6, SC10.c4]);
+    pickInst(g, [g.find('p2', 'characters', SC10.c4)]);
+    need(g, 'choose', 'p1');
+    expect(offeredInst(g)).toEqual([g.find('p2', 'characters', SC10.c6)]);
+  });
+
+  it('B3B-R2: choosing the cost-4 Character first never costs the second K.O. (it is the 6-or-less pick that follows)', () => {
+    const g = main([SC10.c6, SC10.c4, SC10.c3]);
+    pickInst(g, [g.find('p2', 'characters', SC10.c4)]);
+    need(g, 'choose', 'p1');
+    pickInst(g, [g.find('p2', 'characters', SC10.c6)]);
+    expect(g.zone('p2', 'characters').map((c) => c.card)).toEqual([SC10.c3]);
   });
 
   it('both picks are "up to 1": either may be skipped on its own', () => {
@@ -102,9 +108,9 @@ describe('OP10-098 Liberation [Main]: with 2 fewer Characters, K.O. up to 1 (bas
     pickInst(g, [g.find('p2', 'characters', SC10.c4)]);
     expect(g.zone('p2', 'characters').map((c) => c.card)).toEqual([SC10.c6]);
     const h = main([SC10.c6, SC10.c4]);
-    pickInst(h, [h.find('p2', 'characters', SC10.c6)]);
+    pickInst(h, [h.find('p2', 'characters', SC10.c4)]);
     none(h);
-    expect(h.zone('p2', 'characters').map((c) => c.card)).toEqual([SC10.c4]);
+    expect(h.zone('p2', 'characters').map((c) => c.card)).toEqual([SC10.c6]);
   });
 
   it('"base cost": a cost lowered by an effect does not make a Character eligible (base 7, now 6)', () => {

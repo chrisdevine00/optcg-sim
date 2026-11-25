@@ -56,6 +56,15 @@ describe('OP10-082 Kuzan: [Activate: Main]', () => {
     expect(idsOf(g, 'p1', 'characters')).toEqual([BB5]);
   });
 
+  it('B3B-R5: base cost 6 is over the bound (a cost-6 Blackbeard Pirates Character that is not a Kuzan)', () => {
+    // ST27-003 (BB6) is itself a Kuzan, so the name exclusion hid the cost bound; OP16-108 is not.
+    const g = start({ trash: [BB5, 'OP16-108', KUZAN] });
+    activate(g, g.find('p1', 'characters', ID), 'activate');
+    expectDecision(g, 'choose', 'p1');
+    expect(canPick(g, g.find('p1', 'trash', BB5))).toBe(true); // cost 5
+    expect(canPick(g, g.find('p1', 'trash', 'OP16-108'))).toBe(false); // cost 6
+  });
+
   it('cannot play any [Kuzan], the trashed one (cost 5, Blackbeard Pirates) included', () => {
     const g = start();
     activate(g, g.find('p1', 'characters', ID), 'activate');

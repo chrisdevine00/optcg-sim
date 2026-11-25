@@ -2,9 +2,9 @@
 
 Cards: OP10-036, 037, 038, 043, 044, 045, 046, 047, 048, 049, 051, 052, 053, 055, 056, 057, 058, 062, 063, 065, 066, 069, 071, 072, 074.
 
-One disagreement (an `it.fails` in the card's test file).
+One disagreement, **closed in the B3B-R3 fix round** (the engine now announces a hand reveal; the test is a plain test).
 
-1. **OP10-058 Rebecca, "reveal up to 2 ... Dressrosa type Character cards ... from your hand": a revealed card that is not then played gets no `CardRevealed` event.** After revealing Blue Gilly and Viola and choosing to play Gilly, the event stream holds `CardRevealed` only for the play of Gilly (`reason: 'play'`); Viola (cost 5, so not played) is never announced as revealed. CR 11-2-1 and rules-digest 50 make a revealed card known to both players until the effect resolves, so the opponent learns Viola's identity and the engine tells nobody. Severity 1 or 2 (information the opponent is owed, no board effect). Test: `OP10-058.test.ts`, "a card revealed from hand but not played (Viola ...) is announced as revealed". Expected: a `CardRevealed` for each revealed card, played or not.
+1. **(Closed.)** **OP10-058 Rebecca, "reveal up to 2 ... Dressrosa type Character cards ... from your hand": a revealed card that is not then played gets no `CardRevealed` event.** After revealing Blue Gilly and Viola and choosing to play Gilly, the event stream holds `CardRevealed` only for the play of Gilly (`reason: 'play'`); Viola (cost 5, so not played) is never announced as revealed. CR 11-2-1 and rules-digest 50 make a revealed card known to both players until the effect resolves, so the opponent learns Viola's identity and the engine tells nobody. Severity 1 or 2 (information the opponent is owed, no board effect). Test: `OP10-058.test.ts`, "a card revealed from hand but not played (Viola ...) is announced as revealed". Expected: a `CardRevealed` for each revealed card, played or not.
 
 Readings the tests assume, so the review can check them:
 
