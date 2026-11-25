@@ -2,6 +2,12 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-25 — An `attack` timing that names both attacker and target needs both (OP12-081; no ENGINE_VERSION change)
+
+- **Context:** BACKLOG §5: `attackMatch` (engine/src/flow.ts) checked only the selector of the side that watches the event, so "When this Leader attacks your opponent's Leader" (OP12-081 Koala) also fired on an attack on a Character.
+- **Decision:** when a timing gives both `attacker` and `target`, both must match the battle. OP12-081 is scripted (its draw is an effect-level `if`, the colon-less rule). Planted test from both the attacking and the attacked side; both it and OP12-081's "attacks a Character" test fail on the old code. No existing script names both sides in one timing (OP17-040 uses two timings), so no recorded game changes and ENGINE_VERSION stays 0.5.16.
+- **Rejected:** a new timing kind for Leader-on-Leader attacks (the selector pair already says it).
+
 ## 2026-11-25 — Block 3 batch B: a quoted type in the card data is an exact type; a failed [Trigger] goes to the trash; batches run in parallel
 
 - **Context:** the batch B blind tests raised two disagreements (EB02-044 Sengoku `black "Navy" type`, OP09-095 Laffitte `"Blackbeard Pirates" type card`) by reading a quoted type as a substring match (rules-digest 27, CR 2-4-3-1). Separately, OP10-100's notes said an activated [Trigger] whose colon-less "If" fails goes to the hand, while the OP-09 scripts and the engine send it to the trash.

@@ -1369,7 +1369,11 @@ export function fireEvent(
   );
 }
 
-/** Does the battle's attacker (or target) match an `attack` event's selector for `p`? */
+/**
+ * Does the battle's attacker (or target) match an `attack` event's selector for `p`? `side` is the
+ * selector that decides which player's cards watch the event; when the timing also names the other
+ * side ("when this Leader attacks your opponent's Leader", OP12-081), that one must match too.
+ */
 export function attackMatch(
   s: State,
   w: AutoTiming,
@@ -1380,8 +1384,12 @@ export function attackMatch(
   if (typeof w !== 'object' || w.event !== 'attack' || !s.battle) return false;
   const sel = side === 'attacker' ? w.attacker : w.target;
   if (!sel) return false;
+  const ctx = { s, you: p, self: card, live: true };
   const subject = side === 'attacker' ? s.battle.attacker : s.battle.target;
-  return pool({ s, you: p, self: card, live: true }, sel).includes(subject);
+  if (!pool(ctx, sel).includes(subject)) return false;
+  const other = side === 'attacker' ? w.target : w.attacker;
+  const otherSubject = side === 'attacker' ? s.battle.target : s.battle.attacker;
+  return !other || pool(ctx, other).includes(otherSubject);
 }
 
 /**
