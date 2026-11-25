@@ -16,7 +16,7 @@ export const VIVI_L = 'OP04-001'; // Blue/Red, [Nefeltari Vivi], multicolored, {
 export const ODEN_L = 'OP01-031'; // Green, [Kouzuki Oden], <Slash>, {Land of Wano}
 export const HANCOCK_L = 'OP07-038'; // Blue, [Boa Hancock]
 export const KATAKURI_L = 'OP03-099'; // Yellow, [Charlotte Katakuri]
-export const SN_LEADER = 'OP10-099'; // Yellow, {Supernovas}
+export const SN_LEADER = 'ST13-003'; // Yellow, {Supernovas}, unscripted (its text is inert)
 /** Red Leader, <Strike>, {Straw Hat Crew}{Supernovas}: not multicolored, no [Sugar]/[Vivi]/... name. */
 export const STRIKE_L = 'ST01-001';
 
