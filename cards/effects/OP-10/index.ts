@@ -35,13 +35,38 @@ import { OP10_059 } from './OP10-059.ts';
 import { OP10_060 } from './OP10-060.ts';
 import { OP10_061 } from './OP10-061.ts';
 import { OP10_067 } from './OP10-067.ts';
+import { OP10_075 } from './OP10-075.ts';
+import { OP10_076 } from './OP10-076.ts';
+import { OP10_077 } from './OP10-077.ts';
 import { OP10_078 } from './OP10-078.ts';
 import { OP10_079 } from './OP10-079.ts';
 import { OP10_080 } from './OP10-080.ts';
+import { OP10_081 } from './OP10-081.ts';
+import { OP10_082 } from './OP10-082.ts';
+import { OP10_083 } from './OP10-083.ts';
+import { OP10_085 } from './OP10-085.ts';
+import { OP10_086 } from './OP10-086.ts';
+import { OP10_087 } from './OP10-087.ts';
+import { OP10_088 } from './OP10-088.ts';
+import { OP10_090 } from './OP10-090.ts';
+import { OP10_091 } from './OP10-091.ts';
+import { OP10_092 } from './OP10-092.ts';
+import { OP10_093 } from './OP10-093.ts';
+import { OP10_094 } from './OP10-094.ts';
+import { OP10_095 } from './OP10-095.ts';
 import { OP10_096 } from './OP10-096.ts';
 import { OP10_097 } from './OP10-097.ts';
 import { OP10_098 } from './OP10-098.ts';
 import { OP10_099 } from './OP10-099.ts';
+import { OP10_100 } from './OP10-100.ts';
+import { OP10_102 } from './OP10-102.ts';
+import { OP10_103 } from './OP10-103.ts';
+import { OP10_106 } from './OP10-106.ts';
+import { OP10_107 } from './OP10-107.ts';
+import { OP10_108 } from './OP10-108.ts';
+import { OP10_109 } from './OP10-109.ts';
+import { OP10_110 } from './OP10-110.ts';
+import { OP10_111 } from './OP10-111.ts';
 import { OP10_112 } from './OP10-112.ts';
 import { OP10_113 } from './OP10-113.ts';
 import { OP10_114 } from './OP10-114.ts';
@@ -85,13 +110,38 @@ const SET: readonly CardScript[] = [
   OP10_060,
   OP10_061,
   OP10_067,
+  OP10_075,
+  OP10_076,
+  OP10_077,
   OP10_078,
   OP10_079,
   OP10_080,
+  OP10_081,
+  OP10_082,
+  OP10_083,
+  OP10_085,
+  OP10_086,
+  OP10_087,
+  OP10_088,
+  OP10_090,
+  OP10_091,
+  OP10_092,
+  OP10_093,
+  OP10_094,
+  OP10_095,
   OP10_096,
   OP10_097,
   OP10_098,
   OP10_099,
+  OP10_100,
+  OP10_102,
+  OP10_103,
+  OP10_106,
+  OP10_107,
+  OP10_108,
+  OP10_109,
+  OP10_110,
+  OP10_111,
   OP10_112,
   OP10_113,
   OP10_114,
