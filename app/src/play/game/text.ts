@@ -74,6 +74,12 @@ export function modifierWords(e: GameEvent): string {
       return `gains [${String(e.keyword)}]`;
     case 'negate':
       return 'effects negated';
+    case 'grantAttribute':
+      return `gains the <${String(e.attribute)}> attribute`;
+    case 'cannotPlayByEffect':
+      return 'cannot be played by effects';
+    case 'cannotLifeToHand':
+      return 'cannot add Life to hand with its own effects';
     case 'cannotAttack':
       return 'cannot attack';
     case 'basePower':
@@ -305,8 +311,22 @@ export function describeMove(
         break;
       case 'CardsLooked':
         bits.push(
-          `Look at the top ${String(e.count)} of ${whose(ctx.names, e.owner as PlayerId)} deck`,
+          `Look at the top ${String(e.count)} of ${whose(ctx.names, e.owner as PlayerId)} ${e.zone === 'life' ? 'Life cards' : 'deck'}`,
         );
+        break;
+      case 'LifeCardPlaced':
+        bits.push(
+          `Put the card back at the ${e.position === 'top' ? 'top' : 'bottom'} of ${whose(ctx.names, e.player as PlayerId)} Life cards`,
+        );
+        break;
+      case 'LifeReordered':
+        bits.push(`Put ${whose(ctx.names, e.player as PlayerId)} Life cards back in a new order`);
+        break;
+      case 'DonMoved':
+        bits.push(`Move ${String(e.count)} DON!! from ${name(e.fromCard)} to ${name(e.card)}`);
+        break;
+      case 'AttackRedirected':
+        bits.push(`The attack now targets ${name(e.card)}`);
         break;
       case 'ModeChosen':
         bits.push(

@@ -181,7 +181,9 @@ function matchesOf(c: Ctx, id: InstanceId, f: Filter): boolean {
       (def.alsoNamed?.some((n) => n.includes(f.nameIncludes)) ?? false)
     );
   if ('color' in f) return def.colors.includes(f.color);
-  if ('attribute' in f) return def.attributes.includes(f.attribute);
+  // A timed grant (G59) adds an attribute; with no modifier in the game the printed list is read.
+  if ('attribute' in f)
+    return (c.s.mods.length === 0 ? def.attributes : dvOf(c, id).attributes).includes(f.attribute);
   if ('multicolor' in f) return def.colors.length > 1;
   if ('hasTrigger' in f) return def.hasTrigger === f.hasTrigger;
   // Printed text (G49): a card with no script yet reads the same as one with.
@@ -272,6 +274,16 @@ function numOf(c: Ctx, n: Num): number {
     const dv = dvOf(c, id);
     return (n.stat === 'cost' ? dv.cost : n.stat === 'power' ? dv.power : dv.basePower) ?? 0;
   }
+  if ('statOf' in n) {
+    // A stat of the one card a zone names (G67): the Leader's base power, this card's cost, ...
+    const id = pool(c, n.statOf)[0];
+    if (id === undefined) return 0;
+    const dv = dvOf(c, id);
+    return (n.stat === 'cost' ? dv.cost : n.stat === 'power' ? dv.power : dv.basePower) ?? 0;
+  }
+  // The costs of every card the selector names, as they are now (G67).
+  if ('totalCost' in n)
+    return pool(c, n.totalCost).reduce((t, id) => t + (dvOf(c, id).cost ?? 0), 0);
   // The DON!! given to the card this amount is read for (G34); 0 outside a power or cost action.
   // The current power of the card this amount is read for (B4T-R1), floored at 0 (CR 4-12-2).
   if ('targetPower' in n)
@@ -405,8 +417,14 @@ export function payable(c: Ctx, costs: readonly Cost[] | undefined, o: PayOption
         // Your own Characters or Stage (G1): enough of them match.
         if (pool(c, sel).length < n) return false;
       } else handNeeds.push({ sel, n });
-    } else if ('lifeToHand' in k) lifeNeeds += k.lifeToHand.n;
-    else if ('trashLife' in k) lifeNeeds += k.trashLife;
+    } else if ('power' in k) {
+      // "Give your active Leader -5000 power" (G62): the Leader must match (be active).
+      if (pool(c, k.power.target).length < 1) return false;
+    } else if ('lifeToHand' in k) {
+      // "You cannot add Life cards to your hand using your own effects" covers the cost (G60).
+      if (cannotLifeToHandByEffect(s, c.you)) return false;
+      lifeNeeds += k.lifeToHand.n;
+    } else if ('trashLife' in k) lifeNeeds += k.trashLife;
     else if ('turnLifeFaceUp' in k) {
       // The top Life card is turned: it must be there and face-down.
       const top = ps.life.slice(0, k.turnLifeFaceUp);
@@ -600,7 +618,7 @@ export function playsRested(s: State, p: PlayerId, card: InstanceId, live = true
 function leaderMods(
   s: State,
   p: PlayerId,
-  kind: 'cannotDraw' | 'cannotPlay' | 'playCost' | 'cannotSetDon',
+  kind: 'cannotDraw' | 'cannotPlay' | 'playCost' | 'cannotSetDon' | 'cannotLifeToHand',
 ) {
   const leader = s.players[p].leader;
   return s.mods.filter((m) => m.kind === kind && m.target === leader);
@@ -613,6 +631,10 @@ function leaderMods(
  */
 export const cannotSetDonByCharacter = (s: State, p: PlayerId): boolean =>
   leaderMods(s, p, 'cannotSetDon').length > 0;
+
+/** "Cannot add Life cards to your hand using your own effects" is in force for `p` (G60). */
+export const cannotLifeToHandByEffect = (s: State, p: PlayerId): boolean =>
+  leaderMods(s, p, 'cannotLifeToHand').length > 0;
 
 /** "Cannot draw cards using your own effects" is in force for `p`. */
 export const cannotDrawByEffect = (s: State, p: PlayerId): boolean =>

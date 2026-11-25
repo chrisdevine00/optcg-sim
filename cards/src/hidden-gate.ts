@@ -89,6 +89,7 @@ function costPrompts(k: Cost, out: string[]): void {
   else if ('ko' in k) selPrompts(k.ko, out);
   else if ('move' in k) selPrompts(k.move, out);
   else if ('giveDon' in k) selPrompts(k.giveDon.to, out);
+  else if ('power' in k) selPrompts(k.power.target, out);
   else if ('oneOf' in k) for (const a of k.oneOf) for (const c of a) costPrompts(c, out);
 }
 
@@ -128,6 +129,12 @@ function actionPrompts(a: Action, out: string[]): void {
     selPrompts(a.swapBasePower.a, out);
     selPrompts(a.swapBasePower.b, out);
   } else if ('canAttackActive' in a) selPrompts(a.canAttackActive.target, out);
+  // Whose Life, top or bottom, or the order of all of them: always asked, whatever the cards are (G64).
+  else if ('lookAtLife' in a) out.push(`lifeLook:${JSON.stringify(a.lookAtLife)}`);
+  else if ('moveDon' in a) {
+    selPrompts(a.moveDon.from, out);
+    selPrompts(a.moveDon.to, out);
+  } else if ('redirectAttack' in a) selPrompts(a.redirectAttack.to, out);
   // The damaged player is asked about every Life card taken (a [Trigger] decision, ADR 0005).
   else if ('damage' in a) out.push('damage');
 }

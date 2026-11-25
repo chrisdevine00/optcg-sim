@@ -255,7 +255,14 @@ export type GameEventType =
   | 'ModeChosen'
   | 'EffectDeclined'
   // Added in M6b wave 1: Life cards turned face-down (a cost); no card is named.
-  | 'LifeTurnedFaceDown';
+  | 'LifeTurnedFaceDown'
+  // Added in M6b wave 7: a Life card looked at goes back to the top or bottom (`position`), or the
+  // whole Life area is put back in an order (G64); a given DON!! card moves from one card to
+  // another (G65); an attack's target is changed (D3). None names a hidden card.
+  | 'LifeCardPlaced'
+  | 'LifeReordered'
+  | 'DonMoved'
+  | 'AttackRedirected';
 
 export interface GameEvent {
   type: GameEventType;

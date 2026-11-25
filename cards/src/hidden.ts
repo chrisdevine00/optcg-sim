@@ -47,6 +47,9 @@ function num(n: Num): boolean {
   if ('sum' in n) return n.sum.some(num);
   if ('mul' in n) return num(n.mul[0]);
   if ('div' in n) return num(n.div[0]);
+  // The Leader's or this card's stat, and the costs of cards on the field: all public (G67).
+  if ('totalCost' in n) return selector(n.totalCost);
+  if ('statOf' in n) return selector(n.statOf);
   return false; // public counts and stats (and the number of cards an event moved)
 }
 
@@ -65,6 +68,8 @@ function cost(k: Cost): boolean {
   if ('reveal' in k) return true;
   if ('rest' in k) return selector(k.rest);
   if ('ko' in k) return selector(k.ko); // your own Characters: public
+  // A power change on your Leader reads nothing hidden (G62).
+  if ('power' in k) return selector(k.power.target);
   if ('move' in k) return selector(k.move) || destHidden(k.to.zone);
   if ('oneOf' in k) return k.oneOf.some((a) => a.some(cost));
   // lifeToHand, mill, turnLifeFaceDown, giveDon, returnDon: no hidden card is read; a Life card
@@ -94,6 +99,11 @@ function action(a: Action): boolean {
   if ('swapBasePower' in a) return selector(a.swapBasePower.a) || selector(a.swapBasePower.b);
   if ('canAttackActive' in a) return selector(a.canAttackActive.target);
   if ('addReplacement' in a) return replacementReads(a.addReplacement);
+  // Looks at Life cards no one else can see (G64).
+  if ('lookAtLife' in a) return true;
+  // DON!! given to Leaders and Characters, and the target of an attack: all on the board (G65, D3).
+  if ('moveDon' in a) return selector(a.moveDon.from) || selector(a.moveDon.to);
+  if ('redirectAttack' in a) return selector(a.redirectAttack.to);
   if ('move' in a) return selector(a.move.what) || destHidden(a.move.to.zone);
   if ('play' in a) return selector(a.play.what);
   if ('ko' in a) return selector(a.ko);
@@ -141,6 +151,8 @@ function continuous(c: Continuous): boolean {
   if ('lockAttackTarget' in c) return selector(c.lockAttackTarget.only);
   // A filter on the card being played reads its printed values, no hidden zone (G50).
   if ('playRested' in c) return false;
+  // Names cards on the field by printed values (G66).
+  if ('negate' in c) return selector(c.negate.target);
   if ('tiers' in c) return c.tiers.some((t) => condition(t.when) || t.apply.some(continuous));
   return assertNever(c);
 }

@@ -30,6 +30,7 @@ import {
   hooks,
   leaveField,
   markDamagedAtZero,
+  markKnown,
   moveCard,
   placeDon,
   rest,
@@ -745,13 +746,16 @@ export function pushKo(
 export function pushRemove(
   d: Draft,
   card: InstanceId,
-  dest: 'hand' | 'deck' | 'trash',
+  dest: 'hand' | 'deck' | 'trash' | 'life',
   cause: Cause,
   position?: 'top' | 'bottom',
   group?: number,
   rank?: number,
+  /** A Character placed into its owner's Life (G61): face-up, or face-down (the default). */
+  faceUp?: boolean,
 ): void {
   const f: Frame = { f: 'remove', card, dest, cause, considered: [] };
+  if (faceUp !== undefined) f.faceUp = faceUp;
   if (position) f.position = position;
   if (group !== undefined) f.group = group;
   if (rank !== undefined) f.rank = rank;
@@ -868,7 +872,8 @@ function runKo(d: Draft, f: Extract<Frame, { f: 'ko' }>): void {
 
 /** Is this removal an effect of the card's owner's opponent (a protected card ignores it)? */
 function byOpponentEffect(cause: Cause, owner: PlayerId): boolean {
-  return cause.kind === 'effect' && cause.by !== owner;
+  // A cost is part of the effect (RL-16): the opponent's cost that moves your card is their effect's.
+  return (cause.kind === 'effect' || cause.kind === 'cost') && cause.by !== owner;
 }
 
 function runRemove(d: Draft, f: Extract<Frame, { f: 'remove' }>): void {
@@ -883,12 +888,16 @@ function runRemove(d: Draft, f: Extract<Frame, { f: 'remove' }>): void {
     return;
   }
   if (offerReplacement(d, f, 'remove')) return;
-  const opts: { position?: 'top' | 'bottom'; above?: number } = f.position
+  const opts: { position?: 'top' | 'bottom'; above?: number; faceUp?: boolean } = f.position
     ? { position: f.position }
     : {};
   if (f.rank !== undefined && f.position === 'bottom')
     opts.above = (f.placed ?? []).filter((r) => r > f.rank!).length;
-  leaveField(d, f.card, f.dest, f.cause, opts);
+  if (f.dest === 'life') opts.faceUp = f.faceUp === true;
+  const nid = leaveField(d, f.card, f.dest, f.cause, opts);
+  // A Character placed face-down in Life is hidden from then on, but both players saw it come from
+  // the field: they still know which card it is (G61).
+  if (f.dest === 'life' && f.faceUp !== true) markKnown(d, nid, ['p1', 'p2']);
   if (f.rank !== undefined && f.group !== undefined) {
     // Tell the rest of the group where this one went, so each lands above the ones owed below it.
     for (const o of d.stack())
@@ -1170,7 +1179,28 @@ export function applyReplacement(d: Draft, r: ReplacementRef): void {
     });
     d.stack().splice(d.stack().indexOf(mate), 1);
   }
-  pushEffect(d, r.card, c.card, ab, r.controller, 'instead');
+  // A payload that names "the replaced card" reads it as `{ ref: 'replaced' }` (G61, OP11-101).
+  pushEffect(
+    d,
+    r.card,
+    c.card,
+    ab,
+    r.controller,
+    'instead',
+    readsReplaced(ab) ? { b: { replaced: [f.card] } } : {},
+  );
+}
+
+const replacedMemo = new WeakMap<object, boolean>();
+/** Does the payload of this replacement refer to the card it replaced (`{ ref: 'replaced' }`)? */
+function readsReplaced(ab: Ability): boolean {
+  if (ab.kind !== 'replacement') return false;
+  let v = replacedMemo.get(ab.instead);
+  if (v === undefined) {
+    v = JSON.stringify(ab.instead).includes('"ref":"replaced"');
+    replacedMemo.set(ab.instead, v);
+  }
+  return v;
 }
 
 type RemovalFrame = Extract<Frame, { f: 'ko' | 'remove' }>;

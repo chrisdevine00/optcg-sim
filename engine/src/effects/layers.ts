@@ -36,6 +36,7 @@ const RESTRICT_KIND = {
   cannotActivateBlockerAgainstIt: 'noBlocker',
   cannotBeRested: 'cannotBeRested',
   cannotActivateBlocker: 'cannotBlock',
+  cannotBePlayedByEffects: 'cannotPlayByEffect',
 } as const;
 
 /**

@@ -2,6 +2,33 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-25 — M6b-2 wave 7: G59 to G67 and D3 (ENGINE_VERSION stays 0.5.16)
+
+- **Context:** wave 7 of the M6b-1 audit (`docs/research/m6b-wave7.md`): a timed attribute grant, the player restriction on adding Life to the hand, a Character placed into a Life area, a power cost on your Leader, "cannot be played by effects" for a card in the hand, looking at Life cards and placing them back, moving a given DON!!, a permanent negate, a stat of a selector as a `Num`, and (D3, decided 2026-11-23) the narrow `redirectAttack`. 20 cards become expressible; none is scripted.
+- **Decision:**
+  - **G59** extends `grant` with `attribute` beside `keyword`; the modifier is a new kind (`grantAttribute`), read through `Derived.attributes` by the `attribute` filter. A grant may give both, which is what OP15-093 says.
+  - **G60** is a restriction on the player, `cannotAddLifeToHandByOwnEffects`, stored on their Leader like `cannotDraw`. It stops the controller's own Life card going to their own hand by their effect, the cost form included (M6b-Q31, RL-16), and nothing else (M6b-Q77).
+  - **G61** extends `move` instead of adding an action: from `characters` to `life` with a position (`top`, `bottom`, `topOrBottom`) and a face state, as an effect, as a cost (the `move` cost, which now may name the opponent's Character when it goes to Life) and as a replacement payload. A payload names the replaced card with `{ ref: 'replaced' }`, which `applyReplacement` binds only when the payload reads it. The move is a removal frame with a new destination `life`, so protection and replacements see it; a cost counts as an effect for "cannot be removed by your opponent's effects". A face-down card in Life is known to both players (they saw it leave the field).
+  - **G62** is a cost `power { target, amount, duration }` narrowed to your own Leader (one card, a fixed amount); the payment is the modifier, and the selector must match (an active Leader).
+  - **G63** is `cannotBePlayedByEffects`, a card restriction that only a hand-zone permanent on its own card may carry; the effect `play` drops such a card from its candidates. The layers already computed hand-zone permanents.
+  - **G64** is one action, `lookAtLife`, in two shapes (look at one card of either Life and place it at the top or bottom; look at all of yours and order them), reusing the `look` list, `markKnown` and the `order` decision. The cards never leave Life (two small ops, `placeLife` and `orderLife`, so no `lifeRemoved` fires) and keep their face state (rules-digest 108; M6b-Q81).
+  - **G65** is an action, `moveDon { n, from, to }`, over your Leader and Characters; nothing about the DON!! changes but the card that carries them.
+  - **G66** is a continuous `negate { target }` applied at the first stage of the layers: `derive.ts` reads every permanent negation once per memo and adds a `negate` modifier to the cards it names, so everything that reads a card's negation (`negated`, `isNegated`, the permanents, the replacements, the autos) sees it. A source never negates itself; filters read printed values only (the validator uses the deck-filter keys), which also keeps the reading from recursing.
+  - **G67** adds two `Num`s: `{ statOf: Selector, stat }` for the one card a zone names (the Leader or this card, no pick) and `{ totalCost: Selector }` for the sum of current costs.
+  - **D3** is an action, `redirectAttack { to }`, valid only in an auto ability on `onOpponentAttack`, over your Leader and Characters (active or rested). It rewrites `battle.target` and its key, emits `AttackRedirected` and fires nothing again: the declaration's timings are read once, so the Block Step that follows is the one for the new target. The Q&A read, and the reading chosen where they are silent, are in M6b-Q85.
+  - The lethal bound: every new op and form is unclassified (searched) except that the ops that change no Life count and decide nothing are `LIFE_SAFE_OPS`; a move into Life counts as changing Life.
+  - **ENGINE_VERSION is not bumped and the goldens are not re-recorded:** no scripted card uses a new shape, and the changes to paths scripted cards run are invisible to them (see the wave write-up); the golden games and a 2,000-game property run replay with identical hashes.
+- **Rejected:**
+  - A new action for "place a Character into Life": `move` already says "from, to, which end, face state"; the validator keeps the combinations that exist.
+  - A new action `lookAtLife` per shape, or reusing `lookAtTop` with a Life zone: `lookAtTop` takes cards from a deck and moves them; here nothing leaves the area and the cards keep their face state.
+  - Moving a looked-at Life card with `moveCard` (as `lookAtTop` does for a deck): it would fire `lifeRemoved` and re-roll the card's handle for a card that never left.
+  - A permanent negate as a stage after the others: a negated source must produce nothing, so the negation has to be read first.
+  - Reading `byOpponentEffect` as effect-only: a cost of the opponent's that moves your Character would then slip past "cannot be removed by your opponent's effects" (RL-16).
+  - A `Num` `statOf` over any selector with a pick: a `Num` cannot ask; the Leader and this card are the one-card zones.
+  - Having [On Your Opponent's Attack] fire again for the redirect's new target (the audit's proposal, M6b-Q10): the timing is the attack's, not the target's.
+  - Building ST36-005 (a cost that turns the top or bottom Life card): not in the audit's gaps, listed in the write-up.
+  - Settling M6b-Q76 to Q85 now.
+
 ## 2026-11-25 — M6b-2 wave 6: G49 to G58 (ENGINE_VERSION stays 0.5.16)
 
 - **Context:** wave 6 of the M6b-1 audit (`docs/research/m6b-wave6.md`): filters on printed text, "played rested", effects the opponent performs, a place-this-card cost, play of a revealed top card, `sameNameAs`, `Pick.totalPower`, the `triggerActivated` timing, "add this card to your hand" in a [Trigger] and the variable-count hand trash. 22 cards become expressible; none is scripted.

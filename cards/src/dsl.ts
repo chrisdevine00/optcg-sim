@@ -243,6 +243,18 @@ export type Num =
   | { chosen: Name }
   | { refStat: Name; stat: 'cost' | 'power' | 'basePower' | 'donGiven' }
   /**
+   * A stat of the one card a selector names (G67): `from: 'leader'` or `'self'`, no pick, so it
+   * reads a card without asking anyone. "This Character's base power becomes the same as your
+   * Leader's base power" (OP14-053) is `setBasePower` with this as its value, which a `{ refStat }`
+   * cannot be since a permanent has nothing bound. 0 when the card is not there.
+   */
+  | { statOf: Selector; stat: 'cost' | 'power' | 'basePower' }
+  /**
+   * The current costs of every card a selector names added up (G67): "if the total cost of your
+   * Characters is 5 or more" (OP10-022). A selector with no pick over the field.
+   */
+  | { totalCost: Selector }
+  /**
    * The number of DON!! cards given to the card a `power` or `cost` action is applying to, read
    * once per target ("-1000 power for every DON!! card given to that Character", G34). Only an
    * amount of those two actions has a target to read.
@@ -370,6 +382,11 @@ export type Cost =
   | { trashSelf: true }
   | { lifeToHand: { from: 'top' | 'topOrBottom'; n: number } }
   | { turnLifeFaceUp: number }
+  /**
+   * "Give your active Leader -5000 power during this turn" as a cost (G62): a modifier on the card
+   * a cost selector names (your Leader), paid only while that card matches (an active Leader).
+   */
+  | { power: { target: Selector; amount: number; duration: Duration } }
   /** "Turn N of your Life cards face-down": the top N, which must be face-up (G8). */
   | { turnLifeFaceDown: number }
   | { mill: number }
@@ -547,10 +564,40 @@ export type Action =
    * as they have); `from: 'active'` limits it to their active cost-area DON!! (G27).
    */
   | { returnDon: { n: Num | 'toMatchOpponent'; player?: 'opponent'; from?: 'active' } }
-  | { grant: { target: Selector; keyword: Keyword; duration: Duration } }
+  /**
+   * `keyword` and/or `attribute` (G59): "gains [Rush: Character] and the <Slash> attribute during
+   * this turn". An attribute granted is read by the `attribute` filter wherever the card is; it does
+   * not replace the printed ones.
+   */
+  | { grant: { target: Selector; keyword?: Keyword; attribute?: Attribute; duration: Duration } }
   | { negate: { target: Selector; duration: Duration } }
   | { restrict: { target: Selector | P; what: Restriction; duration: Duration } }
   | { activate: { ability: 'main' | 'onPlay' | 'onKO' | 'counter'; of: 'self' } }
+  /**
+   * "Look at up to 1 card from the top of your or your opponent's Life cards and place it at the top
+   * or bottom of the Life cards" (`owner: 'any'`: you choose whose, or none; with `you` or
+   * `opponent` the look is not optional), or "look at all of your Life cards and place them back in
+   * any order" (G64). The cards stay in their owner's Life with the face state they had; only you
+   * see them, and you remember what you saw.
+   */
+  | {
+      lookAtLife:
+        | { owner: P | 'any'; n: 1; place: 'topOrBottom' }
+        | { owner: 'you'; n: 'all'; place: 'anyOrder' };
+    }
+  /**
+   * "Give up to 1 of your currently given DON!! cards to 1 of your Characters" (G65): take `n` DON!!
+   * from the card `from` chooses (your Leader or a Character with DON!! given) and give them to the
+   * card `to` chooses (never the same card). Both are yours; no DON!! changes state.
+   */
+  | { moveDon: { n: number; from: Selector; to: Selector } }
+  /**
+   * "Change the attack target to the selected card" (D3): during an opponent's attack, before the
+   * Block Step, the target becomes the card `to` chooses among your Leader and Characters, active or
+   * rested. [When Attacking] and [On Your Opponent's Attack] do not fire again; a Blocker may still
+   * be declared against the new target (but not by it).
+   */
+  | { redirectAttack: { to: Selector } }
   | { select: Selector };
 
 /** Which K.O.s a scoped `cannotBeKOd` stops (RL-14); a cost counts as an effect (RL-16). */
@@ -560,6 +607,17 @@ export type Restriction =
   | 'cannotAttack'
   | 'cannotActivateBlockerAgainstIt'
   | 'cannotDrawByOwnEffects'
+  /**
+   * "You cannot add Life cards to your hand using your own effects" (G60): a restriction on a
+   * player. It stops your effect (a cost included, M6b-Q31) taking a Life card of yours into your
+   * hand; damage and your opponent's effects are not stopped.
+   */
+  | 'cannotAddLifeToHandByOwnEffects'
+  /**
+   * "This card in your hand cannot be played by effects" (G63): a permanent of a card in your hand
+   * (`zone: 'hand'`, target `self`). Playing it from your hand by the rules stays legal.
+   */
+  | 'cannotBePlayedByEffects'
   | 'cannotBeRemovedByOpponentEffects'
   /** Cannot be K.O.'d at all: by effects and in battle (RL-14). */
   | 'cannotBeKOd'
@@ -612,6 +670,12 @@ export type Continuous =
    * enters the field by a play, from a hand or by an effect, is rested.
    */
   | { playRested: Filter }
+  /**
+   * "Your Leader and all of your Characters that do not have a type including X have their effects
+   * negated" (G66): the cards the selector names, at the first stage of the layers. A source never
+   * negates itself, and a negated source produces nothing.
+   */
+  | { negate: { target: Selector } }
   /** "Your opponent cannot attack any card other than …" (OP17-044). */
   | { lockAttackTarget: { attacker: P; only: Selector } }
   | { tiers: { when: Condition; apply: Continuous[] }[] };
