@@ -35,7 +35,7 @@ import {
   type PlayerView,
 } from '@optcg/engine';
 import { evaluate, total } from './heuristic.ts';
-import { apply, quickAction, settle, type SimContext } from './sim.ts';
+import { apply, isNoOpActivation, quickAction, settle, type SimContext } from './sim.ts';
 import {
   discountPays,
   fingerprint,
@@ -171,6 +171,8 @@ export function treeCandidates(
         out.push({ actions: [a] });
     } else if (unneededDiscount(s, me, a, setup, true)) {
       // Left out (playbook `activateBefore`): a DON!! -1 no card in hand needs.
+    } else if (isNoOpActivation(s, a, me, ctx)) {
+      // Left out: a repeatable ability that changes nothing (B3B-R1) would tie, and win, over ending.
     } else out.push(...withPrompts(s, a, me, ctx, setup));
   }
   // "Use the ability, then play the card" as one move (playbook `activateBefore`).

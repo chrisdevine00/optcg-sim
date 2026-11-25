@@ -83,7 +83,9 @@ export const replay = (record: GameRecord, cards: CardLookup, upTo?: number): St
 
 export const checkInvariants = (state: GameState): string[] => invariants(st(state));
 
-export const summaryHash = (state: GameState): string => hash(st(state));
+/** The semantic hash; `dedupeMods` reads modifiers as a set (see hash.ts). */
+export const summaryHash = (state: GameState, dedupeMods = false): string =>
+  hash(st(state), dedupeMods);
 
 export const queries: Queries = q;
 

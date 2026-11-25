@@ -98,3 +98,18 @@ Survivors of both suites: ST15-003, PRB02-006, ST18-003, OP10-082 (R5). Author-o
 ## Fix round suggestions
 
 R1 (AI no-op filter; also covers EB04-016), R2 (swap the steps), R3 (engine reveal from hand; two scripts), R4 and R6 (docs), R5 and R7 to R8 (tests).
+
+## Fix round
+
+Commit `ea37ab2` (code, tests, DECISIONS, OPEN-QUESTIONS, BACKLOG). Each fix was shown to fail its test when reverted. ENGINE_VERSION stays 0.5.16 (the only event-log change is a new `CardRevealed` for the two cards that set `reveal`; no golden game holds them; goldens pass untouched).
+
+| Finding | Fix |
+| --- | --- |
+| B3B-R1 (3) | `isNoOpActivation` (`ai/src/search/sim.ts`) drops an `activate` that leaves the semantic hash (modifiers read as a set, new `summaryHash(state, dedupeMods)` argument, default unchanged) unchanged under every answer to its prompts; used by `mainCandidates` (Pirate) and `treeCandidates` (Warlord, Emperor). Guard `ai/test/noop-activation.test.ts` (planted Smoker and EB04-016 positions through all three tiers, plus seed 5044's decks); 11 of its 12 tests fail with the filter off. Seed 5044 capped before, ends after; 5031 and 5080 end. Decision recorded 2026-11-25. |
+| B3B-R2 (2) | OP10-098 asks the cost-4 pick first; author and independent tests updated (9 fail on the old script). |
+| B3B-R3 (2) | Selector `reveal: true` (DSL, validator, `select()` emits `CardRevealed` reason `effect`); set in OP10-119 and OP10-058; both `it.fails` are plain tests; DISAGREEMENTS-b and -d closed; planted tests `engine/test/cards/m6b-b3a/reveal-hand.test.ts` (4 fail with the emit off, with the two former `it.fails`). |
+| B3B-R4 (2) | OPEN-QUESTIONS M6b-Q60 ("a rested [Uta]" includes the Leader). |
+| B3B-R5 (2) | New tests: ST18-003 second attack, ST15-003 own-effect K.O. on the opponent's turn, OP10-082 cost-6 non-Kuzan (the old cost-6 card was itself a Kuzan, hidden by the name exclusion). PRB02-006: the runtime never reads `cause` for a `rest` replacement; the mutant is not a valid script and is killed by the registry validation (`cards/test/dsl.test.ts`); a validator test was added to the author file. |
+| B3B-R6 (2) | OP10-100 `rulings` now says an activated [Trigger] whose "If" fails goes to the trash. |
+| B3B-R7, R8 (1) | OP10-099 cost-9 case (OP14-009), OP10-045 same-turn second attack (independent suite). |
+| B3B-R9 to R13 (1) | Left; listed in `docs/BACKLOG.md` section 7. |

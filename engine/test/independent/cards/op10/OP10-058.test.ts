@@ -161,18 +161,15 @@ describe('OP10-058 Rebecca: [On Play] with a Character of cost 8 or more: draw 1
     expect(canFinish(g)).toBe(true);
   });
 
-  // DISAGREEMENT (DISAGREEMENTS-b.md 1): the engine emits no CardRevealed for a card revealed from the
-  // hand by "reveal up to 2 ..." that is then not played (only the play-reveal of the played ones).
-  it.fails(
-    'a card revealed from hand but not played (Viola, cost 5, the non-chosen one) is announced as revealed (CR 11-2-1)',
-    () => {
-      const g = start([GILLY, VIOLA]);
-      playRaw(g, REB);
-      pickCards(g, [GILLY, VIOLA]);
-      pickRaw(g, g.find('p1', 'hand', GILLY));
-      expect(hasEvent(g, 'CardRevealed', { card: VIOLA })).toBe(true);
-    },
-  );
+  // Was DISAGREEMENT (DISAGREEMENTS-b.md 1), fixed in the B3B-R3 fix round: "reveal up to 2 ..." now
+  // announces each revealed card (a selector `reveal`), played or not.
+  it('a card revealed from hand but not played (Viola, cost 5, the non-chosen one) is announced as revealed (CR 11-2-1)', () => {
+    const g = start([GILLY, VIOLA]);
+    playRaw(g, REB);
+    pickCards(g, [GILLY, VIOLA]);
+    pickRaw(g, g.find('p1', 'hand', GILLY));
+    expect(hasEvent(g, 'CardRevealed', { card: VIOLA })).toBe(true);
+  });
 
   it('a Character of cost 8 on my own side also satisfies the condition', () => {
     const g = start([GILLY], { p1: [ISSHO], p2: [] });

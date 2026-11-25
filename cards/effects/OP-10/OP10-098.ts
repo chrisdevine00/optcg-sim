@@ -52,7 +52,7 @@ export const OP10_098: CardScript = {
                   owner: 'opponent',
                   filter: {
                     baseCost: {
-                      lte: 6,
+                      lte: 4,
                     },
                   },
                   pick: {
@@ -68,7 +68,7 @@ export const OP10_098: CardScript = {
                   owner: 'opponent',
                   filter: {
                     baseCost: {
-                      lte: 4,
+                      lte: 6,
                     },
                   },
                   pick: {
@@ -119,6 +119,6 @@ export const OP10_098: CardScript = {
     },
   ],
   rulings: [
-    'reading: "at least 2 less" is opponent Characters minus yours >= 2, checked as the effect resolves; the two K.O.s are two separate "up to 1" picks, the cost-6 one first (the first K.O.d card is not eligible for the second); base cost, not current cost',
+    'reading: "at least 2 less" is opponent Characters minus yours >= 2, checked as the effect resolves; the two K.O.s are two separate "up to 1" picks, the cost-4 one first (the first K.O.d card is not eligible for the second); asking the tighter bound first means no choice of the first card can lose the second K.O. (the cost-6 pick can take any card left, B3B-R2); base cost, not current cost',
   ],
 };

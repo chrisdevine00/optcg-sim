@@ -37,6 +37,14 @@ describe('OP10-099 Eustass"Captain"Kid', () => {
     expect(canPick(g, g.find('p1', 'characters', V.c4))).toBe(false);
   });
 
+  it('B3B-R7: cost 9 is over the upper bound of 8 (cost 8 is the last one that can be chosen)', () => {
+    const g = start([rested(SN.c8), rested('OP14-009')]);
+    g.act({ type: 'endTurn' });
+    accept(g);
+    expect(canPick(g, g.find('p1', 'characters', SN.c8))).toBe(true);
+    expect(canPick(g, g.find('p1', 'characters', 'OP14-009'))).toBe(false); // cost 9
+  });
+
   it('declining the cost: nothing is turned, set or granted', () => {
     const g = start([rested(SN.c3)]);
     g.act({ type: 'endTurn' });

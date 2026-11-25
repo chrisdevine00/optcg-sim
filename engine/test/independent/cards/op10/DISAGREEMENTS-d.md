@@ -1,9 +1,9 @@
 # Disagreements: OP-10 independent tests, group D (22 cards: OP10-018 to OP10-021, 039 to 041, 059 to 061, 078 to 080, 096 to 098, 112, 113, 115, 117 to 119)
 
-Each open entry has an `it.fails` in the card's test file, so the suite stays green while the question is
+D-1 is **closed in the B3B-R3 fix round** (a selector `reveal` flag emits `CardRevealed`; the test is a plain test). Each open entry has an `it.fails` in the card's test file, so the suite stays green while the question is
 open. When it is settled, fix the engine and drop `it.fails`, or change the test and delete the entry.
 
-## D-1. OP10-119 Trafalgar Law: "Reveal up to 1 {Supernovas} Character from your hand and add it to the top of your Life" never reveals the card (severity 2)
+## D-1. (Closed) OP10-119 Trafalgar Law: "Reveal up to 1 {Supernovas} Character from your hand and add it to the top of your Life" never reveals the card (severity 2)
 
 - **Card text:** "[On Play] Reveal up to 1 {Supernovas} type Character card from your hand and add it to the
   top of your Life cards face-down. Then, give up to 1 rested DON!! card to 1 of your {Supernovas} type
