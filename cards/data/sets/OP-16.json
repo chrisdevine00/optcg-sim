@@ -4725,7 +4725,7 @@
    "rarity": "L",
    "set": "OP-16",
    "block": 5,
-   "effectText": "[Opponent's Turn] All of your Characters gain +1 cost. [On your Opponent's Attack] [Once Per Turn] You may trash 1 card with a [Trigger] from your hand: Change the target of that attack to this Leader or to one of your {Blackbeard Pirates} type Character cards.",
+   "effectText": "[Opponent's Turn] All of your Characters gain +1 cost. [On Your Opponent's Attack] [Once Per Turn] You may trash 1 card with a [Trigger] from your hand: Change the target of that attack to this Leader or to one of your {Blackbeard Pirates} type Character cards.",
    "triggerText": null,
    "keywords": [],
    "verified": true,
@@ -4736,7 +4736,15 @@
      "use": "cross-check"
     }
    ],
-   "textFixes": [],
+   "textFixes": [
+    {
+     "field": "effectText",
+     "kind": "override",
+     "from": "[Opponent's Turn] All of your Characters gain +1 cost. [On your Opponent's Attack] [Once Per Turn] You may trash 1 card with a [Trigger] from your hand: Change the target of that attack to this Leader or to one of your {Blackbeard Pirates} type Character cards.",
+     "to": "[Opponent's Turn] All of your Characters gain +1 cost. [On Your Opponent's Attack] [Once Per Turn] You may trash 1 card with a [Trigger] from your hand: Change the target of that attack to this Leader or to one of your {Blackbeard Pirates} type Character cards.",
+     "source": "https://onepiece.limitlesstcg.com/cards/OP16-080"
+    }
+   ],
    "artworks": [
     {
      "artworkId": "OP16-080",
