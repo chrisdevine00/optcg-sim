@@ -28,6 +28,7 @@ import {
   endGame,
   expireModifiers,
   hooks,
+  lastKnown,
   leaveField,
   markDamagedAtZero,
   markKnown,
@@ -735,10 +736,13 @@ export function pushKo(
   group?: number,
   /** The card whose effect or cost K.O.s, for a protection that names its source (G46). */
   src?: InstanceId,
+  /** The source's last-known power and cost, when it left the field before the K.O. (G46). */
+  srcLki?: { power: number | null; basePower: number | null; cost: number | null },
 ): void {
   const f: Frame = { f: 'ko', card, cause, considered: [] };
   if (group !== undefined) f.group = group;
   if (src !== undefined) f.src = src;
+  if (srcLki) f.srcLki = { power: srcLki.power, basePower: srcLki.basePower, cost: srcLki.cost };
   push(d, f);
 }
 
@@ -807,13 +811,24 @@ function runKo(d: Draft, f: Extract<Frame, { f: 'ko' }>): void {
     return;
   }
   const dv = deriveLive(d.s, f.card);
-  // A protection that names the K.O.'s source reads the source card where it is now (G46); one that
-  // has left the game (a card that left the field has a new id) matches nothing.
+  // A protection that names the K.O.'s source reads the source card where it is now (G46): in the
+  // trash for an [On K.O.] source or one that trashed itself as a cost (then by its last-known power
+  // and cost); a source that left the game some other way matches nothing.
   const src = f.src;
   const source = (by: Filter): boolean =>
     src !== undefined &&
     d.s.cards[src] !== undefined &&
-    matches({ s: d.s, you: c.owner, self: f.card, live: true }, src, by);
+    matches(
+      {
+        s: d.s,
+        you: c.owner,
+        self: f.card,
+        live: true,
+        ...(f.srcLki ? { lki: { id: src, ...f.srcLki } } : {}),
+      },
+      src,
+      by,
+    );
   if (
     koProtected(dv, f.cause, c.owner, source) ||
     (dv.removalProof && byOpponentEffect(f.cause, c.owner))
@@ -836,6 +851,7 @@ function runKo(d: Draft, f: Extract<Frame, { f: 'ko' }>): void {
   );
   d.emit({ type: 'KO', instance: f.card, card: c.card, owner, cause: f.cause });
   if (d.s.defs[c.card]!.category === 'Character') recordKo(d, owner);
+  const lki = lastKnown(d, f.card, f.cause);
   const nid = leaveField(d, f.card, 'trash', f.cause);
   pop(d);
   // [On K.O.] activates on the field and resolves from the trash, following the rename
@@ -851,9 +867,9 @@ function runKo(d: Draft, f: Extract<Frame, { f: 'ko' }>): void {
       undefined,
       readsDon ? { cause: f.cause, don } : { cause: f.cause },
     );
-  // "When one of your Characters is K.O.'d" (OP14-041): the filter reads the card as it now is in
-  // the trash, which has its printed values (a last-known snapshot would only matter for a card
-  // whose power was set by an effect; no meta card reads that).
+  // "When one of your Characters is K.O.'d" (OP14-041, OP13-002): the filter reads the card as it
+  // was on the field, its last-known information, not the printed values it has in the trash (the
+  // official Q&A for OP14-053 Vista: K.O.'d with its base power set to 6000 counts as 6000).
   fire(
     d,
     [d.s.active, other(d.s.active)],
@@ -865,7 +881,7 @@ function runKo(d: Draft, f: Extract<Frame, { f: 'ko' }>): void {
       (w.owner === 'opponent' ? p !== owner : p === owner) &&
       // "When one of your Characters is K.O.'d": a K.O.'d Stage is not a Character.
       d.s.defs[d.s.cards[nid]!.card]!.category === 'Character' &&
-      matches({ s: d.s, you: p, self: card, live: true }, nid, w.filter),
+      matches({ s: d.s, you: p, self: card, live: true, lki: { id: nid, ...lki } }, nid, w.filter),
     'koed',
   );
 }
@@ -1355,7 +1371,7 @@ hooks.rested = (d, id, reason, by, source) => {
 };
 
 // A Character or Stage left the field (G29): "when your Character is removed from the field". The
-// card is read where it went (printed values, M6b-Q20); the watchers are the cards still on a field.
+// card is read by its last-known information (M6b-Q20, M4b-14); the watchers are the cards still on a field.
 hooks.removed = (d, info) => {
   fire(
     d,
@@ -1372,7 +1388,14 @@ hooks.removed = (d, info) => {
         if (w.cause === 'yourEffect' && c.by !== p) return false;
         if (w.cause === 'opponentEffect' && (c.kind !== 'effect' || c.by === p)) return false;
       }
-      return !w.filter || matches({ s: d.s, you: p, self: card, live: true }, info.card, w.filter);
+      return (
+        !w.filter ||
+        matches(
+          { s: d.s, you: p, self: card, live: true, lki: { id: info.card, ...info.lki } },
+          info.card,
+          w.filter,
+        )
+      );
     },
     'removed',
   );

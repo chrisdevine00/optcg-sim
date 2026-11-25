@@ -48,6 +48,12 @@ export interface Ctx {
   /** The state is a draft being written: derive without the memo. */
   live?: boolean;
   /**
+   * Last-known information of a card that has left the field (a K.O.'d or removed Character): its
+   * power, base power and cost as they were on the field, read instead of the printed values it
+   * has in the trash now (official Q&A, OP14-053 Vista with OP13-002 Ace).
+   */
+  lki?: { id: InstanceId; power: number | null; basePower: number | null; cost: number | null };
+  /**
    * Set while a permanent effect's own conditions and targets are read (effects/layers.ts): values
    * come from the layers below `upto`, so a layer never reads itself.
    */
@@ -167,10 +173,11 @@ function matchesOf(c: Ctx, id: InstanceId, f: Filter): boolean {
   if (!card) return false;
   const def = c.s.defs[card.card]!;
   if ('category' in f) return f.category.includes(def.category);
-  if ('cost' in f) return cmp(c, dvOf(c, id).cost, f.cost);
+  const lk = c.lki && c.lki.id === id ? c.lki : undefined;
+  if ('cost' in f) return cmp(c, lk ? lk.cost : dvOf(c, id).cost, f.cost);
   if ('baseCost' in f) return cmp(c, def.cost, f.baseCost);
-  if ('power' in f) return cmp(c, dvOf(c, id).power, f.power);
-  if ('basePower' in f) return cmp(c, dvOf(c, id).basePower, f.basePower);
+  if ('power' in f) return cmp(c, lk ? lk.power : dvOf(c, id).power, f.power);
+  if ('basePower' in f) return cmp(c, lk ? lk.basePower : dvOf(c, id).basePower, f.basePower);
   if ('hasCounter' in f) return (def.counter ?? 0) > 0 === f.hasCounter;
   if ('type' in f) return def.types.includes(f.type);
   if ('typeIncludes' in f) return def.types.some((t) => t.includes(f.typeIncludes));

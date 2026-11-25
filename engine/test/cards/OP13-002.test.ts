@@ -163,4 +163,23 @@ describe('OP13-002 Portgas.D.Ace', () => {
     expect(hand(bare, 'p1')).toEqual([]);
     expect(dec(bare)?.kind).toBe('main');
   });
+
+  it("official Q&A (OP14-053 Vista): a Character K.O.'d with its base power set to 6000 counts, read as it was on the field", () => {
+    const VISTA = 'OP14-053';
+    const mk = (turn: 3 | 4) =>
+      game(
+        { leader: leader(), characters: [VISTA] },
+        { leader: PLAIN_BLUE },
+        { turn, activePlayer: turn === 4 ? 'p2' : 'p1' },
+      );
+    // The opponent's turn, 7 or less cards in hand: Vista's base power becomes the Leader's, 6000.
+    const theirs = mk(4);
+    expect(theirs.power(theirs.find('p1', 'characters', VISTA))).toBeGreaterThanOrEqual(6000);
+    koBy(theirs, 'p1', VISTA, 'p2');
+    expect(hand(theirs, 'p1')).toEqual([BLUE]);
+    // On its owner's turn Vista keeps its printed base power (below 6000): no draw.
+    const mine = mk(3);
+    koBy(mine, 'p1', VISTA, 'p2');
+    expect(hand(mine, 'p1')).toEqual([]);
+  });
 });

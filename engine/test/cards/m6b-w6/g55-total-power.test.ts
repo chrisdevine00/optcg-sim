@@ -122,13 +122,24 @@ describe('G55 a total power bound on a pick', () => {
     expect(chosen).not.toContain(g.find('p2', 'characters', V.c2));
   });
 
-  it('power below 0 counts as 0, so a card cannot pay for another', () => {
-    const g = mk();
-    lower(g, 0, 5000); // 3000 - 5000: never below 0
+  it('power below 0 counts as it is, so a card can pay for another (official Q&A, OP09-018)', () => {
+    const g = mk(koTotal({ lte: 1000 }));
+    lower(g, 0, 5000); // 3000 - 5000 = -2000
     run(g);
     g.act({ type: 'pick', choice: g.find('p2', 'characters', V.c1, 0) });
-    // 0 + 3000 and 0 + 4000 both fit within 4000.
-    expect(picks(g)).toHaveLength(2);
+    // -2000 + 3000 = 1000 fits; -2000 + 4000 = 2000 does not.
+    expect(picks(g)).toHaveLength(1);
+  });
+
+  it('a pick over the bound is legal while a later negative-power card can bring it back', () => {
+    const g = mk(koTotal({ lte: 1000 }));
+    lower(g, 1, 5000); // the second 3000 card is -2000
+    run(g);
+    // The first 3000 card: 3000 alone is over, but with the -2000 card after it, 1000 fits.
+    expect(picks(g)).toHaveLength(2); // the first 3000 and the -2000; not the 4000 card
+    g.act({ type: 'pick', choice: g.find('p2', 'characters', V.c1, 0) });
+    expect(g.legal().some((a) => a.type === 'done')).toBe(false); // 3000 is over 1000
+    expect(picks(g)).toHaveLength(1);
   });
 
   it('the number is read when asked: a Num works as the bound', () => {

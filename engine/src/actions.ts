@@ -38,7 +38,7 @@ import {
   top,
 } from './flow.ts';
 import { addModifier, draw, endGame, giveDon, moveCard, rest, shuffleDeck } from './ops/index.ts';
-import { other, type Choice, type State } from './state.ts';
+import { other, type Choice, type DecisionState, type State } from './state.ts';
 
 const r = (text: string, rule?: string): Reason => (rule ? { text, rule } : { text });
 
@@ -275,13 +275,27 @@ export function check(s: State, player: PlayerId, a: Intent | null): Reason | nu
       const picked = dec.picked?.length ?? 0;
       if (picked < (dec.min ?? 0))
         return r(`Choose ${(dec.min ?? 0) - picked} more.`, 'CR 8-4-4-1');
-      return null;
+      return overBound(dec);
     }
     case 'order':
       return (dec.candidates ?? []).includes(a.first)
         ? null
         : r('That is not one of the things to order.');
   }
+}
+
+/** A `choose` whose picks so far add up over its total bound cannot be finished (OP09-018). */
+function overBound(dec: DecisionState): Reason | null {
+  const lim = dec.limits;
+  if (lim?.total === undefined) return null;
+  const keys = (dec.candidates ?? []).map(choiceKey);
+  const total = (dec.picked ?? []).reduce(
+    (a, x) => a + (lim.costs[keys.indexOf(choiceKey(x))] ?? 0),
+    0,
+  );
+  return total > lim.total
+    ? r(`Their total ${lim.what ?? 'cost'} must be ${lim.total} or less.`)
+    : null;
 }
 
 function wrongWindow(t: Intent['type']): Reason {
@@ -388,8 +402,17 @@ function checkPick(s: State, choice: Choice): Reason | null {
     if (lim.names && idx.some((j) => lim.names![j] === lim.names![i]))
       return r('The cards must have different card names.', 'OP17-118');
     if (lim.total !== undefined) {
+      // Feasibility-aware (official Q&A, OP09-018: a -2000 and a 6000 Character together make
+      // 4000): a pick is legal while some completion stays within the limit, so the later
+      // candidates' negative contributions (up to the remaining picks) are counted in.
       const total = idx.reduce((a, j) => a + (lim.costs[j] ?? 0), 0) + (lim.costs[i] ?? 0);
-      if (total > lim.total)
+      const slots = (dec.max ?? 1) - picked.length - 1;
+      const later = lim.costs
+        .slice(i + 1)
+        .filter((x) => x < 0)
+        .sort((x, y) => x - y)
+        .slice(0, Math.max(0, slots));
+      if (total + later.reduce((a, x) => a + x, 0) > lim.total)
         return r(`Their total ${lim.what ?? 'cost'} must be ${lim.total} or less.`);
     }
   }
@@ -490,7 +513,8 @@ export function legalActions(s: State): Action[] {
         for (const c of dec.candidates ?? []) {
           if (checkPick(s, c) === null) out.push({ type: 'pick', choice: c, player: p });
         }
-        if ((dec.picked?.length ?? 0) >= (dec.min ?? 0)) out.push({ type: 'done', player: p });
+        if ((dec.picked?.length ?? 0) >= (dec.min ?? 0) && overBound(dec) === null)
+          out.push({ type: 'done', player: p });
         break;
       case 'order':
         for (const c of dec.candidates ?? [])

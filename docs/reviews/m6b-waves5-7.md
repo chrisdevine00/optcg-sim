@@ -93,3 +93,17 @@ Of 83 mutants, survivors: **OP11-092 Helmeppo** `cost lte 8 to 9` (both suites: 
 ## Fix round suggestions
 
 R1 to R5 (script, checker and engine changes above), R6 to R9, then the nits; re-run this review's probes (R1 to R5 are each a short planted test).
+
+## Fix round (engine part)
+
+Date 2026-11-25. Findings fixed here: W57-R2, R3, R6, R8; R11 listed. R1, R4, R5, R9, R10, R12 are the script and checker part, handled separately; R7 was already fixed on `main`. Each fix has a test that fails on the old code (reverted, watched fail, restored). Decisions: DECISIONS 2026-11-25 "Waves 5 to 7 fix round, engine part".
+
+| Finding | Fix | Test (fails on the old code) |
+| --- | --- | --- |
+| W57-R2 (3) | `selectCards` no longer floors power at 0; `checkPick` is feasibility-aware and `done` is refused over the bound; Q71 settled by the Q&A | `OP09-018.test.ts` the -2000 + 6000 case in both candidate orders; `g55-total-power.test.ts` replaces the "counts as 0" test and adds a feasibility test (4 tests fail on the old code) |
+| W57-R3 (3) | `koed` and `removed` filters read last-known information (`Ctx.lki`, built by `lastKnown`); M4b-14 closed | `OP13-002.test.ts` Vista case (K.O.'d with base power 6000 draws; on its owner's turn it does not); `g24-g25-g29-timings.test.ts` `removed` reads last-known power |
+| W57-R6 (2) | a `trashSelf` cost keeps the source for a later K.O. by the same effect (id in the trash plus last-known power and cost) | `g46-ko-source-filter.test.ts` self-trash cost source: Smoker-style and Bege-style guards |
+| W57-R8 (2) | `cardsVersionOf` hashes `baseEffect` and `printed` only for games with a script that reads them (`hasBaseEffect`, `hasTiming`); all other games keep their hash | `records.test.ts` text correction moves the version of a game with EB02-022; leaves one without it unchanged |
+| W57-R11 (1) | not fixed: DON!! are counts, holding a particular one needs identity (BACKLOG 8) | none |
+
+**ENGINE_VERSION 0.5.16 to 0.5.17**, goldens re-recorded (hashes unchanged; none holds these cards). Re-review: the five probes of R2, R3 and R6 above are now the planted tests.
