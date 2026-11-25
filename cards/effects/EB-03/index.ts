@@ -23,6 +23,7 @@ import { EB03_027 } from './EB03-027.ts';
 import { EB03_028 } from './EB03-028.ts';
 import { EB03_029 } from './EB03-029.ts';
 import { EB03_032 } from './EB03-032.ts';
+import { EB03_033 } from './EB03-033.ts';
 import { EB03_035 } from './EB03-035.ts';
 import { EB03_036 } from './EB03-036.ts';
 import { EB03_037 } from './EB03-037.ts';
@@ -37,6 +38,7 @@ import { EB03_047 } from './EB03-047.ts';
 import { EB03_048 } from './EB03-048.ts';
 import { EB03_049 } from './EB03-049.ts';
 import { EB03_050 } from './EB03-050.ts';
+import { EB03_051 } from './EB03-051.ts';
 import { EB03_052 } from './EB03-052.ts';
 import { EB03_053 } from './EB03-053.ts';
 import { EB03_054 } from './EB03-054.ts';
@@ -73,6 +75,7 @@ const SET: readonly CardScript[] = [
   EB03_028,
   EB03_029,
   EB03_032,
+  EB03_033,
   EB03_035,
   EB03_036,
   EB03_037,
@@ -87,6 +90,7 @@ const SET: readonly CardScript[] = [
   EB03_048,
   EB03_049,
   EB03_050,
+  EB03_051,
   EB03_052,
   EB03_053,
   EB03_054,
