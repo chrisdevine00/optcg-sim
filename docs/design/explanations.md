@@ -304,7 +304,7 @@ Rocks (OP17-039) and Kaido (OP17-058) dominate because they are the slice decks 
       figures: { handCounter: 5000 } },
     { text: 'Taking Ulti\'s hit meant Kaido had to be stopped too: 3000 + 8000 = 11000. Your deck\'s biggest counter is +2000, so no Life card could have covered it.',
       figures: { neededAfterTaking: 11000, bestPossible: 7000 } },
-    { text: 'They had no cards in hand and no active DON!!, so these numbers couldn\'t change.',
+    { text: 'They had no cards in hand and no active DON!!, so their hand adds nothing to these numbers.',
       figures: { opponentHand: 0, opponentActiveDon: 0 } },
   ],
   line: [
