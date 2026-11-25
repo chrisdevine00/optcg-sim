@@ -101,7 +101,7 @@ interface Candidate {
 
 export const detect: Detector = (item, ctx) => {
   const rec = ctx.record;
-  if (!rec?.actions || !ctx.stateAt) return null;
+  if (!rec?.actions || rec.actions.length === 0 || !ctx.stateAt) return null;
   const n = rec.actions.length;
   const end = ctx.stateAt(n);
   const result = queries.result(end);
