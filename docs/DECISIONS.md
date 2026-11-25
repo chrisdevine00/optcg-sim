@@ -2,6 +2,13 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-24 — A colon-less "If" is an effect condition, everywhere (OP-11/OP-12 review, B3A-R1)
+
+- **Context:** OP11-041 Nami's "[Once Per Turn] When ... , if you have 7 or less cards in your hand, draw 1" spends its Once Per Turn when the hand check fails, while OP11-036, 075 and 076 ("[On Play] If ..." with no colon) were scripted with ability-level `conditions`, which do not.
+- **Decision (lead):** an "If" with no colon after it is an effect condition (an `if` step): the ability triggers or is activated, its Once Per Turn is spent, and nothing happens when the check fails. Only an "If" before a cost colon is an activation condition. OP11-036/075/076 now use effect-level `if`, matching EB04-012, EB03-013 and Nami; tests pin it.
+- **Rejected:** keeping both encodings (inconsistent Once Per Turn behaviour between cards with the same wording).
+- **Also recorded:** M6b-Q59 — "turn N Life cards face-down" needs a face-up top card and "face-up" a face-down one (the engine's reading; no official ruling for the face-down mirror); cards listed there.
+
 ## 2026-11-24 — Open decisions at the end of the block 4 session (lead's register)
 
 - **Context:** the owner asked for a checkpoint. This entry lists every decision still open, so a resumed session or the owner can find them in one place. Decisions already taken are in their own entries below.
