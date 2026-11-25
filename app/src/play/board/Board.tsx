@@ -192,6 +192,7 @@ export function Board(b: BoardProps) {
         key="dd"
         type="button"
         className="z dondeck"
+        data-zid={mine ? 'donDeck' : undefined}
         style={rect(R.donDeck)}
         {...item(zk, i++)}
       >
@@ -210,7 +211,12 @@ export function Board(b: BoardProps) {
       </button>,
     );
     items.push(
-      <div key="ca" className="z costarea" style={rect(R.cost)}>
+      <div
+        key="ca"
+        className="z costarea"
+        data-zid={mine ? 'costArea' : undefined}
+        style={rect(R.cost)}
+      >
         <button
           type="button"
           className={`rowbtn ${mine && b.costLegal ? 'legal' : ''} ${mine && b.donMode ? 'selected' : ''}`}
@@ -275,6 +281,7 @@ export function Board(b: BoardProps) {
           key="life"
           type="button"
           className="z slot empty"
+          data-zid={mine ? 'life' : undefined}
           style={rect(R.life)}
           {...item(zk, i++)}
         >
@@ -288,6 +295,7 @@ export function Board(b: BoardProps) {
           key="life"
           type="button"
           className="z slot empty warn"
+          data-zid={mine ? 'life' : undefined}
           style={rect(R.life)}
           {...item(zk, i++)}
         >
@@ -299,7 +307,14 @@ export function Board(b: BoardProps) {
           </span>
         </button>
       ) : (
-        <button key="life" type="button" className="z life" style={rect(R.life)} {...item(zk, i++)}>
+        <button
+          key="life"
+          type="button"
+          className="z life"
+          data-zid={mine ? 'life' : undefined}
+          style={rect(R.life)}
+          {...item(zk, i++)}
+        >
           <span className="sr-only">{lifeName(W, z.life, b.cards)}</span>
           <span className="vis" aria-hidden="true">
             {z.life.map((lc, k) =>
@@ -388,6 +403,7 @@ export function Board(b: BoardProps) {
           key="stage"
           type="button"
           className="z slot empty"
+          data-zid={mine ? 'stage' : undefined}
           style={rect(R.stage)}
           {...item(zk, i++)}
         >
@@ -400,7 +416,14 @@ export function Board(b: BoardProps) {
     );
     const deckN = z.deck.length;
     items.push(
-      <button key="deck" type="button" className="z deck" style={rect(R.deck)} {...item(zk, i++)}>
+      <button
+        key="deck"
+        type="button"
+        className="z deck"
+        data-zid={mine ? 'deck' : undefined}
+        style={rect(R.deck)}
+        {...item(zk, i++)}
+      >
         <span className="sr-only">{`${W} deck, ${n(deckN, 'card')}${deckN <= 5 ? ', running low' : ''}`}</span>
         <span className="vis" aria-hidden="true">
           <CardBack style={{ inset: 0 }} />
@@ -416,6 +439,7 @@ export function Board(b: BoardProps) {
         key="trash"
         type="button"
         className="z trash"
+        data-zid={mine ? 'trash' : undefined}
         style={rect(R.trash)}
         aria-haspopup="dialog"
         onClick={() => b.onTrash(p)}

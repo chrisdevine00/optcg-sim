@@ -76,6 +76,11 @@ export interface GameConfig {
 export interface TutorialFilter {
   allow(action: Action, view: ProjectedView): boolean;
   onBlocked(action: Action): void;
+  /**
+   * WP6, additive. The player pressed something the step does not teach but that is no action
+   * (a card that is not lit, End turn when it is not allowed): `handle` is the card, or null.
+   */
+  onStray?(handle: string | null): void;
 }
 
 /** A commit gate's answer: carry on, or hold the action (the blunder warning shows, M7 WP5). */
@@ -462,6 +467,8 @@ export class GameController {
 
   /** Rewind needs the seat unveiled in hotseat (review M3-04, M3-24). */
   canRewind(): boolean {
+    // The tutorial steps back by whole steps only (flows G2); the runner does that, not the log.
+    if (this.config.tutorial) return false;
     return this.revealed();
   }
 
@@ -1373,6 +1380,7 @@ export class GameController {
   }
 
   rewindMove(): boolean {
+    if (this.config.tutorial) return false;
     this.restart();
     const lines = this.logLines();
     const m = this.session.rewindMove(this.humans());
@@ -1380,6 +1388,7 @@ export class GameController {
   }
 
   backToMyLastDecision(): boolean {
+    if (this.config.tutorial) return false;
     this.restart();
     const lines = this.logLines();
     const m = this.session.backToLastDecision(this.me);
@@ -1387,6 +1396,7 @@ export class GameController {
   }
 
   rewindTo(index: number): boolean {
+    if (this.config.tutorial) return false;
     this.restart();
     const lines = this.logLines();
     const ok = this.session.rewindTo(index);

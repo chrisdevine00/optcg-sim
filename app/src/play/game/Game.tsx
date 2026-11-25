@@ -95,6 +95,7 @@ export function Game({
   onReview,
   reviewLabel,
   studyRail,
+  tutorialSlot,
 }: {
   ctl: GameController;
   onNewGame: () => void;
@@ -107,6 +108,11 @@ export function Game({
    * log, the coach and the decision panel, beside a read-only restored board.
    */
   studyRail?: React.ReactNode;
+  /**
+   * The guided tutorial (M7 WP6): the step card, shown above the decision in the decision panel.
+   * The tutorial hides the coach, gives the panel the tall geometry and has no rewind.
+   */
+  tutorialSlot?: React.ReactNode;
 }) {
   useSyncExternalStore(ctl.subscribe, ctl.getVersion);
   useFocusRescue();
@@ -231,6 +237,12 @@ export function Game({
    * hotseat it needs the other player's agreement (flows F11 step 7).
    */
   function requestRewind(run: () => void) {
+    if (ctl.config.tutorial) {
+      const text = 'Not in the tutorial: use Back to return to the start of the previous step.';
+      setWhy({ text, at: null });
+      ctl.announce(text);
+      return;
+    }
     if (!ctl.canRewind()) {
       setWhy({ text: 'Rewind is unavailable while a hand is hidden.', at: null });
       ctl.announce('Rewind is unavailable while a hand is hidden.');
@@ -310,6 +322,7 @@ export function Game({
     if (battle?.attacker === h && !view.result)
       out.chips!.push({ text: '⚔ attacking', tone: 'attack' });
     const isSick =
+      !ctl.config.tutorial &&
       c.zone === 'characters' &&
       owner === me &&
       kind === 'main' &&
@@ -413,6 +426,15 @@ export function Game({
     setWhy(null);
     const c = index.get(h);
     if (!c) return;
+    // The tutorial teaches one thing at a time: a card that is not lit does nothing but say so
+    // ("Not yet. First, …"), and counts as a blocked attempt (WP6, flows F2 step 2).
+    if (ctl.config.tutorial && mine) {
+      const d = deco(h);
+      if (!d.legal && !d.selected) {
+        ctl.config.tutorial.onStray?.(h);
+        return;
+      }
+    }
     if (!mine) {
       openMenu(h, viaKey);
       return;
@@ -528,8 +550,11 @@ export function Game({
 
   const focusDecision = () => {
     // During the attack confirm the battle maths is the Confirm button's description.
+    // The tutorial's step text is the decision's text: P lands there (flows F2, WP6).
     (
-      document.getElementById('confirm-attack') ?? document.getElementById('decision-title')
+      document.getElementById('confirm-attack') ??
+      document.getElementById('tutorial-text') ??
+      document.getElementById('decision-title')
     )?.focus();
   };
 
@@ -673,6 +698,7 @@ export function Game({
       !e.metaKey &&
       !ctl.hotseat &&
       !ctl.readOnly &&
+      !ctl.config.tutorial &&
       (key === 'l' || key === 'L' || key === 'c' || key === 'C')
     ) {
       e.preventDefault();
@@ -748,7 +774,7 @@ export function Game({
         if (mine && kind === 'main' && legal.endTurn) {
           e.preventDefault();
           act(legal.endTurn);
-        }
+        } else if (mine && kind === 'main') ctl.config.tutorial?.onStray?.(null);
         return;
       case 'a':
       case 'A':
@@ -1013,8 +1039,11 @@ export function Game({
   const slots = { p1: ctl.session.characterSlots('p1'), p2: ctl.session.characterSlots('p2') };
 
   const rail = L.rail;
-  const decTop0 = tall ? rail.tall.top : rail.decision.top;
-  const parts0 = tall ? rail.tall.parts : rail.decision.parts;
+  // The tutorial's step card needs the room, so its panel always has the tall geometry (WP6).
+  const tutorialOn = !!ctl.config.tutorial;
+  const geomTall = tall || tutorialOn;
+  const decTop0 = geomTall ? rail.tall.top : rail.decision.top;
+  const parts0 = geomTall ? rail.tall.parts : rail.decision.parts;
   const logTop = rail.head + rail.notice;
 
   // The coach (board.md §3.13): a strip between the log and the decision panel, taking its height
@@ -1022,7 +1051,8 @@ export function Game({
   // decision wins: while the decision panel is tall the coach is its strip. Where the rail is too
   // narrow or short (tablet, hand peek) there is no coach and the L key speaks its answer only.
   const coach = ctl.coach;
-  const coachRoom = L.supported && rail.w >= 320 && !L.peek && !ctl.hotseat && !ctl.readOnly;
+  const coachRoom =
+    L.supported && rail.w >= 320 && !L.peek && !ctl.hotseat && !ctl.readOnly && !tutorialOn;
   const idleMain =
     mine && kind === 'main' && ui.kind === 'idle' && !view.battle && !view.result && !tall;
   const cmode: CoachMode =
@@ -1038,7 +1068,7 @@ export function Game({
   let coachH = 0;
   let logH: number;
   if (!coachRoom) {
-    logH = tall ? (rail.ticker > 0 ? rail.ticker : 0) : decTop0 - logTop;
+    logH = geomTall ? (rail.ticker > 0 ? rail.ticker : 0) : decTop0 - logTop;
   } else if (cmode === 'tall') {
     parts = [parts0[0], 0, parts0[2]];
     decTop = L.H - parts0[0] - parts0[2];
@@ -1054,7 +1084,7 @@ export function Game({
     coachTop = decTop0 - STRIP_H;
     logH = tall ? tickerH : coachTop - logTop;
   }
-  const logTicker = tall || cmode === 'tall';
+  const logTicker = geomTall || cmode === 'tall';
 
   // The dock avoids the focused element, the battle's cards and every lit card (UX-V11).
   const dockRect = (() => {
@@ -1211,6 +1241,8 @@ export function Game({
                     parts={parts}
                     focusSignal={focusSignal}
                     bodyHidden={cmode === 'tall'}
+                    {...(tutorialOn ? { tutorial: true } : {})}
+                    {...(tutorialSlot ? { tutorialSlot } : {})}
                   />
                   {ctl.toast && (
                     <p className="toast" style={{ top: decTop - 34 }} role="status">

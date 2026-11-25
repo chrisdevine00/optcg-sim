@@ -73,6 +73,8 @@ export function DecisionPanel({
   bodyHidden = false,
   noteSlot,
   commitLabel,
+  tutorial = false,
+  tutorialSlot,
 }: {
   g: G;
   top: number;
@@ -84,10 +86,27 @@ export function DecisionPanel({
   noteSlot?: ReactNode;
   /** M7: replaces the primary footer button's label ("Commit anyway"). Default: unchanged. */
   commitLabel?: string;
+  /**
+   * M7 WP6, the guided tutorial: no Rewind (the tutorial steps back by whole steps) and no
+   * "New game / Rematch" at the end (the completion screen follows).
+   */
+  tutorial?: boolean;
+  /** M7 WP6: the tutorial's step card, above the decision body. */
+  tutorialSlot?: ReactNode;
 }) {
   const headRef = useRef<HTMLHeadingElement>(null);
   const firstRef = useRef<HTMLDivElement>(null);
-  const base = contentFor(g);
+  const base0 = contentFor(g);
+  const base: Content = tutorial
+    ? {
+        ...base0,
+        foot: g.view.result
+          ? {}
+          : base0.foot.secondary?.id === 'rewind-btn'
+            ? { ...base0.foot, secondary: undefined }
+            : base0.foot,
+      }
+    : base0;
   const content =
     commitLabel !== undefined && base.foot.primary
       ? { ...base, foot: { ...base.foot, primary: { ...base.foot.primary, label: commitLabel } } }
@@ -156,6 +175,7 @@ export function DecisionPanel({
             </ul>
           </div>
         )}
+        {tutorialSlot}
         {content.body}
         {noteSlot}
       </div>
@@ -644,7 +664,10 @@ function battleTitle(g: G): string {
 function mainContent(g: G, rewind: NonNullable<Foot['secondary']>): Content {
   const { view, legal, ui } = g;
   const me = g.me;
-  const endTurn = () => legal.endTurn && g.act(legal.endTurn);
+  const endTurn = () => {
+    if (legal.endTurn) g.act(legal.endTurn);
+    else if (g.ctl.config.tutorial) g.ctl.config.tutorial.onStray?.(null);
+  };
   const canAttack = [...legal.attacks.keys()];
   const playable = [...legal.play.keys()];
   const active = view.don[me].active;
@@ -804,9 +827,12 @@ function mainContent(g: G, rewind: NonNullable<Foot['secondary']>): Content {
     };
   }
 
-  const sick = view.zones[me].characters.filter(
-    (c) => !c.rested && !legal.attacks.has(c.handle) && view.turn.number > 2,
-  );
+  // Not in the tutorial: there a card may be unable to attack only because the step narrows the moves.
+  const sick = g.ctl.config.tutorial
+    ? []
+    : view.zones[me].characters.filter(
+        (c) => !c.rested && !legal.attacks.has(c.handle) && view.turn.number > 2,
+      );
   return {
     title: 'Your Main phase',
     tall: false,

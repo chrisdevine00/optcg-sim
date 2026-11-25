@@ -8,6 +8,7 @@ import { UpdatePrompt } from './update/UpdatePrompt.tsx';
 const CardBrowser = lazy(() => import('./cards/CardBrowser.tsx'));
 const PlayRoute = lazy(() => import('./play/PlayRoute.tsx'));
 const DecksRoute = lazy(() => import('./decks/DecksRoute.tsx'));
+const TutorialRoute = lazy(() => import('./tutorial/TutorialRoute.tsx'));
 
 export function App() {
   const path = usePath();
@@ -16,6 +17,13 @@ export function App() {
     return (
       <Suspense fallback={<main className="page" id="main" aria-busy="true" />}>
         <PlayRoute />
+      </Suspense>
+    );
+  if (path === '/tutorial')
+    // The tutorial is the board with a step card: full-screen like a game (flows F2).
+    return (
+      <Suspense fallback={<main className="page" id="main" aria-busy="true" />}>
+        <TutorialRoute />
       </Suspense>
     );
   return (

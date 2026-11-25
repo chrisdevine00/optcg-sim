@@ -19,8 +19,22 @@ export const TUTORIAL_STEP_IDS = [
 ] as const;
 export type TutorialStepId = (typeof TUTORIAL_STEP_IDS)[number];
 
+/** The nine zones of the board the first step names (CR 3-1). */
+export const TUTORIAL_ZONES = [
+  'leader',
+  'characters',
+  'stage',
+  'life',
+  'deck',
+  'trash',
+  'donDeck',
+  'costArea',
+  'hand',
+] as const;
+export type TutorialZone = (typeof TUTORIAL_ZONES)[number];
+
 /** The scenario a step starts from: a `ScenarioSpec` in the loader, or by name. */
-export type ScenarioRef = { name: string } | { spec: ScenarioSpec };
+export type ScenarioRef = { name: string } | { spec: Omit<ScenarioSpec, 'cards'> };
 
 export interface TutorialStep {
   id: TutorialStepId;
@@ -30,6 +44,24 @@ export interface TutorialStep {
   allowed(action: Action, view: ProjectedView): boolean;
   /** True once the view shows the step's goal reached. */
   done(view: ProjectedView): boolean;
+  /**
+   * WP6, additive. True once the step can no longer be won from here (t8: the turn ended without a
+   * win); the runner says "Not quite" and restarts the step.
+   */
+  failed?(view: ProjectedView): boolean;
+  /**
+   * WP6, additive. A step with no engine action (t1) is done when the player has visited every one
+   * of these zones (focused or clicked), so `allowed` is false for every action.
+   */
+  visit?: readonly TutorialZone[];
+  /** WP6, additive. Cards and zones the board lights for this step (card ids, turned into handles via the view). */
+  lit?: ReadonlyArray<
+    { card: string; side: 'me' | 'opp' } | { zone: TutorialZone; side?: 'me' | 'opp' }
+  >;
+  /** WP6, additive. The opponent's script (see `scripted.ts`); absent: it never has a turn. */
+  script?: 'attack-leader' | 'none';
+  /** WP6, additive. Windows are never skipped in this step ("Always ask me", flows G5). */
+  alwaysAsk?: boolean;
   /** Keys into the tutorial copy table (WP6): the prompt, the hint, the "why not" lines. */
   copy: {
     intro: string;

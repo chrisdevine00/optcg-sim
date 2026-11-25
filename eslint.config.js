@@ -53,6 +53,18 @@ const noDynamicEngine = {
     'Dynamic import of @optcg/engine is allowed only in app/src/session/ and ai/src/search/ (M2-20).',
 };
 
+// The tutorial's timing log never leaves the browser (usability-plan §7.1): no beacon anywhere in
+// the app, and no `fetch` outside the art loader and the service worker.
+const noBeacon = {
+  object: 'navigator',
+  property: 'sendBeacon',
+  message: 'Nothing is sent anywhere: the timing log and progress stay on this device.',
+};
+const noFetch = {
+  name: 'fetch',
+  message: 'fetch is allowed only in app/src/art/ and the service worker (usability-plan §7.1).',
+};
+
 export default tseslint.config(
   {
     ignores: [
@@ -138,7 +150,13 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       'no-restricted-imports': ['error', { paths: [fullState], patterns: [enginePublicOnly] }],
       'no-restricted-syntax': ['error', noDynamicEngine],
+      'no-restricted-properties': ['error', noBeacon],
+      'no-restricted-globals': ['error', noFetch],
     },
+  },
+  {
+    files: ['app/src/art/**/*.{ts,tsx}', 'app/src/sw.ts'],
+    rules: { 'no-restricted-globals': 'off' },
   },
   {
     files: ['ai/src/search/**/*.ts'],

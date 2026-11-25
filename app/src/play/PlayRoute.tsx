@@ -14,6 +14,7 @@ import { Setup, type SetupChoice } from './setup/Setup.tsx';
 import { deckById, deckByLeader, loadCards } from './setup/decks.ts';
 import { priorCardIds } from '@optcg/ai';
 import { SCENARIOS, scenarioCardIds } from './setup/scenarios.ts';
+import { applyFirstGame } from '../tutorial/preset.ts';
 import './play.css';
 
 /** A named scenario, or one described in the URL as `json:<base64url of the spec>`. */
@@ -109,7 +110,7 @@ async function startGame(choice: SetupChoice): Promise<GameController> {
   config.aiDeck = theirDeck.spec.main;
   const chooser: PlayerId | undefined =
     choice.first === 'me' ? 'p1' : choice.first === 'opp' ? 'p2' : undefined;
-  return new GameController(
+  const ctl = new GameController(
     cards,
     {
       setup: {
@@ -120,6 +121,11 @@ async function startGame(choice: SetupChoice): Promise<GameController> {
     },
     config,
   );
+  // The first full game after the tutorial (flows F2 step 6): Learner verbosity and the tier-1
+  // lethal detector always on, for this one game. They are set on the loaded profile in memory;
+  // nothing is saved unless the player changes a coach setting (which saves the whole profile).
+  if (choice.firstGame) ctl.coach.profile = applyFirstGame(ctl.coach.profile);
+  return ctl;
 }
 
 export default function PlayRoute() {
