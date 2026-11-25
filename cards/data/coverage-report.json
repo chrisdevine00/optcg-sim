@@ -234,7 +234,6 @@
   {"block":3,"category":"Character","id":"OP09-033","legality":"legal","set":"OP-09","status":"unscripted","tags":["restrict:cannotBeKO","timing:onPlay"],"untagged":0,"weight":0},
   {"block":3,"category":"Event","id":"OP09-039","legality":"legal","set":"OP-09","status":"unscripted","tags":["ko","powerMod"],"untagged":0,"weight":0},
   {"block":3,"category":"Event","id":"OP09-040","legality":"legal","set":"OP-09","status":"unscripted","tags":["ko","rest"],"untagged":0,"weight":0},
-  {"block":3,"category":"Character","id":"OP09-052","legality":"legal","set":"OP-09","status":"unscripted","tags":["cost:trashFromHand","play"],"untagged":0,"weight":0},
   {"block":3,"category":"Event","id":"OP09-058","legality":"legal","set":"OP-09","status":"unscripted","tags":["chooseOne","move"],"untagged":0,"weight":0},
   {"block":3,"category":"Event","id":"OP09-059","legality":"legal","set":"OP-09","status":"unscripted","tags":["draw","powerMod","trashFromHand"],"untagged":0,"weight":0},
   {"block":3,"category":"Character","id":"OP09-065","legality":"legal","set":"OP-09","status":"unscripted","tags":["cost:other","grantKeyword","rest","timing:onPlay"],"untagged":0,"weight":0},
@@ -789,13 +788,13 @@
  "gaps": [
   {"cards":280,"dsl":"onPlay","implemented":"yes","kind":"timing","primitive":"timing:onPlay","weight":2326},
   {"cards":174,"dsl":"power","implemented":"yes","kind":"action","primitive":"powerMod","weight":707},
-  {"cards":126,"dsl":"play","implemented":"yes","kind":"action","primitive":"play","weight":1122},
+  {"cards":125,"dsl":"play","implemented":"yes","kind":"action","primitive":"play","weight":1122},
   {"cards":125,"dsl":"move","implemented":"yes","kind":"action","primitive":"move","weight":488},
   {"cards":120,"dsl":"draw","implemented":"yes","kind":"action","primitive":"draw","weight":1498},
   {"cards":104,"dsl":"ko","implemented":"yes","kind":"action","primitive":"ko","weight":855},
   {"cards":89,"dsl":"lookAtTop","implemented":"yes","kind":"action","primitive":"lookAtTop","weight":951},
   {"cards":86,"dsl":"whenAttacking","implemented":"yes","kind":"timing","primitive":"timing:whenAttacking","weight":374},
-  {"cards":59,"dsl":"trash","implemented":"yes","kind":"cost","primitive":"cost:trashFromHand","weight":905},
+  {"cards":58,"dsl":"trash","implemented":"yes","kind":"cost","primitive":"cost:trashFromHand","weight":905},
   {"cards":55,"dsl":"grant","implemented":"yes","kind":"action","primitive":"grantKeyword","weight":425},
   {"cards":53,"dsl":"trashFromHand","implemented":"yes","kind":"action","primitive":"trashFromHand","weight":652},
   {"cards":51,"dsl":"donMinus","implemented":"yes","kind":"cost","primitive":"cost:donMinus","weight":308},
@@ -855,7 +854,7 @@
   "byBlock": {
    "1": {"keywords":0,"pct":100,"playingFully":5,"scripted":5,"total":5,"unscripted":0,"vanilla":0},
    "2": {"keywords":9,"pct":12.66,"playingFully":77,"scripted":25,"total":608,"unscripted":531,"vanilla":43},
-   "3": {"keywords":2,"pct":67.02,"playingFully":437,"scripted":354,"total":652,"unscripted":215,"vanilla":81},
+   "3": {"keywords":2,"pct":67.18,"playingFully":438,"scripted":355,"total":652,"unscripted":214,"vanilla":81},
    "4": {"keywords":0,"pct":93.55,"playingFully":479,"scripted":444,"total":512,"unscripted":33,"vanilla":35},
    "5": {"keywords":1,"pct":98.52,"playingFully":333,"scripted":309,"total":338,"unscripted":5,"vanilla":23},
    "X": {"keywords":0,"pct":100,"playingFully":9,"scripted":9,"total":9,"unscripted":0,"vanilla":0}
@@ -874,7 +873,7 @@
    "OP-06": {"keywords":2,"pct":11.21,"playingFully":13,"scripted":4,"total":116,"unscripted":103,"vanilla":7},
    "OP-07": {"keywords":1,"pct":9.24,"playingFully":11,"scripted":4,"total":119,"unscripted":108,"vanilla":6},
    "OP-08": {"keywords":1,"pct":15.13,"playingFully":18,"scripted":7,"total":119,"unscripted":101,"vanilla":10},
-   "OP-09": {"keywords":1,"pct":30.25,"playingFully":36,"scripted":25,"total":119,"unscripted":83,"vanilla":10},
+   "OP-09": {"keywords":1,"pct":31.09,"playingFully":37,"scripted":26,"total":119,"unscripted":82,"vanilla":10},
    "OP-10": {"keywords":0,"pct":92.44,"playingFully":110,"scripted":99,"total":119,"unscripted":9,"vanilla":11},
    "OP-11": {"keywords":0,"pct":86.55,"playingFully":103,"scripted":82,"total":119,"unscripted":16,"vanilla":21},
    "OP-12": {"keywords":0,"pct":86.55,"playingFully":103,"scripted":79,"total":119,"unscripted":16,"vanilla":24},
@@ -917,7 +916,7 @@
    "ST-35": {"keywords":0,"pct":100,"playingFully":5,"scripted":5,"total":5,"unscripted":0,"vanilla":0},
    "ST-36": {"keywords":0,"pct":80,"playingFully":4,"scripted":4,"total":5,"unscripted":1,"vanilla":0}
   },
-  "overall": {"keywords":12,"pct":63.09,"playingFully":1340,"scripted":1146,"total":2124,"unscripted":784,"vanilla":182},
+  "overall": {"keywords":12,"pct":63.14,"playingFully":1341,"scripted":1147,"total":2124,"unscripted":783,"vanilla":182},
   "unknown": {
    "count": 118,
    "ids": [
