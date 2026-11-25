@@ -139,6 +139,8 @@ function continuous(c: Continuous): boolean {
   if ('grant' in c) return selector(c.grant.target);
   if ('restrict' in c) return sel(c.restrict.target);
   if ('lockAttackTarget' in c) return selector(c.lockAttackTarget.only);
+  // A filter on the card being played reads its printed values, no hidden zone (G50).
+  if ('playRested' in c) return false;
   if ('tiers' in c) return c.tiers.some((t) => condition(t.when) || t.apply.some(continuous));
   return assertNever(c);
 }

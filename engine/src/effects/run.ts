@@ -246,7 +246,12 @@ export function costText(costs: readonly Cost[] | undefined): string {
       const n = k.rest.pick && 'exactly' in k.rest.pick ? k.rest.pick.exactly : 1;
       return `rest ${n} of your cards`;
     }
-    if ('move' in k) return 'move cards';
+    if ('move' in k) {
+      const zs = Array.isArray(k.move.from) ? k.move.from : [k.move.from];
+      if (zs.includes('self'))
+        return `place this card ${k.to.zone === 'deck' ? `at the ${k.to.position === 'top' ? 'top' : 'bottom'} of your deck` : `in your ${k.to.zone}`}`;
+      return 'move cards';
+    }
     if ('oneOf' in k) return k.oneOf.map((a) => costText(a)).join(' or ');
     return '';
   });
@@ -560,7 +565,14 @@ function selectCards(
   const zones = Array.isArray(sel.from) ? sel.from : [sel.from];
   if (secret && !sel.filter && zones.length === 1 && zones[0] === 'hand' && !o.restrict)
     dec.publicCount = true;
-  if ('upTo' in pk && (pk.totalCost || pk.distinctNames)) {
+  if ('upTo' in pk && pk.totalPower) {
+    // "A total power of 4000 or less" (G55): the chosen cards' current power (never below 0) adds up.
+    dec.limits = {
+      costs: cands.map((id) => Math.max(0, dvOf(c, id).power ?? 0)),
+      total: num(c, pk.totalPower.lte),
+      what: 'power',
+    };
+  } else if ('upTo' in pk && (pk.totalCost || pk.distinctNames)) {
     // "Total cost" is the current cost (CR 2-7-6): +12 cost cards are far over any budget.
     dec.limits = { costs: cands.map((id) => dvOf(c, id).cost ?? 0) };
     if (pk.totalCost && 'lte' in pk.totalCost) dec.limits.total = num(c, pk.totalCost.lte);
@@ -766,7 +778,7 @@ type FieldCostHow =
 /** Does the selector read only Characters and Stage (a cost paid from the field)? */
 function onFieldZones(sel: Selector): boolean {
   const zones = Array.isArray(sel.from) ? sel.from : [sel.from];
-  return zones.every((z) => z === 'characters' || z === 'stage');
+  return zones.every((z) => z === 'characters' || z === 'stage' || z === 'self');
 }
 
 /** The `ph` marker of a field cost whose removal frames have been pushed (see `fieldCost`). */
@@ -1200,6 +1212,8 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
     // card is in the `resolving` slot, an [On K.O.] card in the trash. A cost that moved the card
     // elsewhere (the deck bottom, the hand) leaves nothing to play (BACKLOG OP-15, found on OP15-080).
     const zonesOf = Array.isArray(a.play.what.from) ? a.play.what.from : [a.play.what.from];
+    // "Your opponent plays ..." (G51): their card from their hand, chosen by them, put on their field.
+    const player = a.play.player === 'opponent' ? other(you) : you;
     const selfZone =
       abilityOf(d.s, f.cardId, f.ability)?.kind === 'trigger' ? 'resolving' : 'trash';
     const ids = select(d, f, a.play.what, {
@@ -1211,7 +1225,7 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
       restrict: (id) => {
         const cat = d.s.defs[d.card(id).card]!.category;
         if (zonesOf.includes('self') && d.card(id).zone !== selfZone) return false;
-        return (cat === 'Character' || cat === 'Stage') && !playBlocked(d.s, you, id);
+        return (cat === 'Character' || cat === 'Stage') && !playBlocked(d.s, player, id);
       },
     });
     if (ids === WAIT) return WAIT;
@@ -1223,7 +1237,7 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
       const pf: Frame = {
         f: 'play',
         card: id,
-        player: you,
+        player,
         step: 'pay',
         free: true,
         via: viaOf(d, f),
@@ -1599,7 +1613,9 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
     // "Add N" adds exactly N (or what the DON!! deck holds). "Add up to N" (`upTo`) may add any
     // number from 0 to N (CR 4-8-1, QA-GR): a count is asked, most first, as `giveDon` does
     // (E-Q11, reopened by the OP-17 review). A multi-part add asks per part, in order.
-    const ps = d.pl(you);
+    // `player: 'opponent'` (G51): the DON!! come from the opponent's DON!! deck onto their field.
+    const who = a.player === 'opponent' ? other(you) : you;
+    const ps = d.pl(who);
     for (let i = f.tmp?.add ?? 0; i < a.addDon.length; i++) {
       const part = a.addDon[i]!;
       let k = Math.min(part.n, ps.donDeck);
@@ -1609,7 +1625,7 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
           const counts = Array.from({ length: k + 1 }, (_, j) => k - j);
           return ask(d, f, {
             kind: 'choose',
-            player: you,
+            player: who,
             prompt: `${nameOf(d, f)}: how many ${part.state} DON!! cards will you add (up to ${k})?`,
             min: 1,
             max: 1,
@@ -1631,7 +1647,7 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
       else ps.donRested += k;
       d.emit({
         type: 'DonPlaced',
-        player: you,
+        player: who,
         count: k,
         rested: part.state === 'rested',
         by: 'effect',
@@ -1875,6 +1891,15 @@ function move(
 ): Out {
   const zones = Array.isArray(what.from) ? what.from : [what.from];
   const you = f.controller;
+  if (zones.length === 1 && zones[0] === 'self') {
+    // "[Trigger] ... add this card to your hand" (G57): the card is in the [Trigger] slot while its
+    // effect resolves. The trigger frame then leaves it where the effect put it (CR 10-1-5-3).
+    const me = d.s.cards[f.card];
+    if (!me || me.zone !== 'resolving') return 'next';
+    moveCard(d, f.card, 'hand', { extra: { reason: 'effect' } });
+    f.acted = true;
+    return 'next';
+  }
   if (zones.includes('deckTop') && (zones.length !== 1 || to.zone !== 'life'))
     return unsupported(d, f, `move from the deck top to ${to.zone}`);
   if (zones.length === 1 && zones[0] === 'deckTop') {

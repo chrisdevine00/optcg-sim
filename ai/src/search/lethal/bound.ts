@@ -110,7 +110,16 @@ export function bouncesOf(cardId: string, don: number, isEvent: boolean): number
     if (ab.kind === 'activate' && ab.oncePerTurn !== true && !isEvent) mult = don + 1;
     else if (ab.kind === 'auto' && ab.oncePerTurn !== true) mult = 10;
     const cost = (ab.cost ?? []) as Loose[];
-    if (cost.some((c) => 'trashSelf' in c)) total += mult;
+    // Placing this card at the bottom of the deck (M6b wave 6, G52) takes it off the board too.
+    if (
+      cost.some(
+        (c) =>
+          'trashSelf' in c ||
+          ('move' in c &&
+            ([] as unknown[]).concat((c.move as { from?: unknown }).from).includes('self')),
+      )
+    )
+      total += mult;
     const walk = (n: unknown, m: number): void => {
       if (Array.isArray(n)) return n.forEach((x) => walk(x, m));
       if (!n || typeof n !== 'object') return;
@@ -505,12 +514,17 @@ export function scanAbility(
             sc.gain += k * numBound(b.amount);
           }
         } else if (op === 'addDon') {
+          // The opponent adding DON!! (M6b wave 6, G51) is not classified: the search decides.
+          if (o.do && 'player' in (o.do as Loose)) ok = false;
           for (const e of body as { n: number; state: string }[])
             if (e.state === 'active') sc.addDonActive += k * e.n;
             else sc.addDonRested += k * e.n;
         } else if (op === 'giveDon') sc.giveDon = true;
-        else if (op === 'play') sc.reachTrash = true;
-        else if (op === 'ko' || op === 'rest') {
+        else if (op === 'play') {
+          // Your opponent playing a card (M6b wave 6, G51) puts a card on their side: not classified.
+          if ((body as { player?: unknown }).player === 'opponent') ok = false;
+          sc.reachTrash = true;
+        } else if (op === 'ko' || op === 'rest') {
           // Aimed at their Characters it can remove a Blocker (rest: it cannot block while rested).
           if ((body as { owner?: unknown }).owner !== 'you') sc.blockerLoss += k * pickCount(body);
         } else if (op === 'move') {

@@ -3,7 +3,16 @@
  * conditions (§4.3), cost payability (§4.5, E-D6) and the permanent effects the runtime implements
  * (§4.9: Counter values in hand, attack-target locks). Pure functions of the state.
  */
-import type { Cmp, Condition, Cost, Filter, Num, Selector, Zone as SZone } from '@optcg/cards';
+import type {
+  Cmp,
+  Condition,
+  Continuous,
+  Cost,
+  Filter,
+  Num,
+  Selector,
+  Zone as SZone,
+} from '@optcg/cards';
 import type { InstanceId, PlayerId } from '../api.ts';
 import type { Ability } from '../abilities.ts';
 import {
@@ -18,7 +27,7 @@ import {
   type LayerMemo,
 } from '../derive.ts';
 import { historyOf } from '../history.ts';
-import { other, type Ev, type State } from '../state.ts';
+import { other, type Def, type Ev, type State } from '../state.ts';
 
 export interface Ctx {
   s: State;
@@ -96,6 +105,9 @@ function zoneIds(c: Ctx, p: PlayerId, z: SZone): InstanceId[] {
       return ps.trash;
     case 'deckTop':
       return ps.deck.slice(0, 1);
+    // Only a `play` of the card a reveal showed reads it (G53): the validator allows no other use.
+    case 'lifeTop':
+      return ps.life.slice(0, 1);
     case 'self': {
       const card = c.s.cards[c.self];
       return card && card.owner === p ? [c.self] : [];
@@ -126,7 +138,17 @@ function poolOf(c: Ctx, sel: Selector): InstanceId[] {
 /** Is a selector's pool drawn from a zone hidden from the other player (a secret area)? */
 export function hiddenPool(sel: Selector): boolean {
   const zones = Array.isArray(sel.from) ? sel.from : [sel.from];
+  // The top card an earlier `reveal` showed to both players is no secret: a pool that is only that
+  // bound card (a `ref` filter over the top of the deck or Life, G53) is read in the open.
+  if (zones.every((z) => z === 'deckTop' || z === 'lifeTop') && readsRef(sel.filter)) return false;
   return zones.some((z) => z === 'hand' || z === 'deckTop');
+}
+
+/** Does the filter name a bound card (top level, or inside `all`)? */
+function readsRef(f: Filter | undefined): boolean {
+  if (!f) return false;
+  if ('ref' in f) return true;
+  return 'all' in f && f.all.some(readsRef);
 }
 
 function cmp(c: Ctx, v: number | null, k: Cmp): boolean {
@@ -162,16 +184,38 @@ function matchesOf(c: Ctx, id: InstanceId, f: Filter): boolean {
   if ('attribute' in f) return def.attributes.includes(f.attribute);
   if ('multicolor' in f) return def.colors.length > 1;
   if ('hasTrigger' in f) return def.hasTrigger === f.hasTrigger;
+  // Printed text (G49): a card with no script yet reads the same as one with.
+  if ('hasBaseEffect' in f) return (def.baseEffect ?? def.abilities.length > 0) === f.hasBaseEffect;
+  if ('hasTiming' in f) return printsTiming(def, f.hasTiming);
   if ('keyword' in f) return dvOf(c, id).keywords.includes(f.keyword);
   if ('state' in f) return card.rested === (f.state === 'rested');
   if ('isSelf' in f) return (id === c.self) === f.isSelf;
   if ('playedThisTurn' in f) return card.played === c.s.turn;
   if ('donGiven' in f) return cmp(c, card.don, f.donGiven);
   if ('ref' in f) return (c.b?.[f.ref] ?? []).includes(id);
+  if ('sameNameAs' in f) {
+    // The card name, or a name the rules also give it (EB04-038), shared with a bound card (G54).
+    const names = (d: Def): string[] => [d.name, ...(d.alsoNamed ?? [])];
+    const mine = names(def);
+    return (c.b?.[f.sameNameAs] ?? []).some((bid) => {
+      const bc = c.s.cards[bid];
+      return !!bc && names(c.s.defs[bc.card]!).some((n) => mine.includes(n));
+    });
+  }
   if ('all' in f) return f.all.every((g) => matches(c, id, g));
   if ('any' in f) return f.any.some((g) => matches(c, id, g));
   if ('not' in f) return !matches(c, id, f.not);
   return false;
+}
+
+/** Does the card print this timing? From its text; a hand-built test card reads its abilities. */
+function printsTiming(def: Def, t: string): boolean {
+  if (def.printed) return def.printed.includes(t);
+  return def.abilities.some(
+    (a) =>
+      (a.kind === 'auto' && (a.when as unknown[]).includes(t)) ||
+      (a.kind === 'activate' && ([] as unknown[]).concat(a.when).includes(t)),
+  );
 }
 
 export function donOnField(s: State, p: PlayerId, state?: 'active' | 'rested'): number {
@@ -380,6 +424,12 @@ export function payable(c: Ctx, costs: readonly Cost[] | undefined, o: PayOption
     else if ('move' in k) {
       const n = k.move.pick && 'exactly' in k.move.pick ? k.move.pick.exactly : 1;
       if (pool(c, k.move).length < n) return false;
+      // "Place this Character or Stage at the bottom of the deck" (G52): it must be on the field.
+      const zs = Array.isArray(k.move.from) ? k.move.from : [k.move.from];
+      if (zs.includes('self')) {
+        const me = s.cards[c.self];
+        if (!me || !['characters', 'stage'].includes(me.zone)) return false;
+      }
     } else if ('restSelf' in k) {
       const me = s.cards[c.self];
       if (!me || me.rested || !['leader', 'characters', 'stage'].includes(me.zone)) return false;
@@ -512,6 +562,30 @@ export function attackLock(s: State, attacker: PlayerId, live = false): Instance
     }
   }
   return out;
+}
+
+/**
+ * "Your Character cards are played rested" (G50): does a permanent effect of `p`'s field make the
+ * card `card` that `p` is playing enter rested? The card is read where it is (a hand, a trash, a
+ * Life or deck top, the [Trigger] slot) by its printed values.
+ */
+export function playsRested(s: State, p: PlayerId, card: InstanceId, live = true): boolean {
+  for (const src of liveSources(s, p, live)) {
+    if (!ON_FIELD.has(s.cards[src]!.zone)) continue;
+    for (const ab of permanents(s, src)) {
+      if ((ab.zone ?? 'field') !== 'field') continue;
+      const c: Ctx = { s, you: p, self: src, live };
+      if (!allHold(c, ab.conditions)) continue;
+      const walk = (aps: readonly Continuous[]): boolean =>
+        aps.some((ap) =>
+          'playRested' in ap
+            ? matches(c, card, ap.playRested)
+            : 'tiers' in ap && ap.tiers.some((t) => holds(c, t.when) && walk(t.apply)),
+        );
+      if (walk(ab.apply)) return true;
+    }
+  }
+  return false;
 }
 
 // ---------------------------------------------------------------------------------------------

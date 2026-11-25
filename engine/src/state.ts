@@ -37,6 +37,14 @@ export interface Def {
   keywords: string[];
   hasTrigger: boolean;
   /**
+   * What the printed text says (G49), read from the card text, not from `abilities`: whether the
+   * card has a base effect (keywords alone do not count, a [Trigger] does) and the timings it
+   * prints ([On Play], [When Attacking], ...). Absent on a hand-built test card, which reads as
+   * having a base effect when it has abilities and none otherwise.
+   */
+  baseEffect?: boolean;
+  printed?: string[];
+  /**
    * Names the card is also treated as having under the rules of this game (`rules.alsoNamed`,
    * EB04-038). Absent for almost every card.
    */
@@ -410,7 +418,7 @@ export interface DecisionState {
   /** `choose` over DON!! classes: how many DON!! each candidate class still holds (E-D4). */
   counts?: number[];
   /** `choose` constraints across picks (OP17-118): a total-cost budget and distinct names. */
-  limits?: { total?: number; costs: number[]; names?: string[] };
+  limits?: { total?: number; costs: number[]; names?: string[]; what?: 'power' };
   /** `optional`: accepting is not possible (a cost that cannot be paid; the ask is still shown). */
   noAccept?: true;
   /** What the decision is for (public `Decision.purpose`). */

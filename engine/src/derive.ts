@@ -121,7 +121,9 @@ export function layered(s: State): boolean {
       d.abilities.some(
         (a) =>
           a.kind === 'permanent' &&
-          a.apply.some((c) => !('counter' in c) && !('lockAttackTarget' in c)),
+          a.apply.some(
+            (c) => !('counter' in c) && !('lockAttackTarget' in c) && !('playRested' in c),
+          ),
       ),
     );
     layeredDefs.set(s.defs, v);

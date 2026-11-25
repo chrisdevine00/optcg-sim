@@ -8,6 +8,7 @@
  * - nothing outside `IMPLEMENTED` is used, so a script never silently does nothing.
  * It has no dependencies, so it runs in tests, scripts and CI.
  */
+import { PRINTED_TIMINGS } from './printed.ts';
 import { ATTRIBUTES, CATEGORIES, COLORS, KEYWORDS } from './validate.ts';
 
 /**
@@ -36,6 +37,8 @@ export const IMPLEMENTED = {
     'event:koed',
     // M6b wave 5 (G43).
     'event:damageTaken',
+    // M6b wave 6 (G56).
+    'event:triggerActivated',
     // M6b wave 3 (G22, G24, G29).
     'event:trashedFromHand',
     'event:rested',
@@ -123,6 +126,8 @@ export const IMPLEMENTED = {
     'grant',
     'restrict',
     'tiers',
+    // M6b wave 6 (G50).
+    'playRested',
   ],
   restrictions: [
     'cannotAttack',
@@ -174,6 +179,10 @@ interface Ctx {
   perTarget?: boolean;
   /** Names a `chooseNumber` action has bound so far (G44). */
   chosen: Set<string>;
+  /** Names a `reveal` action has bound so far: the top card of the deck or Life, known to both (G53). */
+  revealed: Set<string>;
+  /** The kind of the ability being validated (a move of "this card" means different things). */
+  abKind?: string;
 }
 
 const isObj = (v: unknown): v is Obj => !!v && typeof v === 'object' && !Array.isArray(v);
@@ -387,12 +396,15 @@ function filter(c: Ctx, path: string, v: unknown): void {
     'attribute',
     'multicolor',
     'hasTrigger',
+    'hasBaseEffect',
+    'hasTiming',
     'keyword',
     'state',
     'isSelf',
     'playedThisTurn',
     'donGiven',
     'ref',
+    'sameNameAs',
     'all',
     'any',
     'not',
@@ -401,6 +413,11 @@ function filter(c: Ctx, path: string, v: unknown): void {
   const x = (v as Obj)[k];
   const p = `${path}.${k}`;
   switch (k) {
+    case 'hasTiming':
+      return enumOf(c, p, x, PRINTED_TIMINGS);
+    case 'sameNameAs':
+      // The name of a card an earlier selector bound (G54).
+      return ref(c, p, x);
     case 'donGiven':
       return cmp(c, p, x);
     case 'attribute':
@@ -414,6 +431,7 @@ function filter(c: Ctx, path: string, v: unknown): void {
       return cmp(c, p, x);
     case 'hasCounter':
     case 'hasTrigger':
+    case 'hasBaseEffect':
     case 'isSelf':
       if (typeof x !== 'boolean') err(c, p, 'expected a boolean');
       return;
@@ -444,7 +462,7 @@ function filter(c: Ctx, path: string, v: unknown): void {
 
 function pick(c: Ctx, path: string, v: unknown): void {
   const k = oneOf(c, path, v, ['upTo', 'exactly', 'any', 'groups'], {
-    upTo: ['totalCost', 'distinctNames'],
+    upTo: ['totalCost', 'totalPower', 'distinctNames'],
   });
   if (!k) return;
   const o = v as Obj;
@@ -455,6 +473,16 @@ function pick(c: Ctx, path: string, v: unknown): void {
     if ((o[k] as number) < 1) err(c, `${path}.${k}`, 'must be at least 1');
   }
   if (o.totalCost !== undefined) cmp(c, `${path}.totalCost`, o.totalCost);
+  if (o.totalPower !== undefined) {
+    // "With a total power of 4000 or less" (G55): only an upper bound, and not beside a cost bound
+    // (one budget per pick), counted over the chosen cards' current power.
+    fields(c, `${path}.totalPower`, o.totalPower, ['lte']);
+    if (isObj(o.totalPower)) num(c, `${path}.totalPower.lte`, o.totalPower.lte);
+    if (o.totalCost !== undefined)
+      err(c, `${path}.totalPower`, 'a pick has one budget: totalCost or totalPower');
+    if (o.distinctNames !== undefined)
+      err(c, `${path}.totalPower`, 'totalPower and distinctNames are not combined');
+  }
   if (o.distinctNames !== undefined && o.distinctNames !== true)
     err(c, `${path}.distinctNames`, 'expected true');
 }
@@ -727,7 +755,7 @@ function cost(c: Ctx, path: string, v: unknown): void {
     case 'move': {
       selector(c, p, o.move);
       if (isObj(o.move) && !(o.move as Obj).pick) err(c, p, 'a cost selector needs a pick');
-      const fieldSide = fieldOrHand(c, p, o.move, 'a move cost', ['hand', 'trash']);
+      const fieldSide = fieldOrHand(c, p, o.move, 'a move cost', ['hand', 'trash'], true);
       dest(c, `${path}.to`, o.to);
       if (fieldSide && isObj(o.to)) {
         // Your own Character or Stage goes to your hand, to the top or bottom of your deck, or to
@@ -740,6 +768,15 @@ function cost(c: Ctx, path: string, v: unknown): void {
           err(c, `${p}.pick`, 'a cost that puts a field card into the deck takes exactly 1');
         if (o.to.zone === 'deck' && o.to.position === 'topOrBottom')
           err(c, `${path}.to.position`, 'a field cost picks the top or the bottom');
+      }
+      // "Place this Character or Stage at the bottom of the owner's deck" (G52): the card itself,
+      // alone in the selector, taken whole (a filter on "this card" says nothing).
+      if (isObj(o.move)) {
+        const zs = Array.isArray(o.move.from) ? o.move.from : [o.move.from];
+        if (zs.includes('self')) {
+          if (zs.length !== 1) err(c, `${p}.from`, 'this card cannot be mixed with other zones');
+          if (o.move.filter !== undefined) err(c, `${p}.filter`, 'this card takes no filter');
+        }
       }
       return moveShape(c, p, o.move, o.to);
     }
@@ -756,11 +793,13 @@ function fieldOrHand(
   sel: unknown,
   what: string,
   handSide: string[] = ['hand'],
+  self = false,
 ): boolean {
   if (!isObj(sel)) return false;
   const zones = (Array.isArray(sel.from) ? sel.from : [sel.from]) as string[];
   const hand = zones.every((z) => handSide.includes(z));
-  const field = zones.every((z) => z === 'characters' || z === 'stage');
+  // `self` is "this Character or Stage" (G52): it is on the field when the cost is paid.
+  const field = zones.every((z) => z === 'characters' || z === 'stage' || (self && z === 'self'));
   if (!hand && !field)
     err(
       c,
@@ -882,7 +921,7 @@ function action(c: Ctx, path: string, v: unknown): void {
       'canAttackActive',
       'addReplacement',
     ],
-    { draw: ['player', 'upTo'] },
+    { draw: ['player', 'upTo'], addDon: ['player'] },
   );
   if (!k) return;
   const o = v as Obj;
@@ -987,7 +1026,10 @@ function action(c: Ctx, path: string, v: unknown): void {
           err(c, `${p}.player`, "only the top card of the opponent's deck is revealed");
       }
       str(c, `${p}.bind`, x.bind);
-      if (typeof x.bind === 'string') c.bound.add(x.bind);
+      if (typeof x.bind === 'string') {
+        c.bound.add(x.bind);
+        c.revealed.add(x.bind);
+      }
       return;
     case 'chooseNumber':
       // "Choose a cost" (G44): a whole number in a small range, bound by name.
@@ -1020,19 +1062,64 @@ function action(c: Ctx, path: string, v: unknown): void {
       // G41: only "all of your Life cards" (the cost form turns the top N).
       if (x !== 'all') err(c, p, "expected 'all'");
       return;
-    case 'play':
-      fields(c, p, x, ['what'], ['rested']);
+    case 'play': {
+      fields(c, p, x, ['what'], ['rested', 'player']);
       if (!isObj(x)) return;
+      // The top of the deck or Life is only the card an earlier `reveal` showed (G53).
+      c.lifeOk = true;
       selector(c, `${p}.what`, x.what);
+      c.lifeOk = false;
       zonesIn(
         c,
         `${p}.what`,
         x.what,
-        ['hand', 'trash', 'self'],
-        'the runtime plays cards from hand, trash or "this card" ([Trigger]) only',
+        ['hand', 'trash', 'self', 'deckTop', 'lifeTop'],
+        'the runtime plays cards from hand, trash, "this card" ([Trigger]) or a revealed top card only',
       );
       if (x.rested !== undefined && x.rested !== true) err(c, `${p}.rested`, 'expected true');
+      const w = x.what;
+      if (isObj(w)) {
+        const zs = (Array.isArray(w.from) ? w.from : [w.from]) as string[];
+        const pk = isObj(w.pick) ? w.pick : undefined;
+        if (zs.includes('deckTop') || zs.includes('lifeTop')) {
+          if (zs.length !== 1 || w.owner !== 'you' || w.chooser !== undefined)
+            err(c, `${p}.what`, 'the revealed top card is yours alone: one zone, owner "you"');
+          if (!readsRevealed(w.filter, c.revealed))
+            err(
+              c,
+              `${p}.what.filter`,
+              'only the card a reveal bound can be played from the top: the filter needs { ref } naming it',
+            );
+          if (!pk || (pk.exactly !== 1 && pk.upTo !== 1))
+            err(
+              c,
+              `${p}.what.pick`,
+              'the revealed card is played with { exactly: 1 } or { upTo: 1 }',
+            );
+        }
+        if (x.player !== undefined) {
+          // Your opponent plays a card from their own hand and chooses it (G51).
+          if (x.player !== 'opponent') err(c, `${p}.player`, 'expected "opponent"');
+          else {
+            if (zs.length !== 1 || zs[0] !== 'hand' || w.owner !== 'opponent')
+              err(
+                c,
+                `${p}.what`,
+                "your opponent plays from their own hand: from 'hand', owner 'opponent'",
+              );
+            if (w.chooser !== 'opponent')
+              err(
+                c,
+                `${p}.what.chooser`,
+                'your opponent chooses the card: chooser must be "opponent"',
+              );
+            if (!pk || (pk.exactly === undefined && pk.upTo === undefined))
+              err(c, `${p}.what.pick`, 'a play by the opponent picks upTo or exactly a number');
+          }
+        }
+      }
       return;
+    }
     case 'power':
     case 'cost':
       fields(c, p, x, ['target', 'amount', 'duration']);
@@ -1094,6 +1181,9 @@ function action(c: Ctx, path: string, v: unknown): void {
         err(c, `${p}.to.pick`, 'with each, the selector has no pick, or an upTo pick');
       return;
     case 'addDon':
+      // The opponent adds DON!! from their DON!! deck (G51), chosen by them when it is optional.
+      if (o.player !== undefined && o.player !== 'opponent')
+        err(c, `${path}.player`, 'expected "opponent"');
       return arr(c, p, x, (y, q) => {
         fields(c, q, y, ['n', 'state'], ['upTo']);
         if (!isObj(y)) return;
@@ -1253,6 +1343,13 @@ function skipRefreshDon(c: Ctx, path: string, sel: unknown): void {
     err(c, `${path}.pick`, 'a count of DON!!: pick { upTo: n } or { exactly: n }');
 }
 
+/** Does the filter name (top level, or inside `all`) a card an earlier `reveal` bound (G53)? */
+function readsRevealed(f: unknown, revealed: Set<string>): boolean {
+  if (!isObj(f)) return false;
+  if (typeof f.ref === 'string') return revealed.has(f.ref);
+  return Array.isArray(f.all) && f.all.some((g) => readsRevealed(g, revealed));
+}
+
 const FIELD_ZONES = ['leader', 'characters', 'stage', 'field', 'self'];
 
 /** Every zone of a selector must be one of `allowed` (the runtime would mishandle others, M4a-07). */
@@ -1276,6 +1373,30 @@ function moveShape(c: Ctx, path: string, what: unknown, to: unknown): void {
   const dz = to.zone;
   const pos = to.position;
   const all = (set: string[]) => zones.every((z) => set.includes(z));
+  if (zones.includes('self')) {
+    // A cost moves this Character or Stage off the field (G52). An effect moves "this card" only
+    // from a [Trigger]'s resolving slot to your hand: "add this card to your hand" (G57).
+    if (c.inCost) return;
+    const pk = what.pick as Record<string, unknown> | undefined;
+    if (
+      zones.length !== 1 ||
+      c.abKind !== 'trigger' ||
+      dz !== 'hand' ||
+      pos !== undefined ||
+      to.faceUp !== undefined
+    )
+      return err(
+        c,
+        path,
+        'a move of this card is a cost, or the "add this card to your hand" of a [Trigger]',
+      );
+    if (what.owner !== 'you')
+      err(c, `${path}.what.owner`, 'this card is yours: owner must be "you"');
+    if (!pk || pk.exactly !== 1)
+      err(c, `${path}.what.pick`, 'adding this card to your hand needs { exactly: 1 }');
+    if (what.filter !== undefined) err(c, `${path}.what.filter`, 'this card takes no filter');
+    return;
+  }
   if (zones.includes('deckTop')) {
     if (zones.length !== 1 || dz !== 'life' || pos !== 'top')
       return err(c, path, 'a move from the deck top is implemented only to the top of Life');
@@ -1431,6 +1552,7 @@ function continuous(c: Ctx, path: string, v: unknown): void {
     'restrict',
     'lockAttackTarget',
     'tiers',
+    'playRested',
   ]);
   if (!k) return;
   const x = (v as Obj)[k];
@@ -1438,6 +1560,16 @@ function continuous(c: Ctx, path: string, v: unknown): void {
   if (!has(IMPLEMENTED.continuous, k))
     return err(c, path, `permanent ${k} is not implemented in the runtime yet`);
   switch (k) {
+    case 'playRested':
+      // "Your Character cards are played rested" (G50): read on the card being played, in hand or
+      // trash or wherever it comes from, so printed values only (nothing relative, no state).
+      return deckFilter(
+        c,
+        p,
+        x,
+        DECK_FILTER_KEYS,
+        'a play filter reads the printed values of the card being played',
+      );
     case 'counter':
       fields(c, p, x, ['target', 'value'], ['onlyIfNone']);
       if (!isObj(x)) return;
@@ -1570,6 +1702,9 @@ function timing(c: Ctx, path: string, v: unknown): void {
     if (v.via !== undefined) enumOf(c, `${path}.via`, v.via, ['rule', 'effect', 'characterEffect']);
   } else if (v.event === 'eventActivated' || v.event === 'blockerActivated') {
     enumOf(c, `${path}.by`, v.by, P);
+  } else if (v.event === 'triggerActivated') {
+    // G56: whose [Trigger]; `any` is either player's.
+    enumOf(c, `${path}.by`, v.by, [...P, 'any']);
   } else if (v.event === 'trashedFromHand') {
     enumOf(c, `${path}.owner`, v.owner, P);
     if (v.by !== undefined) enumOf(c, `${path}.by`, v.by, P);
@@ -1623,6 +1758,8 @@ function ability(c: Ctx, path: string, v: unknown, ids: Set<string>): void {
   c.bound = new Set();
   c.labels = new Set();
   c.chosen = new Set();
+  c.revealed = new Set();
+  c.abKind = typeof v.kind === 'string' ? v.kind : undefined;
   c.evCount =
     v.kind === 'auto' &&
     Array.isArray(v.when) &&
@@ -1788,6 +1925,7 @@ export function validateScript(script: unknown): string[] {
     bound: new Set(),
     labels: new Set(),
     chosen: new Set(),
+    revealed: new Set(),
     inCost: false,
   };
   const path = isObj(script) && typeof script.cardId === 'string' ? script.cardId : 'script';

@@ -69,6 +69,12 @@ export type {
 export type { Action as EffectAction } from './dsl.ts';
 export { textHash } from './dsl.ts';
 export { abilityReadsHiddenZone } from './hidden.ts';
+export {
+  hasBaseEffectText,
+  printedTimings,
+  PRINTED_TIMINGS,
+  type PrintedTiming,
+} from './printed.ts';
 export { IMPLEMENTED, isEffect, validateScript } from './dsl-validate.ts';
 export {
   SCRIPTS,
