@@ -126,9 +126,26 @@ export type AutoTiming =
   | { event: 'blockerActivated'; by: P }
   /** "When your Leader … attacks" (`attacker`) or "… is attacked" (`target`). */
   | { event: 'attack'; attacker?: Selector; target?: Selector }
-  /** "When a DON!! card on your field is returned to your DON!! deck" (OP17-062). */
-  | { event: 'donReturned'; owner: P }
+  /**
+   * "When a DON!! card on your field is returned to your DON!! deck" (OP17-062). One event per
+   * instruction that returns DON!!, with the number returned. `min`: "2 or more DON!! cards are
+   * returned" (G40); `cause`: "by your effect" (`yourEffect`) or by the other player's
+   * (`opponentEffect`), any effect (`effect`); a DON!! −N cost is part of the effect (RL-16).
+   */
+  | {
+      event: 'donReturned';
+      owner: P;
+      min?: number;
+      cause?: 'effect' | 'yourEffect' | 'opponentEffect';
+    }
   | { event: 'lifeRemoved'; owner: P | 'any' }
+  /**
+   * "When you take damage" (G43): `owner` took damage (battle or effect), at least one Life card
+   * was taken, and the damage processing, [Trigger] included, has ended (rules-digest 106). One
+   * event per damage (a Double Attack's 2 points are one damage). A damage a replacement stopped
+   * is not taken.
+   */
+  | { event: 'damageTaken'; owner: P }
   | { event: 'lifeBecameZero'; owner: P }
   /**
    * "When one of your Characters is K.O.'d" (`owner` absent or `you`), or "when one of your
@@ -204,6 +221,8 @@ export type Num =
   | number
   | { count: Selector; distinctNames?: true }
   | { life: P | 'both' }
+  /** The number of face-up cards in a player's Life area (G41): "if you have a face-up Life card". */
+  | { lifeFaceUp: P }
   | { hand: P }
   | { trash: P }
   | { deck: P }
@@ -212,6 +231,8 @@ export type Num =
   | { donGiven: P }
   | { turnIndex: P }
   | { refCount: Name }
+  /** The number a `chooseNumber` action bound (G44). */
+  | { chosen: Name }
   | { refStat: Name; stat: 'cost' | 'power' | 'basePower' | 'donGiven' }
   /**
    * The number of DON!! cards given to the card a `power` or `cost` action is applying to, read
@@ -339,8 +360,11 @@ export type Cost =
   /**
    * Replacement payloads: "return 1 DON!! card from your field to your DON!! deck instead". The
    * object form returns active cost-area DON!! only: "return 2 of your active DON!! cards" (G9).
+   * `{ atLeast: n }` is "return n or more DON!! cards from your field to your DON!! deck" (G42):
+   * the player chooses how many, from n to every DON!! card on their field, and which ones; one
+   * `donReturned` event for the whole number. Not a replacement payload.
    */
-  | { returnDon: number | { n: number; state: 'active' } }
+  | { returnDon: number | { n: number; state: 'active' } | { atLeast: number } }
   /** "Give N active DON!! cards to your Leader or 1 of your Characters" as a cost (G7). */
   | { giveDon: { n: number; state: 'active'; to: Selector } }
   /** "Give 1 of your opponent's rested DON!! cards to 1 of your opponent's Characters" (G20). */
@@ -410,9 +434,31 @@ export type Action =
         rest: 'bottomAnyOrder' | 'trash' | 'topOrBottomAnyOrder' | 'topAnyOrder' | 'stay';
       };
     }
-  | { reveal: { from: 'deckTop' | 'lifeTop'; n: number; bind: Name } }
+  | {
+      reveal: {
+        from: 'deckTop' | 'lifeTop';
+        n: number;
+        bind: Name;
+        /**
+         * `opponent`: reveal the top card of the opponent's deck to both players (G44). It stays
+         * on top, known to both until the deck is shuffled or the card moves.
+         */
+        player?: 'opponent';
+      };
+    }
+  /**
+   * "Choose a cost" (G44): the controller names a whole number from `min` to `max` (at most 10).
+   * Everyone is told the number. It is read back with `{ chosen: bind }`, for instance as the
+   * right side of a cost comparison against a revealed card.
+   */
+  | { chooseNumber: { min: number; max: number; bind: Name } }
   | { move: { what: Selector; to: Dest } }
   | { trashLifeUntil: number }
+  /**
+   * "Turn all of your Life cards face-down" (G41): every face-up card of your Life area turns
+   * face-down (the cost form turns the top N, G8). Face-down cards stay as they are.
+   */
+  | { turnLifeFaceDown: 'all' }
   /** "You take N damage" / "deal N damage to your opponent": real damage, a [Trigger] may activate (G36). */
   | { damage: { player: P; n: Num } }
   /** "You win the game" (G35): the controller wins at once. */
@@ -442,6 +488,12 @@ export type Action =
   | { ko: Selector }
   | { rest: Selector }
   | { setActive: Selector }
+  /**
+   * "Will not become active in your next Refresh Phase": a card (`from` a field zone), or (G48)
+   * `{ from: 'donCostArea', owner: 'opponent', filter: { state: 'rested' }, pick: { upTo: n } }`,
+   * "up to n of your opponent's rested DON!! cards": that many of their rested DON!! stay rested
+   * (as many as they have, up to n).
+   */
   | { skipRefresh: Selector }
   | { power: { target: Selector; amount: Num; duration: Duration } }
   | { setBasePower: { target: Selector; value: Num; duration: Duration } }
@@ -483,8 +535,14 @@ export type Restriction =
   | 'cannotBeRemovedByOpponentEffects'
   /** Cannot be K.O.'d at all: by effects and in battle (RL-14). */
   | 'cannotBeKOd'
-  /** "Cannot be K.O.'d by effects" / "by your opponent's effects" / "in battle" (G6). */
-  | { cannotBeKOd: { cause: KOCause } }
+  /**
+   * "Cannot be K.O.'d by effects" / "by your opponent's effects" / "in battle" (G6). `by` limits it
+   * to a K.O. whose source card matches (G46): the attacker for `battle` ("in battle by <Slash>
+   * attribute cards", "by Leaders"), the card whose effect it is for `effect` and `opponentEffect`
+   * ("by effects of Characters without the <Special> attribute"). The filter reads printed and
+   * current values of that card, nothing relative to the protected card (no `ref`, no `isSelf`).
+   */
+  | { cannotBeKOd: { cause: KOCause; by?: Filter } }
   /**
    * "Cannot be rested": it cannot attack, activate [Blocker], pay a rest cost or be rested by any
    * effect (rules-digest 57, G2).
@@ -494,6 +552,12 @@ export type Restriction =
   | { cannotBeRested: { by: 'opponentEffect' } }
   /** This card cannot activate [Blocker] (the blocking side, G10). */
   | 'cannotActivateBlocker'
+  /**
+   * "Cannot attack your opponent's Characters with a base cost of 7 or less" (G47): the restricted
+   * Leader or Character cannot attack a card matching the filter. The filter reads the target:
+   * printed and current values, keywords and rested state, nothing relative to the attacker.
+   */
+  | { cannotAttackTarget: Filter }
   /**
    * "You cannot play <cards> during this turn". Plays by any means unless `from: 'hand'` ("cannot
    * play cards from your hand", OP13-028): then only plays of a card in the hand are barred and a

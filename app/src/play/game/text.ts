@@ -110,6 +110,10 @@ export function modifierWords(e: GameEvent): string {
       return 'cannot be removed by opponent’s effects';
     case 'attackActive':
       return 'can also attack active Characters';
+    case 'cannotAttackTarget':
+      return 'cannot attack some cards';
+    case 'skipRefreshDon':
+      return `${String(e.amount)} rested DON!! stay rested next Refresh Phase`;
     case 'replacement':
       return 'has a replacement effect this turn';
     default:

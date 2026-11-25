@@ -137,6 +137,13 @@ export type ModKind =
   | 'playCost'
   /** This card can also attack active Characters (M6b wave 4 G32). */
   | 'attackActive'
+  /** This card cannot attack a card matching `filter` (M6b wave 5 G47). */
+  | 'cannotAttackTarget'
+  /**
+   * On a player's Leader: `amount` of that player's rested DON!! cards stay rested through their
+   * next Refresh Phase (M6b wave 5 G48).
+   */
+  | 'skipRefreshDon'
   /**
    * On the controller's Leader: a replacement an effect created for a while (D6, `ab`). It is offered
    * for K.O.s and removals like a printed one, as the ability `mod-<id>`.
@@ -151,7 +158,7 @@ export interface Modifier {
   amount: number;
   /** For `grant`: the keyword. */
   keyword?: string;
-  /** For `cannotPlay` and `playCost`: which cards. */
+  /** For `cannotPlay`, `playCost` and `cannotAttackTarget`: which cards. */
   filter?: Filter;
   /** For `replacement`: the replacement ability, whose id is `mod-<id>` (D6). */
   ab?: Ability;
@@ -162,6 +169,11 @@ export interface Modifier {
    * (`opponentEffect`): what the restriction covers. Absent: everything (M6b wave 1 G2, G6).
    */
   scope?: 'effect' | 'opponentEffect' | 'battle';
+  /**
+   * For a scoped `cannotBeKOd`: only a K.O. whose source card matches this filter is stopped (G46):
+   * the attacker of a battle, or the card whose effect (or cost) K.O.s.
+   */
+  by?: Filter;
   /** For `playCost`: plays it may still change the cost of. */
   uses?: number;
   duration: Duration;
@@ -261,8 +273,21 @@ export type Frame =
       considered?: string[];
       /** Battle damage determined against 0 Life, kept as a frame only so a replacement can stop it. */
       zero?: true;
+      /** Life cards this damage has taken so far: `damageTaken` fires when it ends with any (G43). */
+      taken?: number;
     }
-  | { f: 'ko'; card: InstanceId; cause: Cause; considered: string[]; group?: number }
+  | {
+      f: 'ko';
+      card: InstanceId;
+      cause: Cause;
+      considered: string[];
+      group?: number;
+      /**
+       * The card that K.O.s: the battle's attacker, or the card whose effect or cost it is (G46).
+       * Kept on the frame, not in the `cause`, which events carry and which must name no instance.
+       */
+      src?: InstanceId;
+    }
   /**
    * A rest by an effect, held while a replacement for it may be offered (G37). `by` is the player
    * whose effect rests it and `source` that effect's card.
@@ -345,6 +370,8 @@ export interface Scratch {
   add?: number;
   /** `giveDon` of any opponent DON!!: how many of the DON!! given are active ones (G20). */
   act?: number;
+  /** A cost `returnDon { atLeast }`: how many DON!! the player chose to return (G42). */
+  ret?: number;
 }
 
 /** An auto effect that has activated and waits to resolve (CR 8-6). */
@@ -355,6 +382,8 @@ export interface PendingEffect {
   chosen?: true;
   /** A delayed effect's body starts at this instruction. */
   start?: number;
+  /** A delayed effect's bound selections, carried from the effect that created it (G39). */
+  b?: Record<string, InstanceId[]>;
   card: InstanceId;
   /** The source's projection key when it triggered, for `EffectActivated` (M2-17). */
   key: string;
@@ -488,6 +517,11 @@ export interface Delayed {
   controller: PlayerId;
   /** First instruction of the delayed body in the ability's program. */
   start: number;
+  /**
+   * The selections the creating effect had bound by then (`bind`), restored when the body runs
+   * so it can read them with `{ ref }` (G39). Absent when nothing was bound.
+   */
+  b?: Record<string, InstanceId[]>;
 }
 
 export const other = (p: PlayerId): PlayerId => (p === 'p1' ? 'p2' : 'p1');

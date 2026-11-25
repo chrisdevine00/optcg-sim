@@ -97,13 +97,20 @@ function actionPrompts(a: Action, out: string[]): void {
     if (a.upTo) out.push('draw upTo');
   } else if ('trashFromHand' in a) selPrompts(a.trashFromHand, out);
   else if ('lookAtTop' in a) out.push(`look:${JSON.stringify(a.lookAtTop)}`);
+  else if ('chooseNumber' in a) out.push(`number:${JSON.stringify(a.chooseNumber)}`);
   else if ('move' in a) selPrompts(a.move.what, out);
   else if ('play' in a) selPrompts(a.play.what, out);
   else if ('ko' in a) selPrompts(a.ko, out);
   else if ('rest' in a) selPrompts(a.rest, out);
   else if ('setActive' in a) selPrompts(a.setActive, out);
-  else if ('skipRefresh' in a) selPrompts(a.skipRefresh, out);
-  else if ('power' in a) selPrompts(a.power.target, out);
+  else if ('skipRefresh' in a) {
+    // DON!! held back are a count, not a choice (G48).
+    if (
+      a.skipRefresh.from !== 'donCostArea' &&
+      !(Array.isArray(a.skipRefresh.from) && a.skipRefresh.from.includes('donCostArea'))
+    )
+      selPrompts(a.skipRefresh, out);
+  } else if ('power' in a) selPrompts(a.power.target, out);
   else if ('setBasePower' in a) selPrompts(a.setBasePower.target, out);
   else if ('cost' in a) selPrompts(a.cost.target, out);
   else if ('giveDon' in a) {

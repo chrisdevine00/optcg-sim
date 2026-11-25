@@ -12,6 +12,7 @@ import {
   allHold,
   attackLock,
   counterOf,
+  matches,
   payable,
   playBlocked,
   playCostOf,
@@ -326,6 +327,13 @@ function checkAttack(
     return r("You can attack only your opponent's Leader or Characters.", 'CR 7-1');
   if (t.zone === 'characters' && !t.rested && !dv.attackActive)
     return r("Active Characters can't be attacked.", 'CR 7-1-1-2');
+  // "Cannot attack your opponent's Characters with a base cost of 7 or less" (G47).
+  if (
+    dv.cannotAttackTarget.some((f) =>
+      matches({ s, you: p, self: attacker, live: false }, target, f),
+    )
+  )
+    return r('An effect says this card cannot attack that card.', 'CR 1-3-3');
   if (isSick && !kw.includes('Rush') && t.zone === 'leader')
     return r(
       '[Rush: Character] can attack only Characters on the turn it is played.',

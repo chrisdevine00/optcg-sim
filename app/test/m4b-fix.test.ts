@@ -37,6 +37,8 @@ describe('every modifier kind has words (review M4b-12)', () => {
     cannotPlay: true,
     playCost: true,
     attackActive: true,
+    cannotAttackTarget: true,
+    skipRefreshDon: true,
     replacement: true,
   };
   it.each(Object.keys(kinds).filter((k) => k !== 'power'))('%s', (kind) => {

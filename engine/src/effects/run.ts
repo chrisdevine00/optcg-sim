@@ -13,7 +13,7 @@ import type { Draft } from '../draft.ts';
 import {
   abilityOf,
   collectReplacements,
-  fireEvent,
+  fireDonReturned,
   fireTrashedFromHand,
   pop,
   push,
@@ -113,7 +113,7 @@ export function pushEffect(
   ab: Ability,
   controller: PlayerId,
   part: 'effect' | 'instead',
-  opts: { start?: number; delayed?: boolean; ev?: Ev } = {},
+  opts: { start?: number; delayed?: boolean; ev?: Ev; b?: Record<string, InstanceId[]> } = {},
 ): void {
   // An optional auto, an auto with a cost, or an Event whose activation cost is worded "you
   // may" (CR 8-3-1-4): ask first.
@@ -133,6 +133,7 @@ export function pushEffect(
   };
   if (opts.delayed) f.delayed = true;
   if (opts.ev) f.ev = opts.ev;
+  if (opts.b) f.b = opts.b;
   push(d, f);
 }
 
@@ -213,7 +214,9 @@ export function costText(costs: readonly Cost[] | undefined): string {
     if ('returnDon' in k)
       return typeof k.returnDon === 'number'
         ? `return ${k.returnDon} DON!!`
-        : `return ${k.returnDon.n} active DON!!`;
+        : 'atLeast' in k.returnDon
+          ? `return ${k.returnDon.atLeast} or more DON!!`
+          : `return ${k.returnDon.n} active DON!!`;
     if ('giveDon' in k)
       return 'from' in k.giveDon
         ? `give ${k.giveDon.n} of your opponent's rested DON!!`
@@ -430,6 +433,7 @@ function exec(d: Draft, f: EffectFrame, ins: Instr, ab: Ability): Out {
           ability: f.ability,
           controller: f.controller,
           start: f.ip + 1,
+          ...(f.b ? { b: f.b } : {}),
         },
       ];
       f.ip = ins.to;
@@ -600,6 +604,18 @@ function payCost(d: Draft, f: EffectFrame, k: Cost, reserve: number): Out {
   if ('donMinus' in k) return returnDon(d, f, k.donMinus, reserve, 'cost');
   if ('returnDon' in k) {
     // The object form returns active cost-area DON!! only (G9).
+    if (typeof k.returnDon === 'object' && 'atLeast' in k.returnDon)
+      return returnDon(
+        d,
+        f,
+        k.returnDon.atLeast,
+        reserve,
+        'cost',
+        false,
+        f.controller,
+        false,
+        true,
+      );
     if (typeof k.returnDon !== 'number')
       return returnDon(d, f, k.returnDon.n, reserve, 'cost', true);
     return returnDon(d, f, k.returnDon, reserve, 'cost');
@@ -687,12 +703,7 @@ function payCost(d: Draft, f: EffectFrame, k: Cost, reserve: number): Out {
     const ids = d.ro(f.controller).life.slice(0, k.turnLifeFaceDown);
     if (ids.length < k.turnLifeFaceDown || ids.some((id) => !d.card(id).faceUp))
       return anomaly(d, f, 'turnLifeFaceDown');
-    for (const id of ids) {
-      const w = d.wcard(id);
-      w.faceUp = false;
-      w.key = d.newKey();
-    }
-    d.emit({ type: 'LifeTurnedFaceDown', player: f.controller, count: ids.length });
+    turnFaceDown(d, ids, f.controller);
     return 'next';
   }
   if ('trashLife' in k) {
@@ -790,7 +801,7 @@ function fieldCost(d: Draft, f: EffectFrame, sel: Selector, how: FieldCostHow): 
   const group = ids.length > 1 ? d.s.nextMod++ : undefined;
   for (const id of ids.slice().reverse()) {
     const cause = { kind: 'cost', by: f.controller } as const;
-    if ('ko' in how) pushKo(d, id, cause, group);
+    if ('ko' in how) pushKo(d, id, cause, group, f.card);
     else pushRemove(d, id, how.remove, cause, how.position, group);
   }
   f.ph = FIELD_COST_PUSHED;
@@ -811,30 +822,52 @@ function lifeToHandCost(
     if (life.length === 0) return anomaly(d, f, 'lifeToHand');
     let bottom = false;
     if (spec.from === 'topOrBottom' && life.length > 1) {
-      const g = take(f);
-      if (!Array.isArray(g)) {
-        f.ph = done;
-        return ask(d, f, {
-          kind: 'choose',
-          player: p,
-          prompt: `${nameOf(d, f)}: add the top or the bottom card of your Life cards to your hand?`,
-          min: 1,
-          max: 1,
-          candidates: [{ option: 'top' }, { option: 'bottom' }] as never,
-          picked: [],
-          role: 'mode',
-          options: [
-            { id: 'top', label: 'Top Life card' },
-            { id: 'bottom', label: 'Bottom Life card' },
-          ],
-        });
-      }
-      bottom = (g[0] as { option: string }).option === 'bottom';
+      f.ph = done;
+      const end = lifeEnd(d, f);
+      if (end === WAIT) return WAIT;
+      bottom = end === 'bottom';
     }
     moveCard(d, bottom ? life[life.length - 1]! : life[0]!, 'hand', { extra: { reason: 'life' } });
     done++;
   }
   return 'next';
+}
+
+/**
+ * "The top or bottom of your Life cards": the controller picks the end, blind (Life is face-down,
+ * so the choice tells nobody anything). Waits for the answer, then returns it.
+ */
+function lifeEnd(d: Draft, f: EffectFrame): 'top' | 'bottom' | typeof WAIT {
+  const g = take(f);
+  if (!Array.isArray(g))
+    return ask(d, f, {
+      kind: 'choose',
+      player: f.controller,
+      prompt: `${nameOf(d, f)}: add the top or the bottom card of your Life cards to your hand?`,
+      min: 1,
+      max: 1,
+      candidates: [{ option: 'top' }, { option: 'bottom' }] as never,
+      picked: [],
+      role: 'mode',
+      options: [
+        { id: 'top', label: 'Top Life card' },
+        { id: 'bottom', label: 'Bottom Life card' },
+      ],
+    });
+  return (g[0] as { option: string }).option === 'bottom' ? 'bottom' : 'top';
+}
+
+/**
+ * Turn these face-up Life cards face-down (G8, G41): hidden again, each under a fresh handle so
+ * nothing the viewers saw while it was face-up links to it. Public: the cards were face up.
+ */
+function turnFaceDown(d: Draft, ids: InstanceId[], player: PlayerId): void {
+  for (const id of ids) {
+    const w = d.wcard(id);
+    w.faceUp = false;
+    w.key = d.newKey();
+  }
+  d.emit({ type: 'LifeTurnedFaceDown', player, count: ids.length });
 }
 
 /** Turn a face-down Life card face-up: now public, under a fresh handle (CR 3-2-6-1 areas). */
@@ -959,9 +992,40 @@ function returnDon(
    */
   who: PlayerId = f.controller,
   asMany = false,
+  /** `n` is the least: the player chooses how many to return, up to every DON!! they may (G42). */
+  atLeast = false,
 ): Out {
   if (n <= 0) return 'next';
   const p = who;
+  if (atLeast && f.tmp?.ret === undefined) {
+    // "Return 1 or more DON!!" (G42): how many first, fewest first (a cost: the default is the least
+    // that pays it), then which. A single possible number is not asked.
+    const ps = d.ro(p);
+    let total = ps.donActive - reserve + ps.donRested;
+    for (const id of [ps.leader, ...ps.characters]) total += d.card(id).don;
+    if (total < n) return anomaly(d, f, 'DON!! −');
+    if (total === n) f.tmp = { ...f.tmp, ret: n };
+    else {
+      const got = take(f);
+      if (!Array.isArray(got)) {
+        const counts = Array.from({ length: total - n + 1 }, (_, j) => n + j);
+        return ask(d, f, {
+          kind: 'choose',
+          player: p,
+          prompt: `${nameOf(d, f)}: how many DON!! cards will you return to your DON!! deck (${n} or more)?`,
+          min: 1,
+          max: 1,
+          candidates: counts.map((j) => ({ option: String(j) })) as never,
+          picked: [],
+          role: 'mode',
+          options: counts.map((j) => ({ id: String(j), label: `${j} DON!!` })),
+        });
+      }
+      const k = Number((got[0] as { option: string }).option);
+      f.tmp = { ...f.tmp, ret: Math.min(total, Math.max(n, k)) };
+    }
+  }
+  if (atLeast) n = f.tmp!.ret!;
   const g = take(f);
   let picks: DonClass[];
   if (Array.isArray(g)) {
@@ -1015,7 +1079,7 @@ function returnDon(
   d.emit({ type: 'DonReturned', player: p, count: picks.length, to: 'donDeck' });
   if (asMany && picks.length > 0) f.acted = true;
   // "When a DON!! card on your field is returned to your DON!! deck" (OP17-062).
-  fireEvent(d, p, (w) => typeof w === 'object' && w.event === 'donReturned', 'donReturned');
+  fireDonReturned(d, p, picks.length, f.controller);
   return 'next';
 }
 
@@ -1076,9 +1140,41 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
     return 'next';
   }
   if ('lookAtTop' in a) return lookAtTop(d, f, a.lookAtTop);
+  if ('chooseNumber' in a) {
+    // "Choose a cost" (G44): a number decision for the controller, announced to both players.
+    const { min, max, bind: name } = a.chooseNumber;
+    const got = take(f);
+    if (!Array.isArray(got)) {
+      const nums = Array.from({ length: max - min + 1 }, (_, j) => min + j);
+      return ask(d, f, {
+        kind: 'choose',
+        player: you,
+        prompt: `${nameOf(d, f)}: choose a cost (${min} to ${max}).`,
+        min: 1,
+        max: 1,
+        candidates: nums.map((j) => ({ option: String(j) })) as never,
+        picked: [],
+        role: 'mode',
+        options: nums.map((j) => ({ id: String(j), label: String(j) })),
+      });
+    }
+    const n = Math.min(max, Math.max(min, Number((got[0] as { option: string }).option)));
+    f.n = { ...f.n, [name]: n };
+    d.emit({
+      type: 'ModeChosen',
+      instance: f.card,
+      card: f.cardId,
+      mode: n,
+      label: `Chose ${n}`,
+      player: you,
+    });
+    return 'next';
+  }
   if ('reveal' in a) {
     const fromLife = a.reveal.from === 'lifeTop';
-    const top = fromLife ? d.ro(you).life[0] : d.ro(you).deck[0];
+    // The opponent's deck top (G44) is shown to both players and stays where it is.
+    const holder = a.reveal.player === 'opponent' ? other(you) : you;
+    const top = fromLife ? d.ro(holder).life[0] : d.ro(holder).deck[0];
     if (top === undefined) {
       f.b = { ...f.b, [a.reveal.bind]: [] };
       return 'next';
@@ -1092,6 +1188,7 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
       player: you,
       from: fromLife ? 'life' : 'deck',
       reason: 'effect',
+      ...(holder !== you ? { owner: holder } : {}),
     });
     markKnown(d, top, ['p1', 'p2']);
     f.b = { ...f.b, [a.reveal.bind]: [top] };
@@ -1142,7 +1239,8 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
     if (ids === WAIT) return WAIT;
     const group = ids.length > 1 ? d.s.nextMod++ : undefined;
     if (ids.length) f.acted = true;
-    for (const id of ids.slice().reverse()) pushKo(d, id, { kind: 'effect', by: you }, group);
+    for (const id of ids.slice().reverse())
+      pushKo(d, id, { kind: 'effect', by: you }, group, f.card);
     return 'next';
   }
   if ('rest' in a) {
@@ -1178,6 +1276,31 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
     }
     for (const id of held.slice().reverse())
       push(d, { f: 'rest', card: id, by: you, source: f.card, considered: [] });
+    return 'next';
+  }
+  if (
+    'skipRefresh' in a &&
+    (Array.isArray(a.skipRefresh.from) ? a.skipRefresh.from : [a.skipRefresh.from]).includes(
+      'donCostArea',
+    )
+  ) {
+    // "Up to 1 of your opponent's rested DON!! cards will not become active in your opponent's next
+    // Refresh Phase" (G48): DON!! are interchangeable, so "up to N" holds as many as there are
+    // (E-D4); the count is read now and kept as a modifier on that player's Leader.
+    const p = rel(c, a.skipRefresh.owner === 'you' ? 'you' : 'opponent');
+    const pk = a.skipRefresh.pick;
+    const n = pk && ('upTo' in pk || 'exactly' in pk) ? ('upTo' in pk ? pk.upTo : pk.exactly) : 0;
+    const k = Math.min(n, d.ro(p).donRested);
+    if (k <= 0) return 'next';
+    f.acted = true;
+    addModifier(d, {
+      kind: 'skipRefreshDon',
+      target: d.ro(p).leader,
+      amount: k,
+      duration: { kind: 'afterRefresh', player: p },
+      controller: you,
+      source: f.card,
+    });
     return 'next';
   }
   if ('skipRefresh' in a) {
@@ -1330,6 +1453,15 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
     });
     return 'next';
   }
+  if ('turnLifeFaceDown' in a) {
+    // "Turn all of your Life cards face-down" (G41): the face-up ones turn, the rest stay as they
+    // are; with none face-up nothing happens (no event, and "if you do" reads it as not done).
+    const ids = d.ro(you).life.filter((id) => d.card(id).faceUp);
+    if (ids.length === 0) return 'next';
+    f.acted = true;
+    turnFaceDown(d, ids, you);
+    return 'next';
+  }
   if ('trashLifeUntil' in a) {
     // "Trash cards from the top of your Life cards until you have 1 Life card.
     while (d.ro(you).life.length > a.trashLifeUntil)
@@ -1456,6 +1588,8 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
           kind: spec.kind,
           amount: 0,
           ...(spec.scope ? { scope: spec.scope } : {}),
+          ...(spec.by ? { by: spec.by } : {}),
+          ...(spec.filter ? { filter: spec.filter } : {}),
         });
       }
     }
@@ -1763,6 +1897,21 @@ function move(
         faceUp: to.faceUp ?? false,
         extra: { reason: 'effect' },
       });
+    return 'next';
+  }
+  if (zones.length === 1 && zones[0] === 'lifeTopOrBottom') {
+    // "Add 1 card from the top or bottom of your Life cards to your hand" (G45, OP09-104): your own
+    // Life, mandatory; with one card there is nothing to choose. Not damage: no [Trigger] (QA-GR).
+    const life = d.ro(you).life;
+    if (life.length === 0) return 'next';
+    let bottom = false;
+    if (life.length > 1) {
+      const end = lifeEnd(d, f);
+      if (end === WAIT) return WAIT;
+      bottom = end === 'bottom';
+    }
+    moveCard(d, bottom ? life[life.length - 1]! : life[0]!, 'hand', { extra: { reason: 'life' } });
+    f.acted = true;
     return 'next';
   }
   if (zones.length === 1 && zones[0] === 'lifeTop') {

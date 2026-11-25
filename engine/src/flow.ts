@@ -3,7 +3,7 @@
  * the stack until some player owes a decision or the game is over. Every frame is plain data, so a
  * suspended choice is just a frame waiting for its next action.
  */
-import type { Cost, ReplaceEvent } from '@optcg/cards';
+import type { Cost, Filter, ReplaceEvent } from '@optcg/cards';
 import { isEffect } from '@optcg/cards';
 import type { InstanceId, PlayerId } from './api.ts';
 import type { Ability, AutoTiming, InternalStep } from './abilities.ts';
@@ -577,6 +577,7 @@ function runBattle(d: Draft): void {
           card: b.target,
           cause: { kind: 'battle', by: b.attackerOwner },
           considered: [],
+          src: b.attacker,
         });
       }
       return;
@@ -607,6 +608,8 @@ function runDamage(d: Draft, f: Extract<Frame, { f: 'damage' }>): void {
   if (f.pending !== null) return; // waiting on the trigger decision
   if (f.remaining <= 0) {
     pop(d);
+    // "When you take damage" (G43): after the damage processing, the [Trigger] included, ends.
+    if (f.taken) fireDamageTaken(d, f.player);
     return;
   }
   // "If you would take damage, ... instead" (D4): offered before the Life card moves; applying it
@@ -628,6 +631,7 @@ function runDamage(d: Draft, f: Extract<Frame, { f: 'damage' }>): void {
   }
   const card = life[0]!;
   const def = d.s.defs[d.card(card).card]!;
+  f.taken = (f.taken ?? 0) + 1;
   if (f.banish) {
     // CR 10-1-3-1: trashed instead, no [Trigger].
     moveCard(d, card, 'trash', { revealed: true, extra: { reason: 'banish' } });
@@ -644,6 +648,18 @@ function runDamage(d: Draft, f: Extract<Frame, { f: 'damage' }>): void {
       ? `Damage: activate the [Trigger] of ${def.name}, or add it to your hand?`
       : `Damage: add ${def.name} to your hand.`,
   });
+}
+
+/** `player` took damage and its processing is over: the watchers on both fields (G43). */
+function fireDamageTaken(d: Draft, player: PlayerId): void {
+  fire(
+    d,
+    [d.s.active, other(d.s.active)],
+    (q) => fieldCards(d, q),
+    (w, _card, p) =>
+      typeof w === 'object' && w.event === 'damageTaken' && (w.owner === 'you') === (player === p),
+    'damageTaken',
+  );
 }
 
 export function hasScriptedTrigger(s: State, id: InstanceId): boolean {
@@ -702,9 +718,12 @@ export function pushKo(
   card: InstanceId,
   cause: { kind: 'battle' | 'effect' | 'cost'; by: PlayerId },
   group?: number,
+  /** The card whose effect or cost K.O.s, for a protection that names its source (G46). */
+  src?: InstanceId,
 ): void {
   const f: Frame = { f: 'ko', card, cause, considered: [] };
   if (group !== undefined) f.group = group;
+  if (src !== undefined) f.src = src;
   push(d, f);
 }
 
@@ -770,8 +789,15 @@ function runKo(d: Draft, f: Extract<Frame, { f: 'ko' }>): void {
     return;
   }
   const dv = deriveLive(d.s, f.card);
+  // A protection that names the K.O.'s source reads the source card where it is now (G46); one that
+  // has left the game (a card that left the field has a new id) matches nothing.
+  const src = f.src;
+  const source = (by: Filter): boolean =>
+    src !== undefined &&
+    d.s.cards[src] !== undefined &&
+    matches({ s: d.s, you: c.owner, self: f.card, live: true }, src, by);
   if (
-    koProtected(dv, f.cause, c.owner) ||
+    koProtected(dv, f.cause, c.owner, source) ||
     (dv.removalProof && byOpponentEffect(f.cause, c.owner))
   ) {
     d.emit({ type: 'KOPrevented', instance: f.card, card: c.card });
@@ -1343,6 +1369,31 @@ export function fireTrashedFromHand(
   );
 }
 
+/**
+ * `n` DON!! cards of `returner` were returned from the field to the DON!! deck by the effect (or
+ * cost, part of the effect, RL-16) of the ability's controller `by` (G40). One event per
+ * instruction, so "2 or more returned" reads the whole number. The watchers are the cards on both
+ * fields: `owner` is relative to the watcher, `cause` limits it to the watcher's own effects or
+ * the other player's.
+ */
+export function fireDonReturned(d: Draft, returner: PlayerId, n: number, by: PlayerId): void {
+  if (n <= 0) return;
+  fire(
+    d,
+    [d.s.active, other(d.s.active)],
+    (q) => fieldCards(d, q),
+    (w, _card, p) => {
+      if (typeof w !== 'object' || w.event !== 'donReturned') return false;
+      if ((w.owner === 'you') !== (returner === p)) return false;
+      if (w.min !== undefined && n < w.min) return false;
+      if (w.cause === 'yourEffect' && by !== p) return false;
+      if (w.cause === 'opponentEffect' && by === p) return false;
+      return true;
+    },
+    'donReturned',
+  );
+}
+
 /** Named-timing shorthand (CR 10-2). */
 export function fireFor(
   d: Draft,
@@ -1351,22 +1402,6 @@ export function fireFor(
   cardsOf: (p: PlayerId) => InstanceId[],
 ): void {
   fire(d, order, cardsOf, (w) => w === timing, typeof timing === 'string' ? timing : 'event');
-}
-
-/** An event-triggered auto on `p`'s field ("When a DON!! card on your field is returned …"). */
-export function fireEvent(
-  d: Draft,
-  p: PlayerId,
-  match: (w: AutoTiming) => boolean,
-  label: string,
-): void {
-  fire(
-    d,
-    [p],
-    (q) => fieldCards(d, q),
-    (w) => match(w),
-    label,
-  );
 }
 
 /**
@@ -1411,6 +1446,7 @@ function fireDelayed(d: Draft, controller: PlayerId, batch: number): void {
       controller: x.controller,
       timing: 'endOfThisTurn',
       start: x.start,
+      ...(x.b ? { b: x.b } : {}),
     })),
   ];
 }
@@ -1502,12 +1538,13 @@ function drainPending(d: Draft): boolean {
     timing: next!.timing,
     keys: { instance: next!.key },
   });
-  const opts: { start?: number; delayed?: boolean; ev?: Ev } = {};
+  const opts: { start?: number; delayed?: boolean; ev?: Ev; b?: Record<string, InstanceId[]> } = {};
   if (next!.start !== undefined) {
     opts.start = next!.start;
     opts.delayed = true;
   }
   if (next!.ev) opts.ev = next!.ev;
+  if (next!.b) opts.b = next!.b;
   pushEffect(d, next!.card, next!.cardId, ab, next!.controller, 'effect', opts);
   return true;
 }

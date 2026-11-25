@@ -10,7 +10,7 @@
  * +3000 power" sees the +12 cost effects, and "base power becomes 8000 for a Character with 4000
  * base power" sees the printed value. A source with its effects negated (CR 8-2) produces nothing.
  */
-import type { Continuous, Restriction, Selector } from '@optcg/cards';
+import type { Continuous, Filter, Restriction, Selector } from '@optcg/cards';
 import type { InstanceId } from '../api.ts';
 import { deriveAt, type LayerMemo } from '../derive.ts';
 import type { Ability } from '../abilities.ts';
@@ -44,13 +44,22 @@ const RESTRICT_KIND = {
  */
 export function restrictionMod(
   what: Restriction,
-): { kind: ModKind; scope?: NonNullable<Modifier['scope']> } | undefined {
+):
+  | { kind: ModKind; scope?: NonNullable<Modifier['scope']>; by?: Filter; filter?: Filter }
+  | undefined {
   if (typeof what === 'string') {
     const kind = (RESTRICT_KIND as Record<string, ModKind | undefined>)[what];
     return kind ? { kind } : undefined;
   }
-  if ('cannotBeKOd' in what) return { kind: 'cannotBeKOd', scope: what.cannotBeKOd.cause };
+  if ('cannotBeKOd' in what)
+    return {
+      kind: 'cannotBeKOd',
+      scope: what.cannotBeKOd.cause,
+      ...(what.cannotBeKOd.by ? { by: what.cannotBeKOd.by } : {}),
+    };
   if ('cannotBeRested' in what) return { kind: 'cannotBeRested', scope: what.cannotBeRested.by };
+  if ('cannotAttackTarget' in what)
+    return { kind: 'cannotAttackTarget', filter: what.cannotAttackTarget };
   return undefined;
 }
 
@@ -186,6 +195,8 @@ export function computePerms(
                 target: id,
                 amount: 0,
                 ...(spec.scope ? { scope: spec.scope } : {}),
+                ...(spec.by ? { by: spec.by } : {}),
+                ...(spec.filter ? { filter: spec.filter } : {}),
               });
           }
         }

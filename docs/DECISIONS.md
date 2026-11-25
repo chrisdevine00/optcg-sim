@@ -2,6 +2,32 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-25 — M6b-2 wave 5: G39 to G48 (ENGINE_VERSION stays 0.5.16)
+
+- **Context:** wave 5 of the M6b-1 audit (`docs/research/m6b-wave5.md`): `delayed` steps that remember bound cards, `donReturned` qualifiers, Life face state, `returnDon` with a variable count, `damageTaken`, "choose a cost" with a reveal of the opponent's deck top, a move from the top or bottom of Life to the hand, K.O. protection by source, `cannotAttackTarget`, and `skipRefresh` for DON!!. 25 cards become expressible; none is scripted.
+- **Decision:**
+  - **G39** is a runtime fix with no new DSL: `Delayed` and `PendingEffect` carry the frame's `b` and `pushEffect` restores it. A reference to a card that has since left the field finds nothing (M6b-Q38).
+  - **G40** extends the `donReturned` timing (`min`, `cause` with the three values `removed` uses) and replaces `fireEvent` by `fireDonReturned`: one event per returning instruction with the whole count, both fields' watchers, `owner` read. A cost counts as part of the effect (RL-16, M6b-Q31), so EB03-033's "by your effect" includes DON!! −N (M6b-Q65).
+  - **G41** extends the Action `turnLifeFaceDown` (`'all'`, the cost form keeps its number) and adds the `Num` `lifeFaceUp`. A count of face-up cards is a `cmp`, so no new Condition.
+  - **G42** is a cost form `{ returnDon: { atLeast: n } }`: a count decision (fewest first), then the existing class choice; not allowed in a replacement payload, which cannot ask.
+  - **G43** counts the Life cards a damage frame takes and fires when it ends with any: after the [Trigger] resolved, once per damage (M6b-Q66).
+  - **G44** is three small parts instead of one fused action: `chooseNumber` (a `mode` choice stored in the frame's numeric bindings and announced with the existing `ModeChosen`), `reveal` with `player: 'opponent'` (shows the top card to both and marks it known), and a `Num` `chosen`; the comparison is the existing `ref`/`matches` condition with `baseCost: { eq: { chosen } }`. No new decision kind and no new event type (M6b-Q67).
+  - **G45** is an ordinary `move` from `lifeTopOrBottom` to your hand, with `exactly: 1`; the end is a blind choice shared with the `lifeToHand` cost.
+  - **G46** adds `by?: Filter` to the scoped `cannotBeKOd` restriction. The K.O. source travels on the `ko` frame (`src`), not in the `Cause`, because the cause is copied into events and a raw instance id must not reach a view. A filtered protection is kept apart from the bit mask (`Derived.koBy`); a source that is gone matches nothing (M6b-Q68). Filters that read anything relative to the two cards are refused.
+  - **G47** adds the restriction `cannotAttackTarget: Filter` (timed and permanent) as a modifier read by `checkAttack` through `Derived.cannotAttackTarget`.
+  - **G48** reuses `skipRefresh` with a DON!! selector (`donCostArea`, `{ state: 'rested' }`, a count): a `skipRefreshDon` modifier on the Leader holds `amount` rested DON!! through the Refresh Phase. "Up to n" holds as many as there are (E-D4, DON!! are interchangeable). M6b-Q69.
+  - The lethal bound needed two numbers (`lifeFaceUp`, `chosen`); every new action and restriction form is unclassified there, so the solver searches.
+  - **ENGINE_VERSION is not bumped and the goldens are not re-recorded:** no scripted card uses a new shape, `donReturned` already had only `owner: 'you'` watchers, and no existing delayed body reads a binding; the golden games and a 2,000-game property run replay with identical hashes.
+- **Rejected:**
+  - A fused `revealOpponentTopAndCompare` action: it fits six cards and nothing else; the three parts are each reusable (`chooseNumber` for any "choose a number").
+  - A new decision kind and event type for "choose a cost": the option choice (as every DON!! count) and `ModeChosen` already carry them to the UI, the log and the AI.
+  - Putting the K.O. source in `Cause`: events and last-known snapshots carry the cause, and an instance id there would reach a projected view.
+  - Folding the `by` filter into the `koShield` bit mask: a bit cannot hold a filter.
+  - Excluding costs from "by your effect" (the audit's reading of EB03-033): it contradicts the Q31 decision and RL-16 for every other cause; one flag changes it if a ruling says so.
+  - A `Condition` `lifeFaceUp`: a `Num` serves the two cards and composes with `cmp`.
+  - Choosing which rested DON!! are held back: they are interchangeable, so it would ask a question with one answer.
+  - Settling M6b-Q65 to Q69 now.
+
 ## 2026-11-25 — An `attack` timing that names both attacker and target needs both (OP12-081; no ENGINE_VERSION change)
 
 - **Context:** BACKLOG §5: `attackMatch` (engine/src/flow.ts) checked only the selector of the side that watches the event, so "When this Leader attacks your opponent's Leader" (OP12-081 Koala) also fired on an attack on a Character.
