@@ -270,3 +270,152 @@
 .cert-search-incomplete {
   color: var(--color-warning-text);
 }
+
+/* M7 WP4: the five-word strip. Each button is one word; a badge is a small shape that rides the
+   button's top-right corner, so no label ever grows (the longest, "Tempo" with "10/10", is tested
+   at 1280). Under 320 px there is no coach at all (board.md §3.13). */
+.coach-strip {
+  gap: 3px;
+  padding: 0 6px;
+}
+.coach-strip .coach-btn {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  justify-content: center;
+  padding: 0 2px;
+  font-size: var(--text-xs);
+}
+.coach-strip .coach-btn .coach-badge {
+  position: absolute;
+  top: -7px;
+  right: 0;
+  height: 16px;
+  padding: 0 4px;
+  font-size: 10px;
+  line-height: 16px;
+  border: 1px solid var(--color-bg);
+}
+.coach-badge.neutral {
+  background: var(--color-surface-3);
+  color: var(--color-text);
+  border-color: var(--color-line-strong);
+}
+.coach-strip .coach-chevron {
+  flex: none;
+}
+
+.coach-stale {
+  margin: 4px 0 8px;
+  padding: 4px 8px;
+  border: 1px solid var(--color-warning-text);
+  border-radius: var(--radius-1);
+  color: var(--color-warning-text);
+}
+.hint-stale .ex-line,
+.hint-stale .ex {
+  opacity: 0.6;
+}
+.hint-line li.done .ex-text {
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+.hint-line li.done .ex-n {
+  color: var(--color-success-text);
+}
+.hint-keys,
+.hint-alts {
+  margin-top: 8px;
+}
+.hint-in-decision {
+  margin-top: 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-1);
+  background: var(--color-surface-1);
+}
+.staged-note {
+  margin: 8px 0;
+  padding: 6px 8px;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-1);
+  background: var(--color-surface-1);
+}
+.staged-note p {
+  margin: 0;
+}
+.lookaway {
+  margin: 4px 0;
+  font-weight: var(--weight-semibold);
+}
+
+/* The tempo bar: segments differ by pattern as well as tint (never colour alone). */
+.tempo {
+  margin: 8px 0;
+}
+.tempo-bar {
+  display: flex;
+  height: 16px;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-1);
+  overflow: hidden;
+  background: var(--color-bg);
+}
+.tempo.small .tempo-bar {
+  height: 10px;
+}
+.tempo-label {
+  margin: 4px 0 0;
+  font-weight: var(--weight-semibold);
+}
+.tp {
+  display: block;
+  min-width: 4px;
+  border-right: 1px solid var(--color-bg);
+}
+.tp-paid {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--color-line-strong) 0 3px,
+    var(--color-surface-3) 3px 6px
+  );
+}
+.tp-given {
+  background:
+    radial-gradient(var(--color-text-muted) 28%, transparent 30%) 0 0 / 6px 6px,
+    var(--color-surface-3);
+}
+.tp-held {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--color-accent) 0 2px,
+    var(--color-surface-1) 2px 5px
+  );
+}
+.tp-unused {
+  background: var(--color-bg);
+  box-shadow: inset 0 0 0 2px var(--color-warning-text);
+}
+.tempo-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 4px 0 8px;
+  padding: 0;
+  list-style: none;
+  color: var(--color-text-muted);
+}
+.tempo-legend .key {
+  display: inline-block;
+  width: 14px;
+  height: 10px;
+  margin-right: 4px;
+  border: 1px solid var(--color-line-strong);
+  vertical-align: middle;
+}
+@media (prefers-reduced-motion: reduce) {
+  .coach-strip .coach-btn,
+  .tp {
+    transition: none;
+  }
+}

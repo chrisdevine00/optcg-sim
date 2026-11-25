@@ -1419,6 +1419,13 @@ function defenceContent(g: G): Content {
         {!g.ctl.hotseat && staged && !hidden && (
           <RuleNote kind="battle" compact={g.L.rail.tall.parts[1] < 400} />
         )}
+        {g.ctl.hotseat && !hidden && (
+          // F13b.3: the attacker looks away while the defender's hand shows. A table convention,
+          // not security: the line is the same for any hand.
+          <p className="lookaway" data-testid="look-away">
+            {g.names.player[other(g.me)]}, look away.
+          </p>
+        )}
         <div className="lanes">
           <div className="lane">
             <span className="ln">Block</span>

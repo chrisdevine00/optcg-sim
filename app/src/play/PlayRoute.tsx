@@ -72,9 +72,12 @@ async function startGame(choice: SetupChoice): Promise<GameController> {
     // The AI's own list (its decklist, or its archetype's first list), and the public prior for
     // the human's Leader (ARCHITECTURE §4.3).
     const aiDeck = sc.p2.decklist ?? deckByLeader(p2Leader)?.spec.main ?? [];
+    // The player's own list, for the coach's hint (the player's own data, never the AI's worker).
+    const myDeck = sc.p1.decklist ?? deckByLeader(p1Leader)?.spec.main ?? [];
     const cards = await loadCards([
       ...scenarioCardIds(sc),
       ...aiDeck,
+      ...myDeck,
       ...priorCardIds(p1Leader),
       // The public prior for their Leader: the lethal detector’s biggest Counter (ARCHITECTURE §4.4).
       ...priorCardIds(p2Leader),
@@ -85,6 +88,7 @@ async function startGame(choice: SetupChoice): Promise<GameController> {
       ...aiDeck,
     ];
     config.aiDeck = aiDeck;
+    config.myDeck = myDeck;
     if (mode === 'hotseat')
       config.names = { p1: choice.names[0] || 'Player 1', p2: choice.names[1] || 'Player 2' };
     else
@@ -108,6 +112,7 @@ async function startGame(choice: SetupChoice): Promise<GameController> {
   if (config.mode === 'ai') config.names.p2 = cards.get(theirDeck.leader)?.name ?? 'Opponent';
   config.aiCardIds = [theirDeck.spec.leader, ...theirDeck.spec.main];
   config.aiDeck = theirDeck.spec.main;
+  config.myDeck = mineDeck.spec.main;
   const chooser: PlayerId | undefined =
     choice.first === 'me' ? 'p1' : choice.first === 'opp' ? 'p2' : undefined;
   const ctl = new GameController(

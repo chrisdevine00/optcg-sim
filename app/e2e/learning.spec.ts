@@ -24,6 +24,16 @@ async function check(page: Page, info: TestInfo, name: string) {
 const lethalGame = (page: Page, extra = '') =>
   startGame(page, `scenario=lethalDemo&speed=4&opp=pirate&aibudget=iterations${extra}`);
 
+/** The coach opens on the Hint tab now (M7 WP4): these tests start on the tab they exercise. */
+const seedTab = (page: Page, tab: string) =>
+  page.addInitScript((t) => {
+    try {
+      window.localStorage.setItem('optcg.coach.v1', JSON.stringify({ tab: t }));
+    } catch {
+      /* blocked */
+    }
+  }, tab);
+
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     try {
@@ -136,6 +146,7 @@ test.describe('the tiered lethal detector (learning-ui §3.1)', () => {
   test('always-on tier 2 checks by itself at the lowest priority, badges the button and never moves focus', async ({
     page,
   }) => {
+    await seedTab(page, 'lethal');
     await lethalGame(page);
     await nextDecision(page);
     await page.keyboard.press('c');
@@ -328,6 +339,7 @@ test.describe('focus stays in the coach (L-07) and DON!! math on the board (L-09
   test('"DON!! math on the board" is off by default and tags legal targets when on', async ({
     page,
   }, info) => {
+    await seedTab(page, 'math');
     await lethalGame(page);
     await nextDecision(page);
     await page.locator('[data-zone="my-row"].bc-leader').click();

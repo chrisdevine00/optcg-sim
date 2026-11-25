@@ -2,6 +2,22 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-25 — M7 WP4: the coach panel
+
+- **Context:** learning-ui §2.1 to §2.9, flows F9, accessibility §3.12; WP1 (hint), WP2 (`donLedger`), WP3 (threat) on main. Code: `app/src/play/coach/{Coach,HintSection,MathTempo}.tsx`, `hint.ts`, `tempo.ts`, `coach.ts`.
+- **Decision:**
+  - **Strip:** Hint, Why, Lethal, Math, Tempo and the chevron, each one word; the key letters are no longer drawn on the buttons (a 320 px rail has about 50 px per button) and the badge rides the button's top-right corner so no label grows. Badges: "ready" (Hint, "old" when stale), the existing Lethal ones plus "▲ Threat" when alerts are on, and Tempo's "paid+given/total" (a silent meter, so always shown). The profile `tab` default is now `hint`; a stored tab is kept.
+  - **The coach worker** gets the player's own `game` (own list, both Leaders, tier Warlord) in `init`, via `GameConfig.myDeck` (set from the chosen deck or the scenario's list) and `coachPort(init, game?)`. The AI seat's worker never sees it (test). Hint and threat requests are `searchView(me)` only.
+  - **Stopping a hint:** Esc cancels the request and the next request to that worker restarts it (`CoachPort.restart?`, `AiClient.restart` = the crash path) if the stopped hint's budget has not elapsed. The only higher-priority request that can wait behind a hint is none (the coach worker has priorities 2 to 4), so the rule is "any request behind a stopped hint".
+  - **Do step 1 / Stage this:** main-phase: `controller.stage` lines up the next action of the hint's first step from the legal list (picks of one set: whichever the list offers, R14); the decision panel's note slot shows "Lined up by the coach: ... Do it / Clear", focus goes to Do it, and nothing is applied until the player presses it. Defence: the Blocker and Counters go into the defence planner. Where the decision panel owns the rail (a defence, a choice) the hint renders inside the decision body.
+  - **Ticks:** the player's own actions are recorded (`Coach.noteAction`, before the engine applies) and read against the line by kind, printed card id and target; a step ticks when done, anything else greys the hint ("Board changed: ask again"). A new turn clears it. A hint asked on their move waits and starts when the decision is yours.
+  - **Threat (additive protocol change):** the `threat` request gains `priority?: 2 | 4` so the always-on alert runs at 4 and a press at 2 (`priorityOf`). Runs at their Main Phase start and after each of their moves only when "Tell me when their board threatens lethal" is on; `L` asks at 2. Results are keyed to the position; the copy always says it does not count their hand. The alert speaks only for a proven threat.
+  - **Tempo:** from `donLedger`; frozen at your last turn's split on theirs; E06/E07 lines from `explainUnused`/`explainHeld` on your turn.
+  - **Hotseat:** no coach panel, hint or threat; the defender's panel shows "<attacker>, look away." while the hand is shown (F13b.3).
+  - **Tutorial:** coach features stay off (`supported` is false in the tutorial).
+- **Cut:** "Make taller" on a long hint (the hint scrolls in the open coach); the lesson text has no link target until the curriculum routes exist (M8+).
+- **Rejected:** a second hint button state for "stale vs finished" badge text; re-running the hint on a board change (flows F9.3: never automatic).
+
 ## 2026-11-25 — M7 WP2: blunder scoring and the DON!! tempo ledger
 
 - **Context:** learning-ui §2.8 and §2.9, explanations E06, E07, E17. Code: `ai/src/coach/{blunder,tempo,explain-blunder}.ts`, `ai/src/search/score.ts` (the only place with full-state engine calls, by the ESLint boundary), worker `score` branch.

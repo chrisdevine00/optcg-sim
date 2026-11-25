@@ -1,9 +1,9 @@
 /**
  * The coach panel (learning-ui §2.1, board.md §3.13): a strip in the rail between the log and the
- * decision panel, opening to a section (Why or Lethal), or tall for tier 3 and the guided count.
- * It never takes focus, opens by itself or makes a sound unless the player asked (§2.2): the only
- * unprompted signals are the Lethal button's badge and a polite line, and only when the player has
- * switched the detector on.
+ * decision panel, opening to a section (Hint, Why, Lethal, Math or Tempo), or tall for tier 3 and
+ * the guided count. It never takes focus, opens by itself or makes a sound unless the player asked
+ * (§2.2): the only unprompted signals are badges, and a polite line for a feature the player has
+ * switched on.
  */
 import { useEffect, useRef } from 'react';
 import type { Explanation } from '@optcg/ai';
@@ -11,13 +11,34 @@ import type { G } from '../game/ui.ts';
 import { num } from '../game/text.ts';
 import { CertaintyChip, ExplanationView } from './ExplanationView.tsx';
 import type { GuidedState, Tier } from './coach.ts';
-import type { AlwaysOn } from './profile.ts';
-import { lethalBadge } from './badge.ts';
+import type { AlwaysOn, CoachTab } from './profile.ts';
+import { lethalBadge, type Badge } from './badge.ts';
+import { HintBody } from './HintSection.tsx';
+import { MathSection, TempoSection, ThreatView } from './MathTempo.tsx';
+import { tempoBadge } from './tempo.ts';
 import './coach.css';
 
 export type CoachMode = 'strip' | 'open' | 'tall';
 
 export const STRIP_H = 48;
+
+/** The Hint button's badge: a finished hint is "ready"; a stale one says so. */
+function hintBadge(g: G): Badge | null {
+  const c = g.ctl.coach;
+  const h = c.hint;
+  if (h.status === 'ready')
+    return c.hintProgress().stale ? { glyph: '⚠', text: 'old' } : { glyph: '', text: 'ready' };
+  if (h.status === 'thinking' || h.status === 'waiting') return { glyph: '…', text: 'wait' };
+  return null;
+}
+
+/** The Lethal button's badge on their turn: a threat found, when the player switched alerts on. */
+function threatBadge(g: G): Badge | null {
+  const c = g.ctl.coach;
+  if (!c.profile.alerts || c.threat.status !== 'ready' || c.threat.result?.status !== 'proven')
+    return null;
+  return { glyph: '▲', text: 'Threat' };
+}
 
 export function CoachPanel({
   g,
@@ -37,9 +58,13 @@ export function CoachPanel({
   const resultRef = useRef<HTMLDivElement>(null);
   const { profile } = coach;
   const open = mode !== 'strip';
-  const badge = lethalBadge(coach);
+  const lethalB = lethalBadge(coach) ?? threatBadge(g);
   const canLethal = coach.supported;
+  const canHint = coach.hintSupported;
   const hasWhy = g.ctl.lastWhy() !== null && !g.ctl.hotseat;
+  const hintB = hintBadge(g);
+  const tempoB = coach.tempo ? tempoBadge(coach.tempo.ledger) : null;
+  const tab: CoachTab = profile.tab;
 
   // Focus goes to the section's result only when the player pressed a coach key (§2.1).
   const signal = coach.focusSignal;
@@ -53,6 +78,11 @@ export function CoachPanel({
     return () => clearTimeout(t);
   }, [signal]);
 
+  const pick = (t: CoachTab) => {
+    if (open && profile.tab === t) coach.toggle();
+    else coach.setProfile({ expanded: true, tab: t });
+  };
+
   return (
     <section
       className={`coach ${mode}`}
@@ -61,15 +91,30 @@ export function CoachPanel({
       data-mode={mode}
     >
       <div className="coach-strip" role="group" aria-label="Coach sections">
+        {canHint && (
+          <button
+            type="button"
+            className="coach-btn"
+            id="coach-hint"
+            aria-pressed={open && tab === 'hint'}
+            aria-describedby="coach-key-h"
+            onClick={() => pick('hint')}
+          >
+            Hint
+            {hintB && (
+              <span className="coach-badge" data-testid="hint-badge">
+                {hintB.glyph && <span aria-hidden="true">{hintB.glyph}</span>}
+                <span className={hintB.glyph ? 'sr-only' : undefined}>{hintB.text}</span>
+              </span>
+            )}
+          </button>
+        )}
         {hasWhy && (
           <button
             type="button"
             className="coach-btn"
-            aria-pressed={open && profile.tab === 'why'}
-            onClick={() => {
-              if (open && profile.tab === 'why') coach.toggle();
-              else coach.setProfile({ expanded: true, tab: 'why' });
-            }}
+            aria-pressed={open && tab === 'why'}
+            onClick={() => pick('why')}
           >
             Why
           </button>
@@ -79,7 +124,7 @@ export function CoachPanel({
             type="button"
             className="coach-btn"
             id="coach-lethal"
-            aria-pressed={open && profile.tab === 'lethal'}
+            aria-pressed={open && tab === 'lethal'}
             aria-describedby="coach-key-l"
             onClick={() => {
               // A press of the button is a press of L: it reveals the next tier.
@@ -87,16 +132,47 @@ export function CoachPanel({
             }}
           >
             Lethal
-            {badge && (
+            {lethalB && (
               <span className="coach-badge" data-testid="lethal-badge">
-                {badge.glyph && <span aria-hidden="true">{badge.glyph} </span>}
-                {badge.text}
+                {lethalB.glyph && <span aria-hidden="true">{lethalB.glyph} </span>}
+                {lethalB.text}
               </span>
             )}
-            <kbd aria-hidden="true">L</kbd>
           </button>
         )}
-        {/* NVDA takes L and C once focus is in the coach (L-SR12): say where they work. */}
+        {canLethal && (
+          <button
+            type="button"
+            className="coach-btn"
+            id="coach-math"
+            aria-pressed={open && tab === 'math'}
+            onClick={() => pick('math')}
+          >
+            Math
+          </button>
+        )}
+        {canLethal && (
+          <button
+            type="button"
+            className="coach-btn"
+            id="coach-tempo"
+            aria-pressed={open && tab === 'tempo'}
+            onClick={() => pick('tempo')}
+          >
+            Tempo
+            {tempoB && (
+              <span className="coach-badge neutral" data-testid="tempo-badge">
+                {tempoB}
+              </span>
+            )}
+          </button>
+        )}
+        {/* NVDA takes H, L and C once focus is in the coach (L-SR12): say where they work. */}
+        {canHint && (
+          <span id="coach-key-h" className="sr-only">
+            The H key works from the board. Here, press Enter.
+          </span>
+        )}
         {canLethal && (
           <span id="coach-key-l" className="sr-only">
             The L key works from the board. Here, press Enter.
@@ -120,8 +196,18 @@ export function CoachPanel({
       </div>
       {open && (
         <div className="coach-body" id="coach-body">
-          {profile.tab === 'why' ? (
+          {tab === 'why' ? (
             <WhySection g={g} resultRef={resultRef} onWhy={onWhy} />
+          ) : tab === 'math' ? (
+            <MathSection g={g} />
+          ) : tab === 'tempo' ? (
+            <TempoSection g={g} />
+          ) : tab === 'hint' ? (
+            canHint ? (
+              <HintBody g={g} />
+            ) : (
+              <p className="subtle">The hint is for games against the AI.</p>
+            )
           ) : (
             <LethalSection g={g} resultRef={resultRef} />
           )}
@@ -149,7 +235,11 @@ function WhySection({
   return (
     <div ref={resultRef} tabIndex={-1} className="coach-result" aria-label="Why the AI did that">
       {!ex ? (
-        <p className="subtle">No AI move to explain yet.</p>
+        <p className="subtle">
+          {g.ctl.config.tier === 'rookie'
+            ? 'Rookie picks a random legal move, except that it always blocks or counters a lethal attack.'
+            : 'No AI move to explain yet.'}
+        </p>
       ) : (
         <>
           <ExplanationView
@@ -158,6 +248,12 @@ function WhySection({
             verbosity={g.ctl.coach.profile.verbosity}
             idPrefix="coach-why"
           />
+          {/* Their turn is still being played: only what has been played is explained (E14). */}
+          {g.view.turn.activePlayer === g.opp && !g.view.result && (
+            <p className="coach-note" data-testid="why-hidden-steps">
+              Further steps hidden until played.
+            </p>
+          )}
           <button type="button" className="linkbtn" onClick={onWhy}>
             Open in a window (W)
           </button>
@@ -203,28 +299,30 @@ function LethalSection({
       </select>
     </label>
   );
-  const donMath = (
+  const alerts = (
     <label className="coach-setting coach-check">
       <input
         type="checkbox"
-        checked={profile.donMath}
-        onChange={(e) => coach.setProfile({ donMath: e.target.checked })}
+        checked={profile.alerts}
+        onChange={(e) => coach.setProfile({ alerts: e.target.checked })}
       />
-      <span>DON!! math on the board</span>
+      <span>Tell me when their board threatens lethal</span>
     </label>
   );
   // One tree for every state, with the detector setting in the same slot, so changing it (which
   // re-renders this section) never remounts the control or drops the keyboard's place in it.
   const unavailable = !lethal.key;
+  const theirTurn = unavailable && !!coach.threat.key;
   const label = guided ? 'Count it with me' : 'Lethal';
   return (
     <div ref={resultRef} tabIndex={-1} className="coach-result" role="group" aria-label={label}>
       <div className="coach-state">
-        {unavailable && (
+        {theirTurn && <ThreatView g={g} />}
+        {unavailable && !theirTurn && (
           <p className="subtle">
             {g.ctl.hotseat
               ? 'The lethal detector is for games against the AI.'
-              : 'Available in your Main Phase, once it is your move.'}
+              : 'Available in your Main Phase, once it is your move. In their Main Phase it checks their threat.'}
           </p>
         )}
         {!unavailable && guided && <GuidedCount g={g} guided={guided} />}
@@ -259,7 +357,7 @@ function LethalSection({
         {!unavailable && !guided && lethal.status === 'ready' && tier >= 3 && <Tier3 g={g} />}
       </div>
       {settings}
-      {donMath}
+      {alerts}
     </div>
   );
 }

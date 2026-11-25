@@ -21,9 +21,9 @@ export type Work = Extract<
 export function priorityOf(w: Work): number {
   switch (w.type) {
     case 'lethal':
+    case 'threat':
       return w.priority ?? 2;
     case 'hint':
-    case 'threat':
       return 2;
     case 'score':
       return 3;

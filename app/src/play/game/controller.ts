@@ -61,8 +61,17 @@ export interface GameConfig {
    * changes.
    */
   tutorial?: TutorialFilter;
-  /** Tests: an in-process stand-in for the coach's worker (a second client). */
-  coachPort?: (cards: Card[]) => CoachPort;
+  /**
+   * The human's own main deck (card ids). The coach's worker gets it, the player's own list, so a
+   * hint can be searched from it (M7 WP4); it never reaches the AI seat's worker. Absent: the hint
+   * uses the public archetype list for the player's Leader.
+   */
+  myDeck?: string[];
+  /**
+   * Tests: an in-process stand-in for the coach's worker (a second client). `game` is the player's
+   * own list and the two Leaders (Warlord tier), present when the player's deck is known.
+   */
+  coachPort?: (cards: Card[], game?: GameInfo) => CoachPort;
   /**
    * Review (learning-ui §4.4): start from the first `actions.length` actions of a finished game's
    * record, with its hidden cards, instead of a new game. `readOnly` makes it a restored board to
@@ -254,7 +263,13 @@ export class GameController {
       myDecision: () => this.myDecision(),
       announce: (t) => this.announce(t),
       notify: () => this.notifyRaw(),
-      makePort: (init) => (config.coachPort ? config.coachPort(init) : new AiClient(init)),
+      tutorial: !!config.tutorial,
+      opponentName: () => config.names[config.human === 'p1' ? 'p2' : 'p1'] || 'the opponent',
+      legalActions: () => this.actions(),
+      stage: (a) => this.stage(a),
+      ownDeck: config.myDeck ?? [],
+      makePort: (init, game) =>
+        config.coachPort ? config.coachPort(init, game) : new AiClient(init, game),
     });
     this.session.subscribe(() => this.coach.sync());
     this.seat = config.mode === 'hotseat' ? (this.session.decider() ?? 'p1') : config.human;
@@ -1201,8 +1216,10 @@ export class GameController {
         .zones[this.me].hand.find((x) => x.handle === action.card);
       this.pendingPlay = c?.card ? (this.cards.get(c.card)?.name ?? null) : null;
     } else if (action.type !== 'pick' && action.type !== 'done') this.pendingPlay = null;
+    this.coach.noteAction(action);
     const r = this.session.apply(this.me, action, intentId);
     if (!r.ok) {
+      this.coach.unnoteAction();
       this.error = `That move couldn’t be applied. Nothing changed. (${r.error ?? 'unknown'})`;
       this.bump();
       return false;
@@ -1247,8 +1264,10 @@ export class GameController {
         if (v.decision.kind === 'counter' && want === 'block') continue;
         break;
       }
+      this.coach.noteAction(a);
       const r = this.session.apply(me, a, intentId);
       if (!r.ok) {
+        this.coach.unnoteAction();
         this.error = `That move couldn’t be applied. Nothing changed. (${r.error ?? 'unknown'})`;
         break;
       }

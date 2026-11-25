@@ -31,6 +31,7 @@ import {
 } from '../rail/Decision.tsx';
 import { GameLog, RailHeader } from '../rail/Rail.tsx';
 import { CoachPanel, STRIP_H, type CoachMode } from '../coach/Coach.tsx';
+import { HintBody, StagedNote } from '../coach/HintSection.tsx';
 import type { GameController } from './controller.ts';
 import { useFocusRescue } from './focus.ts';
 import { Arrows, spokenArrows } from '../arrows.tsx';
@@ -670,6 +671,17 @@ export function Game({
     }
 
     if (key === 'Escape') {
+      // A hint that is thinking stops, and one the player is reading goes away (flows F9, WP4).
+      const co = ctl.coach;
+      if (
+        co.hint.status !== 'idle' &&
+        (co.hint.status !== 'ready' || !!t?.closest('[data-hint]')) &&
+        !(mine && ui.kind !== 'idle')
+      ) {
+        e.preventDefault();
+        co.discardHint();
+        return;
+      }
       e.preventDefault();
       if (why) setWhy(null);
       if (
@@ -699,10 +711,11 @@ export function Game({
       !ctl.hotseat &&
       !ctl.readOnly &&
       !ctl.config.tutorial &&
-      (key === 'l' || key === 'L' || key === 'c' || key === 'C')
+      (key === 'l' || key === 'L' || key === 'c' || key === 'C' || key === 'h' || key === 'H')
     ) {
       e.preventDefault();
-      if (key === 'l' || key === 'L') ctl.coach.press(tall);
+      if (key === 'h' || key === 'H') ctl.coach.askHint();
+      else if (key === 'l' || key === 'L') ctl.coach.press(tall);
       else if (tall && ctl.coach.supported)
         // L-SR2: say why nothing opened (the tall decision panel owns the rail).
         ctl.announce(
@@ -1241,6 +1254,24 @@ export function Game({
                     parts={parts}
                     focusSignal={focusSignal}
                     bodyHidden={cmode === 'tall'}
+                    {...(!tutorialOn && !ctl.hotseat && !ctl.readOnly
+                      ? {
+                          noteSlot: (
+                            <>
+                              <StagedNote g={g} />
+                              {/* The decision panel owns the rail (a defence, a choice): the hint shows here. */}
+                              {coachRoom &&
+                                cmode === 'strip' &&
+                                tall &&
+                                coach.hint.status !== 'idle' && (
+                                  <div className="hint-in-decision">
+                                    <HintBody g={g} />
+                                  </div>
+                                )}
+                            </>
+                          ),
+                        }
+                      : {})}
                     {...(tutorialOn ? { tutorial: true } : {})}
                     {...(tutorialSlot ? { tutorialSlot } : {})}
                   />

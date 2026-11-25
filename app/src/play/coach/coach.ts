@@ -11,6 +11,7 @@
 import type { Card } from '@optcg/cards';
 import {
   checkGuidedCount,
+  isNotImplemented,
   explainLethal,
   guidedCount,
   priorCardIds,
@@ -18,11 +19,14 @@ import {
   tier2,
   type CountCheck,
   type Explanation,
+  type GameInfo,
   type GuidedCount,
+  type HintResult,
   type LethalResult,
+  type ThreatResult,
   type Tier1,
 } from '@optcg/ai';
-import type { PlayerId, ProjectedView } from '@optcg/engine';
+import type { Action, PlayerId, ProjectedView } from '@optcg/engine';
 import type { GameSession } from '../../session/index.ts';
 import type { CoachPort } from '../game/ai-client.ts';
 import {
@@ -32,6 +36,17 @@ import {
   type AlwaysOn,
   type CoachProfile,
 } from './profile.ts';
+import {
+  NO_HINT,
+  firstStepDone,
+  nextStage,
+  progressFor,
+  seenIn,
+  stepRefs,
+  type HintProgress,
+  type HintState,
+} from './hint.ts';
+import { ledgerOf, type TempoLedger } from './tempo.ts';
 
 /** What the coach needs from its game. */
 export interface CoachHost {
@@ -46,8 +61,21 @@ export interface CoachHost {
   announce(text: string): void;
   /** Re-render. Never calls `Coach.sync`. */
   notify(): void;
-  /** The worker for the detector, started on first use with `init` data. */
-  makePort(init: Card[]): CoachPort;
+  /** The tutorial runs without the coach (M7 WP6). */
+  readonly tutorial: boolean;
+  /** The player's own main deck (card ids), for the hint; empty when it is not known. */
+  readonly ownDeck: readonly string[];
+  /** The opponent's name, for "Waiting for <name>'s move". */
+  opponentName(): string;
+  /** The seat's legal actions now (what `stage` accepts). */
+  legalActions(): Action[];
+  /** Line one action up for the player to confirm (the controller's `stage`). */
+  stage(action: Action | null): boolean;
+  /**
+   * The coach's worker, started on first use with `init` data (card data the player may see, their
+   * own list) and, when the player's own list is known, the game (own deck, both Leaders).
+   */
+  makePort(init: Card[], game?: GameInfo): CoachPort;
 }
 
 export type Tier = 0 | 1 | 2 | 3;
@@ -76,6 +104,21 @@ export interface GuidedState {
 
 const IDLE: LethalState = { key: null, status: 'idle', result: null, tier: 0, auto: false };
 
+/** The opponent's-turn threat check (WP3), keyed to the position like the lethal answer. */
+export interface ThreatState {
+  key: string | null;
+  status: 'idle' | 'checking' | 'ready' | 'failed';
+  result: ThreatResult | null;
+  /** The background alert asked, not a press of L. */
+  auto: boolean;
+}
+const IDLE_THREAT: ThreatState = { key: null, status: 'idle', result: null, auto: false };
+
+/** A hint search's budget: typical 1.5 to 2.5 s (flows F9). */
+export const HINT_BUDGET_MS = 2000;
+/** The threat check's cap (WP3's own default, in ms). */
+const THREAT_CAP_MS = 1500;
+
 /**
  * Wall-clock caps for the live detector: a search that runs out is "Couldn't finish checking",
  * never "no lethal". The coach's worker is its own, so a long search never delays the AI's turn.
@@ -103,10 +146,25 @@ export class Coach {
   focusSignal = 0;
   /** `tall` was asked for by the player (tier 3, the guided count). */
   wantTall = false;
+  /** The hint (M7 WP4): asked by H or the button only, never by itself. */
+  hint: HintState = NO_HINT;
+  /** Bumps when the player asked for the hint (H): focus goes to its result. */
+  hintFocus = 0;
+  /** The last `hintFocus` the hint section acted on (so a remount never moves focus). */
+  hintFocusSeen = 0;
+  /** The opponent's-turn threat check. */
+  threat: ThreatState = IDLE_THREAT;
+  /** Your DON!! split, as it stood in your last turn's view (frozen on theirs, learning-ui §2.9). */
+  tempo: { ledger: TempoLedger; turn: number } | null = null;
 
   private port: CoachPort | null = null;
   private pending: { id: number; key: string; auto: boolean } | null = null;
+  private hintPending: number | null = null;
+  private threatPending: number | null = null;
+  /** A hint the player stopped may still be running: until then a new request restarts the worker. */
+  private abandonedUntil = 0;
   private lastSpoken = '';
+  private lastThreatSpoken = '';
 
   constructor(private readonly host: CoachHost) {}
 
@@ -116,7 +174,12 @@ export class Coach {
 
   /** The detector runs against the AI, in the player's own idle Main Phase. */
   get supported(): boolean {
-    return !this.host.hotseat && !this.host.readOnly;
+    return !this.host.hotseat && !this.host.readOnly && !this.host.tutorial;
+  }
+
+  /** A hint is for the player's own decisions against the AI (not a puzzle, which is the exercise). */
+  get hintSupported(): boolean {
+    return this.supported && !this.host.puzzle;
   }
 
   /** Is the player in an idle Main Phase decision (the only time a lethal check means anything)? */
@@ -129,6 +192,9 @@ export class Coach {
 
   /** Called on every change of the game: keeps the answer tied to the position. */
   sync(): void {
+    this.refreshTempo();
+    this.syncHint();
+    this.syncThreat();
     const key = this.positionKey();
     if (key === this.lethal.key) return;
     this.cancelPending();
@@ -148,8 +214,10 @@ export class Coach {
   private ensurePort(view: ProjectedView): CoachPort {
     if (!this.port) {
       const opp: PlayerId = this.host.me === 'p1' ? 'p2' : 'p1';
-      const leader = view.zones[opp].leader[0]?.card;
-      // The public prior for their Leader's archetype, then whatever the player can see.
+      const oppLeader = view.zones[opp].leader[0]?.card ?? '';
+      const ownLeader = view.zones[this.host.me].leader[0]?.card ?? '';
+      // The public prior for their Leader's archetype, whatever the player can see, and the
+      // player's own list: all of it the player's own or public (the AI seat's worker never gets it).
       const init: Card[] = [];
       const seen = new Set<string>();
       const add = (id: string | null | undefined) => {
@@ -159,18 +227,34 @@ export class Coach {
           init.push(c);
         }
       };
-      add(leader);
-      this.port = this.host.makePort(init);
+      add(oppLeader);
+      add(ownLeader);
+      for (const id of this.host.ownDeck) add(id);
+      const game: GameInfo | undefined =
+        ownLeader && oppLeader && this.host.ownDeck.length > 0
+          ? {
+              tier: 'warlord',
+              ownDeck: [...this.host.ownDeck],
+              leader: ownLeader,
+              opponentLeader: oppLeader,
+              budgets: 'ms',
+            }
+          : undefined;
+      this.port = this.host.makePort(init, game);
     }
     return this.port;
   }
 
-  private request(auto: boolean, capMs: number = auto ? CAP_MS.auto : CAP_MS.press): void {
-    const key = this.lethal.key;
-    if (!key) return;
-    const view = this.host.session.view(this.host.me);
+  /**
+   * The worker for a request now: card data the player's own view shows goes first, and a worker
+   * still running a hint the player stopped is restarted (a running request cannot be interrupted).
+   */
+  private portFor(view: ProjectedView): CoachPort {
     const port = this.ensurePort(view);
-    // Card data the player's own view shows, plus the public prior the worker already holds.
+    if (this.abandonedUntil > performance.now()) {
+      this.abandonedUntil = 0;
+      port.restart?.();
+    }
     const cards: Card[] = [];
     for (const id of visibleIds(view)) {
       const c = this.host.cards.get(id);
@@ -178,6 +262,15 @@ export class Coach {
     }
     for (const c of this.priorCards(view)) cards.push(c);
     port.reveal(cards);
+    return port;
+  }
+
+  private request(auto: boolean, capMs: number = auto ? CAP_MS.auto : CAP_MS.press): void {
+    const key = this.lethal.key;
+    if (!key) return;
+    const view = this.host.session.view(this.host.me);
+    // Card data the player's own view shows, plus the public prior the worker already holds.
+    const port = this.portFor(view);
     const r = port.lethal(this.host.session.searchView(this.host.me), {
       priority: auto ? 4 : 2,
       capMs,
@@ -224,6 +317,8 @@ export class Coach {
 
   dispose(): void {
     this.cancelPending();
+    this.cancelHint();
+    this.cancelThreat();
     this.port?.terminate();
     this.port = null;
   }
@@ -279,7 +374,13 @@ export class Coach {
       return;
     }
     if (!this.lethal.key) {
-      this.host.announce('Lethal check: available in your Main Phase.');
+      if (this.threat.key) {
+        this.pressThreat();
+        return;
+      }
+      this.host.announce(
+        'Lethal check: available in your Main Phase, or when their Main Phase starts.',
+      );
       return;
     }
     this.profile = { ...this.profile, expanded: true, tab: 'lethal' };
@@ -353,12 +454,312 @@ export class Coach {
   }
 
   // -------------------------------------------------------------------------------------------
+  // The hint (learning-ui §2.4, flows F9): only on a press, from the player's own search view
+  // -------------------------------------------------------------------------------------------
+
+  /** H or the Hint button. At a decision you owe it asks the coach's worker; on their move it waits. */
+  askHint(): void {
+    if (!this.hintSupported) {
+      this.host.announce(
+        this.host.hotseat
+          ? 'Hint: not available in a two-player game.'
+          : 'Hint: not available here.',
+      );
+      return;
+    }
+    const v = this.host.session.view(this.host.me);
+    this.profile = { ...this.profile, expanded: true, tab: 'hint' };
+    saveProfile(this.profile);
+    this.wantTall = false;
+    this.hintFocus++;
+    if (v.result) {
+      this.host.announce('Hint: the game is over.');
+      this.host.notify();
+      return;
+    }
+    this.cancelHint();
+    if (!this.host.myDecision()) {
+      this.hint = { ...NO_HINT, status: 'waiting', turn: v.turn.number };
+      this.host.announce(`Hint: waiting for ${this.host.opponentName()}’s move.`);
+      this.host.notify();
+      return;
+    }
+    this.startHint();
+  }
+
+  private startHint(): void {
+    const view = this.host.session.view(this.host.me);
+    const port = this.portFor(view);
+    const r = port.hint(this.host.session.searchView(this.host.me), { budgetMs: HINT_BUDGET_MS });
+    this.hintPending = r.id;
+    this.hint = { ...NO_HINT, status: 'thinking', turn: view.turn.number, seen: seenIn(view) };
+    this.host.announce('Hint: thinking.');
+    this.host.notify();
+    r.result.then(
+      (a) => {
+        if (this.hintPending !== r.id) return;
+        this.hintPending = null;
+        if (isNotImplemented(a.result)) {
+          this.hint = { ...this.hint, status: 'failed' };
+        } else {
+          this.hint = { ...this.hint, status: 'ready', result: a.result };
+          this.speakHint(a.result);
+        }
+        this.host.notify();
+      },
+      (e: unknown) => {
+        if (this.hintPending !== r.id) return;
+        this.hintPending = null;
+        if (e instanceof Error && e.message === 'cancelled') return;
+        this.hint = { ...this.hint, status: 'failed' };
+        this.host.notify();
+      },
+    );
+  }
+
+  private speakHint(r: HintResult): void {
+    const first = r.line[0]?.text;
+    const n = r.line.length;
+    this.host.announce(
+      `Hint ready: ${r.explanation.claim}${n > 0 ? ` ${n} ${n === 1 ? 'step' : 'steps'}.` : ''}${first ? ` Step 1: ${first}` : ''}`,
+    );
+  }
+
+  private cancelHint(): void {
+    if (this.hintPending !== null) {
+      this.port?.cancel(this.hintPending);
+      // The worker may be mid-search: the next request restarts it rather than wait behind it.
+      this.abandonedUntil = performance.now() + HINT_BUDGET_MS;
+    }
+    this.hintPending = null;
+  }
+
+  /** Esc: stop a running hint or put a finished one away (the player's own call, so it speaks). */
+  discardHint(): boolean {
+    if (this.hint.status === 'idle') return false;
+    const was = this.hint.status;
+    this.cancelHint();
+    this.hint = NO_HINT;
+    this.host.stage(null);
+    this.host.announce(was === 'thinking' ? 'Hint stopped.' : 'Hint cleared.');
+    this.host.notify();
+    return true;
+  }
+
+  /** Where the player is in the hint's line, and whether they have left it. */
+  hintProgress(): HintProgress {
+    return progressFor(this.hint);
+  }
+
+  /** The player acts on the board: read against the hint (called before the engine applies it). */
+  noteAction(a: Action): void {
+    const h = this.hint;
+    if (h.status === 'thinking') {
+      // The position moved on while the search ran: its answer would describe an old board.
+      this.cancelHint();
+      this.hint = NO_HINT;
+    } else if (h.status === 'ready') {
+      this.hint = {
+        ...h,
+        taken: [...h.taken, a],
+        seen: { ...h.seen, ...seenIn(this.host.session.view(this.host.me)) },
+      };
+    }
+  }
+
+  /** The engine refused the action `noteAction` just saw. */
+  unnoteAction(): void {
+    const h = this.hint;
+    if (h.status === 'ready' && h.taken.length > 0)
+      this.hint = { ...h, taken: h.taken.slice(0, -1) };
+  }
+
+  /** "Do step 1": line the hint's next action up; the player still commits it. */
+  stageNext(): boolean {
+    const h = this.hint;
+    const next =
+      h.status === 'ready' && h.result
+        ? nextStage(h.result.viewActions, h.taken, this.host.legalActions())
+        : null;
+    if (!next || !this.host.stage(next)) {
+      this.host.announce('Can’t line that up: the board has changed. Press H to ask again.');
+      return false;
+    }
+    return true;
+  }
+
+  /** True once per press of H: the section that is showing takes the focus (a remount never does). */
+  takeHintFocus(): boolean {
+    if (this.hintFocus === 0 || this.hintFocusSeen === this.hintFocus) return false;
+    this.hintFocusSeen = this.hintFocus;
+    return true;
+  }
+
+  /** "Show" on a hint step: light its cards on the board and say what it is. */
+  showHint(step: number): void {
+    const r = this.hint.result;
+    const m = r?.line[step];
+    if (!m) return;
+    this.shown = { refs: stepRefs(m, this.host.session.view(this.host.me)), step };
+    this.host.announce(`Step ${step + 1}: ${m.text}`);
+    this.host.notify();
+  }
+
+  /** Is anything of the hint's first step left to do (does Do step 1 have something to stage)? */
+  firstStepLeft(): boolean {
+    const h = this.hint;
+    return h.status === 'ready' && !!h.result && !firstStepDone(h.result.viewActions, h.taken);
+  }
+
+  private syncHint(): void {
+    const h = this.hint;
+    if (h.status === 'idle') return;
+    const v = this.host.session.view(this.host.me);
+    if (h.status === 'waiting') {
+      if (v.result) {
+        this.hint = NO_HINT;
+        this.host.notify();
+      } else if (this.host.myDecision()) this.startHint();
+      return;
+    }
+    // A new turn, or the end of the game: a hint is for the turn it was asked in.
+    if (v.result || v.turn.number !== h.turn) {
+      this.cancelHint();
+      this.hint = NO_HINT;
+      this.host.notify();
+    }
+  }
+
+  // -------------------------------------------------------------------------------------------
+  // Their turn: does their board threaten lethal (WP3). Their hand is never counted.
+  // -------------------------------------------------------------------------------------------
+
+  /** Their Main Phase, between battles: the only time the threat check means something. */
+  private threatKey(): string | null {
+    if (!this.supported) return null;
+    const v = this.host.session.view(this.host.me);
+    const opp: PlayerId = this.host.me === 'p1' ? 'p2' : 'p1';
+    if (v.result || v.battle || v.decision?.kind !== 'main' || v.decision.player !== opp)
+      return null;
+    return `${this.host.session.actionCount}|${v.turn.number}|threat`;
+  }
+
+  private syncThreat(): void {
+    const key = this.threatKey();
+    if (key === this.threat.key) return;
+    this.cancelThreat();
+    this.threat = { ...IDLE_THREAT, key };
+    // The background alert is the player's own setting; otherwise nothing runs until L.
+    if (key && this.profile.alerts) this.requestThreat(true);
+    this.host.notify();
+  }
+
+  private requestThreat(auto: boolean): void {
+    const key = this.threat.key;
+    if (!key) return;
+    const view = this.host.session.view(this.host.me);
+    const port = this.portFor(view);
+    const own = this.host.ownDeck;
+    const r = port.threat(this.host.session.searchView(this.host.me), {
+      capMs: THREAT_CAP_MS,
+      ...(own.length > 0 ? { ownDeck: [...own] } : {}),
+      priority: auto ? 4 : 2,
+    });
+    this.threatPending = r.id;
+    this.threat = { ...this.threat, status: 'checking', auto };
+    r.result.then(
+      (a) => {
+        if (this.threatPending !== r.id || this.threat.key !== key) return;
+        this.threatPending = null;
+        if (isNotImplemented(a.result)) this.threat = { ...this.threat, status: 'failed' };
+        else {
+          this.threat = { key, status: 'ready', result: a.result, auto };
+          this.speakThreat(auto);
+        }
+        this.host.notify();
+      },
+      (e: unknown) => {
+        if (this.threatPending !== r.id) return;
+        this.threatPending = null;
+        if (e instanceof Error && e.message === 'cancelled') return;
+        this.threat = { ...this.threat, status: 'failed' };
+        this.host.notify();
+      },
+    );
+  }
+
+  /** The polite line for a threat. Their hand is never counted, and it says so. */
+  threatSpeech(r: ThreatResult): string {
+    const tail = 'This does not count the cards in their hand.';
+    if (r.status === 'unknown') return `Their threat: not fully checked. ${tail}`;
+    if (r.status === 'refuted') return `Their board does not threaten lethal. ${tail}`;
+    const stop = r.mustStop
+      ? ` You must stop ${r.mustStop.stop} of their ${r.mustStop.of} attacks.`
+      : '';
+    return `Their board threatens lethal.${stop} ${tail}`;
+  }
+
+  private speakThreat(auto: boolean): void {
+    const r = this.threat.result;
+    if (!r) return;
+    // An alert speaks only for a threat, and only when the line changes (learning-ui §2.2: polite).
+    if (auto && r.status !== 'proven') return;
+    const text = this.threatSpeech(r);
+    if (auto && text === this.lastThreatSpoken) return;
+    this.lastThreatSpoken = text;
+    this.host.announce(text);
+  }
+
+  private pressThreat(): void {
+    this.profile = { ...this.profile, expanded: true, tab: 'lethal' };
+    saveProfile(this.profile);
+    const { status, result } = this.threat;
+    if (status === 'idle' || status === 'failed') this.requestThreat(false);
+    else if (status === 'ready' && result) {
+      this.focusSignal++;
+      this.host.announce(this.threatSpeech(result));
+    }
+    this.host.notify();
+  }
+
+  /** "Check again" on their turn (after a cap was hit or a failure). */
+  retryThreat(): void {
+    if (!this.threat.key) return;
+    this.cancelThreat();
+    this.threat = { ...this.threat, status: 'idle', result: null };
+    this.requestThreat(false);
+    this.host.notify();
+  }
+
+  private cancelThreat(): void {
+    if (this.threatPending !== null) this.port?.cancel(this.threatPending);
+    this.threatPending = null;
+  }
+
+  // -------------------------------------------------------------------------------------------
+  // Tempo (learning-ui §2.9): this turn's DON!!, frozen while it is their turn
+  // -------------------------------------------------------------------------------------------
+
+  private refreshTempo(): void {
+    if (!this.supported) return;
+    const v = this.host.session.view(this.host.me);
+    if (v.result || v.turn.activePlayer !== this.host.me) return;
+    this.tempo = { ledger: ledgerOf(v, this.host.cards), turn: v.turn.number };
+  }
+
+  // -------------------------------------------------------------------------------------------
   // Panel state (remembered per profile)
   // -------------------------------------------------------------------------------------------
 
   setProfile(p: Partial<CoachProfile>): void {
     this.profile = { ...this.profile, ...p };
     saveProfile(this.profile);
+    if (p.alerts === true && this.threat.key && this.threat.status === 'idle')
+      this.requestThreat(true);
+    if (p.alerts === false && this.threat.auto && this.threat.status === 'checking') {
+      this.cancelThreat();
+      this.threat = { ...this.threat, status: 'idle', auto: false };
+    }
     if (p.alwaysOn !== undefined) {
       // A new always-on level takes effect on this position at once.
       if (p.alwaysOn > 0 && !this.host.puzzle && this.lethal.key && this.lethal.status === 'idle')

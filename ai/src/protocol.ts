@@ -78,6 +78,8 @@ export type AiRequest =
       capMs: number;
       ownDeck?: string[];
       nodes?: number;
+      /** M7 WP4 (additive): 2 on a press (default), 4 for the background alert. */
+      priority?: 2 | 4;
     }
   | { type: 'cancel'; id: number }
   /** Forget the turn plan and battle memory (the player rewound). */

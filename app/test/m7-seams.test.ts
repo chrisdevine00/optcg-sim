@@ -182,7 +182,7 @@ describe('the coach profile migration', () => {
       JSON.stringify({ tab: 'bogus', muted: [1, 'gap'], firstGame: 'x' }),
     );
     const p = loadProfile();
-    expect(p.tab).toBe('lethal');
+    expect(p.tab).toBe('hint');
     expect(p.muted).toEqual(['gap']);
     expect('firstGame' in p).toBe(false);
   });

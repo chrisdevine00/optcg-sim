@@ -66,6 +66,7 @@ export function ExplanationView({
   headingLevel = 3,
   extra,
   caveat,
+  renderLine,
 }: {
   ex: Explanation;
   context: ExplanationContext;
@@ -78,6 +79,8 @@ export function ExplanationView({
   extra?: React.ReactNode;
   /** The Trigger caveat for the certainty chip's tooltip. */
   caveat?: string | null;
+  /** Replaces the numbered line (the hint's own, with ticks and Do step 1). */
+  renderLine?: () => React.ReactNode;
 }) {
   const [more, setMore] = useState(false);
   const H = `h${headingLevel}` as 'h2' | 'h3' | 'h4';
@@ -117,7 +120,8 @@ export function ExplanationView({
         {ex.claim}
       </H>
       {!terse && <CertaintyChip certainty={ex.certainty} context={context} caveat={caveat} />}
-      {!terse && ex.line && ex.line.length > 0 && (
+      {!terse && renderLine && ex.line && ex.line.length > 0 && renderLine()}
+      {!terse && !renderLine && ex.line && ex.line.length > 0 && (
         <ol className="why-line ex-line" aria-label="The line">
           {ex.line.map((m, i) => (
             <li key={i}>

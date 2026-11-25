@@ -52,8 +52,10 @@ export interface CoachPort extends LethalPort {
   score(view: SearchView, opts: { budgetMs: number }): { id: number; result: Promise<ScoreAnswer> };
   threat(
     view: SearchView,
-    opts: { capMs: number; ownDeck?: string[] },
+    opts: { capMs: number; ownDeck?: string[]; priority?: 2 | 4 },
   ): { id: number; result: Promise<ThreatAnswer> };
+  /** Start the worker afresh (a stopped hint may still be running); optional, tests omit it. */
+  restart?(): void;
 }
 
 export interface HintAnswer {
@@ -227,7 +229,7 @@ export class AiClient implements CoachPort {
   /** Does the opponent's board threaten lethal on their turn. */
   threat(
     view: SearchView,
-    opts: { capMs: number; ownDeck?: string[] },
+    opts: { capMs: number; ownDeck?: string[]; priority?: 2 | 4 },
   ): { id: number; result: Promise<ThreatAnswer> } {
     const id = this.nextId++;
     const result = this.send({
@@ -236,11 +238,17 @@ export class AiClient implements CoachPort {
       view,
       capMs: opts.capMs,
       ...(opts.ownDeck ? { ownDeck: opts.ownDeck } : {}),
+      ...(opts.priority ? { priority: opts.priority } : {}),
     }).then((r) => {
       if (r.type !== 'threat') throw new Error('The worker answered the wrong request.');
       return { result: r.result, ms: r.ms };
     });
     return { id, result };
+  }
+
+  /** Terminate and respawn: pending requests are re-sent (the coach's worker, after a stopped hint). */
+  restart(): void {
+    this.crashed();
   }
 
   cancel(id: number): void {

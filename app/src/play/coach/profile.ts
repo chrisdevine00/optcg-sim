@@ -12,7 +12,7 @@ const TABS: readonly CoachTab[] = ['hint', 'why', 'lethal', 'math', 'tempo'];
 export interface CoachProfile {
   /** The coach is expanded (open or tall) rather than collapsed to its strip. */
   expanded: boolean;
-  /** The coach strip's tab (M7). Hint, Math and Tempo arrive with WP4; until then only Why and Lethal show. */
+  /** The coach strip's tab (M7 WP4): Hint (the default), Why, Lethal, Math or Tempo. */
   tab: CoachTab;
   /** The lethal detector: 0 "Ask me" (default), 1 "Tier 1 always on", 2 "Tier 2 always on". */
   alwaysOn: AlwaysOn;
@@ -31,7 +31,7 @@ export interface CoachProfile {
 
 export const DEFAULT_PROFILE: CoachProfile = {
   expanded: false,
-  tab: 'lethal',
+  tab: 'hint',
   alwaysOn: 0,
   verbosity: 'standard',
   donMath: false,
@@ -49,7 +49,7 @@ export function loadProfile(): CoachProfile {
     const p = JSON.parse(raw) as Partial<CoachProfile>;
     return {
       expanded: p.expanded === true,
-      tab: TABS.includes(p.tab as CoachTab) ? (p.tab as CoachTab) : 'lethal',
+      tab: TABS.includes(p.tab as CoachTab) ? (p.tab as CoachTab) : 'hint',
       alwaysOn: p.alwaysOn === 1 || p.alwaysOn === 2 ? p.alwaysOn : 0,
       verbosity: p.verbosity === 'learner' || p.verbosity === 'terse' ? p.verbosity : 'standard',
       donMath: p.donMath === true,
