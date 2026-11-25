@@ -12,6 +12,7 @@
  * The card is played active from the hand. "Up to 1" may be none.
  */
 import { describe, expect, it } from 'vitest';
+import { applyOp } from '../../../../src/testing.ts';
 import {
   at,
   attack,
@@ -22,6 +23,7 @@ import {
   KC,
   kind,
   L11,
+  mine,
   N11,
   need,
   no,
@@ -149,5 +151,18 @@ describe('OP11-024 Aladine: when K.O.’d by the opponent’s effect, trash 1 an
     expect(kind(g)).not.toBe('optional');
     expect(hand(g)).toEqual([N11.fish3, FODDER].sort());
     expect(trash(g)).toEqual([ALADINE]);
+  });
+
+  it('an own-effect K.O. does not trigger it (the cause must be the opponent’s effect)', () => {
+    const g = mine(
+      L11.luffy,
+      { characters: [ALADINE], hand: [N11.fish6, FODDER], costArea: { active: 3, rested: 0 } },
+      {},
+    );
+    const target = chr(g, 'p1', ALADINE);
+    g.state = applyOp(g.state, { op: 'ko', card: target, by: 'p1' }).state;
+    expect(kind(g)).not.toBe('optional');
+    expect(ids(g, 'p1', 'characters')).toEqual([]);
+    expect(ids(g, 'p1', 'hand')).toEqual([N11.fish6, FODDER].sort());
   });
 });

@@ -41,6 +41,15 @@ describe('OP11-004 Kujyaku', () => {
     expect(canPick(g, g.find('p1', 'deck', ID))).toBe(false);
   });
 
+  it('"up to 1": two {Navy} cards among the top 5 cannot both be taken', () => {
+    const g = mk({ hand: [ID], deck: deck5 });
+    play(g, ID);
+    expect(() => pick(g, [g.find('p1', 'deck', NAVY.c1), g.find('p1', 'deck', NAVY.c2)])).toThrow(
+      /can be picked now/,
+    );
+    expect(hand(g, 'p1')).toHaveLength(1);
+  });
+
   it('"up to 1": may take nothing', () => {
     const g = mk({ hand: [ID], deck: [...deck5, V.c3] });
     play(g, ID);

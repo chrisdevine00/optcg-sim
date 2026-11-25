@@ -72,6 +72,15 @@ describe('OP11-002 Ain: [On Play] -1000 power, then K.O. a Character with 0 powe
     expect(ids(g, 'p2', 'characters')).toEqual([N11.dadan]);
   });
 
+  it('a Character at 1000 after the lowering gets no K.O. prompt at all (kills a 1000-power threshold)', () => {
+    const g = game([N11.dadan]);
+    playRaw(g, AIN);
+    pickInst(g, [chr(g, 'p2', N11.dadan)]);
+    // no Character is at 0 or less, so the K.O. step has nothing to offer: back to the main phase
+    need(g, 'main', 'p1');
+    expect(g.power(chr(g, 'p2', N11.dadan))).toBe(1000);
+  });
+
   it('a Character already at 0 power may be K.O.’d while the -1000 goes elsewhere', () => {
     const g = game([N11.cobra, N11.marco]);
     playRaw(g, AIN);

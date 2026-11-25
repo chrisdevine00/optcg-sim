@@ -13,6 +13,7 @@
  * nothing.
  */
 import { describe, expect, it } from 'vitest';
+import { applyOp } from '../../../../src/testing.ts';
 import {
   at,
   attack,
@@ -158,5 +159,18 @@ describe('OP11-035 Fisher Tiger: when K.O.’d by the opponent’s effect, rest 
     expect(kind(g)).not.toBe('optional');
     expect(trash(g)).toEqual([TIGER]);
     expect(hand(g)).toEqual([N11.fish4]);
+  });
+
+  it('an own-effect K.O. does not trigger it (the cause must be the opponent’s effect)', () => {
+    const g = mine(L11.luffy, {
+      characters: [TIGER],
+      hand: [N11.fish4],
+      costArea: { active: 3, rested: 0 },
+    });
+    g.state = applyOp(g.state, { op: 'ko', card: chr(g, 'p1', TIGER), by: 'p1' }).state;
+    expect(kind(g)).not.toBe('optional');
+    expect(trash(g)).toEqual([TIGER]);
+    expect(hand(g)).toEqual([N11.fish4]);
+    expect(donOf(g, 'p1').rested).toBe(0);
   });
 });

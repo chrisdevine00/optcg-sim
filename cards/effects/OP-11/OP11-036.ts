@@ -15,40 +15,42 @@ export const OP11_036: CardScript = {
         'If your Leader is [Shirahoshi], look at 5; reveal up to 1 {Neptunian} card or [Shirahoshi] and add it to your hand; the rest to the bottom in any order',
       kind: 'auto',
       when: ['onPlay'],
-      conditions: [
-        {
-          leader: {
-            name: 'Shirahoshi',
-          },
-        },
-      ],
       effect: [
         {
-          do: {
-            lookAtTop: {
-              n: 5,
-              take: [
-                {
-                  pick: {
-                    upTo: 1,
-                  },
-                  filter: {
-                    any: [
-                      {
-                        type: 'Neptunian',
-                      },
-                      {
-                        name: 'Shirahoshi',
-                      },
-                    ],
-                  },
-                  reveal: true,
-                  to: 'hand',
-                },
-              ],
-              rest: 'bottomAnyOrder',
+          if: {
+            leader: {
+              name: 'Shirahoshi',
             },
           },
+          then: [
+            {
+              do: {
+                lookAtTop: {
+                  n: 5,
+                  take: [
+                    {
+                      pick: {
+                        upTo: 1,
+                      },
+                      filter: {
+                        any: [
+                          {
+                            type: 'Neptunian',
+                          },
+                          {
+                            name: 'Shirahoshi',
+                          },
+                        ],
+                      },
+                      reveal: true,
+                      to: 'hand',
+                    },
+                  ],
+                  rest: 'bottomAnyOrder',
+                },
+              },
+            },
+          ],
         },
       ],
     },

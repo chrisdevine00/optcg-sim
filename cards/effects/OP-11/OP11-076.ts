@@ -16,41 +16,43 @@ export const OP11_076: CardScript = {
       when: ['onPlay'],
       label:
         'If your Leader has the "Impel Down" type, play up to 1 "Impel Down" Character with cost 3 or less from your hand',
-      conditions: [
-        {
-          leader: {
-            type: 'Impel Down',
-          },
-        },
-      ],
       effect: [
         {
-          do: {
-            play: {
-              what: {
-                from: 'hand',
-                owner: 'you',
-                filter: {
-                  all: [
-                    {
-                      category: ['Character'],
+          if: {
+            leader: {
+              type: 'Impel Down',
+            },
+          },
+          then: [
+            {
+              do: {
+                play: {
+                  what: {
+                    from: 'hand',
+                    owner: 'you',
+                    filter: {
+                      all: [
+                        {
+                          category: ['Character'],
+                        },
+                        {
+                          type: 'Impel Down',
+                        },
+                        {
+                          cost: {
+                            lte: 3,
+                          },
+                        },
+                      ],
                     },
-                    {
-                      type: 'Impel Down',
+                    pick: {
+                      upTo: 1,
                     },
-                    {
-                      cost: {
-                        lte: 3,
-                      },
-                    },
-                  ],
-                },
-                pick: {
-                  upTo: 1,
+                  },
                 },
               },
             },
-          },
+          ],
         },
       ],
     },

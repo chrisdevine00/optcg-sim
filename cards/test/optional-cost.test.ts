@@ -119,3 +119,43 @@ describe('the check fails on planted mismatches', () => {
     expect(p).toHaveLength(1);
   });
 });
+
+describe('the start-of-turn printed window ("This effect can be activated at the start of your turn")', () => {
+  const start = {
+    id: 'x',
+    kind: 'auto',
+    when: ['startOfYourTurn'],
+    cost: [{ trash: { from: 'hand', owner: 'you', pick: { exactly: 1 } } }],
+    effect: [],
+  } as unknown as Ability;
+  const card = (effectText: string) => ({ category: 'Leader', effectText, triggerText: null });
+  const problems = (effectText: string) =>
+    optionalCostProblems({ cardId: 'T-1', abilities: [start] }, card(effectText));
+
+  it('matches the untagged unit (the OP11-040 form), with and without [Once Per Turn]', () => {
+    const text =
+      'This effect can be activated at the start of your turn. You may trash 1 card from your hand: Draw 1 card.';
+    expect(problems(text)).toEqual([]);
+    expect(problems(`[Once Per Turn] ${text}`)).toEqual([]);
+  });
+
+  it('judges the cost clause of that unit: a mandatory cost is reported, not "no text unit found"', () => {
+    const p = problems(
+      'This effect can be activated at the start of your turn. Trash 1 card from your hand: Draw 1 card.',
+    );
+    expect(p).toHaveLength(1);
+    expect(p[0]).toContain('does not say "you may"');
+  });
+
+  it('does not match a unit that opens with another tag', () => {
+    const p = problems(
+      '[On Play] This effect can be activated at the start of your turn. You may trash 1 card from your hand: Draw 1 card.',
+    );
+    expect(p).toEqual(['T-1.x: no text unit found for this ability']);
+  });
+
+  it('does not match an unrelated unit', () => {
+    const p = problems('[On Play] You may trash 1 card from your hand: Draw 1 card.');
+    expect(p).toEqual(['T-1.x: no text unit found for this ability']);
+  });
+});

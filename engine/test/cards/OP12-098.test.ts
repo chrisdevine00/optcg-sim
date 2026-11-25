@@ -14,6 +14,8 @@ import {
 } from './helpers-op12g3.ts';
 
 const ID = 'OP12-098';
+/** A printed cost-7 {Revolutionary Army} Character. */
+const RA7 = 'OP09-104';
 
 /** p2 attacks p1's Leader with a 9000 Character; p1 holds the Event at the counter step. */
 const underAttack = (characters: string[]) =>
@@ -39,8 +41,15 @@ describe('OP12-098 Hair Removal Fist', () => {
     expect(g.power(g.find('p1', 'characters', RA8))).toBe(9000);
   });
 
-  it('boundary: a cost-8 Character that is not Revolutionary Army, or a Revolutionary Army one of cost 7, does not count', () => {
+  it('boundary: a cost-8 Character that is not Revolutionary Army does not count', () => {
     const g = underAttack([C8, RA2]);
+    useCounter(g, ID);
+    pick(g, [g.leader('p1')]);
+    expect(g.power(g.leader('p1'))).toBe(7000);
+  });
+
+  it('boundary: a printed cost-7 Revolutionary Army Character (OP09-104 Sabo) does not count', () => {
+    const g = underAttack([RA7]);
     useCounter(g, ID);
     pick(g, [g.leader('p1')]);
     expect(g.power(g.leader('p1'))).toBe(7000);

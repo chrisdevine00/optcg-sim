@@ -99,4 +99,27 @@ describe('OP12-008 Shanks', () => {
     });
     expect(g.legal().some((a) => a.type === 'optional')).toBe(false);
   });
+
+  it('[Once Per Turn] is spent only when the effect resolves: after a declined cost the next attack offers it again (rulings.md QA-OP17)', () => {
+    const g = attack([V.c1, V.c2], [V.c6, V.c5]);
+    decline(g);
+    passBlock(g);
+    while (g.legal().some((a) => a.type === 'endCounter' || a.type === 'trigger')) {
+      g.act(
+        g.legal().some((a) => a.type === 'endCounter')
+          ? { type: 'endCounter' }
+          : { type: 'trigger', activate: false },
+      );
+    }
+    g.act({
+      type: 'attack',
+      attacker: g.find('p2', 'characters', V.c5),
+      target: g.leader('p1'),
+    });
+    expectDecision(g, 'optional', 'p1');
+    accept(g);
+    pick(g, [g.find('p1', 'hand', V.c1)]);
+    pick(g, [at(g, 'p2', 'characters', V.c5)]);
+    expect(g.power(at(g, 'p2', 'characters', V.c5))).toBe(5000); // printed 7000, -2000
+  });
 });

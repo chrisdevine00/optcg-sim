@@ -10,6 +10,7 @@
  * played card enters active. "Up to 1" may be none. [On Play] may return either side's Character.
  */
 import { describe, expect, it } from 'vitest';
+import { applyOp } from '../../../../src/testing.ts';
 import {
   at,
   attack,
@@ -155,5 +156,17 @@ describe("OP11-051 Sanji: when K.O.'d by an opponent effect, look at 5 and play 
     expect(trash(g)).toEqual([SANJI]);
     expect(g.events.some((e) => e.type === 'CardsLooked')).toBe(false);
     expect(deck(g)[0]).toBe(C11.shc3);
+  });
+
+  it('an own-effect K.O. does not trigger the look (the cause must be the opponent’s effect)', () => {
+    const g = mine(L11.mono, { characters: [SANJI], deck: [C11.shc3, ...D(14)] });
+    g.state = applyOp(g.state, {
+      op: 'ko',
+      card: at(g, 'p1', 'characters', SANJI),
+      by: 'p1',
+    }).state;
+    expect(kind(g)).not.toBe('choose');
+    expect(chars(g)).toEqual([]);
+    expect(at(g, 'p1', 'deck', C11.shc3)).toBeDefined();
   });
 });

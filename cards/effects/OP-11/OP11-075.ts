@@ -14,27 +14,33 @@ export const OP11_075: CardScript = {
       kind: 'auto',
       when: ['onPlay'],
       label: 'If your Leader is [Nico Robin] and you have 7 or more DON!!, draw 2 cards',
-      conditions: [
-        {
-          leader: {
-            name: 'Nico Robin',
-          },
-        },
-        {
-          cmp: [
-            {
-              donOnField: 'you',
-            },
-            '>=',
-            7,
-          ],
-        },
-      ],
       effect: [
         {
-          do: {
-            draw: 2,
+          if: {
+            all: [
+              {
+                leader: {
+                  name: 'Nico Robin',
+                },
+              },
+              {
+                cmp: [
+                  {
+                    donOnField: 'you',
+                  },
+                  '>=',
+                  7,
+                ],
+              },
+            ],
           },
+          then: [
+            {
+              do: {
+                draw: 2,
+              },
+            },
+          ],
         },
       ],
     },

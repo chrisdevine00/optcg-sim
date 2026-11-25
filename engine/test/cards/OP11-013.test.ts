@@ -61,4 +61,19 @@ describe('OP11-013 Prince Grus', () => {
     });
     expect(canBlockWith(g, BLK2)).toBe(true);
   });
+
+  it('lasts the whole turn, not just the battle: a second attacker in the same turn still faces no 2000 Blocker', () => {
+    const g = mk({ characters: [ID, 'OP02-084'] }, { characters: [BLK2] });
+    g.act({ type: 'attack', attacker: g.find('p1', 'characters', ID), target: g.leader('p2') });
+    g.act({ type: 'block', blocker: null });
+    g.act({ type: 'endCounter' });
+    expect(dec(g)?.kind).toBe('main');
+    g.act({
+      type: 'attack',
+      attacker: g.find('p1', 'characters', 'OP02-084'),
+      target: g.leader('p2'),
+    });
+    expect(dec(g)?.kind).toBe('block');
+    expect(canBlockWith(g, BLK2)).toBe(false);
+  });
 });

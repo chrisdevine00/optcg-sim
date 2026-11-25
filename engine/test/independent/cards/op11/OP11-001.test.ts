@@ -190,6 +190,27 @@ describe('OP11-001 Koby: [Once Per Turn] replacement of removal by the opponentâ
     expect(ids(g, 'p1', 'characters')).toEqual([N11.navy4]);
   });
 
+  it('[Once Per Turn] with the cost payable twice: a big trash does not let a second Navy Character be replaced', () => {
+    const big = [...T4, 'OP02-007', 'OP01-026', 'OP01-030', 'OP02-009', 'OP02-010'];
+    const g = theirs(
+      KOBY,
+      { characters: [N11.navy3, N11.navy4], trash: big, deck: fill(N11.dadan, 12) },
+      { hand: ['OP09-077', KC] },
+    );
+    opponentKOs(g, chr(g, 'p1', N11.navy4));
+    yes(g);
+    pickInst(
+      g,
+      T4.slice(0, 3).map((c) => at(g, 'p1', 'trash', c)),
+    );
+    settleOrders(g, 'p1');
+    takeMost(g);
+    expect(trash(g).length).toBeGreaterThanOrEqual(6);
+    opponentKingdomCome(g, chr(g, 'p1', N11.navy3));
+    expect(kind(g)).not.toBe('optional');
+    expect(ids(g, 'p1', 'characters')).toEqual([N11.navy4]);
+  });
+
   it('a battle K.O. is not replaced', () => {
     const g = theirs(
       KOBY,

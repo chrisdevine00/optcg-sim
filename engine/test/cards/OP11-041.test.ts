@@ -10,6 +10,7 @@ import {
   hand,
   passBlock,
   pick,
+  play,
   takeDamage,
   times,
   trash,
@@ -41,6 +42,26 @@ describe('OP11-041 Nami (Leader)', () => {
     attackAll(g, V.c7);
     expect(g.life('p2')).toBe(2);
     expect(hand(g, 'p1')).toHaveLength(8);
+    expect(g.zone('p1', 'deck')).toHaveLength(5);
+  });
+
+  it('[Once Per Turn] is spent by the activation, not the draw: 8 cards (the "If" fails), then 7 cards on a second removal still draws nothing', () => {
+    // Reading B3A-R1: "This effect can be activated when ... If you have 7 or less cards in your hand, draw 1"
+    // has no colon, so the "If" is part of the effect and the use is spent when it fails (as EB04-012, EB03-013).
+    const g = mk({
+      leader: ID,
+      characters: [V.c7, V.c6],
+      hand: [V.c1, ...times(7, BLUE)],
+      deck: times(5, BLUE),
+    });
+    attackAll(g, V.c7);
+    expect(g.life('p2')).toBe(2);
+    expect(hand(g, 'p1')).toHaveLength(8); // failed "If": nothing drawn, use spent
+    play(g, V.c1); // 7 cards in hand now
+    expect(hand(g, 'p1')).toHaveLength(7);
+    attackAll(g, V.c6);
+    expect(g.life('p2')).toBe(1);
+    expect(hand(g, 'p1')).toHaveLength(7); // the second removal draws nothing
     expect(g.zone('p1', 'deck')).toHaveLength(5);
   });
 
