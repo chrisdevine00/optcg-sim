@@ -18,13 +18,18 @@ import {
   type TurnResult,
 } from '../src/index.ts';
 
-const ctx = {} as DetectorContext;
+/** A context over an empty record: no action at any index, so every detector has nothing to say. */
+const ctx = {
+  record: { actions: [], seats: { p1: 'human', p2: 'ai' }, auto: [], rewinds: [] },
+  stateAt: () => {
+    throw new Error('no state in an empty record');
+  },
+} as unknown as DetectorContext;
 
 describe('review registry', () => {
-  it('has exactly one detector per kind and each stub returns null', () => {
+  it('has exactly one detector per kind and each detector returns null on an empty record', () => {
     expect(Object.keys(DETECTORS).sort()).toEqual([...FLAG_KINDS].sort());
-    // A kind leaves this list when its package lands (M8 WP1: missed-lethal; it has its own tests).
-    for (const kind of FLAG_KINDS.filter((k) => k !== 'missed-lethal')) {
+    for (const kind of FLAG_KINDS) {
       const item: ReviewItem = { id: `${kind}:1:0`, kind, turn: 1, index: 0, cost: 'cheap' };
       expect(runDetector(item, ctx), kind).toBeNull();
     }

@@ -214,6 +214,26 @@ kbd {
   font-size: var(--text-sm);
   line-height: var(--leading-sm);
 }
+.storage-notice {
+  position: fixed;
+  inset-inline: var(--space-4);
+  bottom: var(--space-4);
+  z-index: var(--z-toast);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  max-width: 60ch;
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  border: 1px solid var(--color-line-strong);
+  box-shadow: var(--elev-1);
+}
+.storage-notice a:not(.btn) {
+  color: inherit;
+  text-decoration: underline;
+}
 .warning-notice {
   border: 1px solid var(--color-warning-text);
 }

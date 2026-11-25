@@ -3,6 +3,7 @@ import { Footer } from './Footer.tsx';
 import { Header } from './Header.tsx';
 import { usePath } from './router.tsx';
 import { Home } from './routes/Home.tsx';
+import { StorageNotice } from './store/StorageNotice.tsx';
 import { UpdatePrompt } from './update/UpdatePrompt.tsx';
 
 const CardBrowser = lazy(() => import('./cards/CardBrowser.tsx'));
@@ -14,6 +15,15 @@ const ReviewsRoute = lazy(() => import('./play/review/ReviewsRoute.tsx'));
 
 export function App() {
   const path = usePath();
+  return (
+    <>
+      <Routes path={path} />
+      <StorageNotice onBoard={path === '/play' || path === '/tutorial'} />
+    </>
+  );
+}
+
+function Routes({ path }: { path: string }) {
   if (path === '/play')
     // The board is full-screen: its rail notice is the footer equivalent (board.md §3.1, C15).
     return (

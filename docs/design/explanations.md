@@ -126,6 +126,7 @@ Producer-specific values that the scenario can't fix (search line counts, timing
 | E18 | Double Attack at 1 Life | Guided count | Luffy OP13-001 vs Rocks | `lethal-math` |
 | E19 | Counter that only tied | Review flag, defence-planner warning | Rocks vs Kaido | `counters-and-blockers` |
 | E20 | Live lethal, three tiers | Lethal detector tier 3 | Kaido vs Rocks | `lethal-math` |
+| E21 | Attacking with a Blocker let their board win | Review flag (M8, "Lethal given away") | Rocks vs Kaido | `lethal-math` |
 
 Rocks (OP17-039) and Kaido (OP17-058) dominate because they are the slice decks (PLAN row 11); OP13-001 appears where the brief requires it.
 
@@ -303,7 +304,7 @@ Rocks (OP17-039) and Kaido (OP17-058) dominate because they are the slice decks 
       figures: { handCounter: 5000 } },
     { text: 'Taking Ulti\'s hit meant Kaido had to be stopped too: 3000 + 8000 = 11000. Your deck\'s biggest counter is +2000, so no Life card could have covered it.',
       figures: { neededAfterTaking: 11000, bestPossible: 7000 } },
-    { text: 'They had no cards in hand and no active DON!!, so these numbers couldn\'t change.',
+    { text: 'They had no cards in hand and no active DON!!, so their hand adds nothing to these numbers.',
       figures: { opponentHand: 0, opponentActiveDon: 0 } },
   ],
   line: [
@@ -901,6 +902,48 @@ Rocks (OP17-039) and Kaido (OP17-058) dominate because they are the slice decks 
 ```
 
 **Check.** Attack 1: 8000 − 5000 + 1000 = 4000; one card gives at most 3000 (trashed to Newgate) or 2000: hit, Life 1, hand 2. Attack 2: 10000 − 5000 + 1000 = 6000; two cards give at most 3000 + 2000 = 5000: hit, Life 0, hand 3. Attack 3: 12000 − 5000 + 1000 = 8000; three cards give at most 3000 + 2000 + 2000 = 7000: hit at 0 Life, win. If Newgate is used earlier, later maxima only fall. 7 of 10 DON!! used; 3 spare. Kaido's own [When Attacking] −2000 is optional and not needed.
+
+---
+
+## E21. Attacking with a Blocker let their board win
+
+**Where:** Game Review flag "Lethal given away" (M8), severe: the turn you attacked, not the turn you lost. Only on a turn their board won. The flag is on your turn T−1; its practice is to survive their turn T from the attack.
+
+**Position.** Game turn 9 (your 5th), your Main Phase, going first. You: Rocks.D.Xebec (OP17-039) Leader 5000, **2 Life** (Kyo, OP17-045, no [Trigger]), no cards in hand, no DON!!. Your only Character is Gloriosa (OP17-046), 1000, [Blocker], active. Them: Kaido (OP17-058) Leader 5000, 3 Life; Ulti & Page One (OP17-060) 6000 and Kaido (OP17-062) 12000, both active, played earlier. Their hand is not counted.
+
+**What you did.** Attacked their Leader with Gloriosa (it rests), then ended your turn. On turn 10 they attacked with Ulti, their Leader and Kaido; you had no active Blocker and took all three hits (2 Life, then the last hit at 0 Life) and lost.
+
+```ts
+{
+  conceptId: 'lethal-math',
+  claim: 'Attacking with Gloriosa let their board win.',
+  evidence: [
+    { text: 'You have 2 Life cards, so they need 3 hits.',
+      figures: { life: 2, hitsNeeded: 3 } },
+    { text: 'They can attack your Leader with Kaido (5000), Ulti (6000), Kaido (12000).',
+      figures: { attackers: 3 } },
+    { text: 'You have no Blocker and no Counter to stop an attack with.',
+      figures: { blockers: 0, counters: 0 } },
+    { text: 'Gloriosa attacked on your turn, so it was resting on theirs and could not Block (CR 7-1-2-1).',
+      figures: { restingBlockers: 1 } },
+    { text: 'Kept back, Gloriosa could have Blocked one of their 3 attacks.',
+      figures: { blockers: 1 } },
+    { text: 'This does not count the cards in their hand.' },
+    { text: 'Your 2 face-down Life cards are not counted: a [Trigger] among them could change this.',
+      figures: { faceDownLife: 2 } },
+  ],
+  line: [
+    { kind: 'block', text: 'Keep Gloriosa back; it can Block one of their 3 attacks, and you only needed to stop 1.', card: 'OP17-046' },
+  ],
+  outcome: 'With it back, your Blocker and hand stop enough of their attacks to survive their board alone.',
+  certainty: 'any-hand',
+  nextTime: 'Before you attack with a Blocker, count their attackers against your Life + 1: a Blocker that attacked cannot Block on their turn.',
+  lessonId: 'L15-lethal-math',
+  sources: ['CR 7-1-2-1', 'CR 7-1-4-1', 'CR 7-1-4-1-1-1'],
+}
+```
+
+**Check.** 2 Life → 3 hits needed (CR 7-1-4-1-1-1); they have three attackers (Leader, Ulti, Kaido), so all three must connect. A Blocker stops one attack (CR 7-1-2-1) and rests; with Gloriosa active that leaves two attacks, two hits, Life 2 → 0: you survive. With it resting (attacking rests a Character, and it stays resting until your next Refresh Phase) there is no Blocker and nothing in hand: three hits, loss. Both checks use their board only, never their hand (`threat()` counts no hidden cards), so this holds whatever they held. The Life [Trigger] row is the usual caveat about your own face-down cards, stated as a chance and not counted. If their board alone did not decide it but their real hand did, the same flag is shown as Hindsight ("Attacking with Gloriosa left you open to their hand.", `needed-hidden-info`, never severe). If keeping the Blocker back would not have helped (1 Life: three hits against one Block still wins), there is no flag and the turn note says "Their board won whatever you did."
 
 ---
 

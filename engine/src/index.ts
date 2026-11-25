@@ -10,6 +10,7 @@ export {
   whyNot,
   preview,
   replay,
+  verifyReplay,
   checkInvariants,
   summaryHash,
   queries,
@@ -32,6 +33,8 @@ export {
   appendAction,
   type TurnSnapshot,
   type RecordWithSnapshots,
+  type VerifyResult,
+  type VerifyFailure,
 } from './record.ts';
 export { InvalidSetup, validateDeck } from './setup.ts';
 export {

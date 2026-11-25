@@ -16,7 +16,7 @@ import { loadProfile, saveProfile } from '../play/coach/profile.ts';
 import { ST21_MAIN, ST22_MAIN, ST21_LEADER, ST22_LEADER } from './decks.ts';
 import { defaultEnv, TutorialRunner } from './runner.ts';
 import { SCENARIOS_T } from './steps.ts';
-import { download, exportName, LocalTimingStore, minutesWords, toCsv, toJson } from './timing.ts';
+import { download, exportName, minutesWords, timingStore, toCsv, toJson } from './timing.ts';
 import { loadProgress, STEP_COUNT, TUTORIAL_LESSONS } from './progress.ts';
 import { TUTORIAL_ZONES, type TutorialZone } from './types.ts';
 import { CONTENT_META } from './copy.ts';
@@ -94,7 +94,7 @@ export default function TutorialRoute() {
         made = new TutorialRunner({
           cards,
           clock: { now: () => performance.now() },
-          store: new LocalTimingStore(),
+          store: timingStore(),
           env: defaultEnv({
             reducedMotion: reducedMotion(),
             aiPace: '2x',

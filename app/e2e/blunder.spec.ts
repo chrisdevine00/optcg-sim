@@ -5,6 +5,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page, type TestInfo } from '@playwright/test';
 import { nextDecision, startGame } from './game-support.ts';
+import { timingRuns } from './idb-support.ts';
 
 const GAME = 'scenario=lethalDemo&speed=4&opp=pirate&aibudget=iterations';
 
@@ -209,16 +210,19 @@ test.describe('Settings', () => {
     expect(csv.suggestedFilename()).toBe('optcg-tutorial-timing-abc123.csv');
     // Exporting sent nothing anywhere.
     expect(requests.length).toBe(before);
-    await page.getByRole('button', { name: /^Delete/ }).click();
+    await page.getByRole('button', { name: /^Delete the run/ }).click();
     await expect(page.getByRole('button', { name: /Delete for good/ })).toBeVisible();
     await page.getByRole('button', { name: 'Keep it' }).click();
     await expect(page.getByText(/1 of 1 steps/)).toBeVisible();
-    await page.getByRole('button', { name: /^Delete/ }).click();
+    await page.getByRole('button', { name: /^Delete the run/ }).click();
     await page.getByRole('button', { name: /Delete for good/ }).click();
     await expect(page.getByText('No tutorial runs are stored.')).toBeVisible();
-    expect(await page.evaluate(() => window.localStorage.getItem('optcg.tutorial.timing.v1'))).toBe(
-      '[]',
-    );
+    // The run lived in IndexedDB since the migration moved it; deleting it emptied that store, and
+    // the old localStorage key is gone for good.
+    expect(await timingRuns(page)).toEqual([]);
+    expect(
+      await page.evaluate(() => window.localStorage.getItem('optcg.tutorial.timing.v1')),
+    ).toBeNull();
   });
 
   test('"Show the welcome question" brings the question back on Home', async ({ page }) => {

@@ -6,7 +6,8 @@
  * pulse; no network beyond the app and the art origins; the exported JSON; screenshots at both sizes.
  */
 import { expect, test, type Page } from '@playwright/test';
-import { card, check, fresh, hand, IDS, myTurn, next, TIMING } from './tutorial-support.ts';
+import { timingRuns } from './idb-support.ts';
+import { card, check, fresh, hand, IDS, myTurn, next } from './tutorial-support.ts';
 
 test.beforeEach(async ({ page }) => {
   await fresh(page);
@@ -136,7 +137,6 @@ test.describe('a full pointer run', () => {
     await expect(page.locator('select[name="mine-list"]')).toHaveValue('tutorial:st21');
     await expect(page.locator('select[name="theirs-list"]')).toHaveValue('tutorial:st22');
     await expect(page.getByRole('radio', { name: /Rookie AI/ })).toBeChecked();
-    const stored = await page.evaluate((k) => window.localStorage.getItem(k), TIMING);
-    expect(JSON.parse(stored!)).toHaveLength(1);
+    expect(await timingRuns(page)).toHaveLength(1);
   });
 });

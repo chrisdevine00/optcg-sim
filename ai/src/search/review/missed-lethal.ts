@@ -11,6 +11,7 @@ import { didInTurn } from './did.ts';
 import type { Detector, ReviewFlag } from './types.ts';
 
 export const detect: Detector = (item, ctx) => {
+  if (!ctx.record.actions[item.index]) return null;
   const state = ctx.stateAt(item.index);
   const dec = queries.decision(state);
   if (!dec || dec.kind !== 'main') return null;
