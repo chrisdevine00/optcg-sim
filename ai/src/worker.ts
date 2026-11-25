@@ -9,6 +9,7 @@ import { chooseAction } from './choose.ts';
 import { answerLethal, insertByPriority } from './search/lethal/request.ts';
 import type { AiRequest, AiResponse, GameInfo } from './protocol.ts';
 import { AiSession } from './session.ts';
+import { answerCoach, priorityOf, type Work } from './coach/dispatch.ts';
 
 const cards = new Map<string, Card>();
 /** Scripts of the cards received so far (they load per set, M6b-0); work waits for them. */
@@ -31,11 +32,6 @@ function ensureSession(): AiSession | null {
   return session;
 }
 
-type Work = Extract<AiRequest, { type: 'planTurn' } | { type: 'decide' } | { type: 'lethal' }>;
-
-/** Lower runs first: the turn's own search 1, a pressed Lethal 2, review 3, the background detector 4. */
-const priorityOf = (w: Work): number => (w.type === 'lethal' ? (w.priority ?? 2) : 1);
-
 /**
  * Requests queue and run one at a time on a later task, so a `cancel` that arrives behind a request
  * is read before that request starts and the stale work never runs (review M5a-12).
@@ -48,6 +44,13 @@ function run(req: Work): void {
   try {
     if (req.type === 'lethal') {
       const res = answerLethal(req, cards);
+      if (cancelled.delete(req.id)) return;
+      post(res);
+      return;
+    }
+    if (req.type === 'hint' || req.type === 'score' || req.type === 'threat') {
+      // WP0 stub: WP1 (hint), WP2 (score) and WP3 (threat) replace this.
+      const res = answerCoach(req, performance.now() - t0);
       if (cancelled.delete(req.id)) return;
       post(res);
       return;

@@ -4,7 +4,14 @@
  * send view actions to it; it never decides legality.
  */
 import type { Card } from '@optcg/cards';
-import { priorCardIds, rookie, type AiTier, type Explanation, type GameInfo } from '@optcg/ai';
+import {
+  actionKey,
+  priorCardIds,
+  rookie,
+  type AiTier,
+  type Explanation,
+  type GameInfo,
+} from '@optcg/ai';
 import type { Action, PlayerId, PlayerView, ProjectedView, SearchView } from '@optcg/engine';
 import {
   GameSession,
@@ -13,7 +20,7 @@ import {
   type SessionRecord,
   type Start,
 } from '../../session/index.ts';
-import { AiClient, type AiDecision, type LethalPort } from './ai-client.ts';
+import { AiClient, type AiDecision, type CoachPort } from './ai-client.ts';
 import { Coach } from '../coach/coach.ts';
 import { PoliteQueue } from './politeQueue.ts';
 import { readsHiddenZone, type VeiledProps } from './veiled.tsx';
@@ -47,8 +54,15 @@ export interface GameConfig {
   aiBudgets?: 'iterations' | 'ms';
   /** Tests: an in-process stand-in for the worker. */
   aiPort?: (cards: Card[], game: GameInfo) => AiPort;
-  /** Tests: an in-process stand-in for the coach's lethal worker (a second client). */
-  coachPort?: (cards: Card[]) => LethalPort;
+  /**
+   * The guided tutorial's allowed-action filter (M7 WP0 seam, WP6 fills it). It only ever removes
+   * engine-legal actions from `actions()` and refuses a disallowed `act()`; it cannot add one, so
+   * the tutorial never invents a rule. `onBlocked` runs for each refused `act()`. Absent: nothing
+   * changes.
+   */
+  tutorial?: TutorialFilter;
+  /** Tests: an in-process stand-in for the coach's worker (a second client). */
+  coachPort?: (cards: Card[]) => CoachPort;
   /**
    * Review (learning-ui §4.4): start from the first `actions.length` actions of a finished game's
    * record, with its hidden cards, instead of a new game. `readOnly` makes it a restored board to
@@ -57,6 +71,15 @@ export interface GameConfig {
    */
   restore?: { record: SessionRecord; readOnly?: boolean; puzzle?: { turn: number } };
 }
+
+/** The tutorial's narrowing of the engine's own legal actions (see `GameConfig.tutorial`). */
+export interface TutorialFilter {
+  allow(action: Action, view: ProjectedView): boolean;
+  onBlocked(action: Action): void;
+}
+
+/** A commit gate's answer: carry on, or hold the action (the blunder warning shows, M7 WP5). */
+export type CommitGate = (action: Action) => 'go' | 'hold';
 
 /** What the controller needs from the AI worker client (AiClient, or a test double). */
 export interface AiPort {
@@ -342,6 +365,14 @@ export class GameController {
    * see (Take the hit, a Blocker, the damage decision), so nothing hidden is lit or listed.
    */
   actions(): Action[] {
+    const all = this.legalActions();
+    const t = this.config.tutorial;
+    if (!t) return all;
+    const view = this.view();
+    return all.filter((a) => t.allow(a, view));
+  }
+
+  private legalActions(): Action[] {
     const priv = this.session.view(this.me);
     if (this.readOnly) return [];
     if (this.revealed()) return priv.actions;
@@ -1116,9 +1147,46 @@ export class GameController {
   // Human actions
   // -------------------------------------------------------------------------------------------
 
+  /**
+   * M7 seams, all inert by default. `commitGate` is asked before a human `act()` is applied; 'hold'
+   * keeps the action in `heldAction` (the blunder warning offers "Commit anyway", which calls
+   * `act(action, id, { skipGate: true })`). `staged` is the action the coach's "Do step 1" has
+   * lined up for the player to confirm; `stage` accepts only an action the player could take now.
+   */
+  commitGate?: CommitGate;
+  heldAction: Action | null = null;
+  staged: Action | null = null;
+
+  stage(action: Action | null): boolean {
+    if (action === null) {
+      if (this.staged) {
+        this.staged = null;
+        this.bump();
+      }
+      return true;
+    }
+    const k = actionKey(action);
+    if (!this.myDecision() || !this.actions().some((a) => actionKey(a) === k)) return false;
+    this.staged = action;
+    this.bump();
+    return true;
+  }
+
   /** Apply one view action for the screen's player. */
-  act(action: Action, intentId?: string): boolean {
+  act(action: Action, intentId?: string, opts?: { skipGate?: boolean }): boolean {
     if (!this.myDecision()) return false;
+    const t = this.config.tutorial;
+    if (t && !t.allow(action, this.view())) {
+      t.onBlocked(action);
+      return false;
+    }
+    if (this.commitGate && !opts?.skipGate && this.commitGate(action) === 'hold') {
+      this.heldAction = action;
+      this.bump();
+      return false;
+    }
+    this.heldAction = null;
+    this.staged = null;
     const before = this.session.actionCount;
     if (action.type === 'playCard') {
       const c = this.session
@@ -1156,6 +1224,11 @@ export class GameController {
     for (const a of actions) {
       const v = this.session.view(me);
       if (v.decision?.player !== me) break;
+      const t = this.config.tutorial;
+      if (t && !t.allow(a, this.view())) {
+        t.onBlocked(a);
+        break;
+      }
       const want =
         a.type === 'block'
           ? 'block'

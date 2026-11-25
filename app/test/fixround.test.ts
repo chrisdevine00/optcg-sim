@@ -8,12 +8,12 @@ import type { Card } from '@optcg/cards';
 import { chooseAction, lethal } from '@optcg/ai';
 import type { PlayerView, SearchView } from '@optcg/engine';
 import { GameController, type AiPort } from '../src/play/game/controller.ts';
-import type { LethalPort } from '../src/play/game/ai-client.ts';
+import type { CoachPort } from '../src/play/game/ai-client.ts';
 import { counterExtras, theyCouldHave } from '../src/play/coach/BattleExtras.tsx';
 import { unknownBound } from '../src/play/coach/Coach.tsx';
 import { prefixOf, reviewInline } from '../src/play/review/analyse.ts';
 import { SCENARIOS } from '../src/play/setup/scenarios.ts';
-import { cardMap } from './support.ts';
+import { cardMap, coachStubs } from './support.ts';
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -32,7 +32,11 @@ class Rookie implements AiPort {
   terminate() {}
 }
 
-class Port implements LethalPort {
+class Port implements CoachPort {
+  private readonly stubs = coachStubs();
+  hint = this.stubs.hint;
+  score = this.stubs.score;
+  threat = this.stubs.threat;
   requests = 0;
   lethal(view: SearchView) {
     this.requests++;

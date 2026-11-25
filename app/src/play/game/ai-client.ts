@@ -7,7 +7,18 @@
  * cards that have become visible) and the AI seat's own view (review M3-09, ADR 0005).
  */
 import type { Card } from '@optcg/cards';
-import type { AiRequest, AiResponse, AiTier, Decided, GameInfo, LethalResult } from '@optcg/ai';
+import type {
+  AiRequest,
+  AiResponse,
+  AiTier,
+  Decided,
+  GameInfo,
+  HintResult,
+  LethalResult,
+  NotImplemented,
+  ScoreTable,
+  ThreatResult,
+} from '@optcg/ai';
 import type { PlayerView, SearchView } from '@optcg/engine';
 
 export interface AiDecision extends Decided {
@@ -16,7 +27,10 @@ export interface AiDecision extends Decided {
   stats?: { rollouts: number; actions: number; planned: boolean };
 }
 
-type Req = Extract<AiRequest, { type: 'decide' } | { type: 'planTurn' } | { type: 'lethal' }>;
+type Req = Extract<
+  AiRequest,
+  { type: 'decide' | 'planTurn' | 'lethal' | 'hint' | 'score' | 'threat' }
+>;
 
 /** What the coach asks of a worker (a second `AiClient`, which never sees the AI seat's data). */
 export interface LethalPort {
@@ -27,6 +41,29 @@ export interface LethalPort {
   reveal(cards: Iterable<Card>): void;
   cancel(id: number): void;
   terminate(): void;
+}
+
+/**
+ * What the coach asks of its worker (M7). The three new answers are the result, or a typed
+ * `not-implemented` until WP1 to WP3 build them; the panel treats that as "no answer yet".
+ */
+export interface CoachPort extends LethalPort {
+  hint(view: SearchView, opts: { budgetMs: number }): { id: number; result: Promise<HintAnswer> };
+  score(view: SearchView, opts: { budgetMs: number }): { id: number; result: Promise<ScoreAnswer> };
+  threat(view: SearchView, opts: { capMs: number }): { id: number; result: Promise<ThreatAnswer> };
+}
+
+export interface HintAnswer {
+  result: HintResult | NotImplemented;
+  ms: number;
+}
+export interface ScoreAnswer {
+  result: ScoreTable | NotImplemented;
+  ms: number;
+}
+export interface ThreatAnswer {
+  result: ThreatResult | NotImplemented;
+  ms: number;
 }
 
 export interface LethalAnswer {
@@ -41,7 +78,7 @@ interface Pending {
   retried: boolean;
 }
 
-export class AiClient {
+export class AiClient implements CoachPort {
   private worker: Worker;
   private nextId = 1;
   private pending = new Map<number, Pending>();
@@ -156,6 +193,39 @@ export class AiClient {
     } satisfies Req;
     const result = this.send(req).then((r) => {
       if (r.type !== 'lethal') throw new Error('The worker answered the wrong request.');
+      return { result: r.result, ms: r.ms };
+    });
+    return { id, result };
+  }
+
+  /** A line to play now (the coach's worker; the asking seat's own view only). */
+  hint(view: SearchView, opts: { budgetMs: number }): { id: number; result: Promise<HintAnswer> } {
+    const id = this.nextId++;
+    const result = this.send({ type: 'hint', id, view, budgetMs: opts.budgetMs }).then((r) => {
+      if (r.type !== 'hint') throw new Error('The worker answered the wrong request.');
+      return { result: r.result, ms: r.ms };
+    });
+    return { id, result };
+  }
+
+  /** Every legal action valued, for the blunder warning. */
+  score(
+    view: SearchView,
+    opts: { budgetMs: number },
+  ): { id: number; result: Promise<ScoreAnswer> } {
+    const id = this.nextId++;
+    const result = this.send({ type: 'score', id, view, budgetMs: opts.budgetMs }).then((r) => {
+      if (r.type !== 'score') throw new Error('The worker answered the wrong request.');
+      return { result: r.result, ms: r.ms };
+    });
+    return { id, result };
+  }
+
+  /** Does the opponent's board threaten lethal on their turn. */
+  threat(view: SearchView, opts: { capMs: number }): { id: number; result: Promise<ThreatAnswer> } {
+    const id = this.nextId++;
+    const result = this.send({ type: 'threat', id, view, capMs: opts.capMs }).then((r) => {
+      if (r.type !== 'threat') throw new Error('The worker answered the wrong request.');
       return { result: r.result, ms: r.ms };
     });
     return { id, result };

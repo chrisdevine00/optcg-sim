@@ -12,14 +12,18 @@ import type { Card } from '@optcg/cards';
 import { lethal } from '@optcg/ai';
 import type { SearchView } from '@optcg/engine';
 import { GameController } from '../src/play/game/controller.ts';
-import type { LethalPort } from '../src/play/game/ai-client.ts';
+import type { CoachPort } from '../src/play/game/ai-client.ts';
 import { lethalBadge } from '../src/play/coach/badge.ts';
 import { SCENARIOS } from '../src/play/setup/scenarios.ts';
-import { cardMap } from './support.ts';
+import { cardMap, coachStubs } from './support.ts';
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-class InProcessLethal implements LethalPort {
+class InProcessLethal implements CoachPort {
+  private readonly stubs = coachStubs();
+  hint = this.stubs.hint;
+  score = this.stubs.score;
+  threat = this.stubs.threat;
   readonly requests: { view: SearchView; priority: number; mode: string }[] = [];
   readonly cancelled: number[] = [];
   private n = 1;

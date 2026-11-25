@@ -24,7 +24,7 @@ import {
 } from '@optcg/ai';
 import type { PlayerId, ProjectedView } from '@optcg/engine';
 import type { GameSession } from '../../session/index.ts';
-import type { LethalPort } from '../game/ai-client.ts';
+import type { CoachPort } from '../game/ai-client.ts';
 import {
   loadProfile,
   recordLethalProgress,
@@ -47,7 +47,7 @@ export interface CoachHost {
   /** Re-render. Never calls `Coach.sync`. */
   notify(): void;
   /** The worker for the detector, started on first use with `init` data. */
-  makePort(init: Card[]): LethalPort;
+  makePort(init: Card[]): CoachPort;
 }
 
 export type Tier = 0 | 1 | 2 | 3;
@@ -104,7 +104,7 @@ export class Coach {
   /** `tall` was asked for by the player (tier 3, the guided count). */
   wantTall = false;
 
-  private port: LethalPort | null = null;
+  private port: CoachPort | null = null;
   private pending: { id: number; key: string; auto: boolean } | null = null;
   private lastSpoken = '';
 
@@ -145,7 +145,7 @@ export class Coach {
   // Requests
   // -------------------------------------------------------------------------------------------
 
-  private ensurePort(view: ProjectedView): LethalPort {
+  private ensurePort(view: ProjectedView): CoachPort {
     if (!this.port) {
       const opp: PlayerId = this.host.me === 'p1' ? 'p2' : 'p1';
       const leader = view.zones[opp].leader[0]?.card;

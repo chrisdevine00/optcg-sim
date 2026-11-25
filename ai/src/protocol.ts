@@ -11,6 +11,7 @@ import type { Card } from '@optcg/cards';
 import type { Action, PlayerId, PlayerView, SearchView } from '@optcg/engine';
 import type { LethalResult, LethalState } from './search/lethal/lethal.ts';
 import type { Explanation } from './explanation.ts';
+import type { HintResult, NotImplemented, ScoreTable, ThreatResult } from './coach/types.ts';
 import type { Budget } from './search/pirate.ts';
 import type { AiTier } from './tiers.ts';
 
@@ -57,6 +58,15 @@ export type AiRequest =
       | { mode: 'public'; view: SearchView }
       | { mode: 'actual'; state: LethalState; attacker?: PlayerId }
     ))
+  /**
+   * M7 (WP0 contracts; WP1 to WP3 answer them). All three take the asking seat's own `SearchView`
+   * and nothing else. `hint`: a line to play now. `score`: every legal action valued, for the
+   * blunder warning. `threat`: does the opponent's board threaten lethal next turn. Priorities
+   * are in `priorityOf` (hint and threat on a press 2, score 3).
+   */
+  | { type: 'hint'; id: number; view: SearchView; budgetMs: number }
+  | { type: 'score'; id: number; view: SearchView; budgetMs: number }
+  | { type: 'threat'; id: number; view: SearchView; capMs: number }
   | { type: 'cancel'; id: number }
   /** Forget the turn plan and battle memory (the player rewound). */
   | { type: 'reset' };
@@ -73,4 +83,7 @@ export type AiResponse =
     }
   | { type: 'planned'; id: number; steps: number; rollouts: number; ms: number }
   | { type: 'lethal'; id: number; result: LethalResult; ms: number }
+  | { type: 'hint'; id: number; result: HintResult | NotImplemented; ms: number }
+  | { type: 'score'; id: number; result: ScoreTable | NotImplemented; ms: number }
+  | { type: 'threat'; id: number; result: ThreatResult | NotImplemented; ms: number }
   | { type: 'error'; id: number; message: string };

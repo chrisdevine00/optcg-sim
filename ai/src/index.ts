@@ -69,3 +69,18 @@ export { reviewMissedLethal, type LethalFlag, type ReviewOptions } from './searc
 export { answerLethal, insertByPriority, DEFAULT_CAP_MS } from './search/lethal/request.ts';
 export { defenceBound, counterProfile, type DefenceBound } from './search/lethal/profile.ts';
 export { FALLBACK_COUNTER } from './search/lethal/public.ts';
+export {
+  actionKey,
+  isNotImplemented,
+  BLUNDER_KINDS,
+  MAX_ALTERNATIVES,
+  NOT_IMPLEMENTED,
+  type BlunderKind,
+  type Certainty,
+  type HintAlternative,
+  type HintResult,
+  type NotImplemented,
+  type ScoreTable,
+  type ThreatResult,
+} from './coach/types.ts';
+export { priorityOf, answerCoach, type Work } from './coach/dispatch.ts';

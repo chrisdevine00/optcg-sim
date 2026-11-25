@@ -6,15 +6,27 @@ import type { Verbosity } from './ExplanationView.tsx';
 
 export type AlwaysOn = 0 | 1 | 2;
 
+export type CoachTab = 'hint' | 'why' | 'lethal' | 'math' | 'tempo';
+const TABS: readonly CoachTab[] = ['hint', 'why', 'lethal', 'math', 'tempo'];
+
 export interface CoachProfile {
   /** The coach is expanded (open or tall) rather than collapsed to its strip. */
   expanded: boolean;
-  tab: 'why' | 'lethal';
+  /** The coach strip's tab (M7). Hint, Math and Tempo arrive with WP4; until then only Why and Lethal show. */
+  tab: CoachTab;
   /** The lethal detector: 0 "Ask me" (default), 1 "Tier 1 always on", 2 "Tier 2 always on". */
   alwaysOn: AlwaysOn;
   verbosity: Verbosity;
   /** "DON!! math on the board" (learning-ui §2.7): "+X to stop" tags on legal targets. Default off. */
   donMath: boolean;
+  /** Blunder warning before a commit (learning-ui §3.3, M7 WP5). Default off. */
+  blunder: boolean;
+  /** Blunder kinds the player has muted (BlunderKind strings). */
+  muted: string[];
+  /** The opponent's-turn threat alert (M7 WP3/WP4). Default off. */
+  alerts: boolean;
+  /** The first-game preset has been offered (true) or declined (false); absent: never asked (WP6). */
+  firstGame?: boolean;
 }
 
 export const DEFAULT_PROFILE: CoachProfile = {
@@ -23,6 +35,9 @@ export const DEFAULT_PROFILE: CoachProfile = {
   alwaysOn: 0,
   verbosity: 'standard',
   donMath: false,
+  blunder: false,
+  muted: [],
+  alerts: false,
 };
 
 const KEY = 'optcg.coach.v1';
@@ -30,17 +45,23 @@ const KEY = 'optcg.coach.v1';
 export function loadProfile(): CoachProfile {
   try {
     const raw = window.localStorage.getItem(KEY);
-    if (!raw) return { ...DEFAULT_PROFILE };
+    if (!raw) return { ...DEFAULT_PROFILE, muted: [] };
     const p = JSON.parse(raw) as Partial<CoachProfile>;
     return {
       expanded: p.expanded === true,
-      tab: p.tab === 'why' ? 'why' : 'lethal',
+      tab: TABS.includes(p.tab as CoachTab) ? (p.tab as CoachTab) : 'lethal',
       alwaysOn: p.alwaysOn === 1 || p.alwaysOn === 2 ? p.alwaysOn : 0,
       verbosity: p.verbosity === 'learner' || p.verbosity === 'terse' ? p.verbosity : 'standard',
       donMath: p.donMath === true,
+      blunder: p.blunder === true,
+      muted: Array.isArray(p.muted)
+        ? p.muted.filter((k): k is string => typeof k === 'string')
+        : [],
+      alerts: p.alerts === true,
+      ...(typeof p.firstGame === 'boolean' ? { firstGame: p.firstGame } : {}),
     };
   } catch {
-    return { ...DEFAULT_PROFILE };
+    return { ...DEFAULT_PROFILE, muted: [] };
   }
 }
 

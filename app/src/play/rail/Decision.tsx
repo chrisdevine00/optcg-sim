@@ -71,6 +71,8 @@ export function DecisionPanel({
   parts,
   focusSignal,
   bodyHidden = false,
+  noteSlot,
+  commitLabel,
 }: {
   g: G;
   top: number;
@@ -78,10 +80,18 @@ export function DecisionPanel({
   focusSignal: number;
   /** The coach is tall: only the header and footer show (board.md §3.13). */
   bodyHidden?: boolean;
+  /** M7: a line under the decision body (the blunder note, a tutorial prompt). Default: nothing. */
+  noteSlot?: ReactNode;
+  /** M7: replaces the primary footer button's label ("Commit anyway"). Default: unchanged. */
+  commitLabel?: string;
 }) {
   const headRef = useRef<HTMLHeadingElement>(null);
   const firstRef = useRef<HTMLDivElement>(null);
-  const content = contentFor(g);
+  const base = contentFor(g);
+  const content =
+    commitLabel !== undefined && base.foot.primary
+      ? { ...base, foot: { ...base.foot, primary: { ...base.foot.primary, label: commitLabel } } }
+      : base;
   useEffect(() => {
     if (focusSignal === 0) return;
     // Focus the first choice when there is one (accessibility §3.2), else the heading.
@@ -147,6 +157,7 @@ export function DecisionPanel({
           </div>
         )}
         {content.body}
+        {noteSlot}
       </div>
       <div
         className={`dec-foot ${content.foot.equal ? 'equal' : ''}`}
