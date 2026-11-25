@@ -2,6 +2,13 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-25 — Block 3 batch B: a quoted type in the card data is an exact type; a failed [Trigger] goes to the trash; batches run in parallel
+
+- **Context:** the batch B blind tests raised two disagreements (EB02-044 Sengoku `black "Navy" type`, OP09-095 Laffitte `"Blackbeard Pirates" type card`) by reading a quoted type as a substring match (rules-digest 27, CR 2-4-3-1). Separately, OP10-100's notes said an activated [Trigger] whose colon-less "If" fails goes to the hand, while the OP-09 scripts and the engine send it to the trash.
+- **Decision (lead, confirmed by review B3C-R3 and B3B-R6):** in optcgapi text, `"X" type` is the official `{X} type` (exact): data-sources rows 43 and 54 show the rendering, the substring form is always printed `type including "X"` (87 times against 295), and OP09-044/046 print both forms in one sentence. Scripts keep exact types; the two tests now assert a substring-only card is not offered. An activated [Trigger] goes to the trash after resolving whether or not its "If" holds; only a declined Trigger goes to the hand. OP10-100's notes were corrected; no engine change.
+- **Process:** batch B's scripting ran while batch A was under review, and both batches went through one gate and one push after both fix rounds. Rejected: pushing batch A alone with batch B's unreviewed scripts on the same local `main`.
+- **Rejected:** treating the quoted form as substring (would widen 295 filters against the official text); an engine change for the Trigger destination (it was already right).
+
 ## 2026-11-25 — Block 3 batch A fix round: the AI leaves out an activation that changes nothing; a hand reveal is announced; OP10-098 asks the cost-4 pick first (B3B-R1 to R3; no ENGINE_VERSION change)
 
 - **Context:** the batch A review (`docs/reviews/m6b-block3-A.md`) failed on B3B-R1 (severity 3): OP10-030 Smoker and EB04-016 have an unlimited [Activate: Main] with no cost and no Once Per Turn ("set up to 1 DON!! as active, then you cannot set DON!! as active using Character effects"). Once the restriction is in place every repeat does nothing, but it stays legal; the Pirate ranks `activate` above `endTurn` (`structural` 2.5 against -1 in `ai/src/search/mcts.ts`), the state does not change, the value ties, and the AI activated it until the 2,000-action cap (seed 5044 of the review's batch decks reproduces it; no other layer caps repeats).
