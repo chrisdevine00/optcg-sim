@@ -7,6 +7,7 @@ import type { GameResult, PlayerId } from '@optcg/engine';
 import type { AiTier } from '@optcg/ai';
 import type { SessionRecord } from '../session/index.ts';
 import { getStore } from '../store/index.ts';
+import { stashGame, unstashGame } from '../store/pending.ts';
 import { reportStoreError } from '../store/open.ts';
 import type { GameMeta, ReviewStore } from '../store/types.ts';
 
@@ -47,6 +48,8 @@ export class GameSaver {
     private readonly now: () => number = Date.now,
     /** Called when a save fails (quota, storage off); the game itself is unaffected. */
     private readonly onError: (e: unknown) => void = reportStoreError,
+    /** The synchronous safety copy's storage; null skips it. */
+    private readonly stash: Storage | null | undefined = undefined,
   ) {}
 
   /** The saved id of this game, once saved. */
@@ -64,15 +67,23 @@ export class GameSaver {
     const endedAt = this.now();
     const id = `g${endedAt.toString(36)}-${Math.abs(('setup' in record.start ? record.start.setup.seed : record.start.scenario.seed) | 0).toString(36)}`;
     this.saved.set(key, id);
-    return this.store()
-      .saveGame({ id, record, meta: metaFrom(src, record, endedAt) })
-      .then(
-        () => id,
-        (e: unknown) => {
-          this.onError(e);
-          return null;
-        },
-      );
+    const game = { id, record, meta: metaFrom(src, record, endedAt) };
+    const store = this.store();
+    // A reload before IndexedDB commits must not lose the game: keep a synchronous copy until it has.
+    const durable = store.kind === 'indexeddb';
+    if (durable) stashGame(game, this.stash);
+    return store.saveGame(game).then(
+      () => {
+        if (durable) unstashGame(id, this.stash);
+        return id;
+      },
+      (e: unknown) => {
+        // A failure the page lived to see is reported (full, off); only an unload leaves the copy.
+        if (durable) unstashGame(id, this.stash);
+        this.onError(e);
+        return null;
+      },
+    );
   }
 }
 

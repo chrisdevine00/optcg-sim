@@ -8,6 +8,7 @@
 import { useSyncExternalStore } from 'react';
 import { IdbStore } from './idb.ts';
 import { migrateFromLocalStorage } from './migrate.ts';
+import { flushStashed } from './pending.ts';
 import { MemoryStore, getStore, setStore } from './index.ts';
 import { SyncKv } from './sync.ts';
 import { StoreQuotaError } from './types.ts';
@@ -124,6 +125,12 @@ async function open(opts: InitOptions): Promise<void> {
         } catch {
           // The keys stay where they are and the copy is idempotent: the next start finishes it.
         }
+      }
+      try {
+        // A game finished just before the last page closed, whose write did not commit.
+        await flushStashed(store, storage);
+      } catch {
+        // The copies stay; the next start tries again.
       }
       synced.timing = await SyncKv.hydrate(store.timing, reportStoreError);
       synced.progress = await SyncKv.hydrate(store.progress, reportStoreError);

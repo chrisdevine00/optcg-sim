@@ -6,6 +6,8 @@ const PORT = Number(process.env.E2E_PORT ?? 4173);
 
 export default defineConfig({
   testDir: 'app/e2e',
+  // The planted games and the 300-decision fixture of the M8 review specs (app/e2e/global-setup.ts).
+  globalSetup: './app/e2e/global-setup.ts',
   timeout: 120_000,
   fullyParallel: false,
   retries: process.env.CI ? 1 : 0,

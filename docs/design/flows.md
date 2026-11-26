@@ -650,9 +650,9 @@ The screen design is in `learning-ui.md` ("Game Review"). This is the flow.
    **System:** opens the review screen. If analysis is still running, the timeline fills turn by turn with a progress line: "Analysing turn 4 of 11". A 300-decision game finishes in under 60 s (PLAN M8). The player can browse finished turns while later ones are analysed.
    **SR (polite):** "Review. Analysing turn 4 of 11." then, at the end, "Review ready: 3 flags."
 
-2. **State: Overview** (`learning-ui.md` §4.1). Header; horizontal turn timeline with severity-sized flags; the flag list under it; the selected flag's explanation; a text-free thumbnail of the position; a pinned footer with **Study this moment**, **Play from here** and **Practice this**.
-   **Player:** selects a flag (click, or Left/Right through flags; the flag list is also a keyboard target).
-   **System:** shows "What you did", the claim, the certainty label, the stronger line, the outcome and the lesson link (`explanations.md` E01–E09, E19). For a "not fully checked" turn, the thumbnail and Study show that turn's starting position.
+2. **State: Overview** (`learning-ui.md` §4.1). Header; the turn timeline (the mulligan is column 0; two rows, "You" and the opponent's notable moves; Left/Right between turns, Up/Down between the rows) with a Life sparkline under it; the flag list under that (one listbox, one tab stop; `N` and Shift+N reach the next and previous flag from anywhere on the screen); the selected flag's explanation; a footer with **Study this moment**, **Play from here** and **Practice this**.
+   **Player:** selects a flag (click, `N`, or Up/Down in the flag list).
+   **System:** shows "What you did", the claim, the certainty label, the stronger line, the outcome and the lesson link (`explanations.md` E01–E09, E19). For a "not fully checked" turn, Study shows that turn's starting position. (As built there is no position thumbnail: Study is the way to see the board.)
 
 3. **Study mode.** **Player:** presses Enter on a flag, or **Study this moment**.
    **System:** shows the restored board at native game size in the game's own two-column layout (read-only; from the record, for display only). The rail holds the explanation with a pinned footer (**Play from here · Practice this**), and the rail header holds **← Overview** and a previous/next flag stepper ("Flag 2 of 5"; N / Shift+N). The stronger line can be stepped through on the board. Esc returns to Overview with the same flag selected. No text renders under 12 px in either mode.
@@ -660,11 +660,15 @@ The screen design is in `learning-ui.md` ("Game Review"). This is the flow.
 
 4. **Replay from here.** "Play from here vs Kaido" starts a new game from that state (as a scenario with the full hidden state from the record, since the original game is over). The AI is the same tier. The new game is marked "from review" and excluded from win rate.
 
-5. **Practice this.** Turns the flag into a puzzle (`learning-ui.md`, "Practice this"). The puzzle is added to the lethal-puzzle bank or the counter-or-take bank, depending on the flag's kind.
+5. **Practice this.** Turns the flag into a puzzle from the same position, against the engine (`learning-ui.md`, "Practice this"), judged by the flag's kind: win this turn (missed lethal), survive the turn (hit that should have been countered), take the attack without a Counter (counter wasted). When the player leaves the puzzle the flag says "Practised: solved" (or "not yet"), and the button reads "Practice again"; History shows it too. Practice for the other kinds is off with "Practice for this kind comes with the drills." (M9). As built the puzzle is not added to a bank: the Practised mark lives in the saved review.
 
 6. **Edge, stale record.** If the record's engine, card or script versions differ from the current build, the review opens read-only from its snapshots (ARCHITECTURE §2.9): timeline and flags viewable; "Play from here" and "Practice this" disabled with "This game was played on an older version. You can read the review, but not replay it."
 
-7. **Edge, analysis cancelled or incomplete.** Unanalysed turns show as hatched on the timeline with "Not analysed" and a "Analyse now" button. A turn whose search hit its cap shows "Not fully checked" (`search-incomplete`) and is never displayed as clean.
+7. **The review is silent while a board is live.** Play from here and Practice pause the analysis and remove the review's own announcement region: nothing of the review ("Analysing", "Review ready") is spoken over a board. On return the flag list has focus again.
+
+8. **Edge, storage full.** A finished game that cannot be saved (the browser's quota, or the 200-game cap) says "Saved games are full. Delete old reviews?" once, politely, with a link to History in delete mode (G8). Nothing is deleted for the player; the game itself is unaffected. A save that a reload interrupts is finished at the next start (a localStorage safety copy until IndexedDB commits).
+
+9. **Edge, analysis cancelled or incomplete.** Unanalysed turns show as hatched on the timeline with "Not analysed" and a "Analyse now" button. A turn whose search hit its cap shows "Not fully checked" (`search-incomplete`) and is never displayed as clean.
 
 ---
 

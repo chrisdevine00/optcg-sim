@@ -603,7 +603,21 @@ Run by `app/a11y/src/m7.ts` (`m7.dry.spec.ts`, `m7.nvda.spec.ts`, `m7.voiceover.
 
 Not built, so not scripted: a **Show me** control in a constrained step (the step lights the cards it names and its text carries the keys); **Settings → Opponent moves: Turn summary only** (M8); the tempo meter's own switch (it is a silent meter, always shown, and is read by `C` in browse mode, not announced). Left to the owner's listening pass: a whole game after the tutorial and `W` after an AI move (S2-kit.md, task 2.4), which the harness cannot judge.
 
-### 11.6 M10 audit
+### 11.6 Script: M8 (the review)
+
+Run by `app/a11y/src/m8.ts` (`m8.dry.spec.ts`, `m8.nvda.spec.ts`, `m8.voiceover.spec.ts`; the dry run checks the harness with Playwright keys and no screen reader). The NVDA run is dispatched by hand: `gh workflow run a11y-nvda.yml --ref <branch> -f browsers=both -f script=m8` (`script=all` runs M3, L, M7 and M8). One part, in one page context: load the planted missed-lethal game (`lethalDemo`, `play?scenario=lethalDemo&speed=step&opp=pirate&aibudget=iterations&start=1`), concede it (the game saves itself), then walk its review. The record is `app/a11y/results/<project>/m8.md`, judged against the Expect column as for M3 and L. This script replaces the review half (steps 6 to 9) of the L script, which was written before the review screen was built.
+
+| # | Do | Expect |
+| --- | --- | --- |
+| R1 | Game menu, Concede, Concede; Tab to "Review this game"; Enter | The review opens with focus on the heading "Game review". A polite "Review. Analysing turn n of N." once per turn (never twice for a turn), then "Review ready: 1 flag."; the status line reads "1 flag · 1 severe". Nothing is assertive |
+| R2 | Tab to the timeline; Left, Right, Down, Up, Home, End; `N` | The timeline is one tab stop (an application region). Each cell is read as "Turn 9, your turn: missed lethal, severe, holds whatever they held."; Down and Up move between "You" and the opponent's notable moves; the mulligan is column 0. `N` says "Flag 1 of 1 selected." and the flag's sentence, politely |
+| R3 | Tab to the Flags list; Enter; read the rail; Escape | The list is one listbox and one tab stop; Enter opens Study (the restored board, read-only, the explanation in the rail); focus is on "Overview"; Escape returns with focus on the same flag list |
+| R4 | The main navigation's "Reviews" link; Enter; Tab to the game's link; Enter | History is a table; the game's link reads as one sentence ("Lost to …, Pirate, <date>, 9 turns, 1 severe flag. Review."); Enter opens the review from the store; a polite "Review. 1 flag." and no progress line (the review is whole) |
+| R5 | Tab to "Practice this"; Enter; wait five seconds on the board | Focus is on "Your Main phase"; one polite "Practice: turn 9 as it stood. Nothing is timed. ..."; for the five seconds after it, nothing of the review ("Analysing", "Review ready", "Review. n flags.") is spoken, and the review's own live region is not in the page (L-SR4: the review never speaks over a live board) |
+
+Not built, so not scripted: the review's own "N of M" progress is too quick to hear on a short game (the 300-decision game of the e2e gate shows it); Practice for the DON!!, attack-order and mulligan kinds ("comes with the drills", M9).
+
+### 11.7 M10 audit
 
 All three scripts on all three reader and browser pairs, plus:
 - 200% browser zoom and the text-spacing CSS on the board, tutorial, review and settings;

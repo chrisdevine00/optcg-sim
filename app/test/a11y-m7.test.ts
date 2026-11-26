@@ -42,7 +42,7 @@ describe('the M7 script', () => {
 
   it('is a choice of the manual NVDA workflow, and is never run on push', () => {
     const wf = read('../../.github/workflows/a11y-nvda.yml');
-    expect(wf).toMatch(/options: \[l, m3, m7, both, all\]/);
+    expect(wf).toMatch(/options: \[l, m3, m7, m8, both, all\]/);
     expect(wf).toContain("'m7' { 'm7\\.nvda' }");
     expect(wf).toMatch(/on:\s+workflow_dispatch:/);
     expect(wf).not.toMatch(/\n\s+push:/);
