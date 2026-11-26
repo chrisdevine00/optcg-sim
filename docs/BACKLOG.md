@@ -64,3 +64,7 @@ Details and options: `docs/research/m6b-runtime-audit.md` §3.
 - W8-N1 (severity 1): a DON!! rest whose only candidates are DON!! (`rest` of `donCostArea`, `exactly: N` below the active count) asks which DON!! class although there is one (`selectRest`). PRB02-005 therefore shows its opponent a one-answer prompt at the start of their Main Phase; OP11-024, OP11-035 and OP12-018 already ask the same. Auto-answering it changes the tests and recorded flows of those three cards (ENGINE_VERSION), so it was left out of wave 8.
 - W8-N2 (severity 1): an Event activated from the trash by an effect (EB03-031) runs with its source still in the trash; a [Main] that names "this card" would read it there. No such Event is known; revisit if one is scripted.
 - W8-N3 (severity 1, fix round R5): mutants killed by one suite only and not yet pinned in the author files: OP15-014 `baseCost` to `cost` (the independent suite's Just Watch Me, Ace!!! case), OP16-079 duration `thisTurn` (the Rush), OP12-041 DON!! add `upTo: true` to `false`. OP12-041's boundary of 3 and "choose none" are pinned (`w8-fix-round-r2.test.ts`).
+
+## 10. Review search (M8-2, 2026-11-26)
+
+- The public lethal search caps on busy late-game boards (3 to 5 attackers, 5 or 6 hidden cards), so the review marks those turns "Not fully checked" (44% of turns on the 303-decision fixture). A sharper refutation bound over hidden counters would settle most of them; shared with L-03 (Unknown rate) and the M5b search budget. The review gate holds this under a 50% ceiling.

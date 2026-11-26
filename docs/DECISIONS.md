@@ -2,6 +2,12 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-26 — M8-2: the review's 10% gate counts deadline markers; honest "Not fully checked" turns get a ceiling and go to the backlog
+
+- **Context:** after M8-1 the 303-decision fixture still marks 4 of 9 reviewed turns (44%). Three are the `public` lethal search itself capping on late-game boards (3 to 5 attackers, 10 active DON!!, 5 or 6 hidden cards worth up to +4000 each); it does not finish at 150,000 or 1,500,000 nodes, so time does not help. One is should-counter's `actual` search. This is the same search limit L-03 measured (Unknown rate) in the learning slice.
+- **Decision (lead):** the plan's ≤ 10% marker gate exists to stop the scheduler from hiding unrun work behind the clock; it now counts **`deadline` markers** only (≤ 10% of reviewed turns). Turns where a search cannot settle its question stay honestly marked "Not fully checked" and are held under a ceiling on the fixture (≤ 50%, measured 44%) so they cannot get worse unnoticed. Making the public lethal search settle busy boards (a sharper refutation bound over hidden counters) is BACKLOG work, shared with L-03 and the M5b search budget. OPEN-QUESTIONS M8-2 closed by this entry.
+- **Rejected:** labelling a capped public search a note (it would claim a turn was checked when the player-visible question is open); a much larger cap (no effect in the bench); dropping the review of late turns.
+
 ## 2026-11-25 — M8: a turn whose public lethal check is refuted counts as checked even if the hindsight search runs out (M8-1)
 
 - **Context:** the WP1 bench reviewed a 303-decision game in about 24 s but marked 6 of 9 turns "Not fully checked" (target ≤ 10%). In every case the `public` check (what the player could see) refuted lethal quickly; only the `actual` hindsight search over the opponent's real cards ran out of nodes on mid-game boards.
