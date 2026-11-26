@@ -13,7 +13,8 @@
  * - **Hindsight**: the board did not decide it (the base is not a board-only loss), but their real hand
  *   did, and the branch is refuted in `actual` mode. Never severe.
  * - No candidate helps: a turn note, "Their board won whatever you did."; no flag.
- * - A cap hit is a "Not fully checked" marker.
+ * - A cap hit on the board check is a "Not fully checked" marker; a cap hit on the hindsight (actual)
+ *   search after the board check answered is a note (M8-1).
  *
  * The item is `T-1` (your turn) or `T`; either finds the same game. Lesson L15. Practice judge
  * `survive-turn` for turn `T`, started from the flagged attack.
@@ -21,7 +22,8 @@
 import type { Card } from '@optcg/cards';
 import { projectForSearch, queries, reduce, type GameState, type PlayerId } from '@optcg/engine';
 import type { Evidence, Explanation, Move } from '../../explanation.ts';
-import { lethal } from '../lethal/lethal.ts';
+import { lethal, type LethalResult } from '../lethal/lethal.ts';
+import { hindsightNote } from '../lethal/review.ts';
 import { threat } from '../lethal/threat.ts';
 import { isLegal, nameOf, other } from './defence-line.ts';
 import {
@@ -155,13 +157,15 @@ export const detect: Detector = (item, ctx) => {
   if (!boardLoss) {
     // Their hand decided it: only `actual` mode sees that.
     const a0 = lethal({ mode: 'actual', state: base, attacker }, cards, ctx.cap);
+    // The board check was answered; only the hindsight search ran out: a note, no marker (M8-1).
     if (a0.status === 'unknown')
-      return { itemId: item.id, turn: item.turn, flags: [], notes: [], marker: incomplete(T - 1) };
+      return { itemId: item.id, turn: item.turn, flags: [], notes: [hindsightNote(a0, 'theirs')] };
     if (a0.status !== 'proven') return null;
   }
 
   const flags: ReviewFlag[] = [];
   let marker: ReviewMarker | undefined;
+  let unfinished: LethalResult | undefined;
   for (const c of candidates) {
     const s1 = branchWithout(ctx, c.k, c.endTurn, theirMain, me);
     if (!s1) continue;
@@ -175,12 +179,13 @@ export const detect: Detector = (item, ctx) => {
       if (helps) flags.push(flagFor(c, T, me, 'any-hand', cards, b0, b1));
     } else {
       const a1 = lethal({ mode: 'actual', state: s1, attacker }, cards, ctx.cap);
-      if (a1.status === 'unknown') marker = incomplete(T - 1);
+      if (a1.status === 'unknown') unfinished = a1;
       else if (a1.status === 'refuted')
         flags.push(flagFor(c, T, me, 'needed-hidden-info', cards, b0, null));
     }
   }
   const notes: Explanation[] = [];
+  if (unfinished) notes.push(hindsightNote(unfinished, 'theirs'));
   if (flags.length === 0 && !marker && boardLoss) notes.push(noHelp(b0.explanation));
   if (flags.length === 0 && notes.length === 0 && !marker) return null;
   return {
