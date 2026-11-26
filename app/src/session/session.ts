@@ -224,6 +224,11 @@ export class GameSession {
     return this.record.actions.length;
   }
 
+  /** The actions applied since the first `n` (a practice puzzle judges what was played after its cut). */
+  actionsSince(n: number): readonly Action[] {
+    return this.record.actions.slice(n);
+  }
+
   get rewound(): boolean {
     return this.record.rewinds.length > 0;
   }

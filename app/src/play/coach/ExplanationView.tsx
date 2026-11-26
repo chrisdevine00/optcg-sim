@@ -6,6 +6,7 @@
  */
 import { useState } from 'react';
 import { certaintyLabel, type Explanation, type ExplanationContext } from '@optcg/ai';
+import { Link } from '../../router.tsx';
 
 export type Verbosity = 'learner' | 'standard' | 'terse';
 
@@ -40,10 +41,13 @@ export function CertaintyChip({
   context,
   id,
   caveat,
+  archetype,
 }: {
   certainty: Explanation['certainty'];
   context: ExplanationContext;
   id?: string;
+  /** A guide-sourced answer names its guide: "From the Rocks guide (sourced)". */
+  archetype?: string | undefined;
   /** The Trigger caveat, when it applies (learning-ui §3.1). */
   caveat?: string | null;
 }) {
@@ -52,7 +56,7 @@ export function CertaintyChip({
   return (
     <p className={`chip outline why-certainty cert-${certainty}`} id={id} title={tip}>
       <span aria-hidden="true">{SHAPE[certainty]} </span>
-      {certaintyLabel(certainty, context)}
+      {certaintyLabel(certainty, context, archetype)}
     </p>
   );
 }
@@ -67,6 +71,8 @@ export function ExplanationView({
   extra,
   caveat,
   renderLine,
+  archetype,
+  lessonLinks = false,
 }: {
   ex: Explanation;
   context: ExplanationContext;
@@ -81,6 +87,10 @@ export function ExplanationView({
   caveat?: string | null;
   /** Replaces the numbered line (the hint's own, with ticks and Do step 1). */
   renderLine?: () => React.ReactNode;
+  /** The guide's name for a sourced label (the review's mulligan). */
+  archetype?: string | undefined;
+  /** The lesson line is a link to `/learn/<lessonId>` (the review screens). */
+  lessonLinks?: boolean;
 }) {
   const [more, setMore] = useState(false);
   const H = `h${headingLevel}` as 'h2' | 'h3' | 'h4';
@@ -105,7 +115,16 @@ export function ExplanationView({
           <b>Next time:</b> {ex.nextTime}
         </p>
       )}
-      {ex.lessonId && <p className="subtle">Lesson: {lessonName(ex.lessonId)}</p>}
+      {ex.lessonId && (
+        <p className="subtle">
+          Lesson:{' '}
+          {lessonLinks ? (
+            <Link to={`/learn/${ex.lessonId}`}>{lessonName(ex.lessonId)}</Link>
+          ) : (
+            lessonName(ex.lessonId)
+          )}
+        </p>
+      )}
       {ex.sources.length > 0 && (
         <details>
           <summary>Sources</summary>
@@ -119,7 +138,14 @@ export function ExplanationView({
       <H id={`${idPrefix}-claim`} className="why-claim">
         {ex.claim}
       </H>
-      {!terse && <CertaintyChip certainty={ex.certainty} context={context} caveat={caveat} />}
+      {!terse && (
+        <CertaintyChip
+          certainty={ex.certainty}
+          context={context}
+          caveat={caveat}
+          archetype={archetype}
+        />
+      )}
       {!terse && renderLine && ex.line && ex.line.length > 0 && renderLine()}
       {!terse && !renderLine && ex.line && ex.line.length > 0 && (
         <ol className="why-line ex-line" aria-label="The line">

@@ -6,3 +6,4 @@ export * from './plan.ts';
 export * from './run.ts';
 export * from './schedule.ts';
 export { didAt, didInTurn, moveOf } from './did.ts';
+export { guideName, isSourced } from './mulligan.ts';

@@ -1,0 +1,44 @@
+/* History (M8 WP6): the saved-games table and its controls. Nothing under 12 px. */
+.history {
+  max-width: 1120px;
+}
+.hist-controls,
+.hist-delete {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin: 12px 0;
+}
+.hist-controls select {
+  margin-left: 4px;
+}
+.hist-confirm {
+  padding: 6px 10px;
+  border: 1px solid var(--color-danger-text);
+  border-radius: var(--radius-2);
+  background: var(--color-surface-1);
+}
+.hist-table {
+  width: 100%;
+}
+.hist-table td,
+.hist-table th {
+  vertical-align: top;
+}
+.hist-table .chip {
+  margin-right: 4px;
+}
+.hist-actions {
+  white-space: nowrap;
+}
+.hist-empty {
+  margin-top: 16px;
+}
+.hist-scroll {
+  overflow-x: auto;
+}
+.btn.danger {
+  border-color: var(--color-danger-text);
+  color: var(--color-danger-text);
+}
