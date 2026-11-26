@@ -12,6 +12,7 @@ import {
   createFromScenario,
   createGame,
   ENGINE_VERSION,
+  finalOf,
   IllegalAction,
   legalActions,
   previewFromView,
@@ -619,6 +620,8 @@ export class GameSession {
       actions: actions.slice(0, index),
       auto: this.record.auto.filter((i) => i < index),
       snapshots: this.record.snapshots.filter((x) => x.actionIndex <= index),
+      // The final state is the rewound position now (M8-R8): a stale `final` would fail the length check.
+      final: finalOf(s, index),
     };
     this.slots = assignSlots(this.initialSlots(), this.eventsByAction.flat());
   }

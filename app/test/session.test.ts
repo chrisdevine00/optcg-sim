@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { rookie } from '@optcg/ai';
-import type { Action, PlayerId } from '@optcg/engine';
+import { verifyReplay, type Action, type PlayerId } from '@optcg/engine';
 import { GameSession, type SessionRecord } from '../src/session/index.ts';
 import { cardMap, lookup, metaDecks } from './support.ts';
 
@@ -103,6 +103,19 @@ describe('session store (ARCHITECTURE §5)', () => {
       expect(JSON.stringify(back.view(p))).toBe(JSON.stringify(s.view(p)));
     expect(back.exportRecord().rewinds).toEqual(rec.rewinds);
     expect(back.verify()).toBe(true);
+  });
+
+  it('a rewound record carries the rewound position as its final state (M8-R8)', () => {
+    const s = newSession(8);
+    play(s, 50);
+    s.rewindTo(30);
+    const cut = s.exportRecord();
+    expect(cut.final?.actionIndex).toBe(30);
+    expect(verifyReplay(cut, lookup)).toMatchObject({ ok: true });
+    play(s, 10);
+    const rec = s.exportRecord();
+    expect(rec.final?.actionIndex).toBe(rec.actions.length);
+    expect(verifyReplay(rec, lookup)).toMatchObject({ ok: true });
   });
 
   it('auto-skips only one-answer windows and records them as auto', () => {

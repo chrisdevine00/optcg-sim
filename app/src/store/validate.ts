@@ -338,7 +338,32 @@ export function sanitizeRecord(v: unknown, b: Budget = new Budget()): SessionRec
     },
     rewinds,
     auto: arr(o.auto, 'auto', MAX_ACTIONS).map((i) => int(i, 'an auto index', 0, MAX_ACTIONS)),
+    ...(o.final === undefined ? {} : { final: finalState(o.final, actions.length) }),
   } as unknown as SessionRecord;
+}
+
+/** A record's `final` (M8-R8), rebuilt field by field; `verifyReplay` compares it with a replay. */
+function finalState(
+  v: unknown,
+  actions: number,
+): { actionIndex: number; hash: string; result: unknown } {
+  const f = obj(v, 'a final state');
+  let result: unknown = null;
+  if (f.result !== null && f.result !== undefined) {
+    const r = obj(f.result, 'a result');
+    result =
+      r.draw !== undefined
+        ? { draw: oneOf(r.draw, 'a draw', ['bothLost', 'loop'] as const) }
+        : {
+            winner: oneOf(r.winner, 'a winner', ['p1', 'p2'] as const),
+            reason: str(r.reason, 'a reason', 100),
+          };
+  }
+  return {
+    actionIndex: int(f.actionIndex, 'final actionIndex', 0, actions),
+    hash: str(f.hash, 'final hash', 100),
+    result,
+  };
 }
 
 export function sanitizeGame(v: unknown, b: Budget = new Budget()): StoredGame {
