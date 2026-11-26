@@ -172,7 +172,10 @@ const cellName = (
   pending: boolean,
   hasNote: boolean,
 ): string => {
-  if (flags.length > 0) return flags.map((f) => flagName(f, a)).join(' ');
+  // The name starts with the words the cell shows ("2 flags"), so it contains its visible text
+  // (WCAG 2.5.3, axe label-content-name-mismatch).
+  if (flags.length > 0)
+    return `${flags.length > 1 ? `${flags.length} flags: ` : ''}${flags.map((f) => flagName(f, a)).join(' ')}`;
   const head =
     turn === 0
       ? 'Mulligan'
