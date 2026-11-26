@@ -90,8 +90,12 @@ export function sortFlags(flags: readonly ReviewFlag[]): ReviewFlag[] {
 }
 
 /** The label of a flag's certainty: the guide label for a mulligan, the review label otherwise. */
-export const certaintyOf = (f: ReviewFlag): string =>
-  certaintyLabel(f.explanation.certainty, f.kind === 'mulligan' ? 'guide' : 'review');
+export const certaintyOf = (f: ReviewFlag, guide?: string): string =>
+  certaintyLabel(f.explanation.certainty, contextOf(f), guide);
+
+/** The certainty context everywhere a flag's explanation is shown: a mulligan is the guide's advice. */
+export const contextOf = (f: ReviewFlag): 'guide' | 'review' =>
+  f.kind === 'mulligan' ? 'guide' : 'review';
 
 export interface Actors {
   /** Whose turn `turn` was. */
@@ -99,12 +103,14 @@ export interface Actors {
   me: PlayerId;
   /** The opponent's Leader, for "Kaido's turn". */
   oppName: string;
+  /** The seat's guide name, for a mulligan flag's "From the Rocks guide (sourced)". */
+  guide?: string | undefined;
 }
 
 /** "Turn 9, your turn: missed lethal, severe, holds whatever they held." */
 export function flagName(f: ReviewFlag, a: Actors): string {
   const sev = SEVERITY[f.severity].word.toLowerCase();
-  const tail = `${sev}, ${certaintyOf(f).toLowerCase()}.`;
+  const tail = `${sev}, ${certaintyOf(f, a.guide).toLowerCase()}.`;
   if (f.kind === 'mulligan') return `Start of the game: mulligan, ${tail}`;
   const whose =
     a.playerOf(f.turn) === a.me || a.playerOf(f.turn) === null
@@ -207,10 +213,16 @@ export function finalLife(record: SessionRecord): Record<PlayerId, number> | nul
   return { p1: s.views.p1.zones.p1.life.length, p2: s.views.p2.zones.p2.life.length };
 }
 
-export const actorsOf = (turns: readonly TurnInfo[], me: PlayerId, oppName: string): Actors => ({
+export const actorsOf = (
+  turns: readonly TurnInfo[],
+  me: PlayerId,
+  oppName: string,
+  guide?: string,
+): Actors => ({
   playerOf: (t) => turns.find((x) => x.turn === t)?.player ?? null,
   me,
   oppName,
+  guide,
 });
 
 /** The position a marker or a turn without a flag is studied at: the turn's start. */
@@ -310,3 +322,36 @@ export const PRACTICE_LABEL: Record<PracticeJudge, string> = {
 
 export const practisedWord = (s: 'solved' | 'not-yet' | undefined): string | null =>
   s === 'solved' ? 'Practised: solved' : s === 'not-yet' ? 'Practised: not yet' : null;
+
+/** The cost is in the label: a deeper search of one turn takes about half a minute (M8-2). */
+export const DEEPER_LABEL = 'Analyse deeper (about half a minute)';
+
+export interface MarkerCopy {
+  lead: string;
+  body: string;
+  /** The one button, or null when nothing more can help. */
+  button: 'deeper' | 'now' | null;
+}
+
+/**
+ * What a marker says (M8-R9). A `deadline` or `not-run` marker is time: we never got to the turn,
+ * and Analyse now settles it. `search-incomplete` is the search: too many possible hands, which a
+ * bigger run seldom settles (M8-2 measured three public-lethal markers that stayed open at ten times
+ * the nodes), so it never says "ran out of time", offers "Analyse deeper" once, and after that
+ * says it did not help.
+ */
+export function markerCopy(
+  reason: 'search-incomplete' | 'deadline' | 'not-run',
+  tried: boolean,
+): MarkerCopy {
+  if (reason !== 'search-incomplete')
+    return { lead: 'Not analysed.', body: 'We stopped before checking this turn.', button: 'now' };
+  const base = 'We couldn’t settle this turn: too many possible hands to check.';
+  return tried
+    ? {
+        lead: 'Not fully checked.',
+        body: `${base} Looking deeper did not settle it either.`,
+        button: null,
+      }
+    : { lead: 'Not fully checked.', body: base, button: 'deeper' };
+}

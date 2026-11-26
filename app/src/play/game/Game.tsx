@@ -36,6 +36,8 @@ import { HintBody, StagedNote } from '../coach/HintSection.tsx';
 import type { GameController } from './controller.ts';
 import { useFocusRescue } from './focus.ts';
 import { Arrows, spokenArrows } from '../arrows.tsx';
+// The board and rail styles come with the board, wherever it is shown (a direct load of a review).
+import '../play.css';
 import { legalOf } from './legal.ts';
 import { cardName, num, other, statusSummary } from './text.ts';
 import { NO_STAGING, type G, type Staging, type UiMode } from './ui.ts';

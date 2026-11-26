@@ -7,8 +7,14 @@ import type { GameResult, PlayerId } from '@optcg/engine';
 import type { AiTier } from '@optcg/ai';
 import type { SessionRecord } from '../session/index.ts';
 import { getStore } from '../store/index.ts';
-import { stashGame, unstashGame } from '../store/pending.ts';
-import { reportStoreError } from '../store/open.ts';
+import {
+  MEMORY_MODE_KEEP,
+  MEMORY_MODE_MAX_CHARS,
+  pruneStash,
+  stashGame,
+  unstashGame,
+} from '../store/pending.ts';
+import { reportStoreError, retryStashed } from '../store/open.ts';
 import type { GameMeta, ReviewStore } from '../store/types.ts';
 
 /** What the saver reads from a game: a `GameController` fits through `sourceOf`. */
@@ -69,17 +75,22 @@ export class GameSaver {
     this.saved.set(key, id);
     const game = { id, record, meta: metaFrom(src, record, endedAt) };
     const store = this.store();
-    // A reload before IndexedDB commits must not lose the game: keep a synchronous copy until it has.
+    // A reload before IndexedDB commits must not lose the game: keep a synchronous copy until it
+    // has. With no IndexedDB the copy is the only one that survives a reload, so it stays (bounded).
     const durable = store.kind === 'indexeddb';
-    if (durable) stashGame(game, this.stash);
+    stashGame(game, this.stash, durable ? Infinity : MEMORY_MODE_MAX_CHARS);
     return store.saveGame(game).then(
       () => {
-        if (durable) unstashGame(id, this.stash);
+        if (durable) {
+          unstashGame(id, this.stash);
+          // The store took this one: any game an earlier failed save left waiting may fit now.
+          void retryStashed(this.stash);
+        } else pruneStash(MEMORY_MODE_KEEP, this.stash);
         return id;
       },
       (e: unknown) => {
-        // A failure the page lived to see is reported (full, off); only an unload leaves the copy.
-        if (durable) unstashGame(id, this.stash);
+        // Full, or at the 200-game cap: the finished game is kept, never dropped. It is saved again
+        // after a delete, from "Save this game", or at the next start.
         this.onError(e);
         return null;
       },

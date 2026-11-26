@@ -29,7 +29,7 @@ const TIP: Record<Explanation['certainty'], string> = {
   'needed-hidden-info':
     'This only works against the hand they actually held, which you couldn’t see. Shown to help you read hands, not as a mistake.',
   'search-incomplete':
-    'The analysis ran out of time on this turn. It found no proof either way. Analyse deeper?',
+    'We couldn’t settle this turn: too many possible hands to check. It found no proof either way.',
 };
 
 /** The live coach speaks of the lists we know and of what you can see now (review L-04). */

@@ -8,7 +8,7 @@
 import { useSyncExternalStore } from 'react';
 import { IdbStore } from './idb.ts';
 import { migrateFromLocalStorage } from './migrate.ts';
-import { flushStashed } from './pending.ts';
+import { flushStashed, pendingCount, restoreStashed, watchPending } from './pending.ts';
 import { MemoryStore, getStore, setStore } from './index.ts';
 import { SyncKv } from './sync.ts';
 import { StoreQuotaError } from './types.ts';
@@ -24,9 +24,11 @@ export interface StoreStatus {
   full: boolean;
   /** The "Saving is off" notice was dismissed for this page load. */
   dismissed: boolean;
+  /** Finished games waiting to be saved (a save failed on the quota or the cap). */
+  pending: number;
 }
 
-let status: StoreStatus = { kind: 'memory', full: false, dismissed: false };
+let status: StoreStatus = { kind: 'memory', full: false, dismissed: false, pending: 0 };
 const listeners = new Set<() => void>();
 const set = (patch: Partial<StoreStatus>) => {
   status = { ...status, ...patch };
@@ -46,6 +48,20 @@ export function useStoreStatus(): StoreStatus {
 }
 export const dismissStoreNotice = () => set({ dismissed: true });
 export const clearStoreFull = () => set({ full: false });
+watchPending(() => set({ pending: pendingCount() }));
+
+/**
+ * Save the finished games a full store turned away (R3). Call it after a delete, after a save that
+ * worked, or from "Save this game". Clears the full notice when nothing is left waiting; a save that
+ * fails again keeps the games and the notice. Returns how many were saved.
+ */
+export async function retryStashed(ls?: Storage | null): Promise<number> {
+  const store = getStore();
+  if (store.kind !== 'indexeddb' || pendingCount(ls) === 0) return 0;
+  const n = await flushStashed(store, ls, reportStoreError);
+  if (pendingCount(ls) === 0) clearStoreFull();
+  return n;
+}
 
 /** Every failed save lands here (`GameSaver`'s `onError`, the resume slot, the small logs). */
 export function reportStoreError(e: unknown): void {
@@ -100,8 +116,8 @@ export async function rehydrateStore(): Promise<void> {
   const store = getStore();
   if (store.kind !== 'indexeddb') return;
   await settleStore();
-  synced.timing = await SyncKv.hydrate(store.timing, reportStoreError);
-  synced.progress = await SyncKv.hydrate(store.progress, reportStoreError);
+  synced.timing = await SyncKv.hydrate(store.timing, reportStoreError, 'timing');
+  synced.progress = await SyncKv.hydrate(store.progress, reportStoreError, 'progress');
 }
 
 /** Tests: forget the boot so `initStore` runs again. */
@@ -110,7 +126,7 @@ export function resetStoreForTests(): void {
   synced.timing = null;
   synced.progress = null;
   setStore(null);
-  status = { kind: 'memory', full: false, dismissed: false };
+  status = { kind: 'memory', full: false, dismissed: false, pending: 0 };
 }
 
 async function open(opts: InitOptions): Promise<void> {
@@ -128,20 +144,32 @@ async function open(opts: InitOptions): Promise<void> {
       }
       try {
         // A game finished just before the last page closed, whose write did not commit.
-        await flushStashed(store, storage);
+        await flushStashed(store, storage, reportStoreError);
       } catch {
         // The copies stay; the next start tries again.
       }
-      synced.timing = await SyncKv.hydrate(store.timing, reportStoreError);
-      synced.progress = await SyncKv.hydrate(store.progress, reportStoreError);
+      synced.timing = await SyncKv.hydrate(store.timing, reportStoreError, 'timing');
+      synced.progress = await SyncKv.hydrate(store.progress, reportStoreError, 'progress');
       setStore(store);
       set({ kind: 'indexeddb' });
+      // Every write is already issued inside its call; on the way out, settle what is in flight.
+      try {
+        addEventListener('pagehide', () => void settleStore());
+      } catch {
+        /* no window (tests) */
+      }
       return;
     } catch {
       synced.timing = synced.progress = null;
     }
   }
   if (!(getStore() instanceof MemoryStore)) setStore(null);
+  // No IndexedDB: the games finished before the last reload come back from their localStorage copy.
+  try {
+    await restoreStashed(getStore(), storage);
+  } catch {
+    /* nothing to restore */
+  }
   set({ kind: 'memory' });
 }
 

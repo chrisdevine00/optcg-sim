@@ -3,10 +3,10 @@
  * synchronous localStorage copy until the store has committed; the next start finishes it.
  */
 import { IDBFactory } from 'fake-indexeddb';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { GameSaver, type SaveSource } from '../src/play/save-game.ts';
 import { IdbStore } from '../src/store/idb.ts';
-import { PENDING_PREFIX, flushStashed } from '../src/store/pending.ts';
+import { PENDING_PREFIX, flushStashed, resetPendingForTests } from '../src/store/pending.ts';
 import { MemoryStore, StoreQuotaError, type ReviewStore } from '../src/store/index.ts';
 import { initStore, resetStoreForTests } from '../src/store/open.ts';
 import { FakeStorage, sessionRecord } from './store-support.ts';
@@ -22,6 +22,7 @@ const src: SaveSource = {
   turn: () => 3,
 };
 const noop = () => undefined;
+afterEach(() => resetPendingForTests());
 
 /** A store whose write never commits: the page unloaded first. */
 function neverCommits(real: IdbStore): ReviewStore {
@@ -52,7 +53,7 @@ describe('the finished game safety copy', () => {
     expect(ls.length).toBe(0);
   });
 
-  it('is removed once IndexedDB has committed, and on a failure the page saw', async () => {
+  it('is removed once IndexedDB has committed, and kept on a failure the page saw (R3)', async () => {
     const factory = new IDBFactory();
     const ls = new FakeStorage();
     const store = await IdbStore.open(factory);
@@ -75,10 +76,13 @@ describe('the finished game safety copy', () => {
       ls,
     ).observe({}, src);
     expect(errors).toHaveLength(1);
+    // A failed save keeps the finished game: it is saved again after room is made.
+    expect(ls.length).toBe(1);
+    expect(await flushStashed(store, ls)).toBe(1);
     expect(ls.length).toBe(0);
   });
 
-  it('is skipped for the in-memory store, and saving twice changes nothing', async () => {
+  it('stays for the in-memory store (R11), and saving twice changes nothing', async () => {
     const ls = new FakeStorage();
     await new GameSaver(
       () => new MemoryStore(),
@@ -86,7 +90,8 @@ describe('the finished game safety copy', () => {
       noop,
       ls,
     ).observe({}, src);
-    expect(ls.length).toBe(0);
+    // No IndexedDB: the copy is what survives a reload, so it stays (bounded).
+    expect(ls.length).toBe(1);
     const store = await IdbStore.open(new IDBFactory());
     new GameSaver(
       () => neverCommits(store),

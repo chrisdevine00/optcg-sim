@@ -8,6 +8,7 @@
  *   should-counter  E05: a hit taken that should have been countered; the game is lost on it
  *   don-unused      E06: eight DON!!, a five-cost card, the Leader attacks with three left over
  *   target          E08: board over face, you attack the Leader with a Character that could clear theirs
+ *   mulligan        E11: a Rocks hand the guide redraws, kept (the guide label, never "holds whatever they held")
  *
  * The positions are those of the detectors' own tests (ai/test/review/*, ai/test/support/*), so what
  * the browser shows is what the unit tests proved; the browser adds the UI around them.
@@ -28,10 +29,13 @@ import { attackOn, recordOf, takeIt, type Spec } from '../../ai/test/review/wp3-
 import { e08Record } from '../../ai/test/support/review-target-positions.ts';
 import { plantRecord } from '../../ai/test/support/review-plant.ts';
 import { lifeOf, listOf } from '../../ai/test/support/scenario.ts';
-import { lookup } from '../../ai/test/support.ts';
+import { cardMap, lookup } from '../../ai/test/support.ts';
+import { atMulligan, findSeed } from '../../ai/test/review/wp2-mulligan.ts';
+import { playbookFor } from '../../ai/src/playbook.ts';
+import { mulliganVerdict } from '../../ai/src/search/mulligan.ts';
 
 export type PlantedName =
-  'missed-lethal' | 'wasted-counter' | 'should-counter' | 'don-unused' | 'target';
+  'missed-lethal' | 'wasted-counter' | 'should-counter' | 'don-unused' | 'target' | 'mulligan';
 
 export interface PlantedGame {
   id: string;
@@ -123,12 +127,30 @@ function missedLethal(): ReviewRecord {
   return plantRecord(spec, () => [{ type: 'concede', player: 'p1' }]);
 }
 
+/** A Rocks hand the guide would redraw, going first, kept: the mulligan flag (E11). */
+function mulliganGame(): ReviewRecord {
+  const cards = cardMap();
+  const rule = playbookFor(ROCKS, listOf(ROCKS), cards).mulligan;
+  const seed = findSeed(
+    ROCKS,
+    true,
+    (h) =>
+      !mulliganVerdict(
+        h.map((id) => cards.get(id)),
+        rule,
+        true,
+      ).keep,
+  );
+  return conceded(atMulligan(ROCKS, seed, true).rec(false));
+}
+
 const BUILDERS: Record<PlantedName, () => ReviewRecord> = {
   'missed-lethal': missedLethal,
   'wasted-counter': () => conceded(e04Record() as RecordWithSnapshots),
   'should-counter': e05Record,
   'don-unused': () => conceded(e06Record() as RecordWithSnapshots),
   target: () => conceded(e08Record() as unknown as RecordWithSnapshots),
+  mulligan: mulliganGame,
 };
 
 /** The last game turn: records carry a snapshot at every turn boundary. */

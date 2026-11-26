@@ -26,9 +26,9 @@ test('Overview: the E06 game, a flag whose Practice is not built yet says so', a
   await axe(page, info, 'overview-no-practice');
 });
 
-test('History with five games, then the empty History', async ({ page }, info) => {
+test('History with six games, then the empty History', async ({ page }, info) => {
   await load(page, Object.values(planted()));
-  await expect(page.getByTestId('history-table').getByRole('row')).toHaveCount(6);
+  await expect(page.getByTestId('history-table').getByRole('row')).toHaveCount(7);
   await axe(page, info, 'history');
   await page.goto('./reviews?mode=delete');
   await expect(
@@ -98,6 +98,37 @@ test('storage full: a finished game that cannot be saved says so, and History of
   await expect(page.getByRole('button', { name: /^Delete selected/ })).toBeDisabled();
   await expect(page.getByRole('checkbox', { name: /^Select / })).toHaveCount(200);
   await axe(page, info, 'storage-full-history');
+
+  // The finished game is kept, not dropped (M8-R3): the notice offers to save it, which fails while
+  // the store is still full and changes nothing.
+  const keep = page.getByTestId('storage-notice').getByRole('button', { name: 'Save this game' });
+  await expect(keep).toBeVisible();
+  await keep.click();
+  await expect(page.getByTestId('storage-notice')).toContainText('Saved games are full.');
+  // Delete the oldest game: the kept game is saved into the room that makes, and the notice clears.
+  await page
+    .getByRole('checkbox', { name: /^Select / })
+    .last()
+    .check();
+  await page.getByRole('button', { name: /^Delete selected/ }).click();
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Delete' }).click();
+  await expect(page.getByTestId('storage-notice')).toBeHidden();
+  await expect(page.getByRole('checkbox', { name: /^Select / })).toHaveCount(200);
+  const ids = await page.evaluate(
+    () =>
+      new Promise<string[]>((resolve, reject) => {
+        const open = indexedDB.open('optcg-sim');
+        open.onerror = () => reject(open.error);
+        open.onsuccess = () => {
+          const r = open.result.transaction('games').objectStore('games').getAllKeys();
+          r.onsuccess = () => resolve(r.result.map(String));
+        };
+      }),
+  );
+  expect(ids.filter((id) => !id.startsWith('filler-') && !id.startsWith('planted-'))).toHaveLength(
+    1,
+  );
+  expect(ids).not.toContain('filler-0');
 });
 
 const GET_REVIEW_STATUS = `(db, id) => new Promise((res) => {

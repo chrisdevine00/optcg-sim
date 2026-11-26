@@ -11,7 +11,13 @@ import { Link, useSearch } from '../router.tsx';
 import { download } from '../tutorial/timing.ts';
 import { exportGame, gameFileName } from '../store/data.ts';
 import { getStore } from '../store/index.ts';
-import { SAVED_FULL, clearStoreFull, settleStore, useStoreStatus } from '../store/open.ts';
+import {
+  SAVED_FULL,
+  clearStoreFull,
+  retryStashed,
+  settleStore,
+  useStoreStatus,
+} from '../store/open.ts';
 import {
   NO_FILTERS,
   RESULT_WORD,
@@ -110,7 +116,11 @@ export function History() {
     }
     setPicked(new Set());
     setConfirm(false);
-    if (ids.length - failed > 0) clearStoreFull();
+    // Room was made: the game a full store turned away is saved now (and the notice clears with it).
+    if (ids.length - failed > 0) {
+      clearStoreFull();
+      await retryStashed();
+    }
     setSaid(
       failed > 0
         ? `Deleted ${ids.length - failed} of ${ids.length}. ${failed} could not be deleted.`
@@ -315,7 +325,13 @@ export function History() {
                             {t}
                           </span>
                         ))}
-                        {r.stale && <span className="chip outline">Read-only: older version</span>}
+                        {r.stale && (
+                          <span className="chip outline">
+                            {r.stale === 'large'
+                              ? 'Read-only: too long to replay'
+                              : 'Read-only: older version'}
+                          </span>
+                        )}
                         {incomplete(r) && !r.stale && (
                           <Link to={`/reviews/${encodeURIComponent(r.id)}`}>
                             Analysis incomplete · Resume

@@ -17,7 +17,7 @@ import type { PlayerId } from '@optcg/engine';
 import { Footer } from '../../Footer.tsx';
 import { Header } from '../../Header.tsx';
 import { getStore } from '../../store/index.ts';
-import { STALE_COPY, liveness, type Liveness } from '../../store/staleness.ts';
+import { liveness, readOnlyWord, staleCopyOf, type Liveness } from '../../store/staleness.ts';
 import type { GameMeta } from '../../store/types.ts';
 import type { SessionRecord } from '../../session/index.ts';
 import { ExplanationView } from '../coach/ExplanationView.tsx';
@@ -36,6 +36,9 @@ import {
   actorsOf,
   collect,
   certaintyOf,
+  contextOf,
+  DEEPER_LABEL,
+  markerCopy,
   finalLife,
   flagName,
   notableMoves,
@@ -51,6 +54,7 @@ import { INERT_AI, leadersOf, restoreConfig } from './restore.ts';
 import { Sparkline } from './Sparkline.tsx';
 import { FlagShape, LEGEND, Timeline } from './Timeline.tsx';
 import { useReview, type UseReviewInput } from './useReview.ts';
+import '../play.css';
 import './review.css';
 
 export interface ReviewScreenProps {
@@ -106,7 +110,8 @@ export function ReviewScreen(props: ReviewScreenProps) {
 
   const turns = useMemo(() => turnsOf(record), [record]);
   const oppName = cards.get(leadersOf(record)[opp])?.name || 'the AI';
-  const actors = useMemo(() => actorsOf(turns, me, oppName), [turns, me, oppName]);
+  const guide = useMemo(() => guideOf(record, me), [record, me]);
+  const actors = useMemo(() => actorsOf(turns, me, oppName, guide), [turns, me, oppName, guide]);
 
   const run = useReview({
     gameId,
@@ -237,7 +242,7 @@ export function ReviewScreen(props: ReviewScreenProps) {
     setScreen({ kind: 'study', ctl: c, flagId: f?.id ?? null, turn: t });
   };
   const playAt = (f: ReviewFlag | null, t: number, practice: boolean) => {
-    const pr = practice ? practiceOf(f, live.live, STALE_COPY) : null;
+    const pr = practice ? practiceOf(f, live.live, staleCopyOf(live)) : null;
     const index = f ? f.restoreIndex : turnStartIndex(turns, t);
     const c = board(index, pr?.ok ? { puzzle: { turn: pr.turn, judge: pr.judge } } : {});
     c.start();
@@ -314,6 +319,7 @@ export function ReviewScreen(props: ReviewScreenProps) {
         marker={data.markers.find((m) => m.turn === screen.turn)}
         archetype={archetypeOf(f, record, me)}
         live={live.live}
+        staleCopy={staleCopyOf(live)}
         practised={run.practised}
         step={(d) => {
           const next = visible[at + d];
@@ -397,9 +403,11 @@ function archetypeOf(
   record: SessionRecord,
   me: PlayerId,
 ): string | undefined {
-  if (f?.kind !== 'mulligan') return undefined;
-  return guideName(playbookFor(leadersOf(record)[me]));
+  return f?.kind === 'mulligan' ? guideOf(record, me) : undefined;
 }
+
+const guideOf = (record: SessionRecord, me: PlayerId): string =>
+  guideName(playbookFor(leadersOf(record)[me]));
 
 function statusLine(
   status: ReturnType<typeof useReview>['status'],
@@ -417,7 +425,7 @@ function statusLine(
     data.flags.length === 0 && data.markers.length === 0
       ? 'Analysed: no flags found.'
       : summaryText(data.flags, data.markers);
-  return live.live ? base : `${base} · Read-only: older version`;
+  return live.live ? base : `${base} · ${readOnlyWord(live)}`;
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -456,6 +464,13 @@ function Overview(p: {
 }) {
   const { meta, data, flag, run, actors } = p;
   const root = useRef<HTMLElement>(null);
+  // "Analyse deeper" is offered once per turn: M8-2 showed a second, bigger run does not settle a
+  // turn the first could not, so a turn already tried says so instead of offering it again.
+  const [tried, setTried] = useState<ReadonlySet<number>>(new Set());
+  const deeper = (m: { turn: number; kind?: FlagKind | null | undefined }) => {
+    setTried((t) => new Set(t).add(m.turn));
+    run.analyse(m.turn, { kind: m.kind, factor: 10 });
+  };
   // A new page (L-SR4): focus its heading, or, coming back from Study or a game, the flag list.
   useEffect(() => {
     const box = root.current?.querySelector<HTMLElement>('[role="listbox"]');
@@ -518,7 +533,7 @@ function Overview(p: {
               {t}
             </span>
           ))}
-          {!p.live.live && <span className="chip outline"> Read-only: older version</span>}
+          {!p.live.live && <span className="chip outline"> {readOnlyWord(p.live)}</span>}
         </p>
         <button type="button" className="btn small" onClick={p.onBack}>
           <span aria-hidden="true">← </span>
@@ -527,25 +542,28 @@ function Overview(p: {
       </div>
       <p className="rv-status" data-testid="review-status">
         {p.status}
-        {run.status === 'done' && data.markers.some((m) => m.reason === 'search-incomplete') && (
-          <>
-            {' '}
-            <button
-              type="button"
-              className="linkbtn"
-              onClick={() => {
-                const m = data.markers.find((x) => x.reason === 'search-incomplete');
-                if (m) run.analyse(m.turn, { kind: m.kind, factor: 10 });
-              }}
-            >
-              Analyse deeper
-            </button>
-          </>
-        )}
+        {run.status === 'done' &&
+          data.markers.some((m) => m.reason === 'search-incomplete' && !tried.has(m.turn)) && (
+            <>
+              {' '}
+              <button
+                type="button"
+                className="linkbtn"
+                onClick={() => {
+                  const m = data.markers.find(
+                    (x) => x.reason === 'search-incomplete' && !tried.has(x.turn),
+                  );
+                  if (m) deeper(m);
+                }}
+              >
+                {DEEPER_LABEL}
+              </button>
+            </>
+          )}
       </p>
       {!p.live.live && (
         <p className="notice" role="note">
-          {STALE_COPY}
+          {staleCopyOf(p.live)}
         </p>
       )}
       <div className="sr-only" role="status" aria-live="polite" data-testid="review-announce">
@@ -623,6 +641,7 @@ function Overview(p: {
           notes={turnNotes}
           practisedState={run.practised[flag.id]}
           live={p.live.live}
+          staleCopy={staleCopyOf(p.live)}
           archetype={p.archetype}
           onStudy={p.onStudy}
           onPlay={p.onPlay}
@@ -660,7 +679,8 @@ function Overview(p: {
               <MarkerNote
                 marker={marker}
                 live={p.live.live}
-                onDeeper={() => run.analyse(marker.turn, { kind: marker.kind, factor: 10 })}
+                tried={tried.has(marker.turn)}
+                onDeeper={() => deeper(marker)}
                 onNow={() => run.analyse(marker.turn)}
               />
             )}
@@ -681,7 +701,7 @@ function Overview(p: {
               </button>
               {!p.live.live && (
                 <span id="rv-why-off" className="subtle">
-                  {STALE_COPY}
+                  {staleCopyOf(p.live)}
                 </span>
               )}
             </div>
@@ -695,6 +715,7 @@ function Overview(p: {
 function MarkerNote({
   marker,
   live,
+  tried,
   onDeeper,
   onNow,
 }: {
@@ -703,21 +724,24 @@ function MarkerNote({
     explanation?: import('@optcg/ai').Explanation;
   };
   live: boolean;
+  /** "Analyse deeper" has been run on this turn already. */
+  tried: boolean;
   onDeeper(): void;
   onNow(): void;
 }) {
-  const unchecked = marker.reason === 'search-incomplete';
+  const copy = markerCopy(marker.reason, tried);
   return (
     <div className="rv-marker" data-testid="marker-note">
       <p>
-        <b>{unchecked ? 'Not fully checked.' : 'Not analysed.'}</b>{' '}
-        {unchecked
-          ? 'The analysis ran out of time on this turn. It found no proof either way.'
-          : 'The review ended before this turn was reached.'}
+        <b>{copy.lead}</b> {copy.body}
       </p>
-      {live && (
-        <button type="button" className="btn small" onClick={unchecked ? onDeeper : onNow}>
-          {unchecked ? 'Analyse deeper' : 'Analyse now'}
+      {live && copy.button && (
+        <button
+          type="button"
+          className="btn small"
+          onClick={copy.button === 'deeper' ? onDeeper : onNow}
+        >
+          {copy.button === 'deeper' ? DEEPER_LABEL : 'Analyse now'}
         </button>
       )}
     </div>
@@ -751,6 +775,7 @@ function FlagDetail({
   notes,
   practisedState,
   live,
+  staleCopy,
   archetype,
   onStudy,
   onPlay,
@@ -761,12 +786,13 @@ function FlagDetail({
   notes: readonly import('@optcg/ai').Explanation[];
   practisedState: 'solved' | 'not-yet' | undefined;
   live: boolean;
+  staleCopy: string;
   archetype: string | undefined;
   onStudy(): void;
   onPlay(): void;
   onPractice(): void;
 }) {
-  const practice = practiceOf(flag, live, STALE_COPY);
+  const practice = practiceOf(flag, live, staleCopy);
   const mark = practisedWord(practisedState);
   return (
     <section aria-labelledby="rv-sel-h" className="rv-card rv-detail" data-testid="selected-flag">
@@ -781,7 +807,7 @@ function FlagDetail({
           size={SEVERITY[flag.severity].size}
           hindsight={flag.severity === 'hindsight'}
         />{' '}
-        {KIND_WORD[flag.kind]} · {SEVERITY[flag.severity].word} · {certaintyOf(flag)}
+        {KIND_WORD[flag.kind]} · {SEVERITY[flag.severity].word} · {certaintyOf(flag, archetype)}
         {mark && (
           <>
             {' · '}
@@ -794,7 +820,7 @@ function FlagDetail({
       </p>
       <ExplanationView
         ex={flag.explanation}
-        context="review"
+        context={contextOf(flag)}
         verbosity="learner"
         idPrefix="rv-ex"
         headingLevel={3}
@@ -828,7 +854,7 @@ function FlagDetail({
         </button>
         {(!live || !practice.ok) && (
           <span id="rv-why-off" className="subtle" data-testid="practice-off">
-            {!live ? STALE_COPY : !practice.ok ? practice.reason : ''}
+            {!live ? staleCopy : !practice.ok ? practice.reason : ''}
           </span>
         )}
         {practice.ok && <span className="sr-only">{PRACTICE_LABEL[practice.judge]}</span>}
@@ -851,6 +877,7 @@ function Study({
   marker,
   archetype,
   live,
+  staleCopy,
   practised,
   step,
   onBack,
@@ -866,6 +893,7 @@ function Study({
   marker: { reason: string } | undefined;
   archetype: string | undefined;
   live: boolean;
+  staleCopy: string;
   practised: Readonly<Record<string, 'solved' | 'not-yet'>>;
   step: (delta: -1 | 1) => void;
   onBack: () => void;
@@ -896,19 +924,19 @@ function Study({
     window.addEventListener('keydown', key);
     return () => window.removeEventListener('keydown', key);
   });
-  const practice = practiceOf(flag, live, STALE_COPY);
+  const practice = practiceOf(flag, live, staleCopy);
   const mark = flag ? practisedWord(practised[flag.id]) : null;
   const where = flag
     ? flag.kind === 'mulligan'
-      ? 'your opening hand, before the mulligan'
+      ? 'at your opening hand, before the mulligan'
       : flag.kind === 'should-counter' || flag.kind === 'counter-wasted'
-        ? 'your counter decision'
+        ? 'at your counter decision'
         : flag.kind === 'target'
-          ? 'the moment before the attack'
+          ? 'at the moment before the attack'
           : flag.kind === 'given-away'
-            ? 'the moment before your Blocker attacked'
+            ? 'at the moment before your Blocker attacked'
             : 'when your Main Phase began'
-    : 'the start of the turn';
+    : 'at the start of the turn';
   const rail = (
     <div
       className="study"
@@ -945,13 +973,13 @@ function Study({
         </button>
       </div>
       <p className="study-note">
-        Turn {turn}, as it stood at {where}. Read-only: nothing here is played.
+        Turn {turn}, as it stood {where}. Read-only: nothing here is played.
       </p>
       <div className="study-body">
         {flag ? (
           <ExplanationView
             ex={flag.explanation}
-            context="review"
+            context={contextOf(flag)}
             verbosity="learner"
             idPrefix="study-ex"
             headingLevel={2}
@@ -982,7 +1010,7 @@ function Study({
       </div>
       {(!live || !practice.ok) && (
         <p id="study-why-off" className="study-note">
-          {!live ? STALE_COPY : !practice.ok ? practice.reason : ''}
+          {!live ? staleCopy : !practice.ok ? practice.reason : ''}
         </p>
       )}
     </div>

@@ -163,7 +163,7 @@ export function FlagList({
                     {sev.word}
                   </span>
                   <span>
-                    {certaintyOf(f)}
+                    {certaintyOf(f, actors.guide)}
                     {mark && <em className="fl-practised"> · {mark}</em>}
                   </span>
                 </li>
