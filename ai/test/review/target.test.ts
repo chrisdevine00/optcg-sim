@@ -23,6 +23,7 @@ import { certaintyLabel } from '../../src/index.ts';
 import {
   DECIDED,
   detect,
+  K,
   judgeTarget,
   MIN_WINS,
   TARGET_GAP,
@@ -318,13 +319,18 @@ describe('what is not flagged', () => {
     const verdict = judgeTarget(view, chosen, targetSetup(view, listOf(KAIDO), cards), {
       iterations: 120,
     });
-    expect(verdict).toMatchObject({ status: 'judged', wins: 4, states: 4 });
+    expect(verdict).toMatchObject({ status: 'judged', wins: K, states: K });
     expect(verdict.gap).toBeGreaterThanOrEqual(TARGET_GAP);
     expect(worthFlagging(view, verdict, cards)).toBe(true);
     // the gap
     expect(worthFlagging(view, verdict, cards, verdict.gap + 0.01)).toBe(false);
     // the better target must win in most guesses of their hand
     expect(worthFlagging(view, { ...verdict, wins: MIN_WINS - 1 }, cards)).toBe(false);
+    // M8-R7: the flag says `any-hand`, so it needs six guessed hands and wins in every one of them
+    expect(K).toBeGreaterThanOrEqual(6);
+    expect(MIN_WINS).toBe(K);
+    expect(verdict.states).toBe(K);
+    expect(worthFlagging(view, { ...verdict, wins: (verdict.states ?? 0) - 1 }, cards)).toBe(false);
     // a game decided in the rollouts is a lethal question, for the missed-lethal check
     expect(worthFlagging(view, { ...verdict, bestValue: DECIDED }, cards)).toBe(false);
     // the same target is not a mistake

@@ -6,7 +6,7 @@
  * prior, seeded from the view's public fingerprint) and rolled out to the start of the next turn.
  * The flag fires when the best target is worth `TARGET_GAP` or more over the one you chose, wins in
  * most guesses of their hand, the rollouts did not decide the game, and the difference has a reason
- * in the cards' public text (`worthFlagging`).
+ * in the cards' public text (`worthFlagging`). The better target must win in all `K` guessed hands.
  *
  * `any-hand`: nothing but the view, public card data, the seat's own list and the prior is read, so
  * the flag is the same for every hand, deck order and face-down Life they could have held (the
@@ -63,11 +63,19 @@ import {
  */
 export const TARGET_GAP = 1;
 
-/** Guessed states per judgement (as the blunder warning). */
-const K = 4;
+/**
+ * Guessed states per judgement. The blunder warning uses 4; this flag is labelled `any-hand` (the
+ * reasons it gives rest on public facts only), so it asks more of the search behind it (M8-R7):
+ * six guessed hands, and the better target must win in every one (`MIN_WINS`).
+ */
+export const K = 6;
 
-/** The better target must win in at least this many of the `K` guesses of their hand. */
-export const MIN_WINS = 3;
+/**
+ * The better target must win in this many of the `K` guesses of their hand: all of them. A flag is
+ * a claim that holds "whatever they held" (explanations.md certainty table); a better target that
+ * loses in one sampled hand is a matter of their hand, which this flag does not claim.
+ */
+export const MIN_WINS = K;
 
 /**
  * A value this far from the heuristic's ordinary range (a win in every guess is 1000) means the
@@ -198,7 +206,7 @@ export function worthFlagging(
   if (Math.max(Math.abs(v.bestValue ?? 0), Math.abs(v.chosenValue ?? 0)) >= DECIDED) return false;
   const opp: PlayerId = view.player === 'p1' ? 'p2' : 'p1';
   const leader = view.zones[opp].leader[0]?.handle;
-  const text = (h: string) => textFacts(viewCard(view, h)?.card ?? null);
+  const text = (h: string) => textFacts(viewCard(view, h)?.card ?? null, cards);
   if (best.target === leader) {
     // Face over board: the Character does nothing on the board, and the hit costs them: stopping it
     // takes two cards or more (or cannot be done).

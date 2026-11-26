@@ -6,6 +6,7 @@
 import type {
   CardLookup,
   GameRecord,
+  GameResult,
   GameSetup,
   GameState,
   PlayerId,
@@ -102,7 +103,25 @@ export interface TurnSnapshot {
   views: Record<PlayerId, ProjectedView>;
 }
 
-export type RecordWithSnapshots = GameRecord & { snapshots: TurnSnapshot[] };
+/**
+ * Where the game stood after the record's last action (M8-R8): the summary hash and the result.
+ * Snapshots exist only at turn starts, so without this the last turn and the result of a record
+ * are not checked. Additive: records written before it have none (`verifyReplay` then says so).
+ */
+export interface FinalState {
+  /** Number of actions applied: must equal `actions.length`, or the record was cut. */
+  actionIndex: number;
+  hash: string;
+  result: GameResult | null;
+}
+
+export type RecordWithSnapshots = GameRecord & { snapshots: TurnSnapshot[]; final?: FinalState };
+
+/** The `final` of a record whose last action produced `state`. */
+export function finalOf(state: GameState, actionIndex: number): FinalState {
+  const s = state as unknown as State;
+  return { actionIndex, hash: summaryHash(s), result: s.result };
+}
 
 function snapshot(state: GameState, actionIndex: number): TurnSnapshot {
   const s = state as unknown as State;
@@ -125,6 +144,7 @@ export function startRecord(start: GameRecord['start'], initial: GameState): Rec
     start,
     actions: [],
     snapshots: [snapshot(initial, 0)],
+    final: finalOf(initial, 0),
   };
 }
 
@@ -141,7 +161,7 @@ export function appendAction(
     !last || last.turn !== s.turn || s.result !== null
       ? [...record.snapshots, snapshot(after, actions.length)]
       : record.snapshots;
-  return { ...record, actions, snapshots };
+  return { ...record, actions, snapshots, final: finalOf(after, actions.length) };
 }
 
 export interface Starter {
@@ -180,9 +200,27 @@ export function replayWith(
 /** Why `verifyReplay` could not vouch for a record. */
 export type VerifyFailure =
   | { ok: false; reason: 'cards' | 'scripts' | 'error' | 'no-snapshots' }
-  | { ok: false; reason: 'hash'; turn: number; actionIndex: number };
+  | {
+      ok: false;
+      reason: 'hash';
+      turn: number;
+      actionIndex: number;
+      /**
+       * Where it failed: a turn snapshot (default), the `final` state after the last action
+       * (`final`: hash or result differs), or the record's length against its `final` (`length`: it
+       * was cut or extended).
+       */
+      at?: 'turn' | 'final' | 'length';
+    };
 
-export type VerifyResult = { ok: true; engineDiffers: boolean } | VerifyFailure;
+export type VerifyResult =
+  | {
+      ok: true;
+      engineDiffers: boolean;
+      /** False for a record with no `final`: only its turn snapshots were checked. */
+      finalChecked: boolean;
+    }
+  | VerifyFailure;
 
 /**
  * Does this build still play this record the way it was recorded? Unlike `replayWith`, an
@@ -190,7 +228,10 @@ export type VerifyResult = { ok: true; engineDiffers: boolean } | VerifyFailure;
  * state's summary hash is compared with every `TurnSnapshot.hash` at its `actionIndex`. If they all
  * match, an engine bump did not change this game and the record stays live (M8 plan). The game's
  * own card data and scripts versions must still match, so a re-scripted card is a failure with its
- * own reason. Pure; it changes no hash and no replay.
+ * own reason. A record that carries a `final` (hash and result after its last action) must also
+ * have exactly that many actions and end in that state, so a truncated record or one with a changed
+ * last turn fails (M8-R8); an older record without it is verified on its snapshots only and the
+ * result says so (`finalChecked: false`). Pure; it changes no hash and no replay.
  */
 export function verifyReplayWith(
   fns: Starter,
@@ -217,6 +258,15 @@ export function verifyReplayWith(
     if (list) list.push(snap);
     else byIndex.set(snap.actionIndex, [snap]);
   }
+  const final = record.final;
+  if (final && final.actionIndex !== record.actions.length)
+    return {
+      ok: false,
+      reason: 'hash',
+      turn: record.snapshots.at(-1)?.turn ?? 0,
+      actionIndex: record.actions.length,
+      at: 'length',
+    };
   const check = (index: number): VerifyFailure | null => {
     for (const snap of byIndex.get(index) ?? [])
       if (summaryHash(step.state as unknown as State) !== snap.hash)
@@ -237,5 +287,20 @@ export function verifyReplayWith(
   // A snapshot past the last action cannot be matched: the record is not what it says.
   for (const idx of byIndex.keys())
     if (idx > record.actions.length) return { ok: false, reason: 'error' };
-  return { ok: true, engineDiffers: record.versions.engine !== ENGINE_VERSION };
+  if (final) {
+    const now = finalOf(step.state, record.actions.length);
+    if (now.hash !== final.hash || JSON.stringify(now.result) !== JSON.stringify(final.result))
+      return {
+        ok: false,
+        reason: 'hash',
+        turn: (step.state as unknown as State).turn,
+        actionIndex: record.actions.length,
+        at: 'final',
+      };
+  }
+  return {
+    ok: true,
+    engineDiffers: record.versions.engine !== ENGINE_VERSION,
+    finalChecked: final !== undefined,
+  };
 }

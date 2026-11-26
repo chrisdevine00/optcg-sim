@@ -72,7 +72,7 @@ export function luffyHindsight(hand: string[], life: string[] = lifeOf(3, ZORO))
     },
     p2: {
       leader: { card: LUFFY, don: 1 },
-      characters: [ZORO, { card: ZORO, rested: true }],
+      characters: ['EB01-017', { card: 'EB01-017', rested: true }],
       hand,
       life,
       costArea: { active: 8, rested: 0 },

@@ -60,9 +60,16 @@ const nameOf = (id: string | null, cards: ReadonlyMap<string, Card>): string =>
 
 /** Plain facts about a Character's text, from its script (public). */
 export interface TextFacts {
-  /** No script, or only [On Play] and [Trigger] text: nothing on the board does anything. */
+  /**
+   * No ongoing ability and no printed keyword ([Blocker], [Rush], [Double Attack], [Banish],
+   * [Unblockable], [Rush: Character]; M8-R2): only [On Play] and [Trigger] text, or none at all.
+   * A keyword acts on the board (a Blocker is the card that stops the next lethal).
+   */
   nothingOnBoard: boolean;
+  /** No script text and no keyword. */
   noText: boolean;
+  /** The printed keywords, from the card data and the script. */
+  keywords: string[];
   /** The ongoing abilities' labels, "[Once Per Turn]" first where it applies. */
   labels: string[];
   /** The biggest power amount an ongoing ability gives, or null. */
@@ -71,11 +78,25 @@ export interface TextFacts {
   boostsLeader: boolean;
 }
 
-export function textFacts(cardId: string | null): TextFacts {
+export function textFacts(cardId: string | null, cards: ReadonlyMap<string, Card>): TextFacts {
   const script = cardId ? SCRIPTS[cardId] : undefined;
   const abilities = script?.abilities ?? [];
+  const keywords = [
+    ...new Set<string>([
+      ...((cardId ? cards.get(cardId)?.keywords : undefined) ?? []),
+      ...(script?.keywords ?? []),
+    ]),
+  ];
+  const keywordLabels = keywords.map((k) => `[${k}]`);
   if (abilities.length === 0)
-    return { nothingOnBoard: true, noText: true, labels: [], boost: null, boostsLeader: false };
+    return {
+      nothingOnBoard: keywords.length === 0,
+      noText: keywords.length === 0,
+      keywords,
+      labels: keywordLabels,
+      boost: null,
+      boostsLeader: false,
+    };
   const timed = (a: (typeof abilities)[number]): boolean =>
     a.kind === 'trigger' || (a.kind === 'auto' && a.when.every((w) => w === 'onPlay'));
   const ongoing = abilities.filter((a) => !timed(a));
@@ -95,9 +116,13 @@ export function textFacts(cardId: string | null): TextFacts {
   };
   for (const a of ongoing) walk('apply' in a ? a.apply : 'effect' in a ? a.effect : null);
   return {
-    nothingOnBoard: ongoing.length === 0,
+    nothingOnBoard: ongoing.length === 0 && keywords.length === 0,
     noText: false,
-    labels: ongoing.map((a) => `${a.oncePerTurn ? '[Once Per Turn] ' : ''}${a.label ?? a.id}`),
+    keywords,
+    labels: [
+      ...keywordLabels,
+      ...ongoing.map((a) => `${a.oncePerTurn ? '[Once Per Turn] ' : ''}${a.label ?? a.id}`),
+    ],
     boost,
     boostsLeader,
   };
@@ -171,8 +196,8 @@ export function explainTarget(f: TargetFacts): { explanation: Explanation; line:
   const bb = f.bestBattle;
   const need = stopNeeded(bb.attackPower, bb.targetPower);
   const spend = spendWords(need, perCard, hand);
-  const bestText = textFacts(f.best.card);
-  const chosenText = textFacts(f.chosen.card);
+  const bestText = textFacts(f.best.card, f.cards);
+  const chosenText = textFacts(f.chosen.card, f.cards);
   const chosenName = chosenIsLeader ? 'their Leader' : nameOf(f.chosen.card, f.cards);
 
   const evidence: Explanation['evidence'] = [];

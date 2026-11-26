@@ -31,6 +31,8 @@ export {
   scriptsVersionOf,
   startRecord,
   appendAction,
+  finalOf,
+  type FinalState,
   type TurnSnapshot,
   type RecordWithSnapshots,
   type VerifyResult,

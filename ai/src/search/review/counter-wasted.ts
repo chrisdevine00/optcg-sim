@@ -26,7 +26,7 @@ import {
   type PlayerId,
 } from '@optcg/engine';
 import type { Evidence, Explanation, Move } from '../../explanation.ts';
-import { counterValueOf, priorCardIds } from '../../knowledge.ts';
+import { counterValueOf, priorCardIds, priorFor } from '../../knowledge.ts';
 import { counterCard, counterOnlyPower, isAuto, nameOf, otherSeat, turnNumber } from './exact.ts';
 import {
   flagId,
@@ -47,10 +47,45 @@ interface Source {
   double: boolean;
   /** An effect that sets a rested Character or Leader active. */
   reactivate: boolean;
+  /** How many of Rush and Double Attack its effects can give (0 to 2): an attacker, or a hit more. */
+  grants: number;
+  /** It plays a Character (which may have Rush). */
+  plays: boolean;
+  /** The most cards its effects put into the hand (a draw or a look at the top), 0 if none. */
+  draws: number;
+  /** The most DON!! its effects add to the field, 0 if none. */
+  don: number;
   cost: number;
 }
 
 const SOURCES = new Map<string, Source>();
+
+/** The grants, draws, plays and DON!! adds of a script, read from its typed data (public). */
+function scan(script: unknown): Pick<Source, 'grants' | 'plays' | 'draws' | 'don'> {
+  const kinds = new Set<string>();
+  let draws = 0;
+  let don = 0;
+  let plays = false;
+  const walk = (v: unknown): void => {
+    if (Array.isArray(v)) return v.forEach(walk);
+    if (!v || typeof v !== 'object') return;
+    const o = v as Record<string, unknown>;
+    const g = o.grant as { keyword?: unknown } | undefined;
+    if (g && (g.keyword === 'Rush' || g.keyword === 'Double Attack')) kinds.add(g.keyword);
+    if ('draw' in o) draws = Math.max(draws, typeof o.draw === 'number' ? o.draw : 3);
+    const look = o.lookAtTop as { n?: unknown } | undefined;
+    if (look) draws = Math.max(draws, typeof look.n === 'number' ? look.n : 3);
+    if ('play' in o) plays = true;
+    if (Array.isArray(o.addDon))
+      don += (o.addDon as { n?: unknown }[]).reduce(
+        (t, d) => t + (typeof d.n === 'number' ? d.n : 2),
+        0,
+      );
+    Object.values(o).forEach(walk);
+  };
+  walk(script);
+  return { grants: kinds.size, plays, draws, don };
+}
 
 /** What a card could add to their attackers this turn, from printed data and its public script. */
 function sourceOf(id: string, cards: ReadonlyMap<string, Card>): Source {
@@ -70,11 +105,20 @@ function sourceOf(id: string, cards: ReadonlyMap<string, Card>): Source {
     rush: kw.has('Rush') && card?.category === 'Character',
     double: kw.has('Double Attack'),
     reactivate,
+    // A [Trigger] fires from Life, not from the hand or the board.
+    ...scan(script?.abilities.filter((a) => a.kind !== 'trigger')),
     cost: card?.cost ?? 0,
   };
   SOURCES.set(id, s);
   return s;
 }
+
+/** Hits one card can add (an extra attacker, or a Double Attack), at most. */
+const hitsOf = (x: Source, boardDouble: boolean): number =>
+  (x.rush ? (x.double ? 2 : 1) : 0) +
+  (x.reactivate ? (boardDouble || x.double ? 2 : 1) : 0) +
+  x.grants +
+  (x.plays ? 2 : 0);
 
 export interface HitBound {
   /** Attackers on their board that can still attack the Leader. */
@@ -91,6 +135,21 @@ export interface HitBound {
  * An upper bound on the Life a seat's opponent can still take this turn, from the state after the
  * battle (their Main Phase again). `'public'` reads only how many cards are in their hand and
  * their active DON!!; `'actual'` reads the cards in their hand (hindsight, never `any-hand`).
+ *
+ * What the public bound counts (M8-R6; it must cover every hidden hand, so each gap is a term):
+ * - their board's attackers (Double Attack twice);
+ * - per card in their hand, the best of what a card of their archetype's sourced lists adds
+ *   (a Rush Character, a re-activation, a granted Rush or Double Attack, a played Character), within
+ *   their active DON!! (a knapsack over the cards, not a greedy pick), plus the DON!! the lists'
+ *   cards could add;
+ * - the cards their draws could bring into the hand (each draw effect in the lists multiplies the
+ *   hand, so the bound is the same for every deck order);
+ * - effects already on their board (a Character that sets a Leader active, grants Rush, draws),
+ *   each counted once, their costs ignored;
+ * - a Leader with no sourced list (a synthetic prior) narrows nothing: every card in hand is
+ *   assumed to add two hits at no cost, so the bound fails and the flag is Hindsight at best.
+ * Their real hand in `'actual'` mode, plus the real cards their draws would bring from the top of
+ * their deck, and the DON!! their effects add (hindsight).
  */
 export function hitBound(
   s: GameState,
@@ -106,50 +165,113 @@ export function hitBound(
   for (const a of legalActions(s))
     if (a.type === 'attack' && a.target === myLeader) attackers.add(a.attacker);
   let boardDamage = 0;
-  for (const inst of attackers)
-    boardDamage += queries.card(s, inst).keywords.includes('Double Attack') ? 2 : 1;
-  const rested = [...queries.zone(s, opp, 'leader'), ...queries.zone(s, opp, 'characters')].filter(
-    (c) => c.rested,
-  ).length;
+  let boardDouble = false;
+  for (const inst of attackers) {
+    const dbl = queries.card(s, inst).keywords.includes('Double Attack');
+    boardDouble ||= dbl;
+    boardDamage += dbl ? 2 : 1;
+  }
   const active = queries.don(s, opp).active;
   const size = queries.zone(s, opp, 'hand').length;
 
-  // The cards that could add an attacker, with what they cost. Public mode: the cheapest of each
-  // kind in the archetype's sourced lists, once per card in hand. Actual mode: the real hand.
+  // Effects already in play: counted once each, costs ignored.
+  const inPlay = [
+    ...queries.zone(s, opp, 'leader'),
+    ...queries.zone(s, opp, 'characters'),
+    ...queries.zone(s, opp, 'stage'),
+  ].map((c) => sourceOf(c.card, cards));
+  const inPlayHits = inPlay.reduce((t, x) => t + hitsOf({ ...x, rush: false }, boardDouble), 0);
+  const inPlayDraws = inPlay.reduce((t, x) => t + x.draws, 0);
+  const inPlayDon = inPlay.reduce((t, x) => t + x.don, 0);
+
+  // The cards that could add hits, with what they cost.
   const oppLeader = queries.zone(s, opp, 'leader')[0]!.card;
-  const pool =
-    hand === 'actual'
-      ? queries.zone(s, opp, 'hand').map((c) => sourceOf(c.card, cards))
-      : (() => {
-          const all = priorCardIds(oppLeader).map((id) => sourceOf(id, cards));
-          const adders = all.filter((x) => x.rush || x.reactivate);
-          const cheapest = adders.reduce((m, x) => Math.min(m, x.cost), Infinity);
-          const double = adders.some((x) => x.rush && x.double);
-          return Array.from({ length: size }, () => ({
-            rush: Number.isFinite(cheapest),
-            double,
-            reactivate: false,
-            cost: Number.isFinite(cheapest) ? cheapest : 0,
-          }));
-        })();
-  let budget = active;
-  let reactivations = rested;
-  let handAttackers = 0;
-  let handDamage = 0;
-  for (const x of [...pool].sort((p, q) => p.cost - q.cost)) {
-    if (!x.rush && !(x.reactivate && reactivations > 0)) continue;
-    if (x.cost > budget) continue;
-    budget -= x.cost;
-    if (!x.rush) reactivations--;
-    handAttackers++;
-    handDamage += x.double ? 2 : 1;
+  let handHits: number;
+  let handAttackers: number;
+  const synthetic = priorFor(oppLeader).synthetic === true;
+  if (hand === 'actual') {
+    // Hindsight reads the real hand, and the real top of their deck for what their draws would
+    // bring in (to a fixed point, capped), and the DON!! their effects add.
+    const deck = queries.zone(s, opp, 'deck');
+    const pool = queries.zone(s, opp, 'hand').map((c) => sourceOf(c.card, cards));
+    let drawn = 0;
+    for (let k = 0; k < 20; k++) {
+      const want = Math.min(deck.length, inPlayDraws + pool.reduce((t, x) => t + x.draws, 0));
+      if (want <= drawn) break;
+      for (; drawn < want; drawn++) pool.push(sourceOf(deck[drawn]!.card, cards));
+    }
+    const extra = inPlayDon + pool.reduce((t, x) => t + x.don, 0);
+    const best = knapsack(
+      pool.map((x) => ({ hits: hitsOf(x, boardDouble), cost: x.cost })),
+      active + extra,
+    );
+    handHits = best.hits;
+    handAttackers = best.items;
+  } else if (synthetic) {
+    // No sourced list: any card in hand could be anything. Two hits each, free.
+    handHits = 2 * (size + inPlayDraws);
+    handAttackers = size;
+  } else {
+    const all = priorCardIds(oppLeader).map((id) => sourceOf(id, cards));
+    const draws = Math.max(0, ...all.map((x) => x.draws));
+    const types = all
+      .map((x) => ({ hits: hitsOf(x, boardDouble), cost: x.cost }))
+      .filter((t) => t.hits > 0);
+    const extraDon = Math.max(0, ...all.map((x) => x.don));
+    const supplied = size * (1 + draws) + inPlayDraws;
+    const best = repeatedKnapsack(types, supplied, active + inPlayDon + extraDon * size);
+    handHits = best.hits;
+    handAttackers = best.items;
   }
   return {
     boardAttackers: attackers.size,
     boardDamage,
     handAttackers,
-    damage: boardDamage + handDamage,
+    damage: boardDamage + inPlayHits + handHits,
   };
+}
+
+/** The most hits from distinct cards within a DON!! budget (each card played at most once). */
+function knapsack(
+  items: { hits: number; cost: number }[],
+  budget: number,
+): { hits: number; items: number } {
+  const dp: { hits: number; items: number }[] = Array.from({ length: budget + 1 }, () => ({
+    hits: 0,
+    items: 0,
+  }));
+  for (const it of items) {
+    if (it.hits <= 0) continue;
+    for (let b = budget; b >= it.cost; b--) {
+      const c = dp[b - it.cost]!;
+      if (c.hits + it.hits > dp[b]!.hits) dp[b] = { hits: c.hits + it.hits, items: c.items + 1 };
+    }
+  }
+  return dp[budget]!;
+}
+
+/** As `knapsack`, for `slots` cards that may each be any of `types` (at most `slots` played). */
+function repeatedKnapsack(
+  types: { hits: number; cost: number }[],
+  slots: number,
+  budget: number,
+): { hits: number; items: number } {
+  const cap = Math.min(slots, 40);
+  // Row j: most hits with at most j cards and at most b DON!! spent.
+  let prev: { hits: number; items: number }[] = Array.from({ length: budget + 1 }, () => ({
+    hits: 0,
+    items: 0,
+  }));
+  for (let j = 1; j <= cap; j++) {
+    const row = prev.map((x) => ({ ...x }));
+    for (const t of types)
+      for (let b = t.cost; b <= budget; b++) {
+        const c = prev[b - t.cost]!;
+        if (c.hits + t.hits > row[b]!.hits) row[b] = { hits: c.hits + t.hits, items: c.items + 1 };
+      }
+    prev = row;
+  }
+  return prev[budget]!;
 }
 
 // --- The window ------------------------------------------------------------------------------

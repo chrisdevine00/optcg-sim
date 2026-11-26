@@ -359,10 +359,18 @@ describe('verifyReplay (M8 WP5)', () => {
   it('a record with matching hashes is live; an engine string bump alone keeps it live', () => {
     const rec = recorded(31);
     expect(rec.snapshots.length).toBeGreaterThan(2);
-    expect(verifyReplay(rec, cards())).toEqual({ ok: true, engineDiffers: false });
+    expect(verifyReplay(rec, cards())).toEqual({
+      ok: true,
+      engineDiffers: false,
+      finalChecked: true,
+    });
     const old = { ...rec, versions: { ...rec.versions, engine: '0.0.1' } };
     expect(() => replay(old, cards())).toThrow(RecordVersionMismatch);
-    expect(verifyReplay(old, cards())).toEqual({ ok: true, engineDiffers: true });
+    expect(verifyReplay(old, cards())).toEqual({
+      ok: true,
+      engineDiffers: true,
+      finalChecked: true,
+    });
   });
 
   it('a changed hash, a changed card or script, and a bad record are each refused with a reason', () => {
@@ -386,6 +394,61 @@ describe('verifyReplay (M8 WP5)', () => {
     });
     const bogus = { ...rec, actions: [{ type: 'nope' } as never, ...rec.actions] };
     expect(verifyReplay(bogus, cards())).toMatchObject({ ok: false });
+  });
+
+  it('M8-R8: the record carries the final hash and result, and verify checks them', () => {
+    const g = playRandomGame({ seed: 34, keepStates: true });
+    let rec = startRecord(g.record.start, g.states[0]!);
+    g.record.actions.forEach((a, i) => {
+      rec = appendAction(rec, a, g.states[i + 1]!);
+    });
+    expect(rec.final).toEqual({
+      actionIndex: rec.actions.length,
+      hash: summaryHash(g.final),
+      result: queries.result(g.final),
+    });
+    expect(queries.result(g.final)).not.toBeNull();
+    expect(verifyReplay(rec, cards())).toMatchObject({ ok: true, finalChecked: true });
+  });
+
+  it('M8-R8: a truncated record, or one with a different end, is refused', () => {
+    const rec = recorded(35);
+    const n = rec.actions.length;
+    // Actions cut, snapshots and final left as written: the length no longer matches.
+    const cut = { ...rec, actions: rec.actions.slice(0, n - 5) };
+    expect(verifyReplay(cut, cards())).toMatchObject({ ok: false, reason: 'hash', at: 'length' });
+    // Snapshots trimmed to the first and the actions cut with them: still refused.
+    const trimmed = { ...cut, snapshots: rec.snapshots.slice(0, 1) };
+    expect(verifyReplay(trimmed, cards())).toMatchObject({ ok: false, at: 'length' });
+    // The length edited to fit, the hash not: the state after the last action differs.
+    const fitted = {
+      ...cut,
+      snapshots: rec.snapshots.filter((x) => x.actionIndex <= n - 5),
+      final: { ...rec.final!, actionIndex: n - 5 },
+    };
+    expect(verifyReplay(fitted, cards())).toMatchObject({ ok: false, reason: 'hash', at: 'final' });
+    // A different final hash, and a different result, each refused.
+    const hash = { ...rec, final: { ...rec.final!, hash: 'x' + rec.final!.hash } };
+    expect(verifyReplay(hash, cards())).toMatchObject({ ok: false, at: 'final' });
+    const result = {
+      ...rec,
+      final: { ...rec.final!, result: { winner: 'p1' as const, reason: 'forged' } },
+    };
+    expect(verifyReplay(result, cards())).toMatchObject({ ok: false, at: 'final' });
+    // Trimmed snapshots alone, with the final intact, still verify: the final covers the end.
+    expect(verifyReplay({ ...rec, snapshots: rec.snapshots.slice(0, 1) }, cards())).toMatchObject({
+      ok: true,
+      finalChecked: true,
+    });
+  });
+
+  it('M8-R8: an older record without a final is verified on its snapshots and says so', () => {
+    const { final: _f, ...old } = recorded(36);
+    expect(verifyReplay(old, cards())).toEqual({
+      ok: true,
+      engineDiffers: false,
+      finalChecked: false,
+    });
   });
 
   it('changes nothing: the record, its hashes and a replay are the same after a verify', () => {
