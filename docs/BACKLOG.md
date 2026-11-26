@@ -68,3 +68,9 @@ Details and options: `docs/research/m6b-runtime-audit.md` §3.
 ## 10. Review search (M8-2, 2026-11-26)
 
 - The public lethal search caps on busy late-game boards (3 to 5 attackers, 5 or 6 hidden cards), so the review marks those turns "Not fully checked" (44% of turns on the 303-decision fixture). A sharper refutation bound over hidden counters would settle most of them; shared with L-03 (Unknown rate) and the M5b search budget. The review gate holds this under a 50% ceiling.
+
+## 11. M8 review, scope carries (docs/reviews/m8-review.md, fix round)
+
+- M8-R10: lethal given away covers only a lost-by-damage last game with a Blocker attack the turn before (not a Character attack, not a missed block or counter); mulligan flags only for sourced guides (OP05-098 and OP08-098 never). Documented in `docs/design/m8-plan.md` "Scope limits". The in-app copy should say "checked: Blocker attacks" (app part of the fix round).
+- M8-R6 follow-up: the counter-wasted bound counts every draw and every re-activation conservatively, so it fails (flag becomes Hindsight or none) while they hold unspent DON!! and a list with cheap re-activators. A sharper bound (the cost of the drawing card, a draw effect's real amount, once-per-turn) would keep more E04-style flags `any-hand`. Measure the rate on the gate fixture before tightening.
+- M8-R8 app follow-up: `sanitizeRecord` (`app/src/store/validate.ts`) rebuilds a record field by field and drops `final`, and `Session.restore` (rewind) cuts `actions` and `snapshots` but keeps the old `final`; both must carry it (restore must recompute it with `finalOf`), or the engine's final check never runs on a stored record (or fails a rewound one).

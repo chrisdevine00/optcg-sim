@@ -44,3 +44,12 @@ After WP0, WP1–WP5 touch disjoint files; WP6 starts on WP0 types and wires to 
 ## Owner
 
 Review the copy of the new templates (E21 and the attack-target wording); dispatch the NVDA run; VoiceOver.
+
+## Scope limits of the shipped flags (M8 review R10, 2026-11-26)
+
+These are by design and are not bugs; the app copy and the BACKLOG name them so a player is not told more than was checked.
+
+- **Lethal given away** (`given-away.ts`) covers one shape only: the game was lost by damage on their turn, their board alone won, and your previous turn had a Blocker attack that rested the Blocker. It does not look at a Character attack that left you open, a Blocker you chose not to use, a counter you did not play, or a game lost any other way (decking, a Leader effect, a concession). A game given away in those ways gets no flag, so the absence of this flag does not mean the game was not given away. Extending it means a branch per kind of earlier turn (attack, no block, no counter); each needs its own `threat()` comparison and its own corpus rate. BACKLOG §11.
+- **Mulligan** (`mulligan.ts`) flags only when the Leader's guide has a sourced rule (an `SH-` tag). OP05-098 and OP08-098 say "no sourced rule" and never flag; a Leader with a default playbook never flags. The label is the guide's ("From the <Leader> guide (sourced)"), which is advice, not a proof. M8-WP2-2 in OPEN-QUESTIONS keeps this until the owner writes those rules from a source.
+- **Counter wasted (b)** is `any-hand` only when a bound over every hidden hand holds (draws, granted Rush or Double Attack, re-activation, DON!! adds, effects already on their board; a Leader without a sourced list narrows nothing). Where it does not, the flag is Hindsight or absent (M8 review R6).
+- **Attack target** is judged one declaration at a time; the order of a turn's attacks is not (see `target.ts`). It is `any-hand` because its words rest on public facts and its search asks six guessed hands to agree (M8 review R7).

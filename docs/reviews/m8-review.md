@@ -98,3 +98,30 @@ With no IndexedDB (memory store, `durable` false), a finished game is only in me
 ## Verdict
 
 FAIL. Fix R1 to R5, re-run the e2e suite and take a screenshot of Study on a direct load.
+
+## Fix round (ai and engine)
+
+Date 2026-11-26. Part 1 of the fix round: R2, R6, R7, R8 and R10. The app findings (R1, R3, R4, R5, R9, R11, R12) are fixed in app/ in parallel and are not covered here. Each test below was run against the old code and failed; the fix was then restored.
+
+| Finding | Fix | Fails on revert |
+| --- | --- | --- |
+| R2 (3) | `textFacts(cardId, cards)` (`explain-target.ts`): `nothingOnBoard` and `noText` also require no printed keyword (all six of the card data's keywords, read from the card and its script); keywords are listed in `labels` (`[Blocker]`). The face-over-board gate in `worthFlagging` therefore never fires on a keyword-only Character. | `ai/test/review/target-keywords.test.ts`: E09 with EB01-017 (vanilla Blocker) as the chosen target gives no flag (the old code flagged it with "no effect text"); keyword-only Characters for Blocker, Rush, Double Attack, Banish, Unblockable and Rush: Character are not "nothing on the board"; Hawkins still flags. Old code: 2 of 3 fail. |
+| R6 (2, treated as must-fix) | The public bound of counter-wasted (b) (`hitBound`, `counter-wasted.ts`) now covers every hidden hand or the flag is not `any-hand`: a knapsack over the cards in hand within their active DON!! (not a greedy pick); each card's possible adds (Rush, re-activation, a granted Rush or Double Attack, a played Character); the cards their draws could bring in (every list card that draws or looks multiplies the hand); the DON!! their cards could add; effects already on their board (counted once, costs ignored); a Leader with no sourced list narrows nothing (every card in hand is two free hits). The Hindsight (actual) bound reads the real hand and the real top of their deck for what their draws would bring (to a fixed point), and DON!! adds. A [Trigger] ability is not read (it fires from Life). Where the bound fails and the real hand cannot prove it either, there is no flag; where only the real hand proves it, the flag is Hindsight (`needed-hidden-info`, never severe), as before. | `ai/test/review/counter-wasted-bound.test.ts` (7 tests): draw-into-more (one card in hand, 8 DON!!: bound 3, not 2), an in-play Zoro, an unsourced Leader, the Hindsight fall-back, real draws in hindsight, a granted Rush or Double Attack. Old code: 6 of 7 fail. The Luffy Hindsight position of `wp2-positions-more.ts` had Zoro (OP13-037) on the board; that re-activator is now counted, so the position uses vanilla Characters (the old test pinned the very gap). |
+| R7 (2) | The target flag stays `any-hand` (its words are built from public facts only: the arithmetic, their hand size, the lists' biggest Counter; "Hindsight: needed their hidden cards" would be false for it), but the search behind it now asks more: K = 6 guessed hands (was 4) and the better target must win in **all** of them (`MIN_WINS = K`, was 3 of 4). Rationale in DECISIONS. Corpus rate: 1 of 948 attacks flagged (0.1%, 40 games), limit 2%. | `target.test.ts` "every condition of a flag is needed": K at least 6, `MIN_WINS === K`, `wins: states - 1` is not flagged. With K = 4 and MIN_WINS = 3 it fails. |
+| R8 (2) | `RecordWithSnapshots` gets an optional `final: { actionIndex, hash, result }` (`finalOf`, written by `startRecord` and every `appendAction`). `verifyReplay` requires `final.actionIndex === actions.length` (a cut or extended record fails, `reason: 'hash'`, `at: 'length'`) and compares the summary hash and the result after the last action (`at: 'final'`). A record without `final` (older) is verified on its snapshots only and the result says so (`finalChecked: false`). The `reason` stays `'hash'` so `staleness.ts` needs no change. No hash, replay or `ENGINE_VERSION` change; the property and golden runs at 2,000 games pass unchanged. | `engine/test/records/records.test.ts` (3 new tests, 1 updated for `finalChecked`): final carried with the right hash and result; truncated actions, trimmed snapshots, a length edited to fit (the hash then differs), a forged hash and a forged result are each refused; trimmed snapshots alone still verify (the final covers the end); an older record is `finalChecked: false`. Old code: 4 of 23 fail. |
+| R10 (2) | Scope limits recorded in `docs/design/m8-plan.md` ("Scope limits of the shipped flags") and BACKLOG §11. No code: a Character-attack or no-block extension of given-away needs its own comparison and corpus rate. The in-app copy line ("checked: Blocker attacks") belongs to the app part. | docs only |
+
+### Needs the app part of the round
+
+`sanitizeRecord` (`app/src/store/validate.ts`) rebuilds a record field by field and drops `final`, so a stored or imported record is verified on its snapshots only until it copies `final` through. `Session.restore` (rewind, `session.ts`) cuts `actions` and `snapshots` but keeps the old `final`: it must recompute it with `finalOf(state, index)` at the same time, or a rewound record would fail its length check once `final` is stored. Neither is needed for this part to be correct, and neither is made here (app/ belongs to the other agent). Logged in BACKLOG §11.
+
+### Checks
+
+| Check | Result |
+| --- | --- |
+| `npx vitest run engine ai cards/test` | 2,982 files passed, 34 skipped; 31,596 tests passed, 26 expected fail, 13 skipped, 164 todo; 0 failed |
+| `ENGINE_GAMES=2000 npx vitest run engine/test/property engine/test/golden` | 10 files, 32 tests passed |
+| `REVIEW_GATE=1 npx vitest run ai/test/review-gate.test.ts` | 2 passed (run beside the 40-game corpus) |
+| target corpus, 40 games, Warlord vs Warlord | 948 attacks, 581 with more than one target, 1 flagged (0.1%, face over board); gap p95 3.5. The first test timed out at 30 min only because the corpus ran beside the full suite; the second test reused its result and passed |
+| differentials (`target-differential`, `exact-differential`) | pass |
+| `npm run typecheck`; `npx eslint .`; `npx prettier --check .` | clean |
