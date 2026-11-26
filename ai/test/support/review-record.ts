@@ -20,7 +20,7 @@ const pick = (leader: string): DeckSpec => metaDecks().find((d) => d.leader === 
 
 export interface PlayedGame {
   record: ReviewRecord;
-  /** Every card of the game (the review worker is sent these). */
+  /** The whole card set (the review worker is sent these, as the app sends `ctl.cards`). */
   cards: Card[];
   seed: number;
   /** Wall-clock ms the game took to play. */
@@ -47,11 +47,12 @@ export function playRecord(
       rec = appendAction(rec, actionFromView(d.before, d.player, d.action), d.after);
     },
   });
-  const defs = (init.state as unknown as { defs: Record<string, unknown> }).defs;
   const all = cardMap();
   return {
     record: { ...rec, seats, auto: [], rewinds: [] },
-    cards: Object.keys(defs).map((id) => all.get(id)!),
+    // The whole set, as the app sends it (`ctl.cards`): the review samples cards the game never
+    // showed (the seat's undrawn deck, the opponent's sourced list).
+    cards: [...all.values()],
     seed,
     playMs: performance.now() - t0,
     finished: m.result !== null,

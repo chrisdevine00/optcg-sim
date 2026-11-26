@@ -254,6 +254,36 @@ describe('given-away: when it does not flag', () => {
     expect(r.marker).toMatchObject({ turn: 9, kind: 'given-away', reason: 'search-incomplete' });
   });
 
+  // M8-1: the Hindsight position of the Kid test. The board check (their board alone) finishes at
+  // 2,000 nodes and answers "not a board loss"; the `actual` search for their real hand does not
+  // (it needs about 3,000): a note, no marker. At 1,500 the board check itself runs out: a marker.
+  const hindsight = (): ReviewRecord => {
+    const KID = 'EB01-003';
+    const spec: Spec = {
+      ...E21,
+      p2: { ...E21.p2, characters: [ULTI], hand: [KID], costArea: { active: 4, rested: 0 } },
+    };
+    return game(spec, [BLOCKER], ['play:' + KID, KID, KAIDO, ULTI]);
+  };
+
+  it('M8-1: the board check answered and the hindsight search ran out is a note, no marker', () => {
+    const r = run(hindsight(), 9, 2_000)!;
+    expect(r.flags).toHaveLength(0);
+    expect(r.marker).toBeUndefined();
+    expect(r.notes).toHaveLength(1);
+    expect(r.notes[0]).toMatchObject({
+      claim: 'Hindsight check not finished',
+      outcome: 'With their real cards they may have had a win whatever you did.',
+    });
+  });
+
+  it('M8-1: the board check itself running out is still a marker', () => {
+    const r = run(hindsight(), 9, 1_500)!;
+    expect(r.flags).toHaveLength(0);
+    expect(r.notes).toHaveLength(0);
+    expect(r.marker).toMatchObject({ turn: 9, kind: 'given-away', reason: 'search-incomplete' });
+  });
+
   it('is inert on a context with no record (the WP0 registry test)', () => {
     expect(DETECTORS['given-away'](item('given-away', 1, 0), {} as never)).toBeNull();
   });

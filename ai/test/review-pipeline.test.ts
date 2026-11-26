@@ -601,6 +601,81 @@ describe('missed lethal as per-turn items (E01)', () => {
   });
 });
 
+// M8-1: a refuted `public` check makes the turn checked; a hindsight search that runs out is a note.
+// Three Kaido attackers against 2 Life and four Counter cards: no lethal, `public` refutes it in
+// 36,875 nodes and `actual` in 56,873 (probed), so a cap of 45,000 finishes the first and not the
+// second, and a cap of 20,000 finishes neither.
+const M81: Spec = {
+  seed: 5,
+  turn: 9,
+  activePlayer: 'p1',
+  firstPlayer: 'p1',
+  p1: {
+    leader: KAIDO,
+    characters: [KAIDO_CHAR, KAIDO_CHAR],
+    life: lifeOf(3, ZORO),
+    hand: [],
+    costArea: { active: 8, rested: 0 },
+    decklist: listOf(KAIDO),
+  },
+  p2: {
+    leader: ROCKS,
+    life: lifeOf(2, ZORO),
+    hand: [ROCKS_PIRATES, NO_AUTHORITY, ROCKS_PIRATES, NO_AUTHORITY],
+    costArea: { active: 0, rested: 0 },
+    decklist: listOf(ROCKS),
+  },
+};
+
+describe('a refuted public check counts the turn as checked (M8-1)', () => {
+  const init = createFromScenario({ ...M81, cards: lookup });
+  const endTurn: Action = { type: 'endTurn', player: 'p1' };
+  const rec = finished(
+    appendAction(
+      startRecord({ scenario: M81 }, init.state),
+      endTurn,
+      reduce(init.state, endTurn).state,
+    ),
+  );
+  const candidate = { turn: 9, player: 'p1' as PlayerId, index: 0 };
+
+  it('public refuted, actual out of nodes: a note and no marker, no flag', () => {
+    const r = reviewRecord(rec, allCards, { seats: ['p1'], nodes: 45_000 });
+    const ml = r.results.filter((x) => x.itemId.startsWith('missed-lethal'));
+    expect(ml).toHaveLength(1);
+    expect(ml[0]!.flags).toEqual([]);
+    expect(ml[0]!.marker).toBeUndefined();
+    expect(ml[0]!.notes).toHaveLength(1);
+    expect(ml[0]!.notes[0]).toMatchObject({
+      claim: 'Hindsight check not finished',
+      outcome: 'With their real cards there may have been a win you could not have seen.',
+    });
+    expect(r.markers).toEqual([]);
+    // The L-slice's own entry point carries no flag and no marker either.
+    expect(
+      checkLethalItem(candidate, rec.actions, init.state, cards, { nodes: 45_000 }),
+    ).toBeNull();
+  });
+
+  it('with enough nodes both searches finish: refuted, no note, no marker', () => {
+    const r = reviewRecord(rec, allCards, { seats: ['p1'], nodes: 150_000 });
+    const ml = r.results.filter((x) => x.itemId.startsWith('missed-lethal'));
+    expect(ml.flatMap((x) => [...x.flags, ...x.notes])).toEqual([]);
+    expect(r.markers).toEqual([]);
+  });
+
+  it('the public check itself running out is still a "Not fully checked" marker', () => {
+    const r = reviewRecord(rec, allCards, { seats: ['p1'], nodes: 20_000 });
+    expect(r.results.flatMap((x) => x.notes)).toEqual([]);
+    expect(r.markers).toHaveLength(1);
+    expect(r.markers[0]).toMatchObject({
+      turn: 9,
+      kind: 'missed-lethal',
+      reason: 'search-incomplete',
+    });
+  });
+});
+
 describe('missed lethal on real games: the pipeline agrees with the sequential review', () => {
   for (const name of ['lost', 'won'] as const) {
     it(`${name} game: same flags and markers at a node cap`, () => {

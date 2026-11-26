@@ -22,4 +22,17 @@ describe.skipIf(!process.env.REVIEW_GATE)('the 60 s gate', () => {
     if (ran < r.plan.items.length)
       expect(r.markers.some((m) => m.reason === 'deadline')).toBe(true);
   });
+
+  // PLAN row 19 / M8-1: at most 10% of the reviewed turns end "Not fully checked". A hindsight search
+  // that runs out after a player-visible answer is a note, not a marker, so it does not count.
+  it('leaves at most 10% of the reviewed turns "Not fully checked"', () => {
+    const f = makeFixture();
+    const r = reviewRecord(f.record, f.cards, { seats: ['p1'] });
+    const reviewed = new Set(r.plan.items.map((i) => i.turn));
+    const marked = new Set(r.markers.map((m) => m.turn));
+    expect(
+      marked.size / reviewed.size,
+      `marked turns ${[...marked].join(',')}`,
+    ).toBeLessThanOrEqual(0.1);
+  });
 });
