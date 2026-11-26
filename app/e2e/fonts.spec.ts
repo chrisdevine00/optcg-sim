@@ -3,6 +3,8 @@ import { expect, test } from '@playwright/test';
 // visual-system.md §4: Inter and Fraunces are self-hosted, and every numeral is tabular.
 test('self-hosted fonts load and numerals are tabular', async ({ page }) => {
   await page.goto('./');
+  // The app renders after the store opens (M8 boot, up to 3 s): fonts load only once text uses them.
+  await page.locator('h1').first().waitFor();
   const result = await page.evaluate(async () => {
     await document.fonts.ready;
     const probe = (text: string, family: string) => {

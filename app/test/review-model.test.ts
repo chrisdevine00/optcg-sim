@@ -33,6 +33,7 @@ import {
   type Row,
 } from '../src/history/model.ts';
 import { SCENARIOS } from '../src/play/setup/scenarios.ts';
+import { cellName } from '../src/play/review/Timeline.tsx';
 import { STALE_COPY } from '../src/store/staleness.ts';
 import type { GameMeta, StoredReview } from '../src/store/types.ts';
 import { cardMap } from './support.ts';
@@ -416,5 +417,23 @@ describe('lessons', () => {
         exitTimed: '',
       },
     ]);
+  });
+});
+
+describe('timeline cell names hold their visible words (WCAG 2.5.3)', () => {
+  const turns = [{ turn: 2, player: 'p1' as const, startIndex: 0, life: { p1: 5, p2: 5 } }];
+  const a = actorsOf(turns, 'p1', 'Rocks');
+  it('a flagged turn still being analysed says "Not analysed yet"', () => {
+    const name = cellName(2, a, [flag('target', 2, 'moderate')], undefined, true, false);
+    expect(name.startsWith('Not analysed yet: ')).toBe(true);
+  });
+  it('two flags say "2 flags"', () => {
+    const fs = [flag('target', 2, 'moderate'), flag('don-unused', 2, 'minor')];
+    expect(cellName(2, a, fs, undefined, false, false).startsWith('2 flags: ')).toBe(true);
+  });
+  it('one finished flag has no prefix', () => {
+    expect(cellName(2, a, [flag('target', 2, 'moderate')], undefined, false, false)).not.toMatch(
+      /^(2 flags|Not analysed)/,
+    );
   });
 });

@@ -74,3 +74,7 @@ Details and options: `docs/research/m6b-runtime-audit.md` §3.
 - M8-R10: lethal given away covers only a lost-by-damage last game with a Blocker attack the turn before (not a Character attack, not a missed block or counter); mulligan flags only for sourced guides (OP05-098 and OP08-098 never). Documented in `docs/design/m8-plan.md` "Scope limits". The in-app copy should say "checked: Blocker attacks" (app part of the fix round).
 - M8-R6 follow-up: the counter-wasted bound counts every draw and every re-activation conservatively, so it fails (flag becomes Hindsight or none) while they hold unspent DON!! and a list with cheap re-activators. A sharper bound (the cost of the drawing card, a draw effect's real amount, once-per-turn) would keep more E04-style flags `any-hand`. Measure the rate on the gate fixture before tightening.
 - ~~M8-R8 app follow-up~~ **Done 2026-11-26:** `sanitizeRecord` keeps `final` (rebuilt field by field) and `Session.restore` recomputes it with `finalOf` (tests `app/test/record-final.test.ts`, `session.test.ts`).
+
+## 12. First paint waits for the store (M8 boot, 2026-11-26)
+
+- `main.tsx` awaits `initStore()` (IndexedDB open and migration, capped at 3 s) before the first render, so the first paint waits on IndexedDB. Render a shell first and open the store in parallel (only the save path, History and Settings → Data need it). Target: M10 performance pass (first playable board under 3 s on a throttled profile).

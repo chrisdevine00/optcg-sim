@@ -164,7 +164,7 @@ export interface TimelineProps {
   me: PlayerId;
 }
 
-const cellName = (
+export const cellName = (
   turn: number,
   a: Actors,
   flags: ReviewFlag[],
@@ -172,10 +172,16 @@ const cellName = (
   pending: boolean,
   hasNote: boolean,
 ): string => {
-  // The name starts with the words the cell shows ("2 flags"), so it contains its visible text
-  // (WCAG 2.5.3, axe label-content-name-mismatch).
-  if (flags.length > 0)
-    return `${flags.length > 1 ? `${flags.length} flags: ` : ''}${flags.map((f) => flagName(f, a)).join(' ')}`;
+  // The name contains every word the cell shows ("2 flags", "Not analysed yet"), so it holds its
+  // visible text (WCAG 2.5.3, axe label-content-name-mismatch). A turn can hold a flag while its
+  // other items are still pending, which a slow machine shows mid-analysis.
+  if (flags.length > 0) {
+    const shown = [
+      flags.length > 1 ? `${flags.length} flags` : '',
+      pending && !marker ? 'Not analysed yet' : '',
+    ].filter(Boolean);
+    return `${shown.length ? `${shown.join(', ')}: ` : ''}${flags.map((f) => flagName(f, a)).join(' ')}`;
+  }
   const head =
     turn === 0
       ? 'Mulligan'
