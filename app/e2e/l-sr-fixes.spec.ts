@@ -135,9 +135,9 @@ test.describe('the review: L-SR3, L-SR4, L-SR5', () => {
     await toReview(page);
     expect(await activeId(page)).toBe('rv-title');
     const region = page.locator('[role="application"][aria-roledescription="turn timeline"]');
-    await expect(region.locator('ol.tl')).toHaveCount(1);
+    await expect(region.locator('ol.rv-tl')).toHaveCount(1);
     // Every timeline action is reachable by Tab and Enter, and choosing a flag is said.
-    await page.locator('button.tl-col').first().focus();
+    await page.locator('[data-cell="9-you"]').focus();
     await page.keyboard.press('n');
     await expect(page.getByTestId('review-announce')).toContainText('Flag 1 of 1 selected');
     // Enter on a flag's turn button says it again, as a fresh node.

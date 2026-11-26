@@ -22,6 +22,13 @@ export function usePath(): string {
   return useSyncExternalStore(subscribe, current, () => '/');
 }
 
+const search = () => window.location.search;
+
+/** The query string (`?mode=delete`): a page that reads it re-renders when only the query changes. */
+export function useSearch(): string {
+  return useSyncExternalStore(subscribe, search, () => '');
+}
+
 export function navigate(to: string) {
   window.history.pushState(null, '', BASE + to);
   for (const fn of listeners) fn();

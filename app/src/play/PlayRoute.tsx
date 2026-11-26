@@ -4,18 +4,20 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import type { PlayerId } from '@optcg/engine';
+import type { SessionRecord } from '../session/index.ts';
+import type { GameMeta } from '../store/types.ts';
 import { Footer } from '../Footer.tsx';
 import { Header } from '../Header.tsx';
 import { navigate } from '../router.tsx';
 import { GameController, type GameConfig, type Speed } from './game/controller.ts';
 import { Game } from './game/Game.tsx';
-import { ReviewFlow } from './review/ReviewFlow.tsx';
+import { ReviewScreen } from './review/ReviewFlow.tsx';
 import { Setup, type SetupChoice } from './setup/Setup.tsx';
 import { deckById, deckByLeader, loadCards } from './setup/decks.ts';
 import { priorCardIds } from '@optcg/ai';
 import { SCENARIOS, scenarioCardIds } from './setup/scenarios.ts';
 import { applyFirstGame } from '../tutorial/preset.ts';
-import { gameSaver, type SaveSource } from './save-game.ts';
+import { gameSaver, metaFrom, type SaveSource } from './save-game.ts';
 import './play.css';
 
 /** A named scenario, or one described in the URL as `json:<base64url of the spec>`. */
@@ -157,8 +159,22 @@ export default function PlayRoute() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const last = useRef<SetupChoice | null>(null);
-  // The finished game is being reviewed (learning-ui §4): the controller stays, its record is read.
-  const [reviewing, setReviewing] = useState(false);
+  // The finished game is being reviewed (learning-ui §4): a copy of its record, taken once, is read
+  // (M8 WP6), so the screen does not depend on the controller that played it.
+  const [reviewing, setReviewing] = useState<{
+    record: SessionRecord;
+    meta: GameMeta;
+    id: string | null;
+  } | null>(null);
+  const openReview = (c: GameController) => {
+    const record = c.session.exportRecord();
+    const src = sourceOf(c, last.current ? deckById(last.current.myDeck)?.name : undefined);
+    setReviewing({
+      record,
+      meta: metaFrom(src, record, Date.now()),
+      id: gameSaver.idOf(c) ?? null,
+    });
+  };
 
   const begin = (choice: SetupChoice) => {
     last.current = choice;
@@ -170,7 +186,7 @@ export default function PlayRoute() {
           old?.dispose();
           return c;
         });
-        setReviewing(false);
+        setReviewing(null);
         c.start();
       })
       .catch((e: unknown) => setError(e instanceof Error ? e.message : String(e)))
@@ -197,18 +213,28 @@ export default function PlayRoute() {
   const goHome = () => {
     ctl?.dispose();
     setCtl(null);
-    setReviewing(false);
+    setReviewing(null);
     navigate('/');
   };
   if (ctl && reviewing) {
-    return <ReviewFlow ctl={ctl} onBackToGame={() => setReviewing(false)} onHome={goHome} />;
+    return (
+      <ReviewScreen
+        gameId={reviewing.id}
+        record={reviewing.record}
+        meta={reviewing.meta}
+        cards={ctl.cards}
+        backLabel="Back to the board"
+        onBack={() => setReviewing(null)}
+        onHome={goHome}
+      />
+    );
   }
   if (ctl) {
     return (
       <Game
         key={ctl.session.seed + ':' + String(ctl.config.mode)}
         ctl={ctl}
-        {...(ctl.config.mode === 'ai' ? { onReview: () => setReviewing(true) } : {})}
+        {...(ctl.config.mode === 'ai' ? { onReview: () => openReview(ctl) } : {})}
         onHome={goHome}
         onNewGame={() => {
           ctl.dispose();

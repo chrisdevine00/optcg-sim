@@ -1,0 +1,9 @@
+.lesson {
+  max-width: 760px;
+}
+.lesson h2 {
+  margin: 24px 0 8px;
+}
+.lesson p {
+  line-height: var(--leading-md);
+}

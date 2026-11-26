@@ -10,6 +10,7 @@ import {
   rookie,
   type AiTier,
   type Explanation,
+  type PracticeJudge,
   type GameInfo,
 } from '@optcg/ai';
 import type { Action, PlayerId, PlayerView, ProjectedView, SearchView } from '@optcg/engine';
@@ -26,6 +27,22 @@ import { Coach } from '../coach/coach.ts';
 import { PoliteQueue } from './politeQueue.ts';
 import { readsHiddenZone, type VeiledProps } from './veiled.tsx';
 import { describeMove, other, turnSummary, type LogLine, type Names } from './text.ts';
+
+/** What a puzzle says when it ends, by judge (the lethal one keeps its L-slice words). */
+const PUZZLE_WORDS: Record<PracticeJudge, { solved: string; failed: string }> = {
+  'win-this-turn': {
+    solved: 'you found lethal.',
+    failed: 'the turn ended without a win.',
+  },
+  'survive-turn': {
+    solved: 'you got through the turn.',
+    failed: 'the game was lost before the turn ended.',
+  },
+  'no-counter-on-attack': {
+    solved: 'you took the hit and kept your cards.',
+    failed: 'you played a Counter.',
+  },
+};
 
 export type Speed = 'step' | 0.5 | 1 | 2 | 4;
 export const SPEEDS: Speed[] = ['step', 0.5, 1, 2, 4];
@@ -79,7 +96,16 @@ export interface GameConfig {
    * look at (Study): nothing can be played and the AI never starts. `puzzle` marks it a lethal
    * puzzle ("Practice this", §4.5), judged when its turn ends.
    */
-  restore?: { record: SessionRecord; readOnly?: boolean; puzzle?: { turn: number } };
+  restore?: {
+    record: SessionRecord;
+    readOnly?: boolean;
+    /**
+     * `judge` (M8 WP6, additive) says how the puzzle is won: `win-this-turn` (the default: win on
+     * `turn`), `survive-turn` (the game is not lost by the end of `turn`) or `no-counter-on-attack`
+     * (the counter step that was cut from ends with no Counter played; `turn` is that attack's turn).
+     */
+    puzzle?: { turn: number; judge?: PracticeJudge };
+  };
 }
 
 /** The tutorial's narrowing of the engine's own legal actions (see `GameConfig.tutorial`). */
@@ -187,7 +213,9 @@ export class GameController {
   /** A restored board to look at: nothing can be played (review Study). */
   readonly readOnly: boolean;
   /** A lethal puzzle from a review flag: the turn it was cut from. */
-  readonly puzzle: { turn: number } | null;
+  readonly puzzle: { turn: number; judge?: PracticeJudge } | null;
+  /** Actions in the record when the puzzle was cut (the `no-counter-on-attack` judge reads after it). */
+  private readonly puzzleFrom: number;
   /** The coach: its lethal detector and its panel state (learning-ui §2, §3). */
   readonly coach: Coach;
   /** The blunder warning before a commit (M7 WP5); inert unless the player switched it on. */
@@ -258,6 +286,7 @@ export class GameController {
       : new GameSession((id) => cards.get(id), start, seats);
     this.readOnly = config.restore?.readOnly === true;
     this.puzzle = config.restore?.puzzle ?? null;
+    this.puzzleFrom = config.restore?.record.actions.length ?? 0;
     this.coach = new Coach({
       me: config.human,
       hotseat: config.mode === 'hotseat',
@@ -361,19 +390,21 @@ export class GameController {
   }
 
   private puzzleNoted = false;
-  /** A lethal puzzle says how it went, once: politely, and (failed) with a toast. */
+  /** A puzzle says how it went, once: politely, and with a toast (failed always; solved off a game-over panel). */
   private checkPuzzle(): void {
     if (!this.puzzle || this.puzzleNoted) return;
     const s = this.puzzleState();
     if (s !== 'solved' && s !== 'failed') return;
     this.puzzleNoted = true;
+    const words = PUZZLE_WORDS[this.puzzle.judge ?? 'win-this-turn'];
     if (s === 'failed')
-      this.toast =
-        'Not this time: the turn ended without a win. Use ⌂ to go back to the review and try again.';
+      this.toast = `Not this time: ${words.failed} Use ⌂ to go back to the review and try again.`;
+    else if (this.puzzle.judge && this.puzzle.judge !== 'win-this-turn')
+      this.toast = `Solved: ${words.solved}`;
     this.announce(
       s === 'solved'
-        ? 'Solved: you found lethal.'
-        : 'Not this time: the turn ended without a win. Use the home button to go back to the review.',
+        ? `Solved: ${words.solved}`
+        : `Not this time: ${words.failed} Use the home button to go back to the review.`,
     );
   }
 
@@ -554,14 +585,28 @@ export class GameController {
   puzzleState(): 'open' | 'solved' | 'failed' | null {
     if (!this.puzzle) return null;
     const v = this.session.view(this.me);
+    const judge = this.puzzle.judge ?? 'win-this-turn';
+    const won = v.result && 'winner' in v.result && v.result.winner === this.me;
+    if (judge === 'no-counter-on-attack') {
+      // The counter step the puzzle was cut at: any Counter played is the mistake; ending the step
+      // without one is the answer.
+      for (const a of this.session.actionsSince(this.puzzleFrom)) {
+        if (a.player !== this.me) continue;
+        if (a.type === 'counter' || (a.type === 'activate' && a.ability === 'counter'))
+          return 'failed';
+        if (a.type === 'endCounter') return 'solved';
+      }
+      return v.result ? 'failed' : 'open';
+    }
+    if (judge === 'survive-turn') {
+      // Survived: not lost by the time the turn ends (a win on the way counts); lost: a result
+      // that is not this player's win.
+      if (v.result) return won ? 'solved' : 'failed';
+      return v.turn.number > this.puzzle.turn ? 'solved' : 'open';
+    }
     // Solved only by a win on the puzzle's own turn: a win after its turn has passed is not it
     // (review L-06).
-    if (v.result)
-      return 'winner' in v.result &&
-        v.result.winner === this.me &&
-        v.turn.number === this.puzzle.turn
-        ? 'solved'
-        : 'failed';
+    if (v.result) return won && v.turn.number === this.puzzle.turn ? 'solved' : 'failed';
     return v.turn.number > this.puzzle.turn || v.turn.activePlayer !== this.me ? 'failed' : 'open';
   }
 

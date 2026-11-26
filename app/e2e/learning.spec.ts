@@ -378,9 +378,13 @@ test.describe('the missed-lethal review (learning-ui §4.2–4.5)', () => {
     await expect(page.getByTestId('review-status')).toHaveText('1 flag · 1 severe', {
       timeout: 30_000,
     });
+    // The flag is on the timeline (one button) and in the Flags listbox (one option).
     await expect(
       page.getByRole('button', { name: /Turn 9, your turn: missed lethal, severe/ }),
-    ).toHaveCount(2);
+    ).toHaveCount(1);
+    await expect(
+      page.getByRole('option', { name: /Turn 9 your turn.*Missed lethal.*Severe/ }),
+    ).toHaveCount(1);
     const detail = page.getByTestId('selected-flag');
     await expect(detail).toContainText('You had lethal this turn.');
     await expect(detail).toContainText('Holds whatever they held');
@@ -438,5 +442,10 @@ test.describe('the missed-lethal review (learning-ui §4.2–4.5)', () => {
     await attackLeader(page.locator('[data-glyph="attack"]').first());
     await expect(page.getByTestId('puzzle-result')).toContainText('Solved', { timeout: 30_000 });
     await expect(page.getByTestId('puzzle-chip')).toHaveText('Practice · solved');
+    // Back in the review the flag says it was practised, and Practice offers to go again (M8 WP6).
+    await page.getByRole('button', { name: 'Leave the game (Home)' }).click();
+    await expect(page.getByTestId('practised')).toHaveText('Practised: solved');
+    await expect(page.locator('#practice-btn')).toHaveText('Practice again');
+    await expect(page.getByRole('listbox', { name: /^Flags/ })).toBeFocused();
   });
 });
