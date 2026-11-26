@@ -7,8 +7,15 @@
  * What this checks is shape and size, not play: whether a game's record still replays is the
  * engine's call (`verifyReplay`, `staleness.ts`), and a record that does not replay opens read-only.
  */
-import { AI_TIERS } from '@optcg/ai';
-import type { Evidence, Explanation, FlagKind, Move, PracticedState, ReviewFlag } from '@optcg/ai';
+import type {
+  AiTier,
+  Evidence,
+  Explanation,
+  FlagKind,
+  Move,
+  PracticedState,
+  ReviewFlag,
+} from '@optcg/ai';
 import type { ReviewMarker, TurnResult } from '@optcg/ai';
 import type { SessionRecord } from '../session/index.ts';
 import type { TutorialTimingLog } from '../tutorial/types.ts';
@@ -20,6 +27,13 @@ import {
   type StoredGame,
   type StoredReview,
 } from './types.ts';
+
+/**
+ * The AI tiers a stored game may name. A local copy, not a value import from `@optcg/ai`: that
+ * barrel pulls the engine and the search into the initial bundle (the store boots before first
+ * render). `app/test/store-import.test.ts` checks it equals `AI_TIERS`.
+ */
+export const STORED_TIERS: readonly AiTier[] = ['rookie', 'pirate', 'warlord', 'emperor'];
 
 export const MAX_IMPORT_BYTES = 50 * 1024 * 1024;
 export const MAX_ACTIONS = 20_000;
@@ -258,7 +272,7 @@ function meta(v: unknown): GameMeta {
     me: oneOf(o.me, 'a seat', ['p1', 'p2'] as const),
     myLeader: str(o.myLeader, 'myLeader', 100),
     opponentLeader: str(o.opponentLeader, 'opponentLeader', 100),
-    tier: oneOf(o.tier, 'a tier', AI_TIERS),
+    tier: oneOf(o.tier, 'a tier', STORED_TIERS),
     deckName: str(o.deckName, 'deckName', 200),
     turns: int(o.turns, 'turns', 0, 10_000),
     endedAt: int(o.endedAt, 'endedAt', 0, 8_640_000_000_000_000),

@@ -2,6 +2,12 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-26 — The store's validator keeps a local tier list (initial bundle 164 KB → 81 KB)
+
+- **Context:** after M8, initial JS was 164.2 KB gzipped (M7: 72.6 KB). The source map showed the engine, the lethal solver and the review detectors in the startup chunk: `app/src/store/validate.ts` (loaded at boot by `initStore`) imported the value `AI_TIERS` from the `@optcg/ai` barrel, which pulls the whole package.
+- **Decision:** `validate.ts` keeps a local `STORED_TIERS`; a unit test asserts it equals `AI_TIERS`. Initial JS is 80.8 KB. Boot-path modules must not value-import the `@optcg/ai` or `@optcg/engine` barrels (type imports are free).
+- **Rejected:** a `@optcg/ai/tiers` subpath export (another public entry for one constant); lazy-loading the validator (it is needed at boot to flush a stashed game).
+
 ## 2026-11-26 — M8 fix round (app): a finished game is never dropped; board CSS belongs to the board; one-per-turn "Analyse deeper"
 
 - **Context:** the M8 review (FAIL, five severity 3) found in the app: a mulligan flag labelled "Holds whatever they held" (R1); a finished game dropped when the save hit the quota or the 200-game cap, after a notice that invited the player to make room (R3); a delete lost to an immediate reload (R4); Study unstyled on a direct load of a review (R5); and copy and storage gaps (R9, R11, R12).

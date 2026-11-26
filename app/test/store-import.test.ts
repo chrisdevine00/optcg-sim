@@ -299,3 +299,11 @@ describe('hostile import files', () => {
 });
 
 type Rec = Record<string, unknown>;
+
+describe('stored tiers', () => {
+  it('match the AI tiers (validate.ts keeps a local copy to stay out of the initial bundle)', async () => {
+    const { AI_TIERS } = await import('@optcg/ai');
+    const { STORED_TIERS } = await import('../src/store/validate.ts');
+    expect([...STORED_TIERS]).toEqual([...AI_TIERS]);
+  });
+});
