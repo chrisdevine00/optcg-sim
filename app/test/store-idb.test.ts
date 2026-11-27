@@ -3,7 +3,7 @@
  * staleness and the size of a saved game. One contract suite runs against both stores.
  */
 import { IDBFactory, IDBObjectStore } from 'fake-indexeddb';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { SCRIPTS } from '@optcg/cards';
 import { ENGINE_VERSION } from '@optcg/engine';
 import { GameSaver } from '../src/play/save-game.ts';
@@ -212,6 +212,70 @@ describe('fallback', () => {
     await initStore({ factory: new IDBFactory(), storage: new FakeStorage() });
     expect(getStore().kind).toBe('indexeddb');
     expect(timingStore()).toBeInstanceOf(IdbTimingStore);
+  });
+});
+
+// M10-R5: a database that opens after the cap. `IdbStore.open` is held by a deferred promise, so no
+// clock is read: the cap is 20 ms and the late open is released by the test.
+describe('a database that opens after the cap', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    resetStoreForTests();
+  });
+  const held = () => {
+    let release!: () => void;
+    const gate = new Promise<void>((r) => (release = r));
+    const real = IdbStore.open.bind(IdbStore);
+    vi.spyOn(IdbStore, 'open').mockImplementation(async (f) => {
+      await gate;
+      return real(f);
+    });
+    return release;
+  };
+  const until = async (cond: () => boolean) => {
+    for (let i = 0; i < 400 && !cond(); i++) await new Promise((r) => setTimeout(r, 25));
+    expect(cond()).toBe(true);
+  };
+  const open = () =>
+    initStore({ factory: new IDBFactory(), storage: new FakeStorage(), timeoutMs: 20 });
+
+  // Revert: delete lateOpen() in store/open.ts (the store stays memory and the status never changes).
+  it('is adopted when nothing was written to memory: the real store, a loaded line, a new epoch', async () => {
+    resetStoreForTests();
+    const release = held();
+    await open();
+    expect(getStore().kind).toBe('memory');
+    expect(storeStatus()).toMatchObject({ kind: 'memory', reason: 'slow', lateLoaded: false });
+    release();
+    await until(() => storeStatus().kind === 'indexeddb');
+    expect(getStore().kind).toBe('indexeddb');
+    expect(storeStatus()).toMatchObject({ reason: null, lateLoaded: true, epoch: 1 });
+    expect(synced.timing).not.toBeNull();
+  });
+
+  // Revert: drop the `written === 0` test in lateOpen() (the game played in memory is then hidden).
+  it('is not adopted after a write to memory: the memory store stays and the notice says why', async () => {
+    resetStoreForTests();
+    const release = held();
+    await open();
+    await getStore().saveGame(storedGame('played-meanwhile', 1, rec));
+    release();
+    await new Promise((r) => setTimeout(r, 300));
+    expect(getStore().kind).toBe('memory');
+    expect(storeStatus()).toMatchObject({
+      kind: 'memory',
+      reason: 'slow',
+      lateLoaded: false,
+      epoch: 0,
+    });
+    expect((await getStore().listGames()).map((g) => g.id)).toEqual(['played-meanwhile']);
+  });
+
+  it('that never opens leaves the slow notice and the memory store', async () => {
+    resetStoreForTests();
+    vi.spyOn(IdbStore, 'open').mockImplementation(() => new Promise(() => undefined));
+    await open();
+    expect(storeStatus()).toMatchObject({ kind: 'memory', reason: 'slow' });
   });
 });
 

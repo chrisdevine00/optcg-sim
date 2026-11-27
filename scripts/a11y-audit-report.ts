@@ -171,7 +171,7 @@ else {
     out.push(`| ${id} | ${e.nodes} | ${e.help} | ${[...e.where].join(', ')} |`);
   out.push(
     '',
-    '`color-contrast` incompletes sit over card art or gradients axe cannot sample; WCAG 1.4.3 and 1.4.11 over art are manual rows of the WCAG audit document (WP5).',
+    'The audit blocks card art, so most `color-contrast` incompletes are not art: on Learn, Progress and Rules they are `aria-hidden` status glyphs (axe cannot read them) and two partly covered links, benign; on Cards, which draws text faces, the text-face body text over its gradient is what axe cannot sample, and `scripts/contrast.ts` checks token pairs, not that. Text over real card art (WCAG 1.4.3 and 1.4.11) is checked by nothing automatic: it is a manual row of the WCAG audit document (M10 review, R15).',
     '',
   );
 }

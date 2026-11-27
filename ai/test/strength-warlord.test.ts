@@ -54,8 +54,8 @@ import { metaDecks } from './support.ts';
  * (run 44074243109, 200 games each: Warlord vs Rookie about 126 min, Warlord vs Pirate about 123,
  * the two controls about 142 together; the laptop-based estimates of the fix round were 2x too
  * small and every series timed out after printing its result). Pirate vs Rookie took 5 minutes.
- * Emperor: 16 games, about 36 s a game on a laptop (measured 2026-11-27: 2 games in 72 s) and an
- * estimated 2 to 3 minutes on the hosted runner, no CI measurement yet: a 100-minute hang guard, inside
+ * Emperor: 16 games, about 54 s a game on a laptop (measured 2026-11-27: 16 games in 862 s), no CI
+ * measurement yet: a 100-minute hang guard, inside
  * its job's 120 (M10-R4). Per push (12 games) the default is ample. Each nightly series is its own CI
  * job (`strength-m5b` matrix; 360 minutes, the hosted maximum, for the 200-game series).
  */

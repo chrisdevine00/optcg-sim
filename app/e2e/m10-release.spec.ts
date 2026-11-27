@@ -114,6 +114,7 @@ test.describe('About', () => {
       'Version',
       'Credits',
       'Third-party licences',
+      'Accessibility',
       'Your data',
       'Report a problem',
     ]);

@@ -901,7 +901,7 @@ export async function runL(p: Pass) {
     // The timeline: the first turn button, then Right until the flagged turn.
     await p.assist(
       'focus moved to the Turn timeline (a user Tabs past the header)',
-      '.tl button.tl-col',
+      '.rv-tl button.rv-tl-cell',
     );
     const f = await p.focus();
     p.note(`On the timeline: ${f.aria}`);

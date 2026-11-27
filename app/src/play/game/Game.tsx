@@ -1144,6 +1144,29 @@ export function Game({
     return placeDock(L, avoid, tall, dock.pinned);
   })();
 
+  // WCAG 1.4.13 hoverable (M10 W5-1): a hover preview stays open while the pointer is inside its box, so
+  // the pointer can travel from the card onto it. The dock itself takes no pointer events (it sits over
+  // the log and must not eat a click meant for a button under it), so the box is tested here, on the
+  // pointer's position; leaving the box starts the usual 150 ms close.
+  const pointerInDock = useRef(false);
+  // Re-subscribed on every render, so the handler always sees the current box and preview timer.
+  useEffect(() => {
+    const box = dock.handle && !dock.pinned ? dockRect : null;
+    const move = (e: PointerEvent) => {
+      const now =
+        !!box &&
+        e.clientX >= box.x &&
+        e.clientX <= box.x + box.w &&
+        e.clientY >= box.y &&
+        e.clientY <= box.y + box.h;
+      if (now) clearTimeout(hoverTimer.current);
+      else if (pointerInDock.current) onPreview(null, 'hover');
+      pointerInDock.current = now;
+    };
+    window.addEventListener('pointermove', move);
+    return () => window.removeEventListener('pointermove', move);
+  });
+
   const lines = ctl.logLines();
 
   const style = {

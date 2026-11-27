@@ -525,6 +525,8 @@ Each AI move plays as **highlight → move → dwell**, then the log line. The s
 
 **The 8 s target, honestly.** With the longer dwells, a typical turn meets 8 s at Rookie and Pirate (the vertical slice's tier) but not at Warlord, which runs about 1.2 s over after compression because its up to 1.8 s of visible thinking is real. *(Measured 2026-11-17: the Warlord turn is shorter than this estimate, 3.5 to 6.2 s for 6 moves or fewer and at most 10.8 s for 11, although the wait on the worker is longer than the 1.8 s allowed, 1.8 to 4.1 s; the harness's games (the player ends each turn at once) may give shorter turns than a real game. The 8 s target is met by typical Warlord turns, not by Emperor.)* We do not hide that by cutting the attack dwell. The owner session (OQ-4) times a clickable prototype at 1× and decides between accepting ≈ 9.2 s for Warlord and starting its plan during the human's End Phase.
 
+**Measured against the 8 s requirement in the app's millisecond mode (M10 fix round, M10-R3): missed.** The 8 s target for a typical turn stays the requirement. In the mode players get (real milliseconds, not iteration budgets) the Warlord's typical turn of 6 or 7 moves takes **9.2 s** (9.19 to 9.20 s on three machines, because the search runs to its budget, so this is not noise), and the wait on the worker is **2.3 to 4.3 s** against the 1.8 s above. The nightly bounds are therefore a typical turn at 12 s (1.5 times 8 s) and the wait at 6 s, each printing the requirement and the observation (`app/e2e/warlord.spec.ts`); the miss is recorded in BACKLOG §14 and is reported, not accommodated. The options to close it are in BACKLOG §14.
+
 **The considering beat.** `flows.md` G5 keeps a uniform 600 ms "considering…" beat before every AI defensive decision (Block, Counter, Trigger), whether or not the AI is slow, so its timing never leaks what it holds. That beat is not "thinking": it is shown on every AI defensive decision, which happens during **your** turn's battles, so it is outside this AI-turn budget.
 
 **Thinking only when it is real.** The "thinking" state appears only if the animation queue is empty **and** the worker has not answered within 300 ms. That avoids a flicker on every move. In thinking:
@@ -623,7 +625,7 @@ These reading pages are responsive. (Open question OQ-1, proposed decision PD-5.
 
 - **No layout shift when art arrives.** Every card box has fixed dimensions from the layout, and the face renders its text frame first (`card-face-study.md`). The image only fills the art window.
 - **Image size.** Images are requested at the slot size where the source allows. optcgapi serves only 600 × 838, so the browser downscales; the service worker caches it (ARCH §5).
-- **Animation.** Animations use only `transform` and `opacity`, so moves, rotations and the hand rise are compositor-only. The attack arrow is one SVG path per battle. The 60 fps budget (PROMPT Performance) is checked by the M10 trace on the board at both targets.
+- **Animation.** Animations use only `transform` and `opacity`, so moves, rotations and the hand rise are compositor-only. The attack arrow is one SVG path per battle. The 60 fps budget (PROMPT Performance) is checked by the M10 frame measurement on the board at both targets, as main-thread frame cadence at 4x CPU on a software compositor, with the compositor's partial and dropped frames reported beside it (`docs/benchmarks.md`).
 - **Fixed geometry.** The layout is recomputed only on resize (debounced 100 ms), never per frame.
 
 ---

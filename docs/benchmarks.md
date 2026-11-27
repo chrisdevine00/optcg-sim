@@ -314,7 +314,24 @@ Scenarios: **ai-turn** is the AI's 13-move turn of `scenario=late` at speed 1; *
 | hand-fan, 720p / 1080p | 4x | 16.7 | 16.8 | 16.8 (to 33.3 at 1080p) | 0% (to 0.4%) | 0 |
 | all four, both sizes | 1x | 16.7 to 16.8 | 16.8 | 16.8 (a single 33.3 to 33.4 frame in a few runs) | 0% to 0.6% | 0 |
 
-**Verdict: every line is met at 4x and at 1x on both sizes, by a wide margin** (p95 16.8 against 20, p99 16.8 against 34, over-25 at most 0.6% against 2%, no long task). The Mac draws every frame on the tick except a few single dropped frames (the "max" column). The CI runner's software compositor is slower; the nightly number is the one that decides, and the owner's `npm run perf:frames -- --headed` is the GPU reference. Traces (`test-results/trace-<scenario>-<project>-<rate>x.json`, 12 to 45 MB each) are workflow artifacts, not committed.
+**What these figures are (M10-R6):** main-thread frame cadence (`requestAnimationFrame` intervals and long tasks) at 4x CPU slowdown on a software compositor. They are not a count of frames the screen showed: the compositor can present a frame without the main thread's latest update (a "partial" frame) or drop it, and the intervals do not see that. Each scenario therefore also writes `frameStates` into `test-results/frames-<project>-<scenario>.json`, read from its Chromium trace (`PipelineReporter` frames that produced output: full, partial, dropped), reported and never asserted. The independent review's reading of the same traces (one run, Mac under load): AI turn 209 full, 19 partial (8%), 5 dropped (2.1%); human turn 411 full, 182 partial (30%), 7 dropped (1.2%); review scroll 97 / 4 / 1; hand fan 186 / 2 / 0. A software compositor on a loaded Mac exaggerates this and a GPU hides it; the owner's `npm run perf:frames -- --headed` is the GPU reference, and if it shows the same shares for the human turn it needs the `BoardCard` memoisation (BACKLOG §14). The fix round's own figures are in the table below.
+
+**Compositor frame states, one run at 720p (M10 fix round, 2026-11-27, load 3.9, Apple M4 Pro, headless Chromium, software compositor; reported, not asserted):**
+
+| Scenario | Rate | Compositor frames | Partial | Dropped |
+| --- | --- | --- | --- | --- |
+| ai-turn | 4x | 235 | 9.8% | 2.5% |
+| ai-turn | 1x | 212 | 3.8% | 0.9% |
+| human-turn | 4x | 600 | 31.2% | 1.0% |
+| human-turn | 1x | 502 | 24.3% | 0.2% |
+| review-scroll | 4x | 103 | 3.9% | 1.0% |
+| review-scroll | 1x | 101 | 4.0% | 1.0% |
+| hand-fan | 4x | 190 | 1.1% | 0.0% |
+| hand-fan | 1x | 184 | 1.1% | 0.5% |
+
+The human turn presents about a quarter to a third of its compositor frames without the main thread's latest update even at 1x, so the table above (rAF cadence) does not show it; whether that is the software compositor or the board's rendering is for the owner's headed run to say.
+
+**Verdict: every line is met at 4x and at 1x on both sizes, by a wide margin** (as main-thread cadence; see the paragraph above for what that does not cover) (p95 16.8 against 20, p99 16.8 against 34, over-25 at most 0.6% against 2%, no long task). The Mac draws every frame on the tick except a few single dropped frames (the "max" column). The CI runner's software compositor is slower; the nightly number is the one that decides, and the owner's `npm run perf:frames -- --headed` is the GPU reference. Traces (`test-results/trace-<scenario>-<project>-<rate>x.json`, 12 to 45 MB each) are workflow artifacts, not committed.
 
 **Headroom, one run each at 720p** (load 8.0): the human turn is the first to lose frames: 8x p99 33.3 ms, 2.9% over 25 ms, 5 long tasks (longest 78 ms); 12x p95 33.3, p99 50.1, 6.0%, 14 long tasks (108 ms); 16x p95 33.4, p99 83.4, 8.7%, 30 long tasks (130 ms). The AI turn: 8x p99 33.3, 2.4%, 2 long tasks; 12x p99 66.7, 4.3%, 8; 16x p95 33.4, 8.2%, 18 (157 ms). The review scroll holds p99 16.8 ms to 12x (16x: 0.8% over 25, one long task of 55 ms); the hand fan likewise (16x: p99 33.3, 1.8%). So the requirement has about twice the headroom. In the 12x trace of the human turn the main thread spends its time in React renders run from the controller's timers (146 timer fires, 1.7 s of the window), layout (556 ms), paint (555 ms) and layerize (535 ms) under a software renderer. No defect is named, so nothing was changed (DECISIONS 2026-11-27 "M10 WP3").
 
@@ -330,5 +347,5 @@ Every request carries the parts: **transfer** (the message there and back), **qu
 | 8 | 7 | 7,089 | 2,841 | 21 | 1,949 | 0 | 871 |
 
 - **Setup plus transfer is 1 to 22 ms of a 2.3 to 4.3 s wait; there is nothing to fix there.** The queue is the turn plan: 2,500 ms of budget (ADR 0008) less the 700 ms of turn-start animation that hides part of it, 1.8 to 1.95 s. The search part is decision searches the animation did not hide (400 ms each, 400 to 715 ms in the requests), 0.4 to 2.3 s a turn.
-- **The warm-up changes nothing measurable.** The session builds in 0 to 0.1 ms; the first plan ran 160,452, 162,074 and 154,818 rollouts cold and 160,640, 163,158 and 159,011 warm (Setup open for 4 s before Start). The wait is the same to within 10 ms.
-- **Against board.md §5.2's 1.8 s target:** met by the plan's remainder alone (1.8 to 1.95 s), missed by the turn as a whole (2.3 to 4.3 s) when decision searches are also waited on. The nightly bound (2,700 ms) is the product figure times 1.5 and stays.
+- **The warm-up changed nothing measurable, and was removed in the fix round (M10-R7).** The session builds in 0 to 0.1 ms; the first plan ran 160,452, 162,074 and 154,818 rollouts cold and 160,640, 163,158 and 159,011 warm (Setup open for 4 s before Start). The wait is the same to within 10 ms.
+- **Against board.md §5.2's 1.8 s target:** met by the plan's remainder alone (1.8 to 1.95 s), missed by the turn as a whole (2.3 to 4.3 s) when decision searches are also waited on. The nightly bound on iteration budgets (2,700 ms) is the product figure times 1.5 and stays; in the app's millisecond mode the wait is bounded at 6,000 ms (the worst measured wait, 4.3 s, plus headroom) and a typical turn at 12 s (1.5 times the 8 s requirement, measured 9.2 s), each printing requirement and observation (M10-R3).

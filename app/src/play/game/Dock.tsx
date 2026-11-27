@@ -71,8 +71,9 @@ export function CardDock({
       style={{ left: rect.x, top: rect.y, width: rect.w, height: rect.h }}
       aria-label={pinned ? `Inspector: ${card.name}` : undefined}
       aria-hidden={pinned ? undefined : true}
-      // The hover preview is never a Tab stop (M3-30).
-      inert={pinned ? undefined : true}
+      // The hover preview is never a Tab stop (M3-30): it holds nothing focusable, and (pointer-events: none)
+      // it never takes a click from what is under it. Game.tsx keeps it open while the pointer is inside its
+      // box (WCAG 1.4.13 hoverable, M10 W5-1).
       role={pinned ? 'dialog' : undefined}
       // The card's text is the dialog's description, so it is read on open (M3 pass F7).
       aria-describedby={pinned ? 'dock-text-body' : undefined}

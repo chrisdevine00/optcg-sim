@@ -1,10 +1,10 @@
 import { useEffect, type ReactNode } from 'react';
-import { gateHeading, storeWanted, useStoreReady } from './ready.ts';
+import { gateHeading, noteGateShown, storeWanted, useStoreReady } from './ready.ts';
 
 /**
  * M10 WP1: the wrapper a route opts into when it reads or writes saved data. Until the store is ready
  * it shows the page's heading (focused, so the title and focus are right at once) and a skeleton with
- * one polite status, "Opening your saved data…"; then the page mounts and its own heading takes over.
+ * one polite status, "Opening your saved data…"; then the page mounts and its own heading takes over (RouteFocus moves focus to it: the gate's heading, which had it, is gone). No aria-busy: the one status inside must be announced (M10-R11).
  * The page never mounts early, so a game cannot start against a store that is still opening. After the
  * 3 s cap `initStore` falls back to memory and marks ready; the store-status notice explains.
  * A path the route table does not gate (`storeWanted`) passes straight through.
@@ -28,9 +28,10 @@ function Waiting({ path, fallback }: { path: string; fallback?: ReactNode }) {
   useEffect(() => {
     document.title = `${heading} · OPTCG Sim`;
     document.getElementById('page-title')?.focus();
+    noteGateShown();
   }, [heading]);
   return (
-    <main className="page" id="main" aria-labelledby="page-title" aria-busy="true">
+    <main className="page" id="main" aria-labelledby="page-title">
       <h1 id="page-title" tabIndex={-1}>
         {heading}
       </h1>

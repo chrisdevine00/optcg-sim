@@ -101,6 +101,17 @@ describe('JSON import names every entry it cannot use (M6-11)', () => {
     [null, 'Entry 2: not a card entry (it needs an "id"), skipped'],
     [7, 'Entry 2: not a card entry (it needs an "id"), skipped'],
     [{ count: 2 }, 'Entry 2: not a card entry (it needs an "id"), skipped'],
+    // M10-R10. Revert: drop the id-type and quantity-key checks in sanitizeJsonDeck (these four then pass).
+    [{ id: 'OP17-041', qty: 4 }, 'Entry 2: "qty" is not read, use "count", skipped'],
+    [{ id: 'OP17-041', quantity: 4 }, 'Entry 2: "quantity" is not read, use "count", skipped'],
+    [
+      { id: 7, count: 2 },
+      'Entry 2: the "id" must be text such as "OP17-039", not a number, skipped',
+    ],
+    [
+      { id: null, count: 2 },
+      'Entry 2: the "id" must be text such as "OP17-039", not another kind of value, skipped',
+    ],
   ];
   it.each(table)('%j reads %s', (entry, message) => {
     const r = run(entry);
@@ -110,11 +121,16 @@ describe('JSON import names every entry it cannot use (M6-11)', () => {
     expect(parsed.main).toEqual(['OP17-040']);
   });
   it('good counts and string entries pass untouched', () => {
-    const text = json(['OP17-040', { id: 'OP17-041', count: 3 }, { id: 'OP17-042' }]);
+    const text = json(['OP17-040', { id: 'OP17-041', count: 3 }]);
     const r = sanitizeJsonDeck(text);
     expect(r.problems).toEqual([]);
     expect(r.text).toBe(text);
-    expect(parseDeckText(r.text, (id) => byId.get(id)).main).toHaveLength(5);
+    expect(parseDeckText(r.text, (id) => byId.get(id)).main).toHaveLength(4);
+  });
+  it('says when an entry has no count and is read as 1 (M10-R10), and keeps it', () => {
+    const r = sanitizeJsonDeck(json(['OP17-040', { id: 'OP17-042' }]));
+    expect(r.problems).toEqual(['Entry 2: no count, read as 1']);
+    expect(parseDeckText(r.text, (id) => byId.get(id)).main).toEqual(['OP17-040', 'OP17-042']);
   });
   it('numbers each entry by its place in the list, and reports every one', () => {
     const r = sanitizeJsonDeck(

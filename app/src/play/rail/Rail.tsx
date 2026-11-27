@@ -83,7 +83,7 @@ export function RailHeader({
           ⌂
         </button>
       </div>
-      <p className="rail-notice" style={{ height: noticeH }} aria-label={DISCLAIMER}>
+      <p className="rail-notice" style={{ height: noticeH }}>
         <span aria-hidden="true">{DISCLAIMER_SHORT}</span>
         <button type="button" className="info" aria-label={DISCLAIMER} title={DISCLAIMER}>
           ⓘ

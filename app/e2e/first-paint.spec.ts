@@ -191,6 +191,7 @@ test('a database that opens late after something was played in memory is not tak
   await concede(page);
   // Released while the game's copy lives only in memory: the database is NOT taken (it would hide the game).
   await release(page);
+  await page.getByRole('button', { name: 'Leave the game (Home)' }).click();
   await page
     .getByRole('navigation', { name: 'Main' })
     .getByRole('link', { name: 'Settings' })
@@ -203,6 +204,22 @@ test('a database that opens late after something was played in memory is not tak
   await page.goto('./settings');
   // After a reload everything is there: the earlier game and the one played during the wait.
   await expect(count(page)).toHaveText('2 saved games in this browser.', { timeout: 15_000 });
+});
+
+// M10-R11. Revert: the `gateWasShown` branch in RouteFocus.tsx (focus is left on <body>), or aria-busy back
+// on the gate's main (the first expectation).
+test('a deep link held by the gate: the status is not hidden by aria-busy, and focus lands on the page heading when it lifts', async ({
+  page,
+}) => {
+  await page.goto('./about');
+  await setHold(page, 'ms:1500');
+  await page.goto('./decks');
+  await expect(gateStatus(page)).toBeVisible();
+  await expect(page.locator('main#main')).not.toHaveAttribute('aria-busy', /.*/);
+  await expect(gateStatus(page)).toHaveCount(0, { timeout: 15_000 });
+  await expect(page.getByRole('heading', { level: 1, name: 'Decks' })).toBeFocused({
+    timeout: 20_000,
+  });
 });
 
 test.describe('measurement', () => {

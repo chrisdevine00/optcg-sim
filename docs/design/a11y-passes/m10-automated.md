@@ -122,7 +122,7 @@ What is automated here, and what is not: axe; the level-one heading and whether 
 | label-content-name-mismatch | 438 | Elements must have their visible text as part of their accessible name | board-explore, board-target, board-count, board-pick, board-order, board-defend, shortcut-sheet, coach-panel, tutorial, drill-lethal, drill-counter, drill-don, rules-show-me, decks-builder, decks-import, decks-export, cards-inspector, review-study |
 | aria-prohibited-attr | 26 | Elements must only use permitted ARIA attributes | board-explore, board-target, board-count, board-pick, board-order, board-defend, coach-panel, tutorial, drill-lethal, drill-counter, drill-don, rules-show-me, review-study |
 
-`color-contrast` incompletes sit over card art or gradients axe cannot sample; WCAG 1.4.3 and 1.4.11 over art are manual rows of the WCAG audit document (WP5).
+The audit blocks card art, so most `color-contrast` incompletes are not art: on Learn, Progress and Rules they are `aria-hidden` status glyphs (axe cannot read them) and two partly covered links, benign; on Cards, which draws text faces, the text-face body text over its gradient is what axe cannot sample, and `scripts/contrast.ts` checks token pairs, not that. Text over real card art (WCAG 1.4.3 and 1.4.11) is checked by nothing automatic: it is a manual row of the WCAG audit document (M10 review, R15).
 
 ## The nine-item nav (M9 open item)
 

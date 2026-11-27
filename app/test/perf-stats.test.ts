@@ -4,7 +4,7 @@
  * instead of interpolating, or count `>= 25` as over, and the exact-value cases fail.
  */
 import { describe, expect, it } from 'vitest';
-import { percentile, summarise } from '../e2e/support/perf-stats.ts';
+import { frameStates, percentile, summarise } from '../e2e/support/perf-stats.ts';
 import { median, summarise as lhSummarise } from '../../scripts/lighthouse.ts';
 
 describe('percentile', () => {
@@ -71,5 +71,38 @@ describe('the Lighthouse median (scripts/lighthouse.ts)', () => {
     expect(s.median.performance).toBe(85);
     expect(s.median.lcp).toBe(900);
     expect([s.min.performance, s.max.performance]).toEqual([80, 90]);
+  });
+});
+
+// M10-R6: the compositor's verdict per frame, from PipelineReporter begin events. Revert: count the
+// "no update desired" frames as produced, or read the end events, and the shares change.
+describe('frameStates', () => {
+  const ev = (state: string, ph = 'b', name = 'PipelineReporter') => ({
+    name,
+    ph,
+    args: { frame_reporter: { state } },
+  });
+  it('counts full, partial and dropped frames and their shares of the frames that produced output', () => {
+    const events = [
+      ...Array.from({ length: 6 }, () => ev('STATE_PRESENTED_ALL')),
+      ev('STATE_PRESENTED_PARTIAL'),
+      ev('STATE_DROPPED'),
+      ...Array.from({ length: 10 }, () => ev('STATE_NO_UPDATE_DESIRED')),
+      ev('STATE_PRESENTED_ALL', 'e'),
+      ev('STATE_DROPPED', 'b', 'SomethingElse'),
+    ];
+    expect(frameStates(events)).toEqual({
+      produced: 8,
+      full: 6,
+      partial: 1,
+      dropped: 1,
+      partialShare: 0.125,
+      droppedShare: 0.125,
+    });
+  });
+  it('says NaN shares for a trace with no frames', () => {
+    const r = frameStates([]);
+    expect(r.produced).toBe(0);
+    expect(r.partialShare).toBeNaN();
   });
 });

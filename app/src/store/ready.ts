@@ -8,6 +8,7 @@
 import { useSyncExternalStore } from 'react';
 
 let ready = false;
+let gateShown = false;
 const listeners = new Set<() => void>();
 let waiters: (() => void)[] = [];
 
@@ -40,9 +41,16 @@ export function whenStoreReady(): Promise<void> {
   return ready ? Promise.resolve() : new Promise<void>((resolve) => waiters.push(resolve));
 }
 
+/** The gate showed its waiting page (M10-R11): the route that follows must hand focus to its own heading. */
+export function noteGateShown(): void {
+  gateShown = true;
+}
+export const gateWasShown = (): boolean => gateShown;
+
 /** Tests: back to "not ready". */
 export function resetReadyForTests(): void {
   ready = false;
+  gateShown = false;
   waiters = [];
 }
 

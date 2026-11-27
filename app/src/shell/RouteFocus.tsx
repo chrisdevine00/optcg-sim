@@ -10,6 +10,7 @@
  * is already inside the page body: only when it is on `<body>` or on something the old route removed.
  */
 import { useEffect } from 'react';
+import { gateWasShown } from '../store/ready.ts';
 
 /** True once the first route has rendered: the first load is not a route change. */
 let booted = false;
@@ -18,7 +19,9 @@ export function RouteFocus({ path }: { path: string }) {
   useEffect(() => {
     if (!booted) {
       booted = true;
-      return;
+      // The first load is not a route change, unless the store gate held the page: its focused heading was
+      // removed when the gate lifted, so focus is on <body> and goes to the page's own heading (M10-R11).
+      if (!gateWasShown()) return;
     }
     const active = document.activeElement;
     const inPage = active && active !== document.body && document.body.contains(active);

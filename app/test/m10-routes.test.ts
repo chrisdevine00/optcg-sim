@@ -32,7 +32,7 @@ describe('M10 wiring in App.tsx', () => {
     expect((app.match(/<Guard /g) ?? []).length).toBeGreaterThanOrEqual(12);
   });
   it('gates the routes that read saved data, and only those', () => {
-    expect(app).toContain('<StoreGate path={path}>');
+    expect(app).toMatch(/<StoreGate\s+key=\{epoch\}\s+path=\{path\}>/);
     for (const name of ['play', 'review', 'tutorial', 'decks', 'settings', 'reviews', 'lesson'])
       expect(app, name).toMatch(new RegExp(`<Guard name="${name}" path=\\{path\\} gated>`));
     for (const name of ['cards', 'about', 'home'])

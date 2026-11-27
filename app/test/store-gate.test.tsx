@@ -97,9 +97,9 @@ describe('the gate', () => {
     const html = gate('/play');
     expect(html.match(/role="status"/g)).toHaveLength(1);
     expect(html).toContain('Opening your saved data…');
-    // The wait is not announced as an alert, and the region says it is busy.
+    // The wait is not announced as an alert, and the region is NOT aria-busy (M10-R11: some readers skip a busy region's status).
     expect(html).not.toContain('role="alert"');
-    expect(html).toContain('aria-busy="true"');
+    expect(html).not.toContain('aria-busy');
   });
 
   it('after ready: the page, no heading of its own, no status', () => {

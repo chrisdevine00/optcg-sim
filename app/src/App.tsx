@@ -176,7 +176,10 @@ function Routes({ path }: { path: string }) {
           <Home />
         </Guard>
       ) : (
-        <NotFound />
+        <>
+          <NotFound />
+          <RouteFocus path={path} />
+        </>
       )}
       <Footer />
     </div>

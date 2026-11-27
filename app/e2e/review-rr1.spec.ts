@@ -65,5 +65,34 @@ test('the hover preview is never a Tab stop (M3-30)', async ({ page }) => {
   await nextDecision(page);
   await page.locator('.bc[data-zone="hand"]').first().focus();
   await expect(page.locator('.dock')).toBeVisible();
-  await expect(page.locator('.dock')).toHaveAttribute('inert', '');
+  // Not a Tab stop: nothing inside it can take focus. (It is hoverable, not inert: W5-1 below.)
+  const focusable = await page
+    .locator('.dock')
+    .locator('a[href], button, input, select, textarea, [tabindex]')
+    .count();
+  expect(focusable).toBe(0);
+  await expect(page.locator('.dock')).not.toHaveAttribute('inert', /.*/);
+});
+
+// WCAG 1.4.13 (M10 W5-1): the pointer can travel from the card onto its preview, and the preview stays;
+// leaving both closes it. Revert: put `inert` / pointer-events: none back on the unpinned dock (the dock
+// closes while the pointer is on it), or drop onHoverEnter (it closes 150 ms after the pointer left the card).
+test('the hover preview stays open while the pointer is on it, and closes when the pointer leaves both (1.4.13)', async ({
+  page,
+}) => {
+  await startGame(page, 'scenario=full&speed=4');
+  await nextDecision(page);
+  const card = page.locator('.bc[data-zone="hand"]').first();
+  const cb = (await card.boundingBox())!;
+  await page.mouse.move(cb.x + cb.width / 2, cb.y + cb.height / 2);
+  const dock = page.locator('.dock');
+  await expect(dock).toBeVisible({ timeout: 20_000 });
+  const db = (await dock.boundingBox())!;
+  // Straight onto the dock, then rest there well past the 150 ms close delay.
+  await page.mouse.move(db.x + db.width / 2, db.y + db.height / 2, { steps: 12 });
+  await page.waitForTimeout(700);
+  await expect(dock).toBeVisible();
+  // Away from both: it closes.
+  await page.mouse.move(2, 2);
+  await expect(dock).toHaveCount(0, { timeout: 20_000 });
 });

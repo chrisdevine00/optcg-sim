@@ -91,9 +91,23 @@ export function sanitizeJsonDeck(text: string): { text: string; problems: string
       problems.push(`${at}: not a card entry (it needs an "id"), skipped`);
       return;
     }
+    // M10-R10: an id that is not text ("OP17-039") is not a card number, and a quantity under another
+    // name is not read; both are said, not guessed at.
+    const id = (x as { id?: unknown }).id;
+    if (typeof id !== 'string') {
+      problems.push(
+        `${at}: the "id" must be text such as "OP17-039", not ${typeof id === 'number' ? 'a number' : 'another kind of value'}, skipped`,
+      );
+      return;
+    }
     const raw = (x as { count?: unknown }).count;
     if (raw === undefined) {
-      kept.push(x);
+      const other = ['qty', 'quantity', 'copies', 'amount', 'n', 'num'].find((k) => k in x);
+      if (other) problems.push(`${at}: "${other}" is not read, use "count", skipped`);
+      else {
+        problems.push(`${at}: no count, read as 1`);
+        kept.push(x);
+      }
       return;
     }
     const n =

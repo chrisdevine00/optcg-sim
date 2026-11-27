@@ -1463,6 +1463,8 @@
   overflow: auto;
   display: flex;
   flex-direction: column;
+  /* Never catches the pointer, so it cannot hide a button under it (the default home is over the log).
+     It is still hoverable (WCAG 1.4.13, M10 W5-1): Game.tsx keeps it open while the pointer is inside its box. */
   pointer-events: none;
   scroll-padding-top: 48px;
 }
