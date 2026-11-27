@@ -261,6 +261,9 @@ for (const screen of SCREENS)
     await prepare(page);
     await screen.show(page);
     await settle(page);
-    // maxDiffPixelRatio, animations and caret come from playwright.config.ts.
-    await expect(page).toHaveScreenshot(`${screen.name}.png`);
+    // maxDiffPixelRatio, animations and caret come from playwright.config.ts. About's version panel
+    // (build id, build time, commit) changes with every build, so it is masked.
+    await expect(page).toHaveScreenshot(`${screen.name}.png`, {
+      mask: [page.getByTestId('about-version')],
+    });
   });
