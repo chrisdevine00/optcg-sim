@@ -115,7 +115,11 @@ test('progress with drill sessions: the chart has a table, and exporting progres
   await seed(page, {
     v: 1,
     lessons: {},
-    sessions: [s('a', 10, 5, 1, null), s('b', 10, 8, 2, null), s('c', 10, 9, 3, 1)],
+    sessions: [
+      s('a', 10, 5, 1, null),
+      s('b', 10, 8, 2, null),
+      { ...s('c', 10, 9, 3, 1), timedOk: 9 },
+    ],
   });
   await page.goto('progress');
   await expect(page.getByRole('heading', { level: 1, name: 'Progress' })).toBeFocused();
