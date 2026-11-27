@@ -6,7 +6,15 @@
 import { useEffect, useState } from 'react';
 import { Link } from '../router.tsx';
 import { staleness } from '../meta/stale.ts';
-import { CREDITS, LICENCE_LINE, NOTICE, PRIVACY, REPORT_URL } from './credits.ts';
+import {
+  ACCESSIBILITY_CLAIM,
+  ACCESSIBILITY_LIMITS,
+  CREDITS,
+  LICENCE_LINE,
+  NOTICE,
+  PRIVACY,
+  REPORT_URL,
+} from './credits.ts';
 import { dayWords, loadVersion, type VersionInfo } from './version.ts';
 import '../styles/about.css';
 
@@ -17,11 +25,16 @@ export default function AboutRoute() {
     document.title = 'About · OPTCG Sim';
     document.getElementById('page-title')?.focus();
     let live = true;
-    void loadVersion().then((v) => {
-      if (live) setVersion(v);
-    });
+    const ask = () =>
+      void loadVersion().then((v) => {
+        if (live) setVersion(v);
+      });
+    ask();
+    // M10-R12: a first load that failed (offline) is asked again when the connection comes back.
+    window.addEventListener('online', ask);
     return () => {
       live = false;
+      window.removeEventListener('online', ask);
     };
   }, []);
   return <AboutView version={version} today={new Date()} />;
@@ -75,6 +88,12 @@ export function AboutView({
                 <dt>Build</dt>
                 <dd>{version.build}</dd>
               </div>
+              {version.commit && (
+                <div>
+                  <dt>Commit</dt>
+                  <dd>{version.commit.slice(0, 12)}</dd>
+                </div>
+              )}
               <div>
                 <dt>Built</dt>
                 <dd>{dayWords(version.builtAt)}</dd>
@@ -138,6 +157,17 @@ export function AboutView({
         </p>
       </section>
 
+      <section aria-labelledby="about-access">
+        <h2 id="about-access">Accessibility</h2>
+        <p data-testid="about-access">{ACCESSIBILITY_CLAIM}</p>
+        <p>Known limits:</p>
+        <ul>
+          {ACCESSIBILITY_LIMITS.map((l) => (
+            <li key={l}>{l}</li>
+          ))}
+        </ul>
+      </section>
+
       <section aria-labelledby="about-data">
         <h2 id="about-data">Your data</h2>
         <ul>
@@ -157,7 +187,9 @@ export function AboutView({
             Open an issue on GitHub<span className="sr-only"> (opens in a new tab)</span>
           </a>{' '}
           and include the version details above. If something broke on a page, its error page has a
-          “Copy details” button that gathers them; it never includes your games or decks.
+          “Copy details” button that gathers them: the app version, the address and the first 120
+          characters of the error message, with card numbers removed. It never includes your saved
+          games or decks, but read it before you post it.
         </p>
       </section>
     </main>

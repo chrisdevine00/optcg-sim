@@ -1,11 +1,13 @@
 /**
  * M10 WP6: what this build is, read from `version.json` at run time (the build writes it beside the
- * app; ARCHITECTURE §5 "App updates"). One lazy fetch, cached for the page's life, shared by the About
+ * app; ARCHITECTURE §5 "App updates"). One lazy fetch (a successful answer is cached for the page's life, a failed one is not: M10-R12), shared by the About
  * page and the error page's "Copy details". It never rejects: no file (dev server, offline) is null.
  */
 export interface VersionInfo {
   release: string;
   build: string;
+  /** The commit the build was made from (M10-R1); empty for a build that could not say. */
+  commit: string;
   builtAt: string;
   cardsThrough: string;
   cardCount: number;
@@ -23,6 +25,7 @@ export function parseVersion(json: unknown): VersionInfo | null {
   return {
     release: str(o.release),
     build: o.build,
+    commit: str(o.commit),
     builtAt: str(o.builtAt),
     cardsThrough: str(o.cardsThrough),
     cardCount: typeof o.cardCount === 'number' ? o.cardCount : 0,
@@ -40,11 +43,19 @@ export function loadVersion(
   fetcher: typeof fetch = (...a) => fetch(...a),
   base: string = import.meta.env.BASE_URL,
 ): Promise<VersionInfo | null> {
-  cached ??= fetcher(`${base}version.json`, { cache: 'no-cache' })
+  if (cached) return cached;
+  const p: Promise<VersionInfo | null> = fetcher(`${base}version.json`, { cache: 'no-cache' })
     .then((r) => (r.ok ? r.json() : null))
     .then(parseVersion)
-    .catch(() => null);
-  return cached;
+    .catch(() => null)
+    .then((v) => {
+      // M10-R12: only a version is remembered. A failed load (offline, a 404 body) is forgotten, so the
+      // next call after the connection is back asks again instead of repeating the old failure.
+      if (v === null && cached === p) cached = null;
+      return v;
+    });
+  cached = p;
+  return p;
 }
 
 /** Forget the cached answer (tests; and a page that wants to retry after coming back online). */

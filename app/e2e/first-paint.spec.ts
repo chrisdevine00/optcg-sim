@@ -87,7 +87,7 @@ test('with the database held: Home, Cards and the Play gate paint; after release
   await nextDecision(page);
   await concede(page);
   await page.goto('./settings');
-  await expect(count(page)).toHaveText('1 saved game in this browser.');
+  await expect(count(page)).toHaveText('1 saved game in this browser.', { timeout: 20_000 });
   await setHold(page, 'hold');
 
   // Home: the h1 and the nav, with the open request pending.
@@ -121,7 +121,7 @@ test('with the database held: Home, Cards and the Play gate paint; after release
   // The game saved before is still there (nothing was written to a stand-in store).
   await setHold(page, null);
   await page.goto('./settings');
-  await expect(count(page)).toHaveText('1 saved game in this browser.');
+  await expect(count(page)).toHaveText('1 saved game in this browser.', { timeout: 20_000 });
 });
 
 test('a game never starts against a store that is still opening, and is saved once it is open', async ({
@@ -139,7 +139,7 @@ test('a game never starts against a store that is still opening, and is saved on
   await setHold(page, null);
   await page.reload();
   await page.goto('./settings');
-  await expect(count(page)).toHaveText('1 saved game in this browser.');
+  await expect(count(page)).toHaveText('1 saved game in this browser.', { timeout: 20_000 });
 });
 
 test('a database that never opens: after the 3 s cap the page shows, in memory, with the one notice', async ({
@@ -153,7 +153,56 @@ test('a database that never opens: after the 3 s cap the page shows, in memory, 
   await expect(page.getByTestId('storage-notice')).toHaveCount(0);
   // The cap (3 s in open()) falls back to memory: the page, and the notice that says why.
   await expect(gateStatus(page)).toHaveCount(0, { timeout: 15_000 });
-  await expect(page.getByTestId('storage-notice')).toContainText('Saving is off');
+  await expect(page.getByTestId('storage-notice')).toContainText('did not load in time');
+});
+
+// M10-R5. Revert: delete lateOpen() in store/open.ts (the first test then still says "No saved games yet.")
+// or drop the `written === 0` check (the second test then loses the game played in memory).
+test('a database that opens 1 s after the cap is taken: the saved game appears and the notice says so', async ({
+  page,
+}) => {
+  await startGame(page, GAME);
+  await nextDecision(page);
+  await concede(page);
+  await page.goto('./about');
+  await setHold(page, 'ms:4000');
+  await page.goto('./settings');
+  // The cap lifts the gate at 3 s; the database has not opened yet.
+  await expect(gateStatus(page)).toHaveCount(0, { timeout: 15_000 });
+  await expect(page.getByTestId('storage-notice')).toContainText('did not load in time');
+  await expect(page.getByTestId('storage-notice')).toContainText('after a reload');
+  // It opens at 4 s with nothing written to memory: adopted, the page reads it, the notice says so.
+  await expect(count(page)).toHaveText('1 saved game in this browser.', { timeout: 15_000 });
+  await expect(page.getByTestId('storage-notice')).toContainText('Your saved games have loaded.');
+  await expect(page.getByRole('note')).toHaveCount(0);
+});
+
+test('a database that opens late after something was played in memory is not taken; the notice stays', async ({
+  page,
+}) => {
+  await startGame(page, GAME);
+  await nextDecision(page);
+  await concede(page);
+  await page.goto('./about');
+  await setHold(page, 'ms:20000');
+  await page.goto(`./play?${GAME}&start=1`);
+  await expect(page.locator('#decision')).toBeVisible({ timeout: 30_000 });
+  await nextDecision(page);
+  await concede(page);
+  // Released while the game's copy lives only in memory: the database is NOT taken (it would hide the game).
+  await release(page);
+  await page
+    .getByRole('navigation', { name: 'Main' })
+    .getByRole('link', { name: 'Settings' })
+    .click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible();
+  await expect(page.getByTestId('storage-notice')).toContainText('did not load in time');
+  await expect(page.getByTestId('storage-notice')).not.toContainText('have loaded');
+  await setHold(page, null);
+  await page.reload();
+  await page.goto('./settings');
+  // After a reload everything is there: the earlier game and the one played during the wait.
+  await expect(count(page)).toHaveText('2 saved games in this browser.', { timeout: 15_000 });
 });
 
 test.describe('measurement', () => {

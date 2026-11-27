@@ -10,6 +10,8 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { AboutView } from '../src/about/AboutRoute.tsx';
 import {
+  ACCESSIBILITY_CLAIM,
+  ACCESSIBILITY_LIMITS,
   CREDITS,
   LICENCE_LINE,
   NOTICE,
@@ -35,6 +37,7 @@ const text = (html: string) =>
 const VERSION: VersionInfo = {
   release: '1.0.0',
   build: 'abc123def456',
+  commit: '0123456789abcdef0123456789abcdef01234567',
   builtAt: '2026-11-27T09:30:00.000Z',
   cardsThrough: 'OP-17',
   cardCount: 3654,
@@ -57,7 +60,7 @@ describe('the unofficial notice', () => {
 
 describe('About page', () => {
   const html = view(VERSION, '2026-11-27');
-  it('has one main and one h1 that can take focus, and the seven sections in order', () => {
+  it('has one main and one h1 that can take focus, and the eight sections in order', () => {
     expect(html.match(/<main/g)).toHaveLength(1);
     expect(html.match(/<h1/g)).toHaveLength(1);
     expect(html).toContain('<h1 id="page-title" tabindex="-1">About</h1>');
@@ -68,6 +71,7 @@ describe('About page', () => {
       'Version',
       'Credits',
       'Third-party licences',
+      'Accessibility',
       'Your data',
       'Report a problem',
     ]);
@@ -76,6 +80,7 @@ describe('About page', () => {
     const t = text(html);
     expect(t).toContain('Release 1.0.0');
     expect(t).toContain('Build abc123def456');
+    expect(t).toContain('Commit 0123456789ab');
     expect(t).toContain('Built 27 Nov 2026');
     expect(t).toContain('Cards through OP-17, 3,654 cards');
     expect(t).toContain('Tournament lists as of 28 Oct 2026');
@@ -91,6 +96,13 @@ describe('About page', () => {
     expect(html).toContain('href="/settings"');
     expect(t).toMatch(/no account/i);
     expect(t).toMatch(/no analytics/i);
+  });
+  // M10-R8: what the art host learns is said, not implied. Revert: drop either sentence from PRIVACY.
+  it('says an image address names the card, that the page sends no referrer and where the app comes from', () => {
+    const t = text(html);
+    expect(t).toContain('An image address names the card');
+    expect(t).toContain('The page sends no referrer');
+    expect(t).toContain('GitHub Pages');
   });
   it('links the licences file and the issue tracker', () => {
     expect(html).toContain('third-party.txt');
@@ -182,5 +194,32 @@ describe('version.json parsing and dates', () => {
     expect(dayWords('2026-11-27T09:30:00.000Z')).toBe('27 Nov 2026');
     expect(dayWords('2026-01-05')).toBe('5 Jan 2026');
     expect(dayWords('soon')).toBe('soon');
+  });
+});
+
+// M10-R2: the claim is what was done. Revert: reword it to "built to WCAG 2.2 AA" in any one place.
+describe('the accessibility claim', () => {
+  const html = view(VERSION, '2026-11-27');
+  it('is the same sentence on the About page, in the README and in the CHANGELOG', () => {
+    expect(ACCESSIBILITY_CLAIM).toBe(
+      'Tested against WCAG 2.2 AA with automated checks on every route; manual screen-reader passes pending.',
+    );
+    expect(text(html)).toContain(ACCESSIBILITY_CLAIM);
+    expect(squash(read('../../README.md'))).toContain(ACCESSIBILITY_CLAIM);
+    expect(squash(read('../../CHANGELOG.md'))).toContain(ACCESSIBILITY_CLAIM);
+  });
+  it('lists the known limits on the About page and in the CHANGELOG', () => {
+    expect(ACCESSIBILITY_LIMITS).toHaveLength(3);
+    const log = squash(read('../../CHANGELOG.md'));
+    for (const l of ACCESSIBILITY_LIMITS) {
+      expect(text(html), l).toContain(text(l));
+      expect(log, l).toContain(l);
+    }
+    expect(squash(ACCESSIBILITY_LIMITS.join(' '))).toMatch(
+      /card art[\s\S]*1\.4\.12[\s\S]*VoiceOver/,
+    );
+  });
+  it('no longer says "Built to WCAG 2.2 AA"', () => {
+    expect(squash(read('../../CHANGELOG.md'))).not.toMatch(/Built to WCAG/);
   });
 });

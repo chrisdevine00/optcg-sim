@@ -382,9 +382,7 @@ export class GameController {
         budgets: config.aiBudgets ?? 'ms',
       };
       const init = aiInitCards(cards, config.aiCardIds ?? [], opponentLeader);
-      this.ai = config.aiPort
-        ? config.aiPort(init, game)
-        : new AiClient(init, game, { adoptWarm: true });
+      this.ai = config.aiPort ? config.aiPort(init, game) : new AiClient(init, game);
     }
     if (config.mode === 'hotseat') {
       this.curtainFor = this.seat;

@@ -15,12 +15,15 @@ import {
 
 class MemoryKv implements KvStore {
   readonly map = new Map<string, unknown>();
+  constructor(private readonly wrote: () => void = () => undefined) {}
   get = (key: string) => Promise.resolve(structuredClone(this.map.get(key)));
   set = (key: string, value: unknown) => {
+    this.wrote();
     this.map.set(key, structuredClone(value));
     return Promise.resolve();
   };
   delete = (key: string) => {
+    this.wrote();
     this.map.delete(key);
     return Promise.resolve();
   };
@@ -32,13 +35,28 @@ export class MemoryStore implements ReviewStore {
   private games = new Map<string, StoredGame>();
   private reviews = new Map<string, StoredReview>();
   private current: CurrentGame | undefined;
-  readonly timing = new MemoryKv();
-  readonly progress = new MemoryKv();
-  readonly meta = new MemoryKv();
+  private writes = 0;
+  private readonly wrote = () => void this.writes++;
+  readonly timing = new MemoryKv(this.wrote);
+  readonly progress = new MemoryKv(this.wrote);
+  readonly meta = new MemoryKv(this.wrote);
 
   constructor(private readonly maxGames = MAX_GAMES) {}
 
+  /**
+   * How many writes this store has taken since it was made or last marked clean (M10-R5). A database
+   * that opens late is adopted only while this is 0: nothing the player did lives only here.
+   */
+  get written(): number {
+    return this.writes;
+  }
+  /** Forget the writes so far: the start-up copy of the games a previous visit left (not the player's). */
+  markClean(): void {
+    this.writes = 0;
+  }
+
   saveGame(game: StoredGame): Promise<void> {
+    this.writes++;
     if (!this.games.has(game.id) && this.games.size >= this.maxGames)
       return Promise.reject(new StoreQuotaError('max-games'));
     this.games.set(game.id, structuredClone(game));
@@ -55,12 +73,14 @@ export class MemoryStore implements ReviewStore {
     );
   }
   deleteGame(id: string): Promise<void> {
+    this.writes++;
     this.games.delete(id);
     this.reviews.delete(id);
     return Promise.resolve();
   }
 
   saveReview(review: StoredReview): Promise<void> {
+    this.writes++;
     this.reviews.set(review.gameId, structuredClone(review));
     return Promise.resolve();
   }
@@ -68,6 +88,7 @@ export class MemoryStore implements ReviewStore {
     return Promise.resolve(structuredClone(this.reviews.get(gameId)));
   }
   deleteReview(gameId: string): Promise<void> {
+    this.writes++;
     this.reviews.delete(gameId);
     return Promise.resolve();
   }
@@ -76,10 +97,12 @@ export class MemoryStore implements ReviewStore {
     return Promise.resolve(structuredClone(this.current));
   }
   setCurrent(slot: CurrentGame): Promise<void> {
+    this.writes++;
     this.current = structuredClone(slot);
     return Promise.resolve();
   }
   clearCurrent(): Promise<void> {
+    this.writes++;
     this.current = undefined;
     return Promise.resolve();
   }
@@ -98,6 +121,7 @@ export class MemoryStore implements ReviewStore {
   }
 
   async importAll(bundle: ExportBundle, conflict: 'replace' | 'keep-both'): Promise<ImportReport> {
+    this.writes++;
     const report: ImportReport = { added: 0, replaced: 0, keptBoth: 0, skipped: 0 };
     for (const g of bundle.games) {
       let id = g.id;
@@ -122,6 +146,7 @@ export class MemoryStore implements ReviewStore {
   }
 
   deleteAll(): Promise<void> {
+    this.writes++;
     this.games.clear();
     this.reviews.clear();
     this.current = undefined;

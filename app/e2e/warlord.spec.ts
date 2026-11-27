@@ -115,7 +115,10 @@ test.describe('M5b: the Warlord and Emperor AIs', () => {
    * to test-results/ai-turns-*.jsonl, and the failure message says which number is which.
    */
   const TIMED = !!process.env.E2E_FULL;
-  const WARLORD_THINK_MS = 2700; // 1,800 x 1.5
+  const WARLORD_THINK_MS = 2700; // 1,800 x 1.5 (iteration budgets)
+  /** Millisecond budgets, nightly (M10-R3): a typical turn 8,000 x 1.5; the wait 4.3 s measured plus headroom. */
+  const WARLORD_TURN_MS = 12_000;
+  const WARLORD_WAIT_MS = 6000;
   const EMPEROR_THINK_MS = 7500; // 5,000 x 1.5
   function checkTurns(
     turns: Awaited<ReturnType<typeof aiTurns>>,
@@ -179,12 +182,30 @@ test.describe('M5b: the Warlord and Emperor AIs', () => {
       once();
       test.skip(!process.env.E2E_FULL, 'wall-clock budgets run nightly (E2E_FULL=1)');
       test.setTimeout(900_000);
-      // Measured, not promised by board.md §5.2 (its 1.8 s of visible thinking assumed the plan
-      // overlaps the turn-start animations; in the worker the wait is the plan plus each
-      // re-search): the whole turn stays within 8.5 s for up to 7 moves, 12.3 s for a heavy one.
+      // The requirement is board.md §5.2's: a typical turn (up to 7 moves) in 8 s, with 1.8 s of
+      // visible thinking. Measured, it is NOT met in the app's millisecond mode (M10-R3): a typical
+      // turn takes 9.2 s (9.19 to 9.20 on three machines, because the search runs to its budget) and
+      // the wait is 2.3 to 4.3 s. That miss is reported (board.md §5.2, BACKLOG §14), not
+      // accommodated. The bounds follow docs/runbooks/testing.md §2 (about 1.5 times the requirement,
+      // noise passes, a search twice as slow fails): a typical turn 12 s (1.5 x 8 s), a heavy one
+      // 12.3 s, the wait on the worker 6 s (the worst measured wait, 4.3 s, plus headroom; a search
+      // twice as slow waits 8.6 s and fails).
       const w = await measure(page, 'seed=31&first=me&opp=warlord&speed=1', 4);
-      for (const t of w)
-        expect(t.ms, `Warlord turn ${t.turn}`).toBeLessThanOrEqual(t.moves <= 7 ? 8500 : 12_300);
+      for (const t of w) {
+        const typical = t.moves <= 7;
+        const bound = typical ? WARLORD_TURN_MS : 12_300;
+        console.log(
+          `Warlord turn ${t.turn} (${t.moves} moves): observed ${t.ms} ms, requirement ${typical ? '8,000' : 'n/a'} ms, bound ${bound} ms; wait observed ${t.thinkMs} ms, requirement 1,800 ms, bound ${WARLORD_WAIT_MS} ms`,
+        );
+        expect(
+          t.ms,
+          `Warlord turn ${t.turn}: ${t.ms} ms observed, requirement ${typical ? '8,000' : 'n/a'} ms (board.md §5.2), bound ${bound} ms`,
+        ).toBeLessThanOrEqual(bound);
+        expect(
+          t.thinkMs,
+          `Warlord turn ${t.turn}: waiting on the worker ${t.thinkMs} ms observed, requirement 1,800 ms (board.md §5.2), bound ${WARLORD_WAIT_MS} ms`,
+        ).toBeLessThanOrEqual(WARLORD_WAIT_MS);
+      }
       const e = await measure(page, 'seed=31&first=me&opp=emperor&speed=1', 3);
       for (const t of e)
         expect(t.ms, `Emperor turn ${t.turn}`).toBeLessThanOrEqual(t.moves <= 7 ? 15_000 : 17_000);

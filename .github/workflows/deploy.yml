@@ -19,19 +19,34 @@ jobs:
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     outputs:
-      # The build id the site must report once it is live (the verify job compares it).
+      # The build id and the commit the site must report once it is live (the verify job compares both).
       build: ${{ steps.version.outputs.build }}
+      sha: ${{ steps.version.outputs.sha }}
     steps:
+      # M10-R1: build exactly the commit whose CI passed. For a workflow_run event the default checkout is
+      # the branch's newest head, which can be a commit whose own CI has not finished (or has failed).
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
       - run: npm ci
       - run: npm run build
+        env:
+          BUILD_COMMIT: ${{ github.event.workflow_run.head_sha || github.sha }}
       - run: cp app/dist/index.html app/dist/404.html && touch app/dist/.nojekyll
       - id: version
-        run: echo "build=$(node -p "require('./app/dist/version.json').build")" >> "$GITHUB_OUTPUT"
+        env:
+          WANT: ${{ github.event.workflow_run.head_sha || github.sha }}
+        run: |
+          sha="$(git rev-parse HEAD)"
+          if [ "$sha" != "$WANT" ]; then echo "checked out $sha, expected $WANT"; exit 1; fi
+          build="$(node -p "require('./app/dist/version.json').build")"
+          echo "build=$build" >> "$GITHUB_OUTPUT"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "Deploying commit \`$sha\` (build \`$build\`)" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -58,6 +73,7 @@ jobs:
         env:
           URL: ${{ needs.deploy.outputs.url }}
           BUILD: ${{ needs.build.outputs.build }}
+          SHA: ${{ needs.build.outputs.sha }}
         run: |
           base="${URL%/}"
           retry() {
@@ -74,11 +90,18 @@ jobs:
             echo "live build: $live, built: $BUILD"
             [ "$live" = "$BUILD" ]
           }
+          # M10-R1: the live site names the commit CI passed, not just the build it made.
+          commit() {
+            live="$(curl -fsS "$base/version.json" | jq -r .commit)"
+            echo "live commit: $live, expected: $SHA"
+            [ -n "$SHA" ] && [ "$live" = "$SHA" ]
+          }
           # Pages answers an unknown path with 404.html (the app's page) and status 404: the app is what counts.
           deep_link() { curl -sS "$base/cards" | grep -q 'id="root"'; }
           licences() { [ "$(curl -s -o /dev/null -w '%{http_code}' "$base/third-party.txt")" = 200 ]; }
+          echo "Live check of commit \`$SHA\` (build \`$BUILD\`)" >> "$GITHUB_STEP_SUMMARY"
           status=0
-          for check in home version deep_link licences; do
+          for check in home version commit deep_link licences; do
             if retry "$check"; then echo "ok: $check"; else echo "FAILED: $check"; status=1; fi
           done
           exit "$status"

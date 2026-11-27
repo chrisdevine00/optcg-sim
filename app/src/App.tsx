@@ -9,6 +9,7 @@ import { NotFound } from './shell/NotFound.tsx';
 import { RouteFocus } from './shell/RouteFocus.tsx';
 import { StorageNotice } from './store/StorageNotice.tsx';
 import { StoreGate } from './store/StoreGate.tsx';
+import { useStoreStatus } from './store/open.ts';
 import { UpdatePrompt } from './update/UpdatePrompt.tsx';
 
 const CardBrowser = lazy(() => import('./cards/CardBrowser.tsx'));
@@ -64,6 +65,8 @@ function Guard({
   gated?: boolean;
   children: ReactNode;
 }) {
+  // A database that opened after the 3 s cap and was taken re-keys the gated page so it reads the real store (M10-R5).
+  const { epoch } = useStoreStatus();
   // The gate is outside the Suspense: its heading shows while the store opens and the chunk loads.
   const page = (
     <Suspense fallback={<Fallback />}>
@@ -73,7 +76,13 @@ function Guard({
   );
   return (
     <ErrorBoundary scope={name}>
-      {gated ? <StoreGate path={path}>{page}</StoreGate> : page}
+      {gated ? (
+        <StoreGate key={epoch} path={path}>
+          {page}
+        </StoreGate>
+      ) : (
+        page
+      )}
     </ErrorBoundary>
   );
 }

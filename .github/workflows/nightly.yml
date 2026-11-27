@@ -88,21 +88,27 @@ jobs:
   # One job per series so none needs the sum of them. Times measured on the hosted runner by the
   # first nightly (run 44074243109, 200 games each): Pirate vs Rookie 5 min, Warlord vs Rookie
   # about 126, Warlord vs Pirate about 123, the two controls about 142 together. Per-test timeouts
-  # in ai/test/strength-warlord.test.ts are 2.5x those; every job gets the hosted maximum, 360.
-  # Reports: test-results/m5b-*.json (each prints its Wilson interval).
+  # in ai/test/strength-warlord.test.ts are 2.5x those; the five 200-game series get the hosted
+  # maximum, 360. Reports: test-results/m5b-*.json (each prints its Wilson interval).
+  # M10-R4: the Emperor job was cancelled at the 360-minute limit in every nightly since 2026-11-19.
+  # Its filter was "Emperor", which is also in the describe title, so vitest ran every test of the
+  # file (Pirate, both Warlord series, both controls: about 8 hours) before reaching the Emperor
+  # report. The filter now names the one test, and the job has its own limit (120 minutes; the 16-game
+  # report is expected to take well under that, and its test timeout is 100 minutes so a hang fails
+  # with a message and uploads its report instead of being cancelled).
   strength-m5b:
     runs-on: ubuntu-latest
-    timeout-minutes: 360
+    timeout-minutes: ${{ matrix.series.minutes }}
     strategy:
       fail-fast: false
       matrix:
         series:
-          - { name: pirate-vs-rookie, filter: 'Pirate beats Rookie', extra: '0' }
-          - { name: warlord-vs-rookie, filter: 'Warlord beats Rookie', extra: '0' }
-          - { name: warlord-vs-pirate, filter: 'Warlord beats Pirate', extra: '0' }
-          - { name: control-full, filter: 'beats a one-iteration', extra: '0' }
-          - { name: control-tiny, filter: 'fails the Pirate gate', extra: '0' }
-          - { name: emperor, filter: 'Emperor', extra: '1' }
+          - { name: pirate-vs-rookie, filter: 'Pirate beats Rookie', extra: '0', minutes: 360 }
+          - { name: warlord-vs-rookie, filter: 'Warlord beats Rookie', extra: '0', minutes: 360 }
+          - { name: warlord-vs-pirate, filter: 'Warlord beats Pirate', extra: '0', minutes: 360 }
+          - { name: control-full, filter: 'beats a one-iteration', extra: '0', minutes: 360 }
+          - { name: control-tiny, filter: 'fails the Pirate gate', extra: '0', minutes: 360 }
+          - { name: emperor, filter: 'Emperor against Warlord', extra: '1', minutes: 120 }
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

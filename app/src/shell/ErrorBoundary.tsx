@@ -21,14 +21,29 @@ export interface ErrorBoundaryProps {
   scope?: string;
 }
 
-/** What "Copy details" puts on the clipboard. The message is cut at its first line and 300 characters. */
+/** The longest piece of an error message "Copy details" copies (M10-R9). */
+export const MESSAGE_CHARS = 120;
+
+/**
+ * Card numbers ("OP17-039", "ST01-012", "P-001", "OP05-119_p1") in an error message. An engine or
+ * validation error can name the card it choked on, and a card can be in a hidden hand.
+ */
+const CARD_NUMBER = /\b(?:[A-Z]{1,4}\d{0,2}-\d{2,3}[A-Za-z0-9_]*)\b/g;
+
+/**
+ * What "Copy details" puts on the clipboard: the release, build, route, the error's name and the first
+ * line of its message, cut at 120 characters with card numbers replaced by "[card]" (M10-R9).
+ * It can still hold a card NAME if the message spells one: the page says to read it before posting.
+ */
 export function detailsText(d: {
   version: VersionInfo | null;
   route: string;
   scope: string;
   error: Error;
 }): string {
-  const first = (d.error.message.split('\n')[0] ?? '').slice(0, 300);
+  const first = (d.error.message.split('\n')[0] ?? '')
+    .replace(CARD_NUMBER, '[card]')
+    .slice(0, MESSAGE_CHARS);
   return [
     `OPTCG Sim ${d.version?.release || 'unknown release'} (build ${d.version?.build || 'unknown'})`,
     `Route: ${d.route}`,
@@ -131,6 +146,10 @@ export function Failure({ error, route, scope }: { error: Error; route: string; 
         Something went wrong on this page
       </h1>
       <p>Your saved games and decks are not affected.</p>
+      <p className="subtle">
+        “Copy details” copies the app version, the address and the start of the error message (card
+        numbers removed). Read it before you post it.
+      </p>
       <p className="failure-actions">
         <button type="button" className="btn primary" onClick={() => window.location.reload()}>
           Reload

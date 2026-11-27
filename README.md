@@ -40,13 +40,17 @@ npm run meta:update  # refresh tournament data, flag stale guides
 
 Dependency arrows point downward only: `app → ai → engine → cards`. ESLint enforces the boundaries.
 
+## Accessibility
+
+Tested against WCAG 2.2 AA with automated checks on every route; manual screen-reader passes pending. The known limits (text over card art, the text-spacing override on the board button, NVDA and VoiceOver on the newest screens) are listed in the About page and the CHANGELOG.
+
 ## Privacy
 
-There is no account, no server of ours, no analytics and no cookies we set. Games, decks, reviews and progress live in the browser's IndexedDB and localStorage and leave it only when you use Export. After the app has loaded, the only network requests are for card images, from the art hosts named in the About page; their operators see your address as any website would. The service worker keeps the app and the images you have seen so it works offline. Settings, then Data, deletes everything. The privacy end-to-end test (`app/e2e/m10-privacy.spec.ts`) records every request origin and fails on one outside the app's own and the art hosts.
+There is no account, no server of ours, no analytics and no cookies we set. Games, decks, reviews and progress live in the browser's IndexedDB and localStorage and leave it only when you use Export. After the app has loaded, the only network requests are for card images, from the art hosts named in the About page, and for the app's own files and version check, from GitHub Pages where it is hosted; their operators see your address as any website would. The page sends no referrer. An image address names the card, so the image host can tell which cards you look at. The service worker keeps the app and the images you have seen so it works offline. Settings, then Data, deletes everything. The privacy end-to-end test (`app/e2e/m10-privacy.spec.ts`) records every request origin and fails on one outside the app's own and the art hosts.
 
 ## Reporting a problem
 
-Open an issue at https://github.com/chrisdevine00/optcg-sim/issues and include the version details from the About page. A page that fails shows a "Copy details" button that gathers them (release, build, route, the error's name and first line); it never includes games or decks. If the issue tracker is ever switched off, replace this section with the owner's address.
+Open an issue at https://github.com/chrisdevine00/optcg-sim/issues and include the version details from the About page. A page that fails shows a "Copy details" button that gathers them (release, build, route, the error's name and the first 120 characters of its message with card numbers removed); it never includes saved games or decks, but read it before posting. If the issue tracker is ever switched off, replace this section with the owner's address.
 
 ## Credits and licences
 

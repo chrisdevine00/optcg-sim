@@ -37,8 +37,9 @@ The first release: M0 to M10.
   site and compares its build id.
 - Works offline after the first visit (the app and the card images you have seen are kept by a
   service worker); updates are offered, never forced mid-game.
-- Built to WCAG 2.2 AA: keyboard-complete, 24 px targets, reduced motion, and no meaning carried
-  by colour alone.
+- Tested against WCAG 2.2 AA with automated checks on every route; manual screen-reader passes pending.
+  Keyboard-complete, 24 px targets, reduced motion, and no meaning carried by colour alone are
+  design rules checked by those tests; the limits of the claim are listed below.
 
 ### Known limits
 
@@ -48,6 +49,16 @@ The first release: M0 to M10.
 - In the lethal drill, the "no lethal" items are limited to the case of too few attackers.
 - The Warlord AI wins 61.5 percent of games against the Pirate AI, below the 65 percent target
   (200-game nightly measurement; 55 percent is the guarded floor).
+- The Warlord and Emperor AI make you wait while they think: in the app's real time budgets a
+  typical Warlord turn takes about 9 seconds, 2 to 4 seconds of it waiting for the AI (the design
+  target is 8 seconds; the measured miss is recorded in `docs/design/board.md` section 5.2).
+- Accessibility limits:
+  - Text drawn over card art: its contrast is unverified, because the automated audit blocks card art.
+  - With text spacing forced larger (WCAG 1.4.12), the main button on two board screens at 1280×720 wraps to three lines and its border is cut by 4 pixels; its label stays whole.
+  - NVDA was scripted for the earlier milestones; the About, Page not found, update and offline screens have not been heard. VoiceOver has not been run. Both are pending.
+- The frame-rate figure is main-thread frame cadence at 4 times CPU slowdown on a software
+  compositor, not a count of frames shown; the compositor's partial and dropped frames are reported
+  beside it in `docs/benchmarks.md`.
 - English cards and the Standard format only.
 - The tournament lists are as of the date the About page shows; when they are older than 60 days
   the page says so.

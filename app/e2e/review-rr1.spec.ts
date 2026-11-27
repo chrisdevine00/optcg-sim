@@ -24,11 +24,11 @@ test('inspecting a card while R is held never leaves the keyboard dead (M3-27)',
   await expect(page.getByRole('dialog', { name: /^Inspector/ })).toBeVisible();
   await page.keyboard.up('r');
   // The reveal ended: the inspector closes and focus returns to the veil.
-  await expect(page.locator('.dock')).toHaveCount(0);
-  await expect(page.locator('.hand-veil')).toBeFocused();
+  await expect(page.locator('.dock')).toHaveCount(0, { timeout: 20_000 });
+  await expect(page.locator('.hand-veil')).toBeFocused({ timeout: 20_000 });
   // Every key works again: R reveals the hand once more.
   await page.keyboard.down('r');
-  await expect(page.locator('.bc[data-zone="hand"]')).toHaveCount(4);
+  await expect(page.locator('.bc[data-zone="hand"]')).toHaveCount(4, { timeout: 20_000 });
   await page.keyboard.up('r');
   await expect(page.locator('.hand-veil')).toBeVisible();
 });

@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
@@ -37,9 +38,20 @@ function versionInfo(build: string) {
   const engine = /ENGINE_VERSION = '([^']+)'/.exec(
     readFileSync(join(root, 'engine/src/record.ts'), 'utf8'),
   )?.[1];
+  // M10-R1: the commit this build was made from. The deploy workflow passes the commit CI passed
+  // (BUILD_COMMIT); a local build asks git; neither is an empty string, never a failure.
+  let commit = process.env.BUILD_COMMIT ?? '';
+  if (!commit) {
+    try {
+      commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim();
+    } catch {
+      commit = '';
+    }
+  }
   return {
     release,
     build,
+    commit,
     builtAt: new Date().toISOString(),
     cardsThrough: manifest.newestSet,
     cardCount: manifest.cardCount,

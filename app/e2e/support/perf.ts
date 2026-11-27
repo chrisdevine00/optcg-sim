@@ -5,12 +5,25 @@
  * trace. The statistics are pure (`percentile`, `summarise`) and unit-tested without a browser
  * (app/test/perf-stats.test.ts). Nothing here reads a clock for an assertion: the spec decides.
  */
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test, type Page } from '@playwright/test';
-import { summarise, type FrameSummary, type LongTask } from './perf-stats.ts';
+import {
+  frameStates,
+  summarise,
+  type FrameStates,
+  type FrameSummary,
+  type LongTask,
+} from './perf-stats.ts';
 
-export { percentile, summarise, type FrameSummary, type LongTask } from './perf-stats.ts';
+export {
+  frameStates,
+  percentile,
+  summarise,
+  type FrameStates,
+  type FrameSummary,
+  type LongTask,
+} from './perf-stats.ts';
 
 declare global {
   interface Window {
@@ -97,14 +110,35 @@ export async function trace<T>(page: Page, name: string, body: () => Promise<T>)
     return await body();
   } finally {
     await browser.stopTracing();
+    // M10-R6: the compositor's frame states from the trace just written (reported, never asserted).
+    try {
+      const raw = JSON.parse(readFileSync(path, 'utf8')) as { traceEvents?: unknown[] };
+      states.set(page, frameStates((raw.traceEvents ?? raw) as Parameters<typeof frameStates>[0]));
+    } catch {
+      states.delete(page);
+    }
   }
 }
 
+const states = new WeakMap<Page, FrameStates>();
+
+/** The frame states of the last `trace` on this page, or undefined when the trace could not be read. */
+export function lastFrameStates(page: Page): FrameStates | undefined {
+  return states.get(page);
+}
+
 /** Writes one scenario's result where the workflow uploads it, whatever the verdict. */
-export function saveFrames(project: string, scenario: string, rate: number, s: FrameSummary): void {
+export function saveFrames(
+  project: string,
+  scenario: string,
+  rate: number,
+  s: FrameSummary,
+  frameStates?: FrameStates,
+): void {
   mkdirSync('test-results', { recursive: true });
   writeFileSync(
     join('test-results', `frames-${project}-${scenario}.json`),
-    JSON.stringify({ project, scenario, rate, ...s }, null, 2) + '\n',
+    JSON.stringify({ project, scenario, rate, ...s, frameStates: frameStates ?? null }, null, 2) +
+      '\n',
   );
 }

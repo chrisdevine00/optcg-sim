@@ -34,6 +34,12 @@ describe('index.html head', () => {
     expect(html).toContain('property="og:description"');
     expect(html).toMatch(/<noscript>[^<]+<\/noscript>/);
   });
+  // M10-R8: image requests carry no Referer. Revert: delete the tag or set another policy.
+  it('sends no referrer, before the first request the page makes', () => {
+    expect(html).toMatch(/<meta\s+name="referrer"\s+content="no-referrer"\s*\/>/);
+    expect(html.indexOf('name="referrer"')).toBeLessThan(html.indexOf('<script'));
+    expect(withCsp(html)).toContain('name="referrer" content="no-referrer"');
+  });
   it('leaves #root empty: no boot line (M10 WP1: it only moved LCP later; the inline background is the first frame)', () => {
     expect(html).toContain('<div id="root"></div>');
     expect(html).not.toContain('Loading OPTCG Sim');

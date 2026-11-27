@@ -20,12 +20,19 @@ const PNG = Buffer.from(
   'base64',
 );
 
-/** Records every http(s) request origin the context makes (pages, workers and the service worker). */
+/**
+ * Records every http(s) request origin the context makes (pages, workers and the service worker), and
+ * the Referer each request to an art host carried (M10-R8: none).
+ */
+const referers: string[] = [];
+const refererChecks: Promise<void>[] = [];
 function recordOrigins(context: BrowserContext): Set<string> {
   const origins = new Set<string>();
   context.on('request', (r) => {
     const u = new URL(r.url());
     if (u.protocol === 'http:' || u.protocol === 'https:') origins.add(u.origin);
+    if (ART_ORIGINS.includes(u.origin))
+      refererChecks.push(r.allHeaders().then((h) => void referers.push(h['referer'] ?? '')));
   });
   return origins;
 }
@@ -148,6 +155,13 @@ test('every request across the app goes to the app or an art host; no cookie; st
   console.log('request origins:', [...origins].sort().join(', '));
   expect(offenders(origins, app)).toEqual([]);
   expect(origins.has(app)).toBe(true);
+
+  // M10-R8: art was asked for, and no request to an art host carried a Referer (the page's
+  // `<meta name="referrer" content="no-referrer">`; the service worker re-sends the page's request).
+  // Revert: delete that meta tag and the Referer is the app's origin.
+  await Promise.all(refererChecks);
+  expect(referers.length, 'no art request was seen').toBeGreaterThan(0);
+  expect(referers.filter((r) => r !== '')).toEqual([]);
 
   // No cookie, anywhere.
   expect(await context.cookies()).toEqual([]);

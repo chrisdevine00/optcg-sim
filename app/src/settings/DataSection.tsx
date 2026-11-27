@@ -10,7 +10,7 @@ import { download } from '../tutorial/timing.ts';
 import { conflictsOf, exportEverything, exportFileName, readImportFile } from '../store/data.ts';
 import { getStore, type ImportReport } from '../store/index.ts';
 import {
-  SAVING_OFF,
+  memoryNotice,
   persistence,
   rehydrateStore,
   reportStoreError,
@@ -192,7 +192,7 @@ export function DataSection({
       </p>
       {status.kind === 'memory' && (
         <p className="set-warn" role="note">
-          {SAVING_OFF}
+          {memoryNotice(status)}
         </p>
       )}
       <p data-testid="data-count">

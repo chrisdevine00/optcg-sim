@@ -3,7 +3,8 @@ import { Link } from '../router.tsx';
 import {
   DELETE_MODE_PATH,
   SAVED_FULL,
-  SAVING_OFF,
+  SAVED_LOADED,
+  memoryNotice,
   dismissStoreNotice,
   retryStashed,
   useStoreStatus,
@@ -21,7 +22,9 @@ export function StorageNotice({ onBoard }: { onBoard: boolean }) {
   const s = useStoreStatus();
   const [said, setSaid] = useState('');
   const off = s.kind === 'memory' && !s.dismissed && !onBoard;
-  if (!off && !s.full && !said) return null;
+  // M10-R5: the database opened late and was taken.
+  const loaded = s.kind === 'indexeddb' && s.lateLoaded && !s.dismissed && !onBoard;
+  if (!off && !loaded && !s.full && !said) return null;
   const save = async () => {
     const n = await retryStashed();
     setSaid(n > 0 ? 'Saved. Your game is in Reviews.' : '');
@@ -46,6 +49,13 @@ export function StorageNotice({ onBoard }: { onBoard: boolean }) {
             </button>
           )}
         </>
+      ) : loaded ? (
+        <>
+          <span>{SAVED_LOADED}</span>
+          <button type="button" className="btn" onClick={dismissStoreNotice}>
+            Dismiss
+          </button>
+        </>
       ) : said && !off ? (
         <>
           <span>{said}</span>
@@ -56,7 +66,7 @@ export function StorageNotice({ onBoard }: { onBoard: boolean }) {
       ) : (
         <>
           <span>
-            {SAVING_OFF} <Link to="/settings">Settings → Data</Link>
+            {memoryNotice(s)} <Link to="/settings">Settings → Data</Link>
           </span>
           <button type="button" className="btn" onClick={dismissStoreNotice}>
             Dismiss

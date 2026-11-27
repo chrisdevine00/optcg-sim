@@ -15,6 +15,14 @@ import { SyncKv } from './sync.ts';
 import { StoreQuotaError } from './types.ts';
 
 export const SAVING_OFF = 'Saving is off in this browser; Export keeps a copy.';
+/**
+ * M10-R5: the database did not open within the cap but may still be opening. Saving is off for now;
+ * a reload finds the saved games (and if it opens while nothing has been written to memory, it is
+ * taken at once and `SAVED_LOADED` says so).
+ */
+export const SAVING_SLOW =
+  'Your saved games did not load in time. They will be there after a reload; until then saving is off.';
+export const SAVED_LOADED = 'Your saved games have loaded.';
 export const SAVED_FULL = 'Saved games are full. Delete old reviews?';
 /** History opens in select-and-delete mode on this query (flows G8; History is WP6's page). */
 export const DELETE_MODE_PATH = '/reviews?mode=delete';
@@ -28,9 +36,31 @@ export interface StoreStatus {
   dismissed: boolean;
   /** Finished games waiting to be saved (a save failed on the quota or the cap). */
   pending: number;
+  /**
+   * Why the store is in memory: `unavailable` (no IndexedDB, or it failed) or `slow` (it did not open
+   * within the cap and may still open; M10-R5).
+   */
+  reason: 'unavailable' | 'slow' | null;
+  /** The database opened after the cap and was taken: one polite "saved games have loaded" line. */
+  lateLoaded: boolean;
+  /** Counts late adoptions; gated pages are keyed by it so they read the real store (M10-R5). */
+  epoch: number;
 }
 
-let status: StoreStatus = { kind: 'opening', full: false, dismissed: false, pending: 0 };
+const FRESH: StoreStatus = {
+  kind: 'opening',
+  full: false,
+  dismissed: false,
+  pending: 0,
+  reason: null,
+  lateLoaded: false,
+  epoch: 0,
+};
+let status: StoreStatus = FRESH;
+
+/** The words of the one memory-mode notice, for the reason (Settings and the notice bar share them). */
+export const memoryNotice = (s: Pick<StoreStatus, 'reason'>): string =>
+  s.reason === 'slow' ? SAVING_SLOW : SAVING_OFF;
 const listeners = new Set<() => void>();
 const set = (patch: Partial<StoreStatus>) => {
   status = { ...status, ...patch };
@@ -85,9 +115,15 @@ export interface InitOptions {
   timeoutMs?: number;
 }
 
+/** The open outlasted its cap (it may still finish: M10-R5). Any other failure is a failed open. */
+class OpenTimeout extends Error {}
+
 function timeout<T>(p: Promise<T>, ms: number): Promise<T> {
   return new Promise((resolve, reject) => {
-    const t = setTimeout(() => reject(new Error('The saved-games database did not open.')), ms);
+    const t = setTimeout(
+      () => reject(new OpenTimeout('The saved-games database did not open.')),
+      ms,
+    );
     p.then(
       (v) => {
         clearTimeout(t);
@@ -135,41 +171,95 @@ export function resetStoreForTests(): void {
   synced.timing = null;
   synced.progress = null;
   setStore(null);
-  status = { kind: 'opening', full: false, dismissed: false, pending: 0 };
+  status = FRESH;
+}
+
+/** Brings a freshly opened store up to date: the old localStorage copies, then the small stores' caches. */
+async function prepare(store: IdbStore, storage: Storage | null): Promise<void> {
+  if (storage) {
+    try {
+      await migrateFromLocalStorage(store, storage);
+    } catch {
+      // The keys stay where they are and the copy is idempotent: the next start finishes it.
+    }
+  }
+  try {
+    // A game finished just before the last page closed, whose write did not commit.
+    await flushStashed(store, storage, reportStoreError);
+  } catch {
+    // The copies stay; the next start tries again.
+  }
+  synced.timing = await SyncKv.hydrate(store.timing, reportStoreError, 'timing');
+  synced.progress = await SyncKv.hydrate(store.progress, reportStoreError, 'progress');
+}
+
+/** Makes an opened store the app's store; on the way out, settle what is in flight. */
+function adopt(store: IdbStore): void {
+  setStore(store);
+  try {
+    addEventListener('pagehide', () => void settleStore());
+  } catch {
+    /* no window (tests) */
+  }
+}
+
+/**
+ * M10-R5: the database finished opening after the cap. If nothing has been written to the memory store
+ * it is taken (the gated pages are re-keyed so they read it, and one line says so). If the player has
+ * already done something that lives only in memory it is not taken, and the notice keeps saying that
+ * the saved games did not load in time and will be there after a reload.
+ */
+async function lateOpen(opening: Promise<IdbStore>, storage: Storage | null): Promise<void> {
+  let store: IdbStore;
+  try {
+    store = await opening;
+  } catch {
+    return; // it never opened: the notice stands
+  }
+  const memory = getStore();
+  const untouched = () =>
+    memory instanceof MemoryStore && getStore() === memory && memory.written === 0;
+  if (!untouched()) return;
+  try {
+    await prepare(store, storage);
+  } catch {
+    synced.timing = synced.progress = null;
+    return;
+  }
+  if (!untouched()) {
+    synced.timing = synced.progress = null;
+    return;
+  }
+  adopt(store);
+  set({
+    kind: 'indexeddb',
+    reason: null,
+    lateLoaded: true,
+    dismissed: false,
+    epoch: status.epoch + 1,
+  });
 }
 
 async function open(opts: InitOptions): Promise<void> {
   const factory = opts.factory === undefined ? safe(() => indexedDB) : opts.factory;
   const storage = opts.storage === undefined ? safe(() => localStorage) : opts.storage;
+  let reason: 'unavailable' | 'slow' = 'unavailable';
+  let late: Promise<IdbStore> | null = null;
   if (factory) {
+    let opening: Promise<IdbStore> | null = null;
     try {
-      const store = await timeout(IdbStore.open(factory), opts.timeoutMs ?? 3000);
-      if (storage) {
-        try {
-          await migrateFromLocalStorage(store, storage);
-        } catch {
-          // The keys stay where they are and the copy is idempotent: the next start finishes it.
-        }
-      }
-      try {
-        // A game finished just before the last page closed, whose write did not commit.
-        await flushStashed(store, storage, reportStoreError);
-      } catch {
-        // The copies stay; the next start tries again.
-      }
-      synced.timing = await SyncKv.hydrate(store.timing, reportStoreError, 'timing');
-      synced.progress = await SyncKv.hydrate(store.progress, reportStoreError, 'progress');
-      setStore(store);
+      opening = IdbStore.open(factory);
+      const store = await timeout(opening, opts.timeoutMs ?? 3000);
+      await prepare(store, storage);
+      adopt(store);
       set({ kind: 'indexeddb' });
-      // Every write is already issued inside its call; on the way out, settle what is in flight.
-      try {
-        addEventListener('pagehide', () => void settleStore());
-      } catch {
-        /* no window (tests) */
-      }
       return;
-    } catch {
+    } catch (e) {
       synced.timing = synced.progress = null;
+      if (e instanceof OpenTimeout && opening) {
+        reason = 'slow';
+        late = opening;
+      }
     }
   }
   if (!(getStore() instanceof MemoryStore)) setStore(null);
@@ -179,7 +269,11 @@ async function open(opts: InitOptions): Promise<void> {
   } catch {
     /* nothing to restore */
   }
-  set({ kind: 'memory' });
+  // That copy is the last visit's, not the player's: it does not count as a write (M10-R5).
+  const mem = getStore();
+  if (mem instanceof MemoryStore) mem.markClean();
+  set({ kind: 'memory', reason });
+  if (late) void lateOpen(late, storage);
 }
 
 function safe<T>(f: () => T): T | null {

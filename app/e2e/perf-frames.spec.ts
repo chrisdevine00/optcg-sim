@@ -20,14 +20,20 @@
  * and its message prints the observed value, the requirement and the bound:
  *   at 4x: p95 <= 30 ms (requirement 20), p99 <= 50 (34), over 25 ms in <= 3% of frames (2%), no
  *   long task over 150 ms (100); at 1x: p99 <= 30 ms (20).
- * The per-push half is the mechanism: app/test/ai-warmup.test.ts, ai-pacing.test.ts, memo-stable.test.ts.
+ * The per-push half is the mechanism: app/test/ai-pacing.test.ts, memo-stable.test.ts.
+ *
+ * What the figures are (M10-R6): the animation-frame intervals are MAIN-THREAD frame cadence at 4x CPU
+ * on a software compositor, not a count of frames the screen showed. Each scenario therefore also
+ * reports `frameStates` from its Chromium trace (compositor frames presented in full, presented
+ * partially because the main thread's update missed the deadline, and dropped). Reported, never asserted.
  */
 import { expect, test, type Page, type TestInfo } from '@playwright/test';
 import { writeFileSync, mkdirSync } from 'node:fs';
-import { decisionKind, nextDecision, resolveChoose, serveArt, startGame } from './game-support.ts';
+import { decisionKind, nextDecision, resolveChoose, startGame } from './game-support.ts';
 import { fixture, load, status } from './review-m8-support.ts';
 import {
   resetFrames,
+  lastFrameStates,
   saveFrames,
   startFrames,
   stopFrames,
@@ -71,10 +77,15 @@ function verdict(rate: number, s: FrameSummary): string[] {
 }
 
 /** Writes, prints and (with PERF_ASSERT) asserts one scenario's result. */
-function report(info: TestInfo, scenario: string, rate: number, s: FrameSummary, extra = ''): void {
-  saveFrames(info.project.name, `${scenario}-${rate}x`, rate, s);
+function report(info: TestInfo, page: Page, scenario: string, rate: number, s: FrameSummary): void {
+  // M10-R6: the compositor's frame states from the trace, reported with the figures, never asserted.
+  const fs = lastFrameStates(page);
+  saveFrames(info.project.name, `${scenario}-${rate}x`, rate, s, fs);
   const longest = Math.max(0, ...s.long.map((l) => l.duration));
-  const line = `${scenario} ${info.project.name} ${rate}x: n ${s.n}, p50 ${s.p50}, p95 ${s.p95}, p99 ${s.p99}, max ${s.max}, over25 ${(s.over25 * 100).toFixed(1)}%, long tasks ${s.long.length} (longest ${Math.round(longest)} ms)${extra}`;
+  const states = fs
+    ? `, compositor frames ${fs.produced} (partial ${(fs.partialShare * 100).toFixed(1)}%, dropped ${(fs.droppedShare * 100).toFixed(1)}%)`
+    : '';
+  const line = `${scenario} ${info.project.name} ${rate}x: n ${s.n}, p50 ${s.p50}, p95 ${s.p95}, p99 ${s.p99}, max ${s.max}, over25 ${(s.over25 * 100).toFixed(1)}%, long tasks ${s.long.length} (longest ${Math.round(longest)} ms)${states}`;
   info.annotations.push({ type: 'frames', description: line });
   console.log(line);
   expect(s.n, `${scenario}: the recorder returned no frames`).toBeGreaterThan(0);
@@ -99,7 +110,7 @@ async function measured(
     await body();
     return stopFrames(page);
   });
-  report(info, scenario, rate, s);
+  report(info, page, scenario, rate, s);
 }
 
 const turns = async (page: Page) =>
@@ -280,7 +291,7 @@ for (const rate of RATES) {
       }
       return stopFrames(page);
     });
-    report(info, 'review-scroll', rate, s);
+    report(info, page, 'review-scroll', rate, s);
   });
 }
 
@@ -327,15 +338,7 @@ test('e. the AI wait on the worker at 1x with real budgets, split into parts (in
   test.skip(info.project.name !== '720p', 'one pass is enough');
   test.setTimeout(420_000);
   const query = process.env.PERF_AI_QUERY ?? 'seed=31&first=me&opp=warlord&speed=1';
-  if (process.env.PERF_AI_WARM) {
-    // The way a player starts: open Setup, let the worker warm while they choose, press Start.
-    await serveArt(page);
-    await page.goto(`./play?${query}`);
-    await expect(page.getByRole('heading', { name: 'New game' })).toBeVisible();
-    await page.waitForTimeout(Number(process.env.PERF_SETUP_MS ?? 4000));
-    await page.getByRole('button', { name: 'Start game' }).click();
-    await expect(page.locator('#decision')).toBeVisible({ timeout: 30_000 });
-  } else await startGame(page, query);
+  await startGame(page, query);
   const want = Number(process.env.PERF_AI_TURNS ?? 4);
   for (let i = 0; i < 1500 && (await turns(page)) < want; i++) {
     const k = await nextDecision(page, 90_000);

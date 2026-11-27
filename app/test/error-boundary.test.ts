@@ -95,6 +95,7 @@ describe('detailsText ("Copy details")', () => {
   const version: VersionInfo = {
     release: '1.0.0',
     build: 'abc123def456',
+    commit: '',
     builtAt: '',
     cardsThrough: '',
     cardCount: 0,
@@ -121,6 +122,22 @@ describe('detailsText ("Copy details")', () => {
       error: new Error('x'.repeat(1000)),
     });
     expect(t).toContain('OPTCG Sim unknown release (build unknown)');
-    expect(t.split('\n').at(-1)!.length).toBeLessThan(330);
+    expect(t.split('\n').at(-1)!.length).toBeLessThan(150);
+  });
+  // M10-R9: an engine or validation message can name a card, and a card can be in a hidden hand.
+  // Revert: drop the CARD_NUMBER replace (the first fails) or raise MESSAGE_CHARS (the second fails).
+  it('replaces card numbers in the message, whatever their form', () => {
+    const t = detailsText({
+      version,
+      route: '/play',
+      scope: 'play',
+      error: new Error('Unknown card OP17-039 and ST01-012 (alt OP05-119_p1), P-001 in hand'),
+    });
+    expect(t).not.toMatch(/OP17|ST01|OP05|P-001/);
+    expect(t).toContain('Unknown card [card] and [card] (alt [card]), [card] in hand');
+  });
+  it('cuts the message at 120 characters', () => {
+    const t = detailsText({ version, route: '/', scope: 'x', error: new Error('y'.repeat(500)) });
+    expect(t.split('\n').at(-1)).toBe(`Error: Error: ${'y'.repeat(120)}`);
   });
 });
