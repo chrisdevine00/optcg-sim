@@ -1675,6 +1675,18 @@
 }
 
 /* ---------- Setup (flows F3a) ---------- */
+/* Centred with a maximum width: at 1920 the empty strip sits on both sides, not on the right (M10 WP7). */
+.setup {
+  width: 100%;
+  margin-inline: auto;
+  box-sizing: border-box;
+}
+/* A long line (the Warlord's) wraps inside its column: no column changes width with the choice. */
+.setup .check > span,
+.setup .subtle {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
 .setup h1 {
   margin: 0 0 8px;
 }

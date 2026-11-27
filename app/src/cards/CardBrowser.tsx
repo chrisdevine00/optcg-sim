@@ -355,9 +355,12 @@ export default function CardBrowser() {
         </div>
         {pending === 0 && failedHere.length === 0 && cov.all.total > 0 && (
           <p className="coverage" data-testid="coverage">
-            <b>{cov.all.fully.toLocaleString('en')}</b> of {cov.all.total.toLocaleString('en')}{' '}
-            {cov.all.total === 1 ? 'card here plays' : 'cards here play'} fully:{' '}
-            {cov.all.scripted.toLocaleString('en')} with a scripted effect,{' '}
+            <b>{cov.all.fully.toLocaleString('en')}</b>{' '}
+            {filters.automatedOnly
+              ? // With the filter on the count is what the list shows (M10 WP7): "463 automated of 2,799 cards".
+                `automated of ${cov.all.total.toLocaleString('en')} ${cov.all.total === 1 ? 'card' : 'cards'}`
+              : `of ${cov.all.total.toLocaleString('en')} ${cov.all.total === 1 ? 'card here plays' : 'cards here play'} fully`}
+            : {cov.all.scripted.toLocaleString('en')} with a scripted effect,{' '}
             {cov.all.noScriptNeeded.toLocaleString('en')} with no effect to script.
             {filters.automatedOnly && ' Automated only is on, so the list shows just those.'}
             {cov.meta.total > 0 && (

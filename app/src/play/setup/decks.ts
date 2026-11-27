@@ -171,28 +171,46 @@ export function automationLine(
 /** A deck by leader id (URL parameters accept `OP17-039`), the first list. */
 export const deckByLeader = (leader: string) => DECKS.find((d) => d.leader === leader);
 
-/** Every card in these decks, loaded from their sets. */
-export async function loadCards(ids: Iterable<string>): Promise<Map<string, Card>> {
+/** What a load found: the cards, and the ids whose set could not be fetched (a network failure, M10 WP7). */
+export interface CardsLoad {
+  cards: Map<string, Card>;
+  /** Card numbers whose set exists but failed to load: "unavailable", never "unknown". */
+  unavailable: Set<string>;
+}
+
+/** Every card in these decks, loaded from their sets; a set that fails to load is reported, not hidden. */
+export async function loadCardsReport(ids: Iterable<string>): Promise<CardsLoad> {
   const wanted = new Set(ids);
-  const sets = new Set(
-    [...wanted].flatMap((id) => {
-      try {
-        return [setCodeOf(id)];
-      } catch {
-        return []; // Not a card number: reported as an unknown card by the deck check.
-      }
-    }),
-  );
+  const setOf = new Map<string, string>();
+  for (const id of wanted) {
+    try {
+      setOf.set(id, setCodeOf(id));
+    } catch {
+      // Not a card number: reported as an unknown card by the deck check.
+    }
+  }
+  const sets = [...new Set(setOf.values())];
   // A set that does not exist (a mistyped number in a saved deck) leaves its cards unknown, so
   // the deck check names them; it does not fail the others (review M6-4).
   // Effect scripts load per set too (M6b-0): every card a game may build needs its script.
   const [files] = await Promise.all([
-    Promise.allSettled([...sets].map((s) => loadSet(s))),
+    Promise.allSettled(sets.map((s) => loadSet(s))),
     loadScripts(wanted),
   ]);
   const out = new Map<string, Card>();
-  for (const f of files)
-    if (f.status === 'fulfilled')
+  const failed = new Set<string>();
+  files.forEach((f, i) => {
+    if (f.status === 'fulfilled') {
       for (const c of f.value.cards) if (wanted.has(c.id)) out.set(c.id, c);
-  return out;
+    } else if (!/^Unknown set /.test(String((f.reason as Error)?.message ?? f.reason)))
+      failed.add(sets[i]!);
+  });
+  const unavailable = new Set<string>();
+  for (const [id, set] of setOf) if (failed.has(set)) unavailable.add(id);
+  return { cards: out, unavailable };
+}
+
+/** Every card in these decks, loaded from their sets. */
+export async function loadCards(ids: Iterable<string>): Promise<Map<string, Card>> {
+  return (await loadCardsReport(ids)).cards;
 }

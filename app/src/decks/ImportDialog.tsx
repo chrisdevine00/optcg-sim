@@ -5,6 +5,7 @@
 import { useEffect, useMemo, useRef, useState, type DragEvent } from 'react';
 import { parseDeckText, type Card } from '@optcg/cards';
 import { deckIssues, type DeckFormat } from '@optcg/engine';
+import { sanitizeJsonDeck } from './keys.ts';
 
 const BLOCKING = new Set(['unknownCard', 'syntax', 'extraLeader']);
 
@@ -51,8 +52,10 @@ export function ImportDialog({
     return (n: string) => m.get(n.toLowerCase()) ?? [];
   }, [cards]);
   // Parsing is cheap; it runs on every edit so the report is always current.
+  // A JSON entry the parser would clamp or ignore is named first and left out (review M6-11).
+  const json = useMemo(() => sanitizeJsonDeck(text), [text]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const parsed = useMemo(() => parseDeckText(text, lookup, byName), [text, cards, byName]);
+  const parsed = useMemo(() => parseDeckText(json.text, lookup, byName), [json, cards, byName]);
   const useLeader = parsed.leader ?? leader;
   const issues = useMemo(
     () => (useLeader ? deckIssues({ leader: useLeader, main: parsed.main }, lookup, format) : []),
@@ -62,6 +65,8 @@ export function ImportDialog({
   const problems = parsed.lines.filter((l) => BLOCKING.has(l.status));
   const read = parsed.lines.length;
   const okCount = read - problems.length;
+  const skipped = json.problems;
+  const problemCount = problems.length + skipped.length;
   const blocker = problems[0]
     ? `Fix or drop line ${problems[0].line} first`
     : !useLeader
@@ -86,9 +91,9 @@ export function ImportDialog({
     id ? issues.filter((i) => i.cards.includes(id)).map((i) => i.message) : [];
 
   const summary =
-    read === 0
+    read === 0 && skipped.length === 0
       ? 'Nothing read yet.'
-      : `${read} lines read · ${okCount} OK · ${problems.length} problem${problems.length === 1 ? '' : 's'}`;
+      : `${read} lines read · ${okCount} OK · ${problemCount} problem${problemCount === 1 ? '' : 's'}`;
 
   return (
     <dialog
@@ -124,8 +129,19 @@ export function ImportDialog({
             {summary}
             {read > 0 && problems[0]
               ? `: line ${problems[0].line}, ${firstSentence(problems[0].message ?? '')}`
-              : ''}
+              : skipped[0]
+                ? `: ${skipped[0].charAt(0).toLowerCase()}${skipped[0].slice(1)}`
+                : ''}
           </p>
+          {skipped.length > 0 && (
+            <ul className="import-skipped" aria-label="Entries skipped">
+              {skipped.map((m) => (
+                <li key={m} className="bad">
+                  <span className="danger">{m}</span>
+                </li>
+              ))}
+            </ul>
+          )}
           <ol className="import-lines">
             {parsed.lines.map((l) => {
               const bad = BLOCKING.has(l.status);
