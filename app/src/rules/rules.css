@@ -86,6 +86,13 @@
   margin: 4px 0 12px;
   padding-left: 22px;
 }
+/* A column of links is a column of targets: 24 px tall each, so none sits within another's 24 px circle
+   (WCAG 2.5.8; M10 WP4). */
+.rules-section li a {
+  display: inline-block;
+  min-height: 24px;
+  line-height: 24px;
+}
 .rule-entry h1 {
   margin: 4px 0 12px;
 }

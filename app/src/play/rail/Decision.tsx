@@ -503,22 +503,25 @@ function contentInner(g: G): Content {
                 ? 'Pick the next card, or keep the order shown.'
                 : 'Your effects triggered together (CR 8-6-1). Pick the one to resolve first.'}
             </p>
-            <ul className="opts col" role="group" aria-label="Order">
-              {legal.order.map((a, i) => (
-                <li key={a.type === 'order' ? a.first : i}>
-                  <button
-                    type="button"
-                    className="opt"
-                    id={`order-${i}`}
-                    data-autofocus={i === 0 ? '' : undefined}
-                    onClick={() => g.act(a)}
-                  >
-                    {cardsToPlace ? 'Next: ' : 'First: '}
-                    {a.type === 'order' ? labelOf(a.first) : ''}
-                  </button>
-                </li>
-              ))}
-            </ul>
+            {/* The group wraps the list: a `role="group"` on the <ul> itself left its <li>s outside any list (axe listitem; M10 WP4). */}
+            <div role="group" aria-label="Order">
+              <ul className="opts col">
+                {legal.order.map((a, i) => (
+                  <li key={a.type === 'order' ? a.first : i}>
+                    <button
+                      type="button"
+                      className="opt"
+                      id={`order-${i}`}
+                      data-autofocus={i === 0 ? '' : undefined}
+                      onClick={() => g.act(a)}
+                    >
+                      {cardsToPlace ? 'Next: ' : 'First: '}
+                      {a.type === 'order' ? labelOf(a.first) : ''}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         ),
         foot: cardsToPlace

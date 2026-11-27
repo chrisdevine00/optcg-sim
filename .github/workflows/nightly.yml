@@ -49,7 +49,7 @@ jobs:
       # millisecond bound in these specs; per push they play the same turns and assert none.
       - run: npx playwright install --with-deps chromium
         if: always()
-      - run: npx playwright test app/e2e/game.spec.ts app/e2e/keyboard.spec.ts app/e2e/pirate.spec.ts app/e2e/warlord.spec.ts app/e2e/review-m8-gate.spec.ts
+      - run: npx playwright test app/e2e/game.spec.ts app/e2e/keyboard.spec.ts app/e2e/pirate.spec.ts app/e2e/warlord.spec.ts app/e2e/review-m8-gate.spec.ts app/e2e/m10-keyboard-warlord.spec.ts
         if: always()
         env:
           E2E_FULL: '1'
