@@ -8,7 +8,7 @@ import { loadScripts, type Card } from '@optcg/cards';
 import { chooseAction } from './choose.ts';
 import { answerLethal, insertByPriority } from './search/lethal/request.ts';
 import { answerThreat } from './search/lethal/threat.ts';
-import type { AiRequest, AiResponse, GameInfo } from './protocol.ts';
+import type { AiRequest, AiResponse, AiTiming, GameInfo } from './protocol.ts';
 import { AiSession } from './session.ts';
 import { answerScore } from './coach/blunder.ts';
 import { priorityOf, type Work } from './coach/dispatch.ts';
@@ -20,6 +20,10 @@ let ready: Promise<void> = Promise.resolve();
 const cancelled = new Set<number>();
 let game: GameInfo | null = null;
 let session: AiSession | null = null;
+/** Wall-clock epoch ms, on the clock the page's `performance.now()` shares (M10 WP3 timing). */
+const epoch = () => performance.timeOrigin + performance.now();
+/** When each queued request arrived (only `decide` and `planTurn` are timed). */
+const arrived = new Map<number, number>();
 const post = (r: AiResponse) => (self as unknown as DedicatedWorkerGlobalScope).postMessage(r);
 
 function ensureSession(): AiSession | null {
@@ -44,6 +48,11 @@ let running = false;
 
 function run(req: Work): void {
   const t0 = performance.now();
+  const started = epoch();
+  const recv = arrived.get(req.id) ?? started;
+  arrived.delete(req.id);
+  let built = started;
+  const timing = (): AiTiming => ({ recv, start: started, built, end: epoch() });
   try {
     if (req.type === 'lethal') {
       const res = answerLethal(req, cards);
@@ -70,15 +79,18 @@ function run(req: Work): void {
       return;
     }
     if (req.type === 'planTurn') {
-      const r = ensureSession()?.planTurn(req.view, req.seed, req.budget) ?? {
+      const s = ensureSession();
+      built = epoch();
+      const r = s?.planTurn(req.view, req.seed, req.budget) ?? {
         steps: 0,
         rollouts: 0,
       };
       if (cancelled.delete(req.id)) return;
-      post({ type: 'planned', id: req.id, ...r, ms: performance.now() - t0 });
+      post({ type: 'planned', id: req.id, ...r, ms: performance.now() - t0, t: timing() });
       return;
     }
     const s = ensureSession();
+    built = epoch();
     const d = s
       ? s.decide(req.view, req.seed)
       : { ...chooseAction(req.view, { tier: req.tier, seed: req.seed, cards }), stats: undefined };
@@ -90,6 +102,7 @@ function run(req: Work): void {
       explanation: d.explanation,
       ...(d.stats ? { stats: d.stats } : {}),
       ms: performance.now() - t0,
+      t: timing(),
     });
   } catch (err) {
     post({ type: 'error', id: req.id, message: err instanceof Error ? err.message : String(err) });
@@ -123,12 +136,14 @@ self.onmessage = (e: MessageEvent<AiRequest>) => {
       ready = Promise.all([ready, loadScripts(req.cards.map((c) => c.id))]).then(() => undefined);
       return;
     case 'cancel':
+      arrived.delete(req.id);
       cancelled.add(req.id);
       return;
     case 'reset':
       session?.reset();
       return;
     default:
+      if (req.type === 'decide' || req.type === 'planTurn') arrived.set(req.id, epoch());
       // By priority, first come first served within one: a background Lethal check never waits
       // ahead of the AI's own turn or of a press of the Lethal button.
       insertByPriority(queue, req, priorityOf);

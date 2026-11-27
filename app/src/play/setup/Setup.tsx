@@ -24,6 +24,7 @@ import {
 import { TUTORIAL_DECK_IDS } from '../../tutorial/decks.ts';
 import { SCENARIOS } from './scenarios.ts';
 import { checkSetupDeck, unavailableText } from './check.ts';
+import { useAiWarmUp } from './useAiWarmUp.ts';
 
 /**
  * Turn-time copy (review M5a-21). It must match docs/benchmarks.md "Pacing"; `app/test/setup-copy.test.ts`
@@ -175,6 +176,17 @@ export function Setup({
   });
   const problems = checks.flatMap((c) => c.problems.map((text) => ({ seat: c.seat, text })));
   const cantLoad = checks.some((c) => c.unavailable.length > 0);
+
+  // The AI's worker is warmed now, not at Start (M10 WP3): it takes a moment to build its session.
+  useAiWarmUp({
+    opponent,
+    myDeck,
+    theirDeck,
+    cards: deckCards,
+    ready: cardsReady && problems.length === 0 && !cantLoad,
+    off: !!url.scenario || !!url.start,
+    ...(url.aiBudgets ? { budgets: url.aiBudgets } : {}),
+  });
 
   const choice = (): SetupChoice => ({
     myDeck,

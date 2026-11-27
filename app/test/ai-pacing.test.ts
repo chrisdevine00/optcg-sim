@@ -32,6 +32,8 @@ class InProcessAi implements AiPort {
     cards: Card[],
     game: GameInfo,
     budgets: ConstructorParameters<typeof AiSession>[0]['budgets'],
+    /** Virtual ms each decision takes to come back (a slow worker); 0 answers at once. */
+    private readonly delay = 0,
   ) {
     for (const c of cards) this.cards.set(c.id, c);
     this.session = new AiSession({
@@ -50,7 +52,12 @@ class InProcessAi implements AiPort {
   decide(view: PlayerView | SearchView, _tier: string, seed: number) {
     const d = this.session.decide(view, seed);
     this.decisions.push({ rollouts: d.stats.rollouts });
-    return { id: this.n++, result: Promise.resolve({ ...d, ms: 0 }) };
+    const answer = { ...d, ms: 0 };
+    const result =
+      this.delay > 0
+        ? new Promise<typeof answer>((resolve) => setTimeout(() => resolve(answer), this.delay))
+        : Promise.resolve(answer);
+    return { id: this.n++, result };
   }
   /** Public card data for every card the AI can now identify (the worker's `reveal`). */
   reveal(cards: Iterable<Card>) {
@@ -81,6 +88,8 @@ async function measure(
   game: 'late' | 'early',
   turns: number,
   budgets: Budgets,
+  /** Virtual ms each worker decision takes (M5a-20); 0 answers at once. */
+  delay = 0,
 ): Promise<Turn[]> {
   const kaido = metaDecks().find((d) => d.leader === 'OP17-058')!;
   const mine = DECKS[0]!;
@@ -101,7 +110,7 @@ async function measure(
       aiCardIds: [kaido.leader, ...kaido.main],
       aiDeck: kaido.main,
       myDeck: mine.spec.main,
-      aiPort: (cards, info) => new InProcessAi(cards, info, budgets),
+      aiPort: (cards, info) => new InProcessAi(cards, info, budgets, delay),
     },
   );
   ctl.start();
@@ -160,6 +169,26 @@ describe('AI turn pacing at 1× on a controlled clock (board.md §5.2, flows F21
     checkTurns(turns, HEAVY_MS);
     // The board takes real time to play out: not a measurement of nothing.
     expect(turns[0]!.ms).toBeGreaterThan(4000);
+  }, 240_000);
+
+  it('the wait on the worker is thinking time, not board time, also where the controller peeks at the next move (M5a-20)', async () => {
+    // A DON!! group peeks at the AI's next move before it decides how long to dwell, and that move
+    // was requested while the DON!! travelled in: with a slow worker the peek waits. That wait used
+    // to fall into board time (`ms - thinkMs`), so a slow worker made the same line look longer on
+    // the board and compressed its dwell. Same game, same line, a worker 900 virtual ms slower:
+    // the board's time is the same; the wait shows in `thinkMs`.
+    const fast = await measure('pirate', 'late', 1, 'iterations', 0);
+    const slow = await measure('pirate', 'late', 1, 'iterations', 900);
+    expect(slow[0]!.moves, 'the same line').toBe(fast[0]!.moves);
+    expect(slow[0]!.thinkMs, 'the slow worker was waited on').toBeGreaterThan(
+      fast[0]!.thinkMs + 900,
+    );
+    const board = (t: Turn) => t.ms - t.thinkMs;
+    expect(
+      Math.abs(board(slow[0]!) - board(fast[0]!)),
+      `board time ${board(slow[0]!)} ms with a slow worker, ${board(fast[0]!)} ms with a fast one`,
+    ).toBeLessThanOrEqual(100);
+    expect(board(slow[0]!)).toBeLessThanOrEqual(HEAVY_MS);
   }, 240_000);
 
   it('Warlord turns: a typical one fits 8 s, a heavy one is bounded', async () => {

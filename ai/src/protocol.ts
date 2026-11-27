@@ -85,6 +85,20 @@ export type AiRequest =
   /** Forget the turn plan and battle memory (the player rewound). */
   | { type: 'reset' };
 
+/**
+ * Where a request's time went inside the worker (M10 WP3, additive, optional): wall-clock epoch
+ * milliseconds (`performance.timeOrigin + performance.now()`, comparable with the page's) when the
+ * worker received the request, began to run it (after earlier requests and the card scripts),
+ * had the session built, and posted the answer. The page turns them into transfer, queue, setup and
+ * search time (`app/src/play/game/ai-client.ts`); nothing in them is game data.
+ */
+export interface AiTiming {
+  recv: number;
+  start: number;
+  built: number;
+  end: number;
+}
+
 export type AiResponse =
   | {
       type: 'decision';
@@ -94,8 +108,9 @@ export type AiResponse =
       ms: number;
       /** Rollouts spent, and whether the move came from the turn plan. */
       stats?: { rollouts: number; actions: number; planned: boolean };
+      t?: AiTiming;
     }
-  | { type: 'planned'; id: number; steps: number; rollouts: number; ms: number }
+  | { type: 'planned'; id: number; steps: number; rollouts: number; ms: number; t?: AiTiming }
   | { type: 'lethal'; id: number; result: LethalResult; ms: number }
   | { type: 'hint'; id: number; result: HintResult | NotImplemented; ms: number }
   | { type: 'score'; id: number; result: ScoreTable | NotImplemented; ms: number }
