@@ -33,6 +33,8 @@ jobs:
         if: always()
         env:
           PERF_ASSERT: '1'
+          # "4x" = the reference machine slowed 4 times: scale the CDP rate by this runner's speed.
+          PERF_CALIBRATE: '1'
       - uses: actions/upload-artifact@v4
         if: always()
         with:

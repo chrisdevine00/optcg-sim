@@ -4,7 +4,7 @@
  * instead of interpolating, or count `>= 25` as over, and the exact-value cases fail.
  */
 import { describe, expect, it } from 'vitest';
-import { frameStates, percentile, summarise } from '../e2e/support/perf-stats.ts';
+import { calibratedRate, frameStates, percentile, summarise } from '../e2e/support/perf-stats.ts';
 import { median, summarise as lhSummarise } from '../../scripts/lighthouse.ts';
 
 describe('percentile', () => {
@@ -104,5 +104,21 @@ describe('frameStates', () => {
     const r = frameStates([]);
     expect(r.produced).toBe(0);
     expect(r.partialShare).toBeNaN();
+  });
+});
+
+describe('calibratedRate (M10 release: the throttle means the same device on any host)', () => {
+  it('keeps the nominal rate on the reference machine', () => {
+    expect(calibratedRate(4, 8.7, 8.7)).toBe(4);
+  });
+  it('divides by how much slower the host is, never below 1', () => {
+    expect(calibratedRate(4, 17.4, 8.7)).toBe(2);
+    expect(calibratedRate(4, 50, 8.7)).toBe(1);
+  });
+  it('throttles a faster host harder', () => {
+    expect(calibratedRate(4, 4.35, 8.7)).toBe(8);
+  });
+  it('leaves 1x alone', () => {
+    expect(calibratedRate(1, 30, 8.7)).toBe(1);
   });
 });

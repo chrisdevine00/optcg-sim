@@ -32,6 +32,9 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 import { decisionKind, nextDecision, resolveChoose, startGame } from './game-support.ts';
 import { fixture, load, status } from './review-m8-support.ts';
 import {
+  calibratedRate,
+  cpuBenchMs,
+  REFERENCE_BENCH_MS,
   resetFrames,
   lastFrameStates,
   saveFrames,
@@ -77,15 +80,25 @@ function verdict(rate: number, s: FrameSummary): string[] {
 }
 
 /** Writes, prints and (with PERF_ASSERT) asserts one scenario's result. */
-function report(info: TestInfo, page: Page, scenario: string, rate: number, s: FrameSummary): void {
+function report(
+  info: TestInfo,
+  page: Page,
+  scenario: string,
+  rate: number,
+  s: FrameSummary,
+  calibration?: { hostBenchMs: number; referenceBenchMs: number; appliedRate: number },
+): void {
   // M10-R6: the compositor's frame states from the trace, reported with the figures, never asserted.
   const fs = lastFrameStates(page);
-  saveFrames(info.project.name, `${scenario}-${rate}x`, rate, s, fs);
+  saveFrames(info.project.name, `${scenario}-${rate}x`, rate, s, fs, calibration);
   const longest = Math.max(0, ...s.long.map((l) => l.duration));
   const states = fs
     ? `, compositor frames ${fs.produced} (partial ${(fs.partialShare * 100).toFixed(1)}%, dropped ${(fs.droppedShare * 100).toFixed(1)}%)`
     : '';
-  const line = `${scenario} ${info.project.name} ${rate}x: n ${s.n}, p50 ${s.p50}, p95 ${s.p95}, p99 ${s.p99}, max ${s.max}, over25 ${(s.over25 * 100).toFixed(1)}%, long tasks ${s.long.length} (longest ${Math.round(longest)} ms)${states}`;
+  const cal = calibration
+    ? ` (calibrated: host bench ${calibration.hostBenchMs.toFixed(1)} ms vs reference ${calibration.referenceBenchMs} ms, CDP rate ${calibration.appliedRate})`
+    : '';
+  const line = `${scenario} ${info.project.name} ${rate}x${cal}: n ${s.n}, p50 ${s.p50}, p95 ${s.p95}, p99 ${s.p99}, max ${s.max}, over25 ${(s.over25 * 100).toFixed(1)}%, long tasks ${s.long.length} (longest ${Math.round(longest)} ms)${states}`;
   info.annotations.push({ type: 'frames', description: line });
   console.log(line);
   expect(s.n, `${scenario}: the recorder returned no frames`).toBeGreaterThan(0);
@@ -103,14 +116,27 @@ async function measured(
   body: () => Promise<void>,
 ): Promise<void> {
   await startFrames(page);
-  await throttle(page, rate);
+  // PERF_CALIBRATE (the hosted perf job): "4x" means the reference machine slowed 4 times, so the
+  // CDP rate is scaled by this host's measured speed (M10 release gate, DECISIONS "M10 release").
+  let calibration:
+    { hostBenchMs: number; referenceBenchMs: number; appliedRate: number } | undefined;
+  if (process.env.PERF_CALIBRATE && rate > 1) {
+    await page.goto('about:blank');
+    const hostBenchMs = await cpuBenchMs(page);
+    calibration = {
+      hostBenchMs,
+      referenceBenchMs: REFERENCE_BENCH_MS,
+      appliedRate: calibratedRate(rate, hostBenchMs),
+    };
+  }
+  await throttle(page, calibration?.appliedRate ?? rate);
   await open();
   const s = await trace(page, scenario, async () => {
     await resetFrames(page);
     await body();
     return stopFrames(page);
   });
-  report(info, page, scenario, rate, s);
+  report(info, page, scenario, rate, s, calibration);
 }
 
 const turns = async (page: Page) =>

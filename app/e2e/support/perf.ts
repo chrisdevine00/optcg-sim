@@ -75,7 +75,43 @@ export async function stopFrames(page: Page): Promise<FrameSummary> {
   return summarise(raw.frames, raw.long);
 }
 
+export { calibratedRate, REFERENCE_BENCH_MS } from './perf-stats.ts';
+
 const rates = new WeakMap<Page, number>();
+
+/**
+ * A fixed workload (object churn, a sort, DOM build and layout) timed in the page, unthrottled:
+ * the median of 7 after one warm-up run. Like Lighthouse's benchmark index, it says how fast this
+ * host is, so a throttle can mean the same target device on any machine.
+ */
+export async function cpuBenchMs(page: Page): Promise<number> {
+  const run = () =>
+    page.evaluate(() => {
+      const t: number[] = [];
+      for (let r = 0; r < 7; r++) {
+        const s = performance.now();
+        let acc = 0;
+        const a: { i: number; v: number }[] = [];
+        for (let i = 0; i < 400000; i++) a.push({ i, v: Math.sqrt(i) });
+        a.sort((x, y) => y.v - x.v);
+        for (const o of a) acc += o.v;
+        const d = document.createElement('div');
+        for (let i = 0; i < 2000; i++) {
+          const e = document.createElement('span');
+          e.textContent = String(i);
+          d.appendChild(e);
+        }
+        document.body.appendChild(d);
+        d.getBoundingClientRect();
+        d.remove();
+        t.push(performance.now() - s + (acc < 0 ? 1 : 0));
+      }
+      t.sort((x, y) => x - y);
+      return t[3]!;
+    });
+  await run();
+  return run();
+}
 
 /** CPU slowdown for this page (4 is the "mid-range laptop" line of the M10 plan); 1 turns it off. */
 export async function throttle(page: Page, rate: number): Promise<void> {
@@ -134,11 +170,22 @@ export function saveFrames(
   rate: number,
   s: FrameSummary,
   frameStates?: FrameStates,
+  calibration?: { hostBenchMs: number; referenceBenchMs: number; appliedRate: number },
 ): void {
   mkdirSync('test-results', { recursive: true });
   writeFileSync(
     join('test-results', `frames-${project}-${scenario}.json`),
-    JSON.stringify({ project, scenario, rate, ...s, frameStates: frameStates ?? null }, null, 2) +
-      '\n',
+    JSON.stringify(
+      {
+        project,
+        scenario,
+        rate,
+        calibration: calibration ?? null,
+        ...s,
+        frameStates: frameStates ?? null,
+      },
+      null,
+      2,
+    ) + '\n',
   );
 }

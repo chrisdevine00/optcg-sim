@@ -2,6 +2,12 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-27 — M10 release gate: the frame throttle is calibrated to the host, as Lighthouse's is
+
+- **Context:** the first hosted `perf.yml` run (46068288201, release mode) met Lighthouse on every route (performance 96 to 100, accessibility 100, 5 runs) but failed the frame line: at CDP 4x the AI turn had 3.4% and the human turn 3.8 to 3.9% of frames over 25 ms against the 2% requirement and 3% bound (p95 16.8 ms; every 1x run clean). Chrome's CPU throttle multiplies the host's own speed, and the 2-core hosted runner with a software compositor is roughly half the reference Mac's speed, so its "4x" is the reference's 8x, where WP3's sweep measured the same 2.4 to 2.9%.
+- **Decision:** "4x" means the reference machine (Apple M4 Pro, Chromium 156) slowed four times. With `PERF_CALIBRATE=1` (set in `perf.yml`) the frame spec times a fixed in-page workload (`cpuBenchMs`, median of 7 after a warm-up; reference 8.7 ms) and applies `calibratedRate(4, host) = max(1, 4 x 8.7 / host)`; the host's benchmark, the reference and the applied rate are printed and written to every `frames-*.json`. The requirement and bound are unchanged. Unit tests cover the rate (reference, slower, much slower, faster host, 1x). Local check: host 7.2 ms, rate 4.8, over 25 ms 0.3%.
+- **Rejected:** raising the 2% requirement or the 3% bound (the line would no longer mean a mid-range laptop); asserting only p95 on hosted runners (drops the measure that caught it); leaving the nightly red (a red that means nothing hides one that does).
+
 ## 2026-11-27 — M10 fix round: the deploy builds the commit CI passed; the Emperor job ran the whole strength file; the Warlord miss is stated, not hidden; the AI warm-up is removed; hover previews are hoverable
 
 - **Context:** the independent review of M10 failed on one severity 3 (M10-R1) and listed fourteen smaller findings (docs/reviews/m10-review.md, "Fix round" at its end has each change, test and fail-on-revert).

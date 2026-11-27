@@ -88,3 +88,20 @@ export function frameStates(events: readonly TraceEvent[]): FrameStates {
     droppedShare: share(dropped),
   };
 }
+
+/**
+ * The CPU benchmark's median on the reference machine (Apple M4 Pro, Chromium 156, 2026-11-27):
+ * `cpuBenchMs` below, 8.7 ms. A host that takes longer is slower than the reference.
+ */
+export const REFERENCE_BENCH_MS = 8.7;
+
+/**
+ * The CDP throttle that makes this host behave like the reference machine slowed by `nominal`.
+ * Chrome's throttle multiplies the host's own speed, so on a host k times slower than the
+ * reference, `nominal / k` gives the same target device (never below 1: a slower host than the
+ * target cannot be sped up). Off unless PERF_CALIBRATE is set (the reference runs are uncalibrated).
+ */
+export function calibratedRate(nominal: number, hostMs: number, reference = REFERENCE_BENCH_MS) {
+  if (nominal <= 1) return 1;
+  return Math.max(1, Math.round(((nominal * reference) / hostMs) * 10) / 10);
+}
