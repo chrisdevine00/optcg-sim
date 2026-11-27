@@ -917,7 +917,8 @@ function ArtSwitch({
       type="button"
       className="btn small art-switch"
       tabIndex={-1}
-      aria-label={`Art ${cur + 1} of ${card.artworks.length} for ${card.name}: show the next`}
+      // The name starts with the visible text (WCAG 2.5.3, label in name).
+      aria-label={`Art ${cur + 1}/${card.artworks.length}: show the next art of ${card.name}`}
       onClick={() =>
         onChange({ ...deck, art: { ...deck.art, [card.id]: card.artworks[next]!.artworkId } })
       }

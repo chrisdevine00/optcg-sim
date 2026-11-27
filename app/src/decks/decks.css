@@ -386,7 +386,9 @@
 
 @media (max-width: 960px) {
   .builder {
-    grid-template-columns: 1fr;
+    /* minmax(0, ...): a bare 1fr takes the widest child's minimum and pushed the panes 15 px past a
+       320 px viewport (WCAG 1.4.10; M10 WP4). */
+    grid-template-columns: minmax(0, 1fr);
     grid-auto-rows: minmax(70vh, auto);
   }
   .import-body {

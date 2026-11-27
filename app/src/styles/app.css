@@ -750,6 +750,21 @@ kbd {
   }
 }
 
+/* Nine links and the wordmark need about 800 CSS px: below 860 the header wraps, so 200% zoom at 1280
+   (640 px) no longer pushes Progress and Settings off the page (WCAG 1.4.10; M10 WP4). */
+@media (max-width: 860px) {
+  .app-header {
+    height: auto;
+    min-height: 56px;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+    padding: var(--space-2) var(--space-3);
+  }
+  .app-nav {
+    flex-wrap: wrap;
+  }
+}
+
 /* ---------- Inspector ---------- */
 .inspector {
   width: min(880px, 94vw);

@@ -6,6 +6,7 @@ import { Home } from './routes/Home.tsx';
 import { m9Route, type M9Page } from './routes/m9.ts';
 import { ErrorBoundary } from './shell/ErrorBoundary.tsx';
 import { NotFound } from './shell/NotFound.tsx';
+import { RouteFocus } from './shell/RouteFocus.tsx';
 import { StorageNotice } from './store/StorageNotice.tsx';
 import { StoreGate } from './store/StoreGate.tsx';
 import { UpdatePrompt } from './update/UpdatePrompt.tsx';
@@ -64,7 +65,12 @@ function Guard({
   children: ReactNode;
 }) {
   // The gate is outside the Suspense: its heading shows while the store opens and the chunk loads.
-  const page = <Suspense fallback={<Fallback />}>{children}</Suspense>;
+  const page = (
+    <Suspense fallback={<Fallback />}>
+      {children}
+      <RouteFocus path={path} />
+    </Suspense>
+  );
   return (
     <ErrorBoundary scope={name}>
       {gated ? <StoreGate path={path}>{page}</StoreGate> : page}

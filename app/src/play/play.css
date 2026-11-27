@@ -1422,6 +1422,11 @@
 }
 .spin {
   min-width: 32px;
+  /* 24 px: the count is a target of its own (WCAG 2.5.8; M10 WP4). */
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   font: var(--weight-bold) var(--text-xl) / 1 var(--font-num);
 }
