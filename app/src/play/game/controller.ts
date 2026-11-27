@@ -6,6 +6,7 @@
 import type { Card } from '@optcg/cards';
 import {
   actionKey,
+  donLedger,
   priorCardIds,
   rookie,
   type AiTier,
@@ -42,11 +43,30 @@ const PUZZLE_WORDS: Record<PracticeJudge, { solved: string; failed: string }> = 
     solved: 'you took the hit and kept your cards.',
     failed: 'you played a Counter.',
   },
-  // M9 WP0 placeholders; WP4 owns the judges and these words.
-  'don-ledger': { solved: 'you spent your DON!!.', failed: 'DON!! was left unused.' },
-  'target-best': { solved: 'you chose the best target.', failed: 'another target was better.' },
+  // M9 WP4: the DON!! and target judges. `mulligan` is judged by the drill shell, not by a board.
+  'don-ledger': {
+    solved: 'you spent your DON!! as well as the best line did.',
+    failed: 'more DON!! was left unused than the best line leaves.',
+  },
+  'target-best': {
+    solved: 'you chose the target that gets the most from the attack.',
+    failed: 'another target was better.',
+  },
   mulligan: { solved: 'you chose well.', failed: 'the guide chooses otherwise.' },
 };
+
+/**
+ * A puzzle on a restored board (`GameConfig.restore.puzzle`). `expect` is what `don-ledger`
+ * (`unusedMin`: the least DON!! the best line leaves unused) and `target-best` (`target`: the
+ * handle of the card the first attack should hit) compare with. `submitLabel` (M9 WP4) renames the
+ * End turn button ("Submit turn") on a drill's board.
+ */
+export interface PuzzleConfig {
+  turn: number;
+  judge?: PracticeJudge;
+  expect?: { target?: string; unusedMin?: number };
+  submitLabel?: string;
+}
 
 export type Speed = 'step' | 0.5 | 1 | 2 | 4;
 export const SPEEDS: Speed[] = ['step', 0.5, 1, 2, 4];
@@ -108,7 +128,7 @@ export interface GameConfig {
      * `turn`), `survive-turn` (the game is not lost by the end of `turn`) or `no-counter-on-attack`
      * (the counter step that was cut from ends with no Counter played; `turn` is that attack's turn).
      */
-    puzzle?: { turn: number; judge?: PracticeJudge };
+    puzzle?: PuzzleConfig;
   };
 }
 
@@ -217,7 +237,7 @@ export class GameController {
   /** A restored board to look at: nothing can be played (review Study). */
   readonly readOnly: boolean;
   /** A lethal puzzle from a review flag: the turn it was cut from. */
-  readonly puzzle: { turn: number; judge?: PracticeJudge } | null;
+  readonly puzzle: PuzzleConfig | null;
   /** Actions in the record when the puzzle was cut (the `no-counter-on-attack` judge reads after it). */
   private readonly puzzleFrom: number;
   /** The coach: its lethal detector and its panel state (learning-ui §2, §3). */
@@ -394,8 +414,23 @@ export class GameController {
   }
 
   private puzzleNoted = false;
+  /** `don-ledger`: the DON!! left unused at the moment the puzzle's turn ended (taken once). */
+  private endLedger: number | null = null;
+  /**
+   * The ledger is read from the player's own view the first time the puzzle's turn is over, which
+   * is right after the End turn that ended it: the opponent has not acted yet, so nothing of theirs
+   * can have moved the DON!!.
+   */
+  private sampleLedger(): void {
+    if (this.puzzle?.judge !== 'don-ledger' || this.endLedger !== null) return;
+    const v = this.session.view(this.me);
+    if (v.result || (v.turn.number <= this.puzzle.turn && v.turn.activePlayer === this.me)) return;
+    this.endLedger = donLedger(v, this.cards).unused;
+  }
+
   /** A puzzle says how it went, once: politely, and with a toast (failed always; solved off a game-over panel). */
   private checkPuzzle(): void {
+    this.sampleLedger();
     if (!this.puzzle || this.puzzleNoted) return;
     const s = this.puzzleState();
     if (s !== 'solved' && s !== 'failed') return;
@@ -591,6 +626,25 @@ export class GameController {
     const v = this.session.view(this.me);
     const judge = this.puzzle.judge ?? 'win-this-turn';
     const won = v.result && 'winner' in v.result && v.result.winner === this.me;
+    if (judge === 'don-ledger') {
+      // Solved when the turn ends with no more DON!! unused than the best line leaves; a win on the
+      // way is solved. The ledger is the player's own (`donLedger` reads only their view).
+      if (v.result) return won ? 'solved' : 'failed';
+      this.sampleLedger();
+      if (this.endLedger === null) return 'open';
+      return this.endLedger <= (this.puzzle.expect?.unusedMin ?? 0) ? 'solved' : 'failed';
+    }
+    if (judge === 'target-best') {
+      // The first attack of the puzzle's turn is the answer; ending the turn without one is not.
+      for (const a of this.session.actionsSince(this.puzzleFrom)) {
+        if (a.player === this.me && a.type === 'attack')
+          return a.target === this.puzzle.expect?.target ? 'solved' : 'failed';
+      }
+      if (v.result) return 'failed';
+      return v.turn.number > this.puzzle.turn || v.turn.activePlayer !== this.me
+        ? 'failed'
+        : 'open';
+    }
     if (judge === 'no-counter-on-attack') {
       // The counter step the puzzle was cut at: any Counter played is the mistake; ending the step
       // without one is the answer.

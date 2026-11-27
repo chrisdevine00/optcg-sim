@@ -696,7 +696,9 @@ function mainContent(g: G, rewind: NonNullable<Foot['secondary']>): Content {
   const playable = [...legal.play.keys()];
   const active = view.don[me].active;
   const sub = `${canAttack.length} can attack · ${active} DON!! unused`;
-  const endBtn = { label: 'End turn', key: 'E', sub, onClick: endTurn, id: 'endturn-btn' };
+  // M9 WP4: a drill's board says "Submit turn" (learning-ui §7.1); the key and the action are End turn's.
+  const endLabel = g.ctl.puzzle?.submitLabel ?? 'End turn';
+  const endBtn = { label: endLabel, key: 'E', sub, onClick: endTurn, id: 'endturn-btn' };
 
   if (ui.kind === 'confirm') return confirmContent(g, ui.attacker, ui.target);
 

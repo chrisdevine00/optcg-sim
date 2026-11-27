@@ -100,6 +100,7 @@ export function Game({
   reviewLabel,
   studyRail,
   tutorialSlot,
+  drillSlot,
 }: {
   ctl: GameController;
   onNewGame: () => void;
@@ -117,6 +118,11 @@ export function Game({
    * The tutorial hides the coach, gives the panel the tall geometry and has no rewind.
    */
   tutorialSlot?: React.ReactNode;
+  /**
+   * M9 WP4: a drill item's bar (item count, timer, Show answer, Skip, and the lethal drill's "No
+   * lethal"), shown above the decision like the tutorial's step card, without the tutorial's limits.
+   */
+  drillSlot?: React.ReactNode;
 }) {
   useSyncExternalStore(ctl.subscribe, ctl.getVersion);
   useFocusRescue();
@@ -1282,7 +1288,9 @@ export function Game({
                         }
                       : {})}
                     {...(tutorialOn ? { tutorial: true } : {})}
-                    {...(tutorialSlot ? { tutorialSlot } : {})}
+                    {...(tutorialSlot || drillSlot
+                      ? { tutorialSlot: tutorialSlot ?? drillSlot }
+                      : {})}
                   />
                   {ctl.toast && (
                     <p className="toast" style={{ top: decTop - 34 }} role="status">
