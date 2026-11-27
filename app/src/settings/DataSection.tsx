@@ -5,6 +5,7 @@
  * Native controls only; every result is spoken politely through `say`. Nothing is sent anywhere.
  */
 import { useEffect, useRef, useState } from 'react';
+import { importWithProgress } from '../progress/store.ts';
 import { download } from '../tutorial/timing.ts';
 import { conflictsOf, exportEverything, exportFileName, readImportFile } from '../store/data.ts';
 import { getStore, type ImportReport } from '../store/index.ts';
@@ -144,7 +145,7 @@ export function DataSection({
   const finish = async (bundle: ExportBundle, skipped: string[], how: 'replace' | 'keep-both') => {
     setPending(null);
     try {
-      const r = await getStore().importAll(bundle, how);
+      const r = await importWithProgress(getStore(), bundle, how);
       await rehydrateStore();
       setProblems(skipped);
       say(reportWords(r, skipped.length));
@@ -186,7 +187,8 @@ export function DataSection({
       <h2 id="set-data">Data</h2>
       <p className="subtle">
         Saved games, their reviews, the tutorial log and your lethal progress live in this browser
-        only. Nothing is sent anywhere. Decks and the settings above are kept separately.
+        only. Nothing is sent anywhere. Progress is included in Export and Import. Decks and the
+        settings above are kept separately.
       </p>
       {status.kind === 'memory' && (
         <p className="set-warn" role="note">
