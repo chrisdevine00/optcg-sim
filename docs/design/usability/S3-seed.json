@@ -1,0 +1,95 @@
+{
+  "schema": "optcg-sim/export/1",
+  "exportedAt": 1795168800000,
+  "build": "usability-s3-seed",
+  "games": [],
+  "reviews": [],
+  "timing": {},
+  "progress": {
+    "v1": {
+      "v": 1,
+      "lessons": {
+        "L09": {
+          "source": "drill",
+          "passedAt": "2026-11-20T10:20:00.000Z"
+        },
+        "L10": {
+          "source": "drill",
+          "passedAt": "2026-11-20T10:10:00.000Z"
+        },
+        "L11": {
+          "source": "manual",
+          "readAt": "2026-11-20T10:30:00.000Z"
+        }
+      },
+      "sessions": [
+        {
+          "id": "s3seed-counter-1",
+          "drill": "counter",
+          "lesson": "L10-counter-or-take",
+          "at": "2026-11-20T10:10:00.000Z",
+          "n": 10,
+          "correct": 8,
+          "shown": 0,
+          "factor": null,
+          "itemIds": [
+            "counter-seed-1",
+            "counter-seed-2",
+            "counter-seed-3",
+            "counter-seed-4",
+            "counter-seed-5",
+            "counter-seed-6",
+            "counter-seed-7",
+            "counter-seed-8",
+            "counter-seed-9",
+            "counter-seed-10"
+          ]
+        },
+        {
+          "id": "s3seed-don-1",
+          "drill": "don",
+          "lesson": "L09-don-efficiency",
+          "at": "2026-11-20T10:20:00.000Z",
+          "n": 10,
+          "correct": 7,
+          "shown": 0,
+          "factor": null,
+          "itemIds": [
+            "don-seed-1",
+            "don-seed-2",
+            "don-seed-3",
+            "don-seed-4",
+            "don-seed-5",
+            "don-seed-6",
+            "don-seed-7",
+            "don-seed-8",
+            "don-seed-9",
+            "don-seed-10"
+          ]
+        },
+        {
+          "id": "s3seed-lethal-1",
+          "drill": "lethal",
+          "lesson": "L15-lethal-math",
+          "at": "2026-11-20T10:25:00.000Z",
+          "n": 10,
+          "correct": 6,
+          "shown": 0,
+          "factor": null,
+          "itemIds": [
+            "lethal-seed-1",
+            "lethal-seed-2",
+            "lethal-seed-3",
+            "lethal-seed-4",
+            "lethal-seed-5",
+            "lethal-seed-6",
+            "lethal-seed-7",
+            "lethal-seed-8",
+            "lethal-seed-9",
+            "lethal-seed-10"
+          ]
+        }
+      ]
+    }
+  }
+}
