@@ -1,0 +1,165 @@
+/* M9 WP4: drill start, item, answer and summary screens. Tokens only; nothing under --text-xs. */
+.page-full {
+  max-width: none;
+}
+.drill {
+  padding: var(--space-6);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+.drill h1:focus,
+.drills h1:focus {
+  outline: none;
+}
+.drill h1:focus-visible,
+.drills h1:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 4px;
+}
+.drill-list {
+  list-style: none;
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-4);
+}
+.drill-tile {
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-2);
+  padding: var(--space-4);
+  background: var(--color-surface-2, var(--color-mat));
+}
+.drill-form {
+  display: grid;
+  gap: var(--space-4);
+  max-width: 420px;
+  margin-top: var(--space-4);
+}
+.drill-form label {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+.drill-hand {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding: 0;
+  margin: var(--space-4) 0;
+}
+.drill-card {
+  width: 140px;
+  aspect-ratio: 600 / 838;
+  position: relative;
+}
+.drill-card .face {
+  position: absolute;
+  inset: 0;
+}
+.drill-answers {
+  display: flex;
+  gap: var(--space-4);
+  margin: var(--space-4) 0;
+}
+.drill-answer {
+  min-width: 140px;
+  min-height: 48px;
+}
+.drill-lines {
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-2);
+  padding: var(--space-3) var(--space-4);
+  display: grid;
+  gap: var(--space-2);
+}
+.drill-line {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  min-height: 24px;
+  line-height: var(--leading-md);
+}
+.drill-bar {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+.drill-slot .drill-bar {
+  margin-top: var(--space-2);
+}
+.drill-bar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.drill-progress,
+.drill-prompt {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-sm);
+}
+.drill-header {
+  color: var(--color-text-muted);
+}
+.drill-timer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+}
+.drill-timer-pick {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.drill-timer-pick .input {
+  width: auto;
+  min-height: 28px;
+}
+.drill-timer-bar {
+  width: 96px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-3);
+  overflow: hidden;
+}
+.drill-timer-fill {
+  display: block;
+  height: 100%;
+  background: var(--color-accent-text);
+}
+.drill-timer-fill.over {
+  background: var(--color-warning-text);
+}
+.drill-right,
+.drill-wrong {
+  margin-bottom: var(--space-2);
+}
+.drill-next {
+  margin-top: var(--space-6);
+}
+.drill-scrim {
+  position: fixed;
+  inset: 0;
+  background: var(--color-scrim);
+  display: grid;
+  place-items: center;
+  z-index: var(--z-dialog);
+}
+.drill-dialog {
+  background: var(--color-surface-1, var(--color-bg));
+  color: var(--color-text);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-3);
+  padding: var(--space-6);
+  max-width: 420px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .drill-timer-fill {
+    transition: width var(--dur-fast) linear;
+  }
+}

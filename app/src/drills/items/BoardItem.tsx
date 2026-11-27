@@ -9,7 +9,6 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { Card } from '@optcg/cards';
 import { GameController } from '../../play/game/controller.ts';
 import { Game } from '../../play/game/Game.tsx';
-import { loadCards } from '../../play/setup/decks.ts';
 import type { SessionRecord } from '../../session/index.ts';
 import { itemCardIds, hasNoLethal, materialise } from '../materialise.ts';
 import type { DrillAi } from '../load.ts';
@@ -41,6 +40,7 @@ export function BoardItemScreen({
   onShow,
   onSkip,
   onLeave,
+  load,
   onReady,
   aiPort,
 }: {
@@ -59,6 +59,8 @@ export function BoardItemScreen({
   onShow(): void;
   onSkip(): void;
   onLeave(): void;
+  /** The session's card loader: loads what is missing and returns the shared map. */
+  load(ids: string[]): Promise<Map<string, Card>>;
   /** Tests: the controller once it is built. */
   onReady?: (ctl: GameController) => void;
   aiPort?: ConstructorParameters<typeof GameController>[2]['aiPort'];
@@ -76,7 +78,7 @@ export function BoardItemScreen({
     void (async () => {
       try {
         const ids = itemCardIds({ start: { scenario: item.scenario } } as unknown as SessionRecord);
-        const cards = (await loadCards(ids)) as Map<string, Card>;
+        const cards = await load(ids);
         if (!live) return;
         const m = materialise(ai, entry, cards, aiPort ? { aiPort: aiPort as never } : {});
         made = m.ctl;
@@ -167,7 +169,12 @@ export function BoardItemScreen({
     );
   if (!ctl)
     return (
-      <main className="page page-full drill" id="main" aria-busy="true" aria-labelledby="page-title">
+      <main
+        className="page page-full drill"
+        id="main"
+        aria-busy="true"
+        aria-labelledby="page-title"
+      >
         <h1 id="page-title" tabIndex={-1}>
           Setting up the board
         </h1>

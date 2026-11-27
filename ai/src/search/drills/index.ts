@@ -14,6 +14,7 @@ export {
   explainMulliganItem,
   judgeMulligan,
   metaListSets,
+  mulliganBank,
   mulliganCoverage,
   mulliganLabel,
 } from './mulligan.ts';

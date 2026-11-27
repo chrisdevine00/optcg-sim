@@ -89,12 +89,14 @@ export async function flagBank(
 
   // Items whose game is gone are dropped (and forgotten).
   let dropped = 0;
+  const kept: Record<string, Cached> = {};
   for (const [k, c] of Object.entries(cache.items))
-    if (!live.has(c.gameId)) {
+    if (live.has(c.gameId)) kept[k] = c;
+    else {
       if (c.entry) dropped++;
-      delete cache.items[k];
       dirty = true;
     }
+  cache.items = kept;
 
   const items: DrillEntry[] = [];
   for (const g of games) {

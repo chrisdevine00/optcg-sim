@@ -5,6 +5,7 @@
  * the injected `ProgressSink` (the lead wires WP6's; the default records nothing).
  */
 import type { Explanation, PracticeJudge } from '@optcg/ai';
+import { progressSink as appSink } from '../progress/store.ts';
 import type { DrillSession, ProgressSink } from '../progress/types.ts';
 import type { AnswerResult, BoardItem, DrillId, DrillItem, SourceFilter } from './types.ts';
 import { DRILL_LESSON } from './types.ts';
@@ -181,13 +182,22 @@ export function summarise(
 
 // --- Progress ------------------------------------------------------------------------------------
 
-/** The sink the shell records through. The lead replaces the default with WP6's `progressStore`. */
-const noop: ProgressSink = { recordSession: () => Promise.resolve() };
-let sink: ProgressSink = noop;
+/** The sink the shell records through: WP6's store by default, a double in tests (`setProgressSink`). */
+let sink: ProgressSink | null = null;
 export const setProgressSink = (s: ProgressSink | null): void => {
-  sink = s ?? noop;
+  sink = s;
 };
-export const progressSink = (): ProgressSink => sink;
+export const progressSink = (): ProgressSink => sink ?? appSink();
+
+/** Records a session; an impossible one (the store throws) is dropped, never shown as a crash. */
+export async function recordSafely(s: DrillSession): Promise<boolean> {
+  try {
+    await progressSink().recordSession(s);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export function toDrillSession(o: {
   sid: string;

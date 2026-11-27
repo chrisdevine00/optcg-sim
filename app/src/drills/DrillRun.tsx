@@ -17,13 +17,14 @@ import { answerFor, type AnswerView, type Detail } from './answers.ts';
 import { BoardItemScreen, type BoardOutcome } from './items/BoardItem.tsx';
 import { ChooseLineScreen } from './items/ChooseLine.tsx';
 import { MulliganItemScreen } from './items/MulliganItem.tsx';
+import { loadBank } from './banks.ts';
 import { droppedNote, flagBank, workerRequester } from './intake.ts';
 import { loadDrillAi } from './load.ts';
 import { AnswerScreen, LeaveDialog, SummaryScreen } from './Screens.tsx';
 import {
   filterEntries,
   pickItems,
-  progressSink,
+  recordSafely,
   sourceNote,
   summarise,
   toDrillSession,
@@ -54,6 +55,19 @@ export function queryOf(search: string): DrillQuery & { sid?: string } {
     ...(p.get('flag') ? { flag: p.get('flag')! } : {}),
     ...(p.get('sid') ? { sid: p.get('sid')! } : {}),
   };
+}
+
+/** Mulligan: the one archetype a session answered, so L12's "for each of 2 archetypes" can count it. */
+function soleArchetype(
+  entries: readonly DrillEntry[],
+  rs: readonly AnswerResult[],
+): string | undefined {
+  const ids = new Set(
+    rs
+      .map((r) => entries.find((e) => e.item.id === r.itemId)?.item)
+      .map((it) => (it && it.drill === 'mulligan' ? it.archetypeId : '')),
+  );
+  return ids.size === 1 && !ids.has('') ? [...ids][0] : undefined;
 }
 
 export const drillOfPath = (path: string): DrillId | null => {
@@ -100,16 +114,19 @@ export default function DrillRun({ path, clock = () => new Date() }: DrillRunPro
   const [results, setResults] = useState<AnswerResult[]>([]);
   const [leaving, setLeaving] = useState(false);
   const [said, setSaid] = useState('');
-  const pool = useRef(new Map<string, Card>());
+  const [pool] = useState(() => new Map<string, Card>());
   const recorded = useRef(false);
 
-  const say = useCallback((t: string) => setSaid((p) => (p === t ? `${t}​` : t)), []);
+  const say = useCallback((t: string) => setSaid((p) => (p === t ? `${t} ` : t)), []);
 
-  const ensure = useCallback(async (ids: Iterable<string>): Promise<Map<string, Card>> => {
-    const missing = [...new Set(ids)].filter((id) => !pool.current.has(id));
-    if (missing.length > 0) for (const [id, c] of await loadCards(missing)) pool.current.set(id, c);
-    return pool.current;
-  }, []);
+  const ensure = useCallback(
+    async (ids: Iterable<string>): Promise<Map<string, Card>> => {
+      const missing = [...new Set(ids)].filter((id) => !pool.has(id));
+      if (missing.length > 0) for (const [id, c] of await loadCards(missing)) pool.set(id, c);
+      return pool;
+    },
+    [pool],
+  );
 
   // --- Load the bank, the player's own items, and pick the session --------------------------------
   useEffect(() => {
@@ -123,9 +140,8 @@ export default function DrillRun({ path, clock = () => new Date() }: DrillRunPro
         if (drill === 'mulligan') {
           // The mulligan bank is built from the lists, so it needs their cards first.
           await ensure(lists.flatMap((s) => [s.leaderId, ...s.lists.flat()]));
-          ai.provideMulliganCards(pool.current);
         }
-        bankItems = ai.bankFor(drill).items.map((item) => ({ item }));
+        bankItems = (await loadBank(drill, ai, pool)).map((item) => ({ item }));
         let dropped = 0;
         if (q.source !== 'bank') {
           const store = getStore();
@@ -173,7 +189,7 @@ export default function DrillRun({ path, clock = () => new Date() }: DrillRunPro
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const entries = loaded?.entries ?? [];
+  const entries = useMemo(() => loaded?.entries ?? [], [loaded]);
   const n = entries.length;
   const i = phase.k === 'item' || phase.k === 'answer' ? phase.i : 0;
   const entry = entries[i];
@@ -187,11 +203,18 @@ export default function DrillRun({ path, clock = () => new Date() }: DrillRunPro
   const record = useCallback(
     (rs: readonly AnswerResult[]) => {
       if (!drill || rs.length === 0) return;
-      void progressSink().recordSession(
-        toDrillSession({ sid, drill, at: clock().toISOString(), results: rs, factor, archetype: q.archetype }),
+      void recordSafely(
+        toDrillSession({
+          sid,
+          drill,
+          at: clock().toISOString(),
+          results: rs,
+          factor,
+          archetype: q.archetype ?? soleArchetype(entries, rs),
+        }),
       );
     },
-    [clock, drill, factor, q.archetype, sid],
+    [clock, drill, entries, factor, q.archetype, sid],
   );
 
   const goNext = (from: number, rs: readonly AnswerResult[]) => {
@@ -207,7 +230,7 @@ export default function DrillRun({ path, clock = () => new Date() }: DrillRunPro
 
   const answer = (d: Detail) => {
     if (!loaded || !entry || phase.k !== 'item') return;
-    const cards = pool.current;
+    const cards = pool;
     const view = answerFor(loaded.ai, entry, d, cards, loaded.lists);
     const r: AnswerResult = {
       itemId: entry.item.id,
@@ -222,7 +245,10 @@ export default function DrillRun({ path, clock = () => new Date() }: DrillRunPro
 
   const skip = () => {
     if (!entry || phase.k !== 'item') return;
-    const rs = [...results, { itemId: entry.item.id, correct: false, shownAnswer: false, ms: null }];
+    const rs = [
+      ...results,
+      { itemId: entry.item.id, correct: false, shownAnswer: false, ms: null },
+    ];
     setResults(rs);
     say('Skipped.');
     goNext(phase.i, rs);
@@ -236,7 +262,8 @@ export default function DrillRun({ path, clock = () => new Date() }: DrillRunPro
 
   // Esc opens "Leave drill?" on the screens that are not the board (the board's own Esc stays its own).
   useEffect(() => {
-    const onboard = phase.k === 'item' && phase.mode === 'board' && entry?.item.drill !== 'mulligan';
+    const onboard =
+      phase.k === 'item' && phase.mode === 'board' && entry?.item.drill !== 'mulligan';
     if (leaving || onboard || phase.k === 'loading') return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && !e.defaultPrevented) setLeaving(true);
@@ -247,7 +274,12 @@ export default function DrillRun({ path, clock = () => new Date() }: DrillRunPro
 
   if (!drill)
     return (
-      <main className="page page-full drill" id="main" data-path={path} aria-labelledby="page-title">
+      <main
+        className="page page-full drill"
+        id="main"
+        data-path={path}
+        aria-labelledby="page-title"
+      >
         <h1 id="page-title" tabIndex={-1}>
           That drill does not exist
         </h1>
@@ -272,7 +304,12 @@ export default function DrillRun({ path, clock = () => new Date() }: DrillRunPro
 
   if (phase.k === 'loading' || phase.k === 'error' || phase.k === 'empty')
     return shell(
-      <main className="page page-full drill" id="main" aria-busy={phase.k === 'loading'} aria-labelledby="page-title">
+      <main
+        className="page page-full drill"
+        id="main"
+        aria-busy={phase.k === 'loading'}
+        aria-labelledby="page-title"
+      >
         <h1 id="page-title" tabIndex={-1} ref={(el) => el?.focus()}>
           {phase.k === 'loading'
             ? `Getting ${DRILL_NAMES[drill]} ready`
@@ -293,14 +330,14 @@ export default function DrillRun({ path, clock = () => new Date() }: DrillRunPro
 
   if (!loaded || phase.k === 'summary') {
     const s = summarise(drill, results, n, factor);
-    const archetypeName = q.archetype ? (q.archetype) : null;
+    const archetypeName = q.archetype ? q.archetype : null;
     return shell(
       <SummaryScreen
         drill={drill}
         summary={s}
         archetypeName={archetypeName}
         dropped={droppedNote(loaded?.dropped ?? 0)}
-        again={() => navigate(`/drills/${drill}/run${search ? search.replace(/([?&])sid=[^&]*&?/, '$1').replace(/[?&]$/, '') : ''}`) as unknown as void}
+        again={() => navigate(`/drills/${drill}`)}
       />,
     );
   }
@@ -333,7 +370,7 @@ export default function DrillRun({ path, clock = () => new Date() }: DrillRunPro
       <MulliganItemScreen
         ai={loaded.ai}
         item={e.item}
-        cards={pool.current}
+        cards={pool}
         {...common}
         onAnswer={(redraw) => answer({ kind: 'mulligan', redraw })}
       />,

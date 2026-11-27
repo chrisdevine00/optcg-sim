@@ -9,13 +9,7 @@ import type { Card } from '@optcg/cards';
 import type { Explanation, ExplanationContext, ListSet } from '@optcg/ai';
 import type { DrillAi } from './load.ts';
 import type { DrillEntry } from './session.ts';
-import type {
-  BoardItem,
-  CounterItem,
-  DonItem,
-  LethalItem,
-  MulliganItem,
-} from './types.ts';
+import type { BoardItem, CounterItem, DonItem, LethalItem, MulliganItem } from './types.ts';
 
 /** What the player did. `shown`: they asked for the answer instead. */
 export type Detail =
@@ -139,7 +133,9 @@ export function answerFor(
   const bestId = don.best[0]!;
   const lineId = d.kind === 'line' ? d.lineId : bestId;
   const right =
-    d.kind === 'line' ? ai.judgeDonLine(don, d.lineId) : d.kind === 'board' && d.outcome === 'solved';
+    d.kind === 'line'
+      ? ai.judgeDonLine(don, d.lineId)
+      : d.kind === 'board' && d.outcome === 'solved';
   const best = don.lines.find((l) => l.id === bestId);
   return finish(
     right,

@@ -10,7 +10,8 @@ import type { Summary } from './session.ts';
 import type { DrillId } from './types.ts';
 import { DRILL_LESSON, DRILL_NAMES } from './types.ts';
 
-const SHAPE = (a: AnswerView): string => (a.title === 'Correct' ? '✓' : a.title === 'Answer shown' ? '◌' : '✗');
+const SHAPE = (a: AnswerView): string =>
+  a.title === 'Correct' ? '✓' : a.title === 'Answer shown' ? '◌' : '✗';
 
 export function AnswerScreen({
   view,
@@ -38,8 +39,18 @@ export function AnswerScreen({
     return () => window.removeEventListener('keydown', onKey);
   }, [onNext]);
   return (
-    <main className="page page-full drill" id="main" aria-labelledby="page-title" data-answer={view.title}>
-      <h1 id="page-title" tabIndex={-1} ref={head} className={view.correct ? 'drill-right' : 'drill-wrong'}>
+    <main
+      className="page page-full drill"
+      id="main"
+      aria-labelledby="page-title"
+      data-answer={view.title}
+    >
+      <h1
+        id="page-title"
+        tabIndex={-1}
+        ref={head}
+        className={view.correct ? 'drill-right' : 'drill-wrong'}
+      >
         <span aria-hidden="true">{SHAPE(view)} </span>
         {view.title}
       </h1>

@@ -3,9 +3,11 @@
  * button, and the option list. Nothing here ends an item: "Over time" is a label, and the answer is
  * still accepted. The polite announcement at 10 s left goes through `announce`.
  */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { DrillId } from '@optcg/ai';
 import { clockWords, ItemTimer, limitSeconds, limitWords, TIMER_CHOICES } from './timer.ts';
+
+const defaultNow = (): number => performance.now();
 
 /** One `ItemTimer` per item (re-created when `itemKey` changes), driven by a 250 ms interval. */
 export function useItemTimer(
@@ -13,19 +15,23 @@ export function useItemTimer(
   factor: number | null,
   itemKey: string,
   announce: (text: string) => void,
-  now: () => number = () => performance.now(),
+  now: () => number = defaultNow,
 ) {
-  const ref = useRef<{ key: string; timer: ItemTimer } | null>(null);
-  if (ref.current?.key !== itemKey) {
+  // One timer per item: a new key is a new clock (created and started in the memo, which is pure
+  // enough: it holds no state of the page, only a clock reading).
+  const timer = useMemo(() => {
     const t = new ItemTimer(drill, factor, now);
     t.start();
-    ref.current = { key: itemKey, timer: t };
-  }
-  const timer = ref.current.timer;
-  timer.setFactor(factor);
+    return t;
+    // `factor` is applied below, so changing it keeps the time already spent.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [itemKey, drill, now]);
   const [, setBeat] = useState(0);
   const say = useRef(announce);
-  say.current = announce;
+  useEffect(() => {
+    say.current = announce;
+    timer.setFactor(factor);
+  });
   useEffect(() => {
     if (factor === null) return;
     const id = window.setInterval(() => {

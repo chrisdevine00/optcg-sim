@@ -25,9 +25,14 @@ export const itemCardIds = (record: SessionRecord): string[] => cardIdsOf(record
 export function puzzleOf(entry: DrillEntry, turn: number): PuzzleConfig {
   const item = entry.item as BoardItem;
   const base = { turn, submitLabel: SUBMIT_LABEL };
-  if (item.drill === 'lethal') return { ...base, judge: entry.judge ?? 'win-this-turn', ...expectOf(entry) };
+  if (item.drill === 'lethal')
+    return { ...base, judge: entry.judge ?? 'win-this-turn', ...expectOf(entry) };
   if (item.drill === 'counter') {
-    const judge = entry.judge ?? ('judge' in item ? (item as { judge: 'survive-turn' | 'no-counter-on-attack' }).judge : 'survive-turn');
+    const judge =
+      entry.judge ??
+      ('judge' in item
+        ? (item as { judge: 'survive-turn' | 'no-counter-on-attack' }).judge
+        : 'survive-turn');
     return { turn, judge };
   }
   // DON!!: the least DON!! any listed line leaves unused is the bar (`best` holds the lines that reach it).
@@ -71,4 +76,5 @@ export function materialise(
 }
 
 /** The "No lethal" button belongs to a lethal item whose answer is stored: a bank item. */
-export const hasNoLethal = (item: BoardItem): boolean => item.drill === 'lethal' && 'answer' in item;
+export const hasNoLethal = (item: BoardItem): boolean =>
+  item.drill === 'lethal' && 'answer' in item;
