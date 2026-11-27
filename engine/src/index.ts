@@ -38,6 +38,13 @@ export {
   type VerifyResult,
   type VerifyFailure,
 } from './record.ts';
+export {
+  scenarioOf,
+  NotExpressible,
+  NOT_EXPRESSIBLE_REASONS,
+  type NotExpressibleReason,
+  type ScenarioOver,
+} from './scenario-of.ts';
 export { InvalidSetup, validateDeck } from './setup.ts';
 export {
   deckErrors,

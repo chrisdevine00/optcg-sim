@@ -31,6 +31,7 @@
     "test:e2e": "playwright test",
     "cards:update": "tsx cards/scripts/update.ts",
     "meta:update": "tsx scripts/meta-update.ts",
+    "drills:bank": "tsx scripts/drill-bank.ts",
     "cards:measure": "tsx cards/scripts/measure-effects.ts",
     "cards:report": "tsx cards/scripts/coverage-report.ts",
     "cards:verify-meta": "tsx cards/scripts/verify-meta.ts",
