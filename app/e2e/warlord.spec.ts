@@ -115,14 +115,22 @@ test.describe('M5b: the Warlord and Emperor AIs', () => {
    * to test-results/ai-turns-*.jsonl, and the failure message says which number is which.
    */
   const TIMED = !!process.env.E2E_FULL;
-  const WARLORD_THINK_MS = 2700; // 1,800 x 1.5 (iteration budgets)
+  /**
+   * On iteration budgets (`aibudget=iterations`) the worker does a fixed amount of search, so its
+   * wait in milliseconds is the runner's speed, not the product: the nightly runner read 4.5 s
+   * (Warlord) and 11.3 s (Emperor) for the same work this Mac does in 2 s. Those waits are reported,
+   * not asserted (testing.md: no wall-clock bound on a quantity the runner sets). The product's wait
+   * is asserted where the product's millisecond budgets run (WARLORD_WAIT_MS below, and the Emperor
+   * figures in that test). The board's own animation and holds are still asserted in every run.
+   */
+  const WARLORD_THINK_MS = null;
   /** Millisecond budgets, nightly (M10-R3): a typical turn 8,000 x 1.5; the wait 4.3 s measured plus headroom. */
   const WARLORD_TURN_MS = 12_000;
   const WARLORD_WAIT_MS = 6000;
-  const EMPEROR_THINK_MS = 7500; // 5,000 x 1.5
+  const EMPEROR_THINK_MS = null; // iteration budgets: reported, see WARLORD_THINK_MS
   function checkTurns(
     turns: Awaited<ReturnType<typeof aiTurns>>,
-    o: { heavyMs: number; thinkMs: number },
+    o: { heavyMs: number; thinkMs: number | null },
   ) {
     if (!TIMED) return;
     for (const t of turns) {
@@ -131,6 +139,12 @@ test.describe('M5b: the Warlord and Emperor AIs', () => {
         t.ms - t.thinkMs,
         `turn ${t.turn}: animation and holds (${t.ms} ms in all, ${t.moves} moves; bound ${limit})`,
       ).toBeLessThanOrEqual(limit);
+      if (o.thinkMs === null) {
+        console.log(
+          `turn ${t.turn}: waited ${t.thinkMs} ms on the worker (iteration budget; reported)`,
+        );
+        continue;
+      }
       expect(
         t.thinkMs,
         `turn ${t.turn}: waiting on the worker (${t.thinkMs} ms; product figure x1.5 = ${o.thinkMs})`,
