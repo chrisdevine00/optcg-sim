@@ -1,5 +1,5 @@
 /**
- * M10 WP0: the document head and the boot line (WP6 extends this file with the checks that the icon,
+ * M10 WP0: the document head and the first frame (WP6 extends this file with the checks that the icon,
  * apple-touch-icon and manifest links resolve). The first frame before React mounts is painted from
  * two values the inline style copies from tokens.css; this keeps them equal. Revert: change either
  * value in index.html or tokens.css and the match test fails.
@@ -34,8 +34,9 @@ describe('index.html head', () => {
     expect(html).toContain('property="og:description"');
     expect(html).toMatch(/<noscript>[^<]+<\/noscript>/);
   });
-  it('puts one boot line in #root', () => {
-    expect(html).toMatch(/<div id="root"><p class="boot"[^>]*>Loading OPTCG Sim…<\/p><\/div>/);
+  it('leaves #root empty: no boot line (M10 WP1: it only moved LCP later; the inline background is the first frame)', () => {
+    expect(html).toContain('<div id="root"></div>');
+    expect(html).not.toContain('Loading OPTCG Sim');
   });
   it('paints the first frame from the tokens: inline background and text equal --color-bg and --color-text', () => {
     const style = /<style>([\s\S]*?)<\/style>/.exec(html)?.[1] ?? '';

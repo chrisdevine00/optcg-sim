@@ -8,6 +8,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { readLethalProgress } from '../play/coach/profile.ts';
 import { getStore } from '../store/index.ts';
 import { settleStore } from '../store/open.ts';
+import { useStoreReady } from '../store/ready.ts';
 import type { StoredReview } from '../store/types.ts';
 import { lessonCredit } from '../tutorial/progress.ts';
 import type { DeriveInput, LethalEntry } from './derive.ts';
@@ -31,8 +32,11 @@ const EMPTY: DeriveInput = {
 export function useProgressData(): ProgressData {
   const [state, setState] = useState<{ input: DeriveInput; lethal: LethalEntry[] } | null>(null);
   const [tick, setTick] = useState(0);
+  // The Learn hub paints before the store is open; its progress card reads once the store is ready.
+  const storeReady = useStoreReady();
   const reload = useCallback(() => setTick((n) => n + 1), []);
   useEffect(() => {
+    if (!storeReady) return;
     let alive = true;
     void (async () => {
       let games: DeriveInput['games'];
@@ -68,7 +72,7 @@ export function useProgressData(): ProgressData {
     return () => {
       alive = false;
     };
-  }, [tick]);
+  }, [tick, storeReady]);
   return useMemo(
     () => ({
       input: state?.input ?? EMPTY,

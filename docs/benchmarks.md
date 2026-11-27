@@ -279,3 +279,19 @@ On this Mac every frame of the turn is on the 60 Hz tick at 4× (the requirement
 2. **The one measurable regression is Best practices 96**, from three icon links whose files WP6 adds.
 3. **Initial JS grew 0.8 KB** (84.3 against 83.5) through chunk splitting, not code; WP2 should pin `react/jsx-runtime` into the entry chunk or accept 84.3 as the new reference before it lowers the cap.
 4. **The frame requirement is met by the AI-turn smoke at 4×;** the other three scenarios are unmeasured, so WP3 keeps its hours until they are.
+
+## M10 WP1 (2026-11-27): first paint with the store off the critical path
+
+Same machine, throttle and command as the M10 baseline (`npm run perf:lighthouse -- --runs 3 --routes home,cards,play`, Apple M4 Pro, Lighthouse 13.6.0, Chromium 156, simulated 4x CPU, 10 Mbit/s, 40 ms RTT; load average 4 to 7 at each start). Median of 3, run-to-run range under 1 ms in LCP and none in score. **Compare LCP, not FCP** (FCP is 203 ms in every row).
+
+| Build | `/` LCP | `/cards` LCP | `/play` LCP | `/play` perf | `/play` transfer KB |
+| --- | --- | --- | --- | --- | --- |
+| Before (WP0: `await initStore()`, boot line) | 441 | 544 | 684 | 100 | 302 |
+| WP1, boot line kept | 441 | 541 | 739 | 99 | 386 |
+| **WP1, boot line removed (shipped)** | **203** | **203** | 742 | 99 | 386 |
+
+- **The boot line costs LCP and buys nothing now**: with React rendering at once, removing it brings Home and Cards LCP from 441 and 541 ms to 203 ms (performance stays 100, accessibility 100). It is gone from `index.html`; the inline background stays.
+- **Home and Cards no longer wait for the database.** Their first render is not behind `initStore` (the measurable effect needs a slow database: the e2e holds the open request and Home, Cards and the Play gate all paint; see `app/e2e/first-paint.spec.ts`). A fast IndexedDB shows no LCP change on Home or Cards beyond the boot-line effect above.
+- **`/play` moved 684 to 742 ms and 302 to 386 KB** (performance 100 to 99). Not slower work: the page now paints its heading at once, so the two variable fonts (84 KB woff2, `Inter` 48 KB and `Fraunces` 37 KB) are requested and counted in the Lighthouse window where before the first paint came after them; the LCP element is the Setup heading after the lazy Play chunk, which now starts one store-open after render. WP2's font work is where this goes.
+- **Time to a playable board at 4x CPU with IndexedDB released 2 s late** (`/play?scenario=late&opp=pirate&speed=step&start=1`, 720p, 3 runs): **2961, 2967, 2967 ms**: the 2 s wait plus about 0.96 s (Play chunk, setup, first decision). Target 3000 ms; asserted at 4500 ms in the perf workflow only (`PERF=1 PERF_ASSERT=1`).
+- **Initial JS** 84.8 KB gzip in 2 files (84.3 at the baseline): `store/ready.ts` and the gate.

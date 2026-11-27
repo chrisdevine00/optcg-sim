@@ -48,12 +48,12 @@ describe('M10 wiring in App.tsx', () => {
 });
 
 describe('the shared pieces', () => {
-  it('export a StoreGate and an ErrorBoundary that render their children until WP1 and WP6', () => {
+  it('export a StoreGate and an ErrorBoundary that render their children (the gate for a path that needs no store; WP1 fills the rest, WP6 the boundary)', () => {
     expect(typeof StoreGate).toBe('function');
     const inner = createElement('p', null, 'page body');
-    expect(renderToStaticMarkup(createElement(StoreGate, { path: '/play', children: inner }))).toBe(
-      '<p>page body</p>',
-    );
+    expect(
+      renderToStaticMarkup(createElement(StoreGate, { path: '/cards', children: inner })),
+    ).toBe('<p>page body</p>');
     expect(
       renderToStaticMarkup(createElement(ErrorBoundary, { scope: 'x', children: inner })),
     ).toBe('<p>page body</p>');
