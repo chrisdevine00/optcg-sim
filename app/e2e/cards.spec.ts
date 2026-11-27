@@ -451,8 +451,8 @@ test.describe('card browser', () => {
       const after = Number((await status(page).innerText()).match(/^(\d+)/)![1]);
       expect(after).toBeLessThan(before);
       expect(after).toBeGreaterThan(0);
-      await expect(cov).toContainText(`of ${before} cards here play fully`);
-      await expect(cov).toContainText(`${after} of ${before} cards here play fully`);
+      // With "Automated only" on the readout says what the list shows (M10 WP7).
+      await expect(cov).toContainText(`${after} automated of ${before} cards`);
       await page.screenshot({ path: `.cache/m4b/browser-automated-only-${w}x${h}.png` });
       await expectNoAxeViolations(page);
 

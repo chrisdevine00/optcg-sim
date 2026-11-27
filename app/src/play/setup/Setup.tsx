@@ -7,7 +7,6 @@
 import { useEffect, useState } from 'react';
 import type { Card } from '@optcg/cards';
 import type { Speed } from '../game/controller.ts';
-import { deckErrors } from '@optcg/engine';
 import { Link } from '../../router.tsx';
 import {
   ARCHETYPES,
@@ -16,7 +15,7 @@ import {
   deckFormat,
   DECKS,
   deckByLeader,
-  loadCards,
+  loadCardsReport,
   SAVED,
   savedOptions,
   TUTORIAL,
@@ -24,6 +23,7 @@ import {
 } from './decks.ts';
 import { TUTORIAL_DECK_IDS } from '../../tutorial/decks.ts';
 import { SCENARIOS } from './scenarios.ts';
+import { checkSetupDeck, unavailableText } from './check.ts';
 
 /**
  * Turn-time copy (review M5a-21). It must match docs/benchmarks.md "Pacing"; `app/test/setup-copy.test.ts`
@@ -131,38 +131,50 @@ export function Setup({
   const [deckCards, setDeckCards] = useState<ReadonlyMap<string, Card>>(new Map());
   /** The pair of decks whose cards are loaded (Start waits for it; review M6-4). */
   const [readyFor, setReadyFor] = useState('');
+  /** Cards whose set could not be fetched: "Card unavailable" with a retry, never "Unknown card" (review N-4). */
+  const [unavailable, setUnavailable] = useState<ReadonlySet<string>>(new Set());
+  const [attempt, setAttempt] = useState(0);
   useEffect(() => {
     let live = true;
     const ids = [myDeck, theirDeck].flatMap((id) => {
       const d = deckById(id);
       return d ? [d.spec.leader, ...d.spec.main] : [];
     });
-    loadCards(ids).then(
-      (m) => {
+    loadCardsReport(ids).then(
+      (r) => {
         if (!live) return;
-        setDeckCards(m);
+        setDeckCards(r.cards);
+        setUnavailable(r.unavailable);
         setReadyFor(`${myDeck}|${theirDeck}`);
       },
-      () => live && setReadyFor(`${myDeck}|${theirDeck}`),
+      () => {
+        if (!live) return;
+        setUnavailable(new Set(ids));
+        setReadyFor(`${myDeck}|${theirDeck}`);
+      },
     );
     return () => {
       live = false;
     };
-  }, [myDeck, theirDeck]);
+  }, [myDeck, theirDeck, attempt]);
 
   // One validation source with the builder and game start (flows F3a step 2, F17 step 7). Once the
   // cards are loaded, a card the data does not know is "Unknown card" here too (review M6-4).
   const cardsReady = readyFor === `${myDeck}|${theirDeck}`;
-  const problems = (['mine', 'theirs'] as const).flatMap((seat) => {
+  const checks = (['mine', 'theirs'] as const).map((seat) => {
     const id = seat === 'mine' ? myDeck : theirDeck;
     const d = deckById(id);
-    if (!d) return [{ seat, text: 'This deck was not found (deleted in another tab?).' }];
-    if (!cardsReady) return [];
-    return deckErrors(d.spec, (c) => deckCards.get(c), deckFormat(id)).map((e) => ({
-      seat,
-      text: e.message,
-    }));
+    if (!d)
+      return {
+        seat,
+        unavailable: [],
+        problems: ['This deck was not found (deleted in another tab?).'],
+      };
+    if (!cardsReady) return { seat, unavailable: [], problems: [] };
+    return { seat, ...checkSetupDeck(d.spec, deckCards, unavailable, deckFormat(id)) };
   });
+  const problems = checks.flatMap((c) => c.problems.map((text) => ({ seat: c.seat, text })));
+  const cantLoad = checks.some((c) => c.unavailable.length > 0);
 
   const choice = (): SetupChoice => ({
     myDeck,
@@ -205,7 +217,9 @@ export function Setup({
         {[myDeck, theirDeck].map((id, i) => {
           const d = deckById(id);
           const seat = hot ? `${names[i]}’s deck` : i === 0 ? 'Your deck' : 'The AI’s deck';
-          return d && [d.spec.leader, ...d.spec.main].every((c) => deckCards.has(c)) ? (
+          // Beside an invalid deck the line would read as approval: the deck's own problems stand alone (review N-4).
+          const clean = checks[i]!.problems.length === 0 && checks[i]!.unavailable.length === 0;
+          return clean && d && [d.spec.leader, ...d.spec.main].every((c) => deckCards.has(c)) ? (
             <li key={i}>{automationLine(d, seat, deckCards)}</li>
           ) : null;
         })}
@@ -223,6 +237,8 @@ export function Setup({
           value={myDeck}
           onChange={setMyDeck}
           problems={problems.filter((p) => p.seat === 'mine').map((p) => p.text)}
+          unavailable={checks[0]!.unavailable}
+          onRetry={() => setAttempt((n) => n + 1)}
         />
         <fieldset className="setup-col">
           <legend>Opponent</legend>
@@ -329,6 +345,8 @@ export function Setup({
             value={theirDeck}
             onChange={setTheirDeck}
             problems={problems.filter((p) => p.seat === 'theirs').map((p) => p.text)}
+            unavailable={checks[1]!.unavailable}
+            onRetry={() => setAttempt((n) => n + 1)}
             compact
           />
         </fieldset>
@@ -397,6 +415,11 @@ export function Setup({
               : {problems.length} problem{problems.length === 1 ? '' : 's'}, listed under the deck.
             </p>
           )}
+          {cantLoad && problems.length === 0 && (
+            <p className="notice warning-notice" role="alert" data-testid="cards-unavailable">
+              Start is off until the card data loads: use Retry under the deck.
+            </p>
+          )}
           {error && (
             <p className="notice warning-notice" role="alert">
               Couldn’t start the game: {error}
@@ -406,7 +429,7 @@ export function Setup({
             type="submit"
             className="btn primary big start"
             aria-busy={loading}
-            disabled={loading || !cardsReady || problems.length > 0}
+            disabled={loading || !cardsReady || problems.length > 0 || cantLoad}
           >
             {loading || !cardsReady ? 'Loading cards…' : 'Start game'}
           </button>
@@ -422,6 +445,8 @@ function DeckPicker({
   value,
   onChange,
   problems,
+  unavailable = [],
+  onRetry,
   compact = false,
 }: {
   legend: string;
@@ -430,6 +455,9 @@ function DeckPicker({
   onChange: (id: string) => void;
   /** This deck's check failures, shown under the picker (review M6-8). */
   problems: string[];
+  /** Cards whose data could not be loaded (a network failure), with a retry. */
+  unavailable?: string[];
+  onRetry?: () => void;
   compact?: boolean;
 }) {
   const saved = savedOptions();
@@ -497,6 +525,19 @@ function DeckPicker({
           </a>
         )}
       </p>
+      {unavailable.length > 0 && (
+        <div className="deck-problems" data-testid={`deck-unavailable-${name}`}>
+          <p>The card data for this deck did not load.</p>
+          <ul>
+            {unavailableText(unavailable).map((t) => (
+              <li key={t}>{t}</li>
+            ))}
+          </ul>
+          <button type="button" className="btn small" onClick={onRetry}>
+            Retry
+          </button>
+        </div>
+      )}
       {problems.length > 0 && (
         <div className="deck-problems" data-testid={`deck-problems-${name}`}>
           <p>

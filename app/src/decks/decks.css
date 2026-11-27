@@ -405,7 +405,24 @@
   color: var(--color-danger-text);
 }
 /* The pane's skip link sits below the header: hide it fully until focused. */
+.builder-deck {
+  position: relative;
+}
+.builder-deck .skip-link:not(:focus),
 .builder-browse .skip-link:not(:focus) {
   clip-path: inset(50%);
   top: var(--space-2);
+}
+
+.import-skipped {
+  list-style: none;
+  margin: 0 0 var(--space-2);
+  padding: 0;
+}
+.import-skipped li {
+  padding: var(--space-1) 0;
+}
+.builder-keys {
+  flex-basis: 100%;
+  margin: 0;
 }

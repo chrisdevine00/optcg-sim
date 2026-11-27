@@ -23,6 +23,7 @@ import { Link, navigate, usePath } from '../router.tsx';
 import { useAllCards } from './allCards.ts';
 import { ExportDialog } from './ExportDialog.tsx';
 import { ImportDialog } from './ImportDialog.tsx';
+import { cycleArt, isGridKey, moveFocus } from './keys.ts';
 import {
   addCopy,
   blocking,
@@ -53,6 +54,18 @@ const setIndex = new Map(manifest.sets.map((s, i) => [s.code, i]));
 const setOrder = (code: string) => setIndex.get(code) ?? 999;
 const PAGE = 60;
 const COSTS: CostFilter[] = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10+'];
+
+/** The builder's shortcut sheet (accessibility §3.15: single keys act only while the grid or list has focus). */
+const BUILDER_KEYS: [string, string][] = [
+  ['/', 'Search the cards'],
+  ['← → ↑ ↓', 'Move between cards (grid) or rows (deck list); focus never wraps'],
+  ['Home / End', 'First / last card or row'],
+  ['Enter or +', 'Add one copy of the focused card'],
+  ['Backspace or −', 'Remove one copy'],
+  ['A', 'Show the next art of the focused card, if it has one'],
+  ['↓ in the search box', 'Go to the results'],
+  ['Escape', 'Back to the search box (from the grid)'],
+];
 
 export const deckPath = (id: string) => `/decks/${id.replace(/^saved:/, '')}`;
 
@@ -190,7 +203,7 @@ interface BrowserFilters {
   automatedOnly: boolean;
 }
 
-function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) {
+export function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) {
   const lookup = (x: string) => cards.get(x);
   const leader = deck.leader ? cards.get(deck.leader) : undefined;
   const [f, setF] = useState<BrowserFilters>({
@@ -210,6 +223,11 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
   const importBtn = useRef<HTMLButtonElement>(null);
   const exportBtn = useRef<HTMLButtonElement>(null);
   const [draft, setDraft] = useState('');
+  // The two composite widgets: one tab stop each, the active item moves with the arrow keys.
+  const [gridIdx, setGridIdx] = useState(0);
+  const [deckIdx, setDeckIdx] = useState(0);
+  const gridRef = useRef<HTMLUListElement>(null);
+  const deckRef = useRef<HTMLDivElement>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const deleteBtn = useRef<HTMLButtonElement>(null);
   const confirmBtn = useRef<HTMLButtonElement>(null);
@@ -222,6 +240,7 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
   const patch = (p: Partial<BrowserFilters>) => {
     setF((x) => ({ ...x, ...p }));
     setShown(PAGE);
+    setGridIdx(0);
   };
 
   const issues = useMemo(() => issuesOf(deck, lookup), [deck, cards]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -262,13 +281,40 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
     update(next);
     setSaid(changeLine('Added', c, c.id, next));
   };
-  const remove = (cid: string, fromList = false) => {
+  const remove = (cid: string, fromList: boolean | number = false) => {
     if (countOf(deck.main, cid) === 0) return;
     const next = removeCopy(deck, cid);
     update(next);
     setSaid(changeLine('Removed', cards.get(cid), cid, next));
-    // The last copy's row leaves the deck list: focus its heading, not the page.
-    if (fromList && countOf(next.main, cid) === 0) focusSoon(() => listTitle.current);
+    if (fromList !== false && countOf(next.main, cid) === 0) {
+      // The last copy's row leaves the deck list. From the keyboard (a row index): the row now at
+      // that place, or the one before it. From a click: the list heading, not the page.
+      if (typeof fromList === 'number') {
+        const left = new Set(next.main).size;
+        if (left === 0) focusSoon(() => listTitle.current);
+        else {
+          const at = Math.min(fromList, left - 1);
+          setDeckIdx(at);
+          focusSoon(() => deckRows()[at] ?? listTitle.current);
+        }
+      } else focusSoon(() => listTitle.current);
+    }
+  };
+  const deckRows = () => [
+    ...(deckRef.current?.querySelectorAll<HTMLElement>('li[data-deckrow]') ?? []),
+  ];
+  const gridTiles = () => [
+    ...(gridRef.current?.querySelectorAll<HTMLElement>(':scope > li') ?? []),
+  ];
+  const focusTile = (i: number) => {
+    setGridIdx(i);
+    gridTiles()[i]?.focus();
+  };
+  const cycle = (c: Card) => {
+    const r = cycleArt(deck, c);
+    if (!r) return setSaid(`${c.name} has no other art.`);
+    update(r.deck);
+    setSaid(r.line);
   };
   const chooseLeader = (c: Card) => {
     update({ ...deck, leader: c.id });
@@ -298,14 +344,70 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  const tileKeys = (e: KeyboardEvent, c: Card) => {
-    if (!leader) return;
-    if (e.key === '+' || e.key === '=') {
+  /** Columns in the grid now: the tiles that share the first tile's row (it reflows with the width). */
+  const gridCols = () => {
+    const t = gridTiles();
+    if (t.length === 0) return 1;
+    return Math.max(1, t.filter((x) => x.offsetTop === t[0]!.offsetTop).length);
+  };
+  const shownCards = results.slice(0, shown);
+  const activeTile = Math.min(gridIdx, Math.max(0, shownCards.length - 1));
+  /**
+   * One tab stop for the card grid (review M6-3). Arrows, Home and End move between tiles; Enter or
+   * + adds a copy; Backspace or − removes one; A cycles the art; Escape goes back to the search box.
+   * Single keys act only on the tile itself (accessibility §3.15); +/− also work from its buttons.
+   */
+  const tileKeys = (e: KeyboardEvent, c: Card, i: number) => {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    const onTile = e.target === e.currentTarget;
+    if (onTile && isGridKey(e.key)) {
+      e.preventDefault();
+      focusTile(moveFocus(i, e.key, gridCols(), shownCards.length));
+    } else if (onTile && e.key === 'Escape') {
+      e.preventDefault();
+      search.current?.focus();
+    } else if (!leader) {
+      if (onTile && e.key === 'Enter') {
+        e.preventDefault();
+        chooseLeader(c);
+      }
+    } else if (e.key === '+' || e.key === '=' || (onTile && e.key === 'Enter')) {
       e.preventDefault();
       add(c);
-    } else if (e.key === '-' || e.key === '_') {
+    } else if (e.key === '-' || e.key === '_' || (onTile && e.key === 'Backspace')) {
       e.preventDefault();
       remove(c.id);
+    } else if (onTile && (e.key === 'a' || e.key === 'A')) {
+      e.preventDefault();
+      cycle(c);
+    }
+  };
+  /** The deck list's rows, flattened in reading order, for its one tab stop. */
+  const flatRows = groups.flatMap((g) => g.rows);
+  const activeRow = Math.min(deckIdx, Math.max(0, flatRows.length - 1));
+  const rowKeys = (e: KeyboardEvent, r: (typeof flatRows)[number], i: number) => {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    const onRow = e.target === e.currentTarget;
+    if (
+      onRow &&
+      (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'Home' || e.key === 'End')
+    ) {
+      e.preventDefault();
+      const to = moveFocus(i, e.key, 1, flatRows.length);
+      setDeckIdx(to);
+      deckRows()[to]?.focus();
+    } else if (onRow && e.key === 'Escape') {
+      e.preventDefault();
+      listTitle.current?.focus();
+    } else if (e.key === '+' || e.key === '=' || (onRow && e.key === 'Enter')) {
+      e.preventDefault();
+      if (r.card) add(r.card);
+    } else if (e.key === '-' || e.key === '_' || (onRow && e.key === 'Backspace')) {
+      e.preventDefault();
+      remove(r.id, i);
+    } else if (onRow && (e.key === 'a' || e.key === 'A') && r.card) {
+      e.preventDefault();
+      cycle(r.card);
     }
   };
 
@@ -320,18 +422,8 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
 
   return (
     <main className="builder" id="main">
+      <h1 className="sr-only">Deck builder</h1>
       <section className="builder-browse" aria-label="Card browser">
-        <a
-          className="skip-link"
-          href="#deck-name"
-          onClick={(e) => {
-            // Past the card grid's controls to the deck (review M6-2: 67 Tab stops otherwise).
-            e.preventDefault();
-            document.getElementById('deck-name')?.focus();
-          }}
-        >
-          Skip to the deck
-        </a>
         <div className="builder-search">
           <label className="sr-only" htmlFor="deck-search">
             Search cards
@@ -344,6 +436,13 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
             placeholder="Search name, ID, type or text   /"
             value={f.query}
             onChange={(e) => patch({ query: e.target.value })}
+            onKeyDown={(e) => {
+              // Down goes from the search box straight to the results, past the filters.
+              if (e.key === 'ArrowDown' && shownCards.length > 0) {
+                e.preventDefault();
+                focusTile(activeTile);
+              }
+            }}
           />
           <span className="muted small" role="status">
             {results.length} result{results.length === 1 ? '' : 's'}
@@ -405,15 +504,44 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
           </Toggle>
         </div>
         <div className="builder-scroll">
-          <ul className="builder-grid" aria-label={leader ? 'Cards' : 'Leaders'}>
-            {results.slice(0, shown).map((c) => {
+          <a
+            className="skip-link"
+            href="#deck-name"
+            onClick={(e) => {
+              // Past the card grid to the deck (review M6-2, M6-3, N-2).
+              e.preventDefault();
+              document.getElementById('deck-name')?.focus();
+            }}
+          >
+            Skip to the deck
+          </a>
+          <p id="grid-keys" className="sr-only">
+            Arrow keys move between cards. Enter or plus adds a copy, Backspace or minus removes
+            one, A changes the art, Escape returns to search.
+          </p>
+          <ul
+            ref={gridRef}
+            className="builder-grid"
+            aria-label={leader ? 'Cards' : 'Leaders'}
+            aria-describedby="grid-keys"
+          >
+            {shownCards.map((c, i) => {
               const n = countOf(deck.main, c.id);
               const over = n > MAX_COPIES;
               return (
                 <li
                   key={c.id}
                   className={`btile${n ? ' in-deck' : ''}${flagged.has(c.id) ? ' bad' : ''}`}
-                  onKeyDown={(e) => tileKeys(e, c)}
+                  // One tab stop: the active tile is in the order, the rest are reached by arrows.
+                  tabIndex={i === activeTile ? 0 : -1}
+                  aria-label={
+                    leader
+                      ? `${c.name} ${c.id}, ${n} of ${MAX_COPIES} in the deck`
+                      : `${c.name} ${c.id}, Leader`
+                  }
+                  data-tile={i}
+                  onFocus={() => setGridIdx(i)}
+                  onKeyDown={(e) => tileKeys(e, c, i)}
                 >
                   <span className="btile-face" title={`${c.name} ${c.id}`}>
                     <CardFace card={c} artwork={artworkFor(c, deck)} tile />
@@ -425,7 +553,9 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
                         type="button"
                         className="iconbtn"
                         aria-label={`Remove one ${c.name} ${c.id}`}
-                        // Not `disabled`: a disabled button drops keyboard focus (review M6-2).
+                        // The keys on the tile do this; the buttons are for the pointer, out of the
+                        // tab order (review M6-3, N-2). Not `disabled`: it would drop focus (M6-2).
+                        tabIndex={-1}
                         aria-disabled={n === 0 ? true : undefined}
                         onClick={() => remove(c.id)}
                       >
@@ -439,6 +569,7 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
                         type="button"
                         className="iconbtn"
                         aria-label={`Add one ${c.name} ${c.id}`}
+                        tabIndex={-1}
                         onClick={() => add(c)}
                       >
                         +
@@ -448,6 +579,7 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
                     <button
                       type="button"
                       className="btn small"
+                      tabIndex={-1}
                       aria-label={`Choose ${c.name} ${c.id} as Leader`}
                       onClick={() => chooseLeader(c)}
                     >
@@ -471,6 +603,17 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
       </section>
 
       <section className="builder-deck" aria-label="Deck">
+        <a
+          className="skip-link"
+          href="#grid"
+          onClick={(e) => {
+            // And back: from the deck to the card grid (review N-2).
+            e.preventDefault();
+            (gridTiles()[activeTile] ?? search.current)?.focus();
+          }}
+        >
+          Skip to the card grid
+        </a>
         <div className="builder-deck-head">
           <label className="sr-only" htmlFor="deck-name">
             Deck name
@@ -585,7 +728,7 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
             {error}
           </p>
         )}
-        <div className="builder-deck-scroll">
+        <div className="builder-deck-scroll" ref={deckRef}>
           {leader && (
             <ul className="checks" aria-label="Deck checks">
               {rows.map((r) => (
@@ -627,37 +770,54 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
           <h2 className="deck-list-title" ref={listTitle} tabIndex={-1}>
             Deck list · {deck.main.length} cards
           </h2>
+          <p id="deck-keys" className="sr-only">
+            Arrow keys move between rows. Enter or plus adds a copy, Backspace or minus removes one,
+            A changes the art.
+          </p>
           {groups.map((g) => (
             <section key={g.label} className="deck-group" aria-label={g.label}>
               <h3>{g.label}</h3>
-              <ul>
-                {g.rows.map((r) => (
-                  <li key={r.id} className={flagged.has(r.id) ? 'bad' : ''}>
-                    <span className="num deck-n">{r.count}</span>
-                    <span className="deck-row-name">
-                      {r.card?.name ?? r.id} <span className="subtle num small">{r.id}</span>
-                      {r.count > MAX_COPIES && <strong className="danger small"> · max 4</strong>}
-                    </span>
-                    <ArtSwitch card={r.card} deck={deck} onChange={update} />
-                    <button
-                      type="button"
-                      className="iconbtn"
-                      aria-label={`Remove one ${r.card?.name ?? r.id}`}
-                      onClick={() => remove(r.id, true)}
+              <ul aria-describedby="deck-keys">
+                {g.rows.map((r) => {
+                  const i = flatRows.indexOf(r);
+                  return (
+                    <li
+                      key={r.id}
+                      className={flagged.has(r.id) ? 'bad' : ''}
+                      data-deckrow={i}
+                      tabIndex={i === activeRow ? 0 : -1}
+                      aria-label={`${r.card?.name ?? r.id} ${r.id}, ${r.count} ${r.count === 1 ? 'copy' : 'copies'}`}
+                      onFocus={() => setDeckIdx(i)}
+                      onKeyDown={(e) => rowKeys(e, r, i)}
                     >
-                      −
-                    </button>
-                    <button
-                      type="button"
-                      className="iconbtn"
-                      aria-label={`Add one ${r.card?.name ?? r.id}`}
-                      disabled={!r.card}
-                      onClick={() => r.card && add(r.card)}
-                    >
-                      +
-                    </button>
-                  </li>
-                ))}
+                      <span className="num deck-n">{r.count}</span>
+                      <span className="deck-row-name">
+                        {r.card?.name ?? r.id} <span className="subtle num small">{r.id}</span>
+                        {r.count > MAX_COPIES && <strong className="danger small"> · max 4</strong>}
+                      </span>
+                      <ArtSwitch card={r.card} deck={deck} onChange={update} />
+                      <button
+                        type="button"
+                        className="iconbtn"
+                        tabIndex={-1}
+                        aria-label={`Remove one ${r.card?.name ?? r.id}`}
+                        onClick={() => remove(r.id, true)}
+                      >
+                        −
+                      </button>
+                      <button
+                        type="button"
+                        className="iconbtn"
+                        tabIndex={-1}
+                        aria-label={`Add one ${r.card?.name ?? r.id}`}
+                        disabled={!r.card}
+                        onClick={() => r.card && add(r.card)}
+                      >
+                        +
+                      </button>
+                    </li>
+                  );
+                })}
               </ul>
             </section>
           ))}
@@ -681,6 +841,22 @@ function Editor({ deck, cards }: { deck: SavedDeck; cards: Map<string, Card> }) 
             Play against this deck
           </Link>
           {playBlocker && <p className="danger small foot-why">{playBlocker}</p>}
+          {/* The builder's shortcut sheet: last in the order, so it adds no stop before the deck. */}
+          <details className="builder-keys">
+            <summary className="small">Keyboard shortcuts</summary>
+            <table className="tbl keys-table">
+              <tbody>
+                {BUILDER_KEYS.map(([k, d]) => (
+                  <tr key={k}>
+                    <th scope="row">
+                      <kbd>{k}</kbd>
+                    </th>
+                    <td>{d}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </details>
         </div>
       </section>
 
@@ -740,6 +916,7 @@ function ArtSwitch({
     <button
       type="button"
       className="btn small art-switch"
+      tabIndex={-1}
       aria-label={`Art ${cur + 1} of ${card.artworks.length} for ${card.name}: show the next`}
       onClick={() =>
         onChange({ ...deck, art: { ...deck.art, [card.id]: card.artworks[next]!.artworkId } })

@@ -593,7 +593,12 @@ export function Board(b: BoardProps) {
         data-zone="mid"
         style={rect(L.mid)}
       >
-        <button type="button" className="mid-left" {...item('mid', 1)}>
+        <button
+          type="button"
+          className="mid-left"
+          title={b.oppActivity || undefined}
+          {...item('mid', 1)}
+        >
           <span className="sr-only">{b.oppActivity || 'No opponent activity'}</span>
           <span className="vis" aria-hidden="true">
             {b.oppThinking && <span className="think-dot" aria-hidden="true" />}
