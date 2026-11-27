@@ -20,6 +20,7 @@ import { download, exportName, minutesWords, timingStore, toCsv, toJson } from '
 import { loadProgress, STEP_COUNT, TUTORIAL_LESSONS } from './progress.ts';
 import { TUTORIAL_ZONES, type TutorialZone } from './types.ts';
 import { CONTENT_META } from './copy.ts';
+import { RuleLink } from '../rules/RuleLink.tsx';
 import '../play/play.css';
 import './tutorial.css';
 
@@ -230,6 +231,17 @@ function useLit(runner: TutorialRunner, view: ProjectedView) {
   });
 }
 
+/** The step's rule as a link to the reference, which opens in a new tab so the step is not lost. */
+export function TutorialRule({ rule, onOpen }: { rule: string; onOpen?: () => void }) {
+  const cr = /^CR (\d[\d-]*)$/.exec(rule)?.[1];
+  if (!cr) return <>Rule: {rule}</>;
+  return (
+    <RuleLink cr={cr} onOpen={onOpen}>
+      Rule: {rule}
+    </RuleLink>
+  );
+}
+
 function StepCard({ runner, onLeave }: { runner: TutorialRunner; onLeave: () => void }) {
   useSyncExternalStore(runner.subscribe, runner.getVersion);
   // The numbers in the words come from the board, so the card follows the game too.
@@ -312,7 +324,11 @@ function StepCard({ runner, onLeave }: { runner: TutorialRunner; onLeave: () => 
           {runner.notice}
         </p>
       )}
-      {runner.rule() && <p className="tut-rule">Rule: {runner.rule()}</p>}
+      {runner.rule() && (
+        <p className="tut-rule">
+          <TutorialRule rule={runner.rule()} onOpen={() => runner.explained()} />
+        </p>
+      )}
       <div className="tut-actions">
         <button type="button" className="btn small" onClick={() => runner.readAgain()}>
           Read again

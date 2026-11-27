@@ -2,6 +2,13 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-26 — M9 WP5: the rules reference reads the two research files at runtime in a lazy chunk, and every demo is replayed on the engine
+
+- **Context:** WP5 builds `/rules`, `/rules/<id>`, "Show me" and the tutorial citation link from `rules-digest.md` (137 items) and `rulings.md`.
+- **Decision:** `data.ts` imports the three Markdown files as `?raw` and `loadRules()` imports it dynamically, so ~100 KB of text is a lazy chunk. Counts are asserted (137 digest items; **50 rulings**, not 52: RL-38 and RL-39 do not exist in the file). Digest item 73 is only an `[engine note]`, so it parses to empty text and is not listed (186 entries are shown). `[engine note]` clauses are cut to the end of their line. Route ids: `item/N`, `RL-NN`, `cr/x-y-z`; a CR number lists the entries citing it, falling back to what is inside it or to its parent rule. Search is a hand-written token index; the box is a real `combobox` (listbox, `aria-activedescendant`, Enter opens, Enter on a rule number jumps).
+- **Decision:** 24 demos, all kept; each is data (scenario, `line` of `ActionPattern`s, `expect`, optional `before`) and `app/test/rules-demos.test.ts` replays every one with `reduce`, mirroring the board (the player's forced windows auto-applied except a damage decision; each step must match exactly one legal action; the scripted opponent must choose what its steps say), checks `expect`, checks the board filter `allowFor` allows exactly the replayed action on each of the player's steps (and narrows the engine's list on step 1), and mutation-tests a changed number, an impossible step and an ambiguous step. `rules-showme.test.ts` plays all 24 through the real `GameController`. Additive contract changes: `ActionPattern.option`/`.don`, `DemoExpect` kind `legal` (with `afterStep`), `DemoZone` `donDeck`, `RuleDemo.before`, `RuleEntry.question`/`.confidenceNote`. Demo links use the demo id (`/rules/<demo-id>/show?back=<entry id>`) because several demos share a ruling.
+- **Rejected:** no automatic "read" credit and no Mark-as-read button (the progress store is WP6's; the done card links the lesson); the second player's turn-2 attack demo (the rules forbid it: RL-28, first battle is turn 3, so the demo shows that instead).
+
 ## 2026-11-26 — M9 WP0: contracts are types plus per-owner stub files, so parallel packages share no file
 
 - **Context:** WP1, WP2, WP3 and WP5 build in parallel from the WP0 contracts; the spec gave `bankFor` one home (`ai/src/search/drills/index.ts`) that WP2 and WP3 would both have to edit, and every new route needs a page.
