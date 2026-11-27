@@ -42,7 +42,6 @@ export function ItemBar({
         </b>
         {note && <span className="drill-note"> · {note}</span>}
       </p>
-      <TimerView drill={drill} timer={timer} factor={factor} onFactor={onFactor} />
       <div className="drill-bar-actions">
         <button type="button" className="btn small" onClick={onShow}>
           Show answer
@@ -55,6 +54,7 @@ export function ItemBar({
         </button>
         {children}
       </div>
+      <TimerView drill={drill} timer={timer} factor={factor} onFactor={onFactor} />
     </div>
   );
 }
