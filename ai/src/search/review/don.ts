@@ -15,6 +15,7 @@
  */
 import type { Card } from '@optcg/cards';
 import { legalActions, project, queries, type GameState, type PlayerId } from '@optcg/engine';
+import { candidateLines } from '../drills/lines.ts';
 import { donLedger, explainHeld, explainUnused, type DonLedger } from '../../coach/tempo.ts';
 import type { Evidence, Explanation, Move } from '../../explanation.ts';
 import { biggestCounter, counterValueOf, priorCardIds } from '../../knowledge.ts';
@@ -102,6 +103,20 @@ function stopOptions(stop: number, oppLeader: string, cards: ReadonlyMap<string,
 
 const eventValue = (id: string, cards: ReadonlyMap<string, Card>): number =>
   counterValueOf(cards.get(id));
+
+/** The fewest DON!! left unused by any candidate line from this Main, or null when none can be built. */
+function bestUnused(
+  main: GameState,
+  player: PlayerId,
+  cards: ReadonlyMap<string, Card>,
+): number | null {
+  try {
+    const lines = candidateLines(main, player, cards);
+    return lines.length === 0 ? null : Math.min(...lines.map((l) => l.unused));
+  } catch {
+    return null;
+  }
+}
 
 export const detect: Detector = (item, ctx): TurnResult | null => {
   const action = ctx.record.actions[item.index];
@@ -224,5 +239,11 @@ export const detect: Detector = (item, ctx): TurnResult | null => {
     explanation,
     did: didMoves(ctx, firstMain, item.index, player),
   };
+  // M9 WP7: Practice restores at the turn's first Main and asks for a line that leaves no more DON!!
+  // unused than the best of the drill's candidate lines (WP3). The flag says some of the `n` unused
+  // DON!! had a use, so the bar is at most `n - 1`: a candidate list that cannot beat the game does
+  // not make "End turn at once" a solution.
+  const unusedMin = Math.min(bestUnused(ctx.stateAt(firstMain), player, cards) ?? n - 1, n - 1);
+  flag.practice = { judge: 'don-ledger', turn, expect: { unusedMin } };
   return { itemId: item.id, turn, flags: [flag], notes: [] };
 };

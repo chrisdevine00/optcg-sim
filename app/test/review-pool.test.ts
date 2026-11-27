@@ -5,7 +5,8 @@
  */
 import { describe, expect, it } from 'vitest';
 import type { Card } from '@optcg/cards';
-import { chooseAction, ReviewJob, type ReviewRequest, type ReviewResponse } from '@optcg/ai';
+import { chooseAction, type ReviewRequest, type ReviewResponse } from '@optcg/ai';
+import { ReviewJob } from '@optcg/ai/review';
 import type { PlayerView, SearchView } from '@optcg/engine';
 import { GameController, type AiPort } from '../src/play/game/controller.ts';
 import { SCENARIOS } from '../src/play/setup/scenarios.ts';

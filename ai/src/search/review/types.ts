@@ -172,9 +172,18 @@ export type ReviewRequest =
   | { type: 'deeper'; itemIds: string[]; factor: number }
   /**
    * M9 (additive): "build a practice item from this flag" (`puzzleFromFlag`, WP2; wired by WP7).
-   * `record` and `cards` are set when no review job holds the record (a stored review, WP4 intake).
+   * `record` and `cards` are set when no review job holds the record (a stored review, WP4 intake);
+   * `flag` (WP7, additive) is the flag itself, which a stored review has but a job may not.
+   * `gameId` goes into the item's id and source.
    */
-  | { type: 'puzzle'; flagId: string; record?: ReviewRecord; cards?: Card[] };
+  | {
+      type: 'puzzle';
+      flagId: string;
+      record?: ReviewRecord;
+      cards?: Card[];
+      flag?: ReviewFlag;
+      gameId?: string;
+    };
 
 export type ReviewResponse =
   | { type: 'progress'; done: number; total: number; turn: number; turns: number }

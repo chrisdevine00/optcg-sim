@@ -30,6 +30,8 @@ export interface AnswerView {
   context: ExplanationContext;
   /** The guide's name for a sourced label. */
   archetype?: string;
+  /** An item that kept the game's real hand says so (M9 WP7): "Their real hand: one way to see it". */
+  handLabel?: string;
   /** Said once by the polite region. */
   spoken: string;
 }
@@ -60,7 +62,9 @@ export function answerFor(
   ): AnswerView => {
     const ok = d.kind !== 'shown' && correct;
     const title = titleOf(d, ok);
+    const real = 'hand' in item && (item as BoardItem).hand === 'real';
     return {
+      ...(real ? { handLabel: ai.certaintyLabel('needed-hidden-info', 'drill') } : {}),
       correct: ok,
       title,
       lines,

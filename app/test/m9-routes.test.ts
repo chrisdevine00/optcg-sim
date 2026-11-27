@@ -5,7 +5,8 @@
 import { createElement, type ReactNode } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import { bankFor, DRILL_IDS, MIN_BANK, type DrillId } from '@optcg/ai';
+import { DRILL_IDS, MIN_BANK, type DrillId } from '@optcg/ai';
+import { bankFor } from '@optcg/ai/drills';
 import { isCurrent, navItems } from '../src/Header.tsx';
 import { DRILL_LESSON, DRILL_NAMES, DRILL_SLUGS, isDrillId } from '../src/drills/types.ts';
 import { m9Route, ruleIdOf, type M9Page } from '../src/routes/m9.ts';

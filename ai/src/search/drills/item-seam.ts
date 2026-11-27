@@ -82,6 +82,19 @@ export const lethalHeaderOf = (item: BoardItem, cards: Cards): string =>
   lethalHeader(publicResultOf(item, cards));
 
 /**
+ * Above the Practice board of an any-hand flag (M9 WP7): their hand is `harderHand`, which the
+ * player is told in counts only ("3 cards, up to +2000 each"), read from their own view in `public`
+ * mode. An item that keeps the real hand (`hand: 'real'`) has no such sentence: it carries the
+ * "Their real hand: one way to see it" label instead.
+ */
+export function harderHandHeader(item: BoardItem, cards: Cards): string {
+  const f = publicResultOf(item, cards).facts;
+  return f.handSize === 0
+    ? 'They have no cards in their hand.'
+    : `Their hand is the strongest the guide allows: ${f.handSize} ${f.handSize === 1 ? 'card' : 'cards'}, up to +${f.maxPerCard} each.`;
+}
+
+/**
  * The answer's headline and text. A bank item has its stored answer (`judgeLethal`); an item cut from a
  * game is solved here: `proven` means a line wins against every hand, anything else is "no proof".
  */

@@ -46,6 +46,11 @@ export interface BoardItem extends ItemBase {
   prefix: Action[];
   /** `harder`: the opponent's hand is `harderHand` from the public prior; `real`: the recorded hand. */
   hand: 'harder' | 'real';
+  /**
+   * M9 WP7 (additive), items cut from a flag: what the board's judge compares with, in THIS item's
+   * instance ids (`puzzleFromFlag` maps the flag's record ids through the rebuilt scenario).
+   */
+  judgeExpect?: { target?: string; unusedMin?: number };
 }
 
 export interface LethalItem extends BoardItem {
@@ -89,6 +94,9 @@ export interface DrillBank {
 
 /** Every committed bank holds at least this many items (done criteria, PLAN §2). */
 export const MIN_BANK = 20;
+
+/** The vanilla card (no [Trigger], no script) that stands in for their hidden Life and deck in an item cut from a game: its data must be loaded with the game's. */
+export const PUZZLE_FILLER_CARD = 'OP01-081';
 
 /** One answered item, as the drill shell records it. */
 export interface AnswerResult {

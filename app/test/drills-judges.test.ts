@@ -6,10 +6,9 @@
  */
 import { describe, expect, it } from 'vitest';
 import type { Card } from '@optcg/cards';
+import { bankFor, recordOfItem } from '@optcg/ai/drills';
 import {
-  bankFor,
   chooseAction,
-  recordOfItem,
   type BoardItem,
   type CounterItem,
   type DonItem,

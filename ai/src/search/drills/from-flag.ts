@@ -81,6 +81,26 @@ function remap(a: Action, m: Map<InstanceId, InstanceId>): Action | null {
   return o as Action;
 }
 
+/**
+ * The flag's judge data in the item's own ids: a `target` is an instance id of the RECORD's state
+ * at the cut, and the rebuilt scenario numbers its cards afresh, so it goes through the position map.
+ */
+function expectOf(
+  flag: ReviewFlag,
+  map: Map<InstanceId, InstanceId>,
+): { judgeExpect: NonNullable<BoardItem['judgeExpect']> } | { judgeExpect?: undefined } | null {
+  const e = flag.practice?.expect;
+  if (!e) return {};
+  const out: NonNullable<BoardItem['judgeExpect']> = {};
+  if (e.unusedMin !== undefined) out.unusedMin = e.unusedMin;
+  if (e.target !== undefined) {
+    const t = map.get(e.target);
+    if (!t) return null;
+    out.target = t;
+  }
+  return { judgeExpect: out };
+}
+
 type BoardDrill = BoardItem['drill'];
 /** Mulligan flags are not boards: the mulligan trainer takes them. */
 const DRILL_OF: Record<ReviewFlag['kind'], BoardDrill | null> = {
@@ -150,9 +170,12 @@ export function puzzleFromFlag(
           life: { [opp]: life },
           deck: { [opp]: deck },
         });
-        createFromScenario({ ...scenario, cards: lookup });
+        const rebuilt = createFromScenario({ ...scenario, cards: lookup }).state;
+        const ex = expectOf(flag, positionMap(here, rebuilt));
+        if (!ex) return fail('This moment cannot be rebuilt as a puzzle.');
         return {
           ...head,
+          ...ex,
           first: firstOf(scenario),
           certainty: 'any-hand',
           label: 'any-hand',
@@ -184,8 +207,11 @@ export function puzzleFromFlag(
         s = reduce(s, b).state;
         prefix.push(b);
       }
+      const ex = expectOf(flag, map);
+      if (!ex) return fail('This moment cannot be rebuilt as a puzzle.');
       return {
         ...head,
+        ...ex,
         first: firstOf(scenario),
         certainty: 'needed-hidden-info',
         label: 'hindsight',

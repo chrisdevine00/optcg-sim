@@ -6,8 +6,16 @@
 import type { Card } from '@optcg/cards';
 import { queries, reduce, replay, type CardLookup, type GameState } from '@optcg/engine';
 import { CapReached, type Cap } from '../lethal/search.ts';
+import { puzzleFromFlag } from '../drills/from-flag.ts';
 import { runDetector } from './registry.ts';
-import type { DetectorContext, ReviewItem, ReviewRecord, TurnResult } from './types.ts';
+import type {
+  DetectorContext,
+  ReviewFlag,
+  ReviewItem,
+  ReviewRecord,
+  ReviewResponse,
+  TurnResult,
+} from './types.ts';
 
 export const CHECKPOINT_EVERY = 20;
 
@@ -104,4 +112,28 @@ export function runItem(item: ReviewItem, rc: RunContext, cap: Cap): TurnResult 
       },
     };
   }
+}
+
+/**
+ * The worker's answer to a `puzzle` message (M9 WP7): the flag as a board item (`puzzleFromFlag`), or
+ * `item: null` with a reason a screen can show. Never throws.
+ */
+export function puzzleResponse(
+  flagId: string,
+  flag: ReviewFlag | undefined,
+  record: ReviewRecord | undefined,
+  cards: ReadonlyMap<string, Card> | undefined,
+  gameId?: string,
+): Extract<ReviewResponse, { type: 'puzzle' }> {
+  if (!flag || !record || !cards)
+    return {
+      type: 'puzzle',
+      flagId,
+      item: null,
+      reason: 'This flag cannot be rebuilt as a puzzle.',
+    };
+  const out = puzzleFromFlag(record, flag, cards, gameId !== undefined ? { gameId } : {});
+  return 'item' in out
+    ? { type: 'puzzle', flagId, item: null, reason: out.reason }
+    : { type: 'puzzle', flagId, item: out };
 }

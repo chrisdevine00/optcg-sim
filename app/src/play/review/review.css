@@ -414,3 +414,14 @@ button.rv-tl-cell:hover {
   color: var(--color-text-muted);
   font-size: var(--text-sm);
 }
+
+/* M9 WP7: what a Practice board says of their hand (counts only) and the real-hand label. */
+.rv-practice-slot {
+  display: grid;
+  gap: var(--space-2);
+}
+.rv-practice-slot p {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-sm);
+}

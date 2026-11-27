@@ -66,7 +66,7 @@ describe('E11: a hand the Rocks guide redraws, kept', () => {
       decisionIndex: at,
       restoreIndex: at,
     });
-    expect(res!.flags[0]!.practice).toBeUndefined();
+    expect(res!.flags[0]!.practice).toEqual({ judge: 'mulligan', turn: 1 });
     expect(res!.flags[0]!.did).toEqual([{ kind: 'keep', text: 'Kept your hand.' }]);
   });
 

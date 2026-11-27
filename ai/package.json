@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
+    ".": "./src/app.ts",
+    "./drills": "./src/drills.ts",
+    "./review": "./src/review.ts",
     "./worker": "./src/worker.ts"
   },
   "dependencies": {

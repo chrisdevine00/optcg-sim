@@ -4,7 +4,8 @@
  */
 import { describe, expect, it } from 'vitest';
 import type { Card } from '@optcg/cards';
-import { bankFor, type BoardItem, type CounterItem, type ReviewFlag } from '@optcg/ai';
+import { bankFor } from '@optcg/ai/drills';
+import type { BoardItem, CounterItem, ReviewFlag } from '@optcg/ai';
 import {
   droppedNote,
   flagBank,

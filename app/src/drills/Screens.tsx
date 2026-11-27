@@ -59,6 +59,12 @@ export function AnswerScreen({
           {l}
         </p>
       ))}
+      {view.handLabel && (
+        <p className="drill-answer-line" data-testid="hand-label">
+          <span aria-hidden="true">◐ </span>
+          {view.handLabel}
+        </p>
+      )}
       {view.explanation ? (
         <ExplanationView
           ex={view.explanation}

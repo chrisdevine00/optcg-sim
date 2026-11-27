@@ -20,7 +20,7 @@ import type { Card } from '@optcg/cards';
 import type { CardLookup } from '@optcg/engine';
 import type { Cap } from '../lethal/search.ts';
 import { phaseOf, planReview, type Phase, type ReviewPlan } from './plan.ts';
-import { makeRunContext, runItem, type RunContext } from './run.ts';
+import { makeRunContext, puzzleResponse, runItem, type RunContext } from './run.ts';
 import type {
   FlagKind,
   ReviewItem,
@@ -243,13 +243,16 @@ export class ReviewJob {
       return;
     }
     if (req.type === 'puzzle') {
-      // M9 WP0 stub; WP7 wires `puzzleFromFlag` here.
-      this.post({
-        type: 'puzzle',
-        flagId: req.flagId,
-        item: null,
-        reason: 'Practice from this flag is not built yet',
-      });
+      // M9 WP7: the request's own record and cards (a stored review), else the running job's.
+      this.post(
+        puzzleResponse(
+          req.flagId,
+          req.flag,
+          req.record ?? this.rc?.record,
+          req.cards ? new Map(req.cards.map((c: Card) => [c.id, c] as const)) : this.rc?.cards,
+          req.gameId,
+        ),
+      );
       return;
     }
     if (!s) return;

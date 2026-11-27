@@ -4,7 +4,7 @@
  * The record holds the start (decks or a scenario) and who sat where, so a game opened from History
  * needs nothing from the live game that produced it.
  */
-import { priorCardIds } from '@optcg/ai';
+import { priorCardIds, PUZZLE_FILLER_CARD } from '@optcg/ai';
 import type { Card } from '@optcg/cards';
 import type { PlayerId } from '@optcg/engine';
 import type { SessionRecord } from '../../session/index.ts';
@@ -30,10 +30,13 @@ export function leadersOf(record: SessionRecord): Record<PlayerId, string> {
   };
 }
 
-/** Every card id a game needs: both lists, and the public priors the lethal checks read. */
+/**
+ * Every card id a game needs: both lists, the public priors the lethal checks read, and the filler
+ * card of a puzzle cut from the game (their hidden Life and deck are rebuilt from it, M9 WP7).
+ */
 export function cardIdsOf(record: SessionRecord): string[] {
   const st = record.start;
-  const ids = new Set<string>();
+  const ids = new Set<string>([PUZZLE_FILLER_CARD]);
   const leaders = leadersOf(record);
   if ('setup' in st) {
     for (const p of ['p1', 'p2'] as PlayerId[]) {

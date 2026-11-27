@@ -218,6 +218,8 @@ export const detect: Detector = (item, ctx): TurnResult | null => {
         ? { kind: 'redraw', text: 'Redrew all five.' }
         : { kind: 'keep', text: 'Kept your hand.' },
     ],
+    // M9 WP7: practised in the mulligan trainer, on this one hand (no board).
+    practice: { judge: 'mulligan', turn: 1 },
   };
   return { itemId: item.id, turn, flags: [flag], notes: [] };
 };

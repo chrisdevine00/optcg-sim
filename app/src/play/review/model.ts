@@ -287,18 +287,26 @@ export function notableMoves(
 // Study and Practice
 // ---------------------------------------------------------------------------------------------
 
-export const DRILLS_COPY = 'Practice for this kind comes with the drills.';
-
-const NOT_YET_PRACTICABLE: ReadonlySet<PracticeJudge> = new Set([
-  'don-ledger',
-  'target-best',
-  'mulligan',
-]);
+/** A stored review made before the detector set `expect` on a target flag: it cannot be judged. */
+export const REANALYSE_COPY = 'Analyse again to practise this.';
+export const NO_PRACTICE_COPY = 'This flag has no puzzle to practise.';
 
 export type PracticeAvailability =
-  { ok: true; judge: PracticeJudge; turn: number } | { ok: false; reason: string };
+  | {
+      ok: true;
+      judge: PracticeJudge;
+      turn: number;
+      expect?: { target?: string; unusedMin?: number };
+    }
+  | { ok: false; reason: string };
 
-/** Which flags can be a puzzle: the ones the detector gave a judge; stale records never. */
+/**
+ * Which flags can be a puzzle: the ones the detector gave a judge; stale records never. A stored
+ * review that lacks `practice` (made before M9 WP7) gets it by kind where the flag alone says
+ * enough: a mulligan is the opening hand; DON!! left unused is "spend it" (no bar was stored, so the
+ * bar is none left); a target flag needs the better target, which only a new analysis records, so
+ * it says so rather than being quietly solved by any attack.
+ */
 export function practiceOf(
   f: ReviewFlag | null,
   live: boolean,
@@ -306,10 +314,17 @@ export function practiceOf(
 ): PracticeAvailability {
   if (!f) return { ok: false, reason: 'Choose a flag first.' };
   if (!live) return { ok: false, reason: staleCopy };
-  // WP7 makes the DON!!, target and mulligan judges practicable; until then they read as before.
-  if (!f.practice || NOT_YET_PRACTICABLE.has(f.practice.judge))
-    return { ok: false, reason: DRILLS_COPY };
-  return { ok: true, judge: f.practice.judge, turn: f.practice.turn };
+  const p = f.practice;
+  if (p) {
+    if (p.judge === 'target-best' && !p.expect?.target)
+      return { ok: false, reason: REANALYSE_COPY };
+    return { ok: true, judge: p.judge, turn: p.turn, ...(p.expect ? { expect: p.expect } : {}) };
+  }
+  if (f.kind === 'mulligan') return { ok: true, judge: 'mulligan', turn: 1 };
+  if (f.kind === 'don-unused')
+    return { ok: true, judge: 'don-ledger', turn: f.turn, expect: { unusedMin: 0 } };
+  if (f.kind === 'target') return { ok: false, reason: REANALYSE_COPY };
+  return { ok: false, reason: NO_PRACTICE_COPY };
 }
 
 /** What the Practice screen says it is, by judge (spoken once when it opens). */

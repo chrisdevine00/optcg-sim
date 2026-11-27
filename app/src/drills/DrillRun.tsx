@@ -18,7 +18,7 @@ import { BoardItemScreen, type BoardOutcome } from './items/BoardItem.tsx';
 import { ChooseLineScreen } from './items/ChooseLine.tsx';
 import { MulliganItemScreen } from './items/MulliganItem.tsx';
 import { loadBank } from './banks.ts';
-import { droppedNote, flagBank, workerRequester } from './intake.ts';
+import { droppedNote, flagBank, markFlagPractised, workerRequester } from './intake.ts';
 import { loadDrillAi } from './load.ts';
 import { AnswerScreen, LeaveDialog, SummaryScreen } from './Screens.tsx';
 import {
@@ -239,6 +239,13 @@ export default function DrillRun({ path, clock = () => new Date() }: DrillRunPro
       ms: factor === null && d.kind === 'shown' ? null : Math.round(timer.elapsedMs()),
     };
     setResults((rs) => [...rs, r]);
+    if (entry.item.source.kind === 'flag' && d.kind !== 'shown')
+      void markFlagPractised(
+        getStore(),
+        entry.item.source.gameId,
+        entry.item.source.flagId,
+        view.correct,
+      );
     say(view.spoken);
     setPhase({ k: 'answer', i: phase.i, view });
   };

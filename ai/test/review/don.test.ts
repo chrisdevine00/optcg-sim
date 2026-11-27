@@ -37,7 +37,8 @@ describe('E06: DON!! left unused', () => {
       decisionIndex: at,
       restoreIndex: 0,
     });
-    expect(f.practice).toBeUndefined();
+    // M9 WP7: practised from the first Main, against the best candidate line (see practice-flags.test.ts).
+    expect(f.practice).toMatchObject({ judge: 'don-ledger', turn: 8 });
   });
 
   it('matches the E06 example: claim, outcome, nextTime, ids, certainty, line, figures', () => {

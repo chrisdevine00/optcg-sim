@@ -6,9 +6,16 @@
  */
 import type { Explanation, PracticeJudge } from '@optcg/ai';
 import { progressSink as appSink } from '../progress/store.ts';
+import {
+  codeOf,
+  EXIT as RULES,
+  isDrillRule,
+  sessionPasses,
+  type DrillRule,
+} from '../progress/exit.ts';
 import type { DrillSession, ProgressSink } from '../progress/types.ts';
 import type { AnswerResult, BoardItem, DrillId, DrillItem, SourceFilter } from './types.ts';
-import { DRILL_LESSON } from './types.ts';
+import { DRILL_LESSON, DRILL_SLUGS } from './types.ts';
 import { limitSeconds } from './timer.ts';
 
 /**
@@ -103,17 +110,30 @@ export function pickItems(
 
 // --- The exit ------------------------------------------------------------------------------------
 
-/** The untimed exit of each drill's lesson, in items right out of `of` (curriculum.md). */
-export const EXIT: Record<DrillId, { needed: number; of: number; perArchetype: number | null }> = {
-  mulligan: { needed: 8, of: 10, perArchetype: 2 }, // L12: 8 of 10, for each of 2 archetypes
-  lethal: { needed: 8, of: 10, perArchetype: null }, // L15
-  counter: { needed: 8, of: 10, perArchetype: null }, // L10
-  don: { needed: 7, of: 10, perArchetype: null }, // L09: 7 of 10 within the top two lines
+/**
+ * The untimed exit of each drill's lesson: WP6's table (`progress/exit.ts`, whose numbers a test
+ * reads back out of curriculum.md), so the summary's "passed" and Progress's credit are one rule.
+ */
+export const ruleOf = (drill: DrillId): DrillRule => {
+  const r = RULES[codeOf(DRILL_LESSON[drill])];
+  if (!isDrillRule(r)) throw new Error(`${drill} has no drill exit`);
+  return r;
 };
 
+/** The same rule in the shape the start screens print: "8 of 10", for each of 2 archetypes. */
+export const EXIT: Record<DrillId, { needed: number; of: number; perArchetype: number | null }> =
+  Object.fromEntries(
+    DRILL_SLUGS.map((d) => {
+      const r = ruleOf(d);
+      return [d, { needed: r.n, of: r.of, perArchetype: r.perArchetype ?? null }];
+    }),
+  ) as Record<DrillId, { needed: number; of: number; perArchetype: number | null }>;
+
 /** How many right a session of `n` items needs: the exit's ratio, rounded up. */
-export const neededFor = (drill: DrillId, n: number): number =>
-  Math.ceil((EXIT[drill].needed * n) / EXIT[drill].of);
+export const neededFor = (drill: DrillId, n: number): number => {
+  const r = ruleOf(drill);
+  return Math.ceil((r.n * n) / r.of);
+};
 
 export interface Summary {
   n: number;
@@ -146,9 +166,11 @@ export function summarise(
   const shown = results.filter((r) => r.shownAnswer).length;
   const skipped = Math.max(0, n - results.length);
   const exit = EXIT[drill];
+  const rule = ruleOf(drill);
   const need = neededFor(drill, n);
   const full = n >= exit.of;
-  const passed = full ? correct >= need : null;
+  // The same function Progress applies to the stored session (`toDrillSession`: n is the answers given).
+  const passed = full ? sessionPasses(rule, { n: results.length, correct } as DrillSession) : null;
   const headline = `${correct} of ${n}: ${passed === null ? 'not counted for the lesson' : passed ? 'passed' : 'not yet'}`;
   const detail = full
     ? `The lesson's exit is ${exit.needed} of ${exit.of}${n === exit.of ? '' : ` (${need} of ${n} for ${n} items)`}${
@@ -162,7 +184,7 @@ export function summarise(
       (r) => r.correct && !r.shownAnswer && r.ms !== null && r.ms / 1000 <= limit,
     ).length;
     const earns = factor <= 1 && full;
-    const ok = earns && within >= need;
+    const ok = earns && sessionPasses(rule, { n: results.length, correct: within } as DrillSession);
     timed = {
       factor,
       within,

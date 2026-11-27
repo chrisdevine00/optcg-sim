@@ -7,13 +7,14 @@
  */
 import { SCRIPTS, type Card } from '@optcg/cards';
 import { counterValueOf, hasCounterTiming, priorFor } from '../../knowledge.ts';
+import { PUZZLE_FILLER_CARD } from './types.ts';
 
 /**
  * A vanilla Character with no [Trigger] and no effect, standing in for a face-down Life card the
  * puzzle may not copy. (Mocha, 3 cost, 5000, Counter +1000: a hit that puts it in their hand adds
  * at most its printed +1000, which the public model's worst-case card already covers.)
  */
-export const INERT_LIFE = 'OP01-081';
+export const INERT_LIFE = PUZZLE_FILLER_CARD;
 
 /** What an Event's [Counter] adds besides power: it rests a Character or draws. */
 function counterExtras(id: string): boolean {

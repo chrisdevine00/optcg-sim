@@ -14,16 +14,13 @@ test('Overview: the missed lethal, with its flag selected', async ({ page }, inf
   await axe(page, info, 'overview');
 });
 
-test('Overview: the E06 game, a flag whose Practice is not built yet says so', async ({
-  page,
-}, info) => {
+test('Overview: the E06 game, a DON!! flag can be practised (M9 WP7)', async ({ page }, info) => {
   const g = planted()['don-unused']!;
   await load(page, [g], `./reviews/${g.id}`);
   await expect(status(page)).toContainText(/1 flag/, { timeout: 45_000 });
-  await expect(page.getByTestId('practice-off')).toContainText(
-    'Practice for this kind comes with the drills.',
-  );
-  await axe(page, info, 'overview-no-practice');
+  await expect(page.getByRole('button', { name: /^Practice this/ })).toBeEnabled();
+  await expect(page.getByTestId('practice-off')).toHaveCount(0);
+  await axe(page, info, 'overview-practice-on');
 });
 
 test('History with six games, then the empty History', async ({ page }, info) => {

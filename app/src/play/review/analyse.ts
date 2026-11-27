@@ -9,7 +9,8 @@
  * progress, `prioritise` and `deeper`.
  */
 import type { Card } from '@optcg/cards';
-import { reviewRecord, type LethalFlag, type ReviewFlag, type TurnResult } from '@optcg/ai';
+import type { LethalFlag, ReviewFlag, TurnResult } from '@optcg/ai';
+import { reviewRecord } from '@optcg/ai/review';
 import type { PlayerId } from '@optcg/engine';
 import type { SessionRecord } from '../../session/index.ts';
 import { ReviewPool, type PoolHandlers, type WorkerLike } from './pool.ts';

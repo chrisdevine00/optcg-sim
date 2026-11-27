@@ -25,7 +25,12 @@ import { lineRefs } from '../coach/coach.ts';
 import { GameController } from '../game/controller.ts';
 import { Game } from '../game/Game.tsx';
 import { PoliteQueue } from '../game/politeQueue.ts';
+import { certaintyLabel } from '@optcg/ai';
+import { workerRequester, type PuzzleRequester } from '../../drills/intake.ts';
+import { loadDrillAi } from '../../drills/load.ts';
+import { navigate } from '../../router.tsx';
 import { prefixOf } from './analyse.ts';
+import { ITEM_JUDGES, mulliganRoute, practiceBoard } from './practice.ts';
 import { FlagList, type SortBy } from './FlagList.tsx';
 import {
   KIND_SHAPE,
@@ -69,12 +74,23 @@ export interface ReviewScreenProps {
   onHome(): void;
   /** Tests: in-process workers, a node cap, a store. */
   review?: Partial<UseReviewInput>;
+  /** Tests (M9 WP7): the `puzzle` requester (default: one review worker per Practice). */
+  practice?: { request: PuzzleRequester };
 }
 
 type Screen =
   | { kind: 'overview' }
   | { kind: 'study'; ctl: GameController; flagId: string | null; turn: number }
-  | { kind: 'play'; ctl: GameController; flag: ReviewFlag | null; turn: number; puzzle: boolean };
+  | {
+      kind: 'play';
+      ctl: GameController;
+      flag: ReviewFlag | null;
+      turn: number;
+      puzzle: boolean;
+      /** M9 WP7: what the Practice board says of their hand, and the label of a real hand. */
+      header?: string | null;
+      handLabel?: string | null;
+    };
 
 const RESULT = { won: 'You won', lost: 'You lost', draw: 'Draw' } as const;
 
@@ -222,7 +238,11 @@ export function ReviewScreen(props: ReviewScreenProps) {
     index: number,
     o: {
       readOnly?: boolean;
-      puzzle?: { turn: number; judge: NonNullable<ReviewFlag['practice']>['judge'] };
+      puzzle?: {
+        turn: number;
+        judge: NonNullable<ReviewFlag['practice']>['judge'];
+        expect?: { target?: string; unusedMin?: number };
+      };
     },
   ): GameController => {
     const prefix = prefixOf(record, index);
@@ -244,9 +264,65 @@ export function ReviewScreen(props: ReviewScreenProps) {
   const playAt = (f: ReviewFlag | null, t: number, practice: boolean) => {
     const pr = practice ? practiceOf(f, live.live, staleCopyOf(live)) : null;
     const index = f ? f.restoreIndex : turnStartIndex(turns, t);
-    const c = board(index, pr?.ok ? { puzzle: { turn: pr.turn, judge: pr.judge } } : {});
-    c.start();
-    setScreen({ kind: 'play', ctl: c, flag: f, turn: t, puzzle: !!pr?.ok });
+    const open = (extra: { header?: string | null; handLabel?: string | null } = {}) => {
+      const c = board(
+        index,
+        pr?.ok
+          ? {
+              puzzle: {
+                turn: pr.turn,
+                judge: pr.judge,
+                ...(pr.expect ? { expect: pr.expect } : {}),
+              },
+            }
+          : {},
+      );
+      c.start();
+      setScreen({ kind: 'play', ctl: c, flag: f, turn: t, puzzle: !!pr?.ok, ...extra });
+    };
+    if (!f || !pr?.ok) return open();
+    // The mulligan has no board: the trainer shell takes the one hand.
+    if (pr.judge === 'mulligan') {
+      if (gameId) navigate(mulliganRoute(gameId, f.id));
+      return;
+    }
+    // Their hand on the Practice board: the harder hand, or the real one with its label.
+    if (ITEM_JUDGES.has(pr.judge)) {
+      const requester = props.practice?.request ?? workerRequester();
+      const real = certaintyLabel('needed-hidden-info', 'drill');
+      void (async () => {
+        try {
+          const ai = await loadDrillAi();
+          const built = await practiceBoard({
+            record,
+            flag: f,
+            judge: pr.judge,
+            gameId,
+            cards,
+            tier: meta.tier,
+            ai,
+            request: requester,
+          });
+          if (!built) return open({ handLabel: real });
+          built.ctl.start();
+          setScreen({
+            kind: 'play',
+            ctl: built.ctl,
+            flag: f,
+            turn: t,
+            puzzle: true,
+            header: built.header,
+            handLabel: built.handLabel,
+          });
+        } catch {
+          open({ handLabel: real });
+        } finally {
+          if ('close' in requester) (requester as { close(): void }).close();
+        }
+      })();
+      return;
+    }
+    open();
   };
   const closeScreen = () => {
     if (screen.kind !== 'overview') screen.ctl.dispose();
@@ -268,12 +344,13 @@ export function ReviewScreen(props: ReviewScreenProps) {
   const play = screen.kind === 'play' ? screen : null;
   useEffect(() => {
     if (!play) return;
-    const judge = play.flag?.practice?.judge;
+    const pr = practiceOf(play.flag, true, '');
+    const judge = pr.ok ? pr.judge : undefined;
     const t = setTimeout(() => {
       document.getElementById('decision-title')?.focus();
       play.ctl.announce(
         play.puzzle && judge
-          ? PRACTICE_INTRO[judge](play.flag?.practice?.turn ?? play.turn)
+          ? PRACTICE_INTRO[judge](pr.ok ? pr.turn : play.turn)
           : `Playing from turn ${play.turn}, as it stood.`,
       );
     }, 150);
@@ -351,6 +428,21 @@ export function ReviewScreen(props: ReviewScreenProps) {
         onRematch={closeScreen}
         onReview={closeScreen}
         reviewLabel="Back to the review"
+        {...(screen.puzzle && (screen.header || screen.handLabel)
+          ? {
+              drillSlot: (
+                <div className="rv-practice-slot" data-testid="practice-slot">
+                  {screen.header && <p data-testid="practice-header">{screen.header}</p>}
+                  {screen.handLabel && (
+                    <p className="chip" data-testid="hand-label">
+                      <span aria-hidden="true">◐ </span>
+                      {screen.handLabel}
+                    </p>
+                  )}
+                </div>
+              ),
+            }
+          : {})}
       />
     );
   }

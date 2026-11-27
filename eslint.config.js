@@ -9,7 +9,15 @@ const noUi = [
   { group: ['@optcg/app', '@optcg/app/*'], message: 'Nothing depends on app/.' },
 ];
 const enginePublicOnly = {
-  group: ['@optcg/engine/*', '@optcg/ai/*', '!@optcg/ai/worker', '**/engine/src/*', '**/ai/src/*'],
+  group: [
+    '@optcg/engine/*',
+    '@optcg/ai/*',
+    '!@optcg/ai/worker',
+    '!@optcg/ai/drills',
+    '!@optcg/ai/review',
+    '**/engine/src/*',
+    '**/ai/src/*',
+  ],
   message: 'Import the package public API (@optcg/engine, @optcg/ai), never its internals.',
 };
 

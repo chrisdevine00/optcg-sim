@@ -8,7 +8,7 @@ import { LESSON, type Explanation, type ReviewFlag, type TurnResult } from '@opt
 import { GameSession } from '../src/session/index.ts';
 import { cardIdsOf, deckOf, leadersOf, restoreConfig } from '../src/play/review/restore.ts';
 import {
-  DRILLS_COPY,
+  REANALYSE_COPY,
   collect,
   finalLife,
   flagName,
@@ -274,13 +274,43 @@ describe('Practice availability', () => {
     });
     expect(practiceOf(wasted, true, STALE_COPY)).toMatchObject({ judge: 'no-counter-on-attack' });
   });
-  it('is off, with the reason, for DON!!, target and mulligan, for a stale game and for no flag', () => {
-    for (const k of ['don-unused', 'target', 'mulligan'] as const)
-      expect(practiceOf(flag(k, 2, 'minor'), true, STALE_COPY)).toEqual({
-        ok: false,
-        reason: DRILLS_COPY,
-      });
-    expect(DRILLS_COPY).toBe('Practice for this kind comes with the drills.');
+  it('uses the stored judge and bar for DON!!, target and mulligan flags', () => {
+    const don = flag('don-unused', 8, 'moderate', {
+      practice: { judge: 'don-ledger', turn: 8, expect: { unusedMin: 1 } },
+    });
+    expect(practiceOf(don, true, STALE_COPY)).toEqual({
+      ok: true,
+      judge: 'don-ledger',
+      turn: 8,
+      expect: { unusedMin: 1 },
+    });
+    const tgt = flag('target', 5, 'moderate', {
+      practice: { judge: 'target-best', turn: 5, expect: { target: 'c7' } },
+    });
+    expect(practiceOf(tgt, true, STALE_COPY)).toMatchObject({ judge: 'target-best' });
+    const mull = flag('mulligan', 1, 'minor', { practice: { judge: 'mulligan', turn: 1 } });
+    expect(practiceOf(mull, true, STALE_COPY)).toEqual({ ok: true, judge: 'mulligan', turn: 1 });
+  });
+  it('falls back by kind for a stored review without `practice`; a target flag says to analyse again', () => {
+    expect(practiceOf(flag('mulligan', 1, 'minor'), true, STALE_COPY)).toMatchObject({
+      ok: true,
+      judge: 'mulligan',
+    });
+    expect(practiceOf(flag('don-unused', 2, 'minor'), true, STALE_COPY)).toMatchObject({
+      ok: true,
+      judge: 'don-ledger',
+      expect: { unusedMin: 0 },
+    });
+    // Never silently solved: without the better target nothing could judge the attack.
+    expect(practiceOf(flag('target', 2, 'minor'), true, STALE_COPY)).toEqual({
+      ok: false,
+      reason: REANALYSE_COPY,
+    });
+    const noTarget = flag('target', 2, 'minor', { practice: { judge: 'target-best', turn: 2 } });
+    expect(practiceOf(noTarget, true, STALE_COPY)).toEqual({ ok: false, reason: REANALYSE_COPY });
+    expect(REANALYSE_COPY).toBe('Analyse again to practise this.');
+  });
+  it('is off for a stale game and for no flag', () => {
     expect(practiceOf(win, false, STALE_COPY)).toEqual({ ok: false, reason: STALE_COPY });
     expect(practiceOf(null, true, STALE_COPY).ok).toBe(false);
   });

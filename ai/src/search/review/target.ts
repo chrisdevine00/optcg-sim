@@ -434,6 +434,13 @@ export const detect: Detector = (item: ReviewItem, ctx: DetectorContext): TurnRe
     explanation,
     did,
   };
+  // M9 WP7: Practice restores just before the attack and judges the first attack's target against
+  // the better one. `expect.target` is the engine's instance id (what an action holds), found by
+  // turning the view's handle back into the action; a handle would never equal `a.target`.
+  const bestTarget = (actionFromView(state, me, best) as Extract<Action, { type: 'attack' }>)
+    .target;
+  if (bestTarget)
+    flag.practice = { judge: 'target-best', turn: item.turn, expect: { target: bestTarget } };
   return { itemId: item.id, turn: item.turn, flags: [flag], notes: [] };
 };
 

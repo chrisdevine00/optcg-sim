@@ -23,6 +23,7 @@ export type PuzzleRequester = (
   record: ReviewRecord,
   flag: ReviewFlag,
   cards: Card[],
+  gameId?: string,
 ) => Promise<{ item: BoardItem | null; reason?: string }>;
 
 export interface IntakeDeps {
@@ -128,7 +129,7 @@ export async function flagBank(
           if (item) entry = { item };
           else reason = 'This hand cannot be rebuilt.';
         } else {
-          const res = await deps.request(r.record, flag, [...r.cards.values()]);
+          const res = await deps.request(r.record, flag, [...r.cards.values()], g.id);
           if (res.item && flag.practice) {
             // The worker does not know the game's id: the item's id and source carry it here.
             const item: BoardItem = {
@@ -140,7 +141,13 @@ export async function flagBank(
               item,
               judge: flag.practice.judge,
               explanation: flag.explanation,
-              ...(flag.practice.expect ? { expect: flag.practice.expect } : {}),
+              // The item's own ids first: a flag's `target` is an id of the record, which a rebuilt
+              // scenario numbers afresh (`puzzleFromFlag` maps it into `judgeExpect`).
+              ...(res.item.judgeExpect
+                ? { expect: res.item.judgeExpect }
+                : flag.practice.expect
+                  ? { expect: flag.practice.expect }
+                  : {}),
             };
           } else reason = res.reason;
         }
@@ -159,14 +166,37 @@ export async function flagBank(
   return { items, dropped };
 }
 
+/**
+ * "Practised: solved / not yet" for a flag answered in the drill shell (a mulligan flag has no board
+ * in the review). Solved is never undone by a later miss, as in the review's own mark. Best effort.
+ */
+export async function markFlagPractised(
+  store: Pick<ReviewStore, 'getReview' | 'saveReview'>,
+  gameId: string,
+  flagId: string,
+  solved: boolean,
+): Promise<void> {
+  try {
+    const cur = await store.getReview(gameId);
+    if (!cur) return;
+    if (cur.practised?.[flagId] === 'solved' && !solved) return;
+    await store.saveReview({
+      ...cur,
+      practised: { ...cur.practised, [flagId]: solved ? 'solved' : 'not-yet' },
+    });
+  } catch {
+    // Storage is off or full: the mark is lost, the drill is not.
+  }
+}
+
 /** "2 puzzles came from games you deleted." */
 export const droppedNote = (n: number): string | null =>
   n === 0 ? null : `${n} ${n === 1 ? 'puzzle' : 'puzzles'} came from games you deleted.`;
 
 /**
  * The default requester: one review worker (`review-worker.ts`, the review screen's) answers the
- * `puzzle` messages of a session's flags one after another and is ended by `close`. WP7 wires
- * `puzzleFromFlag` behind the message; until then it answers "not built yet", which is not kept.
+ * `puzzle` messages of a session's flags one after another and is ended by `close`. The worker
+ * answers with `puzzleFromFlag` (M9 WP7); an answer with no item is not kept.
  */
 export function workerRequester(): PuzzleRequester & { close(): void } {
   let w: Worker | null = null;
@@ -188,13 +218,20 @@ export function workerRequester(): PuzzleRequester & { close(): void } {
     };
     return (w = worker);
   };
-  const request: PuzzleRequester = (record, flag, cards) =>
+  const request: PuzzleRequester = (record, flag, cards, gameId) =>
     new Promise((resolve) => {
       waiting.set(flag.id, (v) => {
         waiting.delete(flag.id);
         resolve(v);
       });
-      open().postMessage({ type: 'puzzle', flagId: flag.id, record, cards });
+      open().postMessage({
+        type: 'puzzle',
+        flagId: flag.id,
+        record,
+        cards,
+        flag,
+        ...(gameId !== undefined ? { gameId } : {}),
+      });
     });
   return Object.assign(request, {
     close: () => {

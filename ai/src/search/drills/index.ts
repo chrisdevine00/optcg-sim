@@ -22,6 +22,7 @@ export { explainCounter, judgeCounter, type CounterChoice } from './counter.ts';
 export { explainDon, judgeDonLine } from './don.ts';
 export { describeLine } from './lines.ts';
 export {
+  harderHandHeader,
   lethalHeaderOf,
   lethalVerdictOf,
   mulliganItemFromFlag,

@@ -8,7 +8,7 @@
  * Practice (`restoreConfig`).
  */
 import type { Card } from '@optcg/cards';
-import type { AiPort, PuzzleConfig } from '../play/game/controller.ts';
+import type { AiPort, GameConfig, PuzzleConfig } from '../play/game/controller.ts';
 import { GameController } from '../play/game/controller.ts';
 import { cardIdsOf, restoreConfig } from '../play/review/restore.ts';
 import type { SessionRecord } from '../session/index.ts';
@@ -59,7 +59,12 @@ export function materialise(
   ai: Pick<DrillAi, 'recordOfItem'>,
   entry: DrillEntry,
   cards: Map<string, Card>,
-  o: { aiPort?: () => AiPort; speed?: GameController['config']['speed'] } = {},
+  o: {
+    aiPort?: () => AiPort;
+    speed?: GameController['config']['speed'];
+    /** The AI's tier: Rookie in the drills; a review's Practice keeps the game's own. */
+    tier?: GameConfig['tier'];
+  } = {},
 ): Materialised {
   const item = entry.item as BoardItem;
   const { record, turn } = ai.recordOfItem(item, cards);
@@ -67,7 +72,7 @@ export function materialise(
   const puzzle = puzzleOf(entry, turn);
   const me = item.seat ?? 'p1';
   const ctl = new GameController(cards, session.start, {
-    ...restoreConfig(session, { me, tier: 'rookie' }, cards),
+    ...restoreConfig(session, { me, tier: o.tier ?? 'rookie' }, cards),
     ...(o.speed ? { speed: o.speed } : {}),
     ...(o.aiPort ? { aiPort: o.aiPort } : {}),
     restore: { record: session, puzzle },
