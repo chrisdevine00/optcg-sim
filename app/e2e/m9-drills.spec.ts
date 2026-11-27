@@ -3,31 +3,12 @@
  * and one wrong, and runs axe on every screen (start, item, answer, summary) at both sizes. Nothing is
  * pre-focused on an item screen; the board drills judge the real board.
  */
-import AxeBuilder from '@axe-core/playwright';
-import { expect, test, type Page, type TestInfo } from '@playwright/test';
-
-async function axe(page: Page, info: TestInfo, name: string) {
-  await page.screenshot({ path: `.cache/m9wp4/${info.project.name}-${name}.png` });
-  const r = await new AxeBuilder({ page })
-    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'])
-    .analyze();
-  expect(
-    r.violations.map(
-      (v) => `${name}: ${v.id}: ${v.nodes.length} node(s), e.g. ${v.nodes[0]?.target.join(' ')}`,
-    ),
-  ).toEqual([]);
-}
+import { expect, test, type Page } from '@playwright/test';
+import { axe, focusedText, noArt } from './m9-support.ts';
 
 test.beforeEach(async ({ page }) => {
-  await page.route(/\.(png|jpe?g|webp)(\?.*)?$/, (r) => r.abort());
+  await noArt(page);
 });
-
-/** The id of what has focus, or its text: an answer must never be it. */
-const focusedText = (page: Page) =>
-  page.evaluate(() => {
-    const el = document.activeElement as HTMLElement | null;
-    return el && el !== document.body ? (el.innerText?.trim() ?? '') : '(nothing)';
-  });
 
 const titleOf = async (page: Page) =>
   (await page.getByRole('heading', { level: 1 }).innerText()).replace(/^[✓✗◌]\s*/, '').trim();

@@ -60,6 +60,9 @@ const KEYS: Record<string, (page: Page) => Promise<void>> = {
   't4-attack': (page) => keyAttack(page, 'leader'),
   't5-defend': async (page) => {
     await myTurn(page, 'block');
+    // The cards the step lights are on the board before keys are pressed at them (a person sees
+    // the lit hand first; "block" alone can be the instant before the hand is drawn).
+    await expect(page.locator('[data-zone="hand"][data-glyph="play"]').first()).toBeVisible();
     await page.keyboard.press('g');
     await page.keyboard.press('h');
     await page.keyboard.press(' ');

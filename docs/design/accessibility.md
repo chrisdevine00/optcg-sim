@@ -270,7 +270,9 @@ Board scope (focus inside the board's application region; no dialog or menu open
 | Review | Two modes (review-1 C21, `learning-ui.md` §4.1). **Overview:** the turn timeline is one `role="application"` region (L-SR3: NVDA's browse mode keeps arrows and N outside it) with a roving tab stop, two rows ("You", "<Leader>'s notable moves") and the mulligan as column 0: Left/Right move between turns, **Up/Down between the two rows**, Home/End to the ends, Enter or Space chooses the cell (on a turn with several flags, the next flag); the flag list under it is a sortable, filterable `listbox` (Up/Down, Home/End, Enter opens Study, F goes to the kind filter) and a tab stop of its own, so every action is reachable without the arrows; `N` / `Shift+N` jump to the next / previous flag; the explanation is a document region; the pinned footer holds Study this moment, Play from here and Practice this. **Study:** Enter on a flag (or "Study this moment") switches to the restored board at native size, read-only, using the board's own tab order and `Q`; the rail holds the explanation and the footer; the rail header holds "← Overview" and the previous/next flag stepper. Escape returns to Overview with focus on the same flag. |
 | Drills | The board model for puzzles. Mulligan and Counter-or-take use the dialogs above. **No answer is pre-focused or pre-styled** (UX-R7): focus starts on the hand or the prompt, the answer buttons have equal weight in a fixed order (Keep, then Redraw). Timer controls are in §8. |
 | Deck builder, card browser | Search is a `combobox`; results are a `grid` with arrow navigation; Enter adds; `Delete` removes from the list; import and export use a textarea and buttons. |
-| Meta explorer | Archetype tiles are links in a list; the matchup grid is a `table` with row and column headers. |
+| Meta explorer | Archetype tiles are links in a list (one tab stop, arrows move across it, Enter opens the guide, `M` the grid). A guide is a document: one `h1` that takes focus, sourced tags are links, our inference carries the words "our reasoning", and every source link is a 24 px target (WCAG 2.5.8; all 12 guides are under axe in e2e). The matchup grid is a `table` with row and column headers; its cells are a roving tab stop (arrows, Home and End) and each is read "Rocks against Kaido: record 16–20, Rocks W–L, plan available, inference"; Enter opens a dialog that takes focus, Escape returns to the cell. |
+| Learn, Progress | Standard document semantics; each page's `h1` takes focus on route change. A lesson row is one link read as a sentence with its state ("not started", "read", "passed"). Progress opens on one recommendation card ("Work on: …") that names a lesson and its numbers; every chart is followed by a table of the same numbers; "Export progress only" is a button and downloads, it sends nothing. |
+| Rules reference, Show me | The search is a `combobox` over a `listbox` (Up/Down, Enter opens, Escape clears); the result count is a polite status line. An entry is a document. **Show me** runs the real board with the tutorial card (the card's text takes focus, "Do this" names a real key); Escape goes back to the rule with focus on "Show me". Citations in lessons, the tutorial and drills open the entry in a new tab and say so in their name. |
 | Settings, rules reference, glossary | Standard document and form semantics. Text reflows at 320 CSS px (WCAG 1.4.10). |
 
 ## 4. Focus
@@ -626,7 +628,20 @@ All three scripts on all three reader and browser pairs, plus:
 - Lighthouse ≥ 90;
 - a full keyboard-only game vs Warlord by hand (PROMPT.md Done when).
 
-## 12. Exceptions and known risks
+### 11.8 Script: M9 (the learning layer)
+
+Run by `app/a11y/src/m9.ts` (`m9.dry.spec.ts`, `m9.nvda.spec.ts`, `m9.voiceover.spec.ts`; the dry run checks the harness with Playwright keys and no screen reader). The NVDA run is dispatched by hand: `gh workflow run a11y-nvda.yml --ref <branch> -f browsers=both -f script=m9` (`script=all` runs M3, L, M7, M8 and M9). Five short parts in one browser context, each loading its own page: **M1** the matchup grid, **D1** the mulligan item, **D2** the drill timer (counter drill at 50%), **R1** the rules search, **P1** Progress. The record is `app/a11y/results/<project>/m9.md`, judged against the Expect column as for M3 and L.
+
+| # | Do | Expect |
+| --- | --- | --- |
+| M1 | Load `meta/matchups`; Tab to the table; Right along the first row to the Kaido column; Down, Up; Enter; Escape | Focus is on "Matchup grid". Table navigation (`Ctrl+Alt+arrows`) reads row and column headers; the cell is read "Rocks against Kaido: record 16–20, Rocks W–L, plan available, inference" (the status is words, never colour alone); Enter opens a dialog that names the matchup and takes focus; Escape returns to the same cell |
+| D1 | Load the mulligan drill; read the heading; Tab, Tab, Shift+Tab; Enter on Keep | Focus is on the heading, which reads the seat and the hand. **No answer is announced before the choice** (the polite region is empty). Keep and Redraw are two buttons of equal weight, neither pressed. After Enter the heading is "Correct" or "Not this time" and has focus; the polite region says it once ("Correct. You chose Keep. The guide says Keep. …") |
+| D2 | Load the counter drill at 50% (15 s an item); Tab to Pause; Enter; Enter; wait | The button is "Pause", then "Resume" (the state is in its name). Pausing stops the count. A polite "10 seconds left." is spoken once when ten seconds remain; nothing is assertive; the timer never answers. (The mulligan's 10 s base time never reaches the warning, so it is scripted on the counter drill.) |
+| R1 | Load `rules`; Tab to the search; type "tie"; Down; Escape | A combobox "Search the rules"; the polite status says "n results for “tie”."; Down reads each result's title and kind; Escape clears the query |
+| P1 | Load `progress`; read the card; Tab to its link | Focus is on "Progress". The card's heading is "Work on: …" and it says what it is built from (with fewer than three reviewed games: "Not enough games yet: next in the course is L01."); its one link is "Start lesson Lnn" |
+
+Not scripted: the lethal and counter boards (the board model of §11.3 applies, with the drill bar in the decision panel's slot) and Show me (its keys are the tutorial's, §11.5).
+
 
 | # | Risk | Likelihood / impact | Mitigation |
 | --- | --- | --- | --- |

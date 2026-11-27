@@ -4,23 +4,11 @@
  * Progress page (chart and its table) and the recommendation says what it is built from; axe runs on
  * each screen.
  */
-import AxeBuilder from '@axe-core/playwright';
-import { expect, test, type Page, type TestInfo } from '@playwright/test';
-
-async function axe(page: Page, info: TestInfo, name: string) {
-  await page.screenshot({ path: `.cache/m9wp6/${info.project.name}-${name}.png`, fullPage: true });
-  const r = await new AxeBuilder({ page })
-    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'])
-    .analyze();
-  expect(
-    r.violations.map(
-      (v) => `${name}: ${v.id}: ${v.nodes.length} node(s), e.g. ${v.nodes[0]?.target.join(' ')}`,
-    ),
-  ).toEqual([]);
-}
+import { expect, test, type Page } from '@playwright/test';
+import { axe, noArt } from './m9-support.ts';
 
 test.beforeEach(async ({ page }) => {
-  await page.route(/\.(png|jpe?g|webp)(\?.*)?$/, (r) => r.abort());
+  await noArt(page);
 });
 
 /** Writes `progress.v1` straight into the app's IndexedDB, as a drill shell would have. */
@@ -139,7 +127,7 @@ test('progress with drill sessions: the chart has a table, and exporting progres
   await expect(
     page.getByRole('row', { name: /L10 Counter or take.*passed \(timed\)/ }),
   ).toBeVisible();
-  await axe(page, info, 'progress-sessions');
+  await axe(page, info, 'progress-sessions', true);
   const [dl] = await Promise.all([
     page.waitForEvent('download'),
     page.getByRole('button', { name: 'Export progress only' }).click(),

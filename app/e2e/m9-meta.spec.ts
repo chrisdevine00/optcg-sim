@@ -3,24 +3,12 @@
  * reasoning, chips that open the Inspector, Play links), and the matchup grid (arrows, Enter opens
  * the details, Esc closes and returns focus, Play this matchup). axe runs on each screen.
  */
-import AxeBuilder from '@axe-core/playwright';
-import { expect, test, type Page, type TestInfo } from '@playwright/test';
-
-async function axe(page: Page, info: TestInfo, name: string) {
-  await page.screenshot({ path: `.cache/m9wp1/${info.project.name}-${name}.png` });
-  const r = await new AxeBuilder({ page })
-    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'])
-    .analyze();
-  expect(
-    r.violations.map(
-      (v) => `${name}: ${v.id}: ${v.nodes.length} node(s), e.g. ${v.nodes[0]?.target.join(' ')}`,
-    ),
-  ).toEqual([]);
-}
+import { expect, test } from '@playwright/test';
+import { axe, noArt } from './m9-support.ts';
 
 test.beforeEach(async ({ page }) => {
   // No art host is reachable in CI; the screens draw without it.
-  await page.route(/\.(png|jpe?g|webp)(\?.*)?$/, (r) => r.abort());
+  await noArt(page);
 });
 
 test('the tiles: header, sort, arrows, Enter opens a guide, M opens the grid', async ({
@@ -160,4 +148,36 @@ test('the grid: arrows, Enter, Esc, disagreement, Play this matchup', async ({ p
     'href',
     /\/play\?p1=OP17-039-rocks%231&p2=OP09-062-nico-robin%231$/,
   );
+});
+
+// Review M9-R2: every guide, not only the first, passes axe (the Sources links are 24 px targets).
+const GUIDES = [
+  'OP17-039',
+  'OP09-062',
+  'ST30-001',
+  'OP13-004',
+  'OP17-058',
+  'OP13-001',
+  'OP15-058',
+  'OP17-079',
+  'OP14-041',
+  'OP12-061',
+  'OP05-098',
+  'OP08-098',
+];
+
+test('every guide passes axe, and the tiles and grid again with it', async ({ page }, info) => {
+  test.setTimeout(180_000);
+  for (const id of GUIDES) {
+    await page.goto(`meta/${id}`);
+    await expect(page.getByRole('heading', { level: 1 })).toBeFocused();
+    await expect(page.getByRole('heading', { level: 2, name: 'Sources' })).toBeVisible();
+    await axe(page, info, `guide-${id}`, true);
+  }
+  await page.goto('meta');
+  await expect(page.getByRole('heading', { level: 1, name: 'Meta Explorer' })).toBeFocused();
+  await axe(page, info, 'tiles-all', true);
+  await page.goto('meta/matchups');
+  await expect(page.getByRole('heading', { level: 1, name: 'Matchup grid' })).toBeFocused();
+  await axe(page, info, 'grid-all', true);
 });

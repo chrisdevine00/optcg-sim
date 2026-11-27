@@ -13,9 +13,9 @@ on:
         options: [both, chrome, firefox]
         default: both
       script:
-        description: Which script to run (m3 is accessibility.md §11.3, l is §11.4, m7 is §11.5, m8 is §11.6; both is m3 and l, all is all four)
+        description: Which script to run (m3 is accessibility.md §11.3, l is §11.4, m7 is §11.5, m8 is §11.6, m9 is §11.8; both is m3 and l, all is all five)
         type: choice
-        options: [l, m3, m7, m8, both, all]
+        options: [l, m3, m7, m8, m9, both, all]
         default: l
 jobs:
   nvda:
@@ -67,7 +67,7 @@ jobs:
       # The spec files for the chosen script (playwright takes file-name patterns).
       - name: Pick the spec files
         run: |
-          $specs = switch ('${{ inputs.script }}') { 'm3' { 'm3\.nvda' } 'm7' { 'm7\.nvda' } 'm8' { 'm8\.nvda' } 'both' { 'm3\.nvda l\.nvda' } 'all' { 'm3\.nvda l\.nvda m7\.nvda m8\.nvda' } default { 'l\.nvda' } }
+          $specs = switch ('${{ inputs.script }}') { 'm3' { 'm3\.nvda' } 'm7' { 'm7\.nvda' } 'm8' { 'm8\.nvda' } 'm9' { 'm9\.nvda' } 'both' { 'm3\.nvda l\.nvda' } 'all' { 'm3\.nvda l\.nvda m7\.nvda m8\.nvda m9\.nvda' } default { 'l\.nvda' } }
           "A11Y_SPECS=$specs" >> $env:GITHUB_ENV
       - name: NVDA + ${{ matrix.browser }}
         continue-on-error: true

@@ -31,7 +31,7 @@ export function ItemBar({
   onShow(): void;
   onSkip(): void;
   onLeave(): void;
-  /** The drill's own extra controls (the lethal drill's "No lethal"), placed after Skip. */
+  /** The drill's own extra controls (the lethal drill's "No lethal"), placed first: at 720p the rail's room is short and the answer controls were cut off behind Submit turn. */
   children?: ReactNode;
 }) {
   return (
@@ -43,6 +43,7 @@ export function ItemBar({
         {note && <span className="drill-note"> · {note}</span>}
       </p>
       <div className="drill-bar-actions">
+        {children}
         <button type="button" className="btn small" onClick={onShow}>
           Show answer
         </button>
@@ -52,7 +53,6 @@ export function ItemBar({
         <button type="button" className="btn small" onClick={onLeave}>
           Leave
         </button>
-        {children}
       </div>
       <TimerView drill={drill} timer={timer} factor={factor} onFactor={onFactor} />
     </div>

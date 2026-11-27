@@ -363,3 +363,14 @@ button.meta-chip:hover {
     grid-template-columns: 1fr;
   }
 }
+
+/* Source links in a guide's footer and other external-link lists: a 24 px target (WCAG 2.5.8). */
+.meta-foot li {
+  margin: 0;
+}
+.meta-foot a {
+  display: inline-block;
+  min-height: 24px;
+  padding-block: 3px;
+  line-height: 18px;
+}

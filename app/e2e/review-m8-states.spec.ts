@@ -25,7 +25,7 @@ test('Overview: the E06 game, a DON!! flag can be practised (M9 WP7)', async ({ 
 
 test('History with six games, then the empty History', async ({ page }, info) => {
   await load(page, Object.values(planted()));
-  await expect(page.getByTestId('history-table').getByRole('row')).toHaveCount(7);
+  await expect(page.getByTestId('history-table').getByRole('row')).toHaveCount(8);
   await axe(page, info, 'history');
   await page.goto('./reviews?mode=delete');
   await expect(

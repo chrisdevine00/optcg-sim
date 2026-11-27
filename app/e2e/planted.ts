@@ -9,6 +9,8 @@
  *   don-unused      E06: eight DON!!, a five-cost card, the Leader attacks with three left over
  *   target          E08: board over face, you attack the Leader with a Character that could clear theirs
  *   mulligan        E11: a Rocks hand the guide redraws, kept (the guide label, never "holds whatever they held")
+ *   hindsight       E21 with their Kid in hand (M9 WP8): attacking with the Blocker lost only to a hand you could not see,
+ *                   so the flag is Hindsight (certainty needed-hidden-info) and Practice keeps the real hand and says so
  *
  * The positions are those of the detectors' own tests (ai/test/review/*, ai/test/support/*), so what
  * the browser shows is what the unit tests proved; the browser adds the UI around them.
@@ -35,7 +37,13 @@ import { playbookFor } from '../../ai/src/playbook.ts';
 import { mulliganVerdict } from '../../ai/src/search/mulligan.ts';
 
 export type PlantedName =
-  'missed-lethal' | 'wasted-counter' | 'should-counter' | 'don-unused' | 'target' | 'mulligan';
+  | 'missed-lethal'
+  | 'wasted-counter'
+  | 'should-counter'
+  | 'don-unused'
+  | 'target'
+  | 'mulligan'
+  | 'hindsight';
 
 export interface PlantedGame {
   id: string;
@@ -101,6 +109,57 @@ function e05Record(): ReviewRecord {
   });
 }
 
+/**
+ * The Hindsight game (ai/test/review/given-away.test.ts, "Hindsight when only their hand made it lethal"):
+ * turn 9, you attack with Gloriosa (your only Blocker) and end the turn; on turn 10 their Leader, Ulti and
+ * the Kid they hold in hand (5000 [Rush]) take your two Life. Their board alone would not have won.
+ */
+function hindsightGame(): ReviewRecord {
+  const BLOCKER = 'OP17-046';
+  const KID = 'EB01-003';
+  const spec: Spec = {
+    seed: 9,
+    turn: 9,
+    activePlayer: 'p1',
+    firstPlayer: 'p1',
+    p1: {
+      leader: ROCKS,
+      characters: [BLOCKER],
+      life: lifeOf(2, KYO),
+      hand: [],
+      costArea: { active: 0, rested: 0 },
+      decklist: listOf(ROCKS),
+    },
+    p2: {
+      leader: KAIDO,
+      characters: [ULTI],
+      life: lifeOf(3, KYO),
+      hand: [KID],
+      costArea: { active: 4, rested: 0 },
+      decklist: listOf(KAIDO),
+    },
+  };
+  const mine = [BLOCKER];
+  const theirs = ['play:' + KID, KID, KAIDO, ULTI];
+  return recordOf(spec, (s, legal) => {
+    const dec = queries.decision(s)!;
+    if (dec.kind === 'main' && dec.player === 'p1') {
+      if (queries.turn(s).number > 9) return undefined;
+      const next = mine.shift();
+      return next ? attackOn(s, legal, 'p1', next) : legal.find((a) => a.type === 'endTurn');
+    }
+    if (dec.kind === 'main' && dec.player === 'p2') {
+      const next = theirs.shift();
+      if (next?.startsWith('play:'))
+        return legal.find(
+          (a) => a.type === 'playCard' && queries.card(s, a.card).card === next.slice(5),
+        );
+      return next ? attackOn(s, legal, 'p2', next) : legal.find((a) => a.type === 'endTurn');
+    }
+    return takeIt(legal);
+  });
+}
+
 /** The same record with p1's concession appended, unless the game is already over. */
 function conceded(rec: RecordWithSnapshots | ReviewRecord): ReviewRecord {
   const full: ReviewRecord = {
@@ -151,6 +210,7 @@ const BUILDERS: Record<PlantedName, () => ReviewRecord> = {
   'don-unused': () => conceded(e06Record() as RecordWithSnapshots),
   target: () => conceded(e08Record() as unknown as RecordWithSnapshots),
   mulligan: mulliganGame,
+  hindsight: hindsightGame,
 };
 
 /** The last game turn: records carry a snapshot at every turn boundary. */

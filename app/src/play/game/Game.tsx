@@ -151,7 +151,15 @@ export function Game({
   const [dock, setDock] = useState<DockState>({ handle: null, pinned: false, how: 'hover' });
   const [dialog, setDialog] = useState<DialogState>(null);
   const [why, setWhy] = useState<{ text: string; at: Rect | null } | null>(null);
-  const [goto, setGoto] = useState(false);
+  const [goto, setGotoState] = useState(false);
+  // The key handler is re-subscribed after a render, so a fast "G then H" can arrive before it sees the
+  // new state: the chord reads the ref, which is set in the same task as the key (M9 WP8, the
+  // tutorial-keyboard flake under load).
+  const gotoRef = useRef(false);
+  const setGoto = (v: boolean) => {
+    gotoRef.current = v;
+    setGotoState(v);
+  };
   const [menuFor, setMenuFor] = useState<string | null>(null);
   const ui: UiMode =
     ui0.key === decisionKey ||
@@ -603,7 +611,7 @@ export function Game({
     const zone = (t?.dataset.zone ?? zoneEl?.dataset.zone) as ZoneKey | undefined;
     const key = e.key;
 
-    if (goto) {
+    if (gotoRef.current) {
       e.preventDefault();
       setGoto(false);
       const map: Record<string, ZoneKey | 'decision' | 'log'> = {
