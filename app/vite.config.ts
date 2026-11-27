@@ -113,5 +113,13 @@ export default defineConfig({
     sourcemap: true,
     // The manifest lets scripts/bundle-budget.ts measure the initial JS (PROMPT.md: under 300 KB gzipped).
     manifest: true,
+    rolldownOptions: {
+      output: {
+        // M10 WP2: one initial file. Left alone, Rolldown hoists React's jsx-runtime (shared by every lazy
+        // route) into a second initial chunk, a second gzip stream (+0.8 KB: 83.5 to 84.3 KB). Naming the
+        // `$initial` modules (all that the entry reaches statically) as one group folds it back.
+        codeSplitting: { groups: [{ name: 'index', tags: ['$initial'] }] },
+      },
+    },
   },
 });
