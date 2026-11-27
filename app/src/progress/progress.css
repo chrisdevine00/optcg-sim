@@ -1,0 +1,131 @@
+/* Progress (M9 WP6). Nothing under 12 px; targets at least 24 px; no meaning in colour alone. */
+.progress {
+  max-width: 960px;
+}
+.progress h2 {
+  margin: 28px 0 8px;
+}
+.progress h3 {
+  margin: 16px 0 4px;
+  font-size: 1rem;
+}
+.pg-card {
+  margin: 16px 0;
+  padding: 4px 16px 8px;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-2);
+  background: var(--color-surface-1);
+}
+.pg-card h2 {
+  margin-top: 12px;
+}
+.pg-others summary {
+  min-height: 24px;
+  cursor: pointer;
+}
+.pg-others ul {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
+.pg-grid {
+  width: 100%;
+  border-collapse: collapse;
+}
+.pg-grid th,
+.pg-grid td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--color-line);
+  text-align: left;
+  vertical-align: top;
+}
+.pg-grid thead th {
+  border-bottom: 1px solid var(--color-line-strong);
+}
+.pg-drill {
+  margin: 12px 0 20px;
+}
+.pg-chart-svg {
+  display: block;
+  width: 100%;
+  max-width: 560px;
+  height: 96px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-2);
+  background: var(--color-surface-1);
+}
+.pg-untimed,
+.pg-timed {
+  stroke: var(--color-accent);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+.pg-timed {
+  stroke-dasharray: 6 4;
+}
+.pg-pass {
+  stroke: var(--color-text-subtle);
+  stroke-width: 1;
+  stroke-dasharray: 1 3;
+  vector-effect: non-scaling-stroke;
+}
+.pg-dot {
+  fill: var(--color-accent);
+}
+.pg-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  align-items: center;
+  margin: 4px 0;
+}
+.pg-swatch {
+  display: inline-block;
+  width: 24px;
+  height: 0;
+  border-top: 2px solid var(--color-accent);
+  vertical-align: middle;
+}
+.pg-swatch.dashed {
+  border-top-style: dashed;
+}
+.pg-swatch.dotted {
+  border-top: 2px dotted var(--color-text-subtle);
+}
+.pg-table summary {
+  min-height: 24px;
+  cursor: pointer;
+}
+.pg-bars {
+  margin: 8px 0;
+  padding: 0;
+  list-style: none;
+}
+.pg-bar-row {
+  display: grid;
+  grid-template-columns: minmax(10em, 18em) 1fr 2.5em;
+  align-items: center;
+  gap: 8px;
+  min-height: 24px;
+}
+.pg-bar {
+  display: block;
+  height: 10px;
+  border: 1px solid var(--color-line-strong);
+  border-radius: 2px;
+}
+.pg-bar-fill {
+  display: block;
+  height: 100%;
+  background: var(--color-accent);
+}
+.pg-bar-n {
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 560px) {
+  .pg-bar-row {
+    grid-template-columns: 1fr 2.5em;
+  }
+  .pg-bar {
+    grid-column: 1 / -1;
+  }
+}
