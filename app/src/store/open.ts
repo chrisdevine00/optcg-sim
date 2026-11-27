@@ -10,6 +10,7 @@ import { IdbStore } from './idb.ts';
 import { migrateFromLocalStorage } from './migrate.ts';
 import { flushStashed, pendingCount, restoreStashed, watchPending } from './pending.ts';
 import { MemoryStore, getStore, setStore } from './index.ts';
+import { markStoreReady, resetReadyForTests } from './ready.ts';
 import { SyncKv } from './sync.ts';
 import { StoreQuotaError } from './types.ts';
 
@@ -19,7 +20,8 @@ export const SAVED_FULL = 'Saved games are full. Delete old reviews?';
 export const DELETE_MODE_PATH = '/reviews?mode=delete';
 
 export interface StoreStatus {
-  kind: 'memory' | 'indexeddb';
+  /** `opening` until `initStore` settles (M10 WP1): no "Saving is off" notice before it is known. */
+  kind: 'opening' | 'memory' | 'indexeddb';
   /** Storage is full: the last save failed on the quota or the 200-game cap. */
   full: boolean;
   /** The "Saving is off" notice was dismissed for this page load. */
@@ -28,7 +30,7 @@ export interface StoreStatus {
   pending: number;
 }
 
-let status: StoreStatus = { kind: 'memory', full: false, dismissed: false, pending: 0 };
+let status: StoreStatus = { kind: 'opening', full: false, dismissed: false, pending: 0 };
 const listeners = new Set<() => void>();
 const set = (patch: Partial<StoreStatus>) => {
   status = { ...status, ...patch };
@@ -101,9 +103,15 @@ function timeout<T>(p: Promise<T>, ms: number): Promise<T> {
 
 let initial: Promise<void> | null = null;
 
-/** Safe to call more than once; later calls wait for the first. Never rejects. */
+/**
+ * Safe to call more than once; later calls wait for the first. Never rejects. When it settles
+ * (IndexedDB, or the memory fallback) the store is marked ready (`ready.ts`), which releases every
+ * route waiting under `StoreGate`; `main.tsx` does not wait for it before the first render.
+ */
 export function initStore(opts: InitOptions = {}): Promise<void> {
-  return (initial ??= open(opts));
+  return (initial ??= open(opts)
+    .catch(() => undefined)
+    .then(markStoreReady));
 }
 
 /** Writes to the small stores are behind memory; wait for them before exporting or deleting. */
@@ -123,10 +131,11 @@ export async function rehydrateStore(): Promise<void> {
 /** Tests: forget the boot so `initStore` runs again. */
 export function resetStoreForTests(): void {
   initial = null;
+  resetReadyForTests();
   synced.timing = null;
   synced.progress = null;
   setStore(null);
-  status = { kind: 'memory', full: false, dismissed: false, pending: 0 };
+  status = { kind: 'opening', full: false, dismissed: false, pending: 0 };
 }
 
 async function open(opts: InitOptions): Promise<void> {

@@ -21,7 +21,9 @@
     <link rel="apple-touch-icon" href="%BASE_URL%apple-touch-icon.png" />
     <link rel="manifest" href="%BASE_URL%manifest.webmanifest" />
     <!--
-      The first frame before React mounts: the two values below duplicate --color-bg and --color-text
+      The first frame before React mounts (there is no boot line: React renders at once since M10 WP1,
+      and a line that React then replaces only moved the Lighthouse LCP later, 203 to 441 ms on Home,
+      docs/benchmarks.md "M10 WP1"): the two values below duplicate --color-bg and --color-text
       of the dark theme in src/styles/tokens.css (a test in app/test/head.test.ts keeps them equal),
       so the page is not white while the script loads.
     -->
@@ -30,17 +32,10 @@
         background: #0b0e12;
         color: #e8ecf1;
       }
-      .boot {
-        margin: 0;
-        padding: 2rem 1rem;
-        font:
-          1rem/1.5 system-ui,
-          sans-serif;
-      }
     </style>
   </head>
   <body>
-    <div id="root"><p class="boot" role="status">Loading OPTCG Sim…</p></div>
+    <div id="root"></div>
     <noscript>OPTCG Sim needs JavaScript to run. Nothing is sent from your browser.</noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
