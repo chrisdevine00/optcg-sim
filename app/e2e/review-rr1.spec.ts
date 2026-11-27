@@ -88,8 +88,10 @@ test('the hover preview stays open while the pointer is on it, and closes when t
   const dock = page.locator('.dock');
   await expect(dock).toBeVisible({ timeout: 20_000 });
   const db = (await dock.boundingBox())!;
-  // Straight onto the dock, then rest there well past the 150 ms close delay.
-  await page.mouse.move(db.x + db.width / 2, db.y + db.height / 2, { steps: 12 });
+  // Onto the dock in one move, then rest there well past the 150 ms close delay. (A 12-step glide
+  // raced the delay itself: on a slow CI runner the trip took longer than 150 ms and the dock had
+  // closed on the way, which measured the runner, not whether the dock is hoverable.)
+  await page.mouse.move(db.x + db.width / 2, db.y + db.height / 2);
   await page.waitForTimeout(700);
   await expect(dock).toBeVisible();
   // Away from both: it closes.
