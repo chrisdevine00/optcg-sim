@@ -6,7 +6,14 @@ import { describe, expect, it } from 'vitest';
 import { DRILL_IDS } from '@optcg/ai';
 import { DRILL_LESSON } from '../src/drills/types.ts';
 import { LESSONS } from '../src/learn/lessons.ts';
-import { codeOf, drillPassedAt, EXIT, isDrillRule, sessionPasses } from '../src/progress/exit.ts';
+import {
+  codeOf,
+  drillPassedAt,
+  EXIT,
+  isDrillRule,
+  sessionPasses,
+  timedPasses,
+} from '../src/progress/exit.ts';
 import { iso, NOW, session } from './progress-support.ts';
 
 describe('the exit table', () => {
@@ -75,12 +82,37 @@ describe('meeting a drill exit', () => {
     expect(drillPassedAt(l10, [ss[3]!])).toBeNull();
   });
 
-  it('counts the timed badge only for a timer at 100% or faster', () => {
-    const slow = session('counter', 10, 9, t(1), { factor: 2 });
-    const exact = session('counter', 10, 9, t(2), { factor: 1 });
+  it('counts the timed badge only for a timer at 100% or faster, with the answers inside the limit (M9-R4)', () => {
+    const slow = session('counter', 10, 9, t(1), { factor: 2, timedOk: 9 });
+    const exact = session('counter', 10, 9, t(2), { factor: 1, timedOk: 9 });
     expect(drillPassedAt(l10, [slow], true)).toBeNull();
     expect(drillPassedAt(l10, [slow, exact], true)).toBe(t(2));
     expect(drillPassedAt(l10, [slow])).toBe(t(1));
+  });
+
+  it('a timed session whose answers were slow passes untimed but earns no badge', () => {
+    // 9 right, only 6 inside the limit: the summary says "needs 8", and so does Progress.
+    const slowAnswers = session('counter', 10, 9, t(1), { factor: 1, timedOk: 6 });
+    expect(sessionPasses(l10, slowAnswers)).toBe(true);
+    expect(timedPasses(l10, slowAnswers)).toBe(false);
+    expect(drillPassedAt(l10, [slowAnswers], true)).toBeNull();
+    expect(drillPassedAt(l10, [slowAnswers])).toBe(t(1));
+    // 8 of 10 inside the limit is enough; 7 is not (the exit is 8 of 10).
+    expect(timedPasses(l10, session('counter', 10, 9, t(1), { factor: 1, timedOk: 8 }))).toBe(true);
+    expect(timedPasses(l10, session('counter', 10, 9, t(1), { factor: 1, timedOk: 7 }))).toBe(
+      false,
+    );
+  });
+
+  it('an old session (no timedOk) or an untimed one never earns the badge, and stays valid', () => {
+    const old = session('counter', 10, 10, t(1), { factor: 1 });
+    expect(old.timedOk).toBeUndefined();
+    expect(timedPasses(l10, old)).toBe(false);
+    expect(drillPassedAt(l10, [old], true)).toBeNull();
+    expect(drillPassedAt(l10, [old])).toBe(t(1));
+    expect(timedPasses(l10, session('counter', 10, 10, t(1), { timedOk: 10 }))).toBe(false);
+    // A short set cannot earn it either.
+    expect(timedPasses(l10, session('counter', 5, 5, t(1), { factor: 1, timedOk: 5 }))).toBe(false);
   });
 
   it('wants two different archetypes for the mulligan drill (L12)', () => {

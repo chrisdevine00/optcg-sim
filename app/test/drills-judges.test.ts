@@ -206,6 +206,31 @@ describe('don-ledger judge', () => {
   });
 });
 
+describe('don-ledger judge: no slack (M9-R9)', () => {
+  const all = (bankFor('don').items as DonItem[]).filter((i) => i.lines.length > 1);
+  /** An item with a line exactly one DON!! worse than the best, and the best line's own. */
+  const closeCall = all.find((i) =>
+    i.lines.some((l) => l.unused === Math.min(...i.lines.map((x) => x.unused)) + 1),
+  )!;
+
+  it('a line that leaves one DON!! more unused than the best fails, and the best solves', async () => {
+    expect(closeCall).toBeDefined();
+    const min = Math.min(...closeCall.lines.map((l) => l.unused));
+    const oneShort = closeCall.lines.find((l) => l.unused === min + 1)!;
+    const play = async (actions: Action[]) => {
+      const entry: DrillEntry = { item: closeCall };
+      const m = open(entry);
+      await playStored(entry, m, actions);
+      await settle(m.ctl);
+      const s = m.ctl.puzzleState();
+      m.ctl.dispose();
+      return s;
+    };
+    expect(await play(oneShort.actions)).toBe('failed');
+    expect(await play(closeCall.lines.find((l) => l.unused === min)!.actions)).toBe('solved');
+  });
+});
+
 describe('target-best judge', () => {
   const item = (bankFor('lethal').items as LethalItem[]).find(
     (i) => i.answer.lethal && i.answer.actions.some((a) => a.type === 'attack'),

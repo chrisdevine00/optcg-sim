@@ -52,7 +52,8 @@
     ],
     "secondShort": 1,
     "requireGoingFirst": ["early"],
-    "source": "SH-XEB; OP17-039 guide (keepable hand, inference)"
+    "redrawIfAllCostAtLeast": 6,
+    "source": "SH-XEB; OP17-039 guide (Mulligan line, inference)"
   },
   "biases": [
     {

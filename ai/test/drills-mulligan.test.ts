@@ -7,7 +7,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import { playbookFor } from '../src/playbook.ts';
 import { MIN_BANK, bankFor } from '../src/search/drills/index.ts';
-import { provideMulliganCards } from '../src/search/drills/bank-mulligan.ts';
+import { DRILL_SCRIPTS_VERSION } from '../src/search/drills/positions.ts';
+import type { MulliganItem } from '../src/search/drills/types.ts';
 import {
   deckOf,
   explainMulliganItem,
@@ -96,15 +97,33 @@ describe('the mulligan bank', () => {
     expect(judgeMulligan(swapped, false, cards, sets)).toBe(false);
   });
 
-  it('labels each item "From the <guide> guide (sourced)"', () => {
+  it('labels each item by what its guide says: "(sourced)", or "(sourced baseline, inference)" when the rule is tagged inference (M9-R5)', () => {
     const rocks = bank.find((i) => i.archetypeId === 'OP17-039-rocks')!;
-    expect(mulliganLabel(rocks, cards)).toBe('From the Rocks guide (sourced)');
+    expect(mulliganLabel(rocks, cards)).toBe('From the Rocks guide (sourced baseline, inference)');
+    let sourcedOnly = 0;
+    for (const i of bank) {
+      const pb = playbookFor(i.mine, undefined, cards);
+      const label = mulliganLabel(i, cards);
+      if (/inference/i.test(pb.mulligan.source)) expect(label, i.id).toMatch(/inference\)$/);
+      else {
+        expect(label, i.id).toMatch(/guide \(sourced\)$/);
+        sourcedOnly++;
+      }
+      expect(label, i.id).not.toMatch(/\(sourced\).*inference/);
+    }
+    // At least one guide's rule is fully sourced, so both labels are in use.
+    expect(sourcedOnly).toBeGreaterThan(0);
   });
 
-  it('is what bankFor serves once the cards are provided, and empty before', () => {
-    expect(bankFor('mulligan').items).toEqual([]);
-    provideMulliganCards(cards);
-    expect(bankFor('mulligan').items).toEqual(bank);
+  it('is the committed file (M9-R11): bankFor serves it, a fresh build on the pinned lists equals it, and each item carries its list', () => {
+    const committed = bankFor('mulligan');
+    expect(JSON.parse(JSON.stringify(bank))).toEqual(committed.items);
+    expect(committed.builtWith.scripts).toBe(DRILL_SCRIPTS_VERSION);
+    for (const i of committed.items as MulliganItem[]) {
+      expect(i.deck, i.id).toHaveLength(50);
+      // The text of the item reads its own list, never the live meta file.
+      expect(deckOf(i, [])).toBe(i.deck);
+    }
   });
 });
 
@@ -185,11 +204,10 @@ describe('the answer text is the M8 explanation, unchanged', () => {
       );
     });
     const hand = atMulligan('OP17-039', seed, true).hand;
-    const item = {
-      ...bank.find((i) => i.archetypeId === rocks.archetypeId && i.first)!,
-      hand,
-      source: { kind: 'bank' as const, seed: 0 },
-    };
+    const { deck: _deck, ...rest } = bank.find(
+      (i) => i.archetypeId === rocks.archetypeId && i.first,
+    )!;
+    const item = { ...rest, hand, source: { kind: 'bank' as const, seed: 0 } };
     const e = explainMulliganItem(item, cards, [{ ...rocks, lists: [listOf('OP17-039')] }]);
     const doc = docExample('E11');
     for (const k of [
@@ -219,5 +237,57 @@ describe('who has items', () => {
         s.archetypeId,
       ).toBe(sourced);
     }
+  });
+});
+
+describe("the Rocks rule is the guide's Mulligan line (M9-R5)", () => {
+  // "Mulligan (inference): hands of only 6+ cost cards, or hands with no 1-3 cost Character going first."
+  const pb = playbookFor('OP17-039', listOf('OP17-039'), cards);
+  const rule = pb.mulligan;
+  const own = listOf('OP17-039');
+  const early = own.filter((id) => rule.pieces[0]!.cards!.includes(id));
+  // 6+ cost cards that are not the guide's backup piece, so a hand of them has no backup either.
+  const pricey = [...new Set(own)].filter(
+    (id) => (cards.get(id)?.cost ?? 0) >= 6 && !rule.pieces[1]!.cards!.includes(id),
+  );
+  const mid = [...new Set(own)].filter(
+    (id) =>
+      !early.includes(id) &&
+      !rule.pieces[1]!.cards!.includes(id) &&
+      [4, 5].includes(cards.get(id)?.cost ?? 0),
+  );
+  const hand = (...ids: string[]) => ids.map((id) => cards.get(id));
+
+  it('has the cards the cases need', () => {
+    expect(early.length).toBeGreaterThan(0);
+    expect(pricey.length).toBeGreaterThan(1);
+    expect(mid.length).toBeGreaterThan(0);
+  });
+
+  it('going first, an early play without the backup piece is a keep (the keepable-hand rule would redraw it)', () => {
+    const h = hand(early[0]!, pricey[0]!, pricey[1]!, pricey[0]!, pricey[1]!);
+    expect(mulliganVerdict(h, rule, true).keep).toBe(true);
+  });
+
+  it('going first, no 1-3 cost Character is a redraw; so is a hand of only 6+ cost cards, either seat', () => {
+    const noEarly = hand(mid[0]!, pricey[0]!, pricey[1]!, pricey[0]!, pricey[1]!);
+    expect(mulliganVerdict(noEarly, rule, true).keep).toBe(false);
+    const allPricey = hand(pricey[0]!, pricey[1]!, pricey[0]!, pricey[1]!, pricey[0]!);
+    expect(mulliganVerdict(allPricey, rule, true).keep).toBe(false);
+    expect(mulliganVerdict(allPricey, rule, false).keep).toBe(false);
+  });
+
+  it('going second, a hand with a 4-5 cost card is not "only 6+": keep', () => {
+    const h = hand(mid[0]!, pricey[0]!, pricey[1]!, pricey[0]!, pricey[1]!);
+    expect(mulliganVerdict(h, rule, false).keep).toBe(true);
+  });
+
+  it('the redraw text for a hand of only 6+ cost cards names that rule', () => {
+    const allPricey = hand(pricey[0]!, pricey[1]!, pricey[0]!, pricey[1]!, pricey[0]!).filter(
+      (c): c is NonNullable<typeof c> => !!c,
+    );
+    const e = explainMulligan({ hand: allPricey, ownDeck: own, pb, first: false, cards });
+    expect(e.claim).toBe('Redraw this hand.');
+    expect(e.nextTime).toMatch(/only 6\+ cost cards/);
   });
 });

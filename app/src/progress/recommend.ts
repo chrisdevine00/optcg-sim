@@ -4,7 +4,9 @@
  * 1. Each concept scores over the last 10 reviewed, non-tutorial games: a flag weighs 3 (severe), 2
  *    (moderate), 1 (minor) or 0.5 (Hindsight); a game's flags are multiplied by 0.85 for each newer
  *    game; the sum is divided by the number of games looked at.
- * 2. +2 for the concept's primary lesson when its drill's last session is under the untimed exit.
+ * 2. +2 for the concept's primary lesson when its drill's last session is under the untimed exit,
+ *    in proportion to the session's size: a session of at least the exit's `of` items counts in full,
+ *    a shorter one by `n / of` (M9-R8: one wrong answer is not a failing drill).
  * 3. A concept whose lesson exit was passed within the last 5 games, with no flag of it since, is out.
  * 4. The highest score wins; a tie goes to the lesson earlier in the curriculum's teaching order.
  * 5. Fewer than 3 reviewed games: the next unfinished lesson, and the card says so.
@@ -98,6 +100,10 @@ export interface RecommendOptions {
   /** The decay per newer game; 0.85 by spec. A test sets 1 to show the pick depends on it. */
   decay?: number;
 }
+
+/** The drill's evidence for a session of `n` items under the exit: full weight from `of` items, else `n / of` of it. */
+export const drillEvidence = (rule: DrillRule, n: number): number =>
+  DRILL_EVIDENCE * Math.min(1, n / rule.of);
 
 const lessonOf = (code: LessonCode): Lesson | undefined => LESSONS.find((l) => l.code === code);
 const orderOf = (code: LessonCode): number => LESSONS.findIndex((l) => l.code === code);
@@ -210,8 +216,8 @@ export function recommend(
     const rule = info.rule;
     let underExit = false;
     if (isDrillRule(rule) && info.last && info.last.correct * rule.of < rule.n * info.last.n) {
-      score += DRILL_EVIDENCE;
-      underExit = true;
+      score += drillEvidence(rule, info.last.n);
+      underExit = info.last.n >= rule.of;
     }
     // 3. Passed lately, no flag since: out.
     const passedMs = info.passedAt ? Date.parse(info.passedAt) : NaN;

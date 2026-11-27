@@ -37,6 +37,7 @@ import {
   refutationCertainty,
   shouldCounterExplanation,
 } from '../review/should-counter.ts';
+import { withHandPremise } from './hand-premise.ts';
 import { applyAll, plainReply, startOf } from './play.ts';
 import { DRILL_SCRIPTS_VERSION, defencePosition, type ListSet } from './positions.ts';
 import type { CounterItem, DrillBank, ScenarioJson } from './types.ts';
@@ -415,6 +416,11 @@ export function explainCounter(
   cards: Cards,
   cap: Cap = COUNTER_CAP,
 ): Explanation | null {
+  const ex = explainCounterRaw(item, cards, cap);
+  return ex && withHandPremise(ex, item, item.detector === 'counter-wasted-b');
+}
+
+export function explainCounterRaw(item: CounterItem, cards: Cards, cap: Cap): Explanation | null {
   const { m0, counter } = replayCounter(item, cards);
   if (item.detector === 'should-counter') {
     // When the refutation's own first attack is this one, its whole-turn line is the answer (E05).

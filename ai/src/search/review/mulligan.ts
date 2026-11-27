@@ -20,6 +20,9 @@ import { flagId, type Detector, type ReviewFlag, type TurnResult } from './types
 export const isSourced = (pb: Playbook): boolean =>
   !pb.isDefault && /\bSH-[A-Z0-9]+/.test(pb.mulligan.source);
 
+/** The guide itself tags its keep or redraw rule as inference (a sourced baseline, built on by the guide's author). */
+export const isInference = (pb: Playbook): boolean => /inference/i.test(pb.mulligan.source);
+
 /** "luffy-rg" in `OP13-001-luffy-rg` becomes "Luffy RG"; `OP17-039-rocks` becomes "Rocks". */
 export function guideName(pb: Playbook): string {
   const rest = pb.archetypeId.startsWith(pb.leaderId + '-')
@@ -136,10 +139,13 @@ export function explainMulligan(args: ExplainMulliganArgs): Explanation {
     outcome = range
       ? `A ${Math.round(chance * 100)}% chance of a play by turn ${first ? 3 : 4} (your 2nd)${firstPlay === null ? '' : `, instead of none until turn ${firstPlay}`}.`
       : 'A fresh five cards, with a chance at the pieces this hand lacks.';
+    const floor = pb.mulligan.redrawIfAllCostAtLeast;
     nextTime =
-      range && first && pb.mulligan.requireGoingFirst.length > 0
-        ? `Going first with ${guide}, redraw any hand with no Character costing ${range.lo} to ${range.hi}.`
-        : `With ${guide}, redraw a hand that lacks ${list(unmet.map((p) => p.label))}.`;
+      floor !== undefined && !(range && first && pb.mulligan.requireGoingFirst.length > 0)
+        ? `With ${guide}, redraw a hand of only ${floor}+ cost cards.`
+        : range && first && pb.mulligan.requireGoingFirst.length > 0
+          ? `Going first with ${guide}, redraw any hand with no Character costing ${range.lo} to ${range.hi}.`
+          : `With ${guide}, redraw a hand that lacks ${list(unmet.map((p) => p.label))}.`;
     sources.push('CR 6-4-1', ...tags);
     move = { kind: 'redraw', text: 'Redraw all five.' };
   } else {

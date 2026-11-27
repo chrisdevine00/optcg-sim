@@ -32,6 +32,11 @@ export interface MulliganItem extends ItemBase {
   drill: 'mulligan';
   hand: string[];
   archetypeId: string;
+  /**
+   * M9-R11 (additive): the 50-card list the hand was drawn from. A committed bank item carries it, so its
+   * answer text (the odds of a fresh five) is a function of the item, not of the live meta file.
+   */
+  deck?: string[];
 }
 
 /** A described board position, without the card lookup: committed as JSON. */
@@ -106,4 +111,10 @@ export interface AnswerResult {
   shownAnswer: boolean;
   /** Milliseconds from showing the item to answering; null when untimed or not measured. */
   ms: number | null;
+  /**
+   * M9-R4 (additive): the limit in seconds that applied when this item was answered (the factor then, not
+   * the one at the end of the set); `null` when untimed or the clock was paused on this item, so it cannot
+   * count as inside the limit. Absent: the set's own factor applies.
+   */
+  limit?: number | null;
 }

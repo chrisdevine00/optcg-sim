@@ -83,14 +83,20 @@ const LABELS: Record<ExplanationContext, Partial<Record<Explanation['certainty']
 
 /**
  * The certainty chip's text in a context ("Certainty labels by context", explanations.md). A guide
- * label names the archetype: "From the Rocks guide (sourced)".
+ * label names the archetype: "From the Rocks guide (sourced)", or "(sourced baseline, inference)" when
+ * the guide tags the rule it gives as inference.
  */
 export function certaintyLabel(
   certainty: Explanation['certainty'],
   context: ExplanationContext,
   archetype?: string,
+  basis: 'sourced' | 'inference' = 'sourced',
 ): string {
   const label = LABELS[context][certainty];
   if (!label) throw new Error(`No ${context} label for ${certainty} (explanations.md)`);
-  return context === 'guide' && archetype ? `From the ${archetype} guide (sourced)` : label;
+  if (context !== 'guide' || !archetype) return label;
+  // A rule the guide itself tags as inference is not called sourced (M9-R5): only its baseline is.
+  return basis === 'inference'
+    ? `From the ${archetype} guide (sourced baseline, inference)`
+    : `From the ${archetype} guide (sourced)`;
 }

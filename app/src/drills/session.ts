@@ -11,12 +11,13 @@ import {
   EXIT as RULES,
   isDrillRule,
   sessionPasses,
+  timedPasses,
   type DrillRule,
 } from '../progress/exit.ts';
 import type { DrillSession, ProgressSink } from '../progress/types.ts';
 import type { AnswerResult, BoardItem, DrillId, DrillItem, SourceFilter } from './types.ts';
 import { DRILL_LESSON, DRILL_SLUGS } from './types.ts';
-import { limitSeconds } from './timer.ts';
+import { limitSeconds, withinLimit } from './timer.ts';
 
 /**
  * A bank item is a full `DrillItem`; an item cut from a game is a bare `BoardItem` (no stored answer: the
@@ -156,6 +157,22 @@ export interface Summary {
   };
 }
 
+/**
+ * The right answers that came inside the limit that applied to each: the limit recorded with the answer
+ * (`AnswerResult.limit`), else the set's own factor. A shown answer never counts.
+ */
+export function timedOkOf(
+  drill: DrillId,
+  results: readonly AnswerResult[],
+  factor: number | null,
+): number {
+  const setLimit = limitSeconds(drill, factor);
+  return results.filter(
+    (r) =>
+      r.correct && !r.shownAnswer && withinLimit(r.ms, r.limit === undefined ? setLimit : r.limit),
+  ).length;
+}
+
 export function summarise(
   drill: DrillId,
   results: readonly AnswerResult[],
@@ -180,11 +197,15 @@ export function summarise(
   let timed: Summary['timed'] = null;
   if (factor !== null) {
     const limit = limitSeconds(drill, factor)!;
-    const within = results.filter(
-      (r) => r.correct && !r.shownAnswer && r.ms !== null && r.ms / 1000 <= limit,
-    ).length;
+    const within = timedOkOf(drill, results, factor);
     const earns = factor <= 1 && full;
-    const ok = earns && sessionPasses(rule, { n: results.length, correct: within } as DrillSession);
+    // The rule Progress applies to the stored session (`timedPasses`): the answers it counts are these.
+    const ok = timedPasses(rule, {
+      n: results.length,
+      correct,
+      factor,
+      timedOk: within,
+    } as DrillSession);
     timed = {
       factor,
       within,
@@ -238,6 +259,7 @@ export function toDrillSession(o: {
     correct: o.results.filter((r) => r.correct && !r.shownAnswer).length,
     shown: o.results.filter((r) => r.shownAnswer).length,
     factor: o.factor,
+    ...(o.factor !== null ? { timedOk: timedOkOf(o.drill, o.results, o.factor) } : {}),
     itemIds: o.results.map((r) => r.itemId),
     ...(o.archetype ? { archetype: o.archetype } : {}),
   };

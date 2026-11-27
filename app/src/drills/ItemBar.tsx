@@ -27,7 +27,7 @@ export function ItemBar({
   note: string | null;
   timer: ItemTimer;
   factor: number | null;
-  onFactor(f: number | null): void;
+  onFactor?: ((f: number | null) => void) | undefined;
   onShow(): void;
   onSkip(): void;
   onLeave(): void;

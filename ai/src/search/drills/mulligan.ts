@@ -8,14 +8,14 @@
  * (sourced)". Nothing here reads a game, an opponent or a hidden card.
  */
 import type { Card } from '@optcg/cards';
-import { seedRng, shuffle } from '@optcg/engine';
+import { ENGINE_VERSION, seedRng, shuffle } from '@optcg/engine';
 import meta from '../../../../docs/research/meta-lists.json';
 import { certaintyLabel, type Explanation } from '../../explanation.ts';
 import { playbookFor } from '../../playbook.ts';
 import { mulliganVerdict, type MulliganVerdict } from '../mulligan.ts';
-import { explainMulligan, guideName, isSourced } from '../review/mulligan.ts';
-import type { ListSet } from './positions.ts';
-import type { MulliganItem } from './types.ts';
+import { explainMulligan, guideName, isInference, isSourced } from '../review/mulligan.ts';
+import { DRILL_SCRIPTS_VERSION, type ListSet } from './positions.ts';
+import type { DrillBank, MulliganItem } from './types.ts';
 
 export const MULLIGAN_LESSON = 'L12-mulligan';
 
@@ -66,6 +66,7 @@ export function verdictOf(
 
 /** The list the item's hand was drawn from. */
 export function deckOf(item: MulliganItem, lists: readonly ListSet[]): readonly string[] {
+  if (item.deck) return item.deck;
   const set = lists.find((l) => l.archetypeId === item.archetypeId);
   if (!set) throw new Error(`No lists for ${item.archetypeId}`);
   return set.lists[item.source.kind === 'bank' ? item.source.seed % set.lists.length : 0]!;
@@ -101,12 +102,33 @@ export function mulliganBank(sets: readonly ListSet[], cards: Cards): MulliganIt
           label: 'guide',
           hand,
           archetypeId: set.archetypeId,
+          deck: [...set.lists[seed % set.lists.length]!],
         };
       }
       for (const cls of ['keep', 'redraw'] as const) if (found[cls]) items.push(found[cls]!);
     }
   });
   return items;
+}
+
+/** The generator `scripts/drill-bank.ts` registers: the bank on the pinned lists, committed like the others. */
+export function generateMulliganBank(
+  cards: Cards,
+  opts: { log?: (line: string) => void } = {},
+): DrillBank & { counts: Record<string, number> } {
+  const counts: Record<string, number> = {};
+  const items = mulliganBank(metaListSets(), cards);
+  for (const i of items) {
+    const k = i.id.endsWith('-keep') ? 'keep' : 'redraw';
+    counts[k] = (counts[k] ?? 0) + 1;
+    opts.log?.(`${i.id}: ${k}`);
+  }
+  return {
+    drill: 'mulligan',
+    builtWith: { engine: ENGINE_VERSION, scripts: DRILL_SCRIPTS_VERSION },
+    items,
+    counts,
+  };
 }
 
 /** Does the player's choice agree with the guide? */
@@ -134,9 +156,15 @@ export function explainMulliganItem(
   });
 }
 
-/** "From the Rocks guide (sourced)": the item's certainty label. */
+/** "From the Rocks guide (sourced baseline, inference)" or "(sourced)": the item's certainty label. */
 export function mulliganLabel(item: MulliganItem, cards: Cards): string {
-  return certaintyLabel('any-hand', 'guide', guideName(playbookFor(item.mine, undefined, cards)));
+  const pb = playbookFor(item.mine, undefined, cards);
+  return certaintyLabel(
+    'any-hand',
+    'guide',
+    guideName(pb),
+    isInference(pb) ? 'inference' : 'sourced',
+  );
 }
 
 /** The sourced guides' leaders in `sets`, and those with no sourced mulligan rule (the start screen's note). */

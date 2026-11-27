@@ -73,6 +73,7 @@ export function AnswerScreen({
           idPrefix="drill-ex"
           headingLevel={2}
           archetype={view.archetype}
+          guideBasis={view.guideBasis}
           lessonLinks
         />
       ) : (

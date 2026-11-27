@@ -38,7 +38,9 @@ describe('lessonStatus', () => {
     [
       'a drill session over the exit at 100%',
       'L10',
-      inputOf([], { progress: progressOf([session('counter', 10, 8, t(1), { factor: 1 })]) }),
+      inputOf([], {
+        progress: progressOf([session('counter', 10, 8, t(1), { factor: 1, timedOk: 8 })]),
+      }),
       'passed-timed',
     ],
     [

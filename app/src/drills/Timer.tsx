@@ -53,7 +53,7 @@ export function TimerView({
   drill: DrillId;
   timer: ItemTimer;
   factor: number | null;
-  onFactor(f: number | null): void;
+  onFactor?: ((f: number | null) => void) | undefined;
 }) {
   const [, setBeat] = useState(0);
   const limit = limitSeconds(drill, factor);
@@ -66,7 +66,8 @@ export function TimerView({
         <select
           className="input"
           value={factor === null ? '' : String(factor)}
-          onChange={(e) => onFactor(e.target.value === '' ? null : Number(e.target.value))}
+          onChange={(e) => onFactor?.(e.target.value === '' ? null : Number(e.target.value))}
+          disabled={!onFactor}
           aria-describedby="drill-timer-words"
         >
           {TIMER_CHOICES.map((c) => (
@@ -78,6 +79,10 @@ export function TimerView({
       </label>
       <span className="sr-only" id="drill-timer-words">
         {limitWords(drill, factor)}. Time never ends an item.
+        {onFactor ? '' : ' The time allowed is fixed once you have answered an item.'}
+        {timer.everPaused && factor !== null
+          ? ' You paused on this item, so it will not count for the timed badge.'
+          : ''}
       </span>
       {limit !== null && left !== null && (
         <>
@@ -90,6 +95,7 @@ export function TimerView({
           <span className="drill-timer-num" data-testid="drill-timer">
             {over ? 'Over time' : `${clockWords(left)} left`}
             {timer.paused ? ' · paused' : ''}
+            {timer.everPaused && !timer.paused ? ' · not counted for the badge' : ''}
           </span>
           <button
             type="button"

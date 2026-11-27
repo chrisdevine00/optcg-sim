@@ -51,7 +51,7 @@ export function BoardItemScreen({
   note: string | null;
   timer: ItemTimer;
   factor: number | null;
-  onFactor(f: number | null): void;
+  onFactor?: ((f: number | null) => void) | undefined;
   onOutcome(o: BoardOutcome): void;
   onNoLethal?: () => void;
   /** DON!!: swap the board for the list of lines (only an item with lines has one). */

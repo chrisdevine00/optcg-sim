@@ -78,3 +78,9 @@ Details and options: `docs/research/m6b-runtime-audit.md` §3.
 ## 12. First paint waits for the store (M8 boot, 2026-11-26)
 
 - `main.tsx` awaits `initStore()` (IndexedDB open and migration, capped at 3 s) before the first render, so the first paint waits on IndexedDB. Render a shell first and open the store in parallel (only the save path, History and Settings → Data need it). Target: M10 performance pass (first playable board under 3 s on a throttled profile).
+
+## 13. M9 review, scope carries (docs/reviews/m9-review.md, fix round)
+
+- M9-R10: most counter and DON!! flags from real games cannot become drill items (a counter step carries pending state `scenarioOf` refuses; DON!! and target are practised in place); no any-hand lethal or counter flag came out of 15 seeded Rookie games, so the harder-hand path is tested on the bank's records only. Wanted: a modifier-free cut at the Main before a counter, a planted E01 game through `puzzleResponse` and `materialise`, and the flag list saying why a flag cannot be practised as a puzzle.
+- M9-R5 follow-up: the review's mulligan flag still says "From the <Leader> guide (sourced)" for a guide whose rule is tagged inference (its e2e asserts the text); the drill label says "(sourced baseline, inference)". Carry the basis on the flag and change both together.
+- M9-R4 follow-up: Progress cannot show why a timed session did not earn the badge (it stores `timedOk` only); the summary says it.

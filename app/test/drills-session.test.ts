@@ -10,15 +10,19 @@ import {
   ItemTimer,
   limitSeconds,
   TIMER_CHOICES,
+  withinLimit,
 } from '../src/drills/timer.ts';
+import { drillPassedAt, timedPasses } from '../src/progress/exit.ts';
 import {
   filterEntries,
   neededFor,
   pickItems,
   recordSafely,
+  ruleOf,
   seedOfSession,
   setProgressSink,
   summarise,
+  timedOkOf,
   toDrillSession,
   type DrillEntry,
 } from '../src/drills/session.ts';
@@ -173,6 +177,70 @@ describe('summary against the lesson’s exit', () => {
     expect(neededFor('lethal', 20)).toBe(16);
   });
 
+  it('the timed badge counts the limit that applied to each answer, not the final one (M9-R4)', () => {
+    // lethal: base 60 s. Ten right; the five slow ones ran under a 100% limit (60 s) and took 90 s,
+    // though the set ended at 200% (120 s). Scored against the final limit they would all be inside.
+    const mixed = rs(10, 10, 30_000).map((r, i) =>
+      i < 5 ? { ...r, ms: 90_000, limit: 60 } : { ...r, limit: 60 },
+    );
+    const s = summarise('lethal', mixed, 10, 1);
+    expect(s.timed).toMatchObject({ within: 5, passed: false });
+    expect(timedOkOf('lethal', mixed, 2)).toBe(5);
+    const noLimits = mixed.map(({ limit: _l, ...r }) => r);
+    expect(timedOkOf('lethal', noLimits, 2)).toBe(10);
+    // A paused item has no limit: it never counts as inside.
+    const paused = rs(10, 10, 1_000).map((r, i) => (i < 3 ? { ...r, limit: null } : r));
+    expect(timedOkOf('lethal', paused, 1)).toBe(7);
+    expect(summarise('lethal', paused, 10, 1).timed).toMatchObject({ within: 7, passed: false });
+  });
+
+  it('the boundary counts: an answer at exactly the limit is inside it, a millisecond over is not', () => {
+    const at = (ms: number) => rs(10, 10, ms).map((r) => ({ ...r, limit: 60 }));
+    expect(timedOkOf('lethal', at(60_000), 1)).toBe(10);
+    expect(timedOkOf('lethal', at(60_001), 1)).toBe(0);
+    // Without a recorded limit the set's own limit is the bar, with the same boundary.
+    expect(timedOkOf('lethal', rs(10, 10, 60_000), 1)).toBe(10);
+    expect(timedOkOf('lethal', rs(10, 10, 60_001), 1)).toBe(0);
+    expect(summarise('lethal', at(60_000), 10, 1).timed).toMatchObject({
+      within: 10,
+      passed: true,
+    });
+    expect(withinLimit(60_000, 60)).toBe(true);
+    expect(withinLimit(60_001, 60)).toBe(false);
+    expect(withinLimit(null, 60)).toBe(false);
+    expect(withinLimit(1, null)).toBe(false);
+  });
+
+  it('the summary’s timed pass is Progress’s: the stored session earns the badge exactly when the summary says passed', () => {
+    for (const ms of [30_000, 59_999, 60_000, 60_001, 200_000]) {
+      const results = rs(9, 10, ms).map((r) => ({ ...r, limit: 60 }));
+      const s = summarise('lethal', results, 10, 1);
+      const session = toDrillSession({
+        sid: 'a',
+        drill: 'lethal',
+        at: '2026-11-26T10:00:00.000Z',
+        results,
+        factor: 1,
+      });
+      expect(session.timedOk, String(ms)).toBe(s.timed!.within);
+      expect(timedPasses(ruleOf('lethal'), session), String(ms)).toBe(s.timed!.passed);
+      expect(drillPassedAt(ruleOf('lethal'), [session], true) !== null, String(ms)).toBe(
+        s.timed!.passed,
+      );
+    }
+  });
+
+  it('an untimed session records no timedOk, and a timed one records it', () => {
+    const base = {
+      sid: 'a',
+      drill: 'don' as const,
+      at: '2026-11-26T10:00:00.000Z',
+      results: rs(8, 10),
+    };
+    expect(toDrillSession({ ...base, factor: null }).timedOk).toBeUndefined();
+    expect(toDrillSession({ ...base, factor: 4 }).timedOk).toBeDefined();
+  });
+
   it('timed results are separate: only 100% or less with a full set earns the badge', () => {
     const fast = summarise('lethal', rs(9, 10, 30_000), 10, 1);
     expect(fast.timed).toMatchObject({ within: 9, earns: true, passed: true });
@@ -181,6 +249,23 @@ describe('summary against the lesson’s exit', () => {
     const generous = summarise('lethal', rs(9, 10, 90_000), 10, 2);
     expect(generous.timed).toMatchObject({ within: 9, earns: false, passed: false });
     expect(summarise('lethal', rs(9, 10), 10, null).timed).toBeNull();
+  });
+});
+
+describe('pause and the factor (M9-R4)', () => {
+  it('a paused item has no limit for the record, and a set that was never paused keeps its limit', () => {
+    const c = clock();
+    const t = new ItemTimer('lethal', 1, c.now);
+    t.start();
+    c.tick(10);
+    expect(t.limitForRecord()).toBe(60);
+    t.pause();
+    c.tick(500);
+    t.start();
+    expect(t.everPaused).toBe(true);
+    expect(t.limitForRecord()).toBeNull();
+    // Untimed: no limit either way.
+    expect(new ItemTimer('lethal', null, c.now).limitForRecord()).toBeNull();
   });
 });
 

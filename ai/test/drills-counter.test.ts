@@ -16,6 +16,7 @@ import {
   counterBank,
   counterItemAt,
   explainCounter,
+  explainCounterRaw,
   judgeCounter,
   naiveCounters,
   replayCounter,
@@ -126,7 +127,7 @@ describe('re-detection: the M8 detectors, run on the replayed record, flag what 
       expect(f.kind).toBe('counter-wasted');
       expect(f.certainty).toBe('any-hand');
       expect(f.practice).toEqual({ judge: 'no-counter-on-attack', turn: i.scenario.turn });
-      expect(f.explanation, i.id).toEqual(explainCounter(i, cards));
+      expect(f.explanation, i.id).toEqual(explainCounterRaw(i, cards, COUNTER_CAP));
       expect(f.explanation.conceptId).toBe(
         i.detector === 'counter-wasted-a' ? 'counters-and-blockers' : 'counter-or-take',
       );

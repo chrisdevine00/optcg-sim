@@ -422,7 +422,7 @@ export function counterWastedOf(
           { kind: 'take', text: `Best: take the hit and ${keep}.` },
           {
             kind: 'counter',
-            text: `Also fine: add ${list(addNames)} (${defenceAfter + add.reduce((t, e) => t + e.value, 0)} vs ${attackerPower}), spending ${played.length + add.length} cards to save ${lifeLost} Life.`,
+            text: `Weaker: add ${list(addNames)} (${defenceAfter + add.reduce((t, e) => t + e.value, 0)} vs ${attackerPower}), which stops it but spends ${played.length + add.length} cards to save ${lifeLost} Life.`,
             card: add[0]!.card,
           },
         ]

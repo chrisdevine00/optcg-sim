@@ -1,7 +1,7 @@
 /**
  * Reports the mulligan bank (M9 WP3): `npx tsx scripts/drill-bank-mulligan.ts`.
  *
- * The mulligan bank is not committed: `mulliganBank` rebuilds it at call time from the sourced lists
+ * The mulligan bank is committed (`npm run drills:bank -- mulligan`, M9-R11); `mulliganBank` builds it from the sourced lists
  * and the card data (about 36 hands). This prints what it holds, per guide and seat, and the guides
  * that have no sourced mulligan rule (the drill's start screen says so for those). Exit 1 when the bank
  * has fewer than `MIN_BANK` items or lacks Keep or Redraw items altogether.

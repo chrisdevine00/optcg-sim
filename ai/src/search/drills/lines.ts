@@ -31,7 +31,8 @@ export interface Line extends DonLine {
   kind: LineKind;
 }
 
-export type LineKind = 'spend' | 'two-cheaper' | 'give-attack' | 'hold' | 'play-give-one';
+export type LineKind =
+  'spend' | 'spend-give' | 'two-cheaper' | 'give-attack' | 'hold' | 'play-give-one';
 
 const other = (p: PlayerId): PlayerId => (p === 'p1' ? 'p2' : 'p1');
 
@@ -162,6 +163,24 @@ function build(kind: LineKind, start: GameState, seat: PlayerId, cards: Cards): 
       if (!any) return null;
       break;
     }
+    case 'spend-give': {
+      // The mixed line (M9-R7): play what can be played, then give every DON!! left to the attacker.
+      let any = false;
+      for (let i = 0; i < 10; i++) {
+        const p = playable(r)[0];
+        if (!p) break;
+        r.do(p);
+        r.settle();
+        any = true;
+      }
+      const atk = topAttacker(r);
+      if (!any || !atk) return null;
+      const before = r.actions.length;
+      give(r, atk);
+      if (r.actions.length === before) return null;
+      if (!attackLeader(r, atk)) return null;
+      break;
+    }
     case 'two-cheaper': {
       const pair = pairOf(r, queries.don(start, seat).active);
       if (!pair) return null;
@@ -197,11 +216,22 @@ function build(kind: LineKind, start: GameState, seat: PlayerId, cards: Cards): 
 }
 
 /** The order lines are offered when more than four are distinct. */
-const KINDS: LineKind[] = ['spend', 'give-attack', 'hold', 'play-give-one', 'two-cheaper'];
+const KINDS: LineKind[] = [
+  'spend',
+  'spend-give',
+  'give-attack',
+  'hold',
+  'play-give-one',
+  'two-cheaper',
+];
+
+/** The most lines one item offers. */
+export const MAX_LINES = 5;
 
 /**
- * Three to four distinct Main lines from `start` (a Main decision of `seat`): spend the DON!! on the
- * dearest plays, on two cheaper plays, give them to an attacker and attack, play one card and give 1 DON!!
+ * Three to five distinct Main lines from `start` (a Main decision of `seat`): spend the DON!! on the
+ * dearest plays, play what can be played and give the rest to an attacker (the mixed line), spend it on
+ * two cheaper plays, give it all to an attacker and attack, play one card and give 1 DON!!
  * to the Leader before its attack, or hold everything. Two lines with the same actions are one.
  */
 export function candidateLines(
@@ -228,7 +258,7 @@ export function candidateLines(
       unused: ledger.unused,
       held: ledger.held.n,
     });
-    if (out.length === 4) break;
+    if (out.length === MAX_LINES) break;
   }
   return out;
 }

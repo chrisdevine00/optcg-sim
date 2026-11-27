@@ -16,6 +16,7 @@ import { metaListSets } from './mulligan.ts';
 import { project, type GameState } from '@optcg/engine';
 import { donLedger, explainHeld, explainUnused, type DonLedger } from '../../coach/tempo.ts';
 import type { Explanation } from '../../explanation.ts';
+import { withHandPremise } from './hand-premise.ts';
 import { candidateLines, type Line, type LineKind } from './lines.ts';
 import { applyAll, startOf } from './play.ts';
 import { DRILL_SCRIPTS_VERSION, mainPosition, type ListSet } from './positions.ts';
@@ -32,10 +33,16 @@ export function scoreLines(
   lines: readonly Line[],
 ): { best: string[]; hold: boolean; lines: Line[] } | null {
   if (lines.length < 3) return null;
-  const sorted = [...lines].sort((a, b) => a.unused - b.unused);
-  if (sorted[0]!.unused >= sorted[1]!.unused) return null;
-  const best = sorted[0]!;
-  return { best: [best.id], hold: best.held > 0, lines: [...lines] };
+  const min = Math.min(...lines.map((l) => l.unused));
+  // A line that holds DON!! on purpose comes first: it is the one the answer text explains (E07).
+  const best = lines
+    .filter((l) => l.unused === min)
+    .sort((x, y) => Number(y.held > 0) - Number(x.held > 0));
+  // Lines tied at the least unused are all best (a mixed line and a full give can both leave 0): the
+  // judge, the board and `reverifyDon` read the same set. A real line must be worse than the best,
+  // not only "hold everything" (a menu where the one wrong answer is doing nothing teaches little).
+  if (!lines.some((l) => l.kind !== 'hold' && l.unused > min)) return null;
+  return { best: best.map((l) => l.id), hold: best.some((l) => l.held > 0), lines: [...lines] };
 }
 
 /** The item of a seeded position, or null when its lines have no unique best one. */
@@ -46,7 +53,7 @@ export function donItemAt(
   cards: Cards,
 ): DonItem | null {
   // E07's lesson is that a held DON!! is not an idle one: giving every DON!! away is not offered then.
-  const exclude: LineKind[] = mine.leaderId === HOLD_LEADER ? ['give-attack'] : [];
+  const exclude: LineKind[] = mine.leaderId === HOLD_LEADER ? ['give-attack', 'spend-give'] : [];
   const scenario = mainPosition(seed, mine, theirs, cards);
   if (!scenario) return null;
   const start = startOf(scenario, cards);
@@ -107,9 +114,9 @@ export function donBank(
     if (!item) continue;
     if (wantHold ? !item.hold : item.hold) continue;
     // Giving every DON!! to an attacker is the best line in most positions; keep it to half the bank.
-    if (!item.hold && item.best[0] === 'give-attack' && giveBest >= Math.floor(want.ordinary / 2))
-      continue;
-    if (item.best[0] === 'give-attack') giveBest++;
+    const giveOnly = item.best.length === 1 && item.best[0] === 'give-attack';
+    if (!item.hold && giveOnly && giveBest >= Math.floor(want.ordinary / 2)) continue;
+    if (giveOnly) giveBest++;
     if (item.hold) hold++;
     else ordinary++;
     items.push(item);
@@ -149,7 +156,10 @@ export function reverifyDon(
     held[l.id] = ledger.held.n;
   }
   const min = Math.min(...Object.values(unused));
-  const best = item.lines.filter((l) => unused[l.id] === min).map((l) => l.id);
+  const best = item.lines
+    .filter((l) => unused[l.id] === min)
+    .sort((x, y) => Number(held[y.id]! > 0) - Number(held[x.id]! > 0))
+    .map((l) => l.id);
   return { unused, best, hold: best.some((id) => held[id]! > 0) };
 }
 
@@ -163,6 +173,10 @@ export function explainDon(
   cards: Cards,
   lineId: string = item.best[0]!,
 ): Explanation {
+  return withHandPremise(explainDonRaw(item, cards, lineId), item);
+}
+
+function explainDonRaw(item: DonItem, cards: Cards, lineId: string): Explanation {
   const { end, ledger } = replayLine(item, lineId, cards);
   const view = project(end, 'p1');
   if (ledger.unused > 0) {

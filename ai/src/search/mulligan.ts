@@ -48,6 +48,11 @@ export function mulliganVerdict(
   }
   const missing = rule.pieces.filter((p) => !met[p.name]).length;
   let keep = missing <= (first ? 0 : rule.secondShort);
+  if (rule.redrawIfAllCostAtLeast !== undefined) {
+    // The guide's Mulligan line: redraw a hand of only expensive cards, or one with no early play going first.
+    const floor = rule.redrawIfAllCostAtLeast;
+    keep = !hand.every((c) => (c?.cost ?? 0) >= floor);
+  }
   if (first && rule.requireGoingFirst.some((name) => !met[name])) keep = false;
   return { keep, met, missing, fills };
 }
