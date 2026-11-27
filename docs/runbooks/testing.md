@@ -79,3 +79,29 @@ own instead of lowering the bar.
 3. Does it poll or wait? Give the wait a hang-guard size, not a bound.
 4. Does it fail when the behaviour it guards breaks? Apply the mutation (ignore the budget, drop the
    bias, disable compression), see it fail, revert, and record that in the commit or the review.
+
+## 5. Visual baselines
+
+Pixel comparison is the one check whose failures are mostly the renderer, not a defect, so it runs in
+the nightly (the `visual` job) and on dispatch, never per push (DECISIONS 2026-11-27 "M10 plan"). Per
+push keeps the saved screenshots and axe.
+
+- **What:** `app/e2e/visual/screens.spec.ts`, 15 screens at 1280x720 and 1920x1080 (30 files in
+  `app/e2e/__visual__/<project>/NN-name.png`). Every card-art host is aborted (cards are text faces; no
+  Bandai art enters an image), the date is fixed, reduced motion is on, fonts are awaited, game screens
+  start from fixed scenarios and seeds with the AI on iteration budgets. `npm run test:visual` runs it
+  (`VISUAL=1`).
+- **Baselines come from Linux only.** Dispatch the "Visual baselines" workflow (`visual-baseline.yml`),
+  download the `visual-baselines` artifact (or dispatch with `commit: true` for a PR from the branch
+  `visual/baselines`), read every image against `docs/design/principles.md` and the PROMPT's design
+  checks, and commit them in a commit that says what changed on screen. Never commit images made on a
+  Mac, and never edit baselines by hand: update only through the workflow.
+- **Absent baseline or other platform: a skip, never a failure.** Each spec prints why it skipped (no
+  baseline for that name, or "baselines are made on Linux"). `VISUAL_ANY_OS=1` runs the specs on another
+  platform to check that they execute; with `--update-snapshots` it would write non-Linux images into
+  `__visual__`, so delete them before committing.
+- **A nightly diff** uploads `visual-diffs` (expected, actual, diff). Read it: a real change means new
+  baselines through the workflow; noise means fix the spec's determinism, not the tolerance
+  (`maxDiffPixelRatio` 0.002, in `playwright.config.ts`).
+- `app/test/visual-support.test.ts` guards the harness per push: every `IMAGE_SOURCES` origin is aborted,
+  and `__visual__` holds only spec-named PNG files under 600 KB.

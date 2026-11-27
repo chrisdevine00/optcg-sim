@@ -60,6 +60,27 @@ jobs:
         with:
           name: nightly-results
           path: test-results/
+  # M10 WP8: pixel comparison of 15 screens at 1280x720 and 1920x1080 against the committed Linux
+  # baselines (app/e2e/__visual__). Nightly and on dispatch, not per push: renderer noise on a pixel
+  # diff is a non-defect failure (DECISIONS 2026-11-27 "M10 plan", lead amendment). Without baselines
+  # every spec skips with a message; a diff uploads expected, actual and diff images.
+  visual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:visual
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: visual-diffs
+          path: test-results/
   # M5b strength (ADR 0008; review M5a-10, M5b-4): 200 iteration-budgeted games per series over
   # twelve ordered deck pairs (all twelve archetypes), each seat in turn. Pirate vs Rookie at least
   # 75%, Warlord vs Rookie at least 95%, Warlord vs Pirate at least 65%, Warlord vs a one-iteration

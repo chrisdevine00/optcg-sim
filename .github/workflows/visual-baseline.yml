@@ -1,0 +1,45 @@
+name: Visual baselines
+# M10 WP8: pixel baselines are made here and nowhere else (a Mac render is not a Linux render).
+# Dispatch it, download the `visual-baselines` artifact, READ EVERY IMAGE against
+# docs/design/principles.md, then commit them (or dispatch with `commit: true` and review the PR the
+# branch `visual/baselines` gives you). docs/runbooks/testing.md, "Visual baselines".
+# Every card-art host is aborted by the specs, so no Bandai art is in an image.
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: 'Also push the images to the branch visual/baselines (open a PR from it)'
+        type: boolean
+        default: false
+permissions:
+  contents: write
+jobs:
+  baselines:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      # Same runner image and browser as the nightly comparison. Old images are removed first so a
+      # renamed screen leaves no orphan.
+      - run: rm -rf app/e2e/__visual__
+      - run: VISUAL=1 npx playwright test app/e2e/visual --update-snapshots --workers=1
+      - run: ls -l app/e2e/__visual__/*/ && du -sh app/e2e/__visual__
+      - uses: actions/upload-artifact@v4
+        with:
+          name: visual-baselines
+          path: app/e2e/__visual__/
+      - name: Push the images to visual/baselines
+        if: ${{ inputs.commit }}
+        run: |
+          git config user.name 'github-actions'
+          git config user.email 'github-actions@users.noreply.github.com'
+          git checkout -B visual/baselines
+          git add app/e2e/__visual__
+          git commit -m 'test(visual): regenerate pixel baselines on Linux'
+          git push --force origin visual/baselines
