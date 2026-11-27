@@ -84,3 +84,9 @@ Details and options: `docs/research/m6b-runtime-audit.md` §3.
 - M9-R10: most counter and DON!! flags from real games cannot become drill items (a counter step carries pending state `scenarioOf` refuses; DON!! and target are practised in place); no any-hand lethal or counter flag came out of 15 seeded Rookie games, so the harder-hand path is tested on the bank's records only. Wanted: a modifier-free cut at the Main before a counter, a planted E01 game through `puzzleResponse` and `materialise`, and the flag list saying why a flag cannot be practised as a puzzle.
 - M9-R5 follow-up: the review's mulligan flag still says "From the <Leader> guide (sourced)" for a guide whose rule is tagged inference (its e2e asserts the text); the drill label says "(sourced baseline, inference)". Carry the basis on the flag and change both together.
 - M9-R4 follow-up: Progress cannot show why a timed session did not earn the badge (it stores `timedOk` only); the summary says it.
+
+## 14. M10 carries (WP7, 2026-11-27)
+
+- **Life-tile caption** (M10 WP7 cut): the caption item lives in `app/src/play/board/Board.tsx`, outside WP7's files; not built. The midline's truncated activity text now has a `title` tooltip (the full text was already its accessible name).
+- **M6-14, M6-15, M6-17 to M6-21** (builder filters by colour and set, DON!! deck size, group by category, and the M6 review's smaller items): cut from M10 by the M10 plan (DECISIONS 2026-11-27 "M10 plan"); BACKLOG §2 had named M6-14 for M10.
+- **Builder tab stops:** 12 from the search box to the deck name (127 before); the spec's "12 or fewer to the last action" is not met literally (the page is under 25 stops).
