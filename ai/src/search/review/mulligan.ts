@@ -53,27 +53,24 @@ function earlyRange(
 
 const nth = (n: number): string => (n === 1 ? '1st' : n === 2 ? '2nd' : n === 3 ? '3rd' : `${n}th`);
 
-export const detect: Detector = (item, ctx): TurnResult | null => {
-  const action = ctx.record.actions[item.index];
-  if (!action || action.type !== 'mulligan') return null;
-  const me = action.player;
-  if (ctx.record.seats[me] !== 'human' || isAuto(ctx, item.index)) return null;
-  const s = ctx.stateAt(item.index);
-  const cards = ctx.cards;
-  const handViews = queries.zone(s, me, 'hand');
-  const hand = handViews.map((c) => cards.get(c.card)).filter((c): c is Card => !!c);
-  const leader = queries.zone(s, me, 'leader')[0]!.card;
-  // The seat's own list: the multiset of its deck, hand and Life (never an order).
-  const ownDeck = [
-    ...queries.zone(s, me, 'deck'),
-    ...handViews,
-    ...queries.zone(s, me, 'life'),
-  ].map((c) => c.card);
-  const pb = playbookFor(leader, ownDeck, cards);
-  if (!isSourced(pb)) return null;
-  const first = queries.turn(s).activePlayer === me;
+export interface ExplainMulliganArgs {
+  /** The five cards held. */
+  hand: readonly Card[];
+  /** The seat's own list: the multiset of its deck, hand and Life (never an order). */
+  ownDeck: readonly string[];
+  pb: Playbook;
+  first: boolean;
+  cards: ReadonlyMap<string, Card>;
+}
+
+/**
+ * The E10 / E11 explanation of what the guide says about a hand (keep or redraw), independent of
+ * what anyone chose. The mulligan detector and the M9 mulligan drill both call it. It reads the
+ * seat's own hand and own list only, so it is `any-hand`.
+ */
+export function explainMulligan(args: ExplainMulliganArgs): Explanation {
+  const { hand, ownDeck, pb, first, cards } = args;
   const verdict = mulliganVerdict(hand, pb.mulligan, first);
-  if (verdict.keep === !action.redraw) return null;
 
   const guide = guideName(pb);
   const counters = hand
@@ -180,6 +177,31 @@ export const detect: Detector = (item, ctx): TurnResult | null => {
     lessonId: 'L12-mulligan',
     sources,
   };
+  return explanation;
+}
+
+export const detect: Detector = (item, ctx): TurnResult | null => {
+  const action = ctx.record.actions[item.index];
+  if (!action || action.type !== 'mulligan') return null;
+  const me = action.player;
+  if (ctx.record.seats[me] !== 'human' || isAuto(ctx, item.index)) return null;
+  const s = ctx.stateAt(item.index);
+  const cards = ctx.cards;
+  const handViews = queries.zone(s, me, 'hand');
+  const hand = handViews.map((c) => cards.get(c.card)).filter((c): c is Card => !!c);
+  const leader = queries.zone(s, me, 'leader')[0]!.card;
+  // The seat's own list: the multiset of its deck, hand and Life (never an order).
+  const ownDeck = [
+    ...queries.zone(s, me, 'deck'),
+    ...handViews,
+    ...queries.zone(s, me, 'life'),
+  ].map((c) => c.card);
+  const pb = playbookFor(leader, ownDeck, cards);
+  if (!isSourced(pb)) return null;
+  const first = queries.turn(s).activePlayer === me;
+  const verdict = mulliganVerdict(hand, pb.mulligan, first);
+  if (verdict.keep === !action.redraw) return null;
+  const explanation = explainMulligan({ hand, ownDeck, pb, first, cards });
   const turn = Math.max(1, queries.turn(s).number);
   const flag: ReviewFlag = {
     id: flagId('mulligan', turn, item.index),

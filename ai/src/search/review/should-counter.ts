@@ -186,6 +186,49 @@ export const detect: Detector = (item: ReviewItem, ctx: DetectorContext) => {
   return { itemId: item.id, turn, flags, notes: [], ...(marker ? { marker } : {}) };
 };
 
+/**
+ * The E05 explanation of the battle `group` from the attacker's Main `m` (the first of `group` is the
+ * attack): the refutation's certainty, the defender's stronger line and what it survives at. The
+ * review's flag and the counter drill both call it (M9 WP3: extracted, behaviour unchanged).
+ */
+export function shouldCounterExplanation(
+  m: GameState,
+  attacker: PlayerId,
+  me: PlayerId,
+  cards: ReadonlyMap<string, Card>,
+  cap: Cap,
+  group: readonly Action[],
+  what: 'take' | 'counter' | 'other',
+): { explanation: Explanation; certainty: 'any-hand' | 'needed-hidden-info' } {
+  const { certainty, pv } = refutationCertainty(m, attacker, cap);
+  // The stronger line: your moves along the refutation, then how the turn ends.
+  let line: Move[] | null = null;
+  let survivedAt: number | null = null;
+  if (pv.length > 0) {
+    const r = renderDefence(m, pv, me, cards);
+    line = r.line.length > 0 ? r.line : null;
+    let s = r.end;
+    const dec = queries.decision(s);
+    if (!queries.result(s) && dec?.kind === 'main' && dec.player === attacker)
+      s = reduce(s, { type: 'endTurn', player: attacker }).state;
+    if (!queries.result(s)) survivedAt = queries.zone(s, me, 'life').length;
+  }
+  return {
+    certainty,
+    explanation: explainShouldCounter(
+      m,
+      attacker,
+      me,
+      cards,
+      certainty,
+      line,
+      survivedAt,
+      what,
+      group,
+    ),
+  };
+}
+
 function flagAt(
   ctx: DetectorContext,
   m: MainState,
@@ -197,8 +240,6 @@ function flagAt(
   const cards = ctx.cards;
   const rec = ctx.record;
   const decisionIndex = decisionOf(rec, m.index, next.index, me);
-  const { certainty, pv } = refutationCertainty(m.state, attacker, ctx.cap);
-
   // What you did: your choices from this battle to the end of the game.
   const did = renderDefence(m.state, rec.actions.slice(m.index), me, cards).line;
   const taken = rec.actions
@@ -208,29 +249,14 @@ function flagAt(
     .slice(m.index, next.index)
     .some((a) => a.player === me && (a.type === 'counter' || a.type === 'activate'));
 
-  // The stronger line: your moves along the refutation, then how the turn ends.
-  let line: Move[] | null = null;
-  let survivedAt: number | null = null;
-  if (pv.length > 0) {
-    const r = renderDefence(m.state, pv, me, cards);
-    line = r.line.length > 0 ? r.line : null;
-    let s = r.end;
-    const dec = queries.decision(s);
-    if (!queries.result(s) && dec?.kind === 'main' && dec.player === attacker)
-      s = reduce(s, { type: 'endTurn', player: attacker }).state;
-    if (!queries.result(s)) survivedAt = queries.zone(s, me, 'life').length;
-  }
-
-  const explanation = explain(
+  const { explanation, certainty } = shouldCounterExplanation(
     m.state,
     attacker,
     me,
     cards,
-    certainty,
-    line,
-    survivedAt,
-    taken && !counterUsed ? 'take' : counterUsed ? 'counter' : 'other',
+    ctx.cap,
     rec.actions.slice(m.index, next.index),
+    taken && !counterUsed ? 'take' : counterUsed ? 'counter' : 'other',
   );
   const severity: Severity = certainty === 'any-hand' ? 'severe' : 'hindsight';
   return {
@@ -248,7 +274,7 @@ function flagAt(
   };
 }
 
-function explain(
+export function explainShouldCounter(
   m: GameState,
   attacker: PlayerId,
   me: PlayerId,

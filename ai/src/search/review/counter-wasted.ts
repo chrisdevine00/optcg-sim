@@ -28,14 +28,7 @@ import {
 import type { Evidence, Explanation, Move } from '../../explanation.ts';
 import { counterValueOf, priorCardIds, priorFor } from '../../knowledge.ts';
 import { counterCard, counterOnlyPower, isAuto, nameOf, otherSeat, turnNumber } from './exact.ts';
-import {
-  flagId,
-  type Detector,
-  type FlagKind,
-  type ReviewFlag,
-  type Severity,
-  type TurnResult,
-} from './types.ts';
+import { flagId, type Detector, type ReviewFlag, type Severity, type TurnResult } from './types.ts';
 
 /** Life from which taking one hit is a choice, not a risk (spec: "Life before the hit >= 3"). */
 export const LIFE_SAFE = 3;
@@ -277,7 +270,7 @@ function repeatedKnapsack(
 // --- The window ------------------------------------------------------------------------------
 
 /** Take the hit: end the counter step, decline every "you may" and Trigger, until their Main. */
-function takeTheHit(s0: GameState, me: PlayerId): GameState {
+export function takeTheHit(s0: GameState, me: PlayerId): GameState {
   let s = reduce(s0, { type: 'endCounter', player: me }).state;
   for (let k = 0; k < 20; k++) {
     const dec = queries.decision(s);
@@ -309,51 +302,39 @@ interface Played {
   value: number;
 }
 
-export const detect: Detector = (item, ctx): TurnResult | null => {
-  const actions = ctx.record.actions;
-  const here = actions[item.index];
-  if (!here) return null;
-  const me = here.player;
-  if (ctx.record.seats[me] !== 'human') return null;
-  const dec = (i: number) => queries.decision(ctx.stateAt(i));
-  // Tolerate an item pointing inside the decision: back up to its first action.
-  let i0 = item.index;
-  while (i0 > 0 && actions[i0 - 1]!.player === me && dec(i0 - 1)?.kind === 'counter') i0--;
-  const d0 = dec(i0);
-  if (!d0 || d0.kind !== 'counter' || d0.player !== me || isAuto(ctx, i0)) return null;
-  const s0 = ctx.stateAt(i0);
+/** One counter committed against the attack: the action, its card id, and what it adds. */
+export interface PlayedCounter {
+  action: Action;
+  card: string;
+  value: number;
+}
+
+/** What the exact check says of a counter decision (E19 for `a`, E04 for `b`). */
+export interface CounterWasted {
+  /** `a`: the battle was lost anyway. `b`: it was stopped, and taking the hit was safe. */
+  case: 'a' | 'b';
+  severity: Severity;
+  certainty: Explanation['certainty'];
+  explanation: Explanation;
+  did: Move[];
+}
+
+/**
+ * The two exact cases on states, with no record: `s0` is the defender's counter decision, `sC` the
+ * state after `played` (still in the counter step). Extracted from the detector in M9 WP3 so the
+ * counter drill classifies positions with the very code that flags a game; behaviour is unchanged.
+ * Null when the counters do anything besides add power, or neither case holds.
+ */
+export function counterWastedOf(
+  s0: GameState,
+  sC: GameState,
+  played: readonly PlayedCounter[],
+  me: PlayerId,
+  cards: ReadonlyMap<string, Card>,
+): CounterWasted | null {
   const battle = queries.battle(s0);
-  if (!battle || battle.blocker !== null) return null;
-  const myLeader = queries.card(s0, battle.target);
-  if (myLeader.zone !== 'leader' || myLeader.owner !== me) return null;
-
-  // The counters committed in this decision, up to the action that ends the step.
-  const played: Played[] = [];
-  let endIdx = -1;
-  for (let k = i0; k < actions.length; k++) {
-    const a = actions[k]!;
-    if (a.player !== me) break;
-    const inst = counterCard(a);
-    if (inst) {
-      const c = queries.card(ctx.stateAt(k), inst);
-      played.push({
-        index: k,
-        action: a,
-        card: c.card,
-        value: counterValueOf(ctx.cards.get(c.card)) || (c.counter ?? 0),
-      });
-    }
-    if (a.type === 'endCounter') {
-      endIdx = k;
-      break;
-    }
-  }
-  if (played.length === 0 || endIdx < 0) return null;
-  const cards = ctx.cards;
+  if (!battle || battle.blocker !== null || played.length === 0) return null;
   if (!played.every((p) => counterOnlyPower(p.card, cards))) return null;
-
-  const turn = turnNumber(s0);
-  const sC = ctx.stateAt(endIdx);
   const lifeBefore = life(s0, me);
   const attackerPower = queries.card(sC, battle.attacker).power;
   const defenceBase = queries.card(s0, battle.target).power;
@@ -378,28 +359,6 @@ export const detect: Detector = (item, ctx): TurnResult | null => {
   const lifeLost = lifeBefore - lifeAfterTake;
   const handIfTake = handSize(taken, me);
   const handIfCounter = handSize(sC, me);
-
-  const make = (
-    kind: FlagKind,
-    severity: Severity,
-    explanation: Explanation,
-    did: Move[],
-  ): TurnResult => {
-    const flag: ReviewFlag = {
-      id: flagId(kind, turn, played[0]!.index),
-      kind,
-      turn,
-      player: me,
-      restoreIndex: i0,
-      decisionIndex: played[0]!.index,
-      severity,
-      certainty: explanation.certainty,
-      explanation,
-      did,
-      practice: { judge: 'no-counter-on-attack', turn },
-    };
-    return { itemId: item.id, turn, flags: [flag], notes: [] };
-  };
 
   // --- (a) the battle was lost anyway (E19) ---
   if (lostAnyway) {
@@ -492,7 +451,7 @@ export const detect: Detector = (item, ctx): TurnResult | null => {
           : ''),
       card: p.card,
     }));
-    return make('counter-wasted', 'moderate', explanation, did);
+    return { case: 'a', severity: 'moderate', certainty: explanation.certainty, explanation, did };
   }
 
   // --- (b) the counters stopped it, and taking it was safe (E04) ---
@@ -559,5 +518,66 @@ export const detect: Detector = (item, ctx): TurnResult | null => {
       (i === played.length - 1 ? ` Your Leader ${defenceAfter}: attack stopped.` : ''),
     card: p.card,
   }));
-  return make('counter-wasted', severity, explanation, did);
+  return { case: 'b', severity, certainty: explanation.certainty, explanation, did };
+}
+
+export const detect: Detector = (item, ctx): TurnResult | null => {
+  const actions = ctx.record.actions;
+  const here = actions[item.index];
+  if (!here) return null;
+  const me = here.player;
+  if (ctx.record.seats[me] !== 'human') return null;
+  const dec = (i: number) => queries.decision(ctx.stateAt(i));
+  // Tolerate an item pointing inside the decision: back up to its first action.
+  let i0 = item.index;
+  while (i0 > 0 && actions[i0 - 1]!.player === me && dec(i0 - 1)?.kind === 'counter') i0--;
+  const d0 = dec(i0);
+  if (!d0 || d0.kind !== 'counter' || d0.player !== me || isAuto(ctx, i0)) return null;
+  const s0 = ctx.stateAt(i0);
+  const battle = queries.battle(s0);
+  if (!battle || battle.blocker !== null) return null;
+  const myLeader = queries.card(s0, battle.target);
+  if (myLeader.zone !== 'leader' || myLeader.owner !== me) return null;
+
+  // The counters committed in this decision, up to the action that ends the step.
+  const played: Played[] = [];
+  let endIdx = -1;
+  for (let k = i0; k < actions.length; k++) {
+    const a = actions[k]!;
+    if (a.player !== me) break;
+    const inst = counterCard(a);
+    if (inst) {
+      const c = queries.card(ctx.stateAt(k), inst);
+      played.push({
+        index: k,
+        action: a,
+        card: c.card,
+        value: counterValueOf(ctx.cards.get(c.card)) || (c.counter ?? 0),
+      });
+    }
+    if (a.type === 'endCounter') {
+      endIdx = k;
+      break;
+    }
+  }
+  if (played.length === 0 || endIdx < 0) return null;
+  const cards = ctx.cards;
+  if (!played.every((p) => counterOnlyPower(p.card, cards))) return null;
+  const turn = turnNumber(s0);
+  const r = counterWastedOf(s0, ctx.stateAt(endIdx), played, me, cards);
+  if (!r) return null;
+  const flag: ReviewFlag = {
+    id: flagId('counter-wasted', turn, played[0]!.index),
+    kind: 'counter-wasted',
+    turn,
+    player: me,
+    restoreIndex: i0,
+    decisionIndex: played[0]!.index,
+    severity: r.severity,
+    certainty: r.certainty,
+    explanation: r.explanation,
+    did: r.did,
+    practice: { judge: 'no-counter-on-attack', turn },
+  };
+  return { itemId: item.id, turn, flags: [flag], notes: [] };
 };

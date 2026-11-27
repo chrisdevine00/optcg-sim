@@ -43,6 +43,16 @@ type Generator = (ctx: GenContext) => Promise<DrillBank & { tried?: number; coun
 
 /** drill -> generator. WP3 adds `mulligan`, `counter` and `don` here, one line each. */
 const GENERATORS: Partial<Record<DrillId, Generator>> = {
+  counter: async (ctx) =>
+    (await import('../ai/src/search/drills/counter.ts')).generateCounterBank(ctx.cards, {
+      ...(ctx.maxSeeds ? { maxSeeds: ctx.maxSeeds } : {}),
+      log: ctx.log,
+    }),
+  don: async (ctx) =>
+    (await import('../ai/src/search/drills/don.ts')).generateDonBank(ctx.cards, {
+      ...(ctx.maxSeeds ? { maxSeeds: ctx.maxSeeds } : {}),
+      log: ctx.log,
+    }),
   lethal: async (ctx) =>
     (await import('../ai/src/search/drills/lethal-gen.ts')).generateLethalBank(ctx.cards, {
       leaders: ctx.leaders,
