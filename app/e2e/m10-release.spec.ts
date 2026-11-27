@@ -378,7 +378,7 @@ test.describe('Content-Security-Policy', () => {
     expect((await csp.violations()).join('\n')).toContain('connect-src');
   });
 
-  test('home, a Rookie turn (AI worker), the builder and a drill run with no violation, and the image fallback holds', async ({
+  test('home, a Rookie turn (AI worker), a review (review worker), the builder and a drill run with no violation, and the image fallback holds', async ({
     page,
   }) => {
     test.setTimeout(180_000);
@@ -412,6 +412,19 @@ test.describe('Content-Security-Policy', () => {
       else throw new Error(`Unexpected decision ${k}`);
     }
     expect(mains).toBe(2);
+
+    // A review: the review worker (and its pool) runs under the policy. The planted lethal demo,
+    // conceded, gives one severe missed-lethal flag (review-screen.spec.ts asserts the same text).
+    await startGame(page, 'scenario=lethalDemo&speed=4&opp=rookie');
+    await nextDecision(page);
+    await page.getByRole('button', { name: 'Game menu' }).click();
+    await page.getByRole('menuitem', { name: 'Concede…' }).click();
+    await page.getByRole('button', { name: 'Concede', exact: true }).click();
+    await expect(page.locator('#decision')).toHaveAttribute('data-kind', 'over');
+    await page.locator('#review-btn').click();
+    await expect(page.getByTestId('review-status')).toHaveText('1 flag · 1 severe', {
+      timeout: 60_000,
+    });
 
     // The builder.
     await importDeck(page, ROCKS);

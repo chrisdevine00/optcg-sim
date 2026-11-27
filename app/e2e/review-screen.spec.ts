@@ -12,6 +12,12 @@ import { expect, test, type Page, type TestInfo } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { nextDecision, startGame } from './game-support.ts';
 
+// These specs read and write the stored review through `new Function` inside the page (the
+// helpers below take their IndexedDB step as source text). The app's Content-Security-Policy
+// (M10 WP6: `script-src 'self'`, no 'unsafe-eval') blocks that, so the harness bypasses CSP here;
+// the policy itself is tested in m10-release.spec.ts, including a review run.
+test.use({ bypassCSP: true });
+
 async function axe(page: Page, info: TestInfo, name: string) {
   await page.screenshot({ path: `.cache/m8wp6/${info.project.name}-${name}.png` });
   const r = await new AxeBuilder({ page })

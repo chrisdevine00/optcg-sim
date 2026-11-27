@@ -7,6 +7,12 @@ import { expect, test, type Page } from '@playwright/test';
 import { nextDecision, startGame } from './game-support.ts';
 import { axe, load, planted, status } from './review-m8-support.ts';
 
+// These specs read and write the stored review through `new Function` inside the page (the
+// helpers below take their IndexedDB step as source text). The app's Content-Security-Policy
+// (M10 WP6: `script-src 'self'`, no 'unsafe-eval') blocks that, so the harness bypasses CSP here;
+// the policy itself is tested in m10-release.spec.ts, including a review run.
+test.use({ bypassCSP: true });
+
 test('Overview: the missed lethal, with its flag selected', async ({ page }, info) => {
   const g = planted()['missed-lethal']!;
   await load(page, [g], `./reviews/${g.id}`);
