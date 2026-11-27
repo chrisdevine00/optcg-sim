@@ -36,12 +36,19 @@ export function ItemBar({
 }) {
   return (
     <div className="drill-bar" role="group" aria-label="Drill controls">
-      <p className="drill-progress" data-testid="drill-progress">
-        <b>
-          Item {index + 1} of {total}
-        </b>
-        {note && <span className="drill-note"> · {note}</span>}
-      </p>
+      <div className="drill-bar-head">
+        <p className="drill-progress" data-testid="drill-progress">
+          <b>
+            Item {index + 1} of {total}
+          </b>
+          {note && <span className="drill-note"> · {note}</span>}
+        </p>
+        {/* Leave sits with "Item N of M" (navigation, not an answer), so the answer row fits the
+            720p rail on one line instead of wrapping below the fold (M9 gate screenshots). */}
+        <button type="button" className="btn small" onClick={onLeave}>
+          Leave
+        </button>
+      </div>
       <div className="drill-bar-actions">
         {children}
         <button type="button" className="btn small" onClick={onShow}>
@@ -49,9 +56,6 @@ export function ItemBar({
         </button>
         <button type="button" className="btn small" onClick={onSkip}>
           Skip
-        </button>
-        <button type="button" className="btn small" onClick={onLeave}>
-          Leave
         </button>
       </div>
       <TimerView drill={drill} timer={timer} factor={factor} onFactor={onFactor} />
