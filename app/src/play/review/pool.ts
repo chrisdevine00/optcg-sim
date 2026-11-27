@@ -105,7 +105,8 @@ export class ReviewPool {
       this.markers[i] = m.markers;
       this.idle[i] = true;
       if (this.idle.every(Boolean)) this.handlers.onDone?.(this.markers.flat());
-    } else this.fail(m.message);
+    } else if (m.type === 'error') this.fail(m.message);
+    // 'puzzle' answers (M9 WP4 intake, WP7) are handled by the package that sends the request.
   }
 
   private fail(message: string): void {

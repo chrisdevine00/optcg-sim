@@ -2,6 +2,12 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-26 — M9 WP0: contracts are types plus per-owner stub files, so parallel packages share no file
+
+- **Context:** WP1, WP2, WP3 and WP5 build in parallel from the WP0 contracts; the spec gave `bankFor` one home (`ai/src/search/drills/index.ts`) that WP2 and WP3 would both have to edit, and every new route needs a page.
+- **Decision:** `bankFor` dispatches to one file per drill (`bank-lethal.ts` for WP2; `bank-mulligan.ts`, `bank-counter.ts`, `bank-don.ts` for WP3), each an empty-bank stub, so `index.ts` never changes again. Each route has a stub page that its package replaces (`StubPage` in `app/src/routes/Stub.tsx`); `routes/m9.ts` holds the pure path table (`m9Route`, `ruleIdOf`) that `App.tsx` and the tests share, so no package edits `App.tsx`. Drills and Rules keep **Learn** marked current in the nav (they sit under it). `ReviewRequest` gains `{type:'puzzle', flagId, record?, cards?}`: the optional record and cards let intake ask for a stored review that no job holds (a review job only holds the record it started with). The review validator accepts the three new judges and `expect`. New routes are lazy; the initial bundle went from 80.9 to 81.8 KB gzipped (route table, nav).
+- **Rejected:** one `bankFor` switch edited by two packages (merge conflicts); an app-side bank loader (the spec puts `bankFor` in ai; where the committed JSON is read from stays WP2/WP3's call).
+
 ## 2026-11-26 — M9 plan: explorer, four drills with deterministic banks, rules reference with validated demos, progress derived not copied
 
 - **Context:** PLAN row 20 (40 h). Done criteria: guides render with as-of dates and sources; each drill at least 20 items; puzzles include items generated from review flags; progress persists, exports and recommends a next lesson. M8 left the hindsight-puzzle label, the any-hand puzzle's harder hand, Practice for DON!!, attack-order and mulligan flags, the full Learn hub, the tutorial citation link and the `optcg.tutorial.credit.v1` credit to M9.

@@ -42,6 +42,10 @@ const PUZZLE_WORDS: Record<PracticeJudge, { solved: string; failed: string }> = 
     solved: 'you took the hit and kept your cards.',
     failed: 'you played a Counter.',
   },
+  // M9 WP0 placeholders; WP4 owns the judges and these words.
+  'don-ledger': { solved: 'you spent your DON!!.', failed: 'DON!! was left unused.' },
+  'target-best': { solved: 'you chose the best target.', failed: 'another target was better.' },
+  mulligan: { solved: 'you chose well.', failed: 'the guide chooses otherwise.' },
 };
 
 export type Speed = 'step' | 0.5 | 1 | 2 | 4;

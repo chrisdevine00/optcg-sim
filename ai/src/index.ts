@@ -112,3 +112,5 @@ export {
 export { priorityOf, answerCoach, type Work } from './coach/dispatch.ts';
 // M8 WP0: review contracts, detector registry, LethalFlag adapter.
 export * from './search/review/index.ts';
+// M9 WP0: drill contracts and the (stub) banks.
+export * from './search/drills/index.ts';

@@ -242,6 +242,16 @@ export class ReviewJob {
       this.cancelled = true;
       return;
     }
+    if (req.type === 'puzzle') {
+      // M9 WP0 stub; WP7 wires `puzzleFromFlag` here.
+      this.post({
+        type: 'puzzle',
+        flagId: req.flagId,
+        item: null,
+        reason: 'Practice from this flag is not built yet',
+      });
+      return;
+    }
     if (!s) return;
     if (req.type === 'prioritise') s.prioritise(req.turn);
     else if (req.type === 'deeper') {

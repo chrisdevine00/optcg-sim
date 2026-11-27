@@ -12,6 +12,7 @@ import type {
   PlayerId,
 } from '@optcg/engine';
 import type { Explanation, Move } from '../../explanation.ts';
+import type { BoardItem } from '../drills/types.ts';
 import type { LethalResult } from '../lethal/lethal.ts';
 import type { Cap } from '../lethal/search.ts';
 
@@ -37,8 +38,17 @@ export const FLAG_KINDS: readonly FlagKind[] = [
 /** Hindsight is never severe: a flag that needed their hidden cards is shown in its own style. */
 export type Severity = 'severe' | 'moderate' | 'minor' | 'hindsight';
 
-/** The puzzle a flag can be practised as; DON!!, target and mulligan have none yet. */
-export type PracticeJudge = 'win-this-turn' | 'survive-turn' | 'no-counter-on-attack';
+/**
+ * The puzzle a flag can be practised as. M9 WP0 (types only) adds `don-ledger`, `target-best` and
+ * `mulligan`; WP7 makes the detectors set them and WP4 the controller judge them.
+ */
+export type PracticeJudge =
+  | 'win-this-turn'
+  | 'survive-turn'
+  | 'no-counter-on-attack'
+  | 'don-ledger'
+  | 'target-best'
+  | 'mulligan';
 
 export interface ReviewFlag {
   /** `${kind}:${turn}:${decisionIndex}`: stable across re-analysis; the key of "Practised". */
@@ -56,7 +66,12 @@ export interface ReviewFlag {
   explanation: Explanation;
   /** "What you did", built in ai/ from the record. */
   did: Move[];
-  practice?: { judge: PracticeJudge; turn: number };
+  practice?: {
+    judge: PracticeJudge;
+    turn: number;
+    /** M9 (additive): what the judge compares with. `unusedMin` for `don-ledger`, a `target` handle for `target-best`. */
+    expect?: { target?: string; unusedMin?: number };
+  };
   /** M8 WP1 (additive): the missed-lethal proofs, which Study (the line's handles) and Practice read. */
   lethal?: LethalProof;
 }
@@ -154,12 +169,19 @@ export type ReviewRequest =
   /** "Analyse now": run this turn's items next. */
   | { type: 'prioritise'; turn: number }
   /** Re-run these items with `factor` times the cap. */
-  | { type: 'deeper'; itemIds: string[]; factor: number };
+  | { type: 'deeper'; itemIds: string[]; factor: number }
+  /**
+   * M9 (additive): "build a practice item from this flag" (`puzzleFromFlag`, WP2; wired by WP7).
+   * `record` and `cards` are set when no review job holds the record (a stored review, WP4 intake).
+   */
+  | { type: 'puzzle'; flagId: string; record?: ReviewRecord; cards?: Card[] };
 
 export type ReviewResponse =
   | { type: 'progress'; done: number; total: number; turn: number; turns: number }
   | { type: 'items'; results: TurnResult[] }
   | { type: 'done'; markers: ReviewMarker[] }
-  | { type: 'error'; message: string };
+  | { type: 'error'; message: string }
+  /** M9 (additive): the answer to `puzzle`; `item` is null with a `reason` when the flag has no puzzle. */
+  | { type: 'puzzle'; flagId: string; item: BoardItem | null; reason?: string };
 
 export type PracticedState = 'solved' | 'not-yet';

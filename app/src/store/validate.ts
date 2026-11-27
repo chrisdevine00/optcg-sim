@@ -198,9 +198,19 @@ function flag(v: unknown): ReviewFlag {
         'win-this-turn',
         'survive-turn',
         'no-counter-on-attack',
+        'don-ledger',
+        'target-best',
+        'mulligan',
       ] as const),
       turn: int(p.turn, 'a practice turn', 0, 10_000),
     };
+    if (p.expect !== undefined) {
+      const e = obj(p.expect, 'practice expect');
+      f.practice.expect = {};
+      if (e.target !== undefined) f.practice.expect.target = str(e.target, 'a target handle', 64);
+      if (e.unusedMin !== undefined)
+        f.practice.expect.unusedMin = int(e.unusedMin, 'unusedMin', 0, 100);
+    }
   }
   return f;
 }

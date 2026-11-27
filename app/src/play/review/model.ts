@@ -289,6 +289,12 @@ export function notableMoves(
 
 export const DRILLS_COPY = 'Practice for this kind comes with the drills.';
 
+const NOT_YET_PRACTICABLE: ReadonlySet<PracticeJudge> = new Set([
+  'don-ledger',
+  'target-best',
+  'mulligan',
+]);
+
 export type PracticeAvailability =
   { ok: true; judge: PracticeJudge; turn: number } | { ok: false; reason: string };
 
@@ -300,7 +306,9 @@ export function practiceOf(
 ): PracticeAvailability {
   if (!f) return { ok: false, reason: 'Choose a flag first.' };
   if (!live) return { ok: false, reason: staleCopy };
-  if (!f.practice) return { ok: false, reason: DRILLS_COPY };
+  // WP7 makes the DON!!, target and mulligan judges practicable; until then they read as before.
+  if (!f.practice || NOT_YET_PRACTICABLE.has(f.practice.judge))
+    return { ok: false, reason: DRILLS_COPY };
   return { ok: true, judge: f.practice.judge, turn: f.practice.turn };
 }
 
@@ -312,12 +320,20 @@ export const PRACTICE_INTRO: Record<PracticeJudge, (turn: number) => string> = {
     `Practice: survive turn ${t}. Nothing is timed. Find the defence that keeps you in the game.`,
   'no-counter-on-attack': () =>
     'Practice: this attack. Nothing is timed. Take the hit, or find out why you should not.',
+  'don-ledger': (t) =>
+    `Practice: turn ${t}. Nothing is timed. Spend your DON!! so little is left unused.`,
+  'target-best': () =>
+    'Practice: this attack. Nothing is timed. Choose the target that gets the most from it.',
+  mulligan: () => 'Practice: your opening hand. Nothing is timed. Keep it or redraw.',
 };
 
 export const PRACTICE_LABEL: Record<PracticeJudge, string> = {
   'win-this-turn': 'Win this turn',
   'survive-turn': 'Survive the turn',
   'no-counter-on-attack': 'Take this attack without a Counter',
+  'don-ledger': 'Spend your DON!!',
+  'target-best': 'Choose the best target',
+  mulligan: 'Keep or redraw',
 };
 
 export const practisedWord = (s: 'solved' | 'not-yet' | undefined): string | null =>
