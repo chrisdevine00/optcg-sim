@@ -22,7 +22,7 @@ import {
   type SessionRecord,
   type Start,
 } from '../../session/index.ts';
-import { AiClient, type AiDecision, type CoachPort } from './ai-client.ts';
+import { AiClient, type AiDecision, type AiParts, type CoachPort } from './ai-client.ts';
 import { BlunderGuard } from '../coach/blunder.ts';
 import { Coach } from '../coach/coach.ts';
 import { PoliteQueue } from './politeQueue.ts';
@@ -382,7 +382,9 @@ export class GameController {
         budgets: config.aiBudgets ?? 'ms',
       };
       const init = aiInitCards(cards, config.aiCardIds ?? [], opponentLeader);
-      this.ai = config.aiPort ? config.aiPort(init, game) : new AiClient(init, game);
+      this.ai = config.aiPort
+        ? config.aiPort(init, game)
+        : new AiClient(init, game, { adoptWarm: true });
     }
     if (config.mode === 'hotseat') {
       this.curtainFor = this.seat;
@@ -840,6 +842,15 @@ export class GameController {
     skipped: boolean;
     moves: number;
     thinkMs: number;
+    /**
+     * `thinkMs` apportioned over where the awaited requests spent their time (M10 WP3): the message
+     * there and back, the wait behind earlier work, the session build and the search. They add up
+     * to `thinkMs` (to rounding); all 0 when the worker is a test double that reports no parts.
+     */
+    transferMs: number;
+    queueMs: number;
+    setupMs: number;
+    searchMs: number;
   }[] = [];
   private aiTurn: {
     turn: number;
@@ -850,6 +861,7 @@ export class GameController {
     /** Moves shown, and time the board waited on the worker. */
     moves: number;
     thinkMs: number;
+    split: AiParts;
   } | null = null;
 
   /** The stored explanation of the AI move that starts at this log index, if it had a choice. */
@@ -920,6 +932,7 @@ export class GameController {
         skipped: this.skipping,
         moves: 0,
         thinkMs: 0,
+        split: { transferMs: 0, queueMs: 0, setupMs: 0, searchMs: 0 },
       };
       if (this.config.tier !== 'rookie') {
         const plan = this.ai!.planTurn(
@@ -975,7 +988,7 @@ export class GameController {
       const t0 = now();
       try {
         const r = await pending.result;
-        if (this.aiTurn && ownTurn) this.aiTurn.thinkMs += now() - t0;
+        if (this.aiTurn && ownTurn) this.thought(now() - t0, r.parts);
         action = r.action;
         explanation = r.explanation;
       } catch (e) {
@@ -1082,6 +1095,10 @@ export class GameController {
         skipped: t.skipped || this.skipping,
         moves: t.moves,
         thinkMs: Math.round(t.thinkMs),
+        transferMs: Math.round(t.split.transferMs),
+        queueMs: Math.round(t.split.queueMs),
+        setupMs: Math.round(t.split.setupMs),
+        searchMs: Math.round(t.split.searchMs),
       });
     }
     if (this.speed === 'step' && !this.skipping && kind === 'main') {
@@ -1097,13 +1114,36 @@ export class GameController {
     return aiDwell(performance.now() - t.start - t.humanMs - t.thinkMs, this.speed);
   }
 
-  /** The AI's next action if it is already requested (the prefetch), else null. */
+  /**
+   * Time the board spent waiting on the worker: it is thinking time, not board time (`ms - thinkMs`
+   * is what the pacing holds), and the dwell compression reads it the same way. Apportioned over
+   * the request's parts when the worker reported them (M10 WP3).
+   */
+  private thought(ms: number, parts?: AiParts): void {
+    const t = this.aiTurn;
+    if (!t) return;
+    t.thinkMs += ms;
+    const whole = parts ? parts.transferMs + parts.queueMs + parts.setupMs + parts.searchMs : 0;
+    if (!parts || whole <= 0) return;
+    for (const k of ['transferMs', 'queueMs', 'setupMs', 'searchMs'] as const)
+      t.split[k] += (ms * parts[k]) / whole;
+  }
+
+  /**
+   * The AI's next action if it is already requested (the prefetch), else null. The wait for it is
+   * the worker's thinking time and is booked as such (review M5a-20): it used to fall into board
+   * time, so a slow search made the next dwell compress and the turn look longer than it played.
+   */
   private async peekNext(): Promise<Action | null> {
     const p = this.prefetched;
     if (!p) return null;
+    const t0 = performance.now();
     try {
-      return (await p.result).action;
+      const r = await p.result;
+      if (this.aiTurn) this.thought(performance.now() - t0, r.parts);
+      return r.action;
     } catch {
+      if (this.aiTurn) this.thought(performance.now() - t0);
       return null;
     }
   }

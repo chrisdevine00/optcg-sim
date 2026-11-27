@@ -1160,10 +1160,15 @@ export function Game({
       className={`play ${L.density} ${L.rail.w < 320 ? 'narrow-rail' : ''}`}
       style={style}
       data-me={me}
-      // Measured AI turns (flows F21), for the pacing check: "turn:ms@speed/moves/thinkMs".
+      // Measured AI turns (flows F21), for the pacing check: "turn:ms@speed/moves/thinkMs", then (M10
+      // WP3) the wait's parts "/transferMs/queueMs/setupMs/searchMs"; a reader of the first four
+      // fields is unchanged.
       data-ai-turns={ctl.aiTurns
         .filter((t) => !t.skipped)
-        .map((t) => `${t.turn}:${t.ms}@${t.speed}/${t.moves}/${t.thinkMs}`)
+        .map(
+          (t) =>
+            `${t.turn}:${t.ms}@${t.speed}/${t.moves}/${t.thinkMs}/${t.transferMs}/${t.queueMs}/${t.setupMs}/${t.searchMs}`,
+        )
         .join(' ')}
     >
       {!L.supported ? (

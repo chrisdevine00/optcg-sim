@@ -279,3 +279,40 @@ On this Mac every frame of the turn is on the 60 Hz tick at 4× (the requirement
 2. **The one measurable regression is Best practices 96**, from three icon links whose files WP6 adds.
 3. **Initial JS grew 0.8 KB** (84.3 against 83.5) through chunk splitting, not code; WP2 should pin `react/jsx-runtime` into the entry chunk or accept 84.3 as the new reference before it lowers the cap.
 4. **The frame requirement is met by the AI-turn smoke at 4×;** the other three scenarios are unmeasured, so WP3 keeps its hours until they are.
+
+## M10 WP3: frames in four scenarios, and the AI's wait split (2026-11-27)
+
+Taken on the production build (`npm run build`, `vite preview`, the Playwright webServer) with `PERF=1 npx playwright test app/e2e/perf-frames.spec.ts` (frames; scenarios a to d, `PERF_RATES=4,1` for the line, `PERF_RATES=8,12,16` for the sweep) and scenario e of the same file for the wait. **Machine:** Apple M4 Pro, macOS 27.2.1, Node 25.9.0, Playwright 1.64.1, Chromium 156 headless with the software compositor, 60 Hz tick. CPU slowdown through CDP `Emulation.setCPUThrottlingRate`. **Load average (1 minute) at the start of each run:** 4.5, 6.1 and 5.5 for the three frame runs (the 4x and 1x rows), 8.0 for the sweep (one run; the number is a headroom sketch, not a result), 2.4 to 7.3 for the wait runs. Nothing is asserted per push; the nightly asserts the bounds (`PERF_ASSERT=1`).
+
+### Frames: median of 3 runs (range), both sizes
+
+Scenarios: **ai-turn** is the AI's 13-move turn of `scenario=late` at speed 1; **human-turn** a keyboard turn (play Kyo, 2 DON!! on the Leader, attack, the AI's answer and its counter-attack answered); **review-scroll** the 300-decision game's timeline (40 wheel steps out and back) and twelve presses of N; **hand-fan** the pointer then the arrow keys along the hand, four passes. Requirement at 4x: p95 20 ms, p99 34 ms, at most 2% of frames over 25 ms, no long task over 100 ms; nightly bound 30, 50, 3%, 150. At 1x: p99 20 ms, bound 30.
+
+| Scenario, size | Rate | p95 | p99 | Max | Over 25 ms | Long tasks |
+| --- | --- | --- | --- | --- | --- | --- |
+| ai-turn, 720p | 4x | 16.7 (16.7 to 16.75) | 16.8 | 50 (33.3 to 66.6) | 0.5% (0.2 to 0.6) | 0 |
+| ai-turn, 1080p | 4x | 16.77 (16.7 to 16.8) | 16.8 | 50 (49.9 to 66.6) | 0.5% (0.3 to 0.6) | 0 |
+| human-turn, 720p | 4x | 16.7 (16.7 to 16.78) | 16.8 | 33.4 (33.3 to 33.4) | 0.2% (0.1 to 0.3) | 0 |
+| human-turn, 1080p | 4x | 16.8 (16.7 to 16.8) | 16.8 | 33.4 (33.3 to 33.4) | 0.5% (0.1 to 0.5) | 0 |
+| review-scroll, 720p / 1080p | 4x | 16.7 / 16.8 | 16.8 | 16.8 | 0% | 0 |
+| hand-fan, 720p / 1080p | 4x | 16.7 | 16.8 | 16.8 (to 33.3 at 1080p) | 0% (to 0.4%) | 0 |
+| all four, both sizes | 1x | 16.7 to 16.8 | 16.8 | 16.8 (a single 33.3 to 33.4 frame in a few runs) | 0% to 0.6% | 0 |
+
+**Verdict: every line is met at 4x and at 1x on both sizes, by a wide margin** (p95 16.8 against 20, p99 16.8 against 34, over-25 at most 0.6% against 2%, no long task). The Mac draws every frame on the tick except a few single dropped frames (the "max" column). The CI runner's software compositor is slower; the nightly number is the one that decides, and the owner's `npm run perf:frames -- --headed` is the GPU reference. Traces (`test-results/trace-<scenario>-<project>-<rate>x.json`, 12 to 45 MB each) are workflow artifacts, not committed.
+
+**Headroom, one run each at 720p** (load 8.0): the human turn is the first to lose frames: 8x p99 33.3 ms, 2.9% over 25 ms, 5 long tasks (longest 78 ms); 12x p95 33.3, p99 50.1, 6.0%, 14 long tasks (108 ms); 16x p95 33.4, p99 83.4, 8.7%, 30 long tasks (130 ms). The AI turn: 8x p99 33.3, 2.4%, 2 long tasks; 12x p99 66.7, 4.3%, 8; 16x p95 33.4, 8.2%, 18 (157 ms). The review scroll holds p99 16.8 ms to 12x (16x: 0.8% over 25, one long task of 55 ms); the hand fan likewise (16x: p99 33.3, 1.8%). So the requirement has about twice the headroom. In the 12x trace of the human turn the main thread spends its time in React renders run from the controller's timers (146 timer fires, 1.7 s of the window), layout (556 ms), paint (555 ms) and layerize (535 ms) under a software renderer. No defect is named, so nothing was changed (DECISIONS 2026-11-27 "M10 WP3").
+
+### The wait on the worker, split (Warlord, ms budgets, `seed=31&first=me&speed=1`, four AI turns at 1x, three runs each)
+
+Every request carries the parts: **transfer** (the message there and back), **queue** (the worker reads no message while it runs a search, so a request sent during the plan waits for it, plus the card scripts), **setup** (the session built on first use) and **search**. A turn's `thinkMs` is apportioned over the parts of the requests it waited on. Turn: moves, total ms, wait (`thinkMs`) and its parts (transfer / queue / setup / search), medians of the three runs; the three runs agree within 10 ms because a search runs until its budget is spent.
+
+| AI turn | Moves | Whole turn | Wait | Transfer | Queue | Setup | Search |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2 | 2 | 5,302 | 3,238 | 1 | 1,807 | 0 | 1,430 |
+| 4 | 6 | 6,555 | 2,268 | 12 | 1,862 | 0 | 395 |
+| 6 | 6 | 9,195 | 4,255 | 1 | 1,948 | 0 | 2,305 |
+| 8 | 7 | 7,089 | 2,841 | 21 | 1,949 | 0 | 871 |
+
+- **Setup plus transfer is 1 to 22 ms of a 2.3 to 4.3 s wait; there is nothing to fix there.** The queue is the turn plan: 2,500 ms of budget (ADR 0008) less the 700 ms of turn-start animation that hides part of it, 1.8 to 1.95 s. The search part is decision searches the animation did not hide (400 ms each, 400 to 715 ms in the requests), 0.4 to 2.3 s a turn.
+- **The warm-up changes nothing measurable.** The session builds in 0 to 0.1 ms; the first plan ran 160,452, 162,074 and 154,818 rollouts cold and 160,640, 163,158 and 159,011 warm (Setup open for 4 s before Start). The wait is the same to within 10 ms.
+- **Against board.md §5.2's 1.8 s target:** met by the plan's remainder alone (1.8 to 1.95 s), missed by the turn as a whole (2.3 to 4.3 s) when decision searches are also waited on. The nightly bound (2,700 ms) is the product figure times 1.5 and stays.

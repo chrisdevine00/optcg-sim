@@ -16,7 +16,7 @@ export {
   type Evidence,
   type Move,
 } from './explanation.ts';
-export type { AiRequest, AiResponse, GameInfo } from './protocol.ts';
+export type { AiRequest, AiResponse, AiTiming, GameInfo } from './protocol.ts';
 export {
   AiSession,
   BUDGETS,
