@@ -2,6 +2,17 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-26 — M9 WP6: progress is sessions and marks; status, win rates and the recommendation are derived; import merges
+
+- **Context:** WP6 builds `progress.v1`, the exit rules, the recommendation, `/progress`, `/learn` and the lesson page.
+- **Decision (store):** `progressStore(kv)` writes through the page's synchronous `progress` cache when there is one (journalled, so a reload after a drill cannot lose a session), else the store's KvStore. Writes are serialised in one queue. `recordSession` stores the session and, when the lesson's exit is now met, the first `passedAt` (and `passedTimedAt` for sessions with `factor <= 1`); a worse later session never undoes it. Status is also derived from the sessions, so a pass survives the 200-session cap. WP4 calls `progressSink()` (`ProgressSink`).
+- **Decision (exit):** a session meets "N of M" when it has at least M items and the same share correct (16 of 20 passes 8 of 10; a 5-item warm-up cannot). L12 needs two archetypes each passing. Only the drill clause of L09/L10 is measured; the "no flag in 2 of 3 games" clause is not (flags are Progress evidence, not an exit gate in M9). L08 is Rookie games, not Rewound, From review or Tutorial.
+- **Decision (import):** `importWithProgress` (one-line change in `DataSection`) merges `progress.v1` with `mergeProgress` before calling the store's `importAll`, which would otherwise overwrite the key. `sanitizeProgress` leaves out a bad session and says so; the wrong envelope or over 2000 sessions refuses the key, not the file.
+- **Decision (recommendation):** "reviewed" is a complete review. Concepts score per slug and one suggestion is kept per lesson. "N flags in your last M games": M runs back to the oldest game in the window with a flag of that concept. A lethal-tier line is supporting only.
+- **Cut / not built:** estimated lesson times (no source for them); "hints used" (not recorded anywhere); the lethal "found alone" rate (a lethal found with no coach use leaves no log entry, so the page reports tiers needed and says the rate is not recorded); glossary links only on the first six terms.
+- **Additive outside WP6 files:** `ExplanationView` gained optional `evidenceLabel` (two explanations on one page made two landmarks with one name, an axe failure).
+- **Rejected:** copying games or flags into progress; replacing on import.
+
 ## 2026-11-26 — M9 WP1: guides are parsed in the browser from the content files; two sources "disagree" when their records are not each other's reverse
 
 - **Context:** the Meta Explorer (tiles, guide, 12 × 12 grid) reads the 12 guide files, `sources.md` and `meta-lists.json`. Three things in the content did not match the spec's picture: two guides' front-matter `archetypeId` differs from the id `meta-lists.json` and `DECKS` use (`OP09-062-robin` against `OP09-062-nico-robin`, `OP05-098-enel` against `OP05-098-enel-yellow`); the spec's disagreement example (Rocks 16-20 against Kaido's row) is one source read from both sides (Kaido's row has 20-16, the exact reverse), so it is not a disagreement; and some guide cells hold several records ("38-63 (bad) [SH-SAB]; 10-8 post-ban [SH-MUC]").

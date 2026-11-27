@@ -461,6 +461,7 @@ export const MAX_PROGRESS_SESSIONS = 2000;
 /** A local copy of the drill ids (`DRILL_IDS` in `@optcg/ai`; a test checks they agree): no barrel import at boot. */
 const STORED_DRILLS = ['mulligan', 'lethal', 'counter', 'don'] as const;
 const LESSON_SOURCES = ['drill', 'tutorial', 'games', 'manual'] as const;
+const SESSION_ID = /^[A-Za-z0-9._:~-]{1,80}$/;
 const LESSON_CODE = /^L\d{2}$/;
 const LESSON_ID = /^L\d{2}-[a-z0-9-]{1,60}$/;
 const ISO = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?Z$/;
@@ -474,7 +475,7 @@ const isoDate = (v: unknown): string | undefined =>
 export function sanitizeSession(v: unknown): DrillSession {
   const o = obj(v, 'a drill session');
   const id = str(o.id, 'a session id', 80);
-  if (!ID_RE.test(id)) return bad('a session id has odd characters');
+  if (!SESSION_ID.test(id)) return bad('a session id has odd characters');
   const lesson = str(o.lesson, 'a session lesson', 80);
   if (!LESSON_ID.test(lesson)) return bad('a session lesson is not a lesson id');
   const at = isoDate(o.at);

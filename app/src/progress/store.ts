@@ -119,9 +119,11 @@ export function progressStore(
         const had = cur.lessons[code];
         if (!had?.readAt) return;
         const { readAt: _drop, ...rest } = had;
-        const lessons = { ...cur.lessons };
-        if (rest.passedAt || rest.passedTimedAt) lessons[code] = rest;
-        else delete lessons[code];
+        const lessons = Object.fromEntries(
+          Object.entries(cur.lessons).flatMap(([k, v]) =>
+            k !== code ? [[k, v]] : rest.passedAt || rest.passedTimedAt ? [[k, rest]] : [],
+          ),
+        );
         await put({ ...cur, lessons });
       }),
   };
