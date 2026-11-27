@@ -91,9 +91,9 @@ export function frameStates(events: readonly TraceEvent[]): FrameStates {
 
 /**
  * The CPU benchmark's median on the reference machine (Apple M4 Pro, Chromium 156, 2026-11-27):
- * `cpuBenchMs` below, 8.7 ms. A host that takes longer is slower than the reference.
+ * `cpuBenchMs` in perf.ts, 15.5 ms. A host that takes longer is slower than the reference.
  */
-export const REFERENCE_BENCH_MS = 8.7;
+export const REFERENCE_BENCH_MS = 15.5;
 
 /**
  * The CDP throttle that makes this host behave like the reference machine slowed by `nominal`.

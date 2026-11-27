@@ -80,33 +80,24 @@ export { calibratedRate, REFERENCE_BENCH_MS } from './perf-stats.ts';
 const rates = new WeakMap<Page, number>();
 
 /**
- * A fixed workload (object churn, a sort, DOM build and layout) timed in the page, unthrottled:
+ * A fixed workload timed in the page, unthrottled:
  * the median of 7 after one warm-up run. Like Lighthouse's benchmark index, it says how fast this
  * host is, so a throttle can mean the same target device on any machine.
  */
 export async function cpuBenchMs(page: Page): Promise<number> {
+  // Pure integer arithmetic (as Lighthouse's benchmark index is): no allocation, no DOM, so a
+  // runner's slow GC or software renderer does not read as a slow CPU (an object-churn and DOM
+  // version said the hosted runner was 3.7x slower; its frame results put it near 2x).
   const run = () =>
     page.evaluate(() => {
       const t: number[] = [];
       for (let r = 0; r < 7; r++) {
         const s = performance.now();
-        let acc = 0;
-        const a: { i: number; v: number }[] = [];
-        for (let i = 0; i < 400000; i++) a.push({ i, v: Math.sqrt(i) });
-        a.sort((x, y) => y.v - x.v);
-        for (const o of a) acc += o.v;
-        const d = document.createElement('div');
-        for (let i = 0; i < 2000; i++) {
-          const e = document.createElement('span');
-          e.textContent = String(i);
-          d.appendChild(e);
-        }
-        document.body.appendChild(d);
-        d.getBoundingClientRect();
-        d.remove();
-        t.push(performance.now() - s + (acc < 0 ? 1 : 0));
+        let x = 0;
+        for (let i = 1; i < 30_000_000; i++) x = (x + (i % 7) * (i ^ 0x5bd1e995)) | 0;
+        t.push(performance.now() - s + (x === 0.5 ? 1 : 0));
       }
-      t.sort((x, y) => x - y);
+      t.sort((p, q) => p - q);
       return t[3]!;
     });
   await run();
