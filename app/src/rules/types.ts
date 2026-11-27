@@ -17,6 +17,10 @@ export interface RuleEntry {
   /** Every `CR x-y-z` and `item N` cited, as `7-1-4-1` and `item/17`. */
   cr: string[];
   confidence?: 'official explicit' | 'official by inference' | 'unresolved';
+  /** WP5, additive. A ruling's confidence line when it says more than the label (`(reveal handling)`). */
+  confidenceNote?: string;
+  /** WP5, additive. A ruling's question, in our words; `text` is its answer. */
+  question?: string;
   sources: string[];
   /** The id of the demo that shows this entry, when there is one. */
   demo?: string;
@@ -50,6 +54,10 @@ export interface ActionPattern {
   /** A Blocker, or `none` for declining to block. */
   blocker?: Ref | 'none';
   choice?: Ref;
+  /** WP5, additive. A named option of a `choose` decision (`{ option: '2' }`). */
+  option?: string;
+  /** WP5, additive. A DON!! picked by where it is: `costActive` or `costRested`. */
+  don?: 'costActive' | 'costRested';
   ability?: string;
   redraw?: boolean;
   accept?: boolean;
@@ -63,7 +71,9 @@ export interface DemoStep {
   match: ActionPattern;
 }
 
-export type DemoZone = 'hand' | 'trash' | 'characters' | 'life' | 'stage' | 'deck' | 'don';
+/** `don` is the DON!! cards in the cost area (active and rested); `donDeck` is the DON!! deck (WP5, additive). */
+export type DemoZone =
+  'hand' | 'trash' | 'characters' | 'life' | 'stage' | 'deck' | 'don' | 'donDeck';
 
 /** A fact about the final state, evaluated with the engine's own `queries` and `derive`. */
 export type DemoExpect =
@@ -71,7 +81,12 @@ export type DemoExpect =
   | { kind: 'zone'; side: 'me' | 'opp'; zone: DemoZone; count: number; card?: string }
   | { kind: 'power'; of: Ref; value: number }
   | { kind: 'rested'; of: Ref; rested: boolean }
-  | { kind: 'result'; winner: 'me' | 'opp' | null };
+  | { kind: 'result'; winner: 'me' | 'opp' | null }
+  /**
+   * WP5, additive. Whether an engine action matching `pattern` is legal for its seat: at the end of
+   * the line, or after `afterStep` steps of it.
+   */
+  | { kind: 'legal'; pattern: ActionPattern; legal: boolean; afterStep?: number };
 
 export interface RuleDemo {
   id: string;
@@ -83,6 +98,8 @@ export interface RuleDemo {
   /** A `Lesson.id` or code (`L25`) this demo supports. */
   lesson?: string;
   scenario: ScenarioJson;
+  /** WP5, additive. Facts about the start position (the attack the demo says is impossible is not legal). */
+  before?: DemoExpect[];
   line: DemoStep[];
   expect: DemoExpect[];
   /** Two sentences, our words. */

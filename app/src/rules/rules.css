@@ -1,0 +1,135 @@
+/*
+ * The rules reference (M9 WP5): the search, the entries, the demo card. Tokens only; text never under
+ * 12 px; targets at least 24 px (WCAG 2.5.8); reflows at 320 CSS px (1.4.10). The demo's card reuses
+ * the tutorial's `.tut-card`, so this file only adds the step list.
+ */
+.rules {
+  max-width: 820px;
+}
+.rules h2 {
+  margin: 28px 0 8px;
+}
+.rules p,
+.rules li {
+  line-height: var(--leading-md);
+}
+.rules-intro {
+  max-width: 68ch;
+}
+.rules-search {
+  margin: 16px 0 8px;
+}
+.rules-search .input {
+  width: 100%;
+  min-height: 40px;
+  box-sizing: border-box;
+}
+.rules-search .search-label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: var(--weight-semibold);
+}
+#rules-results {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-2);
+  background: var(--color-surface-1);
+}
+.rules-opt {
+  padding: 8px 12px;
+  min-height: 24px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--color-line);
+}
+.rules-opt:last-child {
+  border-bottom: 0;
+}
+.rules-opt:hover {
+  background: var(--color-surface-3);
+}
+/* The active option is marked by a bar and a bold title as well as a fill, never by colour alone. */
+.rules-opt[aria-selected='true'] {
+  background: var(--color-surface-3);
+  box-shadow: inset 4px 0 0 var(--color-accent);
+}
+.rules-opt[aria-selected='true'] .rules-opt-title {
+  text-decoration: underline;
+}
+.rules-opt-title {
+  font-weight: var(--weight-semibold);
+}
+.rules-opt-text {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+.rules-demos {
+  columns: 2 260px;
+  padding-left: 20px;
+}
+.rules-demos li {
+  margin: 4px 0;
+}
+.rules-section {
+  border-top: 1px solid var(--color-line);
+  padding: 4px 0;
+}
+.rules-section summary {
+  cursor: pointer;
+  min-height: 24px;
+  padding: 6px 0;
+  font-weight: var(--weight-semibold);
+}
+.rules-section ul {
+  margin: 4px 0 12px;
+  padding-left: 22px;
+}
+.rule-entry h1 {
+  margin: 4px 0 12px;
+}
+.rule-kicker {
+  margin: 8px 0 0;
+}
+.rule-entry section {
+  max-width: 68ch;
+}
+.rule-entry ol,
+.rule-entry ul {
+  padding-left: 22px;
+}
+.rule-cites {
+  color: var(--color-text-muted);
+}
+.rule-show p {
+  margin: 12px 0;
+}
+.term {
+  text-decoration-style: dotted;
+}
+.rule-link {
+  white-space: nowrap;
+}
+.show-steps {
+  list-style: none;
+  margin: 0 0 6px;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+.show-steps li {
+  color: var(--color-text-muted);
+}
+.show-steps li[data-state='now'] {
+  color: var(--color-text);
+  font-weight: var(--weight-semibold);
+}
+.show-steps li[data-state='done'] {
+  color: var(--color-success-text);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .rules-opt {
+    transition: background-color 80ms linear;
+  }
+}
