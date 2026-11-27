@@ -40,6 +40,8 @@ export type ScenarioJson = Omit<ScenarioSpec, 'cards'>;
 export interface BoardItem extends ItemBase {
   drill: 'lethal' | 'counter' | 'don';
   scenario: ScenarioJson;
+  /** The seat the player sits in; absent means `p1` (every bank item). Items from a played game keep the player's own seat. */
+  seat?: 'p1' | 'p2';
   /** Engine actions applied after the start (the attack declared, the block step passed). */
   prefix: Action[];
   /** `harder`: the opponent's hand is `harderHand` from the public prior; `real`: the recorded hand. */
