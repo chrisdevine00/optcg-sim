@@ -79,10 +79,15 @@ describe('export and import round trip', () => {
     expect(one.ok && one.bundle.reviews).toHaveLength(1);
   });
 
-  it('a file from the app is not slow to read: validation of a 300-action game is quick', () => {
-    const t0 = Date.now();
-    expect(parseExport(text(good())).ok).toBe(true);
-    expect(Date.now() - t0).toBeLessThan(5000);
+  // Not a timing test (docs/runbooks/testing.md): a 5 s wall-clock bound on a parse measures the
+  // machine. The parse is synchronous and linear, so a slow one is a hang, which the test's own
+  // timeout catches; what is asserted is that the 300-action game validates and round-trips.
+  it('a file from the app validates: a 300-action game parses and round-trips', () => {
+    const parsed = parseExport(text(good()));
+    expect(parsed.ok).toBe(true);
+    expect(parsed.ok && JSON.stringify(parsed.bundle.games.map((g) => g.id))).toBe(
+      JSON.stringify(JSON.parse(text(good())).games.map((g: { id: string }) => g.id)),
+    );
   });
 });
 

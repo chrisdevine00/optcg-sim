@@ -134,9 +134,10 @@ describe('parseDeckText', () => {
       });
   });
   it('a count over 50 is refused at once, not expanded (review M6-10)', () => {
-    const t0 = Date.now();
+    // Not a timing test: the line is refused before any copy is made, so the result is empty and
+    // the answer is the syntax message (expanding 99,999,999 entries would take seconds and
+    // hundreds of megabytes, and the test's own timeout would catch it, without a stopwatch).
     const p = parseDeckText('99999999 OP17-040', lookup);
-    expect(Date.now() - t0).toBeLessThan(50);
     expect(p.main).toEqual([]);
     expect(p.lines[0]).toMatchObject({ status: 'syntax' });
     expect(p.lines[0]!.message).toMatch(/1 to 50/);

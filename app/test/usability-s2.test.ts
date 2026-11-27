@@ -157,11 +157,30 @@ describe('ub-hint-1: the hint returns a clear line', () => {
     expect(again.line.map((m) => m.text)).toEqual(r.line.map((m) => m.text));
   });
 
-  it('with the app’s wall-clock budget still returns a line starting with Yamato', () => {
-    const live = hint(view, { cards: cardMap(), budget: { ms: 2000 }, game });
+  // The app's millisecond budget (2,000 ms), on an injected clock that advances 0.5 ms a read, so
+  // the search gets the same number of iterations on every machine and under any load. The same
+  // check on the real clock runs in the nightly (TIMING=1): how many iterations 2 s buys is the
+  // machine's business, which is why it is not a per-push test (docs/runbooks/testing.md).
+  it('with the app’s millisecond budget (injected clock) still returns a line starting with Yamato', () => {
+    let t = 0;
+    const live = hint(view, {
+      cards: cardMap(),
+      budget: { ms: 2000 },
+      now: () => (t += 0.5),
+      game,
+    });
     expect(live.line.length).toBeGreaterThan(0);
     expect(live.line[0]).toMatchObject({ kind: 'play', card: YAMATO });
   });
+
+  it.runIf(process.env.TIMING === '1')(
+    'with the app’s wall-clock budget still returns a line starting with Yamato (nightly)',
+    () => {
+      const live = hint(view, { cards: cardMap(), budget: { ms: 2000 }, game });
+      expect(live.line.length).toBeGreaterThan(0);
+      expect(live.line[0]).toMatchObject({ kind: 'play', card: YAMATO });
+    },
+  );
 });
 
 /** The Pirate AI run in process (the worker's code), so a game can be played without a worker. */

@@ -15,10 +15,12 @@
  * without the biases (ARCHITECTURE §4.6). Reports go to `test-results/`.
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { describe, it } from 'vitest';
 import type { DeckSpec, PlayerId } from '@optcg/engine';
 import { BUDGETS, type SessionOptions } from '../src/index.ts';
 import { playMatch, type MatchOptions } from './support/match.ts';
+import { expectRateAtLeast, expectTalliesMeetThresholds } from './support/rate.ts';
+import { wilson } from './support/stats.ts';
 import { PLAN_TIER } from './support/scenario.ts';
 import { mergeTallies, PlanTally, type Tally } from './support/plan-tally.ts';
 import { metaDecks } from './support.ts';
@@ -30,16 +32,6 @@ const EXTRA = process.env.EXTRA === '1';
 /** Pirate-vs-Pirate games for the game-plan assertions (nightly; 0 skips). */
 const PLAN_GAMES = Number(process.env.PLAN_GAMES ?? 0);
 const AB_GAMES = Number(process.env.AB_GAMES ?? 0);
-
-/** Wilson score interval for a binomial proportion (95%). */
-export function wilson(wins: number, n: number, z = 1.96): [number, number] {
-  if (n === 0) return [0, 1];
-  const p = wins / n;
-  const d = 1 + (z * z) / n;
-  const c = p + (z * z) / (2 * n);
-  const r = z * Math.sqrt((p * (1 - p)) / n + (z * z) / (4 * n * n));
-  return [(c - r) / d, (c + r) / d];
-}
 
 const pct = (xs: number[], q: number) => {
   if (xs.length === 0) return 0;
@@ -182,13 +174,13 @@ describe('Pirate strength (PLAN M5a; review M5a-10)', () => {
       budgets: BUDGETS.pirate,
       seconds: (performance.now() - t0) / 1000,
     });
-    expect(s.winRate).toBeGreaterThanOrEqual(FULL ? 0.95 : 0.9);
+    expectRateAtLeast(s.wins, s.games, FULL ? 0.95 : 0.9, { label: 'Pirate vs Rookie win rate' });
   }, 3_600_000);
 
   it(`beats a shallow Pirate (no rollouts) in at least 60% of ${SHALLOW_GAMES} games`, () => {
     const s = series(SHALLOW_GAMES, 20_000, { tier: 'pirate', seat: () => SHALLOW });
     report(`shallow-${SHALLOW_GAMES}`, { date: new Date().toISOString(), ...summary(s) });
-    expect(s.winRate).toBeGreaterThanOrEqual(0.6);
+    expectRateAtLeast(s.wins, s.games, 0.6, { label: 'Pirate vs shallow Pirate win rate' });
   }, 3_600_000);
 
   it.runIf(EXTRA)(
@@ -212,7 +204,9 @@ describe('Pirate strength (PLAN M5a; review M5a-10)', () => {
         restedExposed015Vs035: ab({}, { weights: { restedExposed: 0.35 } }),
         lifeTableVsM5a: ab({}, { weights: { lifeMine: [0, 3.0, 6.2, 7.7, 8.8, 9.8, 10.7, 11.5] } }),
       });
-      expect(nonPrior.winRate).toBeGreaterThanOrEqual(0.95);
+      expectRateAtLeast(nonPrior.wins, nonPrior.games, 0.95, {
+        label: 'Pirate vs Rookie win rate, prior without the opponent’s list',
+      });
     },
     3_600_000,
   );
@@ -266,11 +260,7 @@ describe('Pirate strength (PLAN M5a; review M5a-10)', () => {
         withBias,
         noBias,
       });
-      for (const t of withBias.plan)
-        if (t.total >= 10)
-          expect(t.rate!, `${t.leader} seed ${t.seed}: ${t.text}`).toBeGreaterThanOrEqual(
-            t.threshold,
-          );
+      expectTalliesMeetThresholds(withBias.plan);
     },
     PLAN_TIER === 'pirate' ? 3_600_000 : 10_800_000,
   );

@@ -13,6 +13,7 @@ import { GAP_THRESHOLD, scoreDecision } from '../src/coach/blunder.ts';
 import { actionKey, type BlunderKind } from '../src/coach/types.ts';
 import { cardMap, metaDecks } from './support.ts';
 import { playMatch } from './support/match.ts';
+import { expectRateAtMost } from './support/rate.ts';
 import type { SearchView } from '@optcg/engine';
 
 vi.setConfig({ testTimeout: 1_800_000 });
@@ -118,8 +119,9 @@ describe("Warlord's own choices are almost never flagged", () => {
         ),
       );
     }
-    expect(any / decisions).toBeLessThan(0.01);
+    // A false-positive ceiling, judged by confidence interval (docs/runbooks/testing.md).
+    expectRateAtMost(any, decisions, 0.01, { label: 'Warlord choices flagged, any kind' });
     for (const k of ['missed-lethal', 'unused-don', 'gap'] as const)
-      expect(count(k) / decisions).toBeLessThan(0.01);
+      expectRateAtMost(count(k), decisions, 0.01, { label: `Warlord choices flagged: ${k}` });
   });
 });

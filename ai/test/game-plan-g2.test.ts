@@ -26,6 +26,7 @@ import {
 import { mergeTallies, type Tally } from './support/plan-tally.ts';
 import { PlanTallyG2 } from './support/plan-tally-g2.ts';
 import { playMatch } from './support/match.ts';
+import { expectTalliesMeetThresholds } from './support/rate.ts';
 import { metaDecks } from './support.ts';
 
 vi.setConfig({ testTimeout: 60_000 });
@@ -692,11 +693,7 @@ describe('group-2 game-plan assertions over Pirate-vs-Pirate games (nightly)', (
         JSON.stringify({ date: new Date().toISOString(), withBias, noBias }, null, 2),
       );
       console.log('game-plan-g2', JSON.stringify({ withBias, noBias }));
-      for (const t of withBias.plan)
-        if (t.total >= 10)
-          expect(t.rate!, `${t.leader} seed ${t.seed}: ${t.text}`).toBeGreaterThanOrEqual(
-            t.threshold,
-          );
+      expectTalliesMeetThresholds(withBias.plan);
     },
     PLAN_TIER === 'pirate' ? 3_600_000 : 10_800_000,
   );

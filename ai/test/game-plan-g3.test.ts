@@ -11,6 +11,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { queries, reduce, type Action, type DeckSpec, type GameState } from '@optcg/engine';
 import { PLAYBOOKS } from '../src/index.ts';
 import { playMatch } from './support/match.ts';
+import { expectTalliesMeetThresholds } from './support/rate.ts';
 import { mergeTallies, type Tally } from './support/plan-tally.ts';
 import { G3_LEADERS, PlanTallyG3 } from './support/plan-tally-g3.ts';
 import {
@@ -426,11 +427,7 @@ describe('group 3 game plans over Pirate-vs-Pirate games', () => {
         `test-results/game-plan-g3-${PLAN_GAMES}${PLAN_TIER === 'pirate' ? '' : `-${PLAN_TIER}`}.json`,
         JSON.stringify({ date: new Date().toISOString(), withBias, noBias }, null, 2),
       );
-      for (const t of withBias.plan)
-        if (t.total >= 10)
-          expect(t.rate!, `${t.leader} seed ${t.seed}: ${t.text}`).toBeGreaterThanOrEqual(
-            t.threshold,
-          );
+      expectTalliesMeetThresholds(withBias.plan);
     },
     PLAN_TIER === 'pirate' ? 3_600_000 : 10_800_000,
   );

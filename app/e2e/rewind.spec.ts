@@ -56,15 +56,18 @@ test.describe('rewind (flows F11)', () => {
     await dialog.getByRole('button', { name: 'Rewind to before it' }).click();
     await expect(page.getByRole('group', { name: /Your hand, 2 cards/ })).toHaveCount(1);
     await expect
-      .poll(() =>
-        page.evaluate(
-          (from) =>
-            (
-              window as unknown as { politeWrites: { t: number; text: string }[] }
-            ).politeWrites.filter((w) => w.t - from >= 500 && /^Rewound\. Back to:/.test(w.text))
-              .length,
-          clicked,
-        ),
+      .poll(
+        () =>
+          page.evaluate(
+            (from) =>
+              (
+                window as unknown as { politeWrites: { t: number; text: string }[] }
+              ).politeWrites.filter((w) => w.t - from >= 500 && /^Rewound\. Back to:/.test(w.text))
+                .length,
+            clicked,
+          ),
+        // A hang guard: the write comes 500 ms or more after the click; a slow runner only makes it later.
+        { timeout: 20_000 },
       )
       .toBeGreaterThan(0);
   });

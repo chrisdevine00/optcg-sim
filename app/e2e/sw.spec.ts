@@ -29,7 +29,8 @@ test('the service worker caches card images in a production build', async ({ con
   await page.reload();
   await expect(page.locator('.face[data-art="image"]').first()).toBeVisible();
   const cached = await page.evaluate(async () => {
-    const deadline = Date.now() + 10_000;
+    // A hang guard (the cache fills as images load; a loaded runner is slower).
+    const deadline = Date.now() + 30_000;
     for (;;) {
       const keys = await (await caches.open('optcg-images-v1')).keys();
       if (keys.length > 10 || Date.now() > deadline) return keys.map((k) => k.url);

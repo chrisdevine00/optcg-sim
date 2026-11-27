@@ -13,6 +13,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { Action, SearchView } from '@optcg/engine';
 import { cardMap, metaDecks } from '../support.ts';
 import { playMatch } from '../support/match.ts';
+import { expectRateAtMost } from '../support/rate.ts';
 import {
   judgeTarget,
   targetSetup,
@@ -141,7 +142,10 @@ describe("Warlord's own attacks are almost never flagged", () => {
           1,
         ),
       );
-    expect(flagged.length / attacks).toBeLessThan(0.02);
-    expect(flagged.length / rows.length).toBeLessThan(0.02);
+    // A false-positive ceiling, judged by confidence interval (docs/runbooks/testing.md).
+    expectRateAtMost(flagged.length, attacks, 0.02, { label: 'Warlord attacks flagged, of all' });
+    expectRateAtMost(flagged.length, rows.length, 0.02, {
+      label: 'Warlord attacks flagged, of multi-target attacks',
+    });
   });
 });

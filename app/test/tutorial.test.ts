@@ -22,7 +22,8 @@ import { TUTORIAL_STEP_IDS, TUTORIAL_ZONES, type TutorialStepId } from '../src/t
 import { cardMap, lookup } from './support.ts';
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-async function until(cond: () => boolean, ms = 8000): Promise<void> {
+// A hang guard, not a bound: 8 s on an idle machine was tight under load (docs/runbooks/testing.md).
+async function until(cond: () => boolean, ms = 25_000): Promise<void> {
   const t0 = Date.now();
   while (!cond()) {
     if (Date.now() - t0 > ms) throw new Error('timed out waiting');

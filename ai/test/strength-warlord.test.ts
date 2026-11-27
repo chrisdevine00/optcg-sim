@@ -7,6 +7,13 @@
  * `g % 12` (so the 12 per-push games cover all twelve) and takes the seat `(g + floor(g / 12)) % 2`
  * (so a deck advantage cancels over 24 games).
  *
+ * **Every rate gate is a confidence-interval check** (`expectRateAtLeast` / `expectRateAtMost`,
+ * ai/test/support/stats.ts; docs/runbooks/testing.md "Statistics"): it fails only when the
+ * one-sided 99% bound of the observed rate lies wholly on the wrong side of the target, and every
+ * message prints the observed rate, n, the bound and the target. With 12 games that means a gross
+ * break (Warlord winning fewer than 7 of 12 against Rookie); with 200 games a shortfall of 4 to 8
+ * points against the target (91% against 95%, 67.5% against 75%).
+ *
  * **Per push (`STRENGTH_GAMES`, default 12, about 1.5 minutes):** Pirate vs Rookie at least 75%;
  * Warlord vs Rookie at least 10 of 12. A gross break (a search that throws, plays illegally or
  * does nothing useful) fails here; a 12-game series cannot separate two close tiers, so the
@@ -38,6 +45,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { DeckSpec, PlayerId } from '@optcg/engine';
 import { BUDGETS, type AiTier, type SessionOptions } from '../src/index.ts';
 import { playMatch } from './support/match.ts';
+import { expectRateAtLeast, expectRateAtMost } from './support/rate.ts';
 import { quantile, wilson } from './support/stats.ts';
 import { metaDecks } from './support.ts';
 
@@ -200,7 +208,7 @@ describe('Strength gates, Pirate, Warlord and Emperor (PLAN M5b; review M5a-10)'
     () => {
       const s = series(GAMES, 110_000, { tier: 'pirate' }, { tier: 'rookie' });
       report(`m5b-pirate-vs-rookie-${GAMES}`, s);
-      expect(s.winRate).toBeGreaterThanOrEqual(0.75);
+      expectRateAtLeast(s.wins, s.games, 0.75, { label: 'Pirate vs Rookie' });
     },
     TIMEOUT.pirateVsRookie,
   );
@@ -211,7 +219,7 @@ describe('Strength gates, Pirate, Warlord and Emperor (PLAN M5b; review M5a-10)'
     () => {
       const s = series(GAMES, 120_000, { tier: 'warlord' }, { tier: 'rookie' });
       report(`m5b-warlord-vs-rookie-${GAMES}`, s);
-      expect(s.winRate).toBeGreaterThanOrEqual(FULL ? 0.95 : 10 / 12 - 1e-9);
+      expectRateAtLeast(s.wins, s.games, FULL ? 0.95 : 10 / 12, { label: 'Warlord vs Rookie' });
     },
     TIMEOUT.warlordVsRookie,
   );
@@ -225,7 +233,7 @@ describe('Strength gates, Pirate, Warlord and Emperor (PLAN M5b; review M5a-10)'
     () => {
       const s = series(GAMES, 130_000, { tier: 'warlord' }, { tier: 'pirate' });
       report(`m5b-warlord-vs-pirate-${GAMES}`, s, { target: 0.65, meetsTarget: s.winRate >= 0.65 });
-      expect(s.winRate).toBeGreaterThanOrEqual(0.55);
+      expectRateAtLeast(s.wins, s.games, 0.55, { label: 'Warlord vs Pirate (floor)' });
     },
     TIMEOUT.warlordVsPirate,
   );
@@ -235,7 +243,7 @@ describe('Strength gates, Pirate, Warlord and Emperor (PLAN M5b; review M5a-10)'
     () => {
       const s = series(GAMES, 140_000, { tier: 'warlord' }, { tier: 'warlord', opts: TINY });
       report(`m5b-warlord-vs-tiny-${GAMES}`, s);
-      expect(s.winRate).toBeGreaterThanOrEqual(0.7);
+      expectRateAtLeast(s.wins, s.games, 0.7, { label: 'Warlord vs one-iteration Warlord' });
     },
     TIMEOUT.controlFull,
   );
@@ -245,7 +253,7 @@ describe('Strength gates, Pirate, Warlord and Emperor (PLAN M5b; review M5a-10)'
     () => {
       const s = series(GAMES, 150_000, { tier: 'warlord', opts: TINY }, { tier: 'pirate' });
       report(`m5b-tiny-vs-pirate-${GAMES}`, s);
-      expect(s.winRate).toBeLessThan(0.65);
+      expectRateAtMost(s.wins, s.games, 0.65, { label: 'one-iteration Warlord vs Pirate' });
     },
     TIMEOUT.controlTiny,
   );
@@ -260,7 +268,7 @@ describe('Strength gates, Pirate, Warlord and Emperor (PLAN M5b; review M5a-10)'
       const n = Math.min(GAMES, 16);
       const s = series(n, 160_000, { tier: 'emperor' }, { tier: 'warlord' });
       report(`m5b-emperor-vs-warlord-${n}`, s);
-      expect(s.winRate).toBeGreaterThanOrEqual(0.35);
+      expectRateAtLeast(s.wins, s.games, 0.35, { label: 'Emperor vs Warlord' });
     },
     TIMEOUT.emperor,
   );

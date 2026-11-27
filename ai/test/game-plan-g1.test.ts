@@ -13,6 +13,7 @@ import { queries, reduce, type Action, type GameState } from '@optcg/engine';
 import { PLAYBOOKS } from '../src/index.ts';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { playMatch } from './support/match.ts';
+import { expectTalliesMeetThresholds } from './support/rate.ts';
 import { mergeTallies, type Tally } from './support/plan-tally.ts';
 import { PlanTallyG1 } from './support/plan-tally-g1.ts';
 import { metaDecks } from './support.ts';
@@ -686,11 +687,7 @@ describe.runIf(PLAN_GAMES_G1 > 0)(
           `test-results/game-plan-g1-${PLAN_GAMES_G1}${PLAN_TIER === 'pirate' ? '' : `-${PLAN_TIER}`}.json`,
           JSON.stringify({ date: new Date().toISOString(), withBias, noBias }, null, 2),
         );
-        for (const t of withBias.plan)
-          if (t.total >= 10)
-            expect(t.rate!, `${t.leader} seed ${t.seed}: ${t.text}`).toBeGreaterThanOrEqual(
-              t.threshold,
-            );
+        expectTalliesMeetThresholds(withBias.plan);
       },
       PLAN_TIER === 'pirate' ? 3_600_000 : 10_800_000,
     );

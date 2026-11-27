@@ -35,11 +35,21 @@ jobs:
       # Report: test-results/game-plan-g1-64.json.
       - run: npm run test:plan-g1
         if: always()
+      # The wall-clock product requirements, measured here and nowhere per push (DECISIONS 2026-11-27,
+      # docs/runbooks/testing.md "Time and statistics"): decision time against the tier budgets
+      # (PROMPT: Rookie 10 ms, Pirate 100, Warlord 1,500, Emperor 5,000; the app's ms budgets) at
+      # 1.5 times, the hint's p95, the 300-decision review inside the 60 s gate, and the hint's
+      # wall-clock line. TIMING=1 and REVIEW_GATE=1 switch them on; reports:
+      # test-results/timing-budget.json, timing-hint.json. Run alone, so nothing else loads the runner.
+      - run: npm run test:timing
+        if: always()
       # Full games from turn 1 through the UI (vs Rookie, hotseat, keyboard only, and AI turn pacing
-      # at 1× vs Pirate): too slow per push.
+      # at 1× vs Pirate and Warlord), and the 300-decision review in the real worker pool inside 60 s
+      # (asserted at 90 s): too slow, or wall-clock, per push. E2E_FULL=1 switches on every
+      # millisecond bound in these specs; per push they play the same turns and assert none.
       - run: npx playwright install --with-deps chromium
         if: always()
-      - run: npx playwright test app/e2e/game.spec.ts app/e2e/keyboard.spec.ts app/e2e/pirate.spec.ts app/e2e/warlord.spec.ts
+      - run: npx playwright test app/e2e/game.spec.ts app/e2e/keyboard.spec.ts app/e2e/pirate.spec.ts app/e2e/warlord.spec.ts app/e2e/review-m8-gate.spec.ts
         if: always()
         env:
           E2E_FULL: '1'

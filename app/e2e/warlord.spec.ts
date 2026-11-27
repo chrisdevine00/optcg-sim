@@ -7,6 +7,7 @@
  * choose the same line on every machine.
  */
 import { expect, test, type Page } from '@playwright/test';
+import { appendFileSync, mkdirSync } from 'node:fs';
 import { decisionKind, nextDecision, playToEnd, startGame } from './game-support.ts';
 
 const once = () => test.skip(test.info().project.name !== '720p', 'one pass is enough');
@@ -92,19 +93,45 @@ test.describe('M5b: the Warlord and Emperor AIs', () => {
     }
     const out = (await aiTurns(page)).filter((t) => t.speed === '1');
     test.info().annotations.push({ type: 'ai-turn-ms', description: JSON.stringify(out) });
+    // Observed numbers, whatever the verdict, so a trend is visible (test-results/ is a nightly artifact).
+    mkdirSync('test-results', { recursive: true });
+    appendFileSync(
+      `test-results/ai-turns-${test.info().project.name}.jsonl`,
+      JSON.stringify({ date: new Date().toISOString(), query, turns: out }) + '\n',
+    );
     console.log(`AI turns at 1× (${query}): ${JSON.stringify(out)}`);
     return out;
   }
 
   const TYPICAL_MOVES = 6;
+  /**
+   * Wall-clock pacing is asserted in the nightly only (E2E_FULL=1; docs/runbooks/testing.md). Per
+   * push the same turns are played through the real worker and reported, and board.md §5.2 is held
+   * deterministically by app/test/ai-pacing.test.ts (the controller's own holds on a controlled
+   * clock) and ai/test/budget.test.ts (the search honours its budget in iterations and on an
+   * injected clock). The nightly bound on the worker's wait is the product figure x 1.5 (`o.thinkMs`;
+   * Warlord 1,800 ms of visible thinking in board.md §5.2, Emperor 5,000 ms, the PROMPT tier
+   * budget). A runner that still exceeds it is reported, not accommodated: the observed numbers go
+   * to test-results/ai-turns-*.jsonl, and the failure message says which number is which.
+   */
+  const TIMED = !!process.env.E2E_FULL;
+  const WARLORD_THINK_MS = 2700; // 1,800 x 1.5
+  const EMPEROR_THINK_MS = 7500; // 5,000 x 1.5
   function checkTurns(
     turns: Awaited<ReturnType<typeof aiTurns>>,
     o: { heavyMs: number; thinkMs: number },
   ) {
+    if (!TIMED) return;
     for (const t of turns) {
       const limit = t.moves <= TYPICAL_MOVES ? 8000 : o.heavyMs;
-      expect(t.ms - t.thinkMs, `turn ${t.turn}: animation and holds`).toBeLessThanOrEqual(limit);
-      expect(t.thinkMs, `turn ${t.turn}: waiting on the worker`).toBeLessThanOrEqual(o.thinkMs);
+      expect(
+        t.ms - t.thinkMs,
+        `turn ${t.turn}: animation and holds (${t.ms} ms in all, ${t.moves} moves; bound ${limit})`,
+      ).toBeLessThanOrEqual(limit);
+      expect(
+        t.thinkMs,
+        `turn ${t.turn}: waiting on the worker (${t.thinkMs} ms; product figure x1.5 = ${o.thinkMs})`,
+      ).toBeLessThanOrEqual(o.thinkMs);
       expect(t.ms, `turn ${t.turn}: the whole turn`).toBeLessThanOrEqual(limit + o.thinkMs);
     }
   }
@@ -126,9 +153,9 @@ test.describe('M5b: the Warlord and Emperor AIs', () => {
       );
       expect(late.length + early.length).toBeGreaterThanOrEqual(3);
       // Iteration budgets take longer on CI runners (1,852 ms seen on afefa16; 3,101 ms on turn 6
-      // on 5acae4c and 97eb47a); this bound only catches a hung or main-thread search, so it
-      // matches the nightly one. The ms-budget pacing checks run nightly.
-      checkTurns([...late, ...early], { heavyMs: 10_600, thinkMs: 4000 });
+      // on 5acae4c and 97eb47a; a failure on e8a76f3b): per push this plays the turns and reports
+      // them (checkTurns asserts in the nightly only), so a runner cannot fail it.
+      checkTurns([...late, ...early], { heavyMs: 10_600, thinkMs: WARLORD_THINK_MS });
     });
 
     test('AI turns at 1× over a whole game from turn 1 (nightly)', async ({ page }) => {
@@ -143,7 +170,7 @@ test.describe('M5b: the Warlord and Emperor AIs', () => {
       expect(turns.length).toBeGreaterThanOrEqual(3);
       // Iteration budgets: the bound catches a hung or main-thread search only (CI runners took
       // 2,756 ms on turn 6 in five nightlies, 2026-11-19 to 23); ms pacing is the next test.
-      checkTurns(turns, { heavyMs: 12_300, thinkMs: 4000 });
+      checkTurns(turns, { heavyMs: 12_300, thinkMs: WARLORD_THINK_MS });
     });
 
     test("on the app's millisecond budgets, Warlord and Emperor wait on the worker within board.md §5.2 (nightly)", async ({
@@ -174,7 +201,7 @@ test.describe('M5b: the Warlord and Emperor AIs', () => {
       );
       expect(turns.length).toBeGreaterThanOrEqual(2);
       // CI runners took 5,790 ms on turn 6 (nightlies 2026-11-19 to 23); as above, a hang check.
-      checkTurns(turns, { heavyMs: 12_300, thinkMs: 8500 });
+      checkTurns(turns, { heavyMs: 12_300, thinkMs: EMPEROR_THINK_MS });
     });
   });
 });

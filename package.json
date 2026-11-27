@@ -23,6 +23,7 @@
     "test:lethal": "LETHAL_GAMES=24 LETHAL_NODES=60000 LETHAL_POSITIONS=160 LETHAL_HANDS=4 vitest run ai/test/lethal-games.test.ts ai/test/lethal-sound.test.ts",
     "test:strength": "npm run test:strength:m5b && npm run test:strength:pirate",
     "test:strength:pirate": "STRENGTH_GAMES=200 SHALLOW_GAMES=100 PLAN_GAMES=40 AB_GAMES=40 EXTRA=1 vitest run ai/test/strength.test.ts ai/test/game-plan-g2.test.ts ai/test/game-plan-g3.test.ts",
+    "test:timing": "TIMING=1 REVIEW_GATE=1 vitest run ai/test/budget.test.ts ai/test/hint.test.ts ai/test/review-gate.test.ts app/test/usability-s2.test.ts",
     "test:plan-g1": "PLAN_GAMES_G1=64 vitest run ai/test/game-plan-g1.test.ts",
     "test:strength:m5b": "STRENGTH_GAMES=200 EXTRA=1 vitest run ai/test/strength-warlord.test.ts",
     "test:plan-warlord": "PLAN_TIER=warlord PLAN_GAMES=${PLAN_GAMES:-40} PLAN_GAMES_G1=${PLAN_GAMES_G1:-64} vitest run ai/test/strength.test.ts ai/test/game-plan-g1.test.ts ai/test/game-plan-g2.test.ts ai/test/game-plan-g3.test.ts -t 'game-plan assertions|game plans'",

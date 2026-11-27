@@ -10,9 +10,10 @@
  *   a Main line ends in `endTurn`.
  * - Hidden information: two games differing only in the opponent's hand, deck and Life give the same
  *   request and the same answer; and the test has teeth (a view that shows their hand changes it).
- * - The budget: p95 within 2.5 s plus 20%.
+ * - The budget: per push, the search stops when its injected clock says 2,000 ms are spent (within
+ *   25%); in the nightly (TIMING=1), p95 of the wall clock within 2.5 s plus 20%.
  */
-import { readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import {
   actionFromView,
@@ -38,6 +39,7 @@ import { newMemory, planTurn, type PlanOut } from '../src/search/warlord.ts';
 import { cardMap, metaDecks } from './support.ts';
 import { e15Line, e15State, KAIDO, LUFFY } from './support/hint-e15.ts';
 import { gatherPositions, strip, type HintPosition } from './support/hint-positions.ts';
+import { quantile } from './support/stats.ts';
 
 // Searching tests: CI runners are several times slower than a desktop.
 vi.setConfig({ testTimeout: 180_000 });
@@ -350,25 +352,73 @@ describe('hidden information', () => {
 });
 
 describe('the budget', () => {
-  it('p95 of the wall clock is within 2.5 s plus 20% at the default budget', () => {
-    const positions = gatherPositions(
+  const positionsForBudget = () =>
+    gatherPositions(
       { main: 10, defence: 2, choice: 0 },
       Array.from({ length: 30 }, (_, i) => i + 100),
     );
-    const times: number[] = [];
-    for (const p of positions) {
-      const t0 = performance.now();
+
+  // Per push, no wall clock (docs/runbooks/testing.md): the search is handed a clock that advances
+  // 10 "ms" on every read, so its elapsed time is the number of budget checks it made. It must
+  // stop when that clock says the 2,000 ms budget is spent, within 25% (the 2.5 s of the old gate).
+  it('stops when its injected clock says the 2,000 ms budget is spent (within 25%)', () => {
+    const TICK = 10;
+    const used: number[] = [];
+    for (const p of positionsForBudget()) {
+      let t = 0;
       hint(p.view, {
         cards,
         budget: { ms: 2000 },
+        now: () => (t += TICK),
         game: { ownDeck: p.own, leader: p.leader, opponentLeader: p.opponentLeader },
       });
-      times.push(performance.now() - t0);
+      used.push(t);
     }
-    times.sort((a, b) => a - b);
-    const p95 = times[Math.min(times.length - 1, Math.ceil(times.length * 0.95) - 1)]!;
-    expect(p95).toBeLessThanOrEqual(2500 * 1.2);
+    const worst = Math.max(...used);
+    expect(
+      worst,
+      `the hint read its clock up to ${worst} ms of a 2,000 ms budget (bound 2,500)`,
+    ).toBeLessThanOrEqual(2500 + TICK);
+    expect(worst, 'the hint searched on the injected clock').toBeGreaterThan(1500);
   });
+
+  // The product requirement, in real milliseconds, in the nightly (TIMING=1): p95 within 2.5 s
+  // plus 20% at the default budget. The numbers go to test-results/timing-hint.json.
+  it.runIf(process.env.TIMING === '1')(
+    'p95 of the wall clock is within 2.5 s plus 20% at the default budget (nightly)',
+    () => {
+      const times: number[] = [];
+      for (const p of positionsForBudget()) {
+        const t0 = performance.now();
+        hint(p.view, {
+          cards,
+          budget: { ms: 2000 },
+          game: { ownDeck: p.own, leader: p.leader, opponentLeader: p.opponentLeader },
+        });
+        times.push(performance.now() - t0);
+      }
+      const p95 = quantile(times, 0.95);
+      mkdirSync('test-results', { recursive: true });
+      writeFileSync(
+        'test-results/timing-hint.json',
+        JSON.stringify(
+          {
+            date: new Date().toISOString(),
+            n: times.length,
+            p50: quantile(times, 0.5),
+            p95,
+            max: Math.max(...times),
+          },
+          null,
+          2,
+        ),
+      );
+      expect(
+        p95,
+        `hint p95 ${p95.toFixed(0)} ms over ${times.length} positions; bound 3,000 ms`,
+      ).toBeLessThanOrEqual(2500 * 1.2);
+    },
+  );
 });
 
 describe('the out-parameter of planTurn', () => {
