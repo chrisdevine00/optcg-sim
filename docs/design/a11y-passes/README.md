@@ -19,6 +19,10 @@ block the milestone.
 | [l-nvda-chrome-r4.md](l-nvda-chrome-r4.md) | NVDA + Chrome | Scripted (Guidepup), run 42676731643, after fix round 3: **PASS** by the rule (no severity 3 or 4, none open at 2); L-SR16, L-SR20, L-SR21, L-SR22, L-SR23 fixed and heard; three new at severity 1 (L-SR25 to L-SR27); every step heard, coverage sufficient |
 | [l-nvda-firefox-r4.md](l-nvda-firefox-r4.md) | NVDA + Firefox | Run 42676731643: **INVALID** (speech tap dead, caught by the new probe; no step judged). Record follows from the Firefox-only run 42678583126 |
 | [l-nvda-firefox-r5.md](l-nvda-firefox-r5.md) | NVDA + Firefox | Scripted (Guidepup), Firefox-only run 42678583126, after fix round 3: **PASS** by the rule (no severity 3 or 4, none open at 2); every step heard, coverage sufficient; FF-L1 not reproduced, L-SR15 fixed; L-SR25 (Concede lines unspoken) reproduces in Firefox, held at 1; step 10's "did not reach" is a harness false negative; the speech tap works in a Firefox-only job |
+| m10-nvda-chrome.md | NVDA + Chrome | Owed: a dispatched Guidepup run with `script=all` (every script, M10 included); records are written from its logs |
+| m10-nvda-firefox.md | NVDA + Firefox | Owed: the same run (one job per browser) |
+| m10-voiceover-safari.md | VoiceOver + Safari | Owed: the owner, by hand, from [M10-listening-pass.md](M10-listening-pass.md) (all six scripts and the keyboard game) |
+| [m10-wcag-audit.md](m10-wcag-audit.md) | Every criterion | The WCAG 2.2 A and AA audit: one row per criterion, how it was checked and by whom, with the automated evidence in [m10-automated.md](m10-automated.md) |
 
 ## The harness
 
@@ -174,3 +178,26 @@ may need a fix to the harness; the dry and NVDA projects share the same script.
    VoiceOver versions, or hand them to the agent to write up.
 
 The pass is met when every step's expectation is heard with no pointer and no sighted help.
+
+## The M10 listening sheet (the owner's VoiceOver pass, one document)
+
+`M10-listening-pass.md` is generated, never edited: `npm run a11y:sheet` (`scripts/a11y-sheet.ts`) reads every
+script's step table (`app/a11y/src/index-steps.ts`: M3, L, M7, M8, M9, M10) and writes one sheet with the Do and
+Expect text of each step, blank Result and Heard columns, and the by-hand keyboard game as its last item.
+`app/test/a11y-sheet.test.ts` fails if the sheet is out of date, so a step added to a script reaches the sheet
+(regenerate, commit). The set-up block between the markers below is copied into the sheet's top, so it is
+written once.
+
+<!-- sheet:setup -->
+1. Safari, a private window, at the deployed app: https://chrisdevine00.github.io/optcg-sim/ (the start address of each script is given with it).
+2. Turn VoiceOver on (Command-F5). **VO** is Control+Option. Turn Quick Nav **off** (press Left Arrow and Right Arrow together until VoiceOver says "Quick Nav off") and Single-Key Quick Nav off. Leave VoiceOver's other settings as they are.
+3. Where a step says Tab, use Tab (not VO-Right). To read around a page use VO-Right and VO-Left (next and previous item), VO-Command-H (next heading), VO-Command-L (next link), VO-Command-X (next list) and VO-Command-T (next table).
+4. For each step write pass, fail or note in Result, and in Heard what VoiceOver said when it was not what Expect says (a phone recording of the speech is enough). Also note anything confusing even if it passed.
+5. Never stop a step for time. If a step cannot be done, write why in Result and carry on.
+<!-- /sheet:setup -->
+
+The sheet is about 90 minutes: do it in two sittings, M3 to M8 first, then M9, M10 and the keyboard game. The matching
+records are `<script>-voiceover-safari.md`, written from the filled sheet. The scripted NVDA passes run from
+`gh workflow run a11y-nvda.yml --ref main -f browsers=both -f script=all` (`script=m10` for the release shell alone).
+`m10-wcag-audit.md` holds one row per WCAG 2.2 A and AA success criterion with how it was checked, who judged it and the
+result.
