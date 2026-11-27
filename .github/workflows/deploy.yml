@@ -18,6 +18,9 @@ jobs:
   build:
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
+    outputs:
+      # The build id the site must report once it is live (the verify job compares it).
+      build: ${{ steps.version.outputs.build }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -27,6 +30,8 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: cp app/dist/index.html app/dist/404.html && touch app/dist/.nojekyll
+      - id: version
+        run: echo "build=$(node -p "require('./app/dist/version.json').build")" >> "$GITHUB_OUTPUT"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -37,6 +42,43 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+  # The release check (M10 WP6): the live site answers, is the build just made, serves a deep link
+  # and the licences file. Pages takes a little while to switch over, so each check retries 5 times over
+  # about a minute; the retries are a hang guard, not a bound on how fast Pages is.
+  verify:
+    needs: [build, deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the live site
+        env:
+          URL: ${{ needs.deploy.outputs.url }}
+          BUILD: ${{ needs.build.outputs.build }}
+        run: |
+          base="${URL%/}"
+          retry() {
+            for attempt in 1 2 3 4 5; do
+              if "$@"; then return 0; fi
+              echo "attempt $attempt of $1 failed"
+              sleep 15
+            done
+            return 1
+          }
+          home() { curl -fsS "$base/" | grep -q 'id="root"'; }
+          version() {
+            live="$(curl -fsS "$base/version.json" | jq -r .build)"
+            echo "live build: $live, built: $BUILD"
+            [ "$live" = "$BUILD" ]
+          }
+          # Pages answers an unknown path with 404.html (the app's page) and status 404: the app is what counts.
+          deep_link() { curl -sS "$base/cards" | grep -q 'id="root"'; }
+          licences() { [ "$(curl -s -o /dev/null -w '%{http_code}' "$base/third-party.txt")" = 200 ]; }
+          status=0
+          for check in home version deep_link licences; do
+            if retry "$check"; then echo "ok: $check"; else echo "FAILED: $check"; status=1; fi
+          done
+          exit "$status"
