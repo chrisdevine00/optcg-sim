@@ -30,10 +30,15 @@ function versionInfo(build: string) {
   const meta = JSON.parse(readFileSync(join(root, 'docs/research/meta-lists.json'), 'utf8')) as {
     asOf: string;
   };
+  // The release is the app's SemVer (M10 WP6); the engine's own version stays separate (it versions records).
+  const release = (
+    JSON.parse(readFileSync(join(here, 'package.json'), 'utf8')) as { version: string }
+  ).version;
   const engine = /ENGINE_VERSION = '([^']+)'/.exec(
     readFileSync(join(root, 'engine/src/record.ts'), 'utf8'),
   )?.[1];
   return {
+    release,
     build,
     builtAt: new Date().toISOString(),
     cardsThrough: manifest.newestSet,

@@ -2,6 +2,8 @@
 
 A browser-based One Piece Card Game practice simulator that is also a strategy teacher. Play full games against an AI that runs real meta decks with real card art, then learn from a coach and a post-game review. Unofficial fan tool.
 
+**Play it:** https://chrisdevine00.github.io/optcg-sim/ (release 1.0.0; see `CHANGELOG.md`).
+
 ## Status
 
 See `docs/STATUS.md` for the current phase, milestone, and what is next.
@@ -38,6 +40,22 @@ npm run meta:update  # refresh tournament data, flag stale guides
 
 Dependency arrows point downward only: `app → ai → engine → cards`. ESLint enforces the boundaries.
 
+## Privacy
+
+There is no account, no server of ours, no analytics and no cookies we set. Games, decks, reviews and progress live in the browser's IndexedDB and localStorage and leave it only when you use Export. After the app has loaded, the only network requests are for card images, from the art hosts named in the About page; their operators see your address as any website would. The service worker keeps the app and the images you have seen so it works offline. Settings, then Data, deletes everything. The privacy end-to-end test (`app/e2e/m10-privacy.spec.ts`) records every request origin and fails on one outside the app's own and the art hosts.
+
+## Reporting a problem
+
+Open an issue at https://github.com/chrisdevine00/optcg-sim/issues and include the version details from the About page. A page that fails shows a "Copy details" button that gathers them (release, build, route, the error's name and first line); it never includes games or decks. If the issue tracker is ever switched off, replace this section with the owner's address.
+
+## Credits and licences
+
+The About page and `docs/legal/CREDITS.md` credit every data source, and `third-party.txt` (built by `npm run build`, linked from the About page) holds the licence of every package the app ships.
+
+Licence: to be chosen by the owner.
+
 ## Legal
+
+OPTCG Sim is an unofficial, non-commercial fan tool, not affiliated with or endorsed by Bandai, Shueisha, or Toei Animation. One Piece and all card names, text, and art belong to their respective owners.
 
 Unofficial, non-commercial fan tool. Not affiliated with or endorsed by Bandai, Shueisha, or Toei Animation. One Piece and all card names, text, and art are trademarks and copyrights of their respective owners. Card images are displayed from their source at runtime and are not redistributed from this repository.

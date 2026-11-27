@@ -1,0 +1,76 @@
+/* M10 WP6: the About page, the failure page, the 404 and the offline line. Values come from tokens.css. */
+
+.about section,
+.failure,
+.not-found {
+  max-width: 68ch;
+}
+.about section {
+  margin-top: var(--space-8);
+}
+.about-facts,
+.about-credits {
+  margin: var(--space-3) 0;
+  display: grid;
+  gap: var(--space-3);
+}
+.about-facts > div {
+  display: grid;
+  grid-template-columns: minmax(12ch, 18ch) 1fr;
+  gap: var(--space-3);
+}
+.about-credits > div {
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--color-line-strong);
+}
+.about dt {
+  font-weight: var(--weight-semibold);
+}
+.about dd {
+  margin: 0;
+}
+.about-warn {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-warning-text);
+  border-radius: var(--radius-2);
+  color: var(--color-warning-text);
+}
+
+/* The failure page: heading, reassurance, three actions, the details box. */
+.failure-actions,
+.not-found-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: var(--space-4) 0;
+  padding: 0;
+  list-style: none;
+}
+.failure-details {
+  width: 100%;
+  min-height: 9em;
+  box-sizing: border-box;
+  font:
+    var(--text-sm) / var(--leading-sm) ui-monospace,
+    monospace;
+  color: var(--color-text);
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-2);
+  padding: var(--space-2);
+}
+
+/* The offline line sits under the page heading; it is empty while online. */
+.offline-line:empty {
+  /* Stays in the tree (a live region must exist before its text does), takes no room. */
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.offline-line {
+  margin: var(--space-3) 0;
+  padding: var(--space-2) var(--space-3);
+  border-left: 3px solid var(--color-warning-text);
+  color: var(--color-text-muted);
+  max-width: 68ch;
+}

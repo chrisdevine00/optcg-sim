@@ -23,6 +23,8 @@ import {
   toJson,
 } from '../tutorial/timing.ts';
 import type { TutorialTimingLog } from '../tutorial/types.ts';
+import { Link } from '../router.tsx';
+import { OfflineLine } from '../shell/OfflineLine.tsx';
 import { DataSection } from './DataSection.tsx';
 import './settings.css';
 
@@ -83,6 +85,7 @@ export default function SettingsRoute() {
       <p className="lede">
         Stored in this browser only. Changes apply at once and to the next game you start.
       </p>
+      <OfflineLine />
 
       <section aria-labelledby="set-coach">
         <h2 id="set-coach">Coach</h2>
@@ -268,6 +271,13 @@ export default function SettingsRoute() {
         {!welcomeAsked && (
           <p className="subtle">It will show on the home page the next time you open it.</p>
         )}
+      </section>
+
+      <section aria-labelledby="set-about">
+        <h2 id="set-about">About</h2>
+        <p>
+          <Link to="/about">About OPTCG Sim: version, credits, licences and privacy</Link>
+        </p>
       </section>
 
       <p className="sr-only" role="status" aria-live="polite" data-testid="settings-status">

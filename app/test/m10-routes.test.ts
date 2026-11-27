@@ -61,9 +61,10 @@ describe('the shared pieces', () => {
   it('render the About heading (focus target) and the unchanged not-found page', () => {
     const about = renderToStaticMarkup(createElement(AboutRoute));
     expect(about).toMatch(/<h1 id="page-title" tabindex="-1">About<\/h1>/);
-    expect(renderToStaticMarkup(createElement(NotFound))).toBe(
-      '<main class="page" id="main"><h1>Page not found</h1><p>There is nothing at this address.</p></main>',
-    );
+    // WP6 fills the page in (focus target, links); the heading and sentence stay.
+    const notFound = renderToStaticMarkup(createElement(NotFound));
+    expect(notFound).toContain('<h1 id="page-title" tabindex="-1">Page not found</h1>');
+    expect(notFound).toContain('<p>There is nothing at this address.</p>');
   });
   it('puts an About link after the unchanged legal notice in the footer', () => {
     const footer = renderToStaticMarkup(createElement(Footer));

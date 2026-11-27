@@ -8,6 +8,7 @@ import {
   STEP_COUNT,
   type Welcome,
 } from '../tutorial/progress.ts';
+import { OfflineLine } from '../shell/OfflineLine.tsx';
 
 export function Home() {
   // The welcome question (flows F1): asked until it is answered; a finished tutorial ends it.
@@ -28,6 +29,7 @@ export function Home() {
         Warlord, Emperor, Pirate or Rookie AI, or a friend at the same device, or browse every
         English card.
       </p>
+      <OfflineLine />
       {progress && (
         <p className="home-actions">
           <Link to="/tutorial" className="btn primary" data-testid="continue-tutorial">
