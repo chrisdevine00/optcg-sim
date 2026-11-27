@@ -17,6 +17,8 @@ import type {
   ReviewFlag,
 } from '@optcg/ai';
 import type { ReviewMarker, TurnResult } from '@optcg/ai';
+import { capSessions } from '../progress/merge.ts';
+import type { DrillSession, LessonRecord, ProgressV1 } from '../progress/types.ts';
 import type { SessionRecord } from '../session/index.ts';
 import type { TutorialTimingLog } from '../tutorial/types.ts';
 import {
@@ -451,6 +453,112 @@ export function sanitizeLethalProgress(
   });
 }
 
+// --- progress.v1 (M9 WP6) -----------------------------------------------------------------------
+
+/** The key the progress document lives under in the `progress` KvStore (next to `lethal`). */
+export const PROGRESS_KEY = 'v1';
+export const MAX_PROGRESS_SESSIONS = 2000;
+/** A local copy of the drill ids (`DRILL_IDS` in `@optcg/ai`; a test checks they agree): no barrel import at boot. */
+const STORED_DRILLS = ['mulligan', 'lethal', 'counter', 'don'] as const;
+const LESSON_SOURCES = ['drill', 'tutorial', 'games', 'manual'] as const;
+const SESSION_ID = /^[A-Za-z0-9._:~-]{1,80}$/;
+const LESSON_CODE = /^L\d{2}$/;
+const LESSON_ID = /^L\d{2}-[a-z0-9-]{1,60}$/;
+const ISO = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?Z$/;
+
+const isoDate = (v: unknown): string | undefined =>
+  typeof v === 'string' && v.length <= 40 && ISO.test(v) && !Number.isNaN(Date.parse(v))
+    ? v
+    : undefined;
+
+/** One session; throws on anything that is not a drill session this app could have written. */
+export function sanitizeSession(v: unknown): DrillSession {
+  const o = obj(v, 'a drill session');
+  const id = str(o.id, 'a session id', 80);
+  if (!SESSION_ID.test(id)) return bad('a session id has odd characters');
+  const lesson = str(o.lesson, 'a session lesson', 80);
+  if (!LESSON_ID.test(lesson)) return bad('a session lesson is not a lesson id');
+  const at = isoDate(o.at);
+  if (at === undefined) return bad('a session date is not a date');
+  const n = int(o.n, 'a session item count', 1, 200);
+  const correct = int(o.correct, 'a session score', 0, n);
+  const shown = int(o.shown, 'a session answers-shown count', 0, n);
+  if (correct + shown > n) return bad('a session scored more than it had items');
+  const f = o.factor;
+  if (f !== null && (typeof f !== 'number' || !Number.isFinite(f) || f < 0.5 || f > 10))
+    return bad('a session timer factor is out of range');
+  const out: DrillSession = {
+    id,
+    drill: oneOf(o.drill, 'a session drill', STORED_DRILLS),
+    lesson,
+    at,
+    n,
+    correct,
+    shown,
+    factor: f as number | null,
+    itemIds: arr(o.itemIds, 'a session item list', 200).map((x) => str(x, 'an item id', 120)),
+  };
+  if (o.archetype !== undefined) out.archetype = str(o.archetype, 'an archetype id', 80);
+  return out;
+}
+
+/**
+ * `progress.v1`: only the documented shape comes out. Unknown fields are dropped, text is capped, a
+ * date that is not ISO is dropped, a lesson record with no known source is dropped, and a session that
+ * could not be real is left out (`onDrop` hears about each). Too many sessions or the wrong envelope
+ * is the whole value refused. The newest 200 sessions per drill are kept.
+ */
+export function sanitizeProgress(
+  v: unknown,
+  onDrop: (why: string) => void = () => undefined,
+): ProgressV1 {
+  const o = obj(v, 'progress');
+  if (o.v !== 1) return bad('progress is from another version');
+  const lessons: Record<string, LessonRecord> = {};
+  const rawLessons = obj(o.lessons, 'progress lessons');
+  const codes = Object.keys(rawLessons);
+  if (codes.length > 100) return bad('progress names too many lessons');
+  for (const code of codes) {
+    if (BAD_KEYS.has(code) || !LESSON_CODE.test(code)) {
+      onDrop(`a lesson named “${code.slice(0, 20)}”`);
+      continue;
+    }
+    const r = rawLessons[code];
+    const src = isObj(r) ? r.source : undefined;
+    if (
+      !isObj(r) ||
+      typeof src !== 'string' ||
+      !(LESSON_SOURCES as readonly string[]).includes(src)
+    ) {
+      onDrop(`the record of ${code}`);
+      continue;
+    }
+    const rec: LessonRecord = { source: src as LessonRecord['source'] };
+    const passedAt = isoDate(r.passedAt);
+    const passedTimedAt = isoDate(r.passedTimedAt);
+    const readAt = isoDate(r.readAt);
+    if (passedAt) rec.passedAt = passedAt;
+    if (passedTimedAt) rec.passedTimedAt = passedTimedAt;
+    if (readAt) rec.readAt = readAt;
+    lessons[code] = rec;
+  }
+  const raw = arr(o.sessions, 'progress sessions', MAX_PROGRESS_SESSIONS);
+  const seen = new Set<string>();
+  const sessions: DrillSession[] = [];
+  raw.forEach((x, i) => {
+    try {
+      const s = sanitizeSession(x);
+      if (seen.has(s.id)) throw new Invalid('a session id appears twice');
+      seen.add(s.id);
+      sessions.push(s);
+    } catch (e) {
+      if (!(e instanceof Invalid)) throw e;
+      onDrop(`session ${i + 1} (${e.message})`);
+    }
+  });
+  return { v: 1, lessons, sessions: capSessions(sessions) };
+}
+
 // --- the bundle ---------------------------------------------------------------------------------
 
 export type ParsedBundle =
@@ -549,6 +657,15 @@ export function validateExport(raw: unknown): ParsedBundle {
         bundle.progress[LETHAL_KEY] = sanitizeLethalProgress(raw.progress[LETHAL_KEY]);
       } catch (e) {
         skip('lethal progress', e);
+      }
+    }
+    if (isObj(raw.progress) && raw.progress[PROGRESS_KEY] !== undefined) {
+      try {
+        bundle.progress[PROGRESS_KEY] = sanitizeProgress(raw.progress[PROGRESS_KEY], (why) =>
+          skip('progress', new Invalid(`${why} was left out`)),
+        );
+      } catch (e) {
+        skip('progress', e);
       }
     }
     return { ok: true, bundle, skipped };

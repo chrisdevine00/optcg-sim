@@ -73,6 +73,7 @@ export function ExplanationView({
   renderLine,
   archetype,
   lessonLinks = false,
+  evidenceLabel = 'Why it works',
 }: {
   ex: Explanation;
   context: ExplanationContext;
@@ -91,6 +92,11 @@ export function ExplanationView({
   archetype?: string | undefined;
   /** The lesson line is a link to `/learn/<lessonId>` (the review screens). */
   lessonLinks?: boolean;
+  /**
+   * The evidence region's name. A page with several explanations gives each its own ("Why it works:
+   * a hit that should have been countered"), because two landmarks may not share a name (axe).
+   */
+  evidenceLabel?: string;
 }) {
   const [more, setMore] = useState(false);
   const H = `h${headingLevel}` as 'h2' | 'h3' | 'h4';
@@ -99,7 +105,7 @@ export function ExplanationView({
   const open = learner || more;
   const evidence =
     ex.evidence.length > 0 ? (
-      <section aria-label="Why it works" key="evidence">
+      <section aria-label={evidenceLabel} key="evidence">
         {learner && <p className="ex-sub">Why it works</p>}
         <ul className="why-evidence" aria-label="Why it works">
           {ex.evidence.map((x, i) => (

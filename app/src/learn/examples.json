@@ -1,0 +1,698 @@
+{
+  "L05": [
+    {
+      "id": "E04",
+      "title": "Wasted counter",
+      "position": "Their turn. You: Kaido (OP17-058) Leader 5000, 5 Life, 6 cards in hand. Them: Rocks.D.Xebec Leader with 1 DON!! (6000) attacks your Leader. All their other Characters are rested; it is their last possible attack this turn.",
+      "explanation": {
+        "conceptId": "counter-or-take",
+        "claim": "This counter didn't need playing.",
+        "evidence": [
+          {
+            "text": "You were at 5 Life. Taking the hit leaves 4: you would still need to take 5 more hits to lose.",
+            "figures": {
+              "life": 5,
+              "lifeAfterHit": 4
+            }
+          },
+          {
+            "text": "It was their last attack this turn: nothing else of theirs was active.",
+            "figures": {
+              "remainingAttackers": 0
+            }
+          },
+          {
+            "text": "Countering cost you a card. Taking the hit would have given you one: 7 cards instead of 5.",
+            "figures": {
+              "handIfCounter": 5,
+              "handIfTake": 7
+            }
+          }
+        ],
+        "line": [
+          {
+            "kind": "take",
+            "text": "Take the hit."
+          }
+        ],
+        "outcome": "+2 cards in hand for 1 Life.",
+        "certainty": "any-hand",
+        "nextTime": "At high Life, let a lone hit through. Keep counters for hits that would cost you the game or a Character you need.",
+        "lessonId": "L10-counter-or-take",
+        "sources": ["CR 7-1-4-1-1-2", "SH-CTR", "SH-MIS", "BANDAI-EXP"]
+      }
+    },
+    {
+      "id": "E05",
+      "title": "A hit that should have been countered",
+      "position": "Their turn. You: Rocks.D.Xebec Leader 5000, 1 Life, no Characters. Hand: Rocks Pirates (OP17-056, [Counter] +2000, cost 0), There's No Authority… (OP17-055, [Counter] +2000, cost 0), Buckin (OP08-051, +1000). Them: Kaido (OP17-058); 0 cards in hand, 0 active DON!!; three active attackers: Ulti & Page One (OP17-060) 6000, their Leader with 2 DON!! (7000), Kaido (OP17-062) 12000. Kaido's leader effect only targets Characters, and you have none.",
+      "explanation": {
+        "conceptId": "counter-or-take",
+        "claim": "Taking that hit lost the game.",
+        "evidence": [
+          {
+            "text": "At 1 Life you could take one more hit this turn, not two: a hit at 0 Life loses.",
+            "figures": {
+              "life": 1,
+              "hitsYouCanTake": 1
+            }
+          },
+          {
+            "text": "Their three attacks needed 2000, 3000 and 8000 of counter to stop.",
+            "figures": {
+              "stopUlti": 2000,
+              "stopLeader": 3000,
+              "stopKaido": 8000
+            }
+          },
+          {
+            "text": "Your hand held 5000: enough for the two smaller attacks, never for Kaido.",
+            "figures": {
+              "handCounter": 5000
+            }
+          },
+          {
+            "text": "Taking Ulti's hit meant Kaido had to be stopped too: 3000 + 8000 = 11000. Your deck's biggest counter is +2000, so no Life card could have covered it.",
+            "figures": {
+              "neededAfterTaking": 11000,
+              "bestPossible": 7000
+            }
+          },
+          {
+            "text": "They had no cards in hand and no active DON!!, so their hand adds nothing to these numbers.",
+            "figures": {
+              "opponentHand": 0,
+              "opponentActiveDon": 0
+            }
+          }
+        ],
+        "line": [
+          {
+            "kind": "counter",
+            "text": "Stop Ulti & Page One with There's No Authority (7000 against 6000).",
+            "card": "OP17-055"
+          },
+          {
+            "kind": "counter",
+            "text": "Stop their Leader with Rocks Pirates and Buckin (8000 against 7000).",
+            "card": "OP17-056"
+          },
+          {
+            "kind": "take",
+            "text": "Take Kaido's hit: 1 Life → 0."
+          }
+        ],
+        "outcome": "Survives the turn at 0 Life.",
+        "certainty": "any-hand",
+        "nextTime": "At 1 Life, find the attack you can't stop and save your last Life for it. Counter everything else.",
+        "lessonId": "L10-counter-or-take",
+        "sources": ["CR 1-2-1-1-1", "CR 7-1-4-1", "CR 7-1-4-1-1-1", "SH-CTR", "SH-MIS"]
+      }
+    }
+  ],
+  "L09": [
+    {
+      "id": "E06",
+      "title": "DON!! left unused",
+      "position": "Game turn 8 (your 4th), going second: 8 DON!!. You played Charlotte Linlin (OP17-049, cost 5): 3 active DON!! left. Your Leader (5000, no DON!! given) attacked their Leader: Kaido (OP17-058), 5000, 3 Life. They played Queen (EB04-032, +1000): 6000, attack stopped. You ended the turn with 3 active DON!!. Your hand: Rocks Pirates and There's No Authority… (both cost 0), Kyo, Shiki. Nothing on your board or in your hand spends DON!! on their turn.",
+      "explanation": {
+        "conceptId": "don-efficiency",
+        "claim": "You left 3 DON!! unused.",
+        "evidence": [
+          {
+            "text": "You ended your turn with 3 active DON!!. Your Counter Events cost 0, and nothing else of yours uses DON!! on their turn, so those 3 did nothing.",
+            "figures": {
+              "activeDonAtEnd": 3,
+              "usableOnTheirTurn": 0
+            }
+          },
+          {
+            "text": "Your Leader attacked at 5000 into their 5000 Leader. A 1000 counter stopped it.",
+            "figures": {
+              "attackPower": 5000,
+              "defencePower": 5000,
+              "stopNeeded": 1000
+            }
+          },
+          {
+            "text": "With those 3 DON!! your Leader attacks at 8000, and stopping it takes 8000 − 5000 + 1000 = 4000: two ordinary counters, or one of their +4000 Events, which also costs them a DON!!.",
+            "figures": {
+              "attackWithDon": 8000,
+              "stopNeededWithDon": 4000
+            }
+          }
+        ],
+        "line": [
+          {
+            "kind": "giveDon",
+            "text": "Give 3 DON!! to your Leader (8000) before it attacks.",
+            "card": "OP17-039",
+            "count": 3
+          },
+          {
+            "kind": "attack",
+            "text": "Attack their Leader with your Leader.",
+            "card": "OP17-039",
+            "target": "leader"
+          }
+        ],
+        "outcome": "Costs them at least 1 more card, or 1 more Life.",
+        "certainty": "any-hand",
+        "nextTime": "Before you end your turn, spend every DON!! that nothing will use on their turn. Give it to an attacker before the attack, not after.",
+        "lessonId": "L09-don-efficiency",
+        "sources": ["CR 6-5-5-2", "CR 7-1-4-1", "SH-DON", "SH-MIS"]
+      }
+    },
+    {
+      "id": "E07",
+      "title": "Holding DON!! was correct (OP13-001 Luffy)",
+      "position": "Game turn 8 (your 4th), going second: 8 DON!!. You: Monkey.D.Luffy (OP13-001) Leader. You played Usopp (OP14-022, cost 4): 4 active, 4 rested. You gave 1 DON!! to your Leader (3 active) and attacked with it. End of turn: Usopp (\"[End of Your Turn] If your Leader has the FILM or Straw Hat Crew type, set up to 2 of your DON!! cards as active\") sets 2 active. You end with 5 active, 2 rested, 1 given to your Leader. Them: Rocks.D.Xebec.",
+      "explanation": {
+        "conceptId": "don-efficiency",
+        "claim": "Keeping 5 DON!! active was right.",
+        "evidence": [
+          {
+            "text": "Your Leader keeps its 1 given DON!! through their turn, so its [DON!! x1] defence is on.",
+            "figures": {
+              "givenToLeader": 1
+            }
+          },
+          {
+            "text": "You end with 5 active DON!!, the most it can use. With 6 or more active, the effect can't be used at all.",
+            "figures": {
+              "activeDon": 5,
+              "limit": 5
+            }
+          },
+          {
+            "text": "On their turn each DON!! you rest gives +2000 in a battle: up to +10000 across their attacks. Given on your turn, the same 5 were worth +1000 each: +5000.",
+            "figures": {
+              "theirTurnValue": 10000,
+              "yourTurnValue": 5000
+            }
+          },
+          {
+            "text": "DON!! you rest stay rested until your next turn, so choose which of their attacks gets them.",
+            "figures": {}
+          }
+        ],
+        "line": null,
+        "outcome": "Up to +10000 of defence on their turn, instead of +5000 on your attacks.",
+        "certainty": "any-hand",
+        "nextTime": "With this Leader, end your turn with 1 DON!! on the Leader and up to 5 active. Count those DON!! as defence, like counters in hand.",
+        "lessonId": "L09-don-efficiency",
+        "sources": ["RL-46", "RL-13", "CR 6-5-5-2", "CR 8-3-2-3", "SH-RGL"]
+      }
+    }
+  ],
+  "L10": [
+    {
+      "id": "E05",
+      "title": "A hit that should have been countered",
+      "position": "Their turn. You: Rocks.D.Xebec Leader 5000, 1 Life, no Characters. Hand: Rocks Pirates (OP17-056, [Counter] +2000, cost 0), There's No Authority… (OP17-055, [Counter] +2000, cost 0), Buckin (OP08-051, +1000). Them: Kaido (OP17-058); 0 cards in hand, 0 active DON!!; three active attackers: Ulti & Page One (OP17-060) 6000, their Leader with 2 DON!! (7000), Kaido (OP17-062) 12000. Kaido's leader effect only targets Characters, and you have none.",
+      "explanation": {
+        "conceptId": "counter-or-take",
+        "claim": "Taking that hit lost the game.",
+        "evidence": [
+          {
+            "text": "At 1 Life you could take one more hit this turn, not two: a hit at 0 Life loses.",
+            "figures": {
+              "life": 1,
+              "hitsYouCanTake": 1
+            }
+          },
+          {
+            "text": "Their three attacks needed 2000, 3000 and 8000 of counter to stop.",
+            "figures": {
+              "stopUlti": 2000,
+              "stopLeader": 3000,
+              "stopKaido": 8000
+            }
+          },
+          {
+            "text": "Your hand held 5000: enough for the two smaller attacks, never for Kaido.",
+            "figures": {
+              "handCounter": 5000
+            }
+          },
+          {
+            "text": "Taking Ulti's hit meant Kaido had to be stopped too: 3000 + 8000 = 11000. Your deck's biggest counter is +2000, so no Life card could have covered it.",
+            "figures": {
+              "neededAfterTaking": 11000,
+              "bestPossible": 7000
+            }
+          },
+          {
+            "text": "They had no cards in hand and no active DON!!, so their hand adds nothing to these numbers.",
+            "figures": {
+              "opponentHand": 0,
+              "opponentActiveDon": 0
+            }
+          }
+        ],
+        "line": [
+          {
+            "kind": "counter",
+            "text": "Stop Ulti & Page One with There's No Authority (7000 against 6000).",
+            "card": "OP17-055"
+          },
+          {
+            "kind": "counter",
+            "text": "Stop their Leader with Rocks Pirates and Buckin (8000 against 7000).",
+            "card": "OP17-056"
+          },
+          {
+            "kind": "take",
+            "text": "Take Kaido's hit: 1 Life → 0."
+          }
+        ],
+        "outcome": "Survives the turn at 0 Life.",
+        "certainty": "any-hand",
+        "nextTime": "At 1 Life, find the attack you can't stop and save your last Life for it. Counter everything else.",
+        "lessonId": "L10-counter-or-take",
+        "sources": ["CR 1-2-1-1-1", "CR 7-1-4-1", "CR 7-1-4-1-1-1", "SH-CTR", "SH-MIS"]
+      }
+    },
+    {
+      "id": "E19",
+      "title": "A counter that only tied",
+      "position": "Their turn. You: Rocks.D.Xebec Leader 5000, 3 Life; hand: Rocks Pirates (OP17-056, +2000), Buckin (OP08-051, +1000), Kyo, Shiki. Them: Kaido (OP17-058) Leader with 2 DON!! (7000) attacks your Leader.",
+      "explanation": {
+        "conceptId": "counters-and-blockers",
+        "claim": "Your counter tied, and ties go to the attacker.",
+        "evidence": [
+          {
+            "text": "Their Leader attacked at 7000. Rocks Pirates made yours 7000, so the hit still landed.",
+            "figures": {
+              "attackPower": 7000,
+              "defenceAfter": 7000
+            }
+          },
+          {
+            "text": "Stopping it took 7000 − 5000 + 1000 = 3000. Buckin (+1000) with Rocks Pirates would have made 8000.",
+            "figures": {
+              "stopNeeded": 3000,
+              "withBuckin": 8000
+            }
+          }
+        ],
+        "line": [
+          {
+            "kind": "take",
+            "text": "Best: take the hit and keep Rocks Pirates for a later attack."
+          },
+          {
+            "kind": "counter",
+            "text": "Also fine: add Buckin (8000 vs 7000), spending 2 cards to save 1 Life.",
+            "card": "OP08-051"
+          }
+        ],
+        "outcome": "Keeps Rocks Pirates (+2000) for a later attack, for the same 1 Life.",
+        "certainty": "any-hand",
+        "nextTime": "A counter has to put you above their power, not level with it. Check the \"need\" number before you play one.",
+        "lessonId": "L05-block-and-counter",
+        "sources": ["CR 7-1-4-1", "SH-CTR", "HAKI"]
+      }
+    }
+  ],
+  "L12": [
+    {
+      "id": "E10",
+      "title": "Mulligan: keep",
+      "position": "You: Monkey.D.Luffy (OP13-001), going first, list 1 from meta-lists.json (Aegean Pirate Cup #6, 4th). Opening hand: Nami (OP01-016, cost 1, +1000), Sanji (ST21-003, cost 2, +2000), Usopp (OP14-022, cost 4, +1000), Laboon (OP15-035, cost 1, +2000), Roronoa Zoro (EB04-007, cost 7).",
+      "explanation": {
+        "conceptId": "mulligan",
+        "claim": "Keep this hand.",
+        "evidence": [
+          {
+            "text": "You can act early: Nami costs 1 and searches 5 cards for a Straw Hat Crew Character. Going first you have 1 DON!! on turn 1.",
+            "figures": {
+              "namiCost": 1,
+              "donTurn1": 1
+            }
+          },
+          {
+            "text": "It holds your plan: Usopp sets 2 DON!! active at the end of your turn, which keeps your Leader's defence loaded.",
+            "figures": {
+              "usoppRestand": 2
+            }
+          },
+          {
+            "text": "It can defend: Laboon and Sanji (+2000 each), Usopp and Nami (+1000 each) make 6000 of counter.",
+            "figures": {
+              "counterTotal": 6000
+            }
+          }
+        ],
+        "line": [
+          {
+            "kind": "keep",
+            "text": "Keep."
+          }
+        ],
+        "outcome": "A turn-1 search, a restand piece and 6000 of counter.",
+        "certainty": "any-hand",
+        "nextTime": "Ask three questions: can I act on my first two turns, do I hold a piece of my plan, can I defend? Two yeses is a keep.",
+        "lessonId": "L12-mulligan",
+        "sources": ["CR 5-2-1-6", "SH-MUL", "SH-RGL"]
+      }
+    },
+    {
+      "id": "E11",
+      "title": "Mulligan: redraw",
+      "position": "You: Rocks.D.Xebec (OP17-039), going first, list 1 (ChinoizeCup #122, 6th), which runs 18 Characters costing 1 to 3 (Buckin 3, Streusen 3, Kyo 4, Don Marlon 4, Miss Buckingham Stussy 4). Opening hand: Rocks.D.Xebec (OP17-118, cost 10), Shiki (OP17-048, cost 7), Edward.Newgate (OP17-040, cost 6), Charlotte Linlin (OP17-049, cost 5), Rocks Pirates (OP17-056, [Counter] +2000).",
+      "explanation": {
+        "conceptId": "mulligan",
+        "claim": "Redraw this hand.",
+        "evidence": [
+          {
+            "text": "Your cheapest Character costs 5. Going first you have 1, 3, then 5 DON!!: nothing to play until turn 5 (your 3rd).",
+            "figures": {
+              "cheapestCharacter": 5,
+              "firstPlayableGameTurn": 5
+            }
+          },
+          {
+            "text": "Your deck has 18 Characters that cost 1 to 3. A fresh five has at least one of them 90% of the time.",
+            "figures": {
+              "earlyPlays": 18,
+              "deckSize": 50,
+              "chanceAtLeastOne": 0.9
+            }
+          },
+          {
+            "text": "It defends with one card: Rocks Pirates, +2000.",
+            "figures": {
+              "counterCards": 1,
+              "counterTotal": 2000
+            }
+          },
+          {
+            "text": "Don't keep a hand for Xebec: your Leader digs two cards per hit, and the deck usually finds it by 10 DON!!.",
+            "figures": {}
+          }
+        ],
+        "line": [
+          {
+            "kind": "redraw",
+            "text": "Redraw all five."
+          }
+        ],
+        "outcome": "A 90% chance of a play by turn 3 (your 2nd), instead of none until turn 5.",
+        "certainty": "any-hand",
+        "nextTime": "Going first with Rocks, redraw any hand with no Character costing 1 to 3.",
+        "lessonId": "L12-mulligan",
+        "sources": ["CR 5-2-1-6", "CR 6-4-1", "SH-XEB", "SH-MUL"]
+      }
+    }
+  ],
+  "L14": [
+    {
+      "id": "E08",
+      "title": "Board over face",
+      "position": "Your Main Phase. You: Kaido (OP17-058) Leader with 3 DON!! (8000); King (EB04-031), 7000, active. Some of your DON!! are rested in the cost area. Them: Rocks.D.Xebec Leader 5000, 4 Life, 3 cards; their only Character is Edward.Newgate (OP17-040), 8000, rested (it attacked last turn): \"[Once Per Turn] When your Leader with a type including 'Rocks Pirates' attacks or is attacked, you may trash 1 card from your hand: your Leader gains +3000 power during this battle.\" No Blockers.",
+      "explanation": {
+        "conceptId": "board-vs-face",
+        "claim": "Newgate was the better target for your Leader.",
+        "evidence": [
+          {
+            "text": "Newgate gives their Leader +3000 in one battle every turn, attacking or defending, for one card from hand.",
+            "figures": {
+              "newgateBoost": 3000
+            }
+          },
+          {
+            "text": "Your Leader's −2000 (return 1 rested DON!!) makes Newgate 6000. To save it from your 8000 Leader they need 8000 − 6000 + 1000 = 3000: two cards, since their biggest counter is +2000.",
+            "figures": {
+              "attackPower": 8000,
+              "newgateAfterMinus": 6000,
+              "stopNeeded": 3000,
+              "maxPerCard": 2000,
+              "cardsToSave": 2
+            }
+          },
+          {
+            "text": "At 4 Life, each hit on their Leader gave them a card. Your two hits gave them 2.",
+            "figures": {
+              "opponentLife": 4,
+              "cardsGiven": 2
+            }
+          }
+        ],
+        "line": [
+          {
+            "kind": "attack",
+            "text": "Attack Newgate with your Leader, and return 1 rested DON!! to give it −2000.",
+            "card": "OP17-058",
+            "target": "OP17-040"
+          },
+          {
+            "kind": "attack",
+            "text": "Attack their Leader with King.",
+            "card": "EB04-031",
+            "target": "leader"
+          }
+        ],
+        "outcome": "Newgate K.O.'d, or 2 of their cards spent to save it; King still takes 1 Life.",
+        "certainty": "any-hand",
+        "nextTime": "At high Life, hit the Character that pays them every turn. Turn to their Leader once the hits start setting up lethal.",
+        "lessonId": "L14-board-vs-face",
+        "sources": ["CR 7-1-1-2", "CR 8-3-1-6", "RL-45", "SH-MIS", "BANDAI-EXP"]
+      }
+    },
+    {
+      "id": "E09",
+      "title": "Face over board",
+      "position": "Your Main Phase. You: Rocks.D.Xebec; Shiki (OP17-048), 9000, active. Them: Kaido (OP17-058) Leader 5000, 2 Life, 2 cards; Basil Hawkins (OP17-073), 1000, rested (\"[On Play] You may trash 1 card from your hand: … add up to 1 DON!! card as active\"; no other text). Their Leader's −2000 was already used this turn on your Linlin.",
+      "explanation": {
+        "conceptId": "board-vs-face",
+        "claim": "Shiki should have attacked their Leader.",
+        "evidence": [
+          {
+            "text": "Hawkins's only text is its [On Play], already used. On the board it's a 1000-power Character.",
+            "figures": {
+              "hawkinsPower": 1000
+            }
+          },
+          {
+            "text": "At their Leader, Shiki needs them to find 9000 − 5000 + 1000 = 5000.",
+            "figures": {
+              "stopNeeded": 5000
+            }
+          },
+          {
+            "text": "They had 2 cards. Only a +4000 Event plus another counter reaches 5000; anything less and they drop to 1 Life.",
+            "figures": {
+              "handSize": 2,
+              "biggestCounter": 4000
+            }
+          },
+          {
+            "text": "Their Leader's −2000 was already used this turn, so Shiki stays at 9000.",
+            "figures": {
+              "shikiPower": 9000
+            }
+          }
+        ],
+        "line": [
+          {
+            "kind": "attack",
+            "text": "Attack their Leader with Shiki.",
+            "card": "OP17-048",
+            "target": "leader"
+          }
+        ],
+        "outcome": "Both their cards spent, or 1 Life lost, instead of a 1000-power Character.",
+        "certainty": "any-hand",
+        "nextTime": "Before attacking a Character, ask what it will do next turn. If the answer is \"not much\", hit the Leader.",
+        "lessonId": "L14-board-vs-face",
+        "sources": ["CR 7-1-4-1", "RL-45", "SH-MIS"]
+      }
+    }
+  ],
+  "L15": [
+    {
+      "id": "E01",
+      "title": "Missed lethal (works against any hand)",
+      "position": "Game turn 9, your Main Phase. You: Kaido (OP17-058) Leader, 5000 power, 3 Life. Your Kaido (OP17-062), 12000, active, played on an earlier turn. 4 active DON!! in your cost area, none given yet. Them: Rocks.D.Xebec (OP17-039) Leader, 5000, 1 Life, 2 cards in hand, no Characters. Rocks's three sourced lists run no [Trigger] cards, and their biggest counters are the 0-cost Events Rocks Pirates and There's No Authority… (+2000 each); OP17-118 Xebec's +2000 in hand is conditional and no larger.",
+      "explanation": {
+        "conceptId": "lethal-math",
+        "claim": "You had lethal this turn.",
+        "evidence": [
+          {
+            "text": "They had 1 Life, so you needed 2 hits: one for the last Life card, one to win.",
+            "figures": {
+              "opponentLife": 1,
+              "hitsNeeded": 2
+            }
+          },
+          {
+            "text": "Their 2 cards could add at most +4000: their deck's biggest counters are +2000 Events.",
+            "figures": {
+              "handSize": 2,
+              "maxPerCard": 2000,
+              "maxDefence": 4000
+            }
+          },
+          {
+            "text": "With all 4 DON!! on your Leader it attacks at 9000. Stopping it takes 9000 − 5000 + 1000 = 5000. They have 4000.",
+            "figures": {
+              "leaderPower": 9000,
+              "stopLeader": 5000,
+              "maxDefence": 4000
+            }
+          },
+          {
+            "text": "That hit puts their last Life card in their hand: 3 cards, at most +6000.",
+            "figures": {
+              "handAfterHit": 3,
+              "maxDefenceAfterHit": 6000
+            }
+          },
+          {
+            "text": "Kaido then attacks at 12000. Stopping it takes 12000 − 5000 + 1000 = 8000. They have 6000.",
+            "figures": {
+              "kaidoPower": 12000,
+              "stopKaido": 8000,
+              "maxDefenceAfterHit": 6000
+            }
+          },
+          {
+            "text": "Their deck runs no Trigger cards, so the Life card can't stop you either.",
+            "figures": {
+              "triggersInPrior": 0
+            }
+          }
+        ],
+        "line": [
+          {
+            "kind": "giveDon",
+            "text": "Give all 4 DON!! to your Leader (9000).",
+            "card": "OP17-058",
+            "count": 4
+          },
+          {
+            "kind": "attack",
+            "text": "Attack their Leader with your Leader.",
+            "card": "OP17-058",
+            "target": "leader"
+          },
+          {
+            "kind": "attack",
+            "text": "Attack their Leader with Kaido (12000).",
+            "card": "OP17-062",
+            "target": "leader"
+          }
+        ],
+        "outcome": "Wins the game this turn.",
+        "certainty": "any-hand",
+        "nextTime": "Count Life + 1 hits, then their best possible defence. Put your DON!! where it beats that defence, and send your hardest-to-stop attack last: every hit hands them another card.",
+        "lessonId": "L15-lethal-math",
+        "sources": [
+          "CR 7-1-4-1",
+          "CR 7-1-4-1-1-1",
+          "CR 7-1-4-1-1-2",
+          "CR 6-5-5-2",
+          "SH-CTR",
+          "SH-DON"
+        ]
+      }
+    },
+    {
+      "id": "E20",
+      "title": "Live lethal, three tiers",
+      "position": "Game turn 11 (your 6th), going first: 10 DON!!, all active, none given. You: Kaido (OP17-058) Leader 5000; Ulti & Page One (OP17-060) 6000 and Kaido (OP17-062) 12000, both active, played on earlier turns. Them: Rocks.D.Xebec Leader 5000, 2 Life, 1 card in hand; their only Character is Edward.Newgate (OP17-040), rested (\"[Once Per Turn] When your Leader … is attacked, you may trash 1 card from your hand: your Leader gains +3000 power during this battle\"). No Blockers. No [Trigger] cards in Rocks's lists; biggest counter +2000.",
+      "explanation": {
+        "conceptId": "lethal-math",
+        "claim": "You have lethal: 3 hits, and they can't stop any of them.",
+        "evidence": [
+          {
+            "text": "They are at 2 Life, so you need 3 hits. You have 3 attackers.",
+            "figures": {
+              "opponentLife": 2,
+              "hitsNeeded": 3,
+              "attackers": 3
+            }
+          },
+          {
+            "text": "They hold 1 card. Newgate turns a card into +3000 once this turn; their counters are +2000 each.",
+            "figures": {
+              "handSize": 1,
+              "newgateBoost": 3000,
+              "maxPerCard": 2000
+            }
+          },
+          {
+            "text": "Each hit gives them a card: 1 card for your first attack, 2 for the second, 3 for the third.",
+            "figures": {
+              "cardsAtFirst": 1,
+              "cardsAtSecond": 2,
+              "cardsAtThird": 3
+            }
+          },
+          {
+            "text": "Ulti with 2 DON!! (8000) needs 4000 to stop. They can make 3000.",
+            "figures": {
+              "ultiPower": 8000,
+              "stopUlti": 4000,
+              "maxAtFirst": 3000
+            }
+          },
+          {
+            "text": "Your Leader with 5 DON!! (10000) needs 6000. They can make 5000.",
+            "figures": {
+              "leaderPower": 10000,
+              "stopLeader": 6000,
+              "maxAtSecond": 5000
+            }
+          },
+          {
+            "text": "Kaido (12000) needs 8000. They can make 7000.",
+            "figures": {
+              "kaidoPower": 12000,
+              "stopKaido": 8000,
+              "maxAtThird": 7000
+            }
+          }
+        ],
+        "line": [
+          {
+            "kind": "giveDon",
+            "text": "Give 2 DON!! to Ulti & Page One (8000) and 5 to your Leader (10000).",
+            "count": 7
+          },
+          {
+            "kind": "attack",
+            "text": "Attack their Leader with Ulti & Page One.",
+            "card": "OP17-060",
+            "target": "leader"
+          },
+          {
+            "kind": "attack",
+            "text": "Attack their Leader with your Leader.",
+            "card": "OP17-058",
+            "target": "leader"
+          },
+          {
+            "kind": "attack",
+            "text": "Attack their Leader with Kaido (12000).",
+            "card": "OP17-062",
+            "target": "leader"
+          }
+        ],
+        "outcome": "Wins the game this turn.",
+        "certainty": "any-hand",
+        "nextTime": "Each hit hands them a card. Size each attack against the cards they will have by then, and send the biggest last.",
+        "lessonId": "L15-lethal-math",
+        "sources": [
+          "CR 7-1-4-1",
+          "CR 7-1-4-1-1-1",
+          "CR 7-1-4-1-1-2",
+          "CR 6-5-5-2",
+          "SH-DON",
+          "SH-CTR"
+        ]
+      }
+    }
+  ]
+}

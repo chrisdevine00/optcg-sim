@@ -1,3 +1,4 @@
+/* Learn (M8 WP6, M9 WP6): the course hub and the lesson page. Nothing under 12 px; targets at least 24 px. */
 .lesson {
   max-width: 760px;
 }
@@ -6,4 +7,73 @@
 }
 .lesson p {
   line-height: var(--leading-md);
+}
+.lesson .lesson-h3 {
+  margin: 16px 0 4px;
+  font-size: 1rem;
+}
+.lesson-example {
+  margin: 12px 0 20px;
+  padding: 8px 12px;
+  border-left: 3px solid var(--color-line-strong);
+}
+.lesson-refs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin: 8px 0;
+  padding: 0;
+  list-style: none;
+}
+.lesson-refs a {
+  display: inline-block;
+  min-height: 24px;
+}
+.lesson-status {
+  white-space: nowrap;
+}
+
+/* The hub */
+.learn-hub {
+  max-width: 880px;
+}
+.learn-hub h2 {
+  margin: 24px 0 8px;
+}
+.lh-continue {
+  margin: 16px 0;
+  padding: 4px 16px 8px;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-2);
+  background: var(--color-surface-1);
+}
+.lh-continue h2 {
+  margin-top: 12px;
+}
+.lh-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--color-line);
+}
+.lh-row {
+  border-bottom: 1px solid var(--color-line);
+}
+.lh-link {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  min-height: 44px;
+  padding: 8px 4px;
+}
+.lh-code {
+  min-width: 3.5em;
+  font-weight: 600;
+}
+.lh-title {
+  flex: 1 1 14em;
+}
+.lh-drill {
+  flex: 0 1 18em;
 }
