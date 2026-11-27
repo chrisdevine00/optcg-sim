@@ -1,10 +1,13 @@
 import { lazy, Suspense, type LazyExoticComponent, type ReactNode } from 'react';
-import { Footer } from './Footer.tsx';
 import { Header } from './Header.tsx';
+import { Footer } from './Footer.tsx';
 import { usePath } from './router.tsx';
 import { Home } from './routes/Home.tsx';
 import { m9Route, type M9Page } from './routes/m9.ts';
+import { ErrorBoundary } from './shell/ErrorBoundary.tsx';
+import { NotFound } from './shell/NotFound.tsx';
 import { StorageNotice } from './store/StorageNotice.tsx';
+import { StoreGate } from './store/StoreGate.tsx';
 import { UpdatePrompt } from './update/UpdatePrompt.tsx';
 
 const CardBrowser = lazy(() => import('./cards/CardBrowser.tsx'));
@@ -14,6 +17,7 @@ const TutorialRoute = lazy(() => import('./tutorial/TutorialRoute.tsx'));
 const SettingsRoute = lazy(() => import('./settings/SettingsRoute.tsx'));
 const ReviewsRoute = lazy(() => import('./play/review/ReviewsRoute.tsx'));
 const LessonRoute = lazy(() => import('./learn/LessonRoute.tsx'));
+const AboutRoute = lazy(() => import('./about/AboutRoute.tsx'));
 
 // M9: every new route is its own lazy chunk, so the initial bundle does not grow (WP0).
 const M9_PAGES: Record<M9Page, LazyExoticComponent<(p: { path: string }) => ReactNode>> = {
@@ -30,17 +34,41 @@ const M9_PAGES: Record<M9Page, LazyExoticComponent<(p: { path: string }) => Reac
   progress: lazy(() => import('./progress/ProgressRoute.tsx')),
 };
 
+/** M9 pages that read or write the saved-data store: they sit under `StoreGate` (M10 WP1 fills it). */
+const GATED_M9: ReadonlySet<M9Page> = new Set(['drills', 'drill-start', 'drill-run', 'progress']);
+
 const Fallback = () => <main className="page" id="main" aria-busy="true" />;
 
 export function App() {
   const path = usePath();
   return (
-    <>
+    <ErrorBoundary scope="shell">
       <Routes path={path} />
       <StorageNotice
         onBoard={path === '/play' || path === '/tutorial' || m9Route(path)?.full === true}
       />
-    </>
+    </ErrorBoundary>
+  );
+}
+
+/** One route: its error boundary (a failing page leaves the header and footer up), its store gate if it needs saved data, and the lazy chunk's Suspense. */
+function Guard({
+  name,
+  path,
+  gated = false,
+  children,
+}: {
+  name: string;
+  path: string;
+  gated?: boolean;
+  children: ReactNode;
+}) {
+  // The gate is outside the Suspense: its heading shows while the store opens and the chunk loads.
+  const page = <Suspense fallback={<Fallback />}>{children}</Suspense>;
+  return (
+    <ErrorBoundary scope={name}>
+      {gated ? <StoreGate path={path}>{page}</StoreGate> : page}
+    </ErrorBoundary>
   );
 }
 
@@ -50,31 +78,31 @@ function Routes({ path }: { path: string }) {
     // A drill's items and a rules demo are boards: full-screen like /play.
     const Page = M9_PAGES[m9.page];
     return (
-      <Suspense fallback={<Fallback />}>
+      <Guard name={m9.page} path={path} gated={GATED_M9.has(m9.page)}>
         <Page key={path} path={path} />
-      </Suspense>
+      </Guard>
     );
   }
   if (path === '/play')
     // The board is full-screen: its rail notice is the footer equivalent (board.md §3.1, C15).
     return (
-      <Suspense fallback={<main className="page" id="main" aria-busy="true" />}>
+      <Guard name="play" path={path} gated>
         <PlayRoute />
-      </Suspense>
+      </Guard>
     );
   if (path.startsWith('/reviews/'))
     // A saved game's review can open the board (Study, Play from here): full-screen like /play.
     return (
-      <Suspense fallback={<main className="page" id="main" aria-busy="true" />}>
+      <Guard name="review" path={path} gated>
         <ReviewsRoute path={path} />
-      </Suspense>
+      </Guard>
     );
   if (path === '/tutorial')
     // The tutorial is the board with a step card: full-screen like a game (flows F2).
     return (
-      <Suspense fallback={<main className="page" id="main" aria-busy="true" />}>
+      <Guard name="tutorial" path={path} gated>
         <TutorialRoute />
-      </Suspense>
+      </Guard>
     );
   return (
     <div className="shell">
@@ -98,39 +126,42 @@ function Routes({ path }: { path: string }) {
       <Header />
       <UpdatePrompt />
       {path === '/cards' ? (
-        <Suspense fallback={<main className="page" id="main" aria-busy="true" />}>
+        <Guard name="cards" path={path}>
           <CardBrowser />
-        </Suspense>
+        </Guard>
       ) : path === '/decks' || path.startsWith('/decks/') ? (
-        <Suspense fallback={<main className="page" id="main" aria-busy="true" />}>
+        <Guard name="decks" path={path} gated>
           <DecksRoute />
-        </Suspense>
+        </Guard>
       ) : path === '/settings' ? (
-        <Suspense fallback={<main className="page" id="main" aria-busy="true" />}>
+        <Guard name="settings" path={path} gated>
           <SettingsRoute />
-        </Suspense>
+        </Guard>
+      ) : path === '/about' ? (
+        <Guard name="about" path={path}>
+          <AboutRoute />
+        </Guard>
       ) : path === '/reviews' ? (
-        <Suspense fallback={<main className="page" id="main" aria-busy="true" />}>
+        <Guard name="reviews" path={path} gated>
           <ReviewsRoute path={path} />
-        </Suspense>
+        </Guard>
       ) : m9 ? (
-        <Suspense fallback={<Fallback />}>
+        <Guard name={m9.page} path={path} gated={GATED_M9.has(m9.page)}>
           {(() => {
             const Page = M9_PAGES[m9.page];
             return <Page key={path} path={path} />;
           })()}
-        </Suspense>
+        </Guard>
       ) : path.startsWith('/learn/') ? (
-        <Suspense fallback={<main className="page" id="main" aria-busy="true" />}>
+        <Guard name="lesson" path={path} gated>
           <LessonRoute path={path} />
-        </Suspense>
+        </Guard>
       ) : path === '/' ? (
-        <Home />
+        <Guard name="home" path={path}>
+          <Home />
+        </Guard>
       ) : (
-        <main className="page" id="main">
-          <h1>Page not found</h1>
-          <p>There is nothing at this address.</p>
-        </main>
+        <NotFound />
       )}
       <Footer />
     </div>

@@ -10,6 +10,10 @@ export default defineConfig({
   globalSetup: './app/e2e/global-setup.ts',
   timeout: 120_000,
   fullyParallel: false,
+  // M10: pixel baselines are per project and live beside the visual specs (WP8, nightly only: VISUAL=1);
+  // the frame and Lighthouse measurements are PERF=1 (WP0, WP3). Each spec skips itself on its switch.
+  snapshotPathTemplate: '{testDir}/__visual__/{projectName}/{arg}{ext}',
+  expect: { toHaveScreenshot: { maxDiffPixelRatio: 0.002, animations: 'disabled', caret: 'hide' } },
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? 'github' : 'list',
   use: {

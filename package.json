@@ -37,7 +37,15 @@
     "cards:report": "tsx cards/scripts/coverage-report.ts",
     "cards:verify-meta": "tsx cards/scripts/verify-meta.ts",
     "cards:effects-index": "tsx cards/scripts/effects-index.ts",
-    "check:bundle": "tsx scripts/bundle-budget.ts"
+    "check:bundle": "tsx scripts/bundle-budget.ts",
+    "perf:serve": "tsx scripts/serve-dist.ts",
+    "perf:lighthouse": "tsx scripts/lighthouse.ts",
+    "perf:frames": "PERF=1 playwright test app/e2e/perf-frames.spec.ts --project=720p",
+    "perf": "npm run perf:lighthouse && npm run perf:frames",
+    "licences": "if [ -e scripts/licences.ts ]; then tsx scripts/licences.ts; else echo 'licences: not built yet'; fi",
+    "a11y:sheet": "if [ -e scripts/a11y-sheet.ts ]; then tsx scripts/a11y-sheet.ts; else echo 'a11y:sheet: not built yet'; fi",
+    "test:visual": "if [ -e app/e2e/visual ]; then VISUAL=1 playwright test app/e2e/visual; else echo 'test:visual: not built yet'; fi",
+    "test:audit": "if [ -e app/e2e/m10-audit.spec.ts ]; then playwright test app/e2e/m10-audit.spec.ts; else echo 'test:audit: not built yet'; fi"
   },
   "engines": {
     "node": ">=22.12"
@@ -50,11 +58,13 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
+    "chrome-launcher": "1.2.3",
     "eslint": "^10.13.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "fake-indexeddb": "^6.2.8",
     "fast-check": "^4.10.2",
     "globals": "^17.13.0",
+    "lighthouse": "13.6.0",
     "prettier": "^3.9.10",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",

@@ -232,3 +232,50 @@ Nightly on CI (five runs, 2026-11-19 to 23): 123/200 each night. **The PLAN targ
 ### Setup copy (M5b)
 - Warlord: typically 4–8 s a turn at 1×, up to about 11 s for a long one. Measured above (11 turns, 2 to 11 moves, 3.5 to 10.8 s; 6 moves or fewer 3.5 to 6.2 s, 9 to 11 moves 10.2 to 10.8 s).
 - Emperor: typically 10–15 s a turn at 1×, up to about 17 s for a long one. Measured above (3 turns, 10.3 to 14.4 s); the long-turn figure is an estimate (no long Emperor turn was produced).
+
+## M10 baseline (2026-11-27, base commit c07fc7f6 plus the WP0 wiring)
+
+The starting numbers for M10 (`docs/design/m10-plan.md`), taken by `npm run perf:lighthouse -- --runs 3 --mobile` and `PERF=1 npx playwright test app/e2e/perf-frames.spec.ts` (the scaffold smoke) on a production build (`npm run build`, served by `scripts/serve-dist.ts` with gzip and `cache-control: max-age=600`, the way GitHub Pages serves it).
+
+**Machine and throttles.** Apple M4 Pro, 14 cores, 24 GB, macOS 27.2.1, Node 25.9.0, Lighthouse 13.6.0, Playwright 1.64.1, Chromium 156 (headless). Load average 4.7 (1 minute) at the start of the Lighthouse run, 2.1 at the start of the frame runs; nothing else of mine was running. Lighthouse: desktop form factor, 1350×940, simulated throttling (RTT 40 ms, 10 Mbit/s, CPU slowdown 4×), cold cache and cleared storage, 3 runs per route, median per metric. Frames: CPU slowdown 4× through CDP (`Emulation.setCPUThrottlingRate`), 60 Hz headless compositor on the Mac, 3 runs.
+
+### Lighthouse, six routes (median of 3; performance min to max over the runs)
+
+| Route | Performance | Accessibility | Best practices | LCP ms | FCP ms | TBT ms | CLS | Transfer KB |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `/` | 100 (100 to 100) | 100 | 96 | 441 | 203 | 0 | 0 | 177 |
+| `/cards` | 100 (100 to 100) | 100 | 96 | 545 | 203 | 0 | 0.016 | 201 |
+| `/play?scenario=late&opp=pirate&speed=step` | 100 (100 to 100) | 100 | 96 | 684 | 204 | 0 | 0.044 | 302 |
+| `/meta` | 100 (100 to 100) | 100 | 96 | 732 | 308 | 6 | 0.008 | 199 |
+| `/learn` | 100 (100 to 100) | 100 | 96 | 625 | 203 | 0 | 0.026 | 247 |
+| `/rules` | 100 (100 to 100) | 100 | 96 | 556 | 203 | 0 | 0.025 | 204 |
+
+- **Which criteria already pass: Lighthouse performance 90 or more and accessibility 90 or more pass on all six routes with room to spare** (100 and 100; the nightly bound is 85 and 90). The run-to-run spread is nil in score and a few ms in the metrics, so the simulated throttle is stable on this machine.
+- **Best practices 96, not 100, on every route**: the three links WP0 added to `index.html` (`favicon.svg`, `apple-touch-icon.png`, `manifest.webmanifest`) 404 until WP6 adds the files (a console error). Without those links the same build scored 100.
+- **The boot line moves LCP, not FCP.** `index.html` now has "Loading OPTCG Sim…" in `#root`, so FCP is the boot line (about 203 ms) on every route and means "the HTML painted", not "the app painted". Before the line (the same build with the old `index.html`; 3 runs) LCP and FCP were both 203 ms on `/`, 202 on `/cards`, 203 on `/play`, best practices 100; with it LCP on those three routes is 441, 545 and 684 ms. WP1's before and after must therefore compare **LCP** (the page's real first content), not FCP. Both are inside any bound; the performance score stays 100.
+- **Mobile profile** (Lighthouse's default, one run per route, information only, never asserted): performance 99 (`/`), 96 (`/cards`), 89 (`/play`), 94 (`/meta`), 92 (`/learn`), 95 (`/rules`); accessibility 100 everywhere; LCP 2.1 to 3.2 s; `/play` CLS 0.12 (the others 0.06 to 0.10, `/` 0).
+
+### JavaScript, gzip
+
+- **Initial JS: 84.3 KB in 2 files (index 81.2 KB, `jsx-runtime` 3.1 KB), against 83.5 KB in 1 file before WP0.** `check:bundle` counts it as 84.3 KB. The entry chunk itself is 2.3 KB smaller than before (the route table's fourteen copies of `Suspense` became one), but Rolldown now emits React's `jsx-runtime` wrapper as its own initial chunk, and a second gzip stream costs about 1 KB. Bisected: any change to `App.tsx` or `Footer.tsx` that adds JSX moves it (the same effect with only the new `Footer`, only the new `App.tsx`, and a plain `<a>`); reverting both gives one file again. It is a chunking heuristic, not code: WP2 owns `check:bundle` and the cap (100 KB) and can pin it (see the report to the lead).
+- **Route sizes** (the route's chunk plus every chunk it imports statically that the initial bundle does not; workers excluded; by hand, WP2 builds the table into `check:bundle`): Cards 22.5, Meta 18.7, Matchups 31.2, Guide 29.0, Rules 24.7, Rule entry 22.5, About 0.3, Decks 71.7, Learn 67.7, Progress 72.9, Drills home 99.7, Settings 103.3, Lesson 137.5, Tutorial 178.7, Drill run 184.1, Drill start 185.5, Reviews 195.1, **Play 194.8** (Game 65 + engine 43 + ai 40 + review flow 13 + 33 of smaller chunks), Show me 198.4 KB. The card-data chunk is not in the Cards route's figure because it loads at runtime per set.
+
+### Frames at 4× CPU slowdown: the AI's 13-move turn (smoke scenario)
+
+`scenario=late&opp=pirate&speed=1&aibudget=iterations`, the player ends each turn at once and takes every hit; the window runs from the first turn to the end of the AI's first turn (turn 8: 13 moves, 9.39 s of board time at speed 1, 41 to 46 ms of worker thinking).
+
+| Project, run | Frames | p50 | p95 | p99 | Max | Over 25 ms | Long tasks |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 720p, 1 | 643 | 16.7 | 16.8 | 16.8 | 33.3 | 0.3% | 0 |
+| 720p, 2 | 643 | 16.7 | 16.7 | 16.8 | 33.4 | 0.3% | 0 |
+| 720p, 3 | 643 | 16.7 | 16.8 | 16.8 | 33.4 | 0.5% | 0 |
+| 1080p, 1 | 645 | 16.7 | 16.8 | 16.8 | 50 | 0.2% | 0 |
+
+On this Mac every frame of the turn is on the 60 Hz tick at 4× (the requirement: p95 under 20 ms, p99 under 34 ms, at most 2% over 25 ms, no long task over 100 ms: all met with headroom). The smoke records one scenario only: the human turn, the review timeline scroll and the hand fan (WP3 scenarios b to d) are not measured yet. The CI runner's software compositor is slower than this Mac; the nightly number is the one that decides.
+
+### Gap list for the lead
+
+1. **No Lighthouse gap**: performance and accessibility are 100 on all six routes at the fixed throttle. WP2's Lighthouse work has no failing score to fix; its remaining value is the per-route size table, the 100 KB cap and the lethal-solver decision, and WP1's is the gate itself (the store is off the first paint's path either way, the measure is "time to a playable board with IndexedDB delayed 2 s", not a score).
+2. **The one measurable regression is Best practices 96**, from three icon links whose files WP6 adds.
+3. **Initial JS grew 0.8 KB** (84.3 against 83.5) through chunk splitting, not code; WP2 should pin `react/jsx-runtime` into the entry chunk or accept 84.3 as the new reference before it lowers the cap.
+4. **The frame requirement is met by the AI-turn smoke at 4×;** the other three scenarios are unmeasured, so WP3 keeps its hours until they are.

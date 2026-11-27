@@ -5,9 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="dark light" />
     <title>OPTCG Sim</title>
+    <meta
+      name="description"
+      content="A free, unofficial One Piece Card Game simulator with an AI opponent, a tutorial, drills and game reviews. Runs in your browser; nothing leaves it."
+    />
+    <meta name="theme-color" content="#0b0e12" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f2f4f7" media="(prefers-color-scheme: light)" />
+    <meta property="og:title" content="OPTCG Sim" />
+    <meta
+      property="og:description"
+      content="A free, unofficial One Piece Card Game simulator that runs in your browser."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="%BASE_URL%favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="%BASE_URL%apple-touch-icon.png" />
+    <link rel="manifest" href="%BASE_URL%manifest.webmanifest" />
+    <!--
+      The first frame before React mounts: the two values below duplicate --color-bg and --color-text
+      of the dark theme in src/styles/tokens.css (a test in app/test/head.test.ts keeps them equal),
+      so the page is not white while the script loads.
+    -->
+    <style>
+      html {
+        background: #0b0e12;
+        color: #e8ecf1;
+      }
+      .boot {
+        margin: 0;
+        padding: 2rem 1rem;
+        font:
+          1rem/1.5 system-ui,
+          sans-serif;
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><p class="boot" role="status">Loading OPTCG Sim…</p></div>
+    <noscript>OPTCG Sim needs JavaScript to run. Nothing is sent from your browser.</noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

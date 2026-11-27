@@ -1,0 +1,40 @@
+name: Perf
+# M10: Lighthouse and frame timing, measured with fixed throttles (Lighthouse simulated 40 ms RTT,
+# 10 Mbps, CPU 4x; frames at CPU 4x through CDP) and asserted here, not per push, at about 1.5 times
+# the requirement (docs/runbooks/testing.md "Time and statistics"; DECISIONS 2026-11-27 "M10 plan").
+# Separate from nightly.yml so a slow strength job never delays or masks it. Dispatch with
+# `release: true` for the release gate (5 Lighthouse runs per route, asserted at the requirement, 90).
+on:
+  schedule:
+    - cron: '47 3 * * *'
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Release gate: 5 runs per route, performance and accessibility asserted at 90'
+        type: boolean
+        default: false
+jobs:
+  perf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      # Writes test-results/lighthouse.json and .md whatever the verdict; asserts with --assert.
+      - run: npm run perf:lighthouse -- --assert ${{ inputs.release && '--release' || '' }}
+      # The frame specs build their own (pinned-meta) copy through Playwright's web server.
+      - run: npm run perf:frames
+        if: always()
+        env:
+          PERF_ASSERT: '1'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: perf
+          path: test-results/
