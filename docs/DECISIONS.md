@@ -2,6 +2,16 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-27 — M10 WP8: pixel specs skip cleanly off Linux and without a baseline, the comparison is a nightly job, 15 screens, 600 KB cap
+
+- **Context:** the spec asked for 14 screens, a per-push `visual` job in `ci.yml` and a 200 KB cap; the lead amendment moved the comparison to the nightly and dispatch. Baselines cannot be made on the Mac this was built on.
+- **Decision: a spec skips itself, with its reason,** unless `VISUAL=1`, the platform is Linux (override `VISUAL_ANY_OS=1`, for checking that specs run) and its baseline exists (unless the run is `--update-snapshots`). A missing baseline is therefore never a failure, so the nightly job is green and says "skipped" until the lead commits the first set. `playwright.config.ts` is unchanged (WP0's `snapshotPathTemplate` has no platform in it, which is why the platform skip is in the spec).
+- **Decision: the `visual` job is in `nightly.yml`**, not `ci.yml`; `visual-baseline.yml` (dispatch, optional `commit` input pushing `visual/baselines`) regenerates and uploads the images. `ci.yml` is untouched.
+- **Decision: 15 screens, not 14**: the PROMPT's five first (board, inspector, coach with lethal, review timeline, meta tiles), then the matchup grid, Defend with a Counter staged, Study, a Mulligan drill item, rules search, Progress with the recommendation card, the builder with a deck, About, Settings, Home. Inspector is the Cards route's inspector on OP17-087 (scripted card).
+- **Decision: the cap is 600 KB**, not 200 KB: on this machine the 1080p builder is 478 KB and the 1080p inspector 346 KB as PNG; the cap exists to catch a photo or card scan, and the name and PNG-signature checks do the rest.
+- **Decision: the specs seed IndexedDB themselves** rather than using `review-m8-support.load`, because that helper serves a 1x1 PNG for art hosts and the baselines must abort them.
+- **Evidence:** the 30 images written twice on this Mac are byte-identical, and a compare run (no update) passes 30 of 30; they are discarded (Mac renders are not baselines).
+
 ## 2026-11-27 — M10 WP2: initial cap 100 KB, a per-route table in `check:bundle`, one initial file, the lethal solver stays eager
 
 - **Context:** WP0's baseline scores Lighthouse performance 100 and accessibility 100 on all six routes at the fixed throttle (RTT 40 ms, 10 Mbit/s, CPU 4x), so there was no score to fix. WP0's JSX in `App` and `Footer` made Rolldown emit `react/jsx-runtime` as a second initial chunk (84.3 KB gz in 2 files, against 83.5 KB in 1).
