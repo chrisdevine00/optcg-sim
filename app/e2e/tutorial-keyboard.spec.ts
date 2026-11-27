@@ -70,7 +70,12 @@ const KEYS: Record<string, (page: Page) => Promise<void>> = {
     await page.keyboard.press('Enter');
   },
   't6-trigger': async (page) => {
-    await myTurn(page, 'block');
+    // No Blocker in step 6, so the block window has one answer and is skipped automatically:
+    // depending on when the poll lands, the panel is "block" for an instant or already "counter".
+    // Either way the defence panel with Take the hit is up (waiting for "block" alone raced it).
+    await expect
+      .poll(async () => page.locator('#decision').getAttribute('data-kind'), { timeout: 30_000 })
+      .toMatch(/^(block|counter)$/);
     await tabUntil(page, '#take-hit');
     await page.keyboard.press('Enter');
     await myTurn(page, 'trigger');

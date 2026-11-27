@@ -100,8 +100,10 @@ export async function rightUntil(page: Page, sel: string) {
   expect(await focusIs(page, sel)).toBe(true);
 }
 
-/** "Press Tab until you reach X." */
+/** "Press Tab until you reach X." A person sees X before tabbing to it, so wait for it first
+ * (under load the decision's kind can change a frame before its buttons are drawn). */
 export async function tabUntil(page: Page, sel: string) {
+  await expect(page.locator(sel)).toBeEnabled({ timeout: 30_000 });
   for (let i = 0; i < 30 && !(await focusIs(page, sel)); i++) await page.keyboard.press('Tab');
   expect(await focusIs(page, sel)).toBe(true);
 }
