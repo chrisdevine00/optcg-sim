@@ -42,10 +42,13 @@ export function CertaintyChip({
   id,
   caveat,
   archetype,
+  guideBasis,
 }: {
   certainty: Explanation['certainty'];
   context: ExplanationContext;
   id?: string;
+  /** A guide whose rule is tagged inference says so in the chip (M9-R5). */
+  guideBasis?: 'sourced' | 'inference' | undefined;
   /** A guide-sourced answer names its guide: "From the Rocks guide (sourced)". */
   archetype?: string | undefined;
   /** The Trigger caveat, when it applies (learning-ui §3.1). */
@@ -56,7 +59,7 @@ export function CertaintyChip({
   return (
     <p className={`chip outline why-certainty cert-${certainty}`} id={id} title={tip}>
       <span aria-hidden="true">{SHAPE[certainty]} </span>
-      {certaintyLabel(certainty, context, archetype)}
+      {certaintyLabel(certainty, context, archetype, guideBasis)}
     </p>
   );
 }
@@ -72,6 +75,7 @@ export function ExplanationView({
   caveat,
   renderLine,
   archetype,
+  guideBasis,
   lessonLinks = false,
   evidenceLabel = 'Why it works',
 }: {
@@ -90,6 +94,8 @@ export function ExplanationView({
   renderLine?: () => React.ReactNode;
   /** The guide's name for a sourced label (the review's mulligan). */
   archetype?: string | undefined;
+  /** `inference` when the guide tags its rule as inference: the chip says so (M9-R5). */
+  guideBasis?: 'sourced' | 'inference' | undefined;
   /** The lesson line is a link to `/learn/<lessonId>` (the review screens). */
   lessonLinks?: boolean;
   /**
@@ -150,6 +156,7 @@ export function ExplanationView({
           context={context}
           caveat={caveat}
           archetype={archetype}
+          guideBasis={guideBasis}
         />
       )}
       {!terse && renderLine && ex.line && ex.line.length > 0 && renderLine()}

@@ -25,6 +25,10 @@ export const TIMER_CHOICES: readonly { factor: number | null; label: string }[] 
   { factor: 10, label: '1000%' },
 ];
 
+/** Was an answer given after `ms` milliseconds inside `limit` seconds? The boundary counts (M9-R9). */
+export const withinLimit = (ms: number | null, limit: number | null): boolean =>
+  ms !== null && limit !== null && ms / 1000 <= limit;
+
 /** Seconds allowed for an item: the base time times the factor; null when untimed. */
 export const limitSeconds = (drill: DrillId, factor: number | null): number | null =>
   factor === null ? null : BASE_SECONDS[drill] * factor;
@@ -53,6 +57,7 @@ export type TimerEvent = 'ten-left' | 'over';
 export class ItemTimer {
   private spent = 0;
   private startedAt: number | null = null;
+  private wasPaused = false;
   private said = new Set<TimerEvent>();
 
   constructor(
@@ -73,8 +78,19 @@ export class ItemTimer {
     this.startedAt ??= this.now();
   }
 
+  /** The clock was paused at some point on this item: it cannot count for the timed badge (M9-R4). */
+  get everPaused(): boolean {
+    return this.wasPaused;
+  }
+
+  /** The limit this answer ran under, for the record: `null` when untimed or ever paused. */
+  limitForRecord(): number | null {
+    return this.wasPaused ? null : limitSeconds(this.drill, this.factor);
+  }
+
   pause(): void {
     if (this.startedAt === null) return;
+    this.wasPaused = true;
     this.spent += this.now() - this.startedAt;
     this.startedAt = null;
   }

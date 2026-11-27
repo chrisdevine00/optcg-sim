@@ -30,6 +30,12 @@ export interface DrillSession {
   shown: number;
   /** The timer factor (0.5 to 10), null when untimed. */
   factor: number | null;
+  /**
+   * M9-R4 (additive): the right answers that came inside the limit that applied to each of them (a paused
+   * item does not count). The timed badge reads this, never `factor` alone. Absent on a session from before
+   * it existed, or an untimed one: such a session does not earn the badge.
+   */
+  timedOk?: number;
   itemIds: string[];
   /** Set by the mulligan trainer's per-archetype exit (L12). */
   archetype?: string;

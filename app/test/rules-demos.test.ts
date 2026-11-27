@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { automation, SCRIPTED_IDS } from '@optcg/cards';
-import { actionFromView, legalActions, project, type ProjectedView } from '@optcg/engine';
+import { actionFromView, legalActions, project, queries, type ProjectedView } from '@optcg/engine';
 import { DEMOS } from '../src/rules/demos/index.ts';
 import { ruleExists } from '../src/rules/index.ts';
 import { allowFor, demoCardIds, mySteps, scriptFor } from '../src/rules/showme.ts';
@@ -187,5 +187,36 @@ describe('the demos use the tutorial’s opponent only', () => {
   });
   it('every legal action in a start position is reachable through the engine', () => {
     for (const d of DEMOS) expect(legalActions(start(d)).length, d.id).toBeGreaterThan(0);
+  });
+});
+
+describe('deck-out says what RL-26 says (M9-R1)', () => {
+  const d = DEMOS.find((x) => x.id === 'deck-out')!;
+  const deckOf = (n: number) => {
+    const c = structuredClone(d);
+    c.scenario.p1 = { ...c.scenario.p1, deck: Array.from({ length: n }, () => 'ST21-013') };
+    return c;
+  };
+
+  it('the text names the rule as a rule process at 0 cards, not a failed draw', () => {
+    const text = `${d.say.join(' ')} ${d.goal}`;
+    expect(text).toMatch(/moment your deck reaches 0/);
+    expect(text).toMatch(/rule process/);
+    expect(text).not.toMatch(/Nothing happens while it is empty/);
+    expect(text).not.toMatch(/asks you to draw/);
+  });
+
+  it('the engine agrees: the draw succeeds, the deck is 0, the game is over with 5 Life left', () => {
+    const state = playDemo(d).state;
+    expect(queries.zone(state, 'p1', 'deck')).toHaveLength(0);
+    expect(queries.zone(state, 'p1', 'hand')).toHaveLength(1);
+    expect(queries.zone(state, 'p1', 'life')).toHaveLength(5);
+    expect(queries.result(state)).toMatchObject({ winner: 'p2' });
+  });
+
+  it('the loss is at the draw that reaches 0: with 2 cards the same line survives', () => {
+    const state = playDemo(deckOf(2)).state;
+    expect(queries.zone(state, 'p1', 'deck')).toHaveLength(1);
+    expect(queries.result(state)).toBeNull();
   });
 });

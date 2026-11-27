@@ -460,6 +460,13 @@ export const PROGRESS_KEY = 'v1';
 export const MAX_PROGRESS_SESSIONS = 2000;
 /** A local copy of the drill ids (`DRILL_IDS` in `@optcg/ai`; a test checks they agree): no barrel import at boot. */
 const STORED_DRILLS = ['mulligan', 'lethal', 'counter', 'don'] as const;
+/** The lesson code each drill is the drill of (curriculum.md): a session's `lesson` must be its drill's (M9-R12). */
+const DRILL_CODE: Record<(typeof STORED_DRILLS)[number], string> = {
+  mulligan: 'L12',
+  lethal: 'L15',
+  counter: 'L10',
+  don: 'L09',
+};
 const LESSON_SOURCES = ['drill', 'tutorial', 'games', 'manual'] as const;
 const SESSION_ID = /^[A-Za-z0-9._:~-]{1,80}$/;
 const LESSON_CODE = /^L\d{2}$/;
@@ -487,9 +494,12 @@ export function sanitizeSession(v: unknown): DrillSession {
   const f = o.factor;
   if (f !== null && (typeof f !== 'number' || !Number.isFinite(f) || f < 0.5 || f > 10))
     return bad('a session timer factor is out of range');
+  const drill = oneOf(o.drill, 'a session drill', STORED_DRILLS);
+  if (!lesson.startsWith(`${DRILL_CODE[drill]}-`))
+    return bad('a session lesson does not belong to its drill');
   const out: DrillSession = {
     id,
-    drill: oneOf(o.drill, 'a session drill', STORED_DRILLS),
+    drill,
     lesson,
     at,
     n,
@@ -498,6 +508,10 @@ export function sanitizeSession(v: unknown): DrillSession {
     factor: f as number | null,
     itemIds: arr(o.itemIds, 'a session item list', 200).map((x) => str(x, 'an item id', 120)),
   };
+  if (o.timedOk !== undefined) {
+    out.timedOk = int(o.timedOk, 'a session timed score', 0, correct);
+    if (f === null) return bad('an untimed session has a timed score');
+  }
   if (o.archetype !== undefined) out.archetype = str(o.archetype, 'an archetype id', 80);
   return out;
 }

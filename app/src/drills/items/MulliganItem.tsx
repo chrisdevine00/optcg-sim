@@ -36,7 +36,7 @@ export function MulliganItemScreen({
   note: string | null;
   timer: ItemTimer;
   factor: number | null;
-  onFactor(f: number | null): void;
+  onFactor?: ((f: number | null) => void) | undefined;
   onAnswer(redraw: boolean): void;
   onShow(): void;
   onSkip(): void;

@@ -849,7 +849,7 @@ Rocks (OP17-039) and Kaido (OP17-058) dominate because they are the slice decks 
   ],
   line: [
     { kind: 'take', text: 'Best: take the hit and keep Rocks Pirates for a later attack.' },
-    { kind: 'counter', text: 'Also fine: add Buckin (8000 vs 7000), spending 2 cards to save 1 Life.', card: 'OP08-051' },
+    { kind: 'counter', text: 'Weaker: add Buckin (8000 vs 7000), which stops it but spends 2 cards to save 1 Life.', card: 'OP08-051' },
   ],
   outcome: 'Keeps Rocks Pirates (+2000) for a later attack, for the same 1 Life.',
   certainty: 'any-hand',

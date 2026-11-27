@@ -16,6 +16,7 @@ import {
   PROGRESS_KEY,
   parseExport,
   sanitizeProgress,
+  sanitizeSession,
   validateExport,
 } from '../src/store/validate.ts';
 import {
@@ -45,9 +46,9 @@ describe('recording a session', () => {
 
   it('gives the timed badge only to a session run at 100% or faster', async () => {
     const p = progressStore(new MemoryStore().progress);
-    await p.recordSession(session('don', 10, 9, t(1), { factor: 4 }));
+    await p.recordSession(session('don', 10, 9, t(1), { factor: 4, timedOk: 9 }));
     expect((await p.get()).lessons.L09).toEqual({ source: 'drill', passedAt: t(1) });
-    await p.recordSession(session('don', 10, 9, t(2), { factor: 0.5 }));
+    await p.recordSession(session('don', 10, 9, t(2), { factor: 0.5, timedOk: 9 }));
     expect((await p.get()).lessons.L09).toEqual({
       source: 'drill',
       passedAt: t(1),
@@ -105,6 +106,45 @@ describe('the progress.v1 validator', () => {
     expect(got.lessons.L10).toEqual({ source: 'drill', passedAt: t(1) });
     expect(got.sessions[0]).not.toHaveProperty('unknown');
     expect(got.sessions[0]!.correct).toBe(8);
+  });
+
+  it('timedOk is additive (M9-R4): old sessions stay valid, a good one is kept, an impossible one is left out', () => {
+    const base = session('counter', 10, 8, t(1), { factor: 1 });
+    const dropped: string[] = [];
+    const got = sanitizeProgress(
+      {
+        v: 1,
+        lessons: {},
+        sessions: [
+          { ...base, id: 'old' },
+          { ...base, id: 'good', timedOk: 7 },
+          { ...base, id: 'more-than-correct', timedOk: 9 },
+          { ...base, id: 'negative', timedOk: -1 },
+          { ...base, id: 'untimed', factor: null, timedOk: 3 },
+        ],
+      },
+      (w) => dropped.push(w),
+    );
+    expect(Object.fromEntries(got.sessions.map((s) => [s.id, s.timedOk]))).toEqual({
+      old: undefined,
+      good: 7,
+    });
+    expect(dropped).toHaveLength(3);
+  });
+
+  it('a session whose lesson is not its drill’s is left out; every real drill’s own lesson passes (M9-R12)', () => {
+    const forged = {
+      ...session('lethal', 10, 8, t(1)),
+      id: 'forged',
+      lesson: 'L10-counter-or-take',
+    };
+    const dropped: string[] = [];
+    const got = sanitizeProgress({ v: 1, lessons: {}, sessions: [forged] }, (w) => dropped.push(w));
+    expect(got.sessions).toEqual([]);
+    expect(dropped[0]).toMatch(/does not belong to its drill/);
+    for (const drill of ['mulligan', 'lethal', 'counter', 'don'] as const)
+      expect(() => sanitizeSession(session(drill, 10, 8, t(1)))).not.toThrow();
+    expect(() => sanitizeSession({ ...session('don', 10, 8, t(1)), lesson: 'L10-x' })).toThrow();
   });
 
   it('refuses the wrong envelope, too many sessions, and a non-object', () => {

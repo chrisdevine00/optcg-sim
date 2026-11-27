@@ -237,6 +237,9 @@ export default function DrillRun({ path, clock = () => new Date() }: DrillRunPro
       correct: view.correct,
       shownAnswer: d.kind === 'shown',
       ms: factor === null && d.kind === 'shown' ? null : Math.round(timer.elapsedMs()),
+      // The limit that applies to THIS answer (M9-R4): the factor is locked from the first answer, and a
+      // paused item has none.
+      limit: timer.limitForRecord(),
     };
     setResults((rs) => [...rs, r]);
     if (entry.item.source.kind === 'flag' && d.kind !== 'shown')
@@ -254,7 +257,7 @@ export default function DrillRun({ path, clock = () => new Date() }: DrillRunPro
     if (!entry || phase.k !== 'item') return;
     const rs = [
       ...results,
-      { itemId: entry.item.id, correct: false, shownAnswer: false, ms: null },
+      { itemId: entry.item.id, correct: false, shownAnswer: false, ms: null, limit: null },
     ];
     setResults(rs);
     say('Skipped.');
@@ -367,7 +370,8 @@ export default function DrillRun({ path, clock = () => new Date() }: DrillRunPro
     note,
     timer,
     factor,
-    onFactor: setFactor,
+    // The time allowed is fixed once the first answer counts (M9-R4): the summary scores against it.
+    ...(results.length === 0 ? { onFactor: setFactor } : {}),
     onShow: () => answer({ kind: 'shown' }),
     onSkip: skip,
     onLeave: () => setLeaving(true),

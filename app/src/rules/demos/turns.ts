@@ -290,7 +290,7 @@ export const TURN_DEMOS: RuleDemo[] = [
       p1: {
         leader: K.LUFFY_L,
         life: many(K.VEGAPUNK, 5),
-        deck: [],
+        deck: [K.VEGAPUNK],
         costArea: { active: 3, rested: 0 },
       },
       p2: {
@@ -304,11 +304,16 @@ export const TURN_DEMOS: RuleDemo[] = [
       step('End your turn', { type: 'endTurn' }),
       theirs('They end their turn', { type: 'endTurn' }),
     ],
-    expect: [{ kind: 'result', winner: 'opp' }],
-    say: [
-      'Your deck has no cards left. Nothing happens while it is empty, but at the start of your next turn the Draw Phase asks you to draw, and a player with 0 cards in their deck loses.',
-      'Watch the card count of your deck: running out is a way to lose with Life still in play.',
+    expect: [
+      { kind: 'zone', side: 'me', zone: 'deck', count: 0 },
+      { kind: 'zone', side: 'me', zone: 'hand', count: 1 },
+      { kind: 'life', side: 'me', count: 5 },
+      { kind: 'result', winner: 'opp' },
     ],
-    goal: 'End your turn with an empty deck and see what your next Draw Phase does.',
+    say: [
+      'Your deck has 1 card left. Your next Draw Phase draws it, and you lose the moment your deck reaches 0 cards, with all 5 Life still in play.',
+      'It is a rule process, checked at once: the draw worked, and you do not wait for a draw you cannot make. An effect that draws your last card loses the same way.',
+    ],
+    goal: 'End your turn with 1 card in your deck and watch what your next Draw Phase does.',
   },
 ];

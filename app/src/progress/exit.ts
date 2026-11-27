@@ -58,9 +58,22 @@ export const sessionPasses = (r: DrillRule, s: DrillSession): boolean =>
   s.n >= r.of && s.correct * r.of >= r.n * s.n;
 
 /**
+ * The timed pass, one rule for the drill summary and for Progress (M9-R4): a full set (`of` items or
+ * more), run at the base time or faster (`factor` 1 or less), with at least the exit's share of the answers
+ * both right and inside the limit that applied to them (`timedOk`). A session with no `timedOk` (old, or
+ * untimed) does not earn it: `factor` alone never does.
+ */
+export const timedPasses = (r: DrillRule, s: DrillSession): boolean =>
+  s.n >= r.of &&
+  s.factor !== null &&
+  s.factor <= 1 &&
+  s.timedOk !== undefined &&
+  s.timedOk * r.of >= r.n * s.n;
+
+/**
  * When the exit was first met by the sessions of `r.drill`, as an ISO date-time, or null. With
- * `perArchetype` it is the moment the Nth different archetype first passed. `timedOnly` looks at
- * sessions run at the base time or faster (`factor <= 1`): the separate "passed (timed)" badge.
+ * `perArchetype` it is the moment the Nth different archetype first passed. `timedOnly` is the separate
+ * "passed (timed)" badge: a session counts when `timedPasses` says so.
  */
 export function drillPassedAt(
   r: DrillRule,
@@ -69,8 +82,7 @@ export function drillPassedAt(
 ): string | null {
   const first = new Map<string, string>();
   for (const s of sessions) {
-    if (s.drill !== r.drill || !sessionPasses(r, s)) continue;
-    if (timedOnly && !(s.factor !== null && s.factor <= 1)) continue;
+    if (s.drill !== r.drill || !(timedOnly ? timedPasses(r, s) : sessionPasses(r, s))) continue;
     const key = r.perArchetype ? (s.archetype ?? '') : '*';
     if (r.perArchetype && key === '') continue;
     const had = first.get(key);

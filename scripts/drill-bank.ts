@@ -53,6 +53,10 @@ const GENERATORS: Partial<Record<DrillId, Generator>> = {
       ...(ctx.maxSeeds ? { maxSeeds: ctx.maxSeeds } : {}),
       log: ctx.log,
     }),
+  mulligan: async (ctx) =>
+    (await import('../ai/src/search/drills/mulligan.ts')).generateMulliganBank(ctx.cards, {
+      log: ctx.log,
+    }),
   lethal: async (ctx) =>
     (await import('../ai/src/search/drills/lethal-gen.ts')).generateLethalBank(ctx.cards, {
       leaders: ctx.leaders,

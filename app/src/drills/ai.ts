@@ -20,6 +20,5 @@ export {
   mulliganCoverage,
   mulliganItemFromFlag,
   mulliganLabel,
-  mulliganBank,
   recordOfItem,
 } from '@optcg/ai/drills';

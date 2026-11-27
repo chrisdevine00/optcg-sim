@@ -7,11 +7,14 @@ import { LESSONS } from '../src/learn/lessons.ts';
 import {
   CONCEPT_LESSON,
   DECAY,
+  DRILL_EVIDENCE,
+  drillEvidence,
   nextUnfinished,
   parseConceptTable,
   recommend,
   type RecommendInput,
 } from '../src/progress/recommend.ts';
+import { EXIT, isDrillRule } from '../src/progress/exit.ts';
 import type { FlagSpec, GameSpec } from './progress-support.ts';
 import { credit, inputOf, iso, NOW, progressOf, session } from './progress-support.ts';
 
@@ -295,6 +298,42 @@ describe('recommend', () => {
     const r = recommend(inputOf(clean(2), { progress: progressOf([], lessons) }), NOW);
     expect(r.kind).toBe('done');
     expect(r.lesson).toBeNull();
+  });
+});
+
+describe('the drill evidence weight (M9-R8, M9-R9)', () => {
+  // Lethal math flagged severe in all 10 games: 3 * (1 - 0.85^10) / 0.15 / 10 = 1.61, the most flags can say.
+  const everyGame = Object.fromEntries(
+    Array.from({ length: 10 }, (_, i) => [i, [severe('lethal-math')]]),
+  );
+  const flagged = plan(everyGame, 10);
+  const failing = (n: number, correct: number) =>
+    progressOf([session('counter', n, correct, iso(NOW - 1000))]);
+
+  it('is 2, and a full failing session counts in full (pinned: 0.5 would lose to the flags below)', () => {
+    expect(DRILL_EVIDENCE).toBe(2);
+    expect(recommend(inputOf(flagged, { progress: failing(10, 5) }), NOW).lesson).toBe('L10');
+    expect(recommend(inputOf(flagged, { progress: failing(20, 10) }), NOW).lesson).toBe('L10');
+  });
+
+  it('a session of one item, answered wrong, does not outrank severe flags in every game', () => {
+    expect(recommend(inputOf(flagged, { progress: failing(1, 0) }), NOW).lesson).toBe('L15');
+    expect(recommend(inputOf(flagged, { progress: failing(5, 1) }), NOW).lesson).toBe('L15');
+  });
+
+  it('scales by the session size up to the exit’s ten items', () => {
+    const rule = EXIT.L10!;
+    if (!isDrillRule(rule)) throw new Error('L10 is a drill');
+    expect(drillEvidence(rule, 1)).toBeCloseTo(0.2);
+    expect(drillEvidence(rule, 5)).toBeCloseTo(1);
+    expect(drillEvidence(rule, 10)).toBe(2);
+    expect(drillEvidence(rule, 40)).toBe(2);
+  });
+
+  it('with no flags at all, a failing short session still suggests its lesson, without claiming it is under the exit', () => {
+    const r = recommend(inputOf(clean(4), { progress: failing(1, 0) }), NOW);
+    expect(r.lesson).toBe('L10');
+    expect(r.reason).toBe('Your counter-or-take drill: 0 of 1.');
   });
 });
 

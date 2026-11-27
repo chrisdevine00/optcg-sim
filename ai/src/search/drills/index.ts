@@ -8,10 +8,10 @@ export * from './types.ts';
 
 // M9 WP4: the judges, answer text and seams the drill shell calls (named, so the two
 // `INERT_LIFE`s and the generic `Line` of the generators do not collide in the ai barrel).
-export { provideMulliganCards } from './bank-mulligan.ts';
 export { judgeLethal, lethalHeader, type LethalSubmission, type LethalVerdict } from './lethal.ts';
 export {
   explainMulliganItem,
+  generateMulliganBank,
   judgeMulligan,
   metaListSets,
   mulliganBank,

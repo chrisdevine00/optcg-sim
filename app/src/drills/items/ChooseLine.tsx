@@ -28,7 +28,7 @@ export function ChooseLineScreen({
   note: string | null;
   timer: ItemTimer;
   factor: number | null;
-  onFactor(f: number | null): void;
+  onFactor?: ((f: number | null) => void) | undefined;
   onSubmit(lineId: string): void;
   onBoard(): void;
   onShow(): void;

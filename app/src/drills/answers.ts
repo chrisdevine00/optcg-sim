@@ -30,6 +30,8 @@ export interface AnswerView {
   context: ExplanationContext;
   /** The guide's name for a sourced label. */
   archetype?: string;
+  /** `inference` when the guide tags its mulligan rule as inference (M9-R5): the chip says so. */
+  guideBasis?: 'sourced' | 'inference';
   /** An item that kept the game's real hand says so (M9 WP7): "Their real hand: one way to see it". */
   handLabel?: string;
   /** Said once by the polite region. */
@@ -59,6 +61,7 @@ export function answerFor(
     explanation: Explanation | null,
     context: ExplanationContext,
     archetype?: string,
+    guideBasis?: 'sourced' | 'inference',
   ): AnswerView => {
     const ok = d.kind !== 'shown' && correct;
     const title = titleOf(d, ok);
@@ -71,6 +74,7 @@ export function answerFor(
       explanation,
       context,
       ...(archetype ? { archetype } : {}),
+      ...(guideBasis ? { guideBasis } : {}),
       spoken: `${title}. ${lines.join(' ')}${explanation ? ` ${explanation.claim}` : ''}`,
     };
   };
@@ -79,7 +83,9 @@ export function answerFor(
     const m = item as MulliganItem;
     const ex = ai.explainMulliganItem(m, cards, lists);
     const keep = /^Keep/.test(ex.claim);
-    const name = guideNameOf(ai.mulliganLabel(m, cards));
+    const label = ai.mulliganLabel(m, cards);
+    const name = guideNameOf(label);
+    const basis = /inference/.test(label) ? 'inference' : 'sourced';
     const chose = d.kind === 'mulligan' ? d.redraw : null;
     const right = chose === null ? false : ai.judgeMulligan(m, chose, cards, lists);
     return finish(
@@ -91,6 +97,7 @@ export function answerFor(
       ex,
       'guide',
       name,
+      basis,
     );
   }
 
@@ -147,7 +154,19 @@ export function answerFor(
       right
         ? 'That spends your DON!! as well as any line does.'
         : 'Another line leaves less DON!! unused.',
-      ...(best ? [`A best line: ${best.label}.`] : []),
+      // Lines tied for the least unused DON!! are all best; the answer says it is among the lines shown.
+      ...(best
+        ? [
+            `A best line: ${best.label}.${
+              don.best.length > 1
+                ? ` Also tied for best: ${don.best
+                    .slice(1)
+                    .map((id) => don.lines.find((l) => l.id === id)?.label ?? id)
+                    .join('; ')}.`
+                : ''
+            }`,
+          ]
+        : []),
     ],
     ai.explainDon(don, cards, d.kind === 'line' ? lineId : bestId),
     'drill',

@@ -32,7 +32,7 @@ const bank = bankFor('don');
 const items = bank.items as DonItem[];
 
 describe('the DON!! bank', () => {
-  it('has at least 20 items: ordinary and OP13-001 hold items, three or four lines each', () => {
+  it('has at least 20 items: ordinary and OP13-001 hold items, three to five lines each', () => {
     expect(items.length).toBeGreaterThanOrEqual(MIN_BANK);
     expect(items.filter((i) => i.hold).length).toBeGreaterThanOrEqual(6);
     expect(items.filter((i) => !i.hold).length).toBeGreaterThanOrEqual(12);
@@ -40,7 +40,7 @@ describe('the DON!! bank', () => {
     for (const i of items) {
       expect(i.drill).toBe('don');
       expect(i.lines.length, i.id).toBeGreaterThanOrEqual(3);
-      expect(i.lines.length, i.id).toBeLessThanOrEqual(4);
+      expect(i.lines.length, i.id).toBeLessThanOrEqual(5);
       expect(i.label).toBe('any-hand');
       expect(i.lesson).toBe('L09-don-efficiency');
       for (const l of i.lines) {

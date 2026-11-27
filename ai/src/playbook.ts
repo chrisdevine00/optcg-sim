@@ -312,6 +312,12 @@ export interface MulliganRule {
   secondShort: number;
   /** Pieces required going first whatever `secondShort` says. */
   requireGoingFirst: string[];
+  /**
+   * M9-R5 (additive). The guide's own Mulligan line, when it is a redraw rule and not a list of pieces to
+   * hold: redraw only a hand whose every card costs at least this much, or, going first, one lacking a
+   * `requireGoingFirst` piece. Every other hand is kept; the pieces still explain what a hand holds.
+   */
+  redrawIfAllCostAtLeast?: number;
   /** Where the rule comes from (docs/content/sources.md tag, or the guide). */
   source: string;
 }
