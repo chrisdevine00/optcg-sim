@@ -11,13 +11,15 @@
  * face-down Life are never read, so the label is `any-hand`.
  */
 import type { Card } from '@optcg/cards';
+import { ENGINE_VERSION } from '@optcg/engine';
+import { metaListSets } from './mulligan.ts';
 import { project, type GameState } from '@optcg/engine';
 import { donLedger, explainHeld, explainUnused, type DonLedger } from '../../coach/tempo.ts';
 import type { Explanation } from '../../explanation.ts';
 import { candidateLines, type Line, type LineKind } from './lines.ts';
 import { applyAll, startOf } from './play.ts';
-import { mainPosition, type ListSet } from './positions.ts';
-import type { DonItem } from './types.ts';
+import { DRILL_SCRIPTS_VERSION, mainPosition, type ListSet } from './positions.ts';
+import type { DonItem, DrillBank } from './types.ts';
 
 export const DON_LESSON = 'L09-don-efficiency';
 type Cards = ReadonlyMap<string, Card>;
@@ -185,5 +187,27 @@ export function explainDon(
       'Before you end your turn, spend every DON!! that nothing will use on their turn. Give it to an attacker before the attack, not after.',
     lessonId: DON_LESSON,
     sources: ['CR 6-5-5-2', 'SH-DON', 'SH-MIS'],
+  };
+}
+
+/** The generator `scripts/drill-bank.ts` registers: the bank on the pinned lists, with its build stamp. */
+export function generateDonBank(
+  cards: Cards,
+  opts: { maxSeeds?: number; log?: (line: string) => void } = {},
+): DrillBank & { counts: Record<string, number> } {
+  const counts: Record<string, number> = {};
+  const items = donBank(metaListSets(), cards, {
+    ...(opts.maxSeeds ? { maxSeed: opts.maxSeeds } : {}),
+    onItem: (i) => {
+      const k = i.hold ? 'hold' : 'ordinary';
+      counts[k] = (counts[k] ?? 0) + 1;
+      opts.log?.(`${i.id}: ${k}`);
+    },
+  });
+  return {
+    drill: 'don',
+    builtWith: { engine: ENGINE_VERSION, scripts: DRILL_SCRIPTS_VERSION },
+    items,
+    counts,
   };
 }

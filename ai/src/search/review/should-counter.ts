@@ -215,7 +215,17 @@ export function shouldCounterExplanation(
   }
   return {
     certainty,
-    explanation: explainShouldCounter(m, attacker, me, cards, certainty, line, survivedAt, what, group),
+    explanation: explainShouldCounter(
+      m,
+      attacker,
+      me,
+      cards,
+      certainty,
+      line,
+      survivedAt,
+      what,
+      group,
+    ),
   };
 }
 

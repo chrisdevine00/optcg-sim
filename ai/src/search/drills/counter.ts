@@ -15,6 +15,8 @@
  * text is the detector's own `Explanation`, rebuilt from the item (`explainCounter`).
  */
 import type { Card } from '@optcg/cards';
+import { ENGINE_VERSION } from '@optcg/engine';
+import { metaListSets } from './mulligan.ts';
 import { counterValueOf } from '../../knowledge.ts';
 import {
   legalActions,
@@ -36,8 +38,8 @@ import {
   shouldCounterExplanation,
 } from '../review/should-counter.ts';
 import { applyAll, plainReply, startOf } from './play.ts';
-import { defencePosition, type ListSet } from './positions.ts';
-import type { CounterItem, ScenarioJson } from './types.ts';
+import { DRILL_SCRIPTS_VERSION, defencePosition, type ListSet } from './positions.ts';
+import type { CounterItem, DrillBank, ScenarioJson } from './types.ts';
 
 /** Search budget of every classification: nodes, never milliseconds (deterministic). */
 export const COUNTER_CAP: Cap = { nodes: 40_000 };
@@ -451,4 +453,26 @@ export function explainCounter(
   }
   const { state, played } = naiveCounters(counter, cards);
   return counterWastedOf(counter, state, played, ME, cards)?.explanation ?? null;
+}
+
+/** The generator `scripts/drill-bank.ts` registers: the bank on the pinned lists, with its build stamp. */
+export function generateCounterBank(
+  cards: Cards,
+  opts: { maxSeeds?: number; log?: (line: string) => void } = {},
+): DrillBank & { counts: Record<string, number> } {
+  const counts: Record<string, number> = {};
+  const items = counterBank(metaListSets(), cards, {
+    ...(opts.maxSeeds ? { maxSeed: opts.maxSeeds } : {}),
+    onItem: (i) => {
+      const k = i.detector;
+      counts[k] = (counts[k] ?? 0) + 1;
+      opts.log?.(`${i.id}: ${k}`);
+    },
+  });
+  return {
+    drill: 'counter',
+    builtWith: { engine: ENGINE_VERSION, scripts: DRILL_SCRIPTS_VERSION },
+    items,
+    counts,
+  };
 }

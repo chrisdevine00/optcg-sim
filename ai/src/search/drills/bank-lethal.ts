@@ -1,8 +1,8 @@
 import type { DrillBank } from './types.ts';
+import json from '../../../../app/src/drills/banks/lethal.json';
 
-/** M9 WP0 stub: an empty bank. WP2 replaces the body (and only this file) with the committed lethal bank. */
-export const bank = (): DrillBank => ({
-  drill: 'lethal',
-  builtWith: { engine: '', scripts: '' },
-  items: [],
-});
+/**
+ * The committed lethal bank (M9 WP2): card ids and scenarios only, written by
+ * `npm run drills:bank -- lethal` and re-verified by the solver in `ai/test/drills-lethal.test.ts`.
+ */
+export const bank = (): DrillBank => json as unknown as DrillBank;

@@ -28,13 +28,7 @@ import {
 import type { Evidence, Explanation, Move } from '../../explanation.ts';
 import { counterValueOf, priorCardIds, priorFor } from '../../knowledge.ts';
 import { counterCard, counterOnlyPower, isAuto, nameOf, otherSeat, turnNumber } from './exact.ts';
-import {
-  flagId,
-  type Detector,
-  type ReviewFlag,
-  type Severity,
-  type TurnResult,
-} from './types.ts';
+import { flagId, type Detector, type ReviewFlag, type Severity, type TurnResult } from './types.ts';
 
 /** Life from which taking one hit is a choice, not a risk (spec: "Life before the hit >= 3"). */
 export const LIFE_SAFE = 3;

@@ -8,10 +8,14 @@
 export type Span =
   | { kind: 'text'; text: string }
   | { kind: 'source'; tag: string; label: string; url: string | null }
-  | { kind: 'inference' };
+  /** `note` is the words after "inference" in `*(inference from leader text)*` (additive, WP1). */
+  | { kind: 'inference'; note?: string };
 
 export type GuideBlock =
-  { kind: 'p'; spans: Span[] } | { kind: 'list'; ordered: boolean; items: Span[][] };
+  | { kind: 'p'; spans: Span[] }
+  | { kind: 'list'; ordered: boolean; items: Span[][] }
+  /** Additive (WP1): the Game plan and Defining cards tables. `rows[r][c]` is one cell's spans. */
+  | { kind: 'table'; head: string[]; rows: Span[][][] };
 
 /** One `## ` section, in file order. */
 export interface GuideSection {
@@ -27,8 +31,12 @@ export interface GuideMatchup {
   opponent: string;
   /** The sourced record, or null when the guide gives none ("11-12 (even)": text "even"). */
   record: { w: number; l: number; text: string } | null;
-  /** Whose record it is (a source tag or the guide's leader), null when there is no record. */
+  /** Whose record it is: the leader id of the guide it is written in (its W-L), null when there is none. */
   owner: string | null;
+  /** The whole Record cell with its tags removed ("38-63 (bad); 10-8 post-ban"); additive, WP1. */
+  recordCell: string;
+  /** The Record cell as spans, with its source tags (additive, WP1). */
+  recordSpans: Span[];
   plan: Span[];
   /** `[TAG]`s found in the row, resolved or not (a test requires every tag in `sources.md`). */
   tags: string[];

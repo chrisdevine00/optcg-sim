@@ -1,12 +1,18 @@
 {
   "drill": "counter",
-  "builtWith": { "engine": "0.5.18", "scripts": "wp3-1" },
+  "builtWith": {
+    "engine": "0.5.18",
+    "scripts": "wp3-1"
+  },
   "items": [
     {
       "id": "counter-1",
       "drill": "counter",
       "lesson": "L10-counter-or-take",
-      "source": { "kind": "bank", "seed": 1 },
+      "source": {
+        "kind": "bank",
+        "seed": 1
+      },
       "mine": "OP05-098",
       "theirs": "OP13-004",
       "first": true,
@@ -22,7 +28,10 @@
           "hand": ["OP17-107", "OP06-115"],
           "life": ["OP01-081", "OP01-081", "OP01-081", "OP01-081"],
           "characters": [],
-          "costArea": { "active": 1, "rested": 4 },
+          "costArea": {
+            "active": 1,
+            "rested": 4
+          },
           "decklist": [
             "EB01-056",
             "EB01-056",
@@ -77,14 +86,26 @@
           ]
         },
         "p2": {
-          "leader": { "card": "OP13-004", "don": 3 },
+          "leader": {
+            "card": "OP13-004",
+            "don": 3
+          },
           "characters": [
-            { "card": "OP17-082", "don": 2 },
-            { "card": "OP17-086", "don": 1 }
+            {
+              "card": "OP17-082",
+              "don": 2
+            },
+            {
+              "card": "OP17-086",
+              "don": 1
+            }
           ],
           "life": ["OP01-081", "OP01-081", "OP01-081"],
           "hand": [],
-          "costArea": { "active": 0, "rested": 0 },
+          "costArea": {
+            "active": 0,
+            "rested": 0
+          },
           "decklist": [
             "EB04-007",
             "EB04-007",
@@ -140,8 +161,17 @@
         }
       },
       "prefix": [
-        { "type": "attack", "attacker": "$5p2j3nm", "target": "$tl4piay", "player": "p2" },
-        { "type": "block", "blocker": null, "player": "p1" }
+        {
+          "type": "attack",
+          "attacker": "$5p2j3nm",
+          "target": "$tl4piay",
+          "player": "p2"
+        },
+        {
+          "type": "block",
+          "blocker": null,
+          "player": "p1"
+        }
       ],
       "hand": "harder",
       "expect": "take",
@@ -152,7 +182,10 @@
       "id": "counter-3",
       "drill": "counter",
       "lesson": "L10-counter-or-take",
-      "source": { "kind": "bank", "seed": 3 },
+      "source": {
+        "kind": "bank",
+        "seed": 3
+      },
       "mine": "OP14-041",
       "theirs": "OP12-061",
       "first": true,
@@ -168,7 +201,10 @@
           "hand": ["OP16-113", "OP16-113", "OP14-114"],
           "life": ["OP01-081"],
           "characters": [],
-          "costArea": { "active": 1, "rested": 4 },
+          "costArea": {
+            "active": 1,
+            "rested": 4
+          },
           "decklist": [
             "EB04-058",
             "EB04-058",
@@ -225,13 +261,25 @@
         "p2": {
           "leader": "OP12-061",
           "characters": [
-            { "card": "P-093", "don": 2 },
-            { "card": "OP12-108", "don": 3 },
-            { "card": "EB04-058", "don": 1 }
+            {
+              "card": "P-093",
+              "don": 2
+            },
+            {
+              "card": "OP12-108",
+              "don": 3
+            },
+            {
+              "card": "EB04-058",
+              "don": 1
+            }
           ],
           "life": ["OP01-081", "OP01-081", "OP01-081", "OP01-081", "OP01-081"],
           "hand": [],
-          "costArea": { "active": 0, "rested": 0 },
+          "costArea": {
+            "active": 0,
+            "rested": 0
+          },
           "decklist": [
             "EB04-038",
             "EB04-038",
@@ -287,8 +335,17 @@
         }
       },
       "prefix": [
-        { "type": "attack", "attacker": "$m6lb9pe", "target": "$rdxp50a", "player": "p2" },
-        { "type": "block", "blocker": null, "player": "p1" }
+        {
+          "type": "attack",
+          "attacker": "$m6lb9pe",
+          "target": "$rdxp50a",
+          "player": "p2"
+        },
+        {
+          "type": "block",
+          "blocker": null,
+          "player": "p1"
+        }
       ],
       "hand": "harder",
       "expect": "take",
@@ -299,7 +356,10 @@
       "id": "counter-10",
       "drill": "counter",
       "lesson": "L10-counter-or-take",
-      "source": { "kind": "bank", "seed": 10 },
+      "source": {
+        "kind": "bank",
+        "seed": 10
+      },
       "mine": "OP08-098",
       "theirs": "ST30-001",
       "first": true,
@@ -315,7 +375,10 @@
           "hand": ["OP12-114", "OP12-114"],
           "life": ["OP01-081", "OP01-081"],
           "characters": ["OP08-099"],
-          "costArea": { "active": 0, "rested": 7 },
+          "costArea": {
+            "active": 0,
+            "rested": 7
+          },
           "decklist": [
             "EB01-059",
             "EB03-053",
@@ -370,15 +433,30 @@
           ]
         },
         "p2": {
-          "leader": { "card": "ST30-001", "don": 2 },
+          "leader": {
+            "card": "ST30-001",
+            "don": 2
+          },
           "characters": [
-            { "card": "ST30-012", "don": 2 },
-            { "card": "EB04-002", "don": 3 },
-            { "card": "OP12-015", "don": 1 }
+            {
+              "card": "ST30-012",
+              "don": 2
+            },
+            {
+              "card": "EB04-002",
+              "don": 3
+            },
+            {
+              "card": "OP12-015",
+              "don": 1
+            }
           ],
           "life": ["OP01-081", "OP01-081", "OP01-081", "OP01-081", "OP01-081"],
           "hand": [],
-          "costArea": { "active": 0, "rested": 0 },
+          "costArea": {
+            "active": 0,
+            "rested": 0
+          },
           "decklist": [
             "EB02-017",
             "EB02-017",
@@ -434,8 +512,17 @@
         }
       },
       "prefix": [
-        { "type": "attack", "attacker": "$cabifll", "target": "$s4d9jqh", "player": "p2" },
-        { "type": "block", "blocker": null, "player": "p1" }
+        {
+          "type": "attack",
+          "attacker": "$cabifll",
+          "target": "$s4d9jqh",
+          "player": "p2"
+        },
+        {
+          "type": "block",
+          "blocker": null,
+          "player": "p1"
+        }
       ],
       "hand": "harder",
       "expect": "counter",
@@ -446,7 +533,10 @@
       "id": "counter-14",
       "drill": "counter",
       "lesson": "L10-counter-or-take",
-      "source": { "kind": "bank", "seed": 14 },
+      "source": {
+        "kind": "bank",
+        "seed": 14
+      },
       "mine": "OP13-004",
       "theirs": "OP05-098",
       "first": true,
@@ -462,7 +552,10 @@
           "hand": ["OP04-016", "OP17-087", "ST01-011"],
           "life": ["OP01-081"],
           "characters": ["OP17-083"],
-          "costArea": { "active": 4, "rested": 1 },
+          "costArea": {
+            "active": 4,
+            "rested": 1
+          },
           "decklist": [
             "EB04-007",
             "EB04-007",
@@ -517,14 +610,26 @@
           ]
         },
         "p2": {
-          "leader": { "card": "OP05-098", "don": 3 },
+          "leader": {
+            "card": "OP05-098",
+            "don": 3
+          },
           "characters": [
-            { "card": "OP17-106", "don": 2 },
-            { "card": "EB04-058", "don": 1 }
+            {
+              "card": "OP17-106",
+              "don": 2
+            },
+            {
+              "card": "EB04-058",
+              "don": 1
+            }
           ],
           "life": ["OP01-081", "OP01-081", "OP01-081", "OP01-081", "OP01-081"],
           "hand": [],
-          "costArea": { "active": 0, "rested": 0 },
+          "costArea": {
+            "active": 0,
+            "rested": 0
+          },
           "decklist": [
             "EB02-052",
             "EB02-052",
@@ -580,8 +685,17 @@
         }
       },
       "prefix": [
-        { "type": "attack", "attacker": "$4jn1icg", "target": "$k0r2qwv", "player": "p2" },
-        { "type": "block", "blocker": null, "player": "p1" }
+        {
+          "type": "attack",
+          "attacker": "$4jn1icg",
+          "target": "$k0r2qwv",
+          "player": "p2"
+        },
+        {
+          "type": "block",
+          "blocker": null,
+          "player": "p1"
+        }
       ],
       "hand": "harder",
       "expect": "take",
@@ -592,7 +706,10 @@
       "id": "counter-16",
       "drill": "counter",
       "lesson": "L10-counter-or-take",
-      "source": { "kind": "bank", "seed": 16 },
+      "source": {
+        "kind": "bank",
+        "seed": 16
+      },
       "mine": "OP09-062",
       "theirs": "OP17-058",
       "first": true,
@@ -608,7 +725,10 @@
           "hand": ["OP09-078", "OP09-078", "OP17-102", "OP17-109", "OP17-109"],
           "life": ["OP01-081", "OP01-081"],
           "characters": ["OP16-119"],
-          "costArea": { "active": 1, "rested": 6 },
+          "costArea": {
+            "active": 1,
+            "rested": 6
+          },
           "decklist": [
             "OP09-078",
             "OP09-078",
@@ -663,15 +783,30 @@
           ]
         },
         "p2": {
-          "leader": { "card": "OP17-058", "don": 2 },
+          "leader": {
+            "card": "OP17-058",
+            "don": 2
+          },
           "characters": [
-            { "card": "OP17-073", "don": 2 },
-            { "card": "OP17-060", "don": 3 },
-            { "card": "EB04-032", "don": 1 }
+            {
+              "card": "OP17-073",
+              "don": 2
+            },
+            {
+              "card": "OP17-060",
+              "don": 3
+            },
+            {
+              "card": "EB04-032",
+              "don": 1
+            }
           ],
           "life": ["OP01-081", "OP01-081", "OP01-081"],
           "hand": [],
-          "costArea": { "active": 0, "rested": 0 },
+          "costArea": {
+            "active": 0,
+            "rested": 0
+          },
           "decklist": [
             "EB04-030",
             "EB04-031",
@@ -727,8 +862,17 @@
         }
       },
       "prefix": [
-        { "type": "attack", "attacker": "$gqlygxk", "target": "$bf64q95", "player": "p2" },
-        { "type": "block", "blocker": null, "player": "p1" }
+        {
+          "type": "attack",
+          "attacker": "$gqlygxk",
+          "target": "$bf64q95",
+          "player": "p2"
+        },
+        {
+          "type": "block",
+          "blocker": null,
+          "player": "p1"
+        }
       ],
       "hand": "harder",
       "expect": "take",
@@ -739,7 +883,10 @@
       "id": "counter-19",
       "drill": "counter",
       "lesson": "L10-counter-or-take",
-      "source": { "kind": "bank", "seed": 19 },
+      "source": {
+        "kind": "bank",
+        "seed": 19
+      },
       "mine": "OP14-041",
       "theirs": "OP09-062",
       "first": true,
@@ -755,7 +902,10 @@
           "hand": ["OP06-106"],
           "life": ["OP01-081", "OP01-081"],
           "characters": ["OP17-109"],
-          "costArea": { "active": 2, "rested": 1 },
+          "costArea": {
+            "active": 2,
+            "rested": 1
+          },
           "decklist": [
             "EB04-058",
             "EB04-058",
@@ -812,13 +962,25 @@
         "p2": {
           "leader": "OP09-062",
           "characters": [
-            { "card": "OP17-102", "don": 2 },
-            { "card": "OP12-112", "don": 1 },
-            { "card": "OP17-107", "don": 1 }
+            {
+              "card": "OP17-102",
+              "don": 2
+            },
+            {
+              "card": "OP12-112",
+              "don": 1
+            },
+            {
+              "card": "OP17-107",
+              "don": 1
+            }
           ],
           "life": ["OP01-081", "OP01-081", "OP01-081"],
           "hand": [],
-          "costArea": { "active": 0, "rested": 0 },
+          "costArea": {
+            "active": 0,
+            "rested": 0
+          },
           "decklist": [
             "EB04-058",
             "EB04-058",
@@ -874,9 +1036,22 @@
         }
       },
       "prefix": [
-        { "type": "attack", "attacker": "$0hit8dc", "target": "$5pa1wjy", "player": "p2" },
-        { "type": "optional", "accept": false, "player": "p2" },
-        { "type": "block", "blocker": null, "player": "p1" }
+        {
+          "type": "attack",
+          "attacker": "$0hit8dc",
+          "target": "$5pa1wjy",
+          "player": "p2"
+        },
+        {
+          "type": "optional",
+          "accept": false,
+          "player": "p2"
+        },
+        {
+          "type": "block",
+          "blocker": null,
+          "player": "p1"
+        }
       ],
       "hand": "harder",
       "expect": "counter",
@@ -887,7 +1062,10 @@
       "id": "counter-20",
       "drill": "counter",
       "lesson": "L10-counter-or-take",
-      "source": { "kind": "bank", "seed": 20 },
+      "source": {
+        "kind": "bank",
+        "seed": 20
+      },
       "mine": "OP12-061",
       "theirs": "OP17-039",
       "first": true,
@@ -903,7 +1081,10 @@
           "hand": ["EB04-058", "OP12-108", "P-088", "EB04-058"],
           "life": ["OP01-081", "OP01-081", "OP01-081", "OP01-081"],
           "characters": ["OP16-065"],
-          "costArea": { "active": 0, "rested": 5 },
+          "costArea": {
+            "active": 0,
+            "rested": 5
+          },
           "decklist": [
             "EB04-038",
             "EB04-038",
@@ -958,11 +1139,22 @@
           ]
         },
         "p2": {
-          "leader": { "card": "OP17-039", "don": 3 },
-          "characters": [{ "card": "OP17-054", "don": 3 }],
+          "leader": {
+            "card": "OP17-039",
+            "don": 3
+          },
+          "characters": [
+            {
+              "card": "OP17-054",
+              "don": 3
+            }
+          ],
           "life": ["OP01-081", "OP01-081", "OP01-081", "OP01-081"],
           "hand": [],
-          "costArea": { "active": 0, "rested": 0 },
+          "costArea": {
+            "active": 0,
+            "rested": 0
+          },
           "decklist": [
             "OP08-051",
             "OP08-051",
@@ -1018,9 +1210,22 @@
         }
       },
       "prefix": [
-        { "type": "attack", "attacker": "$fw3fgrg", "target": "$jvejmq8", "player": "p2" },
-        { "type": "optional", "accept": false, "player": "p2" },
-        { "type": "block", "blocker": null, "player": "p1" }
+        {
+          "type": "attack",
+          "attacker": "$fw3fgrg",
+          "target": "$jvejmq8",
+          "player": "p2"
+        },
+        {
+          "type": "optional",
+          "accept": false,
+          "player": "p2"
+        },
+        {
+          "type": "block",
+          "blocker": null,
+          "player": "p1"
+        }
       ],
       "hand": "harder",
       "expect": "take",
@@ -1031,7 +1236,10 @@
       "id": "counter-22",
       "drill": "counter",
       "lesson": "L10-counter-or-take",
-      "source": { "kind": "bank", "seed": 22 },
+      "source": {
+        "kind": "bank",
+        "seed": 22
+      },
       "mine": "OP13-004",
       "theirs": "OP15-058",
       "first": true,
@@ -1047,7 +1255,10 @@
           "hand": ["OP17-087", "OP17-080", "OP17-095", "OP17-095"],
           "life": ["OP01-081"],
           "characters": ["EB04-007", "OP15-092"],
-          "costArea": { "active": 4, "rested": 1 },
+          "costArea": {
+            "active": 4,
+            "rested": 1
+          },
           "decklist": [
             "EB04-007",
             "EB04-007",
@@ -1102,15 +1313,30 @@
           ]
         },
         "p2": {
-          "leader": { "card": "OP15-058", "don": 1 },
+          "leader": {
+            "card": "OP15-058",
+            "don": 1
+          },
           "characters": [
-            { "card": "OP15-118", "don": 1 },
-            { "card": "OP15-067", "don": 1 },
-            { "card": "ST10-010", "don": 1 }
+            {
+              "card": "OP15-118",
+              "don": 1
+            },
+            {
+              "card": "OP15-067",
+              "don": 1
+            },
+            {
+              "card": "ST10-010",
+              "don": 1
+            }
           ],
           "life": ["OP01-081", "OP01-081", "OP01-081", "OP01-081"],
           "hand": [],
-          "costArea": { "active": 2, "rested": 0 },
+          "costArea": {
+            "active": 2,
+            "rested": 0
+          },
           "decklist": [
             "OP05-077",
             "OP05-077",
@@ -1166,8 +1392,17 @@
         }
       },
       "prefix": [
-        { "type": "attack", "attacker": "$1qgzmik", "target": "$r0hhi78", "player": "p2" },
-        { "type": "block", "blocker": null, "player": "p1" }
+        {
+          "type": "attack",
+          "attacker": "$1qgzmik",
+          "target": "$r0hhi78",
+          "player": "p2"
+        },
+        {
+          "type": "block",
+          "blocker": null,
+          "player": "p1"
+        }
       ],
       "hand": "harder",
       "expect": "take",
@@ -1178,7 +1413,10 @@
       "id": "counter-23",
       "drill": "counter",
       "lesson": "L10-counter-or-take",
-      "source": { "kind": "bank", "seed": 23 },
+      "source": {
+        "kind": "bank",
+        "seed": 23
+      },
       "mine": "OP17-058",
       "theirs": "OP12-061",
       "first": true,
@@ -1194,7 +1432,10 @@
           "hand": ["OP17-074"],
           "life": ["OP01-081", "OP01-081"],
           "characters": [],
-          "costArea": { "active": 5, "rested": 0 },
+          "costArea": {
+            "active": 5,
+            "rested": 0
+          },
           "decklist": [
             "EB04-031",
             "EB04-031",
@@ -1249,15 +1490,30 @@
           ]
         },
         "p2": {
-          "leader": { "card": "OP12-061", "don": 2 },
+          "leader": {
+            "card": "OP12-061",
+            "don": 2
+          },
           "characters": [
-            { "card": "EB04-038", "don": 1 },
-            { "card": "ST10-010", "don": 1 },
-            { "card": "OP10-114", "don": 1 }
+            {
+              "card": "EB04-038",
+              "don": 1
+            },
+            {
+              "card": "ST10-010",
+              "don": 1
+            },
+            {
+              "card": "OP10-114",
+              "don": 1
+            }
           ],
           "life": ["OP01-081", "OP01-081", "OP01-081", "OP01-081"],
           "hand": [],
-          "costArea": { "active": 1, "rested": 0 },
+          "costArea": {
+            "active": 1,
+            "rested": 0
+          },
           "decklist": [
             "EB04-038",
             "EB04-038",
@@ -1313,9 +1569,22 @@
         }
       },
       "prefix": [
-        { "type": "attack", "attacker": "$vvl5xie", "target": "$uxn42cb", "player": "p2" },
-        { "type": "optional", "accept": false, "player": "p1" },
-        { "type": "block", "blocker": null, "player": "p1" }
+        {
+          "type": "attack",
+          "attacker": "$vvl5xie",
+          "target": "$uxn42cb",
+          "player": "p2"
+        },
+        {
+          "type": "optional",
+          "accept": false,
+          "player": "p1"
+        },
+        {
+          "type": "block",
+          "blocker": null,
+          "player": "p1"
+        }
       ],
       "hand": "harder",
       "expect": "take",
@@ -1326,7 +1595,10 @@
       "id": "counter-24",
       "drill": "counter",
       "lesson": "L10-counter-or-take",
-      "source": { "kind": "bank", "seed": 24 },
+      "source": {
+        "kind": "bank",
+        "seed": 24
+      },
       "mine": "OP09-062",
       "theirs": "OP17-039",
       "first": true,
@@ -1342,7 +1614,10 @@
           "hand": ["OP17-113", "OP17-109"],
           "life": ["OP01-081", "OP01-081", "OP01-081", "OP01-081"],
           "characters": ["OP17-111", "OP17-113"],
-          "costArea": { "active": 3, "rested": 0 },
+          "costArea": {
+            "active": 3,
+            "rested": 0
+          },
           "decklist": [
             "EB04-058",
             "EB04-058",
@@ -1397,11 +1672,23 @@
           ]
         },
         "p2": {
-          "leader": { "card": "OP17-039", "don": 3 },
-          "characters": ["OP17-045", { "card": "OP17-042", "don": 1 }],
+          "leader": {
+            "card": "OP17-039",
+            "don": 3
+          },
+          "characters": [
+            "OP17-045",
+            {
+              "card": "OP17-042",
+              "don": 1
+            }
+          ],
           "life": ["OP01-081", "OP01-081", "OP01-081", "OP01-081"],
           "hand": [],
-          "costArea": { "active": 0, "rested": 0 },
+          "costArea": {
+            "active": 0,
+            "rested": 0
+          },
           "decklist": [
             "OP08-051",
             "OP08-051",
@@ -1457,8 +1744,17 @@
         }
       },
       "prefix": [
-        { "type": "attack", "attacker": "$m4eq2ac", "target": "$5nwm5pc", "player": "p2" },
-        { "type": "block", "blocker": null, "player": "p1" }
+        {
+          "type": "attack",
+          "attacker": "$m4eq2ac",
+          "target": "$5nwm5pc",
+          "player": "p2"
+        },
+        {
+          "type": "block",
+          "blocker": null,
+          "player": "p1"
+        }
       ],
       "hand": "harder",
       "expect": "take",
@@ -1469,7 +1765,10 @@
       "id": "counter-25",
       "drill": "counter",
       "lesson": "L10-counter-or-take",
-      "source": { "kind": "bank", "seed": 25 },
+      "source": {
+        "kind": "bank",
+        "seed": 25
+      },
       "mine": "OP05-098",
       "theirs": "OP13-004",
       "first": true,
@@ -1485,7 +1784,10 @@
           "hand": ["OP17-107", "OP17-102", "EB04-058", "OP17-109"],
           "life": ["OP01-081", "OP01-081", "OP01-081"],
           "characters": ["OP17-113", "OP17-109"],
-          "costArea": { "active": 0, "rested": 5 },
+          "costArea": {
+            "active": 0,
+            "rested": 5
+          },
           "decklist": [
             "EB02-052",
             "EB02-052",
@@ -1540,11 +1842,22 @@
           ]
         },
         "p2": {
-          "leader": { "card": "OP13-004", "don": 2 },
-          "characters": [{ "card": "OP17-082", "don": 4 }],
+          "leader": {
+            "card": "OP13-004",
+            "don": 2
+          },
+          "characters": [
+            {
+              "card": "OP17-082",
+              "don": 4
+            }
+          ],
           "life": ["OP01-081", "OP01-081", "OP01-081", "OP01-081"],
           "hand": [],
-          "costArea": { "active": 0, "rested": 0 },
+          "costArea": {
+            "active": 0,
+            "rested": 0
+          },
           "decklist": [
             "EB04-007",
             "EB04-007",
@@ -1600,8 +1913,17 @@
         }
       },
       "prefix": [
-        { "type": "attack", "attacker": "$tcfqpgv", "target": "$s2u1u9g", "player": "p2" },
-        { "type": "block", "blocker": null, "player": "p1" }
+        {
+          "type": "attack",
+          "attacker": "$tcfqpgv",
+          "target": "$s2u1u9g",
+          "player": "p2"
+        },
+        {
+          "type": "block",
+          "blocker": null,
+          "player": "p1"
+        }
       ],
       "hand": "harder",
       "expect": "take",
@@ -1612,7 +1934,10 @@
       "id": "counter-35",
       "drill": "counter",
       "lesson": "L10-counter-or-take",
-      "source": { "kind": "bank", "seed": 35 },
+      "source": {
+        "kind": "bank",
+        "seed": 35
+      },
       "mine": "OP14-041",
       "theirs": "OP09-062",
       "first": true,
@@ -1628,7 +1953,10 @@
           "hand": ["OP11-054"],
           "life": ["OP01-081"],
           "characters": ["OP16-119"],
-          "costArea": { "active": 2, "rested": 1 },
+          "costArea": {
+            "active": 2,
+            "rested": 1
+          },
           "decklist": [
             "EB04-058",
             "EB04-058",
@@ -1685,13 +2013,22 @@
         "p2": {
           "leader": "OP09-062",
           "characters": [
-            { "card": "ST34-003", "don": 3 },
-            { "card": "OP17-109", "don": 1 },
+            {
+              "card": "ST34-003",
+              "don": 3
+            },
+            {
+              "card": "OP17-109",
+              "don": 1
+            },
             "OP17-113"
           ],
           "life": ["OP01-081", "OP01-081", "OP01-081", "OP01-081", "OP01-081"],
           "hand": [],
-          "costArea": { "active": 0, "rested": 0 },
+          "costArea": {
+            "active": 0,
+            "rested": 0
+          },
           "decklist": [
             "EB04-058",
             "EB04-058",
@@ -1747,9 +2084,22 @@
         }
       },
       "prefix": [
-        { "type": "attack", "attacker": "$56m7ci2", "target": "$nhlqwx0", "player": "p2" },
-        { "type": "optional", "accept": false, "player": "p2" },
-        { "type": "block", "blocker": null, "player": "p1" }
+        {
+          "type": "attack",
+          "attacker": "$56m7ci2",
+          "target": "$nhlqwx0",
+          "player": "p2"
+        },
+        {
+          "type": "optional",
+          "accept": false,
+          "player": "p2"
+        },
+        {
+          "type": "block",
+          "blocker": null,
+          "player": "p1"
+        }
       ],
       "hand": "harder",
       "expect": "counter",
@@ -1760,7 +2110,10 @@
       "id": "counter-39",
       "drill": "counter",
       "lesson": "L10-counter-or-take",
-      "source": { "kind": "bank", "seed": 39 },
+      "source": {
+        "kind": "bank",
+        "seed": 39
+      },
       "mine": "OP17-058",
       "theirs": "OP12-061",
       "first": true,
@@ -1776,7 +2129,10 @@
           "hand": ["OP07-076", "OP17-073", "OP15-078"],
           "life": ["OP01-081", "OP01-081", "OP01-081", "OP01-081"],
           "characters": [],
-          "costArea": { "active": 3, "rested": 0 },
+          "costArea": {
+            "active": 3,
+            "rested": 0
+          },
           "decklist": [
             "EB04-030",
             "EB04-030",
@@ -1831,11 +2187,22 @@
           ]
         },
         "p2": {
-          "leader": { "card": "OP12-061", "don": 1 },
-          "characters": [{ "card": "P-088", "don": 3 }],
+          "leader": {
+            "card": "OP12-061",
+            "don": 1
+          },
+          "characters": [
+            {
+              "card": "P-088",
+              "don": 3
+            }
+          ],
           "life": ["OP01-081", "OP01-081", "OP01-081"],
           "hand": [],
-          "costArea": { "active": 0, "rested": 0 },
+          "costArea": {
+            "active": 0,
+            "rested": 0
+          },
           "decklist": [
             "EB04-038",
             "EB04-038",
@@ -1891,9 +2258,22 @@
         }
       },
       "prefix": [
-        { "type": "attack", "attacker": "$e0k2w1l", "target": "$x3ls59d", "player": "p2" },
-        { "type": "optional", "accept": false, "player": "p1" },
-        { "type": "block", "blocker": null, "player": "p1" }
+        {
+          "type": "attack",
+          "attacker": "$e0k2w1l",
+          "target": "$x3ls59d",
+          "player": "p2"
+        },
+        {
+          "type": "optional",
+          "accept": false,
+          "player": "p1"
+        },
+        {
+          "type": "block",
+          "blocker": null,
+          "player": "p1"
+        }
       ],
       "hand": "harder",
       "expect": "take",
@@ -1904,7 +2284,10 @@
       "id": "counter-40",
       "drill": "counter",
       "lesson": "L10-counter-or-take",
-      "source": { "kind": "bank", "seed": 40 },
+      "source": {
+        "kind": "bank",
+        "seed": 40
+      },
       "mine": "OP09-062",
       "theirs": "OP17-039",
       "first": true,
@@ -1920,7 +2303,10 @@
           "hand": ["OP17-074"],
           "life": ["OP01-081"],
           "characters": ["OP17-113"],
-          "costArea": { "active": 1, "rested": 2 },
+          "costArea": {
+            "active": 1,
+            "rested": 2
+          },
           "decklist": [
             "EB04-058",
             "EB04-058",
@@ -1977,13 +2363,25 @@
         "p2": {
           "leader": "OP17-039",
           "characters": [
-            { "card": "OP17-050", "don": 1 },
-            { "card": "OP17-046", "don": 1 },
-            { "card": "OP17-054", "don": 1 }
+            {
+              "card": "OP17-050",
+              "don": 1
+            },
+            {
+              "card": "OP17-046",
+              "don": 1
+            },
+            {
+              "card": "OP17-054",
+              "don": 1
+            }
           ],
           "life": ["OP01-081", "OP01-081", "OP01-081"],
           "hand": [],
-          "costArea": { "active": 1, "rested": 0 },
+          "costArea": {
+            "active": 1,
+            "rested": 0
+          },
           "decklist": [
             "OP08-051",
             "OP08-051",
@@ -2039,9 +2437,22 @@
         }
       },
       "prefix": [
-        { "type": "attack", "attacker": "$sizxy7x", "target": "$31etduy", "player": "p2" },
-        { "type": "optional", "accept": false, "player": "p2" },
-        { "type": "block", "blocker": null, "player": "p1" }
+        {
+          "type": "attack",
+          "attacker": "$sizxy7x",
+          "target": "$31etduy",
+          "player": "p2"
+        },
+        {
+          "type": "optional",
+          "accept": false,
+          "player": "p2"
+        },
+        {
+          "type": "block",
+          "blocker": null,
+          "player": "p1"
+        }
       ],
       "hand": "harder",
       "expect": "counter",
@@ -2052,7 +2463,10 @@
       "id": "counter-42",
       "drill": "counter",
       "lesson": "L10-counter-or-take",
-      "source": { "kind": "bank", "seed": 42 },
+      "source": {
+        "kind": "bank",
+        "seed": 42
+      },
       "mine": "OP08-098",
       "theirs": "OP15-058",
       "first": true,
@@ -2068,7 +2482,10 @@
           "hand": ["OP12-099", "OP15-112"],
           "life": ["OP01-081"],
           "characters": ["OP08-110"],
-          "costArea": { "active": 1, "rested": 2 },
+          "costArea": {
+            "active": 1,
+            "rested": 2
+          },
           "decklist": [
             "EB03-053",
             "EB03-053",
@@ -2125,13 +2542,25 @@
         "p2": {
           "leader": "OP15-058",
           "characters": [
-            { "card": "ST10-010", "don": 1 },
-            { "card": "OP12-071", "don": 1 },
-            { "card": "OP15-061", "don": 2 }
+            {
+              "card": "ST10-010",
+              "don": 1
+            },
+            {
+              "card": "OP12-071",
+              "don": 1
+            },
+            {
+              "card": "OP15-061",
+              "don": 2
+            }
           ],
           "life": ["OP01-081", "OP01-081", "OP01-081"],
           "hand": [],
-          "costArea": { "active": 0, "rested": 0 },
+          "costArea": {
+            "active": 0,
+            "rested": 0
+          },
           "decklist": [
             "OP05-077",
             "OP05-077",
@@ -2187,8 +2616,17 @@
         }
       },
       "prefix": [
-        { "type": "attack", "attacker": "$1viwa81", "target": "$rtyfgur", "player": "p2" },
-        { "type": "block", "blocker": null, "player": "p1" }
+        {
+          "type": "attack",
+          "attacker": "$1viwa81",
+          "target": "$rtyfgur",
+          "player": "p2"
+        },
+        {
+          "type": "block",
+          "blocker": null,
+          "player": "p1"
+        }
       ],
       "hand": "harder",
       "expect": "counter",
@@ -2199,7 +2637,10 @@
       "id": "counter-48",
       "drill": "counter",
       "lesson": "L10-counter-or-take",
-      "source": { "kind": "bank", "seed": 48 },
+      "source": {
+        "kind": "bank",
+        "seed": 48
+      },
       "mine": "OP09-062",
       "theirs": "OP14-041",
       "first": true,
@@ -2215,7 +2656,10 @@
           "hand": ["OP17-114", "OP17-110"],
           "life": ["OP01-081"],
           "characters": ["OP17-112", "OP17-113"],
-          "costArea": { "active": 1, "rested": 2 },
+          "costArea": {
+            "active": 1,
+            "rested": 2
+          },
           "decklist": [
             "EB04-058",
             "EB04-058",
@@ -2270,11 +2714,22 @@
           ]
         },
         "p2": {
-          "leader": { "card": "OP14-041", "don": 1 },
-          "characters": [{ "card": "OP15-113", "don": 3 }],
+          "leader": {
+            "card": "OP14-041",
+            "don": 1
+          },
+          "characters": [
+            {
+              "card": "OP15-113",
+              "don": 3
+            }
+          ],
           "life": ["OP01-081", "OP01-081", "OP01-081", "OP01-081", "OP01-081"],
           "hand": [],
-          "costArea": { "active": 0, "rested": 0 },
+          "costArea": {
+            "active": 0,
+            "rested": 0
+          },
           "decklist": [
             "EB04-058",
             "EB04-058",
@@ -2330,8 +2785,17 @@
         }
       },
       "prefix": [
-        { "type": "attack", "attacker": "$8qpk9l1", "target": "$ss8mx2f", "player": "p2" },
-        { "type": "block", "blocker": null, "player": "p1" }
+        {
+          "type": "attack",
+          "attacker": "$8qpk9l1",
+          "target": "$ss8mx2f",
+          "player": "p2"
+        },
+        {
+          "type": "block",
+          "blocker": null,
+          "player": "p1"
+        }
       ],
       "hand": "harder",
       "expect": "counter",
@@ -2342,7 +2806,10 @@
       "id": "counter-50",
       "drill": "counter",
       "lesson": "L10-counter-or-take",
-      "source": { "kind": "bank", "seed": 50 },
+      "source": {
+        "kind": "bank",
+        "seed": 50
+      },
       "mine": "OP08-098",
       "theirs": "ST30-001",
       "first": true,
@@ -2358,7 +2825,10 @@
           "hand": ["OP15-112", "EB04-058", "EB03-053"],
           "life": ["OP01-081", "OP01-081"],
           "characters": [],
-          "costArea": { "active": 4, "rested": 3 },
+          "costArea": {
+            "active": 4,
+            "rested": 3
+          },
           "decklist": [
             "EB03-053",
             "EB03-053",
@@ -2415,13 +2885,25 @@
         "p2": {
           "leader": "ST30-001",
           "characters": [
-            { "card": "OP11-012", "don": 3 },
-            { "card": "EB02-017", "don": 3 },
-            { "card": "OP12-015", "don": 2 }
+            {
+              "card": "OP11-012",
+              "don": 3
+            },
+            {
+              "card": "EB02-017",
+              "don": 3
+            },
+            {
+              "card": "OP12-015",
+              "don": 2
+            }
           ],
           "life": ["OP01-081", "OP01-081", "OP01-081"],
           "hand": [],
-          "costArea": { "active": 0, "rested": 0 },
+          "costArea": {
+            "active": 0,
+            "rested": 0
+          },
           "decklist": [
             "EB02-017",
             "EB02-017",
@@ -2477,8 +2959,17 @@
         }
       },
       "prefix": [
-        { "type": "attack", "attacker": "$u0x9j25", "target": "$6zp644i", "player": "p2" },
-        { "type": "block", "blocker": null, "player": "p1" }
+        {
+          "type": "attack",
+          "attacker": "$u0x9j25",
+          "target": "$6zp644i",
+          "player": "p2"
+        },
+        {
+          "type": "block",
+          "blocker": null,
+          "player": "p1"
+        }
       ],
       "hand": "harder",
       "expect": "counter",
@@ -2489,7 +2980,10 @@
       "id": "counter-51",
       "drill": "counter",
       "lesson": "L10-counter-or-take",
-      "source": { "kind": "bank", "seed": 51 },
+      "source": {
+        "kind": "bank",
+        "seed": 51
+      },
       "mine": "OP14-041",
       "theirs": "OP09-062",
       "first": true,
@@ -2505,7 +2999,10 @@
           "hand": ["EB04-058", "OP14-114", "OP14-107"],
           "life": ["OP01-081"],
           "characters": ["OP15-113", "OP14-112"],
-          "costArea": { "active": 1, "rested": 4 },
+          "costArea": {
+            "active": 1,
+            "rested": 4
+          },
           "decklist": [
             "EB04-058",
             "EB04-058",
@@ -2560,15 +3057,27 @@
           ]
         },
         "p2": {
-          "leader": { "card": "OP09-062", "don": 2 },
+          "leader": {
+            "card": "OP09-062",
+            "don": 2
+          },
           "characters": [
             "OP17-102",
-            { "card": "EB04-058", "don": 1 },
-            { "card": "OP17-113", "don": 3 }
+            {
+              "card": "EB04-058",
+              "don": 1
+            },
+            {
+              "card": "OP17-113",
+              "don": 3
+            }
           ],
           "life": ["OP01-081", "OP01-081", "OP01-081"],
           "hand": [],
-          "costArea": { "active": 0, "rested": 0 },
+          "costArea": {
+            "active": 0,
+            "rested": 0
+          },
           "decklist": [
             "EB04-058",
             "EB04-058",
@@ -2624,8 +3133,17 @@
         }
       },
       "prefix": [
-        { "type": "attack", "attacker": "$f0wb9j6", "target": "$ztche7o", "player": "p2" },
-        { "type": "block", "blocker": null, "player": "p1" }
+        {
+          "type": "attack",
+          "attacker": "$f0wb9j6",
+          "target": "$ztche7o",
+          "player": "p2"
+        },
+        {
+          "type": "block",
+          "blocker": null,
+          "player": "p1"
+        }
       ],
       "hand": "harder",
       "expect": "counter",
@@ -2636,7 +3154,10 @@
       "id": "counter-56",
       "drill": "counter",
       "lesson": "L10-counter-or-take",
-      "source": { "kind": "bank", "seed": 56 },
+      "source": {
+        "kind": "bank",
+        "seed": 56
+      },
       "mine": "OP09-062",
       "theirs": "OP17-058",
       "first": true,
@@ -2652,7 +3173,10 @@
           "hand": ["OP17-102"],
           "life": ["OP01-081"],
           "characters": ["OP17-109", "OP17-113"],
-          "costArea": { "active": 0, "rested": 5 },
+          "costArea": {
+            "active": 0,
+            "rested": 5
+          },
           "decklist": [
             "EB04-058",
             "EB04-058",
@@ -2707,11 +3231,22 @@
           ]
         },
         "p2": {
-          "leader": { "card": "OP17-058", "don": 2 },
-          "characters": [{ "card": "OP17-074", "don": 4 }],
+          "leader": {
+            "card": "OP17-058",
+            "don": 2
+          },
+          "characters": [
+            {
+              "card": "OP17-074",
+              "don": 4
+            }
+          ],
           "life": ["OP01-081", "OP01-081", "OP01-081", "OP01-081"],
           "hand": [],
-          "costArea": { "active": 0, "rested": 0 },
+          "costArea": {
+            "active": 0,
+            "rested": 0
+          },
           "decklist": [
             "EB04-030",
             "EB04-031",
@@ -2767,8 +3302,17 @@
         }
       },
       "prefix": [
-        { "type": "attack", "attacker": "$ywuj86h", "target": "$l5hmrxg", "player": "p2" },
-        { "type": "block", "blocker": null, "player": "p1" }
+        {
+          "type": "attack",
+          "attacker": "$ywuj86h",
+          "target": "$l5hmrxg",
+          "player": "p2"
+        },
+        {
+          "type": "block",
+          "blocker": null,
+          "player": "p1"
+        }
       ],
       "hand": "harder",
       "expect": "counter",
@@ -2779,7 +3323,10 @@
       "id": "counter-57",
       "drill": "counter",
       "lesson": "L10-counter-or-take",
-      "source": { "kind": "bank", "seed": 57 },
+      "source": {
+        "kind": "bank",
+        "seed": 57
+      },
       "mine": "ST30-001",
       "theirs": "OP13-004",
       "first": true,
@@ -2795,7 +3342,10 @@
           "hand": ["OP12-015", "OP01-016", "OP15-032"],
           "life": ["OP01-081"],
           "characters": ["OP12-015"],
-          "costArea": { "active": 2, "rested": 1 },
+          "costArea": {
+            "active": 2,
+            "rested": 1
+          },
           "decklist": [
             "EB02-017",
             "EB02-017",
@@ -2850,15 +3400,27 @@
           ]
         },
         "p2": {
-          "leader": { "card": "OP13-004", "don": 1 },
+          "leader": {
+            "card": "OP13-004",
+            "don": 1
+          },
           "characters": [
-            { "card": "OP17-086", "don": 1 },
+            {
+              "card": "OP17-086",
+              "don": 1
+            },
             "OP17-095",
-            { "card": "OP17-089", "don": 2 }
+            {
+              "card": "OP17-089",
+              "don": 2
+            }
           ],
           "life": ["OP01-081", "OP01-081", "OP01-081"],
           "hand": [],
-          "costArea": { "active": 0, "rested": 0 },
+          "costArea": {
+            "active": 0,
+            "rested": 0
+          },
           "decklist": [
             "EB04-007",
             "EB04-007",
@@ -2914,8 +3476,17 @@
         }
       },
       "prefix": [
-        { "type": "attack", "attacker": "$orn8cfa", "target": "$adlm1fn", "player": "p2" },
-        { "type": "block", "blocker": null, "player": "p1" }
+        {
+          "type": "attack",
+          "attacker": "$orn8cfa",
+          "target": "$adlm1fn",
+          "player": "p2"
+        },
+        {
+          "type": "block",
+          "blocker": null,
+          "player": "p1"
+        }
       ],
       "hand": "harder",
       "expect": "counter",
@@ -2926,7 +3497,10 @@
       "id": "counter-59",
       "drill": "counter",
       "lesson": "L10-counter-or-take",
-      "source": { "kind": "bank", "seed": 59 },
+      "source": {
+        "kind": "bank",
+        "seed": 59
+      },
       "mine": "OP14-041",
       "theirs": "OP12-061",
       "first": true,
@@ -2942,7 +3516,10 @@
           "hand": ["OP14-105"],
           "life": ["OP01-081"],
           "characters": [],
-          "costArea": { "active": 1, "rested": 2 },
+          "costArea": {
+            "active": 1,
+            "rested": 2
+          },
           "decklist": [
             "EB04-058",
             "EB04-058",
@@ -2997,15 +3574,27 @@
           ]
         },
         "p2": {
-          "leader": { "card": "OP12-061", "don": 1 },
+          "leader": {
+            "card": "OP12-061",
+            "don": 1
+          },
           "characters": [
             "OP16-064",
-            { "card": "P-093", "don": 2 },
-            { "card": "OP10-114", "don": 1 }
+            {
+              "card": "P-093",
+              "don": 2
+            },
+            {
+              "card": "OP10-114",
+              "don": 1
+            }
           ],
           "life": ["OP01-081", "OP01-081", "OP01-081", "OP01-081", "OP01-081"],
           "hand": [],
-          "costArea": { "active": 0, "rested": 0 },
+          "costArea": {
+            "active": 0,
+            "rested": 0
+          },
           "decklist": [
             "EB04-038",
             "EB04-038",
@@ -3061,8 +3650,17 @@
         }
       },
       "prefix": [
-        { "type": "attack", "attacker": "$5afsstu", "target": "$sgf02bt", "player": "p2" },
-        { "type": "block", "blocker": null, "player": "p1" }
+        {
+          "type": "attack",
+          "attacker": "$5afsstu",
+          "target": "$sgf02bt",
+          "player": "p2"
+        },
+        {
+          "type": "block",
+          "blocker": null,
+          "player": "p1"
+        }
       ],
       "hand": "harder",
       "expect": "counter",
@@ -3073,7 +3671,10 @@
       "id": "counter-63",
       "drill": "counter",
       "lesson": "L10-counter-or-take",
-      "source": { "kind": "bank", "seed": 63 },
+      "source": {
+        "kind": "bank",
+        "seed": 63
+      },
       "mine": "OP17-058",
       "theirs": "OP12-061",
       "first": true,
@@ -3089,7 +3690,10 @@
           "hand": ["OP15-069", "OP17-060", "OP17-073", "OP15-078"],
           "life": ["OP01-081", "OP01-081", "OP01-081", "OP01-081"],
           "characters": ["OP17-063"],
-          "costArea": { "active": 2, "rested": 1 },
+          "costArea": {
+            "active": 2,
+            "rested": 1
+          },
           "decklist": [
             "EB04-031",
             "EB04-031",
@@ -3144,11 +3748,22 @@
           ]
         },
         "p2": {
-          "leader": { "card": "OP12-061", "don": 1 },
-          "characters": [{ "card": "P-093", "don": 3 }],
+          "leader": {
+            "card": "OP12-061",
+            "don": 1
+          },
+          "characters": [
+            {
+              "card": "P-093",
+              "don": 3
+            }
+          ],
           "life": ["OP01-081", "OP01-081", "OP01-081", "OP01-081"],
           "hand": [],
-          "costArea": { "active": 0, "rested": 0 },
+          "costArea": {
+            "active": 0,
+            "rested": 0
+          },
           "decklist": [
             "EB04-038",
             "EB04-038",
@@ -3204,9 +3819,22 @@
         }
       },
       "prefix": [
-        { "type": "attack", "attacker": "$euszj34", "target": "$9befqrj", "player": "p2" },
-        { "type": "optional", "accept": false, "player": "p1" },
-        { "type": "block", "blocker": null, "player": "p1" }
+        {
+          "type": "attack",
+          "attacker": "$euszj34",
+          "target": "$9befqrj",
+          "player": "p2"
+        },
+        {
+          "type": "optional",
+          "accept": false,
+          "player": "p1"
+        },
+        {
+          "type": "block",
+          "blocker": null,
+          "player": "p1"
+        }
       ],
       "hand": "harder",
       "expect": "take",
@@ -3217,7 +3845,10 @@
       "id": "counter-64",
       "drill": "counter",
       "lesson": "L10-counter-or-take",
-      "source": { "kind": "bank", "seed": 64 },
+      "source": {
+        "kind": "bank",
+        "seed": 64
+      },
       "mine": "OP09-062",
       "theirs": "OP14-041",
       "first": true,
@@ -3233,7 +3864,10 @@
           "hand": ["OP17-109", "ST34-003"],
           "life": ["OP01-081", "OP01-081"],
           "characters": ["OP17-102"],
-          "costArea": { "active": 0, "rested": 7 },
+          "costArea": {
+            "active": 0,
+            "rested": 7
+          },
           "decklist": [
             "EB04-058",
             "EB04-058",
@@ -3288,15 +3922,27 @@
           ]
         },
         "p2": {
-          "leader": { "card": "OP14-041", "don": 3 },
+          "leader": {
+            "card": "OP14-041",
+            "don": 3
+          },
           "characters": [
-            { "card": "OP17-109", "don": 1 },
-            { "card": "OP14-107", "don": 3 },
+            {
+              "card": "OP17-109",
+              "don": 1
+            },
+            {
+              "card": "OP14-107",
+              "don": 3
+            },
             "OP16-113"
           ],
           "life": ["OP01-081", "OP01-081", "OP01-081"],
           "hand": [],
-          "costArea": { "active": 1, "rested": 0 },
+          "costArea": {
+            "active": 1,
+            "rested": 0
+          },
           "decklist": [
             "EB04-058",
             "EB04-058",
@@ -3352,8 +3998,17 @@
         }
       },
       "prefix": [
-        { "type": "attack", "attacker": "$szjhtyi", "target": "$jqbpv39", "player": "p2" },
-        { "type": "block", "blocker": null, "player": "p1" }
+        {
+          "type": "attack",
+          "attacker": "$szjhtyi",
+          "target": "$jqbpv39",
+          "player": "p2"
+        },
+        {
+          "type": "block",
+          "blocker": null,
+          "player": "p1"
+        }
       ],
       "hand": "harder",
       "expect": "counter",
@@ -3364,7 +4019,10 @@
       "id": "counter-88",
       "drill": "counter",
       "lesson": "L10-counter-or-take",
-      "source": { "kind": "bank", "seed": 88 },
+      "source": {
+        "kind": "bank",
+        "seed": 88
+      },
       "mine": "OP09-062",
       "theirs": "OP14-041",
       "first": true,
@@ -3380,7 +4038,10 @@
           "hand": ["OP17-109", "OP17-106"],
           "life": ["OP01-081", "OP01-081", "OP01-081", "OP01-081"],
           "characters": ["OP17-114", "OP17-113"],
-          "costArea": { "active": 1, "rested": 2 },
+          "costArea": {
+            "active": 1,
+            "rested": 2
+          },
           "decklist": [
             "OP09-078",
             "OP09-078",
@@ -3435,14 +4096,26 @@
           ]
         },
         "p2": {
-          "leader": { "card": "OP14-041", "don": 1 },
+          "leader": {
+            "card": "OP14-041",
+            "don": 1
+          },
           "characters": [
-            { "card": "OP17-109", "don": 1 },
-            { "card": "OP06-106", "don": 2 }
+            {
+              "card": "OP17-109",
+              "don": 1
+            },
+            {
+              "card": "OP06-106",
+              "don": 2
+            }
           ],
           "life": ["OP01-081", "OP01-081", "OP01-081", "OP01-081"],
           "hand": [],
-          "costArea": { "active": 0, "rested": 0 },
+          "costArea": {
+            "active": 0,
+            "rested": 0
+          },
           "decklist": [
             "EB04-058",
             "EB04-058",
@@ -3498,8 +4171,17 @@
         }
       },
       "prefix": [
-        { "type": "attack", "attacker": "$4eycqtr", "target": "$tpmqw94", "player": "p2" },
-        { "type": "block", "blocker": null, "player": "p1" }
+        {
+          "type": "attack",
+          "attacker": "$4eycqtr",
+          "target": "$tpmqw94",
+          "player": "p2"
+        },
+        {
+          "type": "block",
+          "blocker": null,
+          "player": "p1"
+        }
       ],
       "hand": "harder",
       "expect": "take",
