@@ -60,6 +60,12 @@ const GENERATORS: Partial<Record<DrillId, Generator>> = {
   lethal: async (ctx) =>
     (await import('../ai/src/search/drills/lethal-gen.ts')).generateLethalBank(ctx.cards, {
       leaders: ctx.leaders,
+      // Admit only items that answer the same under the live meta lists (drills-live-lists.test.ts).
+      agreeWith: (
+        JSON.parse(
+          readFileSync(new URL('../docs/research/meta-lists.json', import.meta.url), 'utf8'),
+        ) as { archetypes: unknown[] }
+      ).archetypes,
       ...(ctx.maxSeeds ? { maxSeeds: ctx.maxSeeds } : {}),
       log: ctx.log,
     }),

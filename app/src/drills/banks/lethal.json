@@ -2,7 +2,7 @@
   "drill": "lethal",
   "builtWith": {
     "engine": "0.5.18",
-    "scripts": "scripts-6bbd0f97"
+    "scripts": "scripts-5455a57f"
   },
   "items": [
     {
@@ -2605,99 +2605,6 @@
       }
     },
     {
-      "id": "lethal-1100033",
-      "drill": "lethal",
-      "lesson": "L15-lethal-math",
-      "source": {
-        "kind": "bank",
-        "seed": 1100033
-      },
-      "mine": "EB02-010",
-      "theirs": "ST30-001",
-      "first": false,
-      "certainty": "any-hand",
-      "label": "any-hand",
-      "scenario": {
-        "seed": 1100033,
-        "turn": 4,
-        "activePlayer": "p1",
-        "firstPlayer": "p2",
-        "p1": {
-          "leader": "EB02-010",
-          "hand": ["ST18-004"],
-          "deck": ["ST18-004", "EB02-017", "OP18-026", "OP18-034", "EB02-035", "OP12-037"],
-          "life": ["OP12-037", "ST18-001", "OP18-026", "OP15-032"],
-          "characters": ["ST18-004", "ST18-004"],
-          "costArea": {
-            "active": 4,
-            "rested": 0
-          }
-        },
-        "p2": {
-          "leader": "ST30-001",
-          "hand": ["OP04-016"],
-          "deck": ["ST31-001", "EB04-002", "OP12-018", "ST31-005", "ST31-005", "OP12-037"],
-          "life": ["OP01-016"],
-          "characters": [],
-          "costArea": {
-            "active": 0,
-            "rested": 3
-          }
-        }
-      },
-      "prefix": [],
-      "hand": "harder",
-      "answer": {
-        "lethal": true,
-        "actions": [
-          {
-            "type": "attack",
-            "attacker": "$689pafp",
-            "target": "$tzbme7i",
-            "player": "p1"
-          },
-          {
-            "type": "attack",
-            "attacker": "$p957q89",
-            "target": "$tzbme7i",
-            "player": "p1"
-          },
-          {
-            "type": "giveDon",
-            "target": "$osbvcwf",
-            "player": "p1"
-          },
-          {
-            "type": "giveDon",
-            "target": "$osbvcwf",
-            "player": "p1"
-          },
-          {
-            "type": "giveDon",
-            "target": "$osbvcwf",
-            "player": "p1"
-          },
-          {
-            "type": "giveDon",
-            "target": "$osbvcwf",
-            "player": "p1"
-          },
-          {
-            "type": "attack",
-            "attacker": "$osbvcwf",
-            "target": "$tzbme7i",
-            "player": "p1"
-          }
-        ],
-        "line": [
-          "Attack their Leader with Zoro-Juurou.",
-          "Attack their Leader with Zoro-Juurou.",
-          "Give 4 DON!! to your Leader.",
-          "Attack their Leader with your Leader."
-        ]
-      }
-    },
-    {
       "id": "lethal-1100037",
       "drill": "lethal",
       "lesson": "L15-lethal-math",
@@ -2948,6 +2855,91 @@
           "Attack their Leader with Zoro-Juurou.",
           "Attack their Leader with Zoro-Juurou.",
           "Attack their Leader with Zoro-Juurou."
+        ]
+      }
+    },
+    {
+      "id": "lethal-1100063",
+      "drill": "lethal",
+      "lesson": "L15-lethal-math",
+      "source": {
+        "kind": "bank",
+        "seed": 1100063
+      },
+      "mine": "EB02-010",
+      "theirs": "OP05-098",
+      "first": true,
+      "certainty": "any-hand",
+      "label": "any-hand",
+      "scenario": {
+        "seed": 1100063,
+        "turn": 5,
+        "activePlayer": "p1",
+        "firstPlayer": "p1",
+        "p1": {
+          "leader": "EB02-010",
+          "hand": ["EB02-017"],
+          "deck": ["EB02-035", "OP12-037", "OP15-032", "ST18-001", "ST18-001", "OP15-078"],
+          "life": ["OP17-022", "OP15-032", "ST18-004", "ST18-001"],
+          "characters": ["EB02-035", "EB02-035", "EB02-035"],
+          "costArea": {
+            "active": 5,
+            "rested": 0
+          }
+        },
+        "p2": {
+          "leader": "OP05-098",
+          "hand": ["OP06-115"],
+          "deck": ["OP17-112", "OP14-104", "OP17-107", "EB04-058", "OP15-113", "OP14-104"],
+          "life": ["EB04-058"],
+          "characters": [],
+          "costArea": {
+            "active": 2,
+            "rested": 2
+          }
+        }
+      },
+      "prefix": [],
+      "hand": "harder",
+      "answer": {
+        "lethal": true,
+        "actions": [
+          {
+            "type": "attack",
+            "attacker": "$qwlrndj",
+            "target": "$hzgzwu5",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$bqg3dqp",
+            "target": "$hzgzwu5",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$ht4ve0y",
+            "target": "$hzgzwu5",
+            "player": "p1"
+          },
+          {
+            "type": "giveDon",
+            "target": "$rbrbesi",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$rbrbesi",
+            "target": "$hzgzwu5",
+            "player": "p1"
+          }
+        ],
+        "line": [
+          "Attack their Leader with your Leader.",
+          "Attack their Leader with Sanji.",
+          "Attack their Leader with Sanji.",
+          "Give 1 DON!! to Sanji.",
+          "Attack their Leader with Sanji."
         ]
       }
     }

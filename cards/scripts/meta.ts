@@ -330,6 +330,9 @@ export function candidate(
       metaShare: 0,
       tier: null,
       sources: ['https://play.limitlesstcg.com/api/tournaments?game=OP'],
+      // No guide or playbook yet: the Meta Explorer shows "Guide pending" until a person writes
+      // one and removes this flag (the guide test checks they agree).
+      guidePending: true,
       lists: [],
     });
   };

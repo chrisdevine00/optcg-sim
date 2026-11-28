@@ -250,8 +250,11 @@ describe('meta:update counting', () => {
       id: 'OP17-039-rocks-d-xebec',
       name: 'Rocks.D.Xebec',
       tier: null,
+      guidePending: true,
     });
     expect(added.lists).toHaveLength(3);
+    // An archetype already in the file keeps its own flags (a written guide has no flag).
+    expect(c2.meta.archetypes.find((a) => a.leaderId !== 'OP17-039')!.guidePending).toBeUndefined();
   });
 
   it('hand-added archetypes (EB02-010 Luffy, OP18-021 Franky; M11 Track C) survive a refresh with no top-8', () => {

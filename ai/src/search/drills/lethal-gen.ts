@@ -26,10 +26,12 @@ import { FOCUS_LEADERS, FOCUS_MIN } from './positions.ts';
 import {
   classify,
   classifyActual,
+  judgeLethal,
   LETHAL_NODES,
   movesOfActions,
   type Classified,
 } from './lethal.ts';
+import { withMetaArchetypes } from '../../knowledge.ts';
 import type { DrillBank, LethalItem } from './types.ts';
 
 /** The item a seed gives, or null when it is not admitted (and why, for the tuning log). */
@@ -105,6 +107,12 @@ export interface LethalGenOptions {
   nodes?: number;
   /** The Leaders given their own pass after the walk (default `FOCUS_LEADERS`; `[]` runs the walk alone). */
   focus?: readonly string[];
+  /**
+   * Another meta file's archetypes (the live `docs/research/meta-lists.json` when the bank is made on
+   * the pinned copy): an item is admitted only if its answer, header and explanation are the same
+   * under both priors, so a meta refresh cannot change a committed answer.
+   */
+  agreeWith?: readonly unknown[];
   /** One line per seed tried, for tuning. */
   log?: (line: string) => void;
 }
@@ -142,6 +150,23 @@ export const FOCUS_SEEDS = 2_000;
  * no "none" item is admitted for them, and the any-hand rule is not relaxed to get one. The pass
  * takes `FOCUS_MIN` lethal items instead, so the Leader's count still reaches the minimum.
  */
+/** Does the item judge the same under the current prior and under `other`'s (both submissions)? */
+export function agreesUnder(
+  item: LethalItem,
+  cards: ReadonlyMap<string, Card>,
+  other: readonly unknown[] | undefined,
+): boolean {
+  if (!other) return true;
+  const subs = [{ kind: 'no-lethal' } as const, { kind: 'played', won: true } as const];
+  const view = (v: ReturnType<typeof judgeLethal>) =>
+    JSON.stringify({ h: v.headline, header: v.header, ex: v.explanation });
+  return subs.every(
+    (sub) =>
+      view(judgeLethal(item, sub, cards)) ===
+      view(withMetaArchetypes(other, () => judgeLethal(item, sub, cards))),
+  );
+}
+
 export const FOCUS_PER_CLASS = FOCUS_MIN / 2;
 export const FOCUS_NONE_SEEDS = 500;
 
@@ -149,7 +174,12 @@ export function lethalFocusItems(
   leaders: readonly string[],
   cards: ReadonlyMap<string, Card>,
   mine: string,
-  opts: { maxSeeds?: number; nodes?: number; log?: (line: string) => void } = {},
+  opts: {
+    maxSeeds?: number;
+    nodes?: number;
+    agreeWith?: readonly unknown[];
+    log?: (line: string) => void;
+  } = {},
 ): LethalItem[] {
   const slot = Math.max(FOCUS_LEADERS.indexOf(mine), 0);
   const counts = { lethal: 0, none: 0 };
@@ -168,6 +198,10 @@ export function lethalFocusItems(
     if (!item) continue;
     const key = item.answer.lethal ? 'lethal' : 'none';
     if (counts[key] >= (key === 'lethal' ? FOCUS_MIN : FOCUS_PER_CLASS)) continue;
+    if (!agreesUnder(item, cards, opts.agreeWith)) {
+      opts.log?.(`seed ${seed}: answer differs under the other meta lists, skipped`);
+      continue;
+    }
     counts[key]++;
     items.push(item);
   }
@@ -200,6 +234,10 @@ export function generateLethalBank(
     if (!item) continue;
     const key = item.answer.lethal ? 'lethal' : 'none';
     if (counts[key] >= want || (against.get(theirs) ?? 0) >= perOpp) continue;
+    if (!agreesUnder(item, cards, opts.agreeWith)) {
+      opts.log?.(`seed ${seed}: answer differs under the other meta lists, skipped`);
+      continue;
+    }
     counts[key]++;
     against.set(theirs, (against.get(theirs) ?? 0) + 1);
     items.push(item);
@@ -215,6 +253,7 @@ export function generateLethalBank(
     const got = lethalFocusItems(opts.leaders, cards, mine, {
       ...(opts.maxSeeds ? { maxSeeds: opts.maxSeeds } : {}),
       ...(opts.nodes ? { nodes: opts.nodes } : {}),
+      ...(opts.agreeWith ? { agreeWith: opts.agreeWith } : {}),
       ...(opts.log ? { log: opts.log } : {}),
     });
     for (const item of got) {

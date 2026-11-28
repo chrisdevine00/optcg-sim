@@ -23,8 +23,10 @@ const meta = JSON.parse(
     fileURLToPath(new URL('../../docs/research/meta-lists.json', import.meta.url)),
     'utf8',
   ),
-) as { archetypes: { leaderId: string; id: string }[] };
-const LEADERS = meta.archetypes.map((a) => a.leaderId);
+) as { archetypes: { leaderId: string; id: string; guidePending?: boolean }[] };
+/** Archetypes with a written guide; `guidePending` ones (added by meta:update) have none yet. */
+const LEADERS = meta.archetypes.filter((a) => a.guidePending !== true).map((a) => a.leaderId);
+const PENDING = meta.archetypes.filter((a) => a.guidePending === true).map((a) => a.leaderId);
 
 describe('parseSources', () => {
   it('reads the tag table, with labels and links', () => {
@@ -39,10 +41,17 @@ describe('parseSources', () => {
 });
 
 describe('parseGuide: all 14 files', () => {
-  it('has fourteen files, one per archetype in meta-lists.json', async () => {
+  it('has fourteen files, one per archetype in meta-lists.json that is not guide-pending', async () => {
     expect(FILES.length).toBe(14);
     const guides = await loadGuides();
     expect(guides.map((g) => g.leaderId).sort()).toEqual([...LEADERS].sort());
+  });
+
+  it('a guide-pending archetype has no guide file, and writing one means removing the flag', async () => {
+    // The 2026-11-28 refresh added Buggy, Saint Gunko and Luffy (ST10-002) with no guide (BACKLOG §15).
+    expect(PENDING.sort()).toEqual(['OP09-042', 'OP18-060', 'ST10-002']);
+    const guides = await loadGuides();
+    for (const p of PENDING) expect(guides.map((g) => g.leaderId)).not.toContain(p);
   });
 
   for (const f of FILES) {

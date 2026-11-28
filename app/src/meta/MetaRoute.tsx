@@ -195,6 +195,12 @@ export default function MetaRoute({ path }: { path: string }) {
                   )}
                 </p>
                 <p className="meta-tile-more">
+                  {!t.guide && (
+                    <>
+                      <span>Guide pending</span>
+                      <br />
+                    </>
+                  )}
                   <span className={st.stale ? 'meta-stale' : undefined}>
                     {st.stale ? '⚠ ' : ''}
                     {st.label}

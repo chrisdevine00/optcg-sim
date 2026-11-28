@@ -23,6 +23,8 @@ interface MetaArchetype {
   metaSharePostBan: number | null;
   tierOpmetagame: string | null;
   tierOpmetagameLabel: string | null;
+  /** Added by `meta:update` with no guide or playbook yet ("Guide pending"). */
+  guidePending?: boolean;
   lists: MetaList[];
 }
 interface MetaFile {
@@ -36,6 +38,7 @@ const META = meta as unknown as MetaFile;
 
 /** How the counting method is told to the player (the header's disclosure). */
 export const countingMethod = (): string => META.countingMethod;
+export const metaAsOf = (): string => META.asOf;
 
 /** "Luffy (Black)", "Enel (Purple)": two archetypes with one Leader name are told apart by colour. */
 export function displayNames(archetypes: readonly MetaArchetype[] = META.archetypes) {
@@ -90,6 +93,7 @@ export function tiles(cards?: ReadonlyMap<string, Card>): Tile[] {
       metaShare: a.metaShare,
       metaSharePostBan: a.metaSharePostBan,
       listDates: a.lists.map((l) => l.date),
+      guide: a.guidePending !== true,
       automated: { n, of },
       deckId: a.lists.length > 0 ? `${a.id}#1` : null,
     };
@@ -122,7 +126,7 @@ export function tileLabel(t: Tile): string {
     `${t.metaShare}% of lists`,
   ];
   if (t.metaSharePostBan !== null) bits.push(`${t.metaSharePostBan}% since the ban`);
-  return `${bits.join(', ')}. Guide and ${t.listDates.length} lists.`;
+  return `${bits.join(', ')}. ${t.guide ? 'Guide and ' : 'Guide pending, '}${t.listDates.length} lists.`;
 }
 
 /** The tile's automation line: the consequence when a deck does not play fully (UX-R42). */
@@ -181,7 +185,8 @@ const isMirror = (a: GuideMatchup, b: GuideMatchup): boolean =>
  */
 export function matchupGrid(guides: readonly Guide[]): Cell[][] {
   const byLeader = new Map(guides.map((g) => [g.leaderId, g]));
-  const ids = META.archetypes.map((a) => a.leaderId);
+  // Archetypes whose guide is pending have no Matchups table yet: the grid holds the guided ones.
+  const ids = guidedLeaders();
   return ids.map((row) =>
     ids.map((col): Cell => {
       if (row === col) return { row, col, mirror: true, entry: null, disagree: false, other: null };
@@ -271,5 +276,13 @@ export function gridMove(
  * guides' front-matter `archetypeId` differ from it (`OP09-062-robin`, `OP05-098-enel`), so links
  * built from a guide go through here.
  */
+/** Leaders of archetypes with a written guide (not `guidePending`), in the file's order. */
+export const guidedLeaders = (): string[] =>
+  META.archetypes.filter((a) => a.guidePending !== true).map((a) => a.leaderId);
+
+/** The archetype whose guide is pending, for the Meta Explorer's "Guide pending" page. */
+export const pendingArchetype = (key: string): MetaArchetype | undefined =>
+  META.archetypes.find((a) => a.guidePending === true && (a.leaderId === key || a.id === key));
+
 export const archetypeIdOf = (leaderId: string): string =>
   META.archetypes.find((a) => a.leaderId === leaderId)?.id ?? leaderId;

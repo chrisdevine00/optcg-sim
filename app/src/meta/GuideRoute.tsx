@@ -11,7 +11,14 @@ import { Inspector } from '../cards/Inspector.tsx';
 import { loadCards } from '../play/setup/decks.ts';
 import { Link } from '../router.tsx';
 import { cardIdsIn, loadGuides } from './guides.ts';
-import { archetypeIdOf, displayName, recordOwner, shortName } from './model.ts';
+import {
+  archetypeIdOf,
+  displayName,
+  metaAsOf,
+  pendingArchetype,
+  recordOwner,
+  shortName,
+} from './model.ts';
 import type { Guide, GuideBlock, GuideMatchup, Span } from './types.ts';
 import './meta.css';
 
@@ -200,13 +207,16 @@ export default function GuideRoute({ path }: { path: string }) {
   }, [guide, defining]);
 
   useEffect(() => {
+    const waiting = guide ? undefined : pendingArchetype(key);
     document.title = guide
       ? `${guide.title} · OPTCG Sim`
-      : guides
-        ? 'Guide not found · OPTCG Sim'
-        : 'Guide · OPTCG Sim';
+      : waiting
+        ? `${waiting.name}: guide pending · OPTCG Sim`
+        : guides
+          ? 'Guide not found · OPTCG Sim'
+          : 'Guide · OPTCG Sim';
     if (guide || guides) document.getElementById('page-title')?.focus();
-  }, [guide, guides]);
+  }, [guide, guides, key]);
 
   if (!guides)
     return (
@@ -215,6 +225,33 @@ export default function GuideRoute({ path }: { path: string }) {
           Archetype guide
         </h1>
         <p role="status">Loading the guide…</p>
+      </main>
+    );
+  const pending = guide ? undefined : pendingArchetype(key);
+  if (!guide && pending)
+    return (
+      <main className="page meta" id="main" aria-labelledby="page-title" data-path={path}>
+        <p className="subtle">
+          <Link to="/meta">← Meta Explorer</Link>
+        </p>
+        <h1 id="page-title" tabIndex={-1}>
+          {pending.name}: guide pending
+        </h1>
+        <p>
+          This deck joined the meta list in the refresh of {metaAsOf()} ({pending.metaShare}% of
+          lists). Its archetype guide and the AI&apos;s playbook for it are not written yet. You can
+          still play its tournament list, or play against it.
+        </p>
+        {pending.lists.length > 0 && (
+          <p>
+            <Link className="btn" to={`/play?p1=${encodeURIComponent(`${pending.id}#1`)}`}>
+              Play this deck
+            </Link>{' '}
+            <Link className="btn" to={`/play?p2=${encodeURIComponent(`${pending.id}#1`)}`}>
+              Play against it
+            </Link>
+          </p>
+        )}
       </main>
     );
   if (!guide)

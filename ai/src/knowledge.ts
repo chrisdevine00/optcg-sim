@@ -95,7 +95,24 @@ interface MetaArchetype {
   lists: MetaList[];
 }
 
-const ARCHETYPES = (meta as unknown as { archetypes: MetaArchetype[] }).archetypes;
+const FILE_ARCHETYPES = (meta as unknown as { archetypes: MetaArchetype[] }).archetypes;
+let ARCHETYPES = FILE_ARCHETYPES;
+
+/**
+ * Runs `fn` with the prior read from another meta file's archetypes, then restores the file's own.
+ * The lethal drill generator uses it to admit only items whose answer is the same under the pinned
+ * and the live meta lists (`ai/test/drills-live-lists.test.ts`), so a weekly refresh cannot change a
+ * committed answer.
+ */
+export function withMetaArchetypes<T>(archetypes: readonly unknown[], fn: () => T): T {
+  const prev = ARCHETYPES;
+  ARCHETYPES = archetypes as MetaArchetype[];
+  try {
+    return fn();
+  } finally {
+    ARCHETYPES = prev;
+  }
+}
 
 /** One sourced list of an archetype prior, with its recency weight. */
 export interface PriorList {

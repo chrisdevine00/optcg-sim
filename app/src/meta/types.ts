@@ -86,6 +86,8 @@ export interface Tile {
   metaSharePostBan: number | null;
   /** Lists with their dates, for "Lists: 8 to 13 Oct" and the staleness flag. */
   listDates: string[];
+  /** False while the archetype's guide is pending (added by `meta:update`, no guide yet). */
+  guide: boolean;
   /** "N of 50 cards automated" from the scripts index. */
   automated: { n: number; of: number };
   /** Id of the first deck in `DECKS` for this leader, for Play this deck / against this deck. */
