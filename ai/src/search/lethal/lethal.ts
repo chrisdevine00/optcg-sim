@@ -167,7 +167,13 @@ function factsOf(
     modelGaps: [],
     defence: defenderCards.flatMap(defenceEffectsOf),
     actualCounter: actual
-      ? queries.zone(s, def, 'hand').reduce((t, c) => t + counterValueOf(cards.get(c.card)), 0)
+      ? queries
+          .zone(s, def, 'hand')
+          .reduce(
+            (t, c) =>
+              t + counterValueOf(cards.get(c.card), queries.zone(s, def, 'leader')[0]?.card),
+            0,
+          )
       : null,
   };
 }

@@ -3,9 +3,10 @@
  *
  * Items are five-card hands drawn, by seed, from a guide's sourced lists; the answer is the guide's
  * own rule (`mulliganVerdict`, the function the Pirate AI and the review's mulligan flag share) and
- * the text is `explainMulligan`. Only a sourced guide has items (`isSourced`): the rule reads the
+ * the text is `explainMulligan`. A guide has items when its rule is sourced (`isSourced`) or is our
+ * reasoning with no written source (`isOurReasoning`: EB02-010, OP18-021). The rule reads the
  * seat's own hand and its own list, so every item is `any-hand`, labelled "From the <guide> guide
- * (sourced)". Nothing here reads a game, an opponent or a hidden card.
+ * (sourced)" or "(our reasoning, no written source)". Nothing here reads a game, an opponent or a hidden card.
  */
 import type { Card } from '@optcg/cards';
 import { ENGINE_VERSION, seedRng, shuffle } from '@optcg/engine';
@@ -13,7 +14,13 @@ import meta from '../../../../docs/research/meta-lists.json';
 import { certaintyLabel, type Explanation } from '../../explanation.ts';
 import { playbookFor } from '../../playbook.ts';
 import { mulliganVerdict, type MulliganVerdict } from '../mulligan.ts';
-import { explainMulligan, guideName, isInference, isSourced } from '../review/mulligan.ts';
+import {
+  explainMulligan,
+  guideName,
+  isInference,
+  isOurReasoning,
+  isSourced,
+} from '../review/mulligan.ts';
 import { DRILL_SCRIPTS_VERSION, type ListSet } from './positions.ts';
 import type { DrillBank, MulliganItem } from './types.ts';
 
@@ -81,7 +88,7 @@ export function mulliganBank(sets: readonly ListSet[], cards: Cards): MulliganIt
   const items: MulliganItem[] = [];
   sets.forEach((set, g) => {
     const pb = playbookFor(set.leaderId, set.lists[0], cards);
-    if (!isSourced(pb) || set.lists.length === 0) return;
+    if (!(isSourced(pb) || isOurReasoning(pb)) || set.lists.length === 0) return;
     for (const first of [true, false]) {
       const found: Partial<Record<'keep' | 'redraw', MulliganItem>> = {};
       for (let k = 0; k < MULLIGAN_SEED_CAP && !(found.keep && found.redraw); k++) {
@@ -163,20 +170,25 @@ export function mulliganLabel(item: MulliganItem, cards: Cards): string {
     'any-hand',
     'guide',
     guideName(pb),
-    isInference(pb) ? 'inference' : 'sourced',
+    isOurReasoning(pb) ? 'reasoning' : isInference(pb) ? 'inference' : 'sourced',
   );
 }
 
-/** The sourced guides' leaders in `sets`, and those with no sourced mulligan rule (the start screen's note). */
+/**
+ * The guides' archetypes in `sets` by what their mulligan rule rests on: a handbook entry (`sourced`),
+ * our reasoning with no written source (`ourReasoning`: offered, labelled as ours), or no rule the
+ * trainer teaches (`unsourced`; the start screen's note).
+ */
 export function mulliganCoverage(
   sets: readonly ListSet[],
   cards: Cards,
-): { sourced: string[]; unsourced: string[] } {
-  const sourced: string[] = [];
-  const unsourced: string[] = [];
-  for (const s of sets)
-    (isSourced(playbookFor(s.leaderId, s.lists[0], cards)) ? sourced : unsourced).push(
+): { sourced: string[]; ourReasoning: string[]; unsourced: string[] } {
+  const out = { sourced: [] as string[], ourReasoning: [] as string[], unsourced: [] as string[] };
+  for (const s of sets) {
+    const pb = playbookFor(s.leaderId, s.lists[0], cards);
+    (isSourced(pb) ? out.sourced : isOurReasoning(pb) ? out.ourReasoning : out.unsourced).push(
       s.archetypeId,
     );
-  return { sourced, unsourced };
+  }
+  return out;
 }

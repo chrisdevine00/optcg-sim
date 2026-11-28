@@ -84,6 +84,8 @@ describe('harderHand', () => {
       'OP12-061',
       'OP05-098',
       'OP08-098',
+      'EB02-010',
+      'OP18-021',
     ];
     const ids = new Set(
       leaders.flatMap((l) => priorFor(l).lists.flatMap((x) => x.cards.map((c) => c.id))),

@@ -65,6 +65,8 @@ const LEADERS = [
   'OP12-061',
   'OP05-098',
   'OP08-098',
+  'EB02-010',
+  'OP18-021',
 ];
 
 const start = (sc: ScenarioJson): GameState => createFromScenario({ ...sc, cards: lookup }).state;
@@ -394,7 +396,7 @@ describe('puzzleFromFlag', () => {
 });
 
 describe('the generator', () => {
-  const opts = { leaders: LEADERS, perClass: 1, maxSeeds: 40 };
+  const opts = { leaders: LEADERS, perClass: 1, maxSeeds: 80 };
 
   it('(e) is deterministic: two runs write the same bytes', () => {
     const a = generateLethalBank(cards, opts);

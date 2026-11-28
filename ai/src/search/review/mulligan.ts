@@ -20,6 +20,14 @@ import { flagId, type Detector, type ReviewFlag, type TurnResult } from './types
 export const isSourced = (pb: Playbook): boolean =>
   !pb.isDefault && /\bSH-[A-Z0-9]+/.test(pb.mulligan.source);
 
+/**
+ * A guide for a deck with no written source at all (EB02-010, OP18-021) says its rule is our
+ * reasoning. The review never flags a hand from it (`isSourced` only), but the mulligan trainer
+ * offers it, labelled as ours.
+ */
+export const isOurReasoning = (pb: Playbook): boolean =>
+  !pb.isDefault && !isSourced(pb) && /our reasoning/i.test(pb.mulligan.source);
+
 /** The guide itself tags its keep or redraw rule as inference (a sourced baseline, built on by the guide's author). */
 export const isInference = (pb: Playbook): boolean => /inference/i.test(pb.mulligan.source);
 

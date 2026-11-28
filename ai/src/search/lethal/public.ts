@@ -114,8 +114,14 @@ export function publicState(
     dn.active + dn.rested + dn.given,
     FALLBACK_COUNTER,
     !sourced,
+    leader,
   ).perCard;
-  const fullProfile = counterProfile(priorCardIds(leader), cards, sourced ? 0 : FALLBACK_COUNTER);
+  const fullProfile = counterProfile(
+    priorCardIds(leader),
+    cards,
+    sourced ? 0 : FALLBACK_COUNTER,
+    leader,
+  );
   const profile: typeof fullProfile =
     model === 'full'
       ? fullProfile

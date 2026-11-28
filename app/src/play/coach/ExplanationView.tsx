@@ -48,7 +48,7 @@ export function CertaintyChip({
   context: ExplanationContext;
   id?: string;
   /** A guide whose rule is tagged inference says so in the chip (M9-R5). */
-  guideBasis?: 'sourced' | 'inference' | undefined;
+  guideBasis?: 'sourced' | 'inference' | 'reasoning' | undefined;
   /** A guide-sourced answer names its guide: "From the Rocks guide (sourced)". */
   archetype?: string | undefined;
   /** The Trigger caveat, when it applies (learning-ui §3.1). */
@@ -95,7 +95,7 @@ export function ExplanationView({
   /** The guide's name for a sourced label (the review's mulligan). */
   archetype?: string | undefined;
   /** `inference` when the guide tags its rule as inference: the chip says so (M9-R5). */
-  guideBasis?: 'sourced' | 'inference' | undefined;
+  guideBasis?: 'sourced' | 'inference' | 'reasoning' | undefined;
   /** The lesson line is a link to `/learn/<lessonId>` (the review screens). */
   lessonLinks?: boolean;
   /**

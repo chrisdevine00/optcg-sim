@@ -129,9 +129,9 @@ describe('card browser filters', () => {
 });
 
 describe('META_IDS (M4b coverage scope)', () => {
-  it('is the 182 meta-list card numbers, not the verified set', async () => {
+  it('is the 205 meta-list card numbers, not the verified set', async () => {
     const { META_IDS } = await import('../src/cards/meta.ts');
-    expect(META_IDS.size).toBe(182);
+    expect(META_IDS.size).toBe(205);
     expect(META_IDS.has('OP17-039')).toBe(true);
     expect(META_IDS.has('OP05-022')).toBe(false); // verified, but in no list
   });

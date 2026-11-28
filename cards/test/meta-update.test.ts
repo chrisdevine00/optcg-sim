@@ -254,6 +254,22 @@ describe('meta:update counting', () => {
     expect(added.lists).toHaveLength(3);
   });
 
+  it('hand-added archetypes (EB02-010 Luffy, OP18-021 Franky; M11 Track C) survive a refresh with no top-8', () => {
+    const hand = ['EB02-010', 'OP18-021'];
+    for (const id of hand) expect(meta.archetypes.some((a) => a.leaderId === id)).toBe(true);
+    // The standings in this file's fixtures hold no top-8 for them: the refresh must keep them.
+    const c = candidate(meta, t, lookup, { ...OPTS, archetypes: 2 }, '2026-11-23');
+    for (const id of hand) {
+      const before = meta.archetypes.find((a) => a.leaderId === id)!;
+      const kept = c.meta.archetypes.find((a) => a.leaderId === id);
+      expect(kept, id).toBeDefined();
+      expect(kept!.lists, id).toEqual(before.lists);
+      expect(kept!.handAdded, id).toBe(before.handAdded);
+      expect(c.stale).toContain(id);
+      expect(c.dropped).toContain(id); // reported for a person, not removed
+    }
+  });
+
   it('the report lists new and stale archetypes, old guides, unscripted cards and missing playbooks', () => {
     const fewer = { ...meta, archetypes: meta.archetypes.filter((a) => a.leaderId !== 'OP17-039') };
     const c = candidate(fewer, t, lookup, { ...OPTS, archetypes: 2 }, '2026-11-23');
