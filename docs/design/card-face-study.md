@@ -1,6 +1,6 @@
 # Card-face study: showing cards under the SAMPLE watermark
 
-**As of:** 2026-10-28 (Phase 4, revision 2: review-1 fixes)
+**As of:** 2026-11-28 (§6: the owner's decision closes the sign-off; treatment A is the default). Revision 2's analysis below is kept as the record.
 **Why this exists:** plan review finding UX-10. Every available card image carries a SAMPLE watermark, which works against principle 6 ("Real card art is the hero"). This study compares ways to draw a card on the board and in the hand at the minimum legible size, recommends one, and asks the owner to sign off early.
 **Inputs:** `docs/research/data-sources.md` (image sources and terms), `board.md` §2 (sizes, badges), `visual-system.md`, `principles.md`.
 **No images are committed.** The sketches below use placeholder rectangles labelled "art". The watermark position was measured on the scans that Track B already cached locally under `.cache/track-b/img/`, which is gitignored and never published.
@@ -170,3 +170,17 @@ Estimates are from the HTML mock-up (`.cache/design/cards/cards.html`, placehold
 > If you prefer the full scan as the default, the cost is the watermark on every card in view. The rest of the design is unchanged.
 
 Until the owner answers, the wireframes and M3 build C. Switching the default later is one setting value, not a redesign.
+
+## 6. Owner's decision (2026-11-28): the full card is the default
+
+The owner signed off, choosing **treatment A, the full scan with the SAMPLE watermark, as the default on the board, in the hand and in every preview**, and keeping C and B as settings. This reverses §4's recommendation and closes §5's sign-off (DECISIONS 2026-11-28). The owner weighed the cost §2 A describes (the watermark on every card in view) and preferred the real card.
+
+What changes (built in M11 D2):
+1. **Default face: Full card.** The whole 600 × 838 scan fills the card box (`object-fit: cover`, same 63:88 plate geometry, same corner radius). Every image source serves the same watermarked scan; only optcgapi is enabled.
+2. **Same plates, same places.** Cost, power, DON!!, keywords, Counter and every chip sit where `board.md` §2.3 puts them, on the same opaque, theme-invariant plates. They cover the printed cost and power, so a stale printed number is never visible next to a live one. Contrast is measured over real scans (art on) in M11, not only on the art-blocked audit.
+3. **The Settings option becomes "Card faces: Full card / Art window / Text first"**, default Full card, applying to the board, the hand, the preview dock, trigger reveals and drills (`16-settings.html`). Art window is treatment C as built in M3; Text first is treatment B. Stored locally, purely cosmetic.
+4. **The fallback is unchanged.** When no image loads, the text face draws in the same box (the B/C frame), so nothing shifts. Accessible names are unchanged: the face stays `aria-hidden` and the card's name carries everything.
+5. **Artwork choice.** The board draws each card in the artwork the player chose for that card in the deck builder, where one is set; otherwise the first artwork.
+6. **The rested card** shows the scan sideways with the watermark as a vertical stripe (seen in the M11 wireframe, `22-playmat.html`); the owner accepted that with the treatment.
+
+The crop-focus overrides (§4.4) stay in the data and apply to the Art window setting.

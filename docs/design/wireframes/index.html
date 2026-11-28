@@ -62,6 +62,7 @@ const S = [
   ['19-progress', 'Progress', '"Work on" card with its numeric reason; course, drills, games, flags, lethal, data', ['progress', 'new']],
   ['20-history', 'Reviews (history)', 'every finished game with flags by severity; empty state', ['list', 'empty']],
   ['21-errors', 'Errors and empty states', 'engine failure, AI crash, art failed, storage full, stale review, old lists, empty reviews', []],
+  ['22-playmat', 'Board: playmat layout (M11)', 'official playsheet zones in our style; full card faces; the Art window and Text first settings', ['main', 'defend', 'raise', 'art', 'text', 'start']],
 ];
 document.getElementById('list').innerHTML = S.map(([f, t, d, st], i) => `<li><div class="n"><span class="num0">${String(i + 1).padStart(2, '0')}</span><a href="${f}.html">${t}</a></div><div class="st">${d}</div>${st.length ? `<div class="st">States: ${st.map((s) => `<a href="${f}.html#${s}">${s}</a>`).join(' · ')}</div>` : ''}<div class="st subtle">shots/${f}${st.length ? '--&lt;state&gt;' : ''}-1280.png, -1920.png</div></li>`).join('');
 </script>

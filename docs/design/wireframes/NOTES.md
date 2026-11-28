@@ -1,6 +1,6 @@
 # Wireframe notes
 
-**As of:** 2026-10-28 (Phase 4 wireframe pass, revised after review 1)
+**As of:** 2026-11-28 (M11: `22-playmat.html`, the playmat arrangement and full card faces; Phase 4 pass revised after review 1)
 
 ## How to use
 
@@ -14,6 +14,12 @@
 - Keyboard (board screens): one Tab stop per zone with arrow keys inside it; the first stop is "Skip to decision". `P` jumps to the decision, `G` then a letter goes to a zone (Shift = opponent's), `A` attacks with the focused card, `+` opens Give DON!!, `E` ends the turn, `U` rewinds, `S` skips. Actions that would change state show a toast instead, because the wireframes have no engine.
 - The rail has three states, set per screen: normal, `decisionTall` (defence, Trigger, attack confirm) and coach `tall` (lethal tier 3, guided count). Every board screen carries the rail notice (disclaimer) under the rail header.
 - Review: `11b-review.html` is Overview, `11c-study.html` is Study, and both read `review-data.js`.
+
+## M11 playmat (2026-11-28)
+
+- `22-playmat.html` renders the board in the playmat arrangement (`board.md` revision 3) from a derived calculator, `WF.playmat(roomy)` in `wf.js`, not from copied tables. Other board screens keep revision 2's geometry; they are the record of the rail and decision states, which did not change.
+- Faces: the full-card stand-in (frame in the card's colour, art, SAMPLE band, text box, name bar) is the default; `#art` and `#text` show the two settings.
+- Screenshots with stand-in art: `m11-shots/` (committed; no card art). For the owner's review only, `?art=1` loads a local, uncommitted map of optcgapi image URLs from `/artmap.js` so the page shows real scans at runtime; nothing with real art is committed.
 
 ## Spec conflicts: all 22 resolved
 

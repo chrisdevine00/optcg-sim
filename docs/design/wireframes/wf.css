@@ -475,3 +475,42 @@ details.srcs summary { cursor: pointer; color: var(--color-text-muted); font-siz
 .btn.big .sub { white-space: normal; text-align: center; }
 .lanehd { display: flex; align-items: center; gap: 6px; }
 .lanehd .grow { flex: 1; }
+
+/* ---------- M11 playmat (board.md revision 3) ---------- */
+/* Zone outlines and labels: our own drawn mat, decorative only (no Bandai artwork, logo or lettering) */
+.pmzones { position: absolute; inset: 0; pointer-events: none; }
+.pmz { position: absolute; border: 1px solid var(--color-mat-line); border-radius: 8px; background: var(--color-mat-zone); }
+.pml { position: absolute; font: var(--weight-semibold) 11px/14px var(--font-ui); letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-subtle); padding: 0 6px; background: var(--color-mat); border-radius: 4px; white-space: nowrap; }
+.pml.tl { left: 8px; top: -8px; } .pml.bl { left: 8px; bottom: -8px; } .pml.tr { right: 8px; top: -8px; } .pml.br { right: 8px; bottom: -8px; }
+.roomy .pml { font-size: 12px; line-height: 16px; top: auto; }
+.roomy .pml.tl, .roomy .pml.tr { top: -9px; } .roomy .pml.bl, .roomy .pml.br { bottom: -9px; }
+.pm .slot.empty { background: transparent; }
+.pm .costarea.pm { background: transparent; border: 0; }
+.pm .costarea.pm .dl { flex-direction: column; justify-content: center; align-items: flex-start; }
+.pm .costarea.pm .sep { position: absolute; top: 18%; bottom: 18%; width: 1px; background: var(--color-mat-line); }
+/* Hand at 1280×720: cards peek at 60% and rise in full on hover or focus (board.md §3.5) */
+.pm.peek .card.inhand { transition: transform var(--dur-fast) var(--ease-standard); }
+.pm.peek .card.inhand:hover, .pm.peek .card.inhand:focus-visible, .pm.peek .card.inhand.raised { transform: translateY(-42%); z-index: 30; margin-top: 0; }
+
+/* Full card (treatment A, M11 default): a stand-in for the whole scan. Frame in the card's colour, art,
+   the SAMPLE band at 40–60%, the printed text box and name bar. Live values sit on the same opaque plates. */
+.pm.face-scan .card .face { background: var(--band); padding: 0; }
+.pm.face-scan .card .art { left: 5%; right: 5%; top: 3%; height: 94%; border-radius: 3px;
+  background: linear-gradient(180deg, transparent 0 58%, rgb(235 238 242 / 0.88) 58% 84%, rgb(20 24 30 / 0.85) 84% 100%),
+    repeating-linear-gradient(135deg, rgb(255 255 255 / 0.06) 0 6px, transparent 6px 12px), var(--art, #2f3a48); }
+.pm.face-scan .card .art::before { top: 38%; height: 16%; left: 2%; right: 2%; font-size: calc(var(--card-w) * 0.17); }
+.pm.face-scan .card .art::after { display: none; }
+.pm.face-scan .card .art .al { top: 16%; }
+.pm.face-scan .card .foot { display: none; }
+/* Real-art preview (?art=1, never committed or published): the whole scan replaces the stand-in */
+.card .art img.real { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; }
+.pm.face-scan .card .art img.real { inset: -3.2% -5.6%; width: 111.2%; height: 106.4%; }
+.stage:not(.face-scan):not(.face-text) .card .art img.real { height: 293%; top: -11.7%; }
+.face-text .card .art img.real { height: 607%; top: -24%; }
+
+/* Text first (treatment B, a setting): name and type lead, a small art crop, the colour band */
+.face-text .card .face { background: var(--color-plate); }
+.face-text .card .art { left: 8%; right: 8%; top: 20%; height: 28%; border-radius: 3px; }
+.face-text .card .art .al { font-size: 11px; }
+.face-text .card .foot { top: 50%; padding: 2px 5px 0; background: transparent; }
+.face-text .card .nm { -webkit-line-clamp: 3; }

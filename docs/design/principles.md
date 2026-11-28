@@ -64,11 +64,11 @@ The answers are numbers and positions that always sit in the same place. Live va
 
 ## 6. Real card art is the hero
 
-**What it means here.** The layout exists to show cards. Chrome is quiet, dark and low in chroma: slate neutrals, no textures, no brand flourishes. The only saturated colours on screen are the cards themselves and a small set of state signals. All available art carries a SAMPLE watermark (`data-sources.md`). So "hero" means the largest clean view of the art we can give, not the full scan at any cost (`card-face-study.md`).
+**What it means here.** The layout exists to show cards. Chrome is quiet, dark and low in chroma: slate neutrals, no textures, no brand flourishes. The only saturated colours on screen are the cards themselves and a small set of state signals. "Hero" means **the real card, whole**: the full official scan on the board, in the hand and in previews, with our live values on opaque plates over the printed ones. Every available scan carries a SAMPLE watermark (`data-sources.md`); the owner accepted it on 2026-11-28 as the cost of showing the real card, reversing revision 2's "largest clean view, not the full scan at any cost". A setting keeps the clean art window and the text-first face for players who prefer them (`card-face-study.md` §6). The board itself takes the shape of the official playsheet's zones (`board.md` PD-7), drawn in our own tokens.
 
 - **Do:** keep panels at most two lightness steps from the mat. Use saturated colour only for state (legal, attack, DON!!) and always together with an icon or text.
-- **Don't:** use gradients, gloss, metallic frames, pirate motifs or anything that imitates the official One Piece Card Game brand. Don't cover more than about half of a board card's art with plates and chips.
-- **Check:** desaturate a board screenshot. Chrome and cards should still separate cleanly. Then count the saturated non-card pixels: they should come only from state signals that are currently active.
+- **Don't:** use gradients, gloss, metallic frames, pirate motifs, the playsheet's artwork, logo or lettering, or anything else that imitates the official One Piece Card Game brand. Taking the playsheet's zone *arrangement* is function, not brand. Don't cover more than about half of a board card's face with plates and chips.
+- **Check:** desaturate a board screenshot. Chrome and cards should still separate cleanly. Then count the saturated non-card pixels: they should come only from state signals that are currently active. With art on, every live number still reads on its plate (contrast measured over real scans, M11).
 
 ## 7. Landscape first, keyboard complete
 

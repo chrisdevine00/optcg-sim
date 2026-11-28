@@ -1,6 +1,6 @@
 # Board
 
-**As of:** 2026-10-28 (Phase 4, revision 2: review-1 fixes)
+**As of:** 2026-11-28 (M11 revision 3: the playmat arrangement and full card faces, on the owner's decision; DECISIONS 2026-11-28). Revision 2 (2026-10-28, review-1 fixes) is in git history.
 **Inputs:** `PROMPT.md` (Phase 4 "Board layout", Accessibility, Performance), `principles.md`, `docs/research/rules-digest.md` §D, §E, §I, `docs/ARCHITECTURE.md` §2.3, §2.7, §4.1, §5, `docs/plan-review-1.md` UX-5, UX-7, UX-9, UX-10, `docs/research/competitive-teardown.md`.
 **Companion files:**
 - `visual-system.md` and `tokens.css`: colours, type, motion.
@@ -24,29 +24,40 @@ The screen has two columns, and neither ever reflows during a game:
 - **The rail** (right). From top to bottom it holds the rail header, the rail notice (the disclaimer, §3.1), the event log, the coach and the decision panel. The rail has three states (§3.9, §3.13): normal, **decision tall** (an owed defensive or battle decision takes the log's space) and **coach tall** (a long explanation the player asked for).
 
 ```
-1280×720                                               board 960 │ rail 320
-┌──────────────────────────────────────────────────────────────────┬──────────────────────┐
-│ Opp identity      [▯▯▯▯▯▯  6 cards]  opponent hand (backs)        │ [Your turn] ≡ Rules ⚙│ rail header
-│                                                                    │ Unofficial fan tool… ⓘ│ rail notice
-│ ┌DON┐┌cost area──┐┌Life──┐  ┌Leader┐  ┌Stage─┐        ┌Deck┐┌Trash┐ │ Event log            │
-│ │ 6 ││▮▮▮▮ ▬▬    ││≡≡≡≡ 4│  │ OPP  │  │      │        │ 32 ││ 12  │ │  T5 Opp · Kaido…     │
-│ └───┘└───────────┘└──────┘  └──────┘  └──────┘        └────┘└─────┘ │  T5 You · Countered… │
-│              [C1]   [C2]   [C3]   [C4]   [C5]   opponent characters │  …                   │
-│ Opponent thinking…   Turn 5 · Your turn · Refresh›Draw›DON!!›[Main]›End   ⧉ 2 waiting │
-│              [C1]   [C2]   [C3]   [C4]   [C5]   your characters     ├──────────────────────┤
-│ ┌DON┐┌cost area──┐┌Life──┐  ┌Leader┐  ┌Stage─┐        ┌Deck┐┌Trash┐ │ Coach ▸ Hint · Why   │
-│ │ 4 ││▮▮▮ ▬▬▬    ││≡≡≡≡≡5│  │ YOU  │  │      │        │ 30 ││ 8   │ ├──────────────────────┤
-│ └───┘└───────────┘└──────┘  └──────┘  └──────┘        └────┘└─────┘ │ Decision panel       │
-│   [h1] [h2] [h3] [h4] [h5] [h6]                     your hand       │ (battle panel here)  │
-│                                                                    │ [Rewind] [End turn ▸]│
-└──────────────────────────────────────────────────────────────────┴──────────────────────┘
+1280×720 (playmat arrangement, M11)                         board 960 │ rail 320
+┌───────┬───────────────────────────────────────────────────┬───────┬──────────────────────┐
+│DON!!  │ Opp · Kaido          [▯▯▯▯▯ backs]       5 cards  │ Trash │ [Your turn] ≡ Rules ⚙│ rail header
+│deck 2 ├───────────────────────────────────────────────────┤ (70%) │ Unofficial fan tool… ⓘ│ rail notice
+│ (70%) │ 1 active ◆  ⟳ 6 rested ◆◆◆◆◆◆   +1 given  COST AREA│       │ Event log            │
+├───────┤                 ┌Leader┐┌Stage─┐                  ├───────┤  T6 Opp · Ulti…      │
+│ Life  │                 │ OPP  ││      │                  │ Deck  │  T7 You · Stussy…    │
+│ ▭     │ CHARACTER AREA ─┴──────┴┴──────┴──────────────    │  31   │  …                   │
+│ ▭     │      [C1]   [C2]   [C3]   [C4]   [C5]             └───────┤                      │
+│ ▭ 3   │                                                           │                      │
+│ Turn 7 · Your turn · Refresh › Draw › DON!! › [Main] › End  ⧉ 2 waiting                  │
+│ Life  │ CHARACTER AREA                                    ┌───────┤──────────────────────┤
+│ ▭     │      [C1]   [C2]   [C3]   [C4]   [C5]             │ Deck  │ Coach ▸ Hint · Why   │
+│ ▭     │                 ┌Leader┐┌Stage─┐                  │  30   ├──────────────────────┤
+│ ▭ 4   │                 │ YOU  ││      │                  │       │ Decision panel       │
+├───────┤ 2 active ◆◆  ⟳ 3 rested ◆◆◆   +2 given  COST AREA ├───────┤ (battle panel here)  │
+│DON!!  │   [h1] [h2] [h3] [h4] [h5] [h6] [h7]  your hand   │ Trash │                      │
+│deck 3 │   (peeks at 60%; a hovered or focused card rises) │   6   │ [Rewind] [End turn ▸]│
+└───────┴───────────────────────────────────────────────────┴───────┴──────────────────────┘
 ```
 
-**Reading order.** Read from top to bottom: opponent hand, opponent Leader row, opponent Characters, midline, your Characters, your Leader row, your hand. Then the rail: log, coach, decision. Character rows face each other across the midline, because Characters are what attack and get attacked. The Leader rows sit behind them, as on the official playmat (Play Guide zone diagram, teardown §6).
+**The playmat arrangement** (M11, owner's decision 2026-11-28). Each half of the board follows the official playsheet's zones (checked against the Play Guide's diagram, §3.15), drawn in our own style:
+- the **Character area** is the row nearest the midline;
+- behind it, the **Leader** on the axis with the **Stage** beside it to the right, and the **Deck** at the right edge;
+- **Life** is a column at the left edge, beside the Character and Leader rows, a stack of face-down cards;
+- along the player's own edge: the **DON!! deck** at the left (under Life), the **cost area** across the middle, and the **Trash** at the right (under the Deck).
+
+The cost row is short (one row of DON!! tokens), so your DON!! deck and Trash, full card size, reach down beside your hand. The opponent has no hand band (their hand is a strip of backs), so their DON!! deck and Trash are drawn at about 70% in the same columns. Zone outlines and small-caps labels ("Character area", "Cost area") use our own mat tokens (`--color-mat-zone`, `--color-mat-line`, `--color-text-subtle`); no Bandai artwork, logo, lettering or numbered callouts are copied. The side columns carry no edge label, because their count plates already name them ("4 Life", "30 Deck", "6 Trash", "DON!! deck 3").
+
+**Reading order.** Read from top to bottom: the opponent strip (identity and hand), opponent cost row, opponent Leader row, opponent Characters, midline, your Characters, your Leader row, your cost row, your hand. The Life column is read with its row (opponent's after their Leader row, yours before your Leader row). Then the rail: log, coach, decision. Character rows face each other across the midline, because Characters are what attack and get attacked.
 
 **Tab order departs from the rail's visual order on purpose** (C3). The board zones are one tab stop each, in the reading order above. After your hand, Tab goes to the **decision panel**, then the coach, then the log, then the rail header with its notice. The decision panel is what you act on next, and it sits next to the hand, so it comes first; WCAG 2.4.3 needs a meaningful order, not the visual one. A "Skip to decision" link (key `P`) is the first stop on the page. `accessibility.md` §3.1 owns the table.
 
-**The opponent is mirrored vertically, not rotated.** The opponent's rows are reflected across the midline: their Leader row is at the top and their Characters face yours. Their zones stay in the **same columns** as yours: Life above Life, DON!! above DON!!, Deck above Deck. A real table rotates the opponent 180°, which puts their Life on your right. We do not copy that, because comparing like with like in one vertical glance is what makes principle 1 work. Opponent cards are drawn upright, never upside down. (Proposed decision PD-2.)
+**The opponent is mirrored vertically, not rotated.** The opponent's rows are reflected across the midline: their cost row is at the top, then their Leader row, and their Characters face yours. Their zones stay in the **same columns** as yours: Life above Life, DON!! deck above DON!! deck, Deck and Trash above Deck and Trash. A real table rotates the opponent 180°, which puts their Life on your right. We do not copy that, because comparing like with like in one vertical glance is what makes principle 1 work. Opponent cards are drawn upright, never upside down. (PD-2, confirmed by the owner 2026-11-28: "opponent mirrored as today".)
 
 **Both Leaders sit on one vertical axis.** The axis runs through both Leader slots, the centre Character slots, the turn indicator and the centre of the hand. At the desktop targets the axis is the board's centre. On tablets it shifts right by the minimum needed to fit the Leader row (§6).
 
@@ -61,22 +72,26 @@ The screen has two columns, and neither ever reflows during a game:
 
 | Target | Board and hand card | Slot (Character, Leader, Stage) | Preview dock card art |
 |---|---|---|---|
-| 1280×720 | **84 × 117** | 117 × 117 | 168 × 235 |
-| 1920×1080 | **126 × 176** (exact 63:88) | 176 × 176 | 240 × 335 |
+| 1280×720 | **80 × 112** (hand peeks at 60%) | 112 × 112 | 168 × 235 |
+| 1920×1080 | **111 × 155** (hand in full) | 155 × 155 | 240 × 335 |
 | Tablet 1180×740 | 86 × 120 | 120 × 120 | 152 × 212 |
 | Tablet 1024×690 | 80 × 112 | 112 × 112 | 144 × 201 |
 | Short desktop 1280×600 | 77 × 108 | 108 × 108 | 140 × 196 |
 | **Minimum legible** | **76 × 106** | 106 × 106 | n/a |
 
-84 × 117 is 0.3% off the true ratio. The art is drawn with `object-fit: cover`, so the error is a sub-pixel crop.
+80 × 112 is 0.2% off the true ratio (revision 2's 84 × 117 was 0.3% off). The art is drawn with `object-fit: cover`, so the error is a sub-pixel crop.
 
 **Slots are square: they are as wide as a card is tall.** A rested card is turned 90° in place, so it needs the card's height as width. Making every rotatable slot square (Characters, Leader, Stage) means resting or untapping never moves a neighbour. The cost is about 33 px of horizontal space per slot at 1280. We have that space, because height binds before width at every target.
 
-**Card size comes from height.** The vertical budget at each target is:
+**Card size comes from height.** In the playmat arrangement the vertical budget at each target is:
 
-`viewport height = strip + 5 gaps + hand gap + midline + bottom margin + 5 card heights`
+`viewport height = strip + 7 gaps + hand gap + midline + bottom margin + 4 card heights + 2 cost rows + hand`
 
-That is four field rows plus the hand. In short-height mode it is 4.6 card heights, because the hand peeks at 60% (§6.3). The script then checks that the Leader row fits horizontally.
+A cost row is 0.4 card heights (one row of DON!! tokens, which are 0.29 card widths). The hand is 1 card height at 1920×1080 and 0.6 (peeking) at 1280×720, where a full hand would put the board card at 75 × 104, under the 76 px floor. So 1280×720 is 5.4 card heights plus 115 px of fixed bands, and 1920×1080 is 5.8 plus 180. The calculator then checks the horizontal fit. Revision 2's single Leader row needed 5 card heights; the playmat's second row along each edge costs about 5% of card size at 1280 and 12% at 1920.
+
+**Short windows keep revision 2's rows** (§6.3). Where the playmat arrangement would put cards under 76 px wide (about 690 px of viewport height at 1280 wide, for example a 1366×768 laptop with browser chrome), the board uses revision 2's arrangement instead: DON!! deck, cost area, Life, Leader, Stage, Deck and Trash in one Leader row. That is a mode change, not a shrink (§6.1, PD-6).
+
+**Revision 3 note.** Pixel examples in §2.2 to §2.5 were measured on revision 2's 84 × 117 card; the 80 × 112 card at 1280 scales them by 0.95. Every position is a fraction of the card, so the plates, chips and rings sit in the same places on the full card face (M11 default), the art window and text first (`card-face-study.md` §6). "Art window" in the chip-slot rules below names a band of the card (y 19% to 39%), whichever face is drawn.
 
 ### 2.2 Minimum legible card size: 76 × 106
 
@@ -162,30 +177,30 @@ Focus and legal combine: the legal ring sits inside and the focus ring outside i
 
 ### 3.1 Exact rectangles at 1280×720
 
-All values are CSS px from the viewport's top-left. "Opp" means opponent. The axis is x = 480.
+All values are CSS px from the viewport's top-left. "Opp" means opponent. The axis is x = 480. Board rows are the playmat arrangement (M11); the calculator is `WF.playmat()` in `docs/design/wireframes/wf.js`, ported to `app/src/play/board/layout.ts` in M11 D3.
 
 | Zone | x | y | w | h | Notes |
 |---|---:|---:|---:|---:|---|
-| Opponent identity | 16 | 0 | 238 | 32 | "Opponent · Warlord · Kaido" (leader name, AI tier), status word ("Thinking") |
-| Opponent hand (backs) | 270 | 0 | 420 | 32 | Backs peek from the top edge; "6 cards" label; known cards face up with a "Known" tag (ARCH §2.7) |
-| Opp DON!! deck | 20 | 49 | 60 | 100 | Back plus count |
-| Opp DON!! cost area | 88 | 40 | 185 | 117 | Active row and rested row (§3.4) |
-| Opp Life | 289 | 40 | 117 | 117 | Face-down stack plus count (§3.3) |
-| Opp Leader slot | 422 | 40 | 117 | 117 | Card 84×117 centred; on the axis |
-| Opp Stage slot | 555 | 40 | 117 | 117 | Square, so a rested Stage fits |
-| Opp Deck | 768 | 40 | 84 | 117 | Back plus count |
-| Opp Trash | 860 | 40 | 84 | 117 | Top card face up plus count; opens the trash viewer |
-| Opp Character slots 1–5 | 172, 297, 422, 547, 672 | 165 | 117 | 117 | Pitch 125; slot 3 on the axis |
-| Midline band | 16 | 290 | 928 | 40 | Left: opponent activity. Centre: turn and phase (520 wide, x 220–740). Right: pending-effects chip. |
-| My Character slots 1–5 | 172, 297, 422, 547, 672 | 338 | 117 | 117 | |
-| My DON!! deck | 20 | 472 | 60 | 100 | |
-| My DON!! cost area | 88 | 463 | 185 | 117 | |
-| My Life | 289 | 463 | 117 | 117 | |
-| My Leader slot | 422 | 463 | 117 | 117 | |
-| My Stage slot | 555 | 463 | 117 | 117 | |
-| My Deck | 768 | 463 | 84 | 117 | |
-| My Trash | 860 | 463 | 84 | 117 | |
-| My hand | 16 | 592 | 928 | 117 | Cards 84×117, 8 px gap, centred on the axis; 10 cards before overlap |
+| Opp DON!! deck | 16 | 0 | 88 | 79 | At 70% (card 57 × 79) beside the strip; back plus "DON!! deck N" plate |
+| Opponent identity | 110 | 0 | 244 | 28 | "Opp · Kaido · Pirate AI", status word ("Thinking") |
+| Opponent hand (backs) | 360 | 0 | 490 | 28 | Backs peek from the top edge; "N cards" at the right; known cards face up with a "Known" tag (ARCH §2.7) |
+| Opp Trash | 856 | 0 | 88 | 79 | At 70%; top card face up, count plate; opens the trash viewer |
+| Opp cost area | 110 | 34 | 740 | 45 | One row: active count and upright tokens, rested count and turned tokens, "+N given" at the right (§3.4) |
+| Opp Life | 16 | 85 | 88 | 230 | Column beside their Leader and Character rows; top of the pile nearest the midline (§3.3) |
+| Opp Leader slot | 424 | 85 | 112 | 112 | On the axis |
+| Opp Stage slot | 542 | 85 | 112 | 112 | Square, so a rested Stage fits |
+| Opp Deck | 856 | 85 | 88 | 112 | Back (80 × 112) plus count |
+| Opp Character slots 1–5 | 188, 306, 424, 542, 660 | 203 | 112 | 112 | Pitch 118; slot 3 on the axis; one "Character area" outline round all five (182, 199, 596 × 120) |
+| Midline band | 16 | 321 | 928 | 36 | Left: opponent activity. Centre: turn and phase (520 wide, x 220–740). Right: pending-effects chip. |
+| My Character slots 1–5 | 188, 306, 424, 542, 660 | 363 | 112 | 112 | Outline 182, 359, 596 × 120 |
+| My Life | 16 | 363 | 88 | 230 | Column beside your Character and Leader rows |
+| My Leader slot | 424 | 481 | 112 | 112 | |
+| My Stage slot | 542 | 481 | 112 | 112 | |
+| My Deck | 856 | 481 | 88 | 112 | |
+| My cost area | 110 | 599 | 740 | 45 | |
+| My DON!! deck | 16 | 599 | 88 | 118 | Full size (80 × 112), reaching down beside the hand |
+| My Trash | 856 | 599 | 88 | 118 | Full size, reaching down beside the hand |
+| My hand | 110 | 650 | 740 | 67 | Cards 80 × 112 peeking at 60% (67 px); a hovered or focused card rises 42% to show in full; 8 px gap, centred on the axis; 8 cards before overlap |
 | Rail header | 960 | 0 | 320 | 44 | Turn chip ("Your turn" / "Opponent's turn"), game menu (Concede, Rematch, Settings, Keyboard shortcuts), Rules reference, Settings, Fullscreen |
 | **Rail notice** | 960 | 44 | 320 | 32 | "Unofficial fan tool. Not affiliated with or endorsed by Bandai, Shueisha or Toei Animation." in 12 px on two lines, plus a 24 × 24 ⓘ whose tooltip and accessible name carry the full disclaimer, including "One Piece and all card names, text and art belong to their respective owners." The notice's own accessible name is the full text too. The board's footer equivalent (C15). |
 | Event log (coach collapsed) | 960 | 76 | 320 | 348 | 32 px header plus 13 rows of 24 px |
@@ -202,34 +217,34 @@ All values are CSS px from the viewport's top-left. "Opp" means opponent. The ax
 | Preview dock (default) | 872 | 80 | 400 | 384 | Over the log and coach only: below the rail notice, above the decision panel (§3.12) |
 | Preview dock (decision tall) | 16 | 40 | 400 | 384 | The board's top-left; never over the tall panel (§3.12) |
 
-The vertical budget: strip 32, five 8 px gaps, a 12 px hand gap, a 40 px midline, five rows of 117, and an 11 px bottom margin, for 720 in total.
+The vertical budget: strip 28, seven 6 px gaps, a 6 px hand gap, a 36 px midline, four rows of 112, two cost rows of 45, a 67 px peeking hand and a 3 px bottom margin, for 720 in total. The rail rows are unchanged from revision 2.
 
 ### 3.2 Exact rectangles at 1920×1080
 
-The axis is x = 760. Gaps are 12, the hand gap 16, margins 24.
+The axis is x = 760. Gaps are 10, the hand gap 10, margins 24, strip 40, midline 52, cost rows 62, bottom margin 8.
 
 | Zone | x | y | w | h |
 |---|---:|---:|---:|---:|
-| Opponent identity | 24 | 0 | 397 | 48 |
-| Opponent hand (backs) | 445 | 0 | 630 | 48 |
-| Opp DON!! deck | 68 | 77 | 91 | 143 |
-| Opp DON!! cost area | 171 | 60 | 277 | 176 |
-| Opp Life | 472 | 60 | 176 | 176 |
-| Opp Leader slot | 672 | 60 | 176 | 176 |
-| Opp Stage slot | 872 | 60 | 176 | 176 |
-| Opp Deck | 1232 | 60 | 126 | 176 |
-| Opp Trash | 1370 | 60 | 126 | 176 |
-| Opp Character slots 1–5 | 296, 484, 672, 860, 1048 | 248 | 176 | 176 |
-| Midline band (turn and phase at x 500–1020) | 24 | 436 | 1472 | 56 |
-| My Character slots 1–5 | 296, 484, 672, 860, 1048 | 504 | 176 | 176 |
-| My DON!! deck | 68 | 709 | 91 | 143 |
-| My DON!! cost area | 171 | 692 | 277 | 176 |
-| My Life | 472 | 692 | 176 | 176 |
-| My Leader slot | 672 | 692 | 176 | 176 |
-| My Stage slot | 872 | 692 | 176 | 176 |
-| My Deck | 1232 | 692 | 126 | 176 |
-| My Trash | 1370 | 692 | 126 | 176 |
-| My hand (11 cards before overlap) | 24 | 884 | 1472 | 176 |
+| Opp DON!! deck (at 72%, card 80 × 112) | 24 | 0 | 119 | 112 |
+| Opponent identity | 153 | 0 | 431 | 40 |
+| Opponent hand (backs) | 594 | 0 | 774 | 40 |
+| Opp Trash (at 72%) | 1377 | 0 | 119 | 112 |
+| Opp cost area | 153 | 50 | 1214 | 62 |
+| Opp Life | 24 | 122 | 119 | 320 |
+| Opp Leader slot | 683 | 122 | 155 | 155 |
+| Opp Stage slot | 848 | 122 | 155 | 155 |
+| Opp Deck | 1377 | 122 | 119 | 155 |
+| Opp Character slots 1–5 (outline 347, 283, 827 × 163) | 353, 518, 683, 848, 1013 | 287 | 155 | 155 |
+| Midline band (turn and phase at x 500–1020) | 24 | 452 | 1472 | 52 |
+| My Character slots 1–5 (outline 347, 510, 827 × 163) | 353, 518, 683, 848, 1013 | 514 | 155 | 155 |
+| My Life | 24 | 514 | 119 | 320 |
+| My Leader slot | 683 | 679 | 155 | 155 |
+| My Stage slot | 848 | 679 | 155 | 155 |
+| My Deck | 1377 | 679 | 119 | 155 |
+| My cost area | 153 | 844 | 1214 | 62 |
+| My DON!! deck | 24 | 844 | 119 | 228 |
+| My Trash | 1377 | 844 | 119 | 228 |
+| My hand (in full; 10 cards before overlap) | 153 | 916 | 1214 | 155 |
 | Rail header | 1520 | 0 | 400 | 56 |
 | Rail notice (two lines at 12 px; full text as its name) | 1520 | 56 | 400 | 32 |
 | Event log (coach collapsed / open) | 1520 | 88 | 400 | 608 / 288 |
@@ -241,11 +256,11 @@ The axis is x = 760. Gaps are 12, the hand gap 16, margins 24.
 | *Coach tall:* decision panel (header and footer) | 1520 | 964 | 400 | 116 |
 | Preview dock (default / decision tall) | 1432 / 24 | 92 / 60 | 480 | 644 |
 
-At 1920 the extra width becomes space beside the Character rows (272 px each side) and between Stage and Deck. It is not used to grow the cards, because height already binds. We leave that space empty on purpose. It is where attack arrows and their labels travel, and the board stays calm.
+At 1920 the extra width becomes space beside the Character rows and between the Life column and the Leader. It is not used to grow the cards, because height already binds. We leave that space empty on purpose. It is where attack arrows and their labels travel, and the board stays calm.
 
 ### 3.3 Life
 
-- **Face down, count visible.** Life is a stack of our own card backs, laid **landscape** as on the physical mat, inside a square box. Each card sits offset by `min(0.1w, (h − w) / (n − 1))`, so 4, 5 or 7 Life stay individually countable. A count plate shows the number at power size, plus the word "Life" at caption size, at the box's bottom-right.
+- **Face down, count visible.** Life is a column of our own card backs, **portrait** as on the playsheet's Life area, at the left edge beside the Character and Leader rows (two rows tall). Each card sits offset by `min(0.34h, (column − h) / (n − 1))`, so 4, 5 or 7 Life stay individually countable (the offset is 29 px for 5 Life at 1280). A count plate shows the number at power size, plus the word "Life" at caption size, at the column's far end from the midline. (Revision 2 laid them landscape in a square box in the Leader row.)
 - **Order.** The top of the Life pile is drawn nearest the midline, so "the top card" (digest items 64 and 107) has a visible place. Taking damage animates that card off the stack.
 - **Face-up Life** (added face up by an effect, digest item 46) shows face up in its position with a "Face up" chip.
 - **0 Life.** The empty box shows "0 Life · next hit loses", with a warning icon, the warning colour and the words. Colour is not the only cue.
@@ -258,12 +273,13 @@ The real DON!! card art is not used. DON!! appear as our own **tokens**: a round
 **Hierarchy** (UX-R4). The number a player needs at a glance is **active DON!!**, so it is the biggest DON!! number on each side. The DON!! deck is the smallest.
 
 - **DON!! deck:** a faded token back plus a caption plate "DON!! deck" over the count at 13 px semibold (caption weight, like the "30 Deck" label, never at power size), so "3" never reads as "I have 3 DON!!". It is an open area (CR 3-3-2), so hover lists its contents, which are always DON!!.
-- **Cost area:** a label column on the left (58 px at 1280, 84 at 1920) and token rows to its right.
-  - **Active row**, on top: upright tokens. Its label is the active count as a numeral at `--num-don` (20 px at 1280, 28 at 1920, bold, tabular) over the word "active".
-  - **Rested row**, below: tokens **rotated 90°** in `--color-don-rested`. Its label is "⟳ 3" at 14 px bold over "rested".
-  - **Given line**, at the bottom: "+2 given to cards" (12 px), so active + rested + given + DON!! deck add up to 10 without arithmetic on the board.
+- **Cost area:** one row along the player's edge, the width of the board between the side columns (740 px at 1280, 1214 at 1920), as on the playsheet.
+  - **Active group**, at the left: the active count as a numeral at `--num-don` (20 px at 1280, 28 at 1920, bold, tabular) over the word "active", then the upright tokens.
+  - **Rested group**, after a divider: "⟳ 3" at 14 px bold over "rested", then the tokens **rotated 90°** in `--color-don-rested`.
+  - **Given**, at the row's right end: "+2 given to cards" (12 px), so active + rested + given + DON!! deck add up to 10 without arithmetic on the board.
+  - Ten tokens fit without overlap at both sizes; the overlap rule below applies only on tablets.
 
-  Rested DON!! are told apart by four cues: row, rotation, icon and label. When a row runs out of width, its tokens overlap with an even pitch, and the label keeps the exact count. The counts are also the zone's accessible name: "Your cost area: 2 active, 3 rested, 2 given to cards". When the active row is a legal source, it carries the legal ring **and** the ◆ corner glyph like every other legal element (UX-R45).
+  Rested DON!! are told apart by four cues: group, rotation, icon and label. When a row runs out of width, its tokens overlap with an even pitch, and the label keeps the exact count. The counts are also the zone's accessible name: "Your cost area: 2 active, 3 rested, 2 given to cards". When the active group is a legal source, it carries the legal ring **and** the ◆ corner glyph like every other legal element (UX-R45).
 - **Given DON!!:** shown on the card they boost. There is a BL badge "◆2", and up to 3 token edges peek 3 px below the card's bottom edge, echoing the physical tuck. The card's live power already includes their +1000 each, on its owner's turn only (§2.3). When a card with given DON!! leaves the field, its tokens animate back to the **rested** row (digest item 84). At Refresh they animate to the rested row and then everything untaps (digest item 67), in that order, so the rule is visible.
 - **DON!! −X costs** return tokens to the DON!! deck (digest item 86). The animation goes to the deck, not the cost area, and the log line says so.
 - **Glance totals.** The midline band does not repeat the DON!! counts. Each cost area's label column is the single home (principle 8).
@@ -271,10 +287,10 @@ The real DON!! card art is not used. DON!! appear as our own **tokens**: a round
 ### 3.5 Deck, trash and hand
 
 - **Deck:** our card back plus a count plate. At 5 cards or fewer, a warning chip shows "5 left" (deck-out loses at once, digest item 3). It is not openable.
-- **Trash:** the top card face up (the same face treatment as the board), a count plate, and the ▤ "Open" affordance on hover and focus. Clicking it or pressing Enter opens the **trash viewer**. That is a dialog docked over the rail's log area, with a scrim over the rail only. It lists cards newest first with filters by category, and Esc closes it and returns focus. Both trashes are open areas (CR 3-5-2).
-- **Your hand:** face up, in the order you chose (ARCH §2.7), centred on the axis, with an 8 px gap.
-  - Above 10 cards at 1280 (11 at 1920), cards overlap with an even pitch.
-  - A hovered or focused card rises by 25% of its height and comes to the front, so it is never covered.
+- **Trash:** under the Deck, at the right edge along the player's edge (the opponent's at about 70%). The top card face up (the same face treatment as the board), a count plate, and the ▤ "Open" affordance on hover and focus. Clicking it or pressing Enter opens the **trash viewer**. That is a dialog docked over the rail's log area, with a scrim over the rail only. It lists cards newest first with filters by category, and Esc closes it and returns focus. Both trashes are open areas (CR 3-5-2).
+- **Your hand:** face up, in the order you chose (ARCH §2.7), centred on the axis between your DON!! deck and Trash, with an 8 px gap.
+  - Above 8 cards at 1280 (10 at 1920), cards overlap with an even pitch.
+  - At 1280×720 the hand **peeks**: the top 60% of each card shows (cost, power, Counter and the top of the art; every hand badge sits in the top 60%). A hovered or focused card rises by 42% of its height to show in full and comes to the front, so it is never covered. At 1920×1080 the hand shows in full and a hovered or focused card rises by 25%.
   - Drag to reorder (keyboard: `accessibility.md`).
 - **Opponent hand:** backs in canonical order (ARCH §2.7), peeking from the top edge, with "N cards". A known card (revealed and still in hand) shows face up at strip size with a "Known" tag, and the preview works on it.
 
@@ -284,7 +300,7 @@ A square slot to the right of the Leader. When empty, it shows the label "Stage"
 
 ### 3.7 Character area
 
-Five fixed square slots. A new Character takes the empty slot **nearest the centre**: 3, then 2, 4, 1, 5. Cards **never move** when a neighbour leaves, which protects spatial memory. Empty slots show a faint outline (`--color-mat-line`), and the label "Character area" appears in the centre slot when all five are empty.
+Five fixed square slots. A new Character takes the empty slot **nearest the centre**: 3, then 2, 4, 1, 5. Cards **never move** when a neighbour leaves, which protects spatial memory. One outline in `--color-mat-line` with a small-caps "Character area" label on its midline-facing edge surrounds the five slots, as the playsheet frames the area; empty slots inside it show a fainter dashed outline.
 
 **Playing a sixth Character** (digest item 78) is not a separate screen. The engine owes a `choose` decision, all five Characters get the target treatment with the label "Trash 1 to make room (not a K.O.)", and the decision panel explains the rule.
 
@@ -434,6 +450,23 @@ The coach is a **collapsible panel in the rail**, between the log and the decisi
 (C20.) The opening hand fans out **over your empty Character row**, which is empty before turn 1, at most 1.15 × the hand-card size (97 × 135 at 1280, 145 × 202 at 1920), centred on the axis. The fan never covers your Leader: at 1280 the Character row ends at y 455 and the Leader slot starts at y 463, so a 135 px card centred on the row (y 329–464) is moved up 4 px to clear it. Keep and Redraw are in the decision panel (one home, principle 8), with Keep on the left; the hand is a readable list for screen readers, and `I` inspects a card. Life is not placed yet ("Life · placed after the mulligan").
 
 ---
+
+### 3.15 Checked against the official playsheet
+
+The zone positions were checked on 2026-11-28 against the Play Guide's playsheet diagram (https://en.onepiece-cardgame.com/play-guide/, the numbered zone figure under "Playsheet"). The repo keeps no copy of the diagram or its artwork; this is the written record.
+
+| Playsheet zone (number in the diagram) | Position on the playsheet | Ours |
+|---|---|---|
+| 1 Character area | The full-width row at the top of the sheet (the edge nearest the opponent), right of the Life area | The row nearest the midline, centred on the axis, five fixed slots |
+| 8 Life | A tall column at the left edge, as high as the Character area and the Leader row together; cards stacked down it | The same: a column at the left edge beside the Character and Leader rows |
+| 2 Leader | Middle row, right of centre | Middle row, on the board's axis (our axis rule, §1); the playsheet's left half of this row holds a printed phase list, which our midline stepper replaces |
+| 3 Stage | Middle row, right of the Leader | The same |
+| 4 Deck | Middle row, right edge | The same |
+| 7 DON!! deck | Bottom row, left edge (under Life) | The same, full size on your side, about 70% on the opponent's |
+| 6 Cost area | Bottom row, the wide middle | The same, one row of tokens |
+| 5 Trash | Bottom row, right edge (under the Deck) | The same, full size on your side, about 70% on the opponent's |
+
+Departures, each for a reason: the Leader sits on the axis rather than right of centre, so both Leaders, the centre Character slots, the turn indicator and the hand share one vertical line (§1); the bottom row is shorter than a card on screen (0.4 card heights), because tokens are smaller than cards and the height budget binds (§2.1); the opponent is mirrored, not rotated (PD-2); zone numbers, the logo and the sheet's printed lettering are not reproduced.
 
 ## 4. Input model
 
@@ -595,6 +628,9 @@ The full 1180 and 1024 rectangle sets are produced by the layout script, and M3 
 
 ### 6.3 Short desktop windows (real 720p screens)
 
+**Revision 3:** the playmat arrangement needs about 690 px of viewport height at 1280 wide for 76 px cards. Below that, the board uses revision 2's single Leader row (this section, unchanged), with the Life box in that row. A window resized across the line changes arrangement on the debounced resize, never mid-animation; both arrangements keep every zone's tab order and accessible names, so only the geometry differs. The full card face, the art window and text first apply in both.
+
+
 A 1280 × 720 **screen** gives a browser viewport of only about 1280 × 600 once browser chrome is subtracted. Below a 650 px viewport height the layout switches to **compact height**:
 - the hand **peeks**: 60% of each card shows, which keeps cost, power and Counter visible, because all hand badges sit in the top 60%;
 - the hovered or focused card rises fully;
@@ -633,7 +669,7 @@ These reading pages are responsive. (Open question OQ-1, proposed decision PD-5.
 ## Open questions
 
 - **OQ-1. Phone landscape.** PROMPT gives phone portrait a "rotate to play" screen, but a phone in landscape (about 850 × 390) is below the board's minimum (968 × 590) at legible card sizes. Should v1 tell phone users the board needs a bigger screen (PD-5)? Or does the owner want a separate phone-landscape layout, for example Leader and Characters in one row, Life and DON!! as counters, and the hand as a drawer? That would be new scope, and its cards would still be about 60 px wide. *Current best answer:* tell the truth on phones; no phone board in v1.
-- **OQ-2. Opponent orientation.** A vertical mirror (zones in the same columns as yours) reads better on a screen. A 180° rotation matches a real table, where their Life is on your right. Does the owner, as a paper player, find the mirror disorienting? *Current best answer:* mirror (PD-2). Confirm in the first owner session (`usability-plan.md`).
+- ~~**OQ-2. Opponent orientation.**~~ **Resolved 2026-11-28:** the owner chose the playmat arrangement with the opponent "mirrored as today" (PD-2 stands; DECISIONS 2026-11-28).
 - **OQ-3. End Turn without a confirm.** The proposal relies on the live sub-label ("2 can attack · 3 DON!! unused") plus Rewind. In a mode without Rewind (a future ranked-like mode), should ending the turn with unused attackers need a confirm? *Current best answer:* there is no such mode in v1; revisit if one is added.
 - **OQ-4. Pacing against the baseline.** The 400 / 600 ms dwells and the 8 s target are reasoned from first principles, and a Warlord turn runs about 1.2 s over (§5.2). SeaKing's pacing is **unobserved**. The owner times a clickable prototype at 1× in the first owner session, and the slice checkpoint compares it with the owner's own hands-on notes.
 - **OQ-6. The board's disclaimer form** (C15). *Decided* (PROMPT "make decisions yourself"; OQ-6 is not a DEVINE item): the visible two-line rail notice (§3.1), whose accessible name is the full disclaimer, is the board's footer equivalent. The `DECISIONS.md` entry is to be recorded with this revision; the owner may still change the form.
@@ -649,6 +685,14 @@ These reading pages are responsive. (Open question OQ-1, proposed decision PD-5.
 **PD-2. The opponent mirrored vertically, with zones in the same columns as yours.** *Context:* principle 1 needs Life, DON!! and deck counts compared at a glance, and the brief says the opponent is mirrored at the top. *Decision:* the opponent's rows are reflected across the midline, their Characters face yours, their Leader row is at the top, and each zone sits in the same column as yours. Their cards render upright. *Alternatives rejected:*
 - a 180° rotation like a real table: it puts their Life opposite yours across the board and needs upside-down art or inconsistent positions;
 - a full copy of your layout, with Characters at the top edge: it puts Leaders next to each other across the midline and Characters far apart, which breaks the attack geometry.
+
+*Confirmed 2026-11-28* by the owner, together with PD-7.
+
+**PD-7. The playmat arrangement (M11, owner's decision).** *Context:* the owner, a paper player, asked for the board to use the real playmat's zones: the Character area nearest the middle, Life at the left, the Leader in the centre with the Stage beside it, the Deck and Trash at the right, and the DON!! deck and cost area along the player's own edge; drawn in our own style, with the opponent mirrored. *Decision:* §1 and §3.1–§3.2 as revised: a Life column, a Leader row of Leader, Stage and Deck, and a short cost row along each edge with the DON!! deck and Trash at its ends; the hand peeks at 1280×720; windows too short for 76 px cards keep revision 2's rows (§6.3). Checked against the playsheet (§3.15). *Alternatives rejected:*
+- keeping revision 2's single Leader row (the owner's decision reverses it);
+- full-height cost rows (cards would fall to about 60 px wide at 1280×720, under the 76 px floor);
+- a full hand at 1280×720 (75 × 104 cards, under the floor), so the hand peeks there, as revision 2 already did below 650 px;
+- the opponent's DON!! deck and Trash at full size (their side has no hand band to reach into; full size would cost another 5% of card size on both sides).
 
 **PD-3. Click-to-select is primary; drag is an accelerator; every move has a keyboard path.** *Context:* PROMPT defaults to both, with click primary. Touch, keyboard and confirm steps all favour click. *Decision:* a single-source selection model with an action popover, where attack is the default action of an attacker. A click on a lit target goes straight to confirm. Drags produce exactly the same states and never bypass a confirm. DON!! giving has a persistent DON!! mode for speed and a stepper for precision. *Alternatives rejected:*
 - drag as primary: imprecise on trackpads and touch, and no keyboard analogue;

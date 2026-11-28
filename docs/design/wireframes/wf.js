@@ -55,6 +55,69 @@
     },
   };
 
+  /*
+   * Playmat geometry (M11, board.md §1 and §3.1–§3.2 revision 3). Derived, not copied: the same arithmetic is
+   * ported to app/src/play/board/layout.ts. Rows from the top: opponent strip, opponent cost row, opponent
+   * Leader row, opponent Characters, midline, your Characters, your Leader row, your cost row, your hand.
+   * Life is a column on the left beside the Character and Leader rows; the DON!! deck sits under it and the
+   * Trash under the Deck on the right, as on the official playsheet. The cost row is short (one row of DON!!
+   * tokens); your DON!! deck and Trash reach down beside the hand, and the opponent's are drawn smaller to fit
+   * beside their strip.
+   */
+  function playmat(roomy) {
+    const base = roomy ? G.roomy : G.compact;
+    const W = base.W, H = base.H, boardW = base.mat[2];
+    const P = roomy
+      ? { strip: 40, g: 10, gH: 10, mid: 52, bottom: 8, margin: 24, peek: false }
+      : { strip: 28, g: 6, gH: 6, mid: 36, bottom: 3, margin: 16, peek: true };
+    const RATIO = 88 / 63, E = 0.4, hf = P.peek ? 0.6 : 1;
+    const fixed = P.strip + 7 * P.g + P.gH + P.mid + P.bottom;
+    let h = Math.floor((H - fixed) / (4 + hf + 2 * E));
+    const w = Math.round(h / RATIO);
+    h = Math.round(w * RATIO);
+    const e = Math.round(E * h), handH = Math.round(hf * h);
+    const axis = boardW / 2, g = P.g, m = P.margin;
+    let y = 0;
+    const yStrip = y; y += P.strip + g;
+    const yOppE = y; y += e + g;
+    const yOppL = y; y += h + g;
+    const yOppC = y; y += h + g;
+    const yMid = y; y += P.mid + g;
+    const yMyC = y; y += h + g;
+    const yMyL = y; y += h + g;
+    const yMyE = y; y += e + P.gH;
+    const yHand = y;
+    const colW = w + 8;                       // Life and DON!! deck column (left), Deck and Trash column (right)
+    const leftX = m, rightX = boardW - m - colW;
+    const inner0 = leftX + colW + g, inner1 = rightX - g;
+    const lx = axis - h / 2;
+    const oppSmallH = P.strip + g + e;        // the opponent's DON!! deck and Trash fit beside their strip
+    const R = (a, b, c, d) => [Math.round(a), Math.round(b), Math.round(c), Math.round(d)];
+    const pitch = h + g;
+    const out = {
+      ...base, playmat: true, peek: P.peek, card: [w, h], slot: h, tok: [Math.round(w * 0.29), Math.round(w * 0.29 * RATIO)],
+      axis, handGap: 8, gap: g, colW, e,
+      oppSmall: [Math.round(oppSmallH / RATIO), oppSmallH],
+      oppId: R(inner0, yStrip, axis - 1.5 * w - inner0 - g, P.strip),
+      oppHand: R(axis - 1.5 * w, yStrip, 3 * w + (inner1 - axis - 1.5 * w) , P.strip),
+      oppDonDeck: R(leftX, 0, colW, oppSmallH), oppTrash: R(rightX, 0, colW, oppSmallH),
+      oppCost: R(inner0, yOppE, inner1 - inner0, e),
+      oppLife: R(leftX, yOppL, colW, 2 * h + g), oppLeader: R(lx, yOppL, h, h), oppStage: R(lx + h + g, yOppL, h, h),
+      oppDeck: R(rightX, yOppL, colW, h),
+      charX: [-2, -1, 0, 1, 2].map((k) => Math.round(axis + k * pitch - h / 2)), oppCharY: yOppC, myCharY: yMyC,
+      mid: R(m, yMid, boardW - 2 * m, P.mid), midCentre: [Math.round(axis - 260), Math.round(axis + 260)],
+      myLife: R(leftX, yMyC, colW, 2 * h + g), myLeader: R(lx, yMyL, h, h), myStage: R(lx + h + g, yMyL, h, h),
+      myDeck: R(rightX, yMyL, colW, h),
+      myCost: R(inner0, yMyE, inner1 - inner0, e),
+      myDonDeck: R(leftX, yMyE, colW, H - yMyE - P.bottom), myTrash: R(rightX, yMyE, colW, H - yMyE - P.bottom),
+      myHand: R(inner0, yHand, inner1 - inner0, handH),
+      charArea: { opp: R(axis - 2.5 * h - 2 * g - 6, yOppC - 4, 5 * h + 4 * g + 12, h + 8), me: R(axis - 2.5 * h - 2 * g - 6, yMyC - 4, 5 * h + 4 * g + 12, h + 8) },
+      rows: { yStrip, yOppE, yOppL, yOppC, yMid, yMyC, yMyL, yMyE, yHand },
+    };
+    out.handMax = Math.floor((out.myHand[2] + 8) / (w + 8));
+    return out;
+  }
+
   // Keyword plates: a glyph at compact density (word in tooltip, name and legend), a short word at roomy (board.md §2.3)
   const KW = {
     blocker: ['⛨', 'Blocker', 'Blocker'], rush: ['»', 'Rush', 'Rush'], rushc: ['»C', 'Rush: Character', 'Rush: C'], double: ['×2', 'Double Attack', 'Double'],
@@ -116,7 +179,7 @@
     const tag = o.tag || 'button';
     const mine = c.who === 'Your' || c.inHand || c.mine || o.mine;
     return `<${tag} class="${cls}" ${c.id ? `id="${c.id}"` : ''} style="left:${x}px;top:${y}px;width:${bw}px;height:${bh}px" aria-label="${esc(label)}" ${tag === 'button' ? 'type="button"' : 'role="img"'} data-name="${esc(c.n)}" data-g="${c.g || ''}" ${mine ? 'data-mine="1"' : ''}>
-      ${peek}<span class="face" aria-hidden="true"><span class="art"><span class="al">art</span></span><span class="foot"><span class="nm">${esc(c.n).replace(/\.(?=\S)/g, '.​')}</span><span class="band"><span class="ini">${esc((c.colInit) || (COLOURS[c.col || 'blue'] || '')[0])}</span></span></span></span>
+      ${peek}<span class="face" aria-hidden="true"><span class="art">${(window.WF_ART && c.cid && WF_ART[c.cid]) ? `<img class="real" alt="" src="${WF_ART[c.cid]}">` : '<span class="al">art</span>'}</span><span class="foot"><span class="nm">${esc(c.n).replace(/\.(?=\S)/g, '.​')}</span><span class="band"><span class="ini">${esc((c.colInit) || (COLOURS[c.col || 'blue'] || '')[0])}</span></span></span></span>
       ${cost}${pow}${don}${kw}${ctr}${glyph}${chips}</${tag}>`;
   }
   function autoName(c) {
@@ -196,6 +259,59 @@
     if (n === 0) return `<div class="z slot empty zitem" role="group" aria-label="${label}, 0 Life, next hit loses" style="${px(rect)};border-color:var(--color-warning)"><span class="plate warn" style="position:static">⚠ 0 <small>Life · next hit loses</small></span></div>`;
     return `<div class="z zitem" role="group" aria-label="${label}, ${n} cards, face down" style="${px(rect)}">${backs(n, [0, 0, rect[2], rect[3]], g, mine)}
       <span class="plate life" style="right:2px;bottom:${mine ? 2 : 'auto'}px;${mine ? '' : 'top:2px;'}z-index:12">${n} <small>Life</small></span></div>`;
+  }
+  // Playmat Life (M11): a column of portrait backs, top of the pile nearest the midline, as on the playsheet
+  function lifeCol(label, n, rect, g, mine) {
+    if (n === null) return `<div class="z slot empty zitem" role="group" aria-label="${label}, not placed yet" style="${px(rect)}"><span class="zlabel">Life · after the mulligan</span></div>`;
+    if (n === 0) return `<div class="z slot empty zitem" role="group" aria-label="${label}, 0 Life, next hit loses" style="${px(rect)};border-color:var(--color-warning)"><span class="plate warn" style="position:static;flex-direction:column;align-items:center">⚠ 0 <small>Life · next hit loses</small></span></div>`;
+    const [cw, ch] = g.card; const lw = cw, lh = ch;
+    const d = n > 1 ? Math.min(ch * 0.34, (rect[3] - 8 - lh) / (n - 1)) : 0;
+    let h = '';
+    for (let i = 0; i < n; i++) {
+      const yy = mine ? 4 + i * d : rect[3] - 4 - lh - i * d; // i = 0 is the top of the pile, nearest the midline
+      h = `<span class="back" style="left:${(rect[2] - lw) / 2}px;top:${yy}px;width:${lw}px;height:${lh}px;z-index:${10 - i}" aria-hidden="true"></span>` + h;
+    }
+    return `<div class="z zitem" role="group" aria-label="${label}, ${n} cards, face down" style="${px(rect)}">${h}
+      <span class="plate life" style="left:50%;transform:translateX(-50%);${mine ? 'bottom:4px' : 'top:4px'};z-index:12">${n} <small>Life</small></span></div>`;
+  }
+  // Playmat cost area (M11): one row along the player's edge. Active tokens upright, then rested tokens turned,
+  // each group led by its count; "given" at the row's end. The active count stays the biggest DON!! number.
+  function costRow(side, rect, g, p) {
+    const [tw, th] = g.tok;
+    const roomy = g.W > 1600;
+    const given = p.given ?? 0;
+    const L = side === 'me' ? 'Your' : 'Opponent’s';
+    const ty = (rect[3] - th) / 2, tyr = (rect[3] - tw) / 2;
+    const labA = roomy ? 70 : 52, labR = roomy ? 66 : 50;
+    let x = 6;
+    let h = `<div class="z costarea pm zitem" role="group" aria-label="${L} cost area: ${p.active} active, ${p.rested} rested${given ? `, ${given} given to cards` : ''}" style="${px(rect)}">`;
+    const actW = labA + Math.max(1, p.active) * (tw + 3);
+    h += `<button type="button" class="rowbtn ${p.donLegal ? 'legal' : ''}" style="left:3px;right:auto;top:3px;bottom:3px;width:${actW + 4}px" aria-label="${p.active} active DON!!${p.donLegal ? ', select to give DON!!' : ''}">${p.donLegal ? '<span class="glyph" aria-hidden="true">◆</span>' : ''}</button>`;
+    h += `<span class="dl act" style="left:${x}px;top:0;height:100%;width:${labA}px" aria-hidden="true"><b class="dn">${p.active}</b><span>active</span></span>`;
+    x += labA;
+    for (let i = 0; i < p.active; i++) h += `<span class="tok" style="--tok-w:${tw}px;--tok-h:${th}px;left:${x + i * (tw + 3)}px;top:${ty}px" aria-hidden="true">◆</span>`;
+    x += Math.max(1, p.active) * (tw + 3) + (roomy ? 22 : 14);
+    h += `<span class="sep" style="left:${x - (roomy ? 11 : 7)}px" aria-hidden="true"></span>`;
+    h += `<span class="dl rest" style="left:${x}px;top:0;height:100%;width:${labR}px" aria-hidden="true"><b>⟳ ${p.rested}</b><span>rested</span></span>`;
+    x += labR;
+    for (let i = 0; i < p.rested; i++) h += `<span class="tok r" style="--tok-w:${tw}px;--tok-h:${th}px;left:${x + i * (th + 3)}px;top:${tyr}px" aria-hidden="true">◆</span>`;
+    h += `<span class="dl given" style="left:auto;right:8px;top:0;height:100%;display:flex;align-items:center" aria-hidden="true">${given ? `+${given} given to cards` : 'none given'}</span>`;
+    if (p.donMode) h += `<span class="cchip don below" style="top:calc(100% + 2px)">◆ Giving DON!!</span>`;
+    return h + '</div>';
+  }
+  // Zone outlines and labels in our own tokens (M11): drawn under the cards, never Bandai artwork or lettering
+  function pmZones(g) {
+    const Z = [];
+    const add = (r, t, pos) => Z.push(`<div class="pmz" style="${px(r)}">${t ? `<span class="pml ${pos}">${t}</span>` : ''}</div>`);
+    for (const [pre, mine] of [['opp', false], ['my', true]]) {
+      const ca = g.charArea[mine ? 'me' : 'opp'];
+      add(ca, 'Character area', mine ? 'tl' : 'bl');
+      add(g[pre + 'Cost'], 'Cost area', mine ? 'tr' : 'br');
+      // The side columns are outlined but carry no edge label: their count plates already name them ("4 Life",
+      // "30 Deck", "6 Trash", "DON!! deck 3"), and an edge label there would collide with the next zone.
+      for (const k of ['Life', 'DonDeck', 'Trash', 'Deck']) add(g[pre + k], '', '');
+    }
+    return `<div class="pmzones" aria-hidden="true">${Z.join('')}</div>`;
   }
   function slotHTML(c, rect, g, label, emptyLabel) {
     if (!c) return `<div class="slot empty zitem" style="${px(rect)}" role="group" aria-label="${label}, empty">${emptyLabel ? `<span class="zlabel">${emptyLabel}</span>` : ''}</div>`;
@@ -301,14 +417,22 @@
     return `<svg class="arrows" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true">${paths}</svg>`;
   }
 
+  // A card-sized box inside a playmat zone: centred across, at the zone's top (yours) or bottom (opponent's)
+  function cardBox(r, g, mine) {
+    const [cw, ch] = g.card;
+    return [Math.round(r[0] + (r[2] - cw) / 2), mine ? r[1] + 0 : r[1] + r[3] - ch, cw, ch];
+  }
   /* ---------- Board ---------- */
   function renderBoard(el, cfg, opt = {}) {
     const roomy = opt.density ? opt.density === 'roomy' : isRoomy();
-    const g = roomy ? G.roomy : G.compact;
+    const g = cfg.layout === 'playmat' ? playmat(roomy) : (roomy ? G.roomy : G.compact);
     const R = {};
     const [cw, ch] = g.card;
     el.classList.toggle('roomy', roomy);
     el.classList.toggle('face-scan', cfg.face === 'scan');
+    el.classList.toggle('face-text', cfg.face === 'text');
+    el.classList.toggle('pm', !!g.playmat);
+    el.classList.toggle('peek', !!g.peek);
     el.style.setProperty('--card-w', cw + 'px');
     el.style.setProperty('--rh', g.railHead + 'px');
     if (opt.density === 'compact') el.style.cssText += ';--badge-power-size:14px;--badge-num-size:13px;--badge-h:20px;--badge-inset:2px;';
@@ -316,6 +440,7 @@
     let h = '';
     if (!opt.boardOnly) h += `<a class="skiplink" href="#decision" data-skip="decision">${cfg.skipLabel || 'Skip to decision'} <kbd>P</kbd></a>`;
     h += `<div class="mat" style="${px(g.mat)}"></div>`;
+    if (g.playmat) h += pmZones(g);
     // Whose turn, without reading (UX-R12): a 4 px bar along the acting player's half of the mat
     const oppTurn = cfg.mid && cfg.mid.opp;
     if (cfg.turnBar !== false && cfg.mid) h += `<div class="turnbar ${oppTurn ? 'opp' : 'me'}" aria-hidden="true" style="left:0;top:${oppTurn ? 0 : g.mid[1] + g.mid[3] / 2}px;height:${oppTurn ? g.mid[1] + g.mid[3] / 2 : g.H - g.mid[1] - g.mid[3] / 2}px"></div>`;
@@ -334,10 +459,14 @@
     const side = (p, pre, mine) => {
       const L = mine ? 'Your' : 'Opponent’s';
       const given = (p.leader && p.leader.don ? p.leader.don : 0) + (p.chars || []).reduce((a, c) => a + (c && c.don ? c.don : 0), 0);
-      let s = `<div role="group" data-zone="${mine ? 'my' : 'opp'}-row" aria-label="${L} Leader row: DON!!, Life, Leader, Stage, Deck, Trash">`;
-      s += donDeck(`${L} DON!! deck`, p.donDeck ?? 0, g[pre + 'DonDeck'], g);
-      s += costArea(mine ? 'me' : 'opp', g[pre + 'Cost'], g, { ...p, given: p.given ?? given });
-      s += lifeZone(`${L} Life`, p.life === undefined ? 5 : p.life, g[pre + 'Life'], g, mine);
+      const pm = !!g.playmat;
+      let s = `<div role="group" data-zone="${mine ? 'my' : 'opp'}-row" aria-label="${pm ? `${L} field: Life, Leader, Stage, Deck, DON!! deck, cost area, Trash` : `${L} Leader row: DON!!, Life, Leader, Stage, Deck, Trash`}">`;
+      const lifeN = p.life === undefined ? 5 : p.life;
+      const gs = pm && !mine ? { ...g, card: g.oppSmall, tok: [Math.round(g.oppSmall[0] * 0.36), Math.round(g.oppSmall[0] * 0.36 * 88 / 63)] } : g;
+      if (pm) s += lifeCol(`${L} Life`, lifeN, g[pre + 'Life'], g, mine);
+      s += donDeck(`${L} DON!! deck`, p.donDeck ?? 0, pm ? cardBox(g[pre + 'DonDeck'], gs, mine) : g[pre + 'DonDeck'], gs);
+      s += (pm ? costRow : costArea)(mine ? 'me' : 'opp', g[pre + 'Cost'], g, { ...p, given: p.given ?? given });
+      if (!pm) s += lifeZone(`${L} Life`, lifeN, g[pre + 'Life'], g, mine);
       R[(mine ? 'me' : 'opp') + '.life'] = g[pre + 'Life'];
       s += slotHTML(p.leader, g[pre + 'Leader'], g, `${L} Leader`);
       R[(mine ? 'me' : 'opp') + '.leader'] = g[pre + 'Leader'];
@@ -346,8 +475,8 @@
       R[(mine ? 'me' : 'opp') + '.cost'] = g[pre + 'Cost'];
       R[(mine ? 'me' : 'opp') + '.deck'] = g[pre + 'Deck'];
       R[(mine ? 'me' : 'opp') + '.trash'] = g[pre + 'Trash'];
-      s += deckZone(`${L} deck`, p.deck ?? 40, g[pre + 'Deck'], g, (p.deck ?? 40) <= 5);
-      s += trashZone(`${L} trash`, p.trash || { n: 0 }, g[pre + 'Trash'], g);
+      s += deckZone(`${L} deck`, p.deck ?? 40, pm ? cardBox(g[pre + 'Deck'], g, true) : g[pre + 'Deck'], g, (p.deck ?? 40) <= 5);
+      s += trashZone(`${L} trash`, p.trash || { n: 0 }, pm ? cardBox(g[pre + 'Trash'], gs, mine) : g[pre + 'Trash'], gs);
       s += '</div>';
       const cy = mine ? g.myCharY : g.oppCharY;
       const chars = p.chars || [];
@@ -374,7 +503,7 @@
     let pitch = cw + g.handGap;
     if (n > g.handMax) pitch = (hr[2] - cw) / (n - 1);
     const total = n ? cw + (n - 1) * pitch : 0;
-    const startX = g.axis - total / 2;
+    const startX = g.playmat ? Math.max(hr[0], g.axis - total / 2) : g.axis - total / 2;
     let hh = `<div class="z" role="group" data-zone="hand" aria-label="Your hand, ${n} cards" style="left:0;top:0;width:0;height:0">`;
     hand.forEach((c, i) => {
       const r = [startX + i * pitch, hr[1], cw, ch];
@@ -660,5 +789,5 @@
     if (footer) footer.innerHTML = `<span>${DISCLAIMER}</span><span class="spacer"></span><a href="16-settings.html#about">About and sources</a>`;
   }
 
-  window.WF = { scrollCue, G, cardHTML, renderBoard, mountBoard, statesBar, state, chrome, esc, isRoomy, DISCLAIMER, DISCLAIMER_SHORT, installKeys, announce };
+  window.WF = { scrollCue, G, playmat, cardHTML, renderBoard, mountBoard, statesBar, state, chrome, esc, isRoomy, DISCLAIMER, DISCLAIMER_SHORT, installKeys, announce };
 })();

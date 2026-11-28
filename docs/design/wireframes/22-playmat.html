@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Board: playmat layout (M11)</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="wf.css">
+</head>
+<body class="board-page">
+<main class="stage" aria-label="Game: Rocks.D.Xebec (you) vs Kaido (Pirate AI)"></main>
+<div id="announce-polite" class="sr-only" role="status" aria-live="polite"></div>
+<script src="wf.js"></script>
+<script src="cards.js"></script>
+<script src="scenarios.js"></script>
+<script>
+// Real-art preview for the owner's review only: ?art=1 loads a local, uncommitted URL map (art loads at runtime,
+// never committed). Without it, every card is a drawn stand-in.
+if (new URLSearchParams(location.search).has('art')) document.write('<script src="/artmap.js"><\/script>');
+</script>
+<script>
+/*
+ * M11 board: the official playsheet's zone arrangement in our own style (board.md revision 3, DECISIONS 2026-11-28).
+ * Life column left of the Character and Leader rows; Leader on the axis with Stage beside it; Deck right;
+ * DON!! deck, cost area and Trash along each player's own edge. The opponent is mirrored, zones in the same columns.
+ */
+const STATES = [
+  ['main', 'Main phase · full cards'],
+  ['defend', 'Defending · decision tall'],
+  ['raise', 'Hand card raised (hover or focus)'],
+  ['art', 'Setting: Art window'],
+  ['text', 'Setting: Text first'],
+  ['start', 'Empty mat · zone labels'],
+];
+WF.mountBoard((st) => {
+  let s;
+  if (st === 'defend') {
+    const opp = (c) => ({ ...c, who: 'Opponent’s' });
+    s = {
+      boardLabel: 'Game board, turn 8, opponent’s turn, you are defending',
+      opp: {
+        idText: 'Kaido · Pirate AI', hand: 4, donDeck: 0, active: 5, rested: 3, life: 1, deck: 29,
+        leader: opp(K('OP17-058', { r: true, don: 2, p: 7000, st: ['opp-act', 'battle'], chips: [{ t: '⚔ attacking', cls: 'attack', pos: 'below' }], noRestChip: true })),
+        trash: { n: 6, top: K('OP17-077') },
+        chars: [opp(K('OP17-073', { chips: [{ t: 'New' }] })), opp(K('EB04-031')), opp(K('OP17-074')), opp(K('OP17-060', { r: true })), null],
+      },
+      me: {
+        donDeck: 2, active: 3, rested: 5, life: 3, deck: 27,
+        leader: K('OP17-039', { who: 'Your', st: ['battle'] }),
+        trash: { n: 9, top: K('OP17-055') },
+        chars: [null, K('OP17-040'), K('OP17-046'), K('OP17-048', { r: true }), null],
+        hand: [K('OP17-056', { hand: true, st: ['legal'], g: 'play' }), K('OP08-051', { hand: true, st: ['legal'], g: 'play' }), K('OP17-055', { hand: true, st: ['legal'], g: 'play' }), K('OP17-045', { hand: true, st: ['dim'] }), K('OP17-048', { hand: true, st: ['dim'] })],
+      },
+      mid: { turn: 'Turn 8 · Opponent’s turn', opp: true, battle: 'Block' },
+      decisionTall: true,
+      decision: {
+        title: 'Block step · you are defending',
+        body: `<p style="margin:0 0 8px"><b>Kaido attacks your Leader.</b> 7000 vs 5000: you need <b>+3000</b> to stop it.</p>
+          <p class="subtle" style="margin:0">Counter cards are lit in your hand. The panel is the same as today; only the board around it moved.</p>`,
+        foot: `<button class="btn" type="button">No block</button><span class="grow"></span><button class="btn primary big" type="button"><span class="lbl2">Take the hit</span><span class="sub">Life 3 → 2</span></button>`,
+      },
+      log: [SCN.opp(`${SCN.lk('Kaido')} attacks your Leader · 7000 vs 5000`)],
+      arrows: [{ from: 'opp.leader', to: 'me.leader', bend: 0, cut: 40 }],
+    };
+  } else {
+    s = SCN.mainBase();
+    const me = s.me;
+    me.leader.g = 'attack'; me.leader.st = ['legal'];
+    me.chars[2].g = 'attack'; me.chars[2].st = ['legal'];
+    me.donLegal = true;
+    me.hand.forEach((c) => { if (c.playable) { c.g = 'play'; c.st = ['legal']; } });
+    me.hand.push(K('OP17-048', { hand: true }));
+    if (st === 'raise') me.hand[3].st = ['legal', 'raised', 'wf-focus'];
+    s.decision = {
+      title: 'Your Main phase',
+      body: `<p style="margin:0 0 6px">Play a card, give DON!!, attack, or end your turn.</p>
+        <ul style="margin:0;padding-left:16px;line-height:20px">
+          <li><b>2 can attack:</b> your Leader, Shiki <span class="subtle">(⚔)</span></li>
+          <li><b>3 cards playable</b> from hand <span class="subtle">(▶)</span></li>
+          <li><b>2 DON!! active</b> · click your cost area to give</li>
+        </ul>`,
+      foot: `${SCN.rewind}<a class="btn primary big" data-key="E" href="#" aria-label="End turn (E). 2 can attack, 2 DON!! unused"><span class="lbl2">End turn <kbd>E</kbd></span><span class="sub">2 can attack · 2 DON!! unused</span></a>`,
+    };
+    if (st === 'start') {
+      s = { ...s, boardLabel: 'Game board before the first turn', opp: { idText: 'Kaido · Pirate AI', hand: 5, donDeck: 10, active: 0, rested: 0, life: 5, deck: 45, leader: { ...K('OP17-058'), who: 'Opponent’s' }, chars: [null, null, null, null, null], trash: { n: 0 } },
+        me: { donDeck: 10, active: 0, rested: 0, life: 5, deck: 45, leader: K('OP17-039', { who: 'Your' }), chars: [null, null, null, null, null], trash: { n: 0 }, hand: me.hand.slice(0, 5).map((c) => ({ ...c, st: [], g: '' })) },
+        mid: { turn: 'Turn 1 · Your turn', phase: 'Main' } };
+    }
+  }
+  s.layout = 'playmat';
+  s.face = st === 'art' ? 'art' : st === 'text' ? 'text' : 'scan';
+  return s;
+}, STATES);
+</script>
+</body>
+</html>

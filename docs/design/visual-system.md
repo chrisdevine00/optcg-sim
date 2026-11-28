@@ -1,6 +1,6 @@
 # Visual system
 
-**As of:** 2026-10-28 (Phase 4, revision 2: review-1 fixes)
+**As of:** 2026-11-28 (M11: §1 revised for the full card face and the playmat arrangement, on the owner's decision). Revision 2 (2026-10-28) is in git history.
 **Tokens:** `docs/design/tokens.css`. That file is the source of truth for every value below. M0 copies it to `app/src/styles/tokens.css`.
 **Contrast check:** `.cache/design/contrast.mjs` parses `tokens.css` and checks every declared pair. M0 moves it into the build, where any failing pair fails CI (PLAN, M0 done criteria).
 **Related:** `principles.md` (6: art is the hero), `board.md` (geometry, badges, pacing), `card-face-study.md`.
@@ -8,6 +8,10 @@
 ## 1. Stance
 
 The product should feel like a well-made instrument: a quiet slate surface, precise numbers, and colour reserved for the cards and for state. It must not look like the official One Piece Card Game. That brand uses red, black and gold, heavy condensed italic display type, and rope, compass and pirate motifs, and we use none of them. There are no textures, no gloss, and no gradients on chrome. Our card backs and DON!! tokens are our own geometric designs and never imitate the printed ones.
+
+**M11 (owner's decision, 2026-11-28).** Two things move toward the real game, and the stance holds for everything else:
+- **Cards are the full official scan** on the board, in the hand and in previews, SAMPLE watermark included (`card-face-study.md` §6). The scan is the one place the printed card's frame and colours appear; our plates sit on top of it.
+- **The board follows the official playsheet's zone arrangement** (`board.md` §1, §3.15, PD-7): Character area nearest the midline, Life at the left, Leader and Stage in the middle, Deck and Trash at the right, DON!! deck and cost area along each player's edge. It is drawn only with our own mat tokens (`--color-mat`, `--color-mat-zone`, `--color-mat-line`) and our own small-caps labels in Inter. The playsheet's artwork, logo, numbered callouts, red frames and display lettering are never used.
 
 Four rules follow from that stance:
 1. **Chrome is close to the mat.** Surfaces step 1–3% in lightness from the playmat. Separation comes from spacing and thin lines, not contrast blocks.
