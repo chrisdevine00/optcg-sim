@@ -29,14 +29,21 @@ function walk(dir: string, out: string[] = []): string[] {
   return out;
 }
 
-/** What a fixture's validity depends on: the engine, the effect scripts and the card data. */
+/**
+ * What a fixture's validity depends on: the engine, the effect scripts, the card data, and the AI
+ * that plays it with its priors (the meta lists and the play-frequency table).
+ */
 function inputsKey(): string {
   const h = createHash('sha1');
-  for (const dir of ['engine/src', 'cards/effects', 'cards/data/sets'])
+  for (const dir of ['engine/src', 'cards/effects', 'cards/data/sets', 'ai/src'])
     for (const f of walk(dir).sort()) {
       const s = statSync(f);
       h.update(`${f}:${s.size}:${Math.round(s.mtimeMs)}`);
     }
+  for (const f of ['cards/data/play-frequency.json', 'docs/research/meta-lists.json']) {
+    const s = statSync(f);
+    h.update(`${f}:${s.size}:${Math.round(s.mtimeMs)}`);
+  }
   return h.digest('hex');
 }
 

@@ -31,7 +31,7 @@ export interface FixtureOptions {
   seed?: number;
   /** Fewest decisions; default 300. */
   min?: number;
-  /** Seeds to try before settling for the longest; default 12. */
+  /** Seeds to try before settling for the longest; default 40 (games take 1 to 2 s each). */
   tries?: number;
   /** Progress lines (the CLI passes console.error). */
   log?: (line: string) => void;
@@ -41,7 +41,7 @@ export function makeFixture(opts: FixtureOptions = {}): Fixture {
   const min = opts.min ?? 300;
   const base = opts.seed ?? 70_001;
   let best: Fixture | null = null;
-  for (let t = 0; t < (opts.tries ?? 12); t++) {
+  for (let t = 0; t < (opts.tries ?? 40); t++) {
     const g = playRecord(base + t, { p1: 'pirate', p2: 'pirate' });
     opts.log?.(
       `seed ${g.seed}: ${g.record.actions.length} actions, ${Math.round(g.playMs / 1000)} s`,
