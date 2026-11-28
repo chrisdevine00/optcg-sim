@@ -1,16 +1,6 @@
 /** EB03-026 Boa Hancock. */
 import { describe, expect, it } from 'vitest';
-import {
-  BLUE,
-  dec,
-  don,
-  expectDecision,
-  giveMostEach,
-  pick,
-  play,
-  times,
-  V,
-} from './helpers.ts';
+import { BLUE, dec, don, expectDecision, giveMostEach, pick, play, times, V } from './helpers.ts';
 import { activate, cardsIn, mk, offeredAb } from './helpers-eb03g1.ts';
 
 const ID = 'EB03-026';
