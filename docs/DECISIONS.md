@@ -2,6 +2,12 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-28 — OP-18 rest of the set: 89 cards in four groups, wave G3–G6, OP18-117 held
+
+- **Context:** after the slice, 103 OP-18 cards were left: 7 vanilla, 89 expressible, 7 behind gaps G3–G7 (`docs/research/m6b-audit/OP-18.md`). All seven gap cards are played (Abyss Pentagram in 62 Gunko lists; the CP cards 7 to 16 each; Buster Call 10).
+- **Decision:** the 89 were scripted by four agents in their own worktrees from one brief (overrides verified against the official OP-18 page, the audit's proposed readings, ~5 author tests each), merged and regenerated here. Wave G3–G6, each with a planted test that fails when reverted (`engine/test/cards/m6b-op18/g3-g6.test.ts`): G3 a hand or trash card to the top or bottom of Life face-up (`move` to Life with `topOrBottom`, the end asked once); G4 `lifeToHand { n: 'all' }` and `trashLife: 'all'`, payable with any number of Life cards (M6b-Q97); G5 the permanent `playCost` on cards in your hand, read in `playCostOf` on the card's cost before the reduction; G6 `activate { ability: 'trigger', of }` on a revealed hand card (M6b-Q98). Six cards scripted on them (OP18-020, -097, -099, -100, -101, -105). No `ENGINE_VERSION` bump: no earlier script uses these shapes (goldens unchanged). G7 (play from a searched deck, shuffle) is size L (a hidden deck search in the view and a shuffle event) and is held: OP18-117 stays stats-only (BACKLOG §15).
+- **Rejected:** writing all 89 here serially (hours of elapsed time for no gain in review quality, since blind tests and an adversarial review follow); approximating Buster Call without a real deck search (it would let a player play cards they could not have found, or hide the search from no one).
+
 ## 2026-11-28 — M11 Track C: Franky (OP18-021) and Monkey.D.Luffy Green/Purple (EB02-010) as the 13th and 14th archetypes
 
 - **Context:** the owner wants to practise these two Leaders, play them and against them. Both have results only below the top 8 (EB02-010 15th of 121, OP18-021 28th of 121 and of 60 in ChinoizeCup #136 and #138, 2026-11-16 to 18), no written deck guide was read for either, and OP-18 is two weeks old.
