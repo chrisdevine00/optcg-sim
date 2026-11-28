@@ -21,7 +21,8 @@ test('the service worker caches card images in a production build', async ({ con
       headers: { 'access-control-allow-origin': '*' },
     });
   });
-  await page.goto('./cards');
+  // OP-17: a set with images (the newest set, OP-18, comes from Limitless and has none yet, ADR 0015).
+  await page.goto('./cards?set=OP-17');
   await page.waitForFunction(() => navigator.serviceWorker.controller !== null, null, {
     timeout: 15_000,
   });

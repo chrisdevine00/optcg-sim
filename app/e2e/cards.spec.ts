@@ -21,7 +21,17 @@ const load = (code: string) =>
     ) as { cards: C[] }
   ).cards;
 const op17 = load('OP-17');
-const NEWEST = 'OP-17 (newest set)';
+/** The newest set opens by default. OP-18 comes from Limitless card pages and has no images yet
+ * (ADR 0015), so the art tests pick OP-17, a set with images, explicitly. */
+const NEWEST_CODE = (
+  JSON.parse(readFileSync(new URL('../../cards/data/manifest.json', import.meta.url), 'utf8')) as {
+    newestSet: string;
+  }
+).newestSet;
+const newest = load(NEWEST_CODE);
+const NEWEST = `${NEWEST_CODE} (newest set)`;
+const N0 = newest[0]!.id;
+const N2 = newest[2]!.id;
 const SCRIPTED = new Set(SCRIPTED_ID_LIST);
 /** Cards that do not play fully (the coverage report's backlog): keyword-only cards such as a
  * plain [Blocker] have effect text but play fully without a script, so effect text alone is not
@@ -81,16 +91,19 @@ async function expectNoAxeViolations(page: Page) {
 }
 
 test.describe('card browser', () => {
-  test('opens from the home page and shows the newest set with art', async ({ page }) => {
+  test('opens from the home page on the newest set; a set with images shows art', async ({
+    page,
+  }) => {
     await serveArt(page);
     await page.goto('./');
     await page.getByRole('link', { name: /Browse .* cards/ }).click();
     await expect(page).toHaveURL(/\/optcg-sim\/cards$/);
     await expect(page).toHaveTitle('Cards · OPTCG Sim');
     await expect(page.getByRole('heading', { name: 'Cards', level: 1 })).toBeVisible();
-    await expect(status(page)).toHaveText(`${op17.length} cards in ${NEWEST}`);
-    await expect(tile(page, 'OP17-001').locator('.face')).toHaveAttribute('data-art', 'image');
+    await expect(status(page)).toHaveText(`${newest.length} cards in ${NEWEST}`);
     await expect(page.getByText('unofficial, non-commercial fan tool')).toBeVisible();
+    await page.goto('./cards?set=OP-17');
+    await expect(tile(page, 'OP17-001').locator('.face')).toHaveAttribute('data-art', 'image');
     await expectNoAxeViolations(page);
   });
 
@@ -124,12 +137,12 @@ test.describe('card browser', () => {
     page,
   }) => {
     await serveArt(page);
-    await page.goto('./cards');
+    await page.goto('./cards?set=OP-17');
     await page.getByRole('button', { name: 'Blue', exact: true }).click();
     await page.getByRole('button', { name: 'Leader', exact: true }).click();
     const expected = op17.filter((c) => c.category === 'Leader' && c.colors.includes('Blue'));
     await expect(status(page)).toHaveText(
-      `${expected.length} card${expected.length === 1 ? '' : 's'} in ${NEWEST}`,
+      `${expected.length} card${expected.length === 1 ? '' : 's'} in OP-17`,
     );
     const names = await page
       .locator('.card-btn .sr-only')
@@ -140,7 +153,7 @@ test.describe('card browser', () => {
     await expect(chips.getByRole('button', { name: 'Remove filter Colour: Blue' })).toBeVisible();
     await expect(page).toHaveURL(/color=Blue&category=Leader/);
     await chips.getByRole('button', { name: 'Clear all' }).click();
-    await expect(status(page)).toHaveText(`${op17.length} cards in ${NEWEST}`);
+    await expect(status(page)).toHaveText(`${op17.length} cards in OP-17`);
   });
 
   test('empty results say what was searched and offer a way out', async ({ page }) => {
@@ -196,7 +209,7 @@ test.describe('card browser', () => {
   test('keyboard path: search to results in one key, arrows, open and close', async ({ page }) => {
     await serveArt(page);
     await page.goto('./cards');
-    await expect(tile(page, 'OP17-001')).toBeVisible();
+    await expect(tile(page, N0)).toBeVisible();
     await page.keyboard.press('/');
     await expect(page.getByRole('searchbox', { name: /Search cards/ })).toBeFocused();
     await page.keyboard.type('Kaido');
@@ -218,7 +231,7 @@ test.describe('card browser', () => {
     await expect(page).not.toHaveURL(/card=/);
     // From page load: the first Tab reaches "Skip to results", which lands on the grid.
     await page.goto('./cards');
-    await expect(tile(page, 'OP17-001')).toBeVisible();
+    await expect(tile(page, N0)).toBeVisible();
     await page.keyboard.press('Tab');
     await expect(page.getByRole('link', { name: 'Skip to results' })).toBeFocused();
     await page.keyboard.press('Enter');
@@ -230,7 +243,7 @@ test.describe('card browser', () => {
     await serveArt(page);
     await page.emulateMedia({ forcedColors: 'active' });
     await page.goto('./cards');
-    await expect(tile(page, 'OP17-001')).toBeVisible();
+    await expect(tile(page, N0)).toBeVisible();
     await page.getByRole('searchbox', { name: /Search cards/ }).press('ArrowDown');
     await expectFocusAt(page, '0');
     const ring = await page.evaluate(() => {
@@ -251,7 +264,7 @@ test.describe('card browser', () => {
     await serveArt(page);
     await page.setViewportSize({ width: 320, height: 180 });
     await page.goto('./cards');
-    await expect(status(page)).toHaveText(`${op17.length} cards in ${NEWEST}`);
+    await expect(status(page)).toHaveText(`${newest.length} cards in ${NEWEST}`);
     const m = await page.evaluate(() => {
       const box = (s: string) => document.querySelector(s)!.getBoundingClientRect();
       return {
@@ -265,8 +278,8 @@ test.describe('card browser', () => {
     expect(m.count.top).toBeGreaterThanOrEqual(m.header.bottom);
     expect(m.results.width).toBeGreaterThan(250);
     expect(m.results.height).toBeGreaterThanOrEqual(180);
-    await tile(page, 'OP17-001').scrollIntoViewIfNeeded();
-    await expect(tile(page, 'OP17-001')).toBeInViewport();
+    await tile(page, N0).scrollIntoViewIfNeeded();
+    await expect(tile(page, N0)).toBeInViewport();
     // Filters sit behind a button, and open above the results.
     await page.getByRole('button', { name: 'Filters' }).click();
     await expect(page.getByLabel('Set', { exact: true })).toBeVisible();
@@ -319,11 +332,11 @@ test.describe('card browser', () => {
   }) => {
     await serveArt(page);
     await page.goto('./cards');
-    await tile(page, 'OP17-003').click();
+    await tile(page, N2).click();
     await expect(page.getByRole('dialog')).toBeVisible();
     await page.goBack();
     await expect(page.getByRole('dialog')).toBeHidden();
-    await expect(tile(page, 'OP17-003')).toBeFocused();
+    await expect(tile(page, N2)).toBeFocused();
     await page.goto('./cards?set=OP-17&card=OP17-005');
     await expect(page.getByRole('dialog')).toBeVisible();
     await page.keyboard.press('Escape');
@@ -385,7 +398,7 @@ test.describe('card browser', () => {
     page,
   }) => {
     await page.route(IMAGES, (r) => r.abort('blockedbyclient'));
-    await page.goto('./cards');
+    await page.goto('./cards?set=OP-17');
     const face = tile(page, 'OP17-039').locator('.face');
     await expect(face).toHaveAttribute('data-art', 'text');
     await expect(face.locator('.face-text-body')).toContainText('[When Attacking]');
@@ -405,15 +418,15 @@ test.describe('card browser', () => {
   test('a set that fails to load says so and can be retried', async ({ page }) => {
     await serveArt(page);
     let fail = true;
-    await page.route(/\/assets\/OP-17-[^/]*\.js$/, (r) =>
+    await page.route(new RegExp(`/assets/${NEWEST_CODE}-[^/]*\\.js$`), (r) =>
       fail ? r.abort('failed') : r.continue(),
     );
     await page.goto('./cards');
-    await expect(status(page)).toHaveText("Couldn't load OP-17");
+    await expect(status(page)).toHaveText(`Couldn't load ${NEWEST_CODE}`);
     await expect(page.getByRole('alert')).toContainText("The card list didn't load");
     fail = false;
     await page.getByRole('button', { name: 'Retry' }).click();
-    await expect(status(page)).toHaveText(`${op17.length} cards in ${NEWEST}`);
+    await expect(status(page)).toHaveText(`${newest.length} cards in ${NEWEST}`);
   });
 
   // M4b: coverage shown in the browser.

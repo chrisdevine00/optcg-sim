@@ -389,7 +389,7 @@ test.describe('Content-Security-Policy', () => {
 
     // Home, with art served: images from the allowed host load.
     await serveArt(page);
-    await page.goto('./cards');
+    await page.goto('./cards?set=OP-17'); // a set with images (OP-18 has none yet, ADR 0015)
     await expect(page.locator('.face[data-art="image"]').first()).toBeVisible({ timeout: 20_000 });
 
     // A Rookie turn: the AI answers from its worker, so a blocked worker would stall here.
@@ -438,7 +438,7 @@ test.describe('Content-Security-Policy', () => {
     // The fallback: every art host fails, the card is drawn as text.
     await page.unroute(/https:\/\/(optcgapi\.com|optcg-api\.arjunbansal-ai\.workers\.dev)\/.*/);
     await page.route(/https:\/\/optcgapi\.com\/.*/, (r) => r.abort());
-    await page.goto('./cards');
+    await page.goto('./cards?set=OP-17');
     await expect(page.locator('.face[data-art="text"]').first()).toBeVisible({ timeout: 20_000 });
 
     expect(await csp.violations()).toEqual([]);
