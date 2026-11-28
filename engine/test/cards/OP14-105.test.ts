@@ -1,6 +1,16 @@
 /** OP14-105 Gorgon Sisters. */
 import { describe, expect, it } from 'vitest';
-import { BLUE, don, expectDecision, game, hand, pick, PLAIN_BLUE, V } from './helpers.ts';
+import {
+  BLUE,
+  don,
+  expectDecision,
+  game,
+  giveMostEach,
+  hand,
+  pick,
+  PLAIN_BLUE,
+  V,
+} from './helpers.ts';
 import { HANCOCK, KUJA, LILY, ROSI } from './helpers-hancock-rosi.ts';
 import { damageWith } from './triggers.ts';
 
@@ -27,6 +37,7 @@ describe('OP14-105 Gorgon Sisters', () => {
       g.find('p1', 'hand', KUJA, 1),
       g.find('p1', 'hand', LILY),
     ]);
+    giveMostEach(g);
     expect(g.eventsOfType('CardRevealed').filter((e) => e.reason === 'cost')).toHaveLength(3);
     expect(hand(g, 'p1')).toHaveLength(4);
     expect(g.card(g.leader('p1')).don).toBe(1);
@@ -61,6 +72,7 @@ describe('OP14-105 Gorgon Sisters', () => {
     ]);
     expectDecision(g, 'choose', 'p1');
     pick(g, [g.leader('p1'), g.find('p1', 'characters', KUJA)]);
+    giveMostEach(g);
     expect(g.card(g.leader('p1')).don).toBe(1);
     expect(g.card(g.find('p1', 'characters', KUJA)).don).toBe(1);
     expect(g.card(g.find('p1', 'characters', 'OP14-105')).don).toBe(0);

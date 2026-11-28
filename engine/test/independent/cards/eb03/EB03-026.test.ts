@@ -37,6 +37,7 @@ import {
   zoneIds,
 } from './kit-eb03a.ts';
 import { act } from '../../helpers.ts';
+import { giveMostEach } from '../../../cards/helpers.ts';
 
 const HANCOCK = 'EB03-026';
 
@@ -119,6 +120,7 @@ describe("EB03-026 Boa Hancock: [Activate: Main] [Once Per Turn] place 1 of your
     pickInst(g, [chr(g, 'p1', SA.marco)]);
     need(g, 'choose', 'p1');
     pickInst(g, [chr(g, 'p1', SA.sai)]);
+    giveMostEach(g); // "up to 1 ... each": 1 or none per target (OP-18 review R8)
     expect(zoneIds(g, 'p1', 'characters')).toEqual([HANCOCK, SA.sai].sort());
     expect(donOf(g, 'p1')).toMatchObject({ active: 4, rested: 1, given: 2 });
     expect(g.power(g.leader('p1'))).toBe(6000);
@@ -143,6 +145,7 @@ describe("EB03-026 Boa Hancock: [Activate: Main] [Once Per Turn] place 1 of your
     pickInst(g, [chr(g, 'p1', HANCOCK)]);
     need(g, 'choose', 'p1');
     pickInst(g, [chr(g, 'p1', SA.sai)]);
+    giveMostEach(g);
     expect(zoneIds(g, 'p1', 'characters')).toEqual([SA.marco, SA.sai].sort());
     expect(deck(g, 'p1').at(-1)).toBe(HANCOCK);
     expect(donOf(g, 'p1')).toMatchObject({ given: 2 });
@@ -190,6 +193,7 @@ describe("EB03-026 Boa Hancock: [Activate: Main] [Once Per Turn] place 1 of your
     useYes(g, h);
     pickInst(g, [chr(g, 'p1', SA.marco)]);
     pickInst(g, [chr(g, 'p1', SA.sai)]);
+    giveMostEach(g);
     need(g, 'main', 'p1');
     expect(offeredAbilities(g, h)).toEqual([]);
   });

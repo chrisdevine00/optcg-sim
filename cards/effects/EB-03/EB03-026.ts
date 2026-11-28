@@ -90,6 +90,7 @@ export const EB03_026: CardScript = {
               n: 1,
               state: 'rested',
               each: true,
+              upTo: true,
               to: {
                 from: ['leader', 'characters'],
                 owner: 'you',

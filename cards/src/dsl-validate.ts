@@ -1283,9 +1283,12 @@ function action(c: Ctx, path: string, v: unknown): void {
       if (x.uses !== 1) err(c, `${p}.uses`, 'only uses = 1 is implemented');
       return;
     case 'giveDon':
-      fields(c, p, x, ['n', 'state', 'to'], ['each', 'from']);
+      fields(c, p, x, ['n', 'state', 'to'], ['each', 'from', 'upTo']);
       if (!isObj(x)) return;
       num(c, `${p}.n`, x.n);
+      // "up to N ... each" (OP-18 review R8): each target's count may be 0; only with `each`.
+      if (x.upTo !== undefined && (x.upTo !== true || x.each !== true))
+        err(c, `${p}.upTo`, 'expected true, with each');
       if (x.from !== undefined && x.from !== 'opponent') err(c, `${p}.from`, 'expected "opponent"');
       // The opponent's DON!! go to the opponent's own card, one target (G20); `any` (active or
       // rested, the giver's choice) is only for that form.

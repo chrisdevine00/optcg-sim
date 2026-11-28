@@ -23,6 +23,7 @@ export const OP18_046: CardScript = {
               n: 2,
               state: 'rested',
               each: true,
+              upTo: true,
               to: { from: ['leader', 'characters'], owner: 'you' },
             },
           },

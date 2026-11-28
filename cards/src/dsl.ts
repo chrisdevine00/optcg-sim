@@ -595,6 +595,11 @@ export type Action =
         to: Selector;
         each?: true;
         /**
+         * "up to N ... each" (OP-18 review R8): every target's count runs from N down to 0, so a
+         * target with no pick ("your Leader and all of your Characters") can still be given none.
+         */
+        upTo?: true;
+        /**
          * Give the opponent's DON!! to the opponent's own Leader or Characters (G20): the giver
          * chooses which DON!! and which card; they return to their owner at Refresh (CR 6-2-3).
          */

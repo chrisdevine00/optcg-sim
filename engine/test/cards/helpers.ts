@@ -159,3 +159,16 @@ export const hand = (g: TestGame, p: PlayerId): CardId[] => g.zone(p, 'hand').ma
 export const trash = (g: TestGame, p: PlayerId): CardId[] => g.zone(p, 'trash').map((c) => c.card);
 export const don = (g: TestGame, p: PlayerId) => queries.don(g.state, p);
 export const types = (g: TestGame): string[] => g.events.map((e) => e.type);
+
+/**
+ * Answer every open "how many DON!! will you give to X" question with the most (giveDon `each` over
+ * targets with no pick asks 0..N per target since OP-18 review R8).
+ */
+export function giveMostEach(g: TestGame): void {
+  for (;;) {
+    const d = dec(g);
+    if (d?.kind !== 'choose' || !/will you give to/.test(d.prompt ?? '') || !d.options?.length)
+      return;
+    g.act({ type: 'pick', choice: { option: d.options[0]!.id } });
+  }
+}

@@ -1,6 +1,16 @@
 /** EB03-026 Boa Hancock. */
 import { describe, expect, it } from 'vitest';
-import { BLUE, dec, don, expectDecision, pick, play, times, V } from './helpers.ts';
+import {
+  BLUE,
+  dec,
+  don,
+  expectDecision,
+  giveMostEach,
+  pick,
+  play,
+  times,
+  V,
+} from './helpers.ts';
 import { activate, cardsIn, mk, offeredAb } from './helpers-eb03g1.ts';
 
 const ID = 'EB03-026';
@@ -49,6 +59,7 @@ describe('EB03-026 Boa Hancock [Activate: Main]', () => {
     pick(g, [g.find('p1', 'characters', V.c1)]); // the cost
     expect(g.zone('p1', 'deck').at(-1)!.card).toBe(V.c1);
     pick(g, [g.find('p1', 'characters', V.c2)]); // the Character to be given DON!!
+    giveMostEach(g); // "up to 1" each: 1 or none per target (OP-18 review R8)
     expectDecision(g, 'main', 'p1');
     expect(g.card(g.leader('p1')).don).toBe(1);
     expect(g.card(g.find('p1', 'characters', V.c2)).don).toBe(1);
@@ -70,6 +81,7 @@ describe('EB03-026 Boa Hancock [Activate: Main]', () => {
     pick(g, [g.find('p1', 'characters', ID)]);
     expect(g.zone('p1', 'deck').at(-1)!.card).toBe(ID);
     pick(g, [g.find('p1', 'characters', V.c1)]);
+    giveMostEach(g);
     expect(g.card(g.leader('p1')).don).toBe(1);
     expect(g.card(g.find('p1', 'characters', V.c1)).don).toBe(1);
   });
@@ -77,6 +89,7 @@ describe('EB03-026 Boa Hancock [Activate: Main]', () => {
   it('with only Hancock on the field: the cost places her, and the Leader still gets a DON!!', () => {
     const g = start(3, [ID]);
     activate(g, g.find('p1', 'characters', ID), 'give-don'); // the only Character: paid without a choice
+    giveMostEach(g);
     expect(cardsIn(g, 'p1', 'characters')).toEqual([]);
     expect(g.card(g.leader('p1')).don).toBe(1);
   });
@@ -87,6 +100,7 @@ describe('EB03-026 Boa Hancock [Activate: Main]', () => {
     pick(g, [g.find('p1', 'characters', V.c1)]);
     pick(g, [g.find('p1', 'characters', V.c2)]);
     pick(g, [g.find('p1', 'characters', V.c2)]); // the one DON!! goes to the Character
+    giveMostEach(g);
     expectDecision(g, 'main', 'p1');
     expect(g.card(g.leader('p1')).don).toBe(0);
     expect(g.card(g.find('p1', 'characters', V.c2)).don).toBe(1);

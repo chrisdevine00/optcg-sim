@@ -17,3 +17,5 @@ Two tests are kept as `it.fails`. Everything else in group D (32 cards) passes.
 - Test: `OP18-080.test.ts`, "with OP09-081 Teach, trashing a card ... draws 1".
 
 **Settled (review, 2026-11-28):** OP18-046 — the engine deviates from "up to" when the targets are "all of your Characters" (no target pick): OP18-R8, severity 2, carried to BACKLOG §15 (the fix changes `giveDon each` for older cards too, so it needs an ENGINE_VERSION bump and new goldens). OP18-080 — not a script fault: OP09-081 Teach is unscripted (BACKLOG D5), OP18-R12. Both `it.fails` stay until those land.
+
+**OP18-046 fixed (2026-11-28, ENGINE_VERSION 0.5.19):** `giveDon` gained `upTo` ("up to N ... each"); with no target pick every count now offers 0. The test is a normal test again.

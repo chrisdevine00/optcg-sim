@@ -41,9 +41,13 @@ describe('OP13-042 Edward.Newgate', () => {
     pick(g, [g.find('p1', 'hand', V.c1)]);
     pick(g, [g.find('p1', 'characters', V.c2)]);
     const d = expectDecision(g, 'choose', 'p1');
-    expect(d.options!.map((o) => o.label)).toEqual(['2 DON!!', '1 DON!!']);
+    // "Up to 2 ... each" with no target pick: 0 is offered too (OP-18 review R8, E-Q11).
+    expect(d.options!.map((o) => o.label)).toEqual(['2 DON!!', '1 DON!!', 'None']);
     g.act({ type: 'pick', choice: { option: d.options![1]!.id } });
     expect(g.card(g.leader('p1')).don).toBe(1);
+    const e = expectDecision(g, 'choose', 'p1');
+    g.act({ type: 'pick', choice: { option: e.options!.at(-1)!.id } }); // none to the Character
+    expect(g.card(g.find('p1', 'characters', V.c2)).don).toBe(0);
   });
 
   it('with no other Character, Edward himself is the one Character that gets the DON!!', () => {

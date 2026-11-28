@@ -65,8 +65,9 @@ describe('OP14-105 Gorgon Sisters [Activate: Main]: reveal 3 Amazon Lily/Kuja ca
   it('only Amazon Lily / Kuja Pirates cards can be revealed (Marco is not offered)', () => {
     const g = game();
     activate(g, g.find('p1', 'characters', GORGON));
-    // Picks of an unordered set are made in canonical order, so assert on the reachable sets.
-    expect([...reachablePickSets(g)]).toEqual([
+    // Picks of an unordered set are made in canonical order, so assert on the reachable sets. Depth 3:
+    // the reveal is exactly 3; the per-target DON!! counts asked after it are not reveal picks.
+    expect([...reachablePickSets(g, 3)]).toEqual([
       [V.kuja8, V.salomeKuja, V.sweetpea].sort().join('+'),
     ]);
   });

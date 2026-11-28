@@ -2154,15 +2154,26 @@ function giveDon(
       ids = picked;
       f.tmp = { ...f.tmp, sel: ids, give: 0 };
     }
+    // "Up to N ... each" with no target pick ("your Leader and all of your Characters up to 2 ...
+    // each", OP18-046, OP14-105, OP13-042, EB03-026): no target can be skipped by choosing fewer,
+    // so each count also offers 0 and nothing is reserved for later targets (E-Q11, CR 4-8-1;
+    // review OP18-R8). Without `upTo` every target gets at least one, as before.
+    const noPick = !g.to.pick && g.upTo === true;
     for (let i = f.tmp?.give ?? 0; i < ids.length; i++) {
       const id = ids[i]!;
-      const hi = Math.min(per, d.ro(you)[key] - (ids.length - i - 1));
-      if (hi <= 0) break;
+      const hi = noPick
+        ? Math.min(per, d.ro(you)[key])
+        : Math.min(per, d.ro(you)[key] - (ids.length - i - 1));
+      if (hi <= 0) {
+        if (noPick) continue;
+        break;
+      }
+      const lo = noPick ? 0 : 1;
       let k = hi;
-      if (hi > 1) {
+      if (hi > lo) {
         const got = take(f);
         if (!Array.isArray(got)) {
-          const counts = Array.from({ length: hi }, (_, j) => hi - j);
+          const counts = Array.from({ length: hi - lo + 1 }, (_, j) => hi - j);
           return ask(d, f, {
             kind: 'choose',
             player: you,
@@ -2172,12 +2183,12 @@ function giveDon(
             candidates: counts.map((j) => ({ option: String(j) })) as never,
             picked: [],
             role: 'mode',
-            options: counts.map((j) => ({ id: String(j), label: `${j} DON!!` })),
+            options: counts.map((j) => ({ id: String(j), label: j === 0 ? 'None' : `${j} DON!!` })),
           });
         }
-        k = Math.min(hi, Math.max(1, Number((got[0] as { option: string }).option)));
+        k = Math.min(hi, Math.max(lo, Number((got[0] as { option: string }).option)));
       }
-      give(id, k);
+      if (k > 0) give(id, k);
       f.tmp = { ...f.tmp, give: i + 1 };
     }
     return 'next';

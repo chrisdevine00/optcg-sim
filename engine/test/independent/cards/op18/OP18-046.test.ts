@@ -111,7 +111,8 @@ describe('OP18-046 Mr.0 & Ms. All Sunday: [On Play] draw 2, give the Leader and 
     expect(donOf(g, 'p1')).toMatchObject({ rested: 5, given: 4 });
   });
 
-  it.fails('"up to 2": a target may be given 0 (the count question offers 0, CR 8-4-4-1)', () => {
+  // Settled: OP-18 review R8 fixed in ENGINE_VERSION 0.5.19 (DISAGREEMENTS-d.md).
+  it('"up to 2": a target may be given 0 (the count question offers 0, CR 8-4-4-1)', () => {
     const g = onPlay();
     play(g, g.find('p1', 'hand', MR0));
     const d = need(g, 'choose', 'p1');
