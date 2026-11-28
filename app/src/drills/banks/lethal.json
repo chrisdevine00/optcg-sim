@@ -2,7 +2,7 @@
   "drill": "lethal",
   "builtWith": {
     "engine": "0.5.18",
-    "scripts": "scripts-09d06b01"
+    "scripts": "scripts-6bbd0f97"
   },
   "items": [
     {
@@ -1920,6 +1920,1035 @@
       "answer": {
         "lethal": false,
         "reason": "attackers"
+      }
+    },
+    {
+      "id": "lethal-1000005",
+      "drill": "lethal",
+      "lesson": "L15-lethal-math",
+      "source": {
+        "kind": "bank",
+        "seed": 1000005
+      },
+      "mine": "OP18-021",
+      "theirs": "OP17-039",
+      "first": false,
+      "certainty": "any-hand",
+      "label": "any-hand",
+      "scenario": {
+        "seed": 1000005,
+        "turn": 4,
+        "activePlayer": "p1",
+        "firstPlayer": "p2",
+        "p1": {
+          "leader": "OP18-021",
+          "hand": ["EB02-035", "OP18-038", "OP18-075"],
+          "deck": ["OP18-034", "OP18-077", "EB02-017", "OP12-037", "EB02-035", "ST18-004"],
+          "life": ["OP12-037", "EB02-061", "OP18-061", "OP18-075"],
+          "characters": [
+            "ST18-004",
+            "ST18-004",
+            "ST18-004",
+            {
+              "card": "OP18-070",
+              "playedThisTurn": true,
+              "rested": false
+            }
+          ],
+          "costArea": {
+            "active": 3,
+            "rested": 1
+          }
+        },
+        "p2": {
+          "leader": "OP17-039",
+          "hand": ["OP17-055"],
+          "deck": ["OP17-044", "OP08-051", "OP17-118", "OP17-045", "OP17-049", "OP17-054"],
+          "life": ["OP17-056"],
+          "characters": [],
+          "costArea": {
+            "active": 1,
+            "rested": 2
+          }
+        }
+      },
+      "prefix": [],
+      "hand": "harder",
+      "answer": {
+        "lethal": true,
+        "actions": [
+          {
+            "type": "attack",
+            "attacker": "$w221c8i",
+            "target": "$muti5nr",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$hsop7yr",
+            "target": "$muti5nr",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$cxankds",
+            "target": "$muti5nr",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$22yrtx4",
+            "target": "$muti5nr",
+            "player": "p1"
+          }
+        ],
+        "line": [
+          "Attack their Leader with your Leader.",
+          "Attack their Leader with Zoro-Juurou.",
+          "Attack their Leader with Zoro-Juurou.",
+          "Attack their Leader with Zoro-Juurou."
+        ]
+      }
+    },
+    {
+      "id": "lethal-1000017",
+      "drill": "lethal",
+      "lesson": "L15-lethal-math",
+      "source": {
+        "kind": "bank",
+        "seed": 1000017
+      },
+      "mine": "OP18-021",
+      "theirs": "OP17-039",
+      "first": true,
+      "certainty": "any-hand",
+      "label": "any-hand",
+      "scenario": {
+        "seed": 1000017,
+        "turn": 5,
+        "activePlayer": "p1",
+        "firstPlayer": "p1",
+        "p1": {
+          "leader": "OP18-021",
+          "hand": [],
+          "deck": ["EB02-035", "EB02-061", "OP18-072", "EB02-035", "OP18-076", "OP18-061"],
+          "life": ["OP18-070", "OP18-078", "OP18-076", "OP18-061"],
+          "characters": ["EB02-035", "EB02-035", "EB02-035"],
+          "costArea": {
+            "active": 5,
+            "rested": 0
+          }
+        },
+        "p2": {
+          "leader": "OP17-039",
+          "hand": ["OP17-055"],
+          "deck": ["OP17-118", "OP17-045", "OP17-055", "OP17-050", "OP17-042", "OP17-056"],
+          "life": ["OP17-056"],
+          "characters": [],
+          "costArea": {
+            "active": 1,
+            "rested": 3
+          }
+        }
+      },
+      "prefix": [],
+      "hand": "harder",
+      "answer": {
+        "lethal": true,
+        "actions": [
+          {
+            "type": "attack",
+            "attacker": "$tabk4n7",
+            "target": "$hond3th",
+            "player": "p1"
+          },
+          {
+            "type": "giveDon",
+            "target": "$utolyhi",
+            "player": "p1"
+          },
+          {
+            "type": "giveDon",
+            "target": "$utolyhi",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$utolyhi",
+            "target": "$hond3th",
+            "player": "p1"
+          }
+        ],
+        "line": [
+          "Attack their Leader with Sanji.",
+          "Give 2 DON!! to Sanji.",
+          "Attack their Leader with Sanji."
+        ]
+      }
+    },
+    {
+      "id": "lethal-1000043",
+      "drill": "lethal",
+      "lesson": "L15-lethal-math",
+      "source": {
+        "kind": "bank",
+        "seed": 1000043
+      },
+      "mine": "OP18-021",
+      "theirs": "OP05-098",
+      "first": false,
+      "certainty": "any-hand",
+      "label": "any-hand",
+      "scenario": {
+        "seed": 1000043,
+        "turn": 4,
+        "activePlayer": "p1",
+        "firstPlayer": "p2",
+        "p1": {
+          "leader": "OP18-021",
+          "hand": ["OP18-066"],
+          "deck": ["OP18-066", "OP18-038", "OP18-076", "OP18-076", "ST18-004", "OP18-061"],
+          "life": ["OP18-034", "OP18-038", "EB02-017", "OP18-072"],
+          "characters": ["ST18-004", "ST18-004", "ST18-004"],
+          "costArea": {
+            "active": 4,
+            "rested": 0
+          }
+        },
+        "p2": {
+          "leader": "OP05-098",
+          "hand": ["OP06-115"],
+          "deck": ["OP11-106", "OP17-107", "OP17-102", "EB04-058", "OP17-107", "OP17-107"],
+          "life": ["OP17-112"],
+          "characters": [],
+          "costArea": {
+            "active": 1,
+            "rested": 2
+          }
+        }
+      },
+      "prefix": [],
+      "hand": "harder",
+      "answer": {
+        "lethal": true,
+        "actions": [
+          {
+            "type": "attack",
+            "attacker": "$mi7yhpx",
+            "target": "$8660q6b",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$hss3wcp",
+            "target": "$8660q6b",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$6uyc5lf",
+            "target": "$8660q6b",
+            "player": "p1"
+          },
+          {
+            "type": "giveDon",
+            "target": "$9xe2tty",
+            "player": "p1"
+          },
+          {
+            "type": "giveDon",
+            "target": "$9xe2tty",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$9xe2tty",
+            "target": "$8660q6b",
+            "player": "p1"
+          }
+        ],
+        "line": [
+          "Attack their Leader with your Leader.",
+          "Attack their Leader with Zoro-Juurou.",
+          "Attack their Leader with Zoro-Juurou.",
+          "Give 2 DON!! to Zoro-Juurou.",
+          "Attack their Leader with Zoro-Juurou."
+        ]
+      }
+    },
+    {
+      "id": "lethal-1000055",
+      "drill": "lethal",
+      "lesson": "L15-lethal-math",
+      "source": {
+        "kind": "bank",
+        "seed": 1000055
+      },
+      "mine": "OP18-021",
+      "theirs": "OP17-039",
+      "first": false,
+      "certainty": "any-hand",
+      "label": "any-hand",
+      "scenario": {
+        "seed": 1000055,
+        "turn": 4,
+        "activePlayer": "p1",
+        "firstPlayer": "p2",
+        "p1": {
+          "leader": "OP18-021",
+          "hand": ["OP18-074", "OP18-077", "OP18-034"],
+          "deck": ["OP18-031", "OP18-070", "EB02-017", "OP18-076", "OP15-035", "EB02-061"],
+          "life": ["OP18-076", "EB02-017", "OP18-078", "OP18-031"],
+          "characters": ["OP18-031", "OP18-031", "OP18-031"],
+          "costArea": {
+            "active": 4,
+            "rested": 0
+          }
+        },
+        "p2": {
+          "leader": "OP17-039",
+          "hand": ["OP17-055"],
+          "deck": ["OP17-050", "OP17-050", "OP17-040", "OP17-054", "OP17-048", "OP17-118"],
+          "life": ["OP17-044"],
+          "characters": [],
+          "costArea": {
+            "active": 0,
+            "rested": 3
+          }
+        }
+      },
+      "prefix": [],
+      "hand": "harder",
+      "answer": {
+        "lethal": true,
+        "actions": [
+          {
+            "type": "attack",
+            "attacker": "$ksv90rg",
+            "target": "$i7a6qst",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$8xfd6x3",
+            "target": "$i7a6qst",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$f13yxhy",
+            "target": "$i7a6qst",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$1mtz268",
+            "target": "$i7a6qst",
+            "player": "p1"
+          }
+        ],
+        "line": [
+          "Attack their Leader with your Leader.",
+          "Attack their Leader with Nico Robin.",
+          "Attack their Leader with Nico Robin.",
+          "Attack their Leader with Nico Robin."
+        ]
+      }
+    },
+    {
+      "id": "lethal-1000061",
+      "drill": "lethal",
+      "lesson": "L15-lethal-math",
+      "source": {
+        "kind": "bank",
+        "seed": 1000061
+      },
+      "mine": "OP18-021",
+      "theirs": "OP17-039",
+      "first": true,
+      "certainty": "any-hand",
+      "label": "any-hand",
+      "scenario": {
+        "seed": 1000061,
+        "turn": 5,
+        "activePlayer": "p1",
+        "firstPlayer": "p1",
+        "p1": {
+          "leader": "OP18-021",
+          "hand": [],
+          "deck": ["OP18-075", "EB02-017", "EB02-035", "EB02-017", "EB02-017", "OP18-078"],
+          "life": ["OP18-078", "OP18-061", "OP18-078", "OP18-038"],
+          "characters": [
+            "EB02-035",
+            "EB02-035",
+            "EB02-035",
+            {
+              "card": "EB02-017",
+              "playedThisTurn": true,
+              "rested": false
+            }
+          ],
+          "costArea": {
+            "active": 4,
+            "rested": 1
+          }
+        },
+        "p2": {
+          "leader": "OP17-039",
+          "hand": ["OP17-055"],
+          "deck": ["OP17-118", "OP17-040", "OP17-054", "OP17-048", "OP17-052", "OP17-046"],
+          "life": ["OP17-040"],
+          "characters": [],
+          "costArea": {
+            "active": 2,
+            "rested": 2
+          }
+        }
+      },
+      "prefix": [],
+      "hand": "harder",
+      "answer": {
+        "lethal": true,
+        "actions": [
+          {
+            "type": "attack",
+            "attacker": "$snrvwiv",
+            "target": "$fvpq24v",
+            "player": "p1"
+          },
+          {
+            "type": "giveDon",
+            "target": "$vupwdxb",
+            "player": "p1"
+          },
+          {
+            "type": "giveDon",
+            "target": "$vupwdxb",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$vupwdxb",
+            "target": "$fvpq24v",
+            "player": "p1"
+          }
+        ],
+        "line": [
+          "Attack their Leader with Sanji.",
+          "Give 2 DON!! to Sanji.",
+          "Attack their Leader with Sanji."
+        ]
+      }
+    },
+    {
+      "id": "lethal-1000067",
+      "drill": "lethal",
+      "lesson": "L15-lethal-math",
+      "source": {
+        "kind": "bank",
+        "seed": 1000067
+      },
+      "mine": "OP18-021",
+      "theirs": "OP17-039",
+      "first": false,
+      "certainty": "any-hand",
+      "label": "any-hand",
+      "scenario": {
+        "seed": 1000067,
+        "turn": 4,
+        "activePlayer": "p1",
+        "firstPlayer": "p2",
+        "p1": {
+          "leader": "OP18-021",
+          "hand": ["OP18-070"],
+          "deck": ["OP15-035", "EB02-035", "EB02-017", "OP18-061", "OP15-035", "OP18-034"],
+          "life": ["OP18-034", "EB02-017", "OP18-031", "EB02-035"],
+          "characters": ["OP18-031", "OP18-031", "OP18-031"],
+          "costArea": {
+            "active": 4,
+            "rested": 0
+          }
+        },
+        "p2": {
+          "leader": "OP17-039",
+          "hand": ["OP17-055"],
+          "deck": ["OP17-056", "OP17-054", "OP17-050", "OP17-055", "OP17-045", "OP17-056"],
+          "life": ["OP17-045"],
+          "characters": [],
+          "costArea": {
+            "active": 2,
+            "rested": 1
+          }
+        }
+      },
+      "prefix": [],
+      "hand": "harder",
+      "answer": {
+        "lethal": true,
+        "actions": [
+          {
+            "type": "attack",
+            "attacker": "$7tbt5p5",
+            "target": "$uuar5yg",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$djaagjz",
+            "target": "$uuar5yg",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$ut4rlc0",
+            "target": "$uuar5yg",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$xogf7cd",
+            "target": "$uuar5yg",
+            "player": "p1"
+          }
+        ],
+        "line": [
+          "Attack their Leader with your Leader.",
+          "Attack their Leader with Nico Robin.",
+          "Attack their Leader with Nico Robin.",
+          "Attack their Leader with Nico Robin."
+        ]
+      }
+    },
+    {
+      "id": "lethal-1100005",
+      "drill": "lethal",
+      "lesson": "L15-lethal-math",
+      "source": {
+        "kind": "bank",
+        "seed": 1100005
+      },
+      "mine": "EB02-010",
+      "theirs": "OP17-039",
+      "first": true,
+      "certainty": "any-hand",
+      "label": "any-hand",
+      "scenario": {
+        "seed": 1100005,
+        "turn": 5,
+        "activePlayer": "p1",
+        "firstPlayer": "p1",
+        "p1": {
+          "leader": "EB02-010",
+          "hand": ["OP18-038", "EB02-035", "EB02-035"],
+          "deck": ["OP15-078", "OP18-026", "OP12-037", "OP12-037", "OP13-027", "OP18-026"],
+          "life": ["OP18-034", "OP18-038", "ST18-004"],
+          "characters": ["EB02-035", "EB02-035", "EB02-035"],
+          "costArea": {
+            "active": 5,
+            "rested": 0
+          }
+        },
+        "p2": {
+          "leader": "OP17-039",
+          "hand": ["OP17-055", "OP17-055"],
+          "deck": ["OP17-056", "OP17-049", "OP17-052", "OP17-054", "OP17-050", "OP17-055"],
+          "life": ["OP17-056", "OP17-040"],
+          "characters": [],
+          "costArea": {
+            "active": 3,
+            "rested": 1
+          }
+        }
+      },
+      "prefix": [],
+      "hand": "harder",
+      "answer": {
+        "lethal": true,
+        "actions": [
+          {
+            "type": "attack",
+            "attacker": "$mv2j4vl",
+            "target": "$j1p4ik9",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$z33xazq",
+            "target": "$j1p4ik9",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$mkn0c7o",
+            "target": "$j1p4ik9",
+            "player": "p1"
+          },
+          {
+            "type": "giveDon",
+            "target": "$3ybqayy",
+            "player": "p1"
+          },
+          {
+            "type": "giveDon",
+            "target": "$3ybqayy",
+            "player": "p1"
+          },
+          {
+            "type": "giveDon",
+            "target": "$3ybqayy",
+            "player": "p1"
+          },
+          {
+            "type": "giveDon",
+            "target": "$3ybqayy",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$3ybqayy",
+            "target": "$j1p4ik9",
+            "player": "p1"
+          }
+        ],
+        "line": [
+          "Attack their Leader with Sanji.",
+          "Attack their Leader with Sanji.",
+          "Attack their Leader with Sanji.",
+          "Give 4 DON!! to your Leader.",
+          "Attack their Leader with your Leader."
+        ]
+      }
+    },
+    {
+      "id": "lethal-1100019",
+      "drill": "lethal",
+      "lesson": "L15-lethal-math",
+      "source": {
+        "kind": "bank",
+        "seed": 1100019
+      },
+      "mine": "EB02-010",
+      "theirs": "OP05-098",
+      "first": true,
+      "certainty": "any-hand",
+      "label": "any-hand",
+      "scenario": {
+        "seed": 1100019,
+        "turn": 5,
+        "activePlayer": "p1",
+        "firstPlayer": "p1",
+        "p1": {
+          "leader": "EB02-010",
+          "hand": ["OP18-031", "EB02-017", "OP15-078"],
+          "deck": ["OP15-032", "OP18-031", "OP07-064", "EB02-061", "OP07-064", "EB02-017"],
+          "life": ["ST18-005", "OP08-036", "ST18-001", "OP13-040"],
+          "characters": ["EB02-035", "EB02-035", "EB02-035"],
+          "costArea": {
+            "active": 5,
+            "rested": 0
+          }
+        },
+        "p2": {
+          "leader": "OP05-098",
+          "hand": ["OP06-115"],
+          "deck": ["EB04-058", "OP11-106", "OP17-109", "OP16-119", "OP15-113", "OP11-106"],
+          "life": ["EB01-056"],
+          "characters": [],
+          "costArea": {
+            "active": 3,
+            "rested": 1
+          }
+        }
+      },
+      "prefix": [],
+      "hand": "harder",
+      "answer": {
+        "lethal": true,
+        "actions": [
+          {
+            "type": "attack",
+            "attacker": "$rt8n5qk",
+            "target": "$96be4dj",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$xavhq9d",
+            "target": "$96be4dj",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$t49ayz9",
+            "target": "$96be4dj",
+            "player": "p1"
+          },
+          {
+            "type": "giveDon",
+            "target": "$ct6yck5",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$ct6yck5",
+            "target": "$96be4dj",
+            "player": "p1"
+          }
+        ],
+        "line": [
+          "Attack their Leader with your Leader.",
+          "Attack their Leader with Sanji.",
+          "Attack their Leader with Sanji.",
+          "Give 1 DON!! to Sanji.",
+          "Attack their Leader with Sanji."
+        ]
+      }
+    },
+    {
+      "id": "lethal-1100033",
+      "drill": "lethal",
+      "lesson": "L15-lethal-math",
+      "source": {
+        "kind": "bank",
+        "seed": 1100033
+      },
+      "mine": "EB02-010",
+      "theirs": "ST30-001",
+      "first": false,
+      "certainty": "any-hand",
+      "label": "any-hand",
+      "scenario": {
+        "seed": 1100033,
+        "turn": 4,
+        "activePlayer": "p1",
+        "firstPlayer": "p2",
+        "p1": {
+          "leader": "EB02-010",
+          "hand": ["ST18-004"],
+          "deck": ["ST18-004", "EB02-017", "OP18-026", "OP18-034", "EB02-035", "OP12-037"],
+          "life": ["OP12-037", "ST18-001", "OP18-026", "OP15-032"],
+          "characters": ["ST18-004", "ST18-004"],
+          "costArea": {
+            "active": 4,
+            "rested": 0
+          }
+        },
+        "p2": {
+          "leader": "ST30-001",
+          "hand": ["OP04-016"],
+          "deck": ["ST31-001", "EB04-002", "OP12-018", "ST31-005", "ST31-005", "OP12-037"],
+          "life": ["OP01-016"],
+          "characters": [],
+          "costArea": {
+            "active": 0,
+            "rested": 3
+          }
+        }
+      },
+      "prefix": [],
+      "hand": "harder",
+      "answer": {
+        "lethal": true,
+        "actions": [
+          {
+            "type": "attack",
+            "attacker": "$689pafp",
+            "target": "$tzbme7i",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$p957q89",
+            "target": "$tzbme7i",
+            "player": "p1"
+          },
+          {
+            "type": "giveDon",
+            "target": "$osbvcwf",
+            "player": "p1"
+          },
+          {
+            "type": "giveDon",
+            "target": "$osbvcwf",
+            "player": "p1"
+          },
+          {
+            "type": "giveDon",
+            "target": "$osbvcwf",
+            "player": "p1"
+          },
+          {
+            "type": "giveDon",
+            "target": "$osbvcwf",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$osbvcwf",
+            "target": "$tzbme7i",
+            "player": "p1"
+          }
+        ],
+        "line": [
+          "Attack their Leader with Zoro-Juurou.",
+          "Attack their Leader with Zoro-Juurou.",
+          "Give 4 DON!! to your Leader.",
+          "Attack their Leader with your Leader."
+        ]
+      }
+    },
+    {
+      "id": "lethal-1100037",
+      "drill": "lethal",
+      "lesson": "L15-lethal-math",
+      "source": {
+        "kind": "bank",
+        "seed": 1100037
+      },
+      "mine": "EB02-010",
+      "theirs": "OP17-039",
+      "first": false,
+      "certainty": "any-hand",
+      "label": "any-hand",
+      "scenario": {
+        "seed": 1100037,
+        "turn": 4,
+        "activePlayer": "p1",
+        "firstPlayer": "p2",
+        "p1": {
+          "leader": "EB02-010",
+          "hand": ["OP18-026", "ST18-004", "OP18-034"],
+          "deck": ["OP18-034", "OP18-038", "EB02-035", "PRB02-012", "EB02-061", "OP15-078"],
+          "life": ["OP18-038", "EB02-061", "EB02-035", "ST18-004"],
+          "characters": ["ST18-004", "ST18-004"],
+          "costArea": {
+            "active": 4,
+            "rested": 0
+          }
+        },
+        "p2": {
+          "leader": "OP17-039",
+          "hand": ["OP17-055"],
+          "deck": ["OP08-051", "OP17-118", "OP17-048", "OP17-042", "OP17-054", "OP17-055"],
+          "life": ["OP17-048"],
+          "characters": [],
+          "costArea": {
+            "active": 0,
+            "rested": 3
+          }
+        }
+      },
+      "prefix": [],
+      "hand": "harder",
+      "answer": {
+        "lethal": true,
+        "actions": [
+          {
+            "type": "giveDon",
+            "target": "$1y439ok",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$1y439ok",
+            "target": "$81tpr3i",
+            "player": "p1"
+          },
+          {
+            "type": "giveDon",
+            "target": "$iu4nt6r",
+            "player": "p1"
+          },
+          {
+            "type": "giveDon",
+            "target": "$iu4nt6r",
+            "player": "p1"
+          },
+          {
+            "type": "giveDon",
+            "target": "$iu4nt6r",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$iu4nt6r",
+            "target": "$81tpr3i",
+            "player": "p1"
+          }
+        ],
+        "line": [
+          "Give 1 DON!! to Zoro-Juurou.",
+          "Attack their Leader with Zoro-Juurou.",
+          "Give 3 DON!! to Zoro-Juurou.",
+          "Attack their Leader with Zoro-Juurou."
+        ]
+      }
+    },
+    {
+      "id": "lethal-1100043",
+      "drill": "lethal",
+      "lesson": "L15-lethal-math",
+      "source": {
+        "kind": "bank",
+        "seed": 1100043
+      },
+      "mine": "EB02-010",
+      "theirs": "OP17-039",
+      "first": true,
+      "certainty": "any-hand",
+      "label": "any-hand",
+      "scenario": {
+        "seed": 1100043,
+        "turn": 5,
+        "activePlayer": "p1",
+        "firstPlayer": "p1",
+        "p1": {
+          "leader": "EB02-010",
+          "hand": [],
+          "deck": ["PRB02-012", "EB02-061", "OP09-078", "OP18-026", "OP18-026", "EB02-017"],
+          "life": ["OP09-078", "OP18-034", "EB02-035", "OP18-026"],
+          "characters": ["EB02-035", "EB02-035", "EB02-035"],
+          "costArea": {
+            "active": 5,
+            "rested": 0
+          }
+        },
+        "p2": {
+          "leader": "OP17-039",
+          "hand": ["OP17-055"],
+          "deck": ["OP17-056", "OP17-055", "OP17-055", "OP17-049", "OP17-052", "OP17-048"],
+          "life": ["OP17-049"],
+          "characters": ["OP17-046"],
+          "costArea": {
+            "active": 1,
+            "rested": 3
+          }
+        }
+      },
+      "prefix": [],
+      "hand": "harder",
+      "answer": {
+        "lethal": true,
+        "actions": [
+          {
+            "type": "attack",
+            "attacker": "$jfhf604",
+            "target": "$16ecfvv",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$dhipcnz",
+            "target": "$16ecfvv",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$1ois2jx",
+            "target": "$16ecfvv",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$srcnh4m",
+            "target": "$16ecfvv",
+            "player": "p1"
+          }
+        ],
+        "line": [
+          "Attack their Leader with your Leader.",
+          "Attack their Leader with Sanji.",
+          "Attack their Leader with Sanji.",
+          "Attack their Leader with Sanji."
+        ]
+      }
+    },
+    {
+      "id": "lethal-1100049",
+      "drill": "lethal",
+      "lesson": "L15-lethal-math",
+      "source": {
+        "kind": "bank",
+        "seed": 1100049
+      },
+      "mine": "EB02-010",
+      "theirs": "OP17-039",
+      "first": false,
+      "certainty": "any-hand",
+      "label": "any-hand",
+      "scenario": {
+        "seed": 1100049,
+        "turn": 4,
+        "activePlayer": "p1",
+        "firstPlayer": "p2",
+        "p1": {
+          "leader": "EB02-010",
+          "hand": [],
+          "deck": ["OP13-037", "OP09-078", "OP12-037", "OP07-064", "OP17-023", "ST18-004"],
+          "life": ["EB02-017", "OP07-064", "OP15-032", "ST30-012"],
+          "characters": [
+            "ST18-004",
+            "ST18-004",
+            "ST18-004",
+            {
+              "card": "OP17-023",
+              "playedThisTurn": true,
+              "rested": false
+            }
+          ],
+          "costArea": {
+            "active": 3,
+            "rested": 1
+          }
+        },
+        "p2": {
+          "leader": "OP17-039",
+          "hand": ["OP17-055"],
+          "deck": ["OP17-040", "OP17-055", "OP17-048", "OP17-118", "OP17-049", "OP17-044"],
+          "life": ["OP17-050"],
+          "characters": [],
+          "costArea": {
+            "active": 0,
+            "rested": 3
+          }
+        }
+      },
+      "prefix": [],
+      "hand": "harder",
+      "answer": {
+        "lethal": true,
+        "actions": [
+          {
+            "type": "attack",
+            "attacker": "$ldw0etx",
+            "target": "$db8nljy",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$lq09sme",
+            "target": "$db8nljy",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$2dc8tjx",
+            "target": "$db8nljy",
+            "player": "p1"
+          },
+          {
+            "type": "attack",
+            "attacker": "$6xnj0j6",
+            "target": "$db8nljy",
+            "player": "p1"
+          }
+        ],
+        "line": [
+          "Attack their Leader with your Leader.",
+          "Attack their Leader with Zoro-Juurou.",
+          "Attack their Leader with Zoro-Juurou.",
+          "Attack their Leader with Zoro-Juurou."
+        ]
       }
     }
   ]

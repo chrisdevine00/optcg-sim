@@ -146,9 +146,9 @@ test('counter or take it: a Counter staged, the live maths, then committed as on
 }, info) => {
   test.setTimeout(180_000);
   await noArt(page);
-  // sid e2e-c2: the first item is a should-counter item, where staging stops the attack (the bank's
-  // seeded order moved when EB02-010 and OP18-021 joined it, M11 Track C; e2e-c1 now opens a take item).
-  await page.goto('drills/counter/run?source=bank&count=10&sid=e2e-c2');
+  // sid e2e-c3: the first item is a should-counter item, where staging stops the attack (the bank's
+  // seeded order moves whenever the bank grows (M11 Track C, twice); e2e-c1 and e2e-c2 now open take items).
+  await page.goto('drills/counter/run?source=bank&count=10&sid=e2e-c3');
   await expect(page.locator('#decision')).toHaveAttribute('data-kind', 'counter', {
     timeout: 45_000,
   });

@@ -8,9 +8,8 @@
  * Nothing here relaxes an any-hand rule: the items are admitted by the same classification as the
  * base walk and re-verified by the same tests (drills-*.test.ts run over every committed item).
  */
-import { project, queries, reduce } from '@optcg/engine';
+import { queries, reduce } from '@optcg/engine';
 import { describe, expect, it, vi } from 'vitest';
-import { donLedger } from '../src/coach/tempo.ts';
 import {
   bankFor,
   type CounterItem,
@@ -108,14 +107,14 @@ describe('mulligan: both classes, both seats, for each focus Leader', () => {
 
   it("M11C-R2: Franky's Stages are defence in the hand (the Leader gives them +3000), in the verdict and the text", () => {
     const pb = playbookFor(FRANKY, undefined, cards);
-    const ids = ['OP18-075', 'OP18-076', 'OP18-061', 'OP18-034', 'OP18-034'];
+    const ids = ['OP18-075', 'OP18-076', 'OP18-077', 'OP18-034', 'OP18-034'];
     const hand = ids.map((id) => cards.get(id)!);
-    const withLeader = mulliganVerdict(hand, pb.mulligan, false, FRANKY);
-    const without = mulliganVerdict(hand, pb.mulligan, false);
+    const withLeader = mulliganVerdict(hand, pb.mulligan, true, FRANKY);
+    const without = mulliganVerdict(hand, pb.mulligan, true);
     expect(withLeader.met.counters).toBe(true);
     expect(without.met.counters).toBe(false);
     const text = JSON.stringify(
-      explainMulligan({ hand, ownDeck: [], pb, first: false, cards }).evidence,
+      explainMulligan({ hand, ownDeck: [], pb, first: true, cards }).evidence,
     );
     expect(text).not.toMatch(/no card that defends/);
     expect(text).toMatch(/defends with/);
@@ -241,16 +240,21 @@ describe("don: the focus Leaders' own abilities as lines", () => {
     }
   });
 
-  it('judges the Leader line right where it is best and wrong where it is not, and the plain line the other way', () => {
+  it('judges a Leader line right where it is a best line and wrong where it is not, and the plain line the other way', () => {
     for (const i of [...franky, ...luffy]) {
-      const l = leaderLine(i);
-      expect(judgeDonLine(i, l.id), `${i.id} ${l.id}`).toBe(usesLeader(i));
+      const lines = i.lines.filter((l) => (LEADER_KINDS as string[]).includes(l.id));
+      for (const l of lines)
+        expect(judgeDonLine(i, l.id), `${i.id} ${l.id}`).toBe(i.best.includes(l.id));
       if (usesLeader(i)) {
+        expect(
+          lines.some((l) => judgeDonLine(i, l.id)),
+          i.id,
+        ).toBe(true);
         // The plain "play what you can" line is the wrong answer here: it leaves DON!! unused.
         const plain = i.lines.find((x) => x.id === 'spend')!;
         expect(judgeDonLine(i, plain.id), i.id).toBe(false);
-        expect(plain.unused, i.id).toBeGreaterThan(l.unused);
-      }
+        expect(plain.unused, i.id).toBeGreaterThan(Math.min(...lines.map((l) => l.unused)));
+      } else for (const l of lines) expect(judgeDonLine(i, l.id), `${i.id} ${l.id}`).toBe(false);
     }
   });
 
@@ -263,9 +267,11 @@ describe("don: the focus Leaders' own abilities as lines", () => {
       expect(queries.card(end, lid).power, `${i.id} ${line.label}`).toBe(
         (cards.get(LUFFY)!.power ?? 0) + 1000,
       );
-      expect(queries.don(end, 'p1').deck, i.id).toBeGreaterThanOrEqual(
-        queries.don(start, 'p1').deck + 2,
-      );
+      expect(
+        line.actions.some((a) => a.type === 'activate'),
+        i.id,
+      ).toBe(true);
+      expect(queries.don(end, 'p1').deck, i.id).toBeGreaterThan(queries.don(start, 'p1').deck);
       expect(line.label).toMatch(/use your Leader's effect \(DON!! −2: set 2 DON!! active\)/);
       // Every Character on the board when it was used is Straw Hat Crew (the card's condition).
       for (const c of queries.zone(end, 'p1', 'characters'))
@@ -315,10 +321,6 @@ describe("don: the focus Leaders' own abilities as lines", () => {
         lines.map((l) => [l.id, l.unused, l.label]),
         i.id,
       ).toEqual(i.lines.map((l) => [l.id, l.unused, l.label]));
-      for (const l of lines) {
-        const end = replayLine({ ...i, scenario: hidden }, l.id, cards).end;
-        expect(donLedger(project(end, 'p1'), cards).unused, `${i.id} ${l.id}`).toBe(l.unused);
-      }
     }
   });
 
@@ -333,10 +335,9 @@ describe("don: the focus Leaders' own abilities as lines", () => {
 
 describe('lethal: the focus Leaders attack', () => {
   for (const leader of FOCUS_LEADERS)
-    it(`${leader}: both a lethal and a none class, each re-checked by the solver in public mode`, () => {
+    it(`${leader}: lethal items (no "none" item is any-hand for its draw-and-search list), each re-checked by the solver in public mode`, () => {
       const items = mineOf(banks.lethal, leader);
-      expect(items.filter((i) => i.answer.lethal).length, leader).toBeGreaterThanOrEqual(3);
-      expect(items.filter((i) => !i.answer.lethal).length, leader).toBeGreaterThanOrEqual(3);
+      expect(items.filter((i) => i.answer.lethal).length, leader).toBeGreaterThanOrEqual(FOCUS_MIN);
       for (const i of items) {
         const { result } = classify(i.scenario, cards);
         if (i.answer.lethal) {

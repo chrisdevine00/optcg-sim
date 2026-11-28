@@ -135,7 +135,15 @@ export const shapeOf = (seed: number): BoardShape => (seed % 2 === 0 ? 'short' :
  */
 export const FOCUS_SEED_BASE = 1_000_000;
 export const FOCUS_SEEDS = 2_000;
+/**
+ * Lethal items wanted per focus Leader, and "none" items wanted within the first `FOCUS_NONE_SEEDS`
+ * seeds. The two Leaders' lists hold draw and search cards (Nami, Iceburg, the Stages), so a "none by
+ * count" refutation is only "from what you hold", never any-hand (`needed-hidden-info`, lethal.ts):
+ * no "none" item is admitted for them, and the any-hand rule is not relaxed to get one. The pass
+ * takes `FOCUS_MIN` lethal items instead, so the Leader's count still reaches the minimum.
+ */
 export const FOCUS_PER_CLASS = FOCUS_MIN / 2;
+export const FOCUS_NONE_SEEDS = 500;
 
 export function lethalFocusItems(
   leaders: readonly string[],
@@ -150,7 +158,7 @@ export function lethalFocusItems(
   for (
     let k = 1;
     k <= (opts.maxSeeds ?? FOCUS_SEEDS) &&
-    (counts.lethal < FOCUS_PER_CLASS || counts.none < FOCUS_PER_CLASS);
+    (counts.lethal < FOCUS_MIN || (counts.none < FOCUS_PER_CLASS && k <= FOCUS_NONE_SEEDS));
     k++
   ) {
     const seed = FOCUS_SEED_BASE + slot * 100_000 + k;
@@ -159,7 +167,7 @@ export function lethalFocusItems(
     opts.log?.(`seed ${seed} ${mine}/${theirs}: ${why}`);
     if (!item) continue;
     const key = item.answer.lethal ? 'lethal' : 'none';
-    if (counts[key] >= FOCUS_PER_CLASS) continue;
+    if (counts[key] >= (key === 'lethal' ? FOCUS_MIN : FOCUS_PER_CLASS)) continue;
     counts[key]++;
     items.push(item);
   }

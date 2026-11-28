@@ -31,9 +31,10 @@ function counterExtras(id: string): boolean {
 const EXTRAS_BONUS = 500;
 
 /** The defence value of one copy of a card in hand: its Counter, plus a bonus for an Event that rests or draws. */
-export function defenceValue(card: Card | undefined): number {
+export function defenceValue(card: Card | undefined, leaderId?: string): number {
   if (!card) return 0;
-  const v = counterValueOf(card);
+  // The owner's Leader counts: OP18-021 gives every Stage in hand a +3000 Counter (M11 Track C).
+  const v = counterValueOf(card, leaderId);
   return card.category === 'Event' && v > 0 && counterExtras(card.id) ? v + EXTRAS_BONUS : v;
 }
 
@@ -60,7 +61,7 @@ export function harderHand(
     for (const l of priorFor(leader).lists)
       for (const c of l.cards) copies.set(c.id, Math.max(copies.get(c.id) ?? 0, c.count));
   const ranked = [...copies.keys()]
-    .map((id) => ({ id, v: defenceValue(cards.get(id)) }))
+    .map((id) => ({ id, v: defenceValue(cards.get(id), leader) }))
     .sort((a, b) => b.v - a.v || (a.id < b.id ? -1 : 1));
   const out: string[] = [];
   for (const r of ranked)

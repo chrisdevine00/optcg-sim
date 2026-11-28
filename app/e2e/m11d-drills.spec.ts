@@ -28,18 +28,22 @@ test('Franky guide to the filtered drills hub, start screens and runs, by keyboa
     'Mulligan trainer',
     'Lethal puzzles',
     'Counter or take it',
-    'DON!! efficiency',
+    'DON!! allocation',
   ])
-    await expect(page.getByRole('link', { name: new RegExp(name) })).toHaveAttribute(
+    await expect(page.getByRole('link', { name, exact: true })).toHaveAttribute(
       'href',
       /\?leader=OP18-021$/,
     );
 
   // The start screen has the Leader's archetype chosen already.
-  const counter = page.getByRole('link', { name: /Counter or take/ });
+  const counter = page.getByRole('link', { name: 'Counter or take it', exact: true });
   await counter.focus();
   await page.keyboard.press('Enter');
   await expect(page.getByLabel('Archetype')).toHaveValue(FRANKY);
+  // M11C-R8: the three Luffy Leaders are told apart by colour, as on the Meta tiles.
+  await expect(
+    page.getByLabel('Archetype').locator('option', { hasText: 'Luffy (Green/Purple)' }),
+  ).toHaveCount(1);
   await axe(page, info, 'm11d-start');
   const start = page.getByRole('button', { name: 'Start' });
   await start.focus();
