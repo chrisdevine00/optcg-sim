@@ -137,6 +137,8 @@ export const IMPLEMENTED = {
     'playRested',
     // M6b wave 7 (G66).
     'negate',
+    // OP-18 wave G5: "the cost of playing <cards> from your hand will be reduced by N".
+    'playCost',
   ],
   restrictions: [
     'cannotAttack',
@@ -731,11 +733,15 @@ function cost(c: Ctx, path: string, v: unknown): void {
       int(c, p, o[k]);
       if (k === 'turnLifeFaceDown' && (o[k] as number) < 1) err(c, p, 'must be at least 1');
       return;
-    case 'donMinus':
     case 'trashLife':
+      // A number of Life cards, or 'all' of them (OP-18 wave G4).
+      if (o[k] === 'all') return;
+      int(c, p, o[k]);
+      if ((o[k] as number) < 1) err(c, p, 'must be at least 1 (or "all")');
+      return;
+    case 'donMinus':
     case 'mill':
       int(c, p, o[k]);
-      if (k === 'trashLife' && (o[k] as number) < 1) err(c, p, 'must be at least 1');
       return;
     case 'returnDon':
       // A number: DON!! from anywhere on the field. `{ n, state: 'active' }`: active cost-area DON!! (G9).
@@ -854,8 +860,13 @@ function cost(c: Ctx, path: string, v: unknown): void {
       const spec = o[k];
       if (!isObj(spec)) return;
       enumOf(c, `${p}.from`, spec.from, ['top', 'topOrBottom']);
+      // One card, or 'all' of them from the top (OP-18 wave G4).
+      if (spec.n === 'all') {
+        if (spec.from !== 'top') err(c, `${p}.from`, 'n "all" takes every card from the top');
+        return;
+      }
       int(c, `${p}.n`, spec.n);
-      if (spec.n !== 1) err(c, `${p}.n`, 'only n = 1 is implemented');
+      if (spec.n !== 1) err(c, `${p}.n`, 'only n = 1 or "all" is implemented');
       return;
     }
     case 'move': {
@@ -1500,7 +1511,18 @@ function action(c: Ctx, path: string, v: unknown): void {
     case 'activate':
       fields(c, p, x, ['ability', 'of']);
       if (!isObj(x)) return;
-      enumOf(c, `${p}.ability`, x.ability, ['main', 'onPlay', 'onKO', 'counter']);
+      enumOf(c, `${p}.ability`, x.ability, ['main', 'onPlay', 'onKO', 'counter', 'trigger']);
+      if (x.ability === 'trigger') {
+        // The [Trigger] of one card in your hand, named by a bound selection (G6).
+        if (!isObj(x.of))
+          return err(c, `${p}.of`, 'a [Trigger] is activated on a selected hand card');
+        selector(c, `${p}.of`, x.of);
+        if (x.of.from !== 'hand' || x.of.owner !== 'you')
+          err(c, `${p}.of`, "the [Trigger] of a card in your own hand ('hand', 'you')");
+        if (x.of.pick !== undefined)
+          err(c, `${p}.of.pick`, 'name the card with a bound { ref } filter, no pick');
+        return;
+      }
       if (isObj(x.of)) return activateEvent(c, p, x);
       return enumOf(c, `${p}.of`, x.of, ['self']);
   }
@@ -1707,8 +1729,13 @@ function moveShape(c: Ctx, path: string, what: unknown, to: unknown): void {
     }
     if (!all(['hand', 'trash']))
       return err(c, `${path}.to`, 'only a hand, trash or Character card moves into Life');
-    if (pos !== undefined && pos !== 'top')
-      err(c, `${path}.to.position`, 'a card enters Life at the top');
+    // From a hand or trash: the top, or the end the controller picks (OP-18 wave G3).
+    if (pos !== undefined && pos !== 'top' && pos !== 'topOrBottom')
+      err(
+        c,
+        `${path}.to.position`,
+        'a hand or trash card enters Life at the "top" or "topOrBottom"',
+      );
     return;
   }
   if (dz === 'deck' && pos !== 'top' && pos !== 'bottom' && pos !== 'topOrBottom')
@@ -1845,6 +1872,22 @@ function continuous(c: Ctx, path: string, v: unknown): void {
         DECK_FILTER_KEYS,
         'a play filter reads the printed values of the card being played',
       );
+    case 'playCost':
+      // A permanent reduction (or increase) of the cost of playing cards from your hand (G5).
+      fields(c, p, x, ['target', 'amount']);
+      if (!isObj(x)) return;
+      selector(c, `${p}.target`, x.target);
+      zonesIn(
+        c,
+        `${p}.target`,
+        x.target,
+        ['hand'],
+        'a play-cost change applies to cards in your hand',
+      );
+      ownerYou(c, `${p}.target`, x.target, 'a play-cost change applies to your own hand');
+      if (isObj(x.target) && x.target.pick !== undefined)
+        err(c, `${p}.target`, 'a play-cost change names every match: no pick');
+      return num(c, `${p}.amount`, x.amount);
     case 'counter':
       fields(c, p, x, ['target', 'value'], ['onlyIfNone']);
       if (!isObj(x)) return;

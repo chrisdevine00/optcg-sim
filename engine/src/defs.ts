@@ -32,6 +32,8 @@ export const DECK_RULES: Readonly<Record<CardId, RulesClause[]>> = {
   'OP12-001': [{ deckRestriction: { cost: { gte: 5 } } }],
   // OP16-042 Prisoner of Impel Down: "you may have any number of this card in your deck".
   'OP16-042': [{ anyNumberInDeck: true }],
+  // OP18-093 Sleeptids: "you may have any number of this card in your deck".
+  'OP18-093': [{ anyNumberInDeck: true }],
 };
 
 export const STANDARD_DON = 10;

@@ -129,7 +129,11 @@ export function layered(s: State): boolean {
         (a) =>
           a.kind === 'permanent' &&
           a.apply.some(
-            (c) => !('counter' in c) && !('lockAttackTarget' in c) && !('playRested' in c),
+            (c) =>
+              !('counter' in c) &&
+              !('lockAttackTarget' in c) &&
+              !('playRested' in c) &&
+              !('playCost' in c),
           ),
       ),
     );

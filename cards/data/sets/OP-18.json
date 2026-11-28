@@ -32,8 +32,14 @@
    "effectText": "All of your Characters with both the {Animal} and {Alabasta} types gain [Rush] and +1000 power.\n[Once Per Turn] When your {Alabasta} type Character is K.O.'d, draw 1 card.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -80,8 +86,14 @@
    "effectText": "[On Play] You may trash 1 {Alabasta} type card from your hand: Draw 2 cards.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -178,8 +190,14 @@
    "effectText": "Apply each of the following effects based on this Character's power:\n• If it has 5000 power or more, this Character gains [Rush].\n• If it has 6000 power or more, this Character gains [Banish].\n• If it has 7000 power or more, this Character gains [Unblockable].",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -227,8 +245,14 @@
    "effectText": "[Your Turn] This Character gains +1000 power for every [Kung Fu Jugon].",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -275,8 +299,14 @@
    "effectText": "If you have [Nefeltari Vivi], this Character gains [Rush] and +1000 power.\n(This card can attack on the turn in which it is played.)",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -324,8 +354,14 @@
    "effectText": "If your Leader has the {Navy} type, this Character gains [Banish] and +1000 power.\n(When this card deals damage, the target card is trashed without activating its Trigger.)",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -372,8 +408,14 @@
    "effectText": "If your Leader has the {Alabasta} type, this Character gains [Rush].\n[On Play] You may trash 1 Character card with 5000 power or less from your hand: Draw 2 cards and this Character gains [Banish] during this turn.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -420,9 +462,17 @@
    "block": 5,
    "effectText": "[Rush] (This card can attack on the turn in which it is played.)\n[Activate: Main] You may trash this Character: If you have 9 or more DON!! cards on your field, play up to 1 [Karoo] from your hand.",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Rush"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -471,8 +521,14 @@
    "effectText": "[On K.O.] Add up to 1 Character card with 4000 power or less from your trash to your hand.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -519,8 +575,14 @@
    "effectText": "All of your Characters with both the {Animal} and {Alabasta} types gain +1000 power.\n[Opponent's Turn] This Character gains [Blocker] and +6000 power.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -568,8 +630,14 @@
    "effectText": "[When Attacking] Up to 1 of your Characters with both the {Animal} and {Alabasta} types gains +1000 power during this turn.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -616,8 +684,14 @@
    "effectText": "If your Leader has the {Alabasta} type, this Character gains [Rush].\n[On Play] You may trash 1 Character card with 5000 power or less from your hand: Draw 2 cards and trash up to 1 of your opponent's Characters with 3000 base power or less.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -665,8 +739,14 @@
    "effectText": "[When Attacking] Up to 1 of your {Alabasta} type Characters gains [Rush] during this turn.\n(This card can attack on the turn in which it is played.)",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -714,8 +794,14 @@
    "effectText": "[On Your Opponent's Attack] You may trash this Character: If your Leader has the {Alabasta} type, give up to 1 of your opponent's Leader or Characters −3000 power during this turn.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -762,9 +848,17 @@
    "block": 5,
    "effectText": "[Banish]\n[On K.O.] Play up to 1 {Alabasta} type Character card with 6000 power or less from your hand.",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Banish"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -812,8 +906,14 @@
    "effectText": "[Once Per Turn] If your {Alabasta} type Character would be removed from the field by your opponent's effect, you may give your Leader −2000 power during this turn instead.\n[When Attacking] Up to 1 of your {Alabasta} type Characters gains [Rush] during this turn.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -858,8 +958,14 @@
    "effectText": "[Main] All of your {Alabasta} type Characters gain +1000 power during this turn.",
    "triggerText": "Up to 1 of your Leader or Characters gains +2000 power during this turn.",
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -905,8 +1011,14 @@
    "effectText": "[Main] If you have no Characters with 7000 base power or more, give up to 1 of your opponent's Characters −3000 power during this turn.\n[Counter] Your Leader gains +3000 power during this battle.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -951,8 +1063,14 @@
    "effectText": "[Counter] You may add all of your Life cards to your hand: If your Leader is [Nefeltari Vivi], give your opponent's Leader and all of their Characters −5000 power during this turn.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -1057,8 +1175,14 @@
    "effectText": "[DON!! x3] [When Attacking] [Once Per Turn] You may set this Leader as active. If you do, this Leader will not become active in your next Refresh Phase.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -1105,8 +1229,14 @@
    "effectText": "[On Play] Up to 1 of your {East Blue} type Leader or Characters gains [Banish] during this turn.\n(When this card deals damage, the target card is trashed without activating its Trigger.)",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -1153,9 +1283,17 @@
    "block": 5,
    "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[End of Your Turn] You may trash this Character: Set your Leader as active.",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Blocker"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -1203,8 +1341,14 @@
    "effectText": "[End of Your Turn] If this Character is rested, set your Leader as active.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -1363,8 +1507,14 @@
    "effectText": "[Activate: Main] You may rest 1 of your [Gonbe] and this Character: Set your [Monkey.D.Luffy] Leader as active.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -1412,9 +1562,17 @@
    "block": 5,
    "effectText": "[Rush]\n[When Attacking] [Once Per Turn] Give up to 3 rested DON!! cards to your Leader and set this Character as active. Then, this Character will not become active in your next Refresh Phase.",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Rush"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -1462,8 +1620,14 @@
    "effectText": "[Opponent's Turn] If this Character is rested, give this Character −2000 power.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -1566,8 +1730,14 @@
    "effectText": "[On Play]/[On K.O.] Up to 1 of your opponent's rested Characters with 8000 power or less will not become active in your opponent's next Refresh Phase.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -1613,9 +1783,17 @@
    "block": 5,
    "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[End of Your Turn] You may trash this Character: Set up to 1 of your Characters as active.",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Blocker"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -1767,8 +1945,14 @@
    "effectText": "[End of Your Turn] You may trash this Character: Draw 1 card and set your Leader as active.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -1815,9 +1999,17 @@
    "block": 5,
    "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[On K.O.] Rest up to 1 of your opponent's cards.",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Blocker"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -1916,8 +2108,14 @@
    "effectText": "[Counter] Up to 1 of your [Monkey.D.Luffy] gains +2000 power during this battle. Then, if your Leader is active, draw 1 card.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -1963,8 +2161,14 @@
    "effectText": "[Main] K.O. up to 1 of your opponent's rested Characters with a cost of 7 or less.",
    "triggerText": "Rest up to 1 of your opponent's Characters with a cost of 7 or less.",
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -2011,8 +2215,14 @@
    "effectText": "When your Character with a type including \"Baroque Works\" and 3000 base power or more is K.O.'d, draw 1 card, and your opponent trashes 1 card from their hand.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -2061,8 +2271,14 @@
    "effectText": "[On K.O.] Draw 1 card.\n[Activate: Main] [Once Per Turn] Give up to 1 rested DON!! card to 1 of your {Dressrosa} type Leader or Characters.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -2159,8 +2375,14 @@
    "effectText": "[DON!! x1] This Character gains +1000 power.\n[On Play] Draw 1 card and trash 1 card from your hand.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -2208,8 +2430,14 @@
    "effectText": "Also treat this card's name as [Sanji] according to the rules.\nThis Character gains +1000 power for every 5 Events in your trash.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -2258,8 +2486,14 @@
    "effectText": "[On Play] Draw 2 cards and give your Leader and all of your Characters up to 2 rested DON!! cards each.\n[On Your Opponent's Attack] You may trash 1 card from your hand: The base power of your Leader with a type including \"Baroque Works\" becomes 7000 during this turn.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -2307,8 +2541,14 @@
    "effectText": "[On Play] Your Leader with the {Cross Guild} type or a type including \"Baroque Works\" gains [Unblockable] during this turn.\n(This card cannot be blocked.)",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -2354,9 +2594,17 @@
    "block": 5,
    "effectText": "[Rush] (This card can attack on the turn in which it is played.)\n[On Play] Play up to 1 Character card with a type including \"Baroque Works\" and a cost of 5 or less from your hand.",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Rush"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -2403,8 +2651,14 @@
    "effectText": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 card with a type including \"Baroque Works\", add it to your hand and place the rest at the bottom of your deck in any order. Then, give up to 1 rested DON!! card to your Leader or 1 of your Characters.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -2451,9 +2705,17 @@
    "block": 5,
    "effectText": "[Blocker]\n[On Play] If your Leader's type includes \"Baroque Works\", up to 1 of your opponent's Characters with a cost of 7 or less cannot attack until the end of your opponent's next End Phase.",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Blocker"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -2501,8 +2763,14 @@
    "effectText": "[DON!! x1] This Character gains +1000 power.\n[On Play] You may rest 5 of your DON!! cards: Place up to 1 Character with a cost of 6 or less and up to 1 Character with a cost of 5 or less at the bottom of the owner's deck in any order of the owner's choosing.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -2550,8 +2818,14 @@
    "effectText": "[DON!! x1] This Character gains +1000 power.\n[On Play] Play up to 1 Character card with a type including \"Baroque Works\" and a cost of 3 or less from your hand.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -2598,8 +2872,14 @@
    "effectText": "[DON!! x1] This Character gains +1000 power.\n[On Play] Look at 3 cards from the top of your deck, reorganize them in any order and place them at the top or bottom of your deck.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -2647,8 +2927,14 @@
    "effectText": "[DON!! x1] This Character gains +1000 power.\n[Opponent's Turn] [Once Per Turn] If your Character with a type including \"Baroque Works\" would be removed from the field by your opponent's effect, you may trash 1 card from your hand instead.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -2696,8 +2982,14 @@
    "effectText": "[DON!! x1] This Character gains +1000 power.\n[On Play] Return up to 1 of your opponent's Characters with a cost of 2 or less to the owner's hand.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -2745,8 +3037,14 @@
    "effectText": "[DON!! x1] This Character gains +1000 power.\n[On Play] You may place 1 of your Characters with a type including \"Baroque Works\" other than this Character at the bottom of your deck: Your opponent trashes 1 card from their hand.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -2791,8 +3089,14 @@
    "effectText": "[Main] You may rest 3 of your DON!! cards: Return up to 1 Character with a cost of 5 or less to the owner's hand.\n[Counter] Your Leader gains +3000 power during this battle.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -2838,8 +3142,14 @@
    "effectText": "[Main] You may return 1 of your Characters to the owner's hand: Place up to 1 Character with a cost of 4 or less at the bottom of the owner's deck.",
    "triggerText": "Activate this card's [Main] effect.",
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -2885,8 +3195,14 @@
    "effectText": "[Main] You may rest 1 of your DON!! cards and trash 1 card with a type including \"Baroque Works\" from your hand: Draw 2 cards.\n[Counter] You may trash 1 card from your hand: Up to 1 of your Leader or Characters gains +3000 power during this battle.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -2935,8 +3251,14 @@
    "effectText": "[Once Per Turn] When a Character is played from your trash, draw 2 cards and trash 1 card from your hand.\n[Activate: Main] [Once Per Turn] You may trash 1 card from your hand: If you have a Character with 8000 base power or more, add up to 1 DON!! card as active from your DON!! deck.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -3088,8 +3410,14 @@
    "effectText": "[On Play] You may K.O. 1 of your Stages with a cost of 5 or less: Add up to 1 DON!! card as rested from your DON!! deck.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -3137,8 +3465,14 @@
    "effectText": "[Your Turn] [On Play] DON!! −1: Up to 1 of your opponent's Characters with 7000 base power or less and up to 1 of your opponent's Characters with 5000 base power or less cannot attack until the end of your opponent's next End Phase.\n[On K.O.] DON!! −1: Play this Character card from your trash.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -3183,9 +3517,17 @@
    "block": "X",
    "effectText": "[Blocker]\n[On Play] DON!! −1: Play up to 1 {Celestial Dragons} type Character card with 6000 power or less from your trash.",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Blocker"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -3287,8 +3629,14 @@
    "effectText": "[On Play] You may trash 1 {Big Mom Pirates} type card from your hand: Draw 2 cards.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -3335,8 +3683,14 @@
    "effectText": "[Once Per Turn] If this Character would be K.O.'d, you may DON!! −1 instead.\n[On Play] DON!! −1: Up to 1 of your opponent's Characters with a cost of 7 or less cannot be rested until the end of your opponent's next End Phase.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -3385,8 +3739,14 @@
    "effectText": "If your {The Franky Family} type Character would be K.O.'d, you may DON!! −1 and rest this Character instead.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -3488,8 +3848,14 @@
    "effectText": "[Once Per Turn] If your {Donquixote Pirates} type Character would be removed from the field by your opponent's effect, you may DON!! −1 instead.\n[Opponent's Turn] If your Leader is {Sugar}, this Characters gains [Blocker] and +2000 power.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -3904,8 +4270,14 @@
    "effectText": "[Activate: Main] You may rest 2 of your DON!! cards and this Leader and trash 1 card with a type including \"CP\" from your hand: Add up to 1 card from the top of your deck to the top of your Life cards.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -3953,8 +4325,14 @@
    "effectText": "[Your Turn] [Once Per Turn] When a card is trashed from your hand by your [Marshall.D.Teach] Leader's effect, if you have no other [Van Augur], draw 1 card.\n[On K.O.] Draw 1 Card.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -4002,8 +4380,14 @@
    "effectText": "If you have a [Gecko Moria] Character, this Character gains [Double Attack] and [Blocker].",
    "triggerText": "Play up to 1 {Thriller Bark Pirates} type Character card with a cost of 4 or less from your trash rested.",
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -4051,8 +4435,14 @@
    "effectText": "[When Attacking] This Character's base power becomes the same as your opponent's Leader's power during this turn.\n[On K.O.] You may trash 1 card from your hand: If your Leader has the {Blackbeard Pirates} type, play this Character card from your trash rested.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -4100,8 +4490,14 @@
    "effectText": "[Your Turn] [On Play] Play up to 1 [Sleeptids] from your trash.\n[On K.O.] You may trash 2 cards from your hand: Play this Character card from your trash.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -4149,8 +4545,14 @@
    "effectText": "[On Play] Look at 4 cards from the top of your deck; reveal up to 1 {Holy Knights of God} type card and add it to your hand. Then, trash the rest.\n[Activate: Main] You may rest 4 of your DON!! cards: Play up to 1 {Holy Knights of God} type Character card with a cost of 6 or less from your trash.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -4197,8 +4599,14 @@
    "effectText": "[Activate: Main] You may return this Character to the owner's hand: Up to 1 of your [Saint Shamrock] Characters gains [Rush], [Banish] or [Unblockable] during this turn.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -4247,8 +4655,14 @@
    "effectText": "This Character gains +12 cost.\n[On K.O.] K.O. up to 1 of your opponent's Characters with a cost of 4 or less.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -4297,8 +4711,14 @@
    "effectText": "This Character gains +12 cost.\nIf you only have Characters with a cost of 12 or more, this Character gains +2000 power.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -4346,8 +4766,14 @@
    "effectText": "[Your Turn] [On Play] If you have 6 or more DON!! cards on your field, K.O. up to 1 of your opponent's Characters with a base cost of 4 or less.\n[On K.O.] You may trash 2 cards from your hand: Play this Character card from your trash.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -4396,8 +4822,14 @@
    "effectText": "This Character gains +12 cost.\n[On Play] You may trash 1 card from your hand: Your opponent trashes 1 card from their hand.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -4494,8 +4926,14 @@
    "effectText": "This Character gains +12 cost.\n[When Attacking] You may trash 1 card from your hand: Add up to 1 of your Character cards with a cost of 2 or less from your trash to your hand.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -4543,8 +4981,14 @@
    "effectText": "If there is a Character with a cost of 12 or more, this Character gains +3000 power.\nIf you have 10 or more cards in your trash, this Character gains [Rush].\n(This card can attack on the turn in which it is played.)",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -4590,9 +5034,17 @@
    "block": 5,
    "effectText": "Under the rules of this game, you may have any number of this card in your deck.\n[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Blocker"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -4639,8 +5091,14 @@
    "effectText": "[Main] Look at 5 cards from the top of your deck; reveal up to 1 {Elbaph} type card and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
    "triggerText": "Draw 1 card.",
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -4686,8 +5144,14 @@
    "effectText": "[Main] If your Leader has the {Celestial Dragons} type, look at 5 cards from the top of your deck; reveal up to 1 [Sleeptids] or {Holy Knights of God} type card and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
    "triggerText": "Activate this card's [Main] effect.",
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -4733,8 +5197,14 @@
    "effectText": "[Main] You may rest 3 of your DON!! cards: Play up to 1 {Holy Knights of God} type Character card with a cost of 6 or less from your trash.\n[Counter] If you have 10 or more cards in your trash, up to 1 of your Leader or Characters gains +4000 power during this battle.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -4781,8 +5251,14 @@
    "effectText": "If your Leader has the {Celestial Dragons} type, the cost of playing {Holy Knights of God} or {Five Elders} type Character cards with a cost of 2 or more from your hand will be reduced by 1.\n[On Play] Draw 1 card and trash 2 cards from the top of your deck.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -4829,9 +5305,17 @@
    "block": 5,
    "effectText": "[Unblockable] (This card cannot be blocked.)",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Unblockable"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -4878,8 +5362,14 @@
    "effectText": "[On Play] Add up to 1 card with a type including \"CP\" from your hand to the top or bottom of your Life cards face-up.",
    "triggerText": "If your Leader's type includes \"CP\", draw 1 card and place up to 1 Character with a cost of 8 or less at the bottom of the owner's deck.",
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -4926,8 +5416,14 @@
    "effectText": "[On Play] Draw 1 card, then add up to 1 card with a type including \"CP\" from your hand to the top or bottom of your Life cards face-up.",
    "triggerText": "If your Leader's type includes \"CP\", draw 1 card and rest up to 1 of your opponent's Leader or Characters.",
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -4974,8 +5470,14 @@
    "effectText": "[On K.O.] Add up to 1 card with a type including \"CP\" from your hand to the top or bottom of your Life cards face-up.",
    "triggerText": "If your Leader's type includes \"CP\", K.O. or rest up to 1 of your opponent's Characters with a cost of 6 or less.",
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -5070,8 +5572,14 @@
    "effectText": "[On K.O.] Add up to 1 card from the top of your deck to the top of your Life cards. Then, trash up to 1 card from the top of your opponent's Life cards.",
    "triggerText": "If your Leader's type includes \"CP\", draw 1 card and place up to 1 Character with a cost of 8 or less at the bottom of the owner's deck.",
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -5118,9 +5626,17 @@
    "block": 5,
    "effectText": "[Banish] (When this card deals damage, the target card is trashed without activating its Trigger.)",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Banish"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -5167,8 +5683,14 @@
    "effectText": "",
    "triggerText": "If your Leader's type includes \"CP\", reveal up to 1 card with a type including \"CP\" other than [Spandam] from your hand. Activate the [Trigger] effect of the revealed card.",
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -5215,9 +5737,17 @@
    "block": 5,
    "effectText": "[Double Attack] (This card deals 2 damage.)",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Double Attack"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -5263,9 +5793,17 @@
    "block": 5,
    "effectText": "[Blocker]",
    "triggerText": "If your Leader's type includes \"CP\", place up to 1 Character with a cost of 5 or less at the bottom of the owner's deck.",
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Blocker"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -5312,8 +5850,14 @@
    "effectText": "[On Play] You may trash 1 card with a type including \"CP\" from your hand: Draw 2 cards.\n[Activate: Main] You may rest this Character: Up to 1 of your [Spandam] gains +1000 power during this turn.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -5359,9 +5903,17 @@
    "block": 5,
    "effectText": "[Blocker]",
    "triggerText": "If your Leader's type includes \"CP\", K.O. or rest up to 1 of your opponent's Characters with a cost of 6 or less.",
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Blocker"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -5408,8 +5960,14 @@
    "effectText": "[On Play] Look at 4 cards from the top of your deck; reveal up to 1 card with a type including \"CP\" other than [Blueno] and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
    "triggerText": "Draw 1 card and K.O. up to 1 of your opponent's Characters with a cost of 2 or less.",
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -5456,9 +6014,17 @@
    "block": 5,
    "effectText": "[Rush] (This card can attack on the turn in which it is played.)",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Rush"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -5505,9 +6071,17 @@
    "block": 5,
    "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
    "triggerText": null,
-   "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "keywords": [
+    "Blocker"
+   ],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -5554,8 +6128,14 @@
    "effectText": "[On Play]/[On K.O.] Trash up to 1 card from the top of your opponent's Life cards.",
    "triggerText": "If your Leader's type includes \"CP\", draw 1 card and place up to 1 Character with a cost of 8 or less at the bottom of the owner's deck.",
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -5602,8 +6182,14 @@
    "effectText": "[On Play] Look at all of your Life cards and place them back in your Life area in any order.",
    "triggerText": "If your Leader's type includes \"CP\", place up to 1 Character with a cost of 5 or less at the bottom of the owner's deck.",
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -5648,8 +6234,14 @@
    "effectText": "[Main] K.O. up to 1 of your opponent's Characters with a cost of 5 or less.",
    "triggerText": "If your Leader's type includes \"CP\", draw 1 card and place up to 1 Character with a cost of 7 or less at the bottom of the owner's deck.",
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -5694,8 +6286,14 @@
    "effectText": "[Counter] You may trash 1 card from your hand: Up to 1 of your Leader or Characters gains +3000 power during this battle.",
    "triggerText": "If your Leader's type includes \"CP\", rest up to 1 of your opponent's Characters.",
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {
@@ -5845,8 +6443,14 @@
    "effectText": "[On K.O.] You may trash 1 card from your hand: Play this Character card from your trash.\n[Activate: Main] [Once Per Turn] If this Character was played on this turn, play up to 1 {Holy Knights of God} type Character card with a cost of 6 or less from your trash.",
    "triggerText": null,
    "keywords": [],
-   "verified": false,
-   "verifiedBy": [],
+   "verified": true,
+   "verifiedBy": [
+    {
+     "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+     "date": "2026-11-27",
+     "use": "cross-check"
+    }
+   ],
    "textFixes": [],
    "artworks": [
     {

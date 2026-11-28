@@ -61,3 +61,13 @@ Shared [On Play]: Draw 1 card, then add up to 1 DON!! card as rested from your D
 ### OP18-118 Monkey.D.Luffy
 [On Play] Set up to 3 of your DON!! cards as active. Then, up to 1 of your opponent's Characters cannot be rested until the end of your opponent's next End Phase. [End of Your Turn] Set up to 1 of your {Water Seven} type cards as active.
 - As OP18-027 without the cost limit; [End of Your Turn] as OP18-031's first half.
+
+## Rest of the set
+
+The other 89 cards were scripted in four groups; their readings are in `OP-18-scripting-g1.md` to `-g4.md`. The six cards behind wave G3–G6:
+
+- **OP18-020 Stop Fighting!!!** [Counter] cost `lifeToHand { from: 'top', n: 'all' }` (`costOptional`, "You may"); `if leader name Nefeltari Vivi` then −5000 `thisTurn` on the opponent's Leader and every Character. The Life cards move even when the Leader check fails (colon-less "If"). Payable at 0 Life (M6b-Q97).
+- **OP18-097 Abyss Pentagram** permanent `playCost −1` on your hand's {Holy Knights of God} or {Five Elders} Characters with cost ≥ 2, condition `leader type Celestial Dragons`; [On Play] draw 1, mill 2.
+- **OP18-099 Kaku, OP18-100 Kalifa, OP18-101 Kumadori** "add up to 1 "CP" card from your hand to the top or bottom of your Life cards face-up": `move` hand → Life `topOrBottom`, `faceUp` (G3). Kaku's [Trigger] places a Character of either side (OP17-046 reading); Kumadori's [Trigger] as OP18-109.
+- **OP18-105 Spandam** [Trigger]: `select` a revealed "CP" hand card other than [Spandam] (`bind r`), then `activate { ability: 'trigger', of: { ref r } }` (G6, M6b-Q98).
+- **OP18-117 Buster Call** held (G7, BACKLOG §15).

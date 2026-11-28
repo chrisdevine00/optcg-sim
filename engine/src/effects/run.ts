@@ -321,7 +321,10 @@ export function costText(costs: readonly Cost[] | undefined): string {
     }
     if ('restSelf' in k) return 'rest this card';
     if ('trashSelf' in k) return 'trash this card';
-    if ('lifeToHand' in k) return `add ${k.lifeToHand.n} of your Life cards to your hand`;
+    if ('lifeToHand' in k)
+      return k.lifeToHand.n === 'all'
+        ? 'add all of your Life cards to your hand'
+        : `add ${k.lifeToHand.n} of your Life cards to your hand`;
     if ('turnLifeFaceUp' in k)
       return typeof k.turnLifeFaceUp === 'number'
         ? `turn ${k.turnLifeFaceUp} of your Life cards face-up`
@@ -850,8 +853,10 @@ function payCost(d: Draft, f: EffectFrame, k: Cost, reserve: number): Out {
   if ('trashLife' in k) {
     // "Trash N cards from the top of your Life cards" (G30): not damage, so no [Trigger]; each card
     // goes face up to the trash and the Life watchers (`lifeRemoved`) fire as for any Life move.
-    if (d.ro(f.controller).life.length < k.trashLife) return anomaly(d, f, 'trashLife');
-    for (let i = 0; i < k.trashLife; i++)
+    // 'all' (G4): every Life card, as many as there are (none is a legal payment, M6b-Q97).
+    const n = k.trashLife === 'all' ? d.ro(f.controller).life.length : k.trashLife;
+    if (d.ro(f.controller).life.length < n) return anomaly(d, f, 'trashLife');
+    for (let i = 0; i < n; i++)
       moveCard(d, d.ro(f.controller).life[0]!, 'trash', {
         revealed: true,
         extra: { reason: 'cost' },
@@ -990,9 +995,14 @@ function fieldCost(d: Draft, f: EffectFrame, sel: Selector, how: FieldCostHow): 
 function lifeToHandCost(
   d: Draft,
   f: EffectFrame,
-  spec: { from: 'top' | 'topOrBottom'; n: number },
+  spec: { from: 'top' | 'topOrBottom'; n: number | 'all' },
 ): Out {
   const p = f.controller;
+  if (spec.n === 'all') {
+    // Every Life card, from the top (G4): not damage, no [Trigger]; none is a legal payment.
+    for (const id of [...d.ro(p).life]) moveCard(d, id, 'hand', { extra: { reason: 'life' } });
+    return 'next';
+  }
   let done = f.ph ?? 0;
   while (done < spec.n) {
     const life = d.ro(p).life;
@@ -1929,6 +1939,28 @@ function action(d: Draft, f: EffectFrame, a: EffectAction): Out {
         : num(c, a.returnDon.n);
     return returnDon(d, f, n, 0, 'target');
   }
+  if ('activate' in a && a.activate.ability === 'trigger') {
+    // The [Trigger] of a revealed card in your hand (G6, OP18-105): one card; its own conditions
+    // and cost are read by its effect frame, as in a Life [Trigger] (OP17-076). The card stays
+    // where it is unless the effect moves it.
+    const id = pool(c, a.activate.of).find((x) => d.card(x).zone === 'hand');
+    if (id === undefined) return 'next';
+    const cardId = d.card(id).card;
+    const trig = d.s.defs[cardId]!.abilities.find((x) => x.kind === 'trigger');
+    if (!trig) return 'next';
+    f.acted = true;
+    d.emit({
+      type: 'EffectActivated',
+      player: you,
+      instance: id,
+      card: cardId,
+      ability: trig.id,
+      timing: 'trigger',
+      keys: { instance: d.card(id).key },
+    });
+    pushEffect(d, id, cardId, trig, you, 'effect');
+    return 'next';
+  }
   if ('activate' in a && a.activate.of !== 'self') return activateEvent(d, f, a.activate.of);
   if ('activate' in a) {
     // "[Trigger] Activate this card's [Main] effect" (QA-OP03 OP03-074: its own costs are paid).
@@ -2353,8 +2385,8 @@ function move(
   }
   let ids: InstanceId[];
   if (
-    to.zone === 'deck' &&
-    (to.position === 'topOrBottom' || to.position === 'bottom') &&
+    ((to.zone === 'deck' && (to.position === 'topOrBottom' || to.position === 'bottom')) ||
+      (to.zone === 'life' && to.position === 'topOrBottom')) &&
     f.tmp?.sel
   ) {
     ids = f.tmp.sel; // already chosen; waiting for the top or bottom answer, or the order
@@ -2395,7 +2427,20 @@ function move(
     return 'next';
   }
   if (to.zone === 'life') {
-    // Hand or trash to the top of Life (OP06-106; OP14-104 face-up).
+    // Hand or trash to the top of Life (OP06-106; OP14-104 face-up), or to the end the controller
+    // picks (OP18-099 to OP18-101, OP-18 wave G3: "to the top or bottom of your Life cards face-up").
+    if (to.position === 'topOrBottom') {
+      if (ids.length === 0) return 'next';
+      f.tmp = { ...f.tmp, sel: ids };
+      const end = lifeEnd(
+        d,
+        f,
+        `${nameOf(d, f)}: place the card at the top or the bottom of your Life cards?`,
+      );
+      if (end === WAIT) return WAIT;
+      placeCards(d, ids, { ...(to as Dest), position: end }, 'effect');
+      return 'next';
+    }
     placeCards(d, ids, to as Dest, 'effect');
     return 'next';
   }

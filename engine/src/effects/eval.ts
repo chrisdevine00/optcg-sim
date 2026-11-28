@@ -480,8 +480,9 @@ export function payable(c: Ctx, costs: readonly Cost[] | undefined, o: PayOption
     } else if ('lifeToHand' in k) {
       // "You cannot add Life cards to your hand using your own effects" covers the cost (G60).
       if (cannotLifeToHandByEffect(s, c.you)) return false;
-      lifeNeeds += k.lifeToHand.n;
-    } else if ('trashLife' in k) lifeNeeds += k.trashLife;
+      // 'all' is payable with any number of Life cards, none included (G4, M6b-Q97).
+      if (k.lifeToHand.n !== 'all') lifeNeeds += k.lifeToHand.n;
+    } else if ('trashLife' in k) lifeNeeds += k.trashLife === 'all' ? 0 : k.trashLife;
     else if ('turnLifeFaceUp' in k) {
       // The top Life card is turned: it must be there and face-down (an end, G68).
       if (!lifeFaceCost(s, c.you, k.turnLifeFaceUp, false)) return false;
@@ -714,7 +715,8 @@ export function playBlocked(s: State, p: PlayerId, card: InstanceId): boolean {
 
 /**
  * What `p` pays to play this card from hand: its current cost, changed by the pending one-shot
- * discounts that match it. `used` are the discounts that applied (they are spent when it is paid).
+ * discounts that match it and by permanent `playCost` effects on the field (G5). `used` are the
+ * one-shot discounts that applied (they are spent when it is paid); permanent ones are never spent.
  */
 export function playCostOf(
   s: State,
@@ -731,5 +733,17 @@ export function playCostOf(
     delta += m.amount;
     used.push(m.id);
   }
+  // Permanent reductions of the cost of playing cards from your hand (OP18-097, OP-18 wave G5):
+  // read on the card's current cost, so "a cost of 2 or more" sees the cost before the reduction.
+  if (s.cards[card]?.zone === 'hand')
+    for (const src of liveSources(s, p, live))
+      for (const ab of permanents(s, src)) {
+        if ((ab.zone ?? 'field') !== 'field') continue;
+        const c: Ctx = { s, you: p, self: src, live };
+        if (!allHold(c, ab.conditions)) continue;
+        for (const ap of ab.apply)
+          if ('playCost' in ap && pool(c, ap.playCost.target).includes(card))
+            delta += num(c, ap.playCost.amount);
+      }
   return { cost: Math.max(0, base + delta), used };
 }

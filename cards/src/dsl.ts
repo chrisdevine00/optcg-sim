@@ -398,7 +398,11 @@ export type Cost =
   | { rest: Selector }
   | { restSelf: true }
   | { trashSelf: true }
-  | { lifeToHand: { from: 'top' | 'topOrBottom'; n: number } }
+  /**
+   * "Add N of your Life cards to your hand". `n: 'all'` (OP-18 wave G4, OP18-020): every Life card,
+   * from the top; payable with any number of Life cards, none included (M6b-Q97).
+   */
+  | { lifeToHand: { from: 'top' | 'topOrBottom'; n: number | 'all' } }
   /**
    * "Turn N of your Life cards face-up": the top N, which must be face-down. The object form (G68)
    * is "turn 1 card from the top or bottom of your Life cards face-up": one card at the named end
@@ -418,9 +422,10 @@ export type Cost =
   | { mill: number }
   /**
    * "Trash N cards from the top of your Life cards" (G30): not damage, so no [Trigger]; the card
-   * is trashed face up. Payable while the Life area holds N cards.
+   * is trashed face up. Payable while the Life area holds N cards. `'all'` (G4, OP18-117): every
+   * Life card, payable with any number, none included (M6b-Q97).
    */
-  | { trashLife: number }
+  | { trashLife: number | 'all' }
   /**
    * Replacement payloads: "return 1 DON!! card from your field to your DON!! deck instead". The
    * object form returns active cost-area DON!! only: "return 2 of your active DON!! cards" (G9).
@@ -621,7 +626,15 @@ export type Action =
          * activation for watchers. From the trash: only its [Main] runs, the card stays, and no
          * watcher sees an Event activated (official OP12, OP15, EB03 Q&A).
          */
-        | { ability: 'main'; of: Selector };
+        | { ability: 'main'; of: Selector }
+        /**
+         * "Reveal up to 1 card ... from your hand. Activate the [Trigger] effect of the revealed
+         * card" (OP18-105, OP-18 wave G6): the [Trigger] of the one hand card the selector names
+         * (bound by an earlier revealing `select`) runs with that card as its source; its own cost
+         * is asked as for any [Trigger]; the card stays in the hand unless the effect moves it
+         * (a "this card" move only acts on a [Trigger] in its resolving slot) (M6b-Q98).
+         */
+        | { ability: 'trigger'; of: Selector };
     }
   /**
    * "Look at up to 1 card from the top of your or your opponent's Life cards and place it at the top

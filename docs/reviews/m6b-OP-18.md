@@ -95,3 +95,89 @@ The verdict was PASS, so no severity 3 or 4 needed fixing; the severity 2 findin
 - **R2 fixed.** `engine/test/cards/OP18-031.test.ts` "must not apply on your own turn, even to the opponent's effect": p2's Life [Trigger] K.O.s p1's Character on p1's turn and no replacement is offered. With the `opponentsTurn` condition removed from the script the test fails (checked).
 - **R3, R6:** OPEN-QUESTIONS M6b-Q95 (one replacement saves a group) and M6b-Q94 (the G1 reading). Also M6b-Q96 (OP18-071's "{Sugar}"), from the rest-of-set scripting.
 - **R4, R5, R7:** carried. R4 (Rookie's printed Counter) goes to `docs/BACKLOG.md` with Track C; R7's cards are scripted in the rest-of-set batch.
+
+## Rest of the set (2026-11-28)
+
+**Reviewer:** independent adversarial review (subagent). **Build reviewed:** worktree branch `claude/zealous-montalcini-101d31` at `5e2d66f8` (95 scripts, wave G3-G6 `16a95154..6645ed7c`, blind tests). No tracked file was changed; scratch tests, a vitest config and logs lived under `/private/tmp/claude-502/s/`.
+
+**Verdict: PASS.** No severity 3 or 4. 95 of 95 scripts match their text clause by clause (every Leader, the 11 most played cards, every number, owner, filter and timing word); G3-G6 have no wrong result and no leak. Three severity 2 findings (a rules deviation in `giveDon each`, a display gap for G5, a ruling gap in G6) and three severity 1.
+
+### Method
+
+1. Dumped all 95 scripts (abilities, minified) beside `cards/data/sets/OP-18.json` and compared each clause: targets, owners, "up to", cost and power boundaries (`power` vs `basePower`), types (`type` vs `typeIncludes`), durations, Once Per Turn, colon-less "If" (effect condition) vs "If" after a colon, cost vs effect, optionality, [Trigger]s (all 18 [Trigger] cards and all 7 [Counter] cards carry the ability), the `rules` clauses (OP18-045 `alsoNamed`, OP18-093 `anyNumberInDeck`, and the `defs.ts` table entry). The printed keywords of all 119 cards equal the data `keywords` (script-checked). Popularity from `.cache/meta/standings`: OP18-093 249, -064 202, -119 184, -084 and -083 183, -097 182, -085 179, -096 179, -088 166, -095 151; Leaders Gunko 46 lists, Franky 12, Ms. All Sunday 11, Spandam 11, Luffy 9, Karoo 7.
+2. Probes (scratch tests, deleted with the directory): G6 with real revealed cards, G5 legality and view cost, G3 end prompt and projection, Mr.0's DON!! questions, OP18-016 with an empty and a one-card hand, Saint Shamrock K.O.'d under Gunko, `playCostOf` timing (1.6 microseconds per call, `legalActions` 18 microseconds on a 7-card hand: no hot-path cost).
+3. Random games: a scratch property harness mocks `engine/test/support/decks.ts` so `standardDecksFor(seed)` returns decks of 50 OP-18 cards (random 1-4 copy bunches, Leader chosen from Gunko x2, Spandam x2, Ms. All Sunday, Karoo, Luffy, Franky; both seats), then runs the repository's own `standard-games`, `leaks`, `skeleton-diff` and `projection` tests unchanged. Totals: 2,000 + 2,000 games with invariants, replay hash, listed/unlisted actions (the 6,000 run also ran leaks with 400 runs and the other two); leak property 200 + 600 + 400 runs (seeds `PROPERTY_SEED` default, 777, 991); skeleton diff and projection once at 3,000 and once at 6,000. **Failing seeds: none.** Caveat: random play rarely builds the Gunko engine on purpose, so this is an invariant and leak check, not a card-behaviour check.
+4. Ran `engine/test/cards/OP18*`, `engine/test/cards/m6b-op18`, `engine/test/independent/cards/op18`, `cards/test/{hidden-gate,script-text,effects-index}`: 227 files, 3,091 pass, 3 expected failures (the three filed disagreements).
+
+### Findings
+
+### OP18-R8 (2) OP18-046 cannot give a target 0 DON!!: disagreement settled, the engine deviates from "up to" (E-Q11)
+- **Probe:** Mr.0 played with 9 rested DON!! and a Leader plus two Characters: the first question is "how many rested DON!! will you give to Ms. All Sunday (up to 2)?" with options `2`, `1`; no `0`, no `done`. Every target is served at least 1 while DON!! remain.
+- **Cause:** `giveDon` with `each` (`run.ts` ~2139): when the selector has no `pick` ("your Leader and all of your Characters") and the pool fits the DON!! on hand, all targets are taken without a question and each count runs `hi..1`. DECISIONS 2026-11-24 (ENGINE_VERSION 0.5.10) rejected a `0` option because "choosing fewer targets already means that"; that holds for "up to N of your Characters ... each" (a target pick) but not for "all of your Characters", where there is no target pick, so a target can never be skipped. CR 4-8-1 and E-Q11 allow fewer, including none.
+- **Severity 2:** more DON!! on a target is rarely worse, and the 9 DON!! from the cost nearly always cover everyone; a player who wants to concentrate DON!! (2 + 1 + 0) or keep a Character at a given DON!! count cannot.
+- **Fix:** in the `each` branch, when `g.to.pick` is absent, offer `0` (label "None") in the per-target count (and then keep the reservation maths). Turn the `it.fails` in `OP18-046.test.ts` into a normal test and remove the entry from `DISAGREEMENTS-d.md`.
+
+### OP18-R9 (2) The Play button and the view show the printed cost, so Abyss Pentagram's discount is invisible (G5 display)
+- **Evidence:** with OP18-060 and OP18-097 on the field, a cost 5 {Holy Knights of God} Character in hand: `queries.card(...).cost` is 5, `legalActions` offers the play with 4 active DON!!, and the play rests 4. `app/src/play/game/Game.tsx:1636` and `rail/Decision.tsx:814` print `rest {c.card.cost} DON!!` from the printed card, so the button says "rest 5 DON!!" while resting 4 (a player with 4 DON!! sees a number they cannot pay, then the play works). `board/BoardCard.tsx` hand plate and `Dock.tsx` use the view cost, also the printed one. The AI heuristics `ai/src/search/pirate.ts:506, 519, 655` compare active DON!! with `card.cost` the same way (heuristics only; legality comes from `legalActions`, so no wrong play). The same blind spot already exists for one-shot `playCost` modifiers (Trafalgar Law type); G5 makes it constant in the 46 Gunko lists (Abyss Pentagram: 182 copies).
+- **Legality, once-only uses, hidden information: checked and right.** `check`, `eventPayable` and `runPlay` all call `playCostOf` (live in the pay step), so offered and paid costs agree; the reduction applies only while the card is in the hand (`s.cards[card].zone === 'hand'`), reads the cost before the reduction (a cost 1 card is untouched, probe), never goes below 0, does not touch the one-shot mods' `used` list (they stay spent only when they applied), and is absent without a {Celestial Dragons} Leader (probe: 0 plays at 4 DON!!). The discount depends on the identity of hand cards but only changes the owner's own action list; `layered()` skips `playCost`; 8,000 OP-18 random games and the leak/skeleton properties found nothing.
+- **Fix:** add the engine's play cost to the view of the viewer's own hand cards (`ViewCard.playCost`, from `playCostOf`) and read it in the two Play labels and the hand plate; optionally in the AI's pirate heuristics. One component test with OP18-097 on the board.
+
+### OP18-R10 (2) G6 / M6b-Q98: a revealed CP card whose [Trigger] says "this card" does nothing, and the stated reason is wrong
+- **Probe:** a stand-in effect with the exact G6 steps (reveal a hand card, `activate trigger`): revealing OP17-071 Who's.Who ("[Trigger] Play this card") leaves it in hand and plays nothing; revealing EB04-049 Finger Pistol Yellow Lotus ("[Trigger] Activate this card's [Main] effect") runs nothing, not even its optional mill cost. Both are CP-typed and Standard-legal, so both can be revealed by OP18-105. M6b-Q98 and the DSL comment say "No OP-18 [Trigger] of a CP card says 'this card', so no OP-18 card depends on the second half yet": true of OP-18, but the revealed card can come from any set (OP17-071 and EB04-049 are in the CP list; also the same text on ST29/OP03/OP08 cards is a plain effect). None of the 11 cached Spandam lists plays either card, so this is a ruling gap, not a live defect.
+- **Frames, OPT, "this card" moves (rest of the G6 brief):** the nested frame is pushed on top of Spandam's [Trigger] frame, resolves first (draw happened before the rest, probe), carries the hand card as source, emits `EffectActivated` with `timing: 'trigger'` and the revealed card is public (`CardRevealed`). There is no OPT on any CP [Trigger]. `hidden.ts` treats the selector as a hand read, which is correct for a permanent/activate but is not a gate (checked by `hidden-gate.test.ts`, passes).
+- **Severity 2:** a reading, both cards are rare in Spandam lists.
+- **Fix:** decide per rules: the text is executable from the hand ("play this card" can play the card from the hand for free; "activate this card's [Main]" can run its [Main]), so I would let `self` mean the hand card for a hand-activated Trigger, or at least list OP17-071 and EB04-049 in Q98 and pin the chosen behaviour in `g3-g6.test.ts`.
+
+### OP18-R11 (1) Disagreement OP18-016 settled: the engine is right (ADR 0005); one UX nit remains for an entirely empty hand
+- With a filter over a hidden hand the prompt is asked at `min 0 max 0` even when no card matches, because skipping it would tell the opponent that no match exists (`hidden-gate.ts` header, DECISIONS "Empty picks", `run.ts:636`). The blind test's scenario holds a non-matching card in hand, so the `it.fails` should be rewritten to expect the empty `choose` and `done`, and the entry removed. The comparison with Chopper (OP18-010) is wrong: that is the trash (public), not the hand.
+- Nit: with the hand entirely empty (public size 0) the prompt is still asked (probe: `choose 0 0`), because `selectCards` skips only when `!sel.filter`. Skipping when the unfiltered pool is empty would be safe (a hand size is public). Applies to every "play/trash up to 1 {filter} from hand" script, not just OP18-016.
+
+### OP18-R12 (1) Disagreement OP18-080 settled: not a Van Augur defect; the first clause is dead until OP09-081 is scripted
+- OP09-081 Marshall.D.Teach has no script (BACKLOG D5, whole-side [On Play] negation), and OP16-080 trashes only on the opponent's turn, where `[Your Turn]` is correctly silent. The script (`trashedFromHand` by your Teach Leader, `includeCosts`, `yourTurn`, OPT, "no other [Van Augur]" read when the draw resolves) matches the text and M6b-Q31. Keep the `it.fails`, and re-run it when D5 lands.
+
+### OP18-R13 (1) Minor
+- The `playCostOf` doc comment still says "pending one-shot discounts"; add the permanent reduction.
+- No test pins `each` with no target pick (R8) or a hand-activated "this card" [Trigger] (R10); both would have shown the issues above.
+
+## Script versus card text: result (rest of the set)
+
+95 of 95 compared; no mismatch in a cost, number, filter, duration, Once Per Turn, owner, zone, timing keyword or [Trigger]. Points most likely to be wrong, checked and right:
+
+- **Leaders.** OP18-001: both-types filter is `all(type Animal, type Alabasta)`, Rush and +1000 together; the draw is `koed` of an own Alabasta Character, OPT, any cause (opponent's Alabasta does not draw: author and blind tests). OP18-022: `donGiven 3` on itself, OPT, `may` set active, `ifDid` the Refresh skip (Q15 reading; blind tests pin the one-Refresh duration). OP18-041: `typeIncludes "Baroque Works"` (so "Former Baroque Works" counts), `basePower >= 3000`, no OPT, the opponent chooses the discard; an empty opponent hand asks nothing. OP18-060: `from: trash`, `by: you`, OPT, draw 2 then trash 1 as plain steps; Activate: Main OPT, colon-less "If" read as an effect condition, `basePower >= 8000`; probe: Saint Shamrock K.O.'d under Gunko pays, returns, Gunko draws 2 and trashes 1 in that order. OP18-079: `restDon 2`, `restSelf`, trash `typeIncludes CP`, `deckTop` to the top of Life face-down.
+- **Gunko deck (most played).** OP18-064: two separate picks, the second excluding the first (`not ref`), `[Your Turn]` only on the [On Play]; OP18-083/088/119/082 pay a hand cost and replay from the trash; OP18-084 trashes the unchosen looked-at cards; OP18-085 asks the keyword before the target and returns first; OP18-096 and -095 boundaries (cost 6, 10 cards in trash, `type` / `name Sleeptids`); OP18-065 `power <= 6000` printed; OP18-093 no ability, `rules.anyNumberInDeck` and the identical `DECK_RULES` entry in `engine/src/defs.ts`.
+- **Cost +12 Giants (086-091), Stansen, Zoro OP18-092:** `cost +12` on self; Stansen's "only" is "no Character of yours with cost <= 11"; Zoro reads either side's cost and your own trash.
+- **Replacements (017, 054, 068, 069, 071):** scope `opponentEffect` vs any K.O., OPT, optional, and the cost of "instead" payable on public information or secret and offered (flow fix of 0.5.9).
+
+## G3-G6: side effects checked
+
+| Wave | Result |
+| --- | --- |
+| G3 hand/trash card to the top or bottom of Life, face-up (099, 100, 101) | The pick over the hand is asked at max 0 even with no CP card (no gate); the end question is asked only after a card was chosen, so it reveals nothing the face-up card does not. Probe: card ends face-up at the bottom, three face-down cards above it, one `choose` for the card and one for the end. `hash.ts` and `project.ts` already handle face-up Life; leak, skeleton and projection properties clean (the runs listed in Method). The validator limits `topOrBottom` to hand/trash sources. |
+| G4 `lifeToHand 'all'` (020) and `trashLife 'all'` (unused until 117) | Payable with 0 Life (Q97), moves every Life card with reason `life`, no [Trigger], respects `cannotLifeToHandByEffect`. `payable` adds 0; `costText` says "all". No other reader sums `n` (grep over engine, ai, app). 0 Life accepted costs nothing and resolves, as ruled. `trashLife 'all'` has no script, so its path is untested by cards (planted test only). |
+| G5 `playCost` permanent (097) | Legal, correct, cheap; display gap R9. |
+| G6 `activate trigger` (105) | Works for plain steps (draw, K.O., place at the bottom, chooseOne); gap R10. |
+
+## Disagreements: settled
+
+| Test | Ruling |
+| --- | --- |
+| OP18-016 empty hand prompt | Engine right (ADR 0005); test wrong; R11 nit for a wholly empty hand. |
+| OP18-046 "up to 2 each" never offers 0 | Engine deviates from E-Q11/CR 4-8-1 for "all of your Characters"; R8, severity 2, fix is small. |
+| OP18-080 Teach clause unreachable | Engine gap (OP09-081 unscripted, BACKLOG D5), not a script fault; R12. |
+
+## Recommendations (in order)
+
+1. R8: offer `0` per target when the `each` selector has no pick; convert the `it.fails`.
+2. R9: expose the play cost in the own-hand view and read it in the Play labels.
+3. R10: decide the "this card" reading for a hand-activated [Trigger] and amend Q98 (OP17-071, EB04-049).
+4. R11: rewrite the OP18-016 blind test; optionally skip the empty-hand filtered prompt.
+5. R12, R13: notes.
+
+### Fix round (rest of the set, 2026-11-28)
+
+PASS, so nothing had to be fixed; the round took the small items and carried the two that change engine behaviour or the view API.
+- **R11:** the blind OP18-016 test now asserts the empty pick (ADR 0005); DISAGREEMENTS-c settled.
+- **R12:** DISAGREEMENTS-d notes OP18-080's Teach clause waits on OP09-081 (BACKLOG D5).
+- **R10:** M6b-Q98 now names OP17-071 and EB04-049 and the reading's effect on them.
+- **R13:** the `playCostOf` comment covers permanent reductions.
+- **R8, R9:** carried to BACKLOG §15 (R8 changes `giveDon each` for older cards: an ENGINE_VERSION bump and new goldens; R9 adds a view field). The OP18-046 `it.fails` stays until R8 lands.
