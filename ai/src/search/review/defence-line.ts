@@ -69,7 +69,10 @@ export function attackersOn(
 
 /** The Counter value of every card in `p`'s hand. */
 export function handCounter(s: GameState, p: PlayerId, cards: ReadonlyMap<string, Card>): number {
-  return queries.zone(s, p, 'hand').reduce((t, c) => t + counterValueOf(cards.get(c.card)), 0);
+  const leader = queries.zone(s, p, 'leader')[0]?.card;
+  return queries
+    .zone(s, p, 'hand')
+    .reduce((t, c) => t + counterValueOf(cards.get(c.card), leader), 0);
 }
 
 interface Battle {

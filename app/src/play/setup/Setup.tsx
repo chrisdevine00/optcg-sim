@@ -210,7 +210,7 @@ export function Setup({
         </p>
       )}
       <p className="lede">
-        Pick two decks (the twelve meta decks, or your own from Decks), an opponent and who goes
+        Pick two decks (the fourteen meta decks, or your own from Decks), an opponent and who goes
         first.
       </p>
       <ul className="lede automation" data-testid="automation">

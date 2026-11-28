@@ -355,7 +355,10 @@ export function explainShouldCounter(
     let best = 0;
     for (const z of ['deck', 'life'] as const)
       for (const c of queries.zone(m, me, z))
-        best = Math.max(best, counterValueOf(cards.get(c.card)));
+        best = Math.max(
+          best,
+          counterValueOf(cards.get(c.card), queries.zone(m, me, 'leader')[0]?.card),
+        );
     const bestPossible = hc + best;
     if (mustStop > 0)
       evidence.push({

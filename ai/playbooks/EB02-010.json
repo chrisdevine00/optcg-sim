@@ -1,0 +1,105 @@
+{
+  "leaderId": "EB02-010",
+  "archetypeId": "EB02-010-luffy-gp",
+  "aiName": "Luffy",
+  "asOf": "2026-11-28",
+  "guide": "docs/content/archetypes/EB02-010.md",
+  "notes": [
+    "Written from the guide's 'Game plan by turn' and 'Playbook seeds'. No written deck guide exists for this Leader (no top-8 result yet): every claim is our reasoning from card text [CARD-18], so the guide is confidence low and the mulligan rule is labelled our reasoning, not sourced.",
+    "Every number here is an inference: the guide gives the direction, not the value. weights, faceBias, counterAggression, cardValue and bias sizes were set by reasoning and have not been tuned on their own.",
+    "Bias sizes were chosen so the planted game-plan tests pass; ai/test/game-plan-g4.test.ts runs every seed with the biases off too, and lists the seeds that pass only because a bias encodes the guide's line.",
+    "Citations ('cite', 'citeSource') are what 'Why?' shows when a move follows the line; only biases whose condition is public carry one.",
+    "goFirst false: strategy-concepts section 10 [S17], the general default is to go second; the Leader's +1000 defends on the opponent's turn and its DON!! -2 is a tempo loan.",
+    "weights.don 1.1: the Leader returns 2 DON!! and sets 2 active, and Sanji & Pudding refunds one; DON!! on the field count a little more.",
+    "counterAggression 1.05, faceBias 0.95/1.0/1.05: a Straw Hat Crew midrange deck whose Leader defends (inference).",
+    "mulligan: our reasoning (no SH- tag): a searcher, and a couple of Counter cards; going second one piece short is fine, going first the searcher is required.",
+    "seed 3 uses the playBeforeActivate bias: Sanji & Pudding must already be on the field when the Leader's DON!! -2 returns two DON!!, or its refund does not happen."
+  ],
+  "goFirst": false,
+  "digTargets": ["EB02-035", "EB02-017", "PRB02-012", "ST18-004"],
+  "winConditions": ["EB02-061", "OP17-022"],
+  "cardValue": {
+    "EB02-035": 0.5,
+    "EB02-061": 0.3,
+    "ST18-004": 0.2,
+    "EB02-017": 0.2
+  },
+  "weights": {
+    "don": 1.1
+  },
+  "faceBias": {
+    "early": 0.95,
+    "mid": 1.0,
+    "late": 1.05
+  },
+  "counterAggression": 1.05,
+  "mulligan": {
+    "pieces": [
+      {
+        "name": "searcher",
+        "label": "a searcher (Nami, Shoot Down That Flag or Zoro-Juurou)",
+        "cards": ["EB02-017", "PRB02-012", "OP18-038", "ST18-004"],
+        "min": 1
+      },
+      {
+        "name": "counters",
+        "label": "a couple of cards with a Counter",
+        "min": 2
+      }
+    ],
+    "secondShort": 1,
+    "requireGoingFirst": ["searcher"],
+    "source": "EB02-010 guide (keepable hand, inference; our reasoning, no written source)"
+  },
+  "biases": [
+    {
+      "seed": 1,
+      "kind": "activate",
+      "card": "EB02-010",
+      "ability": "set-active",
+      "fromOwnTurn": 2,
+      "bonus": 3.0,
+      "cite": "Its guide (our reasoning from the Leader's text): DON!! -2 sets 2 DON!! active and gives the Leader +1000 until the end of the opponent's next turn.",
+      "citeSource": "CARD-18"
+    },
+    {
+      "seed": 2,
+      "kind": "play",
+      "cards": ["EB02-017", "PRB02-012"],
+      "byOwnTurn": 2,
+      "bonus": 2.0,
+      "cite": "Its guide (our reasoning): open with a Nami searcher on turn 1 or 2.",
+      "citeSource": "CARD-18"
+    },
+    {
+      "seed": 3,
+      "kind": "playBeforeActivate",
+      "card": "EB02-035",
+      "source": "EB02-010",
+      "ability": "set-active",
+      "penalty": 3.0,
+      "cite": "Its guide (our reasoning from card text): play Sanji & Pudding first, so the DON!! the Leader returns add a DON!! and set it active.",
+      "citeSource": "CARD-18"
+    }
+  ],
+  "assertions": [
+    {
+      "seed": 1,
+      "text": "Uses the Leader's DON!! -2 on every own turn from T2 on which it is legal.",
+      "threshold": 0.8,
+      "source": "CARD-18 (threshold is inference)"
+    },
+    {
+      "seed": 2,
+      "text": "Plays a Nami searcher (EB02-017 or PRB02-012) on T1 or T2 when one is in hand.",
+      "threshold": 0.8,
+      "source": "inference from CARD-18"
+    },
+    {
+      "seed": 3,
+      "text": "When it holds Sanji & Pudding and can pay for it, plays it before using the Leader's DON!! -2 on that turn.",
+      "threshold": 0.8,
+      "source": "CARD-18 (threshold is inference)"
+    }
+  ]
+}

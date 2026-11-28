@@ -27,14 +27,16 @@ const T = tiles();
 const byLeader = (id: string) => T.find((t) => t.leaderId === id)!;
 
 describe('tiles and names', () => {
-  it('has twelve tiles, one name each, told apart by colour where a Leader name repeats', () => {
-    expect(T).toHaveLength(12);
-    expect(new Set(T.map((t) => t.name)).size).toBe(12);
+  it('has fourteen tiles, one name each, told apart by colour where a Leader name repeats', () => {
+    expect(T).toHaveLength(14);
+    expect(new Set(T.map((t) => t.name)).size).toBe(14);
     expect(byLeader('OP17-079').name).toBe('Luffy (Black)');
     expect(byLeader('OP13-001').name).toBe('Luffy (Red/Green)');
     expect(byLeader('OP15-058').name).toBe('Enel (Purple)');
     expect(byLeader('OP05-098').name).toBe('Enel (Yellow)');
     expect(byLeader('OP17-039').name).toBe('Rocks.D.Xebec');
+    expect(byLeader('EB02-010').name).toBe('Luffy (Green/Purple)');
+    expect(byLeader('OP18-021').name).toBe('Franky');
   });
   it('the Rocks tile reads the learning-ui example', () => {
     const rocks = byLeader('OP17-039');
@@ -81,7 +83,7 @@ describe('sort and filter', () => {
   it('filters by colour', () => {
     const blue = filterByColor(T, 'Blue');
     expect(blue.map((t) => t.leaderId).sort()).toEqual(['OP14-041', 'OP17-039']);
-    expect(filterByColor(T, null)).toHaveLength(12);
+    expect(filterByColor(T, null)).toHaveLength(14);
     expect(colorsOf(T)).toEqual(['Red', 'Green', 'Blue', 'Purple', 'Black', 'Yellow']);
   });
 });
@@ -124,9 +126,9 @@ describe('automation line', () => {
 });
 
 describe('matchup grid', () => {
-  it('is 12 by 12 with a mirror on the diagonal and 132 plans elsewhere', async () => {
+  it('is 14 by 14 with a mirror on the diagonal and 182 plans elsewhere', async () => {
     const grid = matchupGrid(await loadGuides());
-    expect(grid).toHaveLength(12);
+    expect(grid).toHaveLength(14);
     let plans = 0;
     grid.forEach((row, r) =>
       row.forEach((c, i) => {
@@ -134,7 +136,7 @@ describe('matchup grid', () => {
         if (!c.mirror && c.entry) plans++;
       }),
     );
-    expect(plans).toBe(132);
+    expect(plans).toBe(182);
   });
   it('shows a record or "plan", never a percentage', async () => {
     const grid = matchupGrid(await loadGuides()).flat();

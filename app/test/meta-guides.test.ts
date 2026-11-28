@@ -1,5 +1,5 @@
 /**
- * M9 WP1: the guide parser over all 12 archetype files, the sources it resolves through, and the
+ * M9 WP1: the guide parser over all 14 archetype files, the sources it resolves through, and the
  * checks that make a guide edit fail loudly (an unknown tag, a missing opponent row).
  */
 import { describe, expect, it } from 'vitest';
@@ -38,9 +38,9 @@ describe('parseSources', () => {
   });
 });
 
-describe('parseGuide: all 12 files', () => {
-  it('has twelve files, one per archetype in meta-lists.json', async () => {
-    expect(FILES.length).toBe(12);
+describe('parseGuide: all 14 files', () => {
+  it('has fourteen files, one per archetype in meta-lists.json', async () => {
+    expect(FILES.length).toBe(14);
     const guides = await loadGuides();
     expect(guides.map((g) => g.leaderId).sort()).toEqual([...LEADERS].sort());
   });
@@ -65,10 +65,10 @@ describe('parseGuide: all 12 files', () => {
           'playbook-seeds',
         ]);
       });
-      it('has 11 opponent rows, every opponent a known leader, never itself', () => {
-        expect(g.matchups).toHaveLength(11);
+      it('has 13 opponent rows, every opponent a known leader, never itself', () => {
+        expect(g.matchups).toHaveLength(13);
         const opp = g.matchups.map((m) => m.opponent);
-        expect(new Set(opp).size).toBe(11);
+        expect(new Set(opp).size).toBe(13);
         for (const o of opp) {
           expect(LEADERS).toContain(o);
           expect(o).not.toBe(g.leaderId);
@@ -105,12 +105,12 @@ describe('parseGuide: all 12 files', () => {
     const bad = g.matchups.flatMap((m) => m.tags).filter((t) => !knownTag(t));
     expect(bad).toContain('SH-ZZZ');
   });
-  it('a guide with a row removed fails the 11-row check (revert check)', () => {
+  it('a guide with a row removed fails the 13-row check (revert check)', () => {
     const text = read('OP17-039.md')
       .split('\n')
       .filter((l) => !l.startsWith('| OP08-098 Kalgara'))
       .join('\n');
-    expect(parseGuide(text).matchups).toHaveLength(10);
+    expect(parseGuide(text).matchups).toHaveLength(12);
   });
   it('a file with no front matter is refused', () => {
     expect(() => parseGuide('# nothing\n')).toThrow(/front matter/);

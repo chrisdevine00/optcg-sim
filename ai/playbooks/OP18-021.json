@@ -1,0 +1,134 @@
+{
+  "leaderId": "OP18-021",
+  "archetypeId": "OP18-021-franky",
+  "aiName": "Franky",
+  "asOf": "2026-11-28",
+  "guide": "docs/content/archetypes/OP18-021.md",
+  "notes": [
+    "Written from the guide's 'Game plan by turn' and 'Playbook seeds'. No written deck guide exists for this Leader (an OP-18 Leader with no top-8 result yet): every claim is our reasoning from card text [CARD-18], so the guide is confidence low and the mulligan rule is labelled our reasoning, not sourced.",
+    "Every number here is an inference: the guide gives the direction, not the value. weights, faceBias, counterAggression, cardValue and bias sizes were set by reasoning and have not been tuned on their own.",
+    "Bias sizes were chosen so the planted game-plan tests pass; ai/test/game-plan-g4.test.ts runs every seed with the biases off too, and lists the seeds that pass only because a bias encodes the guide's line.",
+    "Citations ('cite', 'citeSource') are what 'Why?' shows when a move follows the line; only biases whose condition is public carry one.",
+    "goFirst false: strategy-concepts section 10 [S17]. The Leader makes every Stage in hand a +3000 Counter, so the deck defends well and wants the longer game (inference).",
+    "weights.hand 1.1 and counterAggression 1.1: a Stage in hand is a +3000 Counter, so hand cards are worth a little more and Life is spent less readily (inference). The AI's counter estimate reads the Leader's grant from its script (ai/src/knowledge.ts leaderCounterGrants).",
+    "cardValue: the Stages draw a card and add a rested DON!! when played; Franky OP18-034 rests a Character when a Stage of cost 5 or more is out.",
+    "mulligan: our reasoning (no SH- tag): an opening searcher, a Stage (a +3000 Counter that also plays for free with the Leader), and a card with a Counter; going second one piece short is fine, going first the searcher is required."
+  ],
+  "goFirst": false,
+  "digTargets": ["OP18-075", "OP18-076", "OP18-077", "OP18-078", "OP18-034"],
+  "winConditions": ["OP18-118", "EB02-061"],
+  "cardValue": {
+    "OP18-075": 0.3,
+    "OP18-076": 0.3,
+    "OP18-077": 0.3,
+    "OP18-078": 0.3,
+    "OP18-034": 0.4,
+    "OP18-070": 0.2
+  },
+  "weights": {
+    "hand": 1.1
+  },
+  "faceBias": {
+    "early": 0.95,
+    "mid": 1.0,
+    "late": 1.0
+  },
+  "counterAggression": 1.1,
+  "mulligan": {
+    "pieces": [
+      {
+        "name": "searcher",
+        "label": "an opening searcher (Iceburg, Nami or Tom)",
+        "cards": ["OP18-061", "EB02-017", "PRB02-012", "OP18-070"],
+        "min": 1
+      },
+      {
+        "name": "stage",
+        "label": "a Stage to play free with the Leader or to counter with",
+        "cards": ["OP18-075", "OP18-076", "OP18-077", "OP18-078"],
+        "min": 1
+      },
+      {
+        "name": "counters",
+        "label": "a card with a Counter",
+        "min": 1
+      }
+    ],
+    "secondShort": 1,
+    "requireGoingFirst": ["searcher"],
+    "source": "OP18-021 guide (keepable hand, inference; our reasoning, no written source)"
+  },
+  "biases": [
+    {
+      "seed": 1,
+      "kind": "activate",
+      "card": "OP18-021",
+      "ability": "play-stage",
+      "fromOwnTurn": 1,
+      "bonus": 3.0,
+      "cite": "Its guide (our reasoning from the Leader's text): DON!! -1 plays a Stage of cost 5 or less from hand, so the Stage's draw and DON!! come without paying its cost.",
+      "citeSource": "CARD-18"
+    },
+    {
+      "seed": 2,
+      "kind": "avoidPlay",
+      "card": "OP18-034",
+      "whileInHand": "OP18-075",
+      "fromOwnTurn": 1,
+      "penalty": 3.0
+    },
+    {
+      "seed": 2,
+      "kind": "avoidPlay",
+      "card": "OP18-034",
+      "whileInHand": "OP18-076",
+      "fromOwnTurn": 1,
+      "penalty": 3.0
+    },
+    {
+      "seed": 2,
+      "kind": "avoidPlay",
+      "card": "OP18-034",
+      "whileInHand": "OP18-077",
+      "fromOwnTurn": 1,
+      "penalty": 3.0
+    },
+    {
+      "seed": 2,
+      "kind": "avoidPlay",
+      "card": "OP18-034",
+      "whileInHand": "OP18-078",
+      "fromOwnTurn": 1,
+      "penalty": 3.0
+    },
+    {
+      "seed": 3,
+      "kind": "play",
+      "cards": ["OP18-061", "EB02-017", "PRB02-012", "OP18-070"],
+      "byOwnTurn": 2,
+      "bonus": 2.0,
+      "cite": "Its guide (our reasoning): open with a searcher on turn 1 or 2.",
+      "citeSource": "CARD-18"
+    }
+  ],
+  "assertions": [
+    {
+      "seed": 1,
+      "text": "Uses the Leader's DON!! -1 to play a Stage on its own turns T1 to T3 whenever a Stage is in hand and the ability is legal.",
+      "threshold": 0.8,
+      "source": "CARD-18 (threshold is inference)"
+    },
+    {
+      "seed": 2,
+      "text": "Plays a Stage before Franky OP18-034 when it holds both.",
+      "threshold": 0.8,
+      "source": "CARD-18 (threshold is inference)"
+    },
+    {
+      "seed": 3,
+      "text": "Plays a searcher (Iceburg, Nami or Tom) on T1 or T2 when one is in hand.",
+      "threshold": 0.8,
+      "source": "inference from CARD-18"
+    }
+  ]
+}

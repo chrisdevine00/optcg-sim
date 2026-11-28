@@ -31,7 +31,7 @@ export interface AnswerView {
   /** The guide's name for a sourced label. */
   archetype?: string;
   /** `inference` when the guide tags its mulligan rule as inference (M9-R5): the chip says so. */
-  guideBasis?: 'sourced' | 'inference';
+  guideBasis?: 'sourced' | 'inference' | 'reasoning';
   /** An item that kept the game's real hand says so (M9 WP7): "Their real hand: one way to see it". */
   handLabel?: string;
   /** Said once by the polite region. */
@@ -61,7 +61,7 @@ export function answerFor(
     explanation: Explanation | null,
     context: ExplanationContext,
     archetype?: string,
-    guideBasis?: 'sourced' | 'inference',
+    guideBasis?: 'sourced' | 'inference' | 'reasoning',
   ): AnswerView => {
     const ok = d.kind !== 'shown' && correct;
     const title = titleOf(d, ok);
@@ -85,7 +85,11 @@ export function answerFor(
     const keep = /^Keep/.test(ex.claim);
     const label = ai.mulliganLabel(m, cards);
     const name = guideNameOf(label);
-    const basis = /inference/.test(label) ? 'inference' : 'sourced';
+    const basis = /our reasoning/.test(label)
+      ? 'reasoning'
+      : /inference/.test(label)
+        ? 'inference'
+        : 'sourced';
     const chose = d.kind === 'mulligan' ? d.redraw : null;
     const right = chose === null ? false : ai.judgeMulligan(m, chose, cards, lists);
     return finish(

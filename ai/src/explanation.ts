@@ -90,12 +90,15 @@ export function certaintyLabel(
   certainty: Explanation['certainty'],
   context: ExplanationContext,
   archetype?: string,
-  basis: 'sourced' | 'inference' = 'sourced',
+  basis: 'sourced' | 'inference' | 'reasoning' = 'sourced',
 ): string {
   const label = LABELS[context][certainty];
   if (!label) throw new Error(`No ${context} label for ${certainty} (explanations.md)`);
   if (context !== 'guide' || !archetype) return label;
   // A rule the guide itself tags as inference is not called sourced (M9-R5): only its baseline is.
+  // A deck with no written source at all (EB02-010, OP18-021): the rule is ours, said so.
+  if (basis === 'reasoning')
+    return `From the ${archetype} guide (our reasoning, no written source)`;
   return basis === 'inference'
     ? `From the ${archetype} guide (sourced baseline, inference)`
     : `From the ${archetype} guide (sourced)`;

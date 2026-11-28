@@ -3185,6 +3185,516 @@
           "source": "Limitless platform API /tournaments/{id}/standings"
         }
       ]
+    },
+    {
+      "id": "EB02-010-luffy-gp",
+      "leaderId": "EB02-010",
+      "name": "Monkey.D.Luffy",
+      "colors": ["Green", "Purple"],
+      "top8Count": 0,
+      "metaShare": 0.2,
+      "metaSharePostBan": 0.2,
+      "tier": null,
+      "tierOnepieceGg": null,
+      "tierOpmetagame": null,
+      "tierOpmetagameLabel": null,
+      "handAdded": "Added by hand 2026-11-28 (M11 Track C). No top-8 result yet (best placing 15th of 121), so the three lists are the best placings found in the cached Limitless standings: 15th of 121, 22nd of 26, 62nd of 95. In the four cached OP18-era events (2026-11-16 to 11-23, 379 decks) it is 1.1% of decks. meta:update replaces the lists as top-8s arrive.",
+      "sources": [
+        "https://play.limitlesstcg.com/api/tournaments?game=OP",
+        "https://onepiece.limitlesstcg.com/cards/EB02-010"
+      ],
+      "lists": [
+        {
+          "event": "[OP18] ChinoizeCup #136 MONDAY",
+          "date": "2026-11-16",
+          "placing": "15th",
+          "player": "divalol",
+          "url": "https://play.limitlesstcg.com/tournament/6af5879bdcbca32da6c4f034/player/divalol/decklist",
+          "leader": "EB02-010",
+          "main": [
+            {
+              "id": "EB02-017",
+              "count": 4
+            },
+            {
+              "id": "PRB02-012",
+              "count": 4
+            },
+            {
+              "id": "OP18-026",
+              "count": 4
+            },
+            {
+              "id": "ST18-001",
+              "count": 4
+            },
+            {
+              "id": "ST18-004",
+              "count": 4
+            },
+            {
+              "id": "EB02-035",
+              "count": 4
+            },
+            {
+              "id": "OP13-027",
+              "count": 2
+            },
+            {
+              "id": "OP18-034",
+              "count": 4
+            },
+            {
+              "id": "EB02-061",
+              "count": 3
+            },
+            {
+              "id": "OP15-032",
+              "count": 2
+            },
+            {
+              "id": "OP15-078",
+              "count": 4
+            },
+            {
+              "id": "OP09-078",
+              "count": 4
+            },
+            {
+              "id": "OP18-038",
+              "count": 4
+            },
+            {
+              "id": "OP12-037",
+              "count": 2
+            },
+            {
+              "id": "OP13-040",
+              "count": 1
+            }
+          ],
+          "players": 121,
+          "record": {
+            "wins": 5,
+            "losses": 2,
+            "ties": 0
+          },
+          "source": "Limitless platform API /tournaments/{id}/standings"
+        },
+        {
+          "event": "[OP17.5] Win a box | Rumble league #12",
+          "date": "2026-10-08",
+          "placing": "22nd",
+          "player": "Vins_spez",
+          "url": "https://play.limitlesstcg.com/tournament/6abf4a4d783097f8dcb75d5e/player/vins_spez/decklist",
+          "leader": "EB02-010",
+          "main": [
+            {
+              "id": "EB02-017",
+              "count": 4
+            },
+            {
+              "id": "OP17-023",
+              "count": 4
+            },
+            {
+              "id": "PRB02-012",
+              "count": 4
+            },
+            {
+              "id": "ST18-001",
+              "count": 4
+            },
+            {
+              "id": "ST18-004",
+              "count": 4
+            },
+            {
+              "id": "OP13-037",
+              "count": 2
+            },
+            {
+              "id": "OP14-031",
+              "count": 2
+            },
+            {
+              "id": "ST30-012",
+              "count": 2
+            },
+            {
+              "id": "EB02-035",
+              "count": 4
+            },
+            {
+              "id": "OP07-064",
+              "count": 4
+            },
+            {
+              "id": "OP15-032",
+              "count": 2
+            },
+            {
+              "id": "EB02-061",
+              "count": 1
+            },
+            {
+              "id": "OP17-022",
+              "count": 1
+            },
+            {
+              "id": "OP15-078",
+              "count": 4
+            },
+            {
+              "id": "OP09-078",
+              "count": 4
+            },
+            {
+              "id": "OP12-037",
+              "count": 2
+            },
+            {
+              "id": "OP13-040",
+              "count": 2
+            }
+          ],
+          "players": 26,
+          "record": {
+            "wins": 1,
+            "losses": 2,
+            "ties": 0
+          },
+          "source": "Limitless platform API /tournaments/{id}/standings"
+        },
+        {
+          "event": "[OP18] ChinoizeCup #137 TUESDAY",
+          "date": "2026-11-17",
+          "placing": "62nd",
+          "player": "PolGoFo",
+          "url": "https://play.limitlesstcg.com/tournament/6af58a2900d53a11f5b91e31/player/polgofo/decklist",
+          "leader": "EB02-010",
+          "main": [
+            {
+              "id": "EB02-017",
+              "count": 4
+            },
+            {
+              "id": "PRB02-012",
+              "count": 4
+            },
+            {
+              "id": "ST18-001",
+              "count": 4
+            },
+            {
+              "id": "ST18-004",
+              "count": 4
+            },
+            {
+              "id": "OP18-031",
+              "count": 4
+            },
+            {
+              "id": "EB02-035",
+              "count": 4
+            },
+            {
+              "id": "OP07-064",
+              "count": 4
+            },
+            {
+              "id": "OP18-034",
+              "count": 2
+            },
+            {
+              "id": "EB02-061",
+              "count": 1
+            },
+            {
+              "id": "OP15-032",
+              "count": 1
+            },
+            {
+              "id": "ST18-005",
+              "count": 2
+            },
+            {
+              "id": "OP15-078",
+              "count": 4
+            },
+            {
+              "id": "OP09-078",
+              "count": 4
+            },
+            {
+              "id": "OP12-037",
+              "count": 2
+            },
+            {
+              "id": "OP13-040",
+              "count": 2
+            },
+            {
+              "id": "OP07-076",
+              "count": 2
+            },
+            {
+              "id": "OP08-036",
+              "count": 2
+            }
+          ],
+          "players": 95,
+          "record": {
+            "wins": 1,
+            "losses": 2,
+            "ties": 0
+          },
+          "source": "Limitless platform API /tournaments/{id}/standings"
+        }
+      ]
+    },
+    {
+      "id": "OP18-021-franky",
+      "leaderId": "OP18-021",
+      "name": "Franky",
+      "colors": ["Green", "Purple"],
+      "top8Count": 0,
+      "metaShare": 0,
+      "metaSharePostBan": 0,
+      "tier": null,
+      "tierOnepieceGg": null,
+      "tierOpmetagame": null,
+      "tierOpmetagameLabel": null,
+      "handAdded": "Added by hand 2026-11-28 (M11 Track C). OP18 Leader with no top-8 result yet (best placing 28th of 121), so the three lists are the best placings that need no unscripted card: 28th of 121, 28th of 60, 100th of 105. In the four cached OP18-era events (2026-11-16 to 11-23, 379 decks) it is 2.9% of decks. meta:update replaces the lists as top-8s arrive.",
+      "sources": [
+        "https://play.limitlesstcg.com/api/tournaments?game=OP",
+        "https://onepiece.limitlesstcg.com/cards/OP18-021"
+      ],
+      "lists": [
+        {
+          "event": "[OP18] ChinoizeCup #136 MONDAY",
+          "date": "2026-11-16",
+          "placing": "28th",
+          "player": "trocheesy",
+          "url": "https://play.limitlesstcg.com/tournament/6af5879bdcbca32da6c4f034/player/trocheesy/decklist",
+          "leader": "OP18-021",
+          "main": [
+            {
+              "id": "EB02-017",
+              "count": 4
+            },
+            {
+              "id": "OP18-070",
+              "count": 4
+            },
+            {
+              "id": "OP15-035",
+              "count": 3
+            },
+            {
+              "id": "OP18-061",
+              "count": 4
+            },
+            {
+              "id": "OP18-031",
+              "count": 4
+            },
+            {
+              "id": "EB02-035",
+              "count": 4
+            },
+            {
+              "id": "OP18-072",
+              "count": 3
+            },
+            {
+              "id": "OP18-034",
+              "count": 4
+            },
+            {
+              "id": "EB02-061",
+              "count": 1
+            },
+            {
+              "id": "OP18-118",
+              "count": 3
+            },
+            {
+              "id": "OP18-074",
+              "count": 4
+            },
+            {
+              "id": "OP18-076",
+              "count": 4
+            },
+            {
+              "id": "OP18-078",
+              "count": 4
+            },
+            {
+              "id": "OP18-075",
+              "count": 2
+            },
+            {
+              "id": "OP18-077",
+              "count": 2
+            }
+          ],
+          "players": 121,
+          "record": {
+            "wins": 4,
+            "losses": 3,
+            "ties": 0
+          },
+          "source": "Limitless platform API /tournaments/{id}/standings"
+        },
+        {
+          "event": "[OP18] ChinoizeCup #138 WEDNESDAY",
+          "date": "2026-11-18",
+          "placing": "28th",
+          "player": "Chromos",
+          "url": "https://play.limitlesstcg.com/tournament/6af58c7300d53a11f5b91e38/player/chromos/decklist",
+          "leader": "OP18-021",
+          "main": [
+            {
+              "id": "EB02-017",
+              "count": 4
+            },
+            {
+              "id": "OP15-069",
+              "count": 4
+            },
+            {
+              "id": "OP18-070",
+              "count": 3
+            },
+            {
+              "id": "OP18-061",
+              "count": 4
+            },
+            {
+              "id": "ST18-004",
+              "count": 3
+            },
+            {
+              "id": "EB02-035",
+              "count": 4
+            },
+            {
+              "id": "OP18-027",
+              "count": 3
+            },
+            {
+              "id": "OP18-034",
+              "count": 4
+            },
+            {
+              "id": "EB02-061",
+              "count": 1
+            },
+            {
+              "id": "OP18-038",
+              "count": 4
+            },
+            {
+              "id": "OP12-037",
+              "count": 2
+            },
+            {
+              "id": "OP18-075",
+              "count": 4
+            },
+            {
+              "id": "OP18-076",
+              "count": 4
+            },
+            {
+              "id": "OP18-078",
+              "count": 4
+            },
+            {
+              "id": "OP18-077",
+              "count": 2
+            }
+          ],
+          "players": 60,
+          "record": {
+            "wins": 2,
+            "losses": 1,
+            "ties": 0
+          },
+          "source": "Limitless platform API /tournaments/{id}/standings"
+        },
+        {
+          "event": "[OP18] ChinoizeCup #139 MONDAY",
+          "date": "2026-11-23",
+          "placing": "100th",
+          "player": "Ziiaaaac",
+          "url": "https://play.limitlesstcg.com/tournament/6afdc0fcb2fccaf0272d581c/player/ziiaaaac/decklist",
+          "leader": "OP18-021",
+          "main": [
+            {
+              "id": "EB02-017",
+              "count": 4
+            },
+            {
+              "id": "PRB02-012",
+              "count": 4
+            },
+            {
+              "id": "OP18-061",
+              "count": 4
+            },
+            {
+              "id": "ST18-004",
+              "count": 4
+            },
+            {
+              "id": "OP18-066",
+              "count": 4
+            },
+            {
+              "id": "OP18-072",
+              "count": 4
+            },
+            {
+              "id": "OP18-034",
+              "count": 4
+            },
+            {
+              "id": "EB02-061",
+              "count": 2
+            },
+            {
+              "id": "OP18-038",
+              "count": 4
+            },
+            {
+              "id": "OP18-075",
+              "count": 4
+            },
+            {
+              "id": "OP18-076",
+              "count": 4
+            },
+            {
+              "id": "OP18-077",
+              "count": 4
+            },
+            {
+              "id": "OP18-078",
+              "count": 4
+            }
+          ],
+          "players": 105,
+          "record": {
+            "wins": 0,
+            "losses": 2,
+            "ties": 0
+          },
+          "source": "Limitless platform API /tournaments/{id}/standings"
+        }
+      ]
     }
   ]
 }

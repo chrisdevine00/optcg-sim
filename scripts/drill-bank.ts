@@ -4,7 +4,7 @@
  * card ids and scenarios only (no art), at `app/src/drills/banks/<drill>.json`.
  *
  * One generator per drill, each exported from `ai/src/search/drills/` and registered below with a
- * line in `GENERATORS`. A generator gets the card data, the twelve guides' Leaders and a log, and
+ * line in `GENERATORS`. A generator gets the card data, the fourteen guides' Leaders and a log, and
  * returns the bank (extra fields `tried` and `counts` are for the log and are not written).
  *
  * Options: `--max-seeds N` stops the search after N seeds (the honest-numbers case: it writes what

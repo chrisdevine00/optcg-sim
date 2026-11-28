@@ -91,7 +91,7 @@ export function lethalItemOf(
 }
 
 export interface LethalGenOptions {
-  /** Archetype Leader ids, in a fixed order (the script passes the guides' twelve). */
+  /** Archetype Leader ids, in a fixed order (the script passes the guides' fourteen). */
   leaders: readonly string[];
   /** Items of each class; default 14. */
   perClass?: number;

@@ -1,21 +1,21 @@
 /**
  * Strength gates for Warlord and Emperor (PLAN M5b exit, ADR 0008; review M5a-10, M5b-2, 3, 9, 11).
  *
- * Twelve ordered deck pairs from six disjoint archetype pairs that cover all twelve archetypes
- * (the first is Rocks and Kaido, the M5a pair), each seat in turn, deterministic seeds and
+ * Fourteen ordered deck pairs from seven disjoint archetype pairs that cover all fourteen archetypes
+ * (the first is Rocks and Kaido, the M5a pair; the seventh, Luffy EB02-010 and Franky, M11 Track C), each seat in turn, deterministic seeds and
  * iteration budgets, so a run plays the same games on every machine. Game `g` plays ordered pair
- * `g % 12` (so the 12 per-push games cover all twelve) and takes the seat `(g + floor(g / 12)) % 2`
+ * `g % 14` (so the 14 per-push games cover all fourteen) and takes the seat `(g + floor(g / 14)) % 2`
  * (so a deck advantage cancels over 24 games).
  *
  * **Every rate gate is a confidence-interval check** (`expectRateAtLeast` / `expectRateAtMost`,
  * ai/test/support/stats.ts; docs/runbooks/testing.md "Statistics"): it fails only when the
  * one-sided 99% bound of the observed rate lies wholly on the wrong side of the target, and every
- * message prints the observed rate, n, the bound and the target. With 12 games that means a gross
+ * message prints the observed rate, n, the bound and the target. With 14 games that means a gross
  * break (Warlord winning fewer than 7 of 12 against Rookie); with 200 games a shortfall of 4 to 8
  * points against the target (91% against 95%, 67.5% against 75%).
  *
- * **Per push (`STRENGTH_GAMES`, default 12, about 1.5 minutes):** Pirate vs Rookie at least 75%;
- * Warlord vs Rookie at least 10 of 12. A gross break (a search that throws, plays illegally or
+ * **Per push (`STRENGTH_GAMES`, default 14, about 2 minutes):** Pirate vs Rookie at least 75%;
+ * Warlord vs Rookie at least 83% (10 of 12). A gross break (a search that throws, plays illegally or
  * does nothing useful) fails here; a 12-game series cannot separate two close tiers, so the
  * Pirate and control gates are nightly only.
  *
@@ -56,7 +56,7 @@ import { metaDecks } from './support.ts';
  * small and every series timed out after printing its result). Pirate vs Rookie took 5 minutes.
  * Emperor: 16 games, about 54 s a game on a laptop (measured 2026-11-27: 16 games in 862 s), no CI
  * measurement yet: a 100-minute hang guard, inside
- * its job's 120 (M10-R4). Per push (12 games) the default is ample. Each nightly series is its own CI
+ * its job's 120 (M10-R4). Per push (14 games) the default is ample. Each nightly series is its own CI
  * job (`strength-m5b` matrix; 360 minutes, the hosted maximum, for the 200-game series).
  */
 const MIN = 60_000;
@@ -73,11 +73,11 @@ function FULL_TIMEOUT(minutes: number): number {
 }
 vi.setConfig({ testTimeout: 10 * MIN });
 
-const GAMES = Number(process.env.STRENGTH_GAMES ?? 12);
+const GAMES = Number(process.env.STRENGTH_GAMES ?? 14);
 const FULL = GAMES >= 200;
 const EXTRA = process.env.EXTRA === '1';
 
-/** Six disjoint pairs covering all twelve archetypes; each is played both ways round. */
+/** Seven disjoint pairs covering all fourteen archetypes; each is played both ways round. */
 export const PAIRS: [string, string][] = [
   ['OP17-039', 'OP17-058'], // Rocks, Kaido (the M5a pair)
   ['OP09-062', 'OP13-004'], // Robin, Sabo
@@ -85,6 +85,7 @@ export const PAIRS: [string, string][] = [
   ['OP17-079', 'OP14-041'], // Luffy (OP17), Hancock
   ['OP12-061', 'OP05-098'], // Rosinante, Enel (OP05)
   ['OP08-098', 'OP13-001'], // Kalgara, Luffy (OP13)
+  ['EB02-010', 'OP18-021'], // Luffy (Green/Purple), Franky (M11 Track C)
 ];
 const ORDERED = PAIRS.flatMap(([x, y]) => [
   [x, y],
@@ -215,9 +216,9 @@ describe('Strength gates, Pirate, Warlord and Emperor (PLAN M5b; review M5a-10)'
     TIMEOUT.pirateVsRookie,
   );
 
-  // Per push: 12 games, one per ordered pair, at least 10 (a Rookie winning 3 games is a break).
+  // Per push: 14 games, one per ordered pair, at least 10 of 12 by rate (a Rookie winning 3 games is a break).
   it(
-    `Warlord beats Rookie in at least ${FULL ? '95%' : '10 of 12'} of ${GAMES} games`,
+    `Warlord beats Rookie in at least ${FULL ? '95%' : '83%'} of ${GAMES} games`,
     () => {
       const s = series(GAMES, 120_000, { tier: 'warlord' }, { tier: 'rookie' });
       report(`m5b-warlord-vs-rookie-${GAMES}`, s);

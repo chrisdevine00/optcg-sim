@@ -433,6 +433,21 @@ export function mainBias(root: GameState, me: PlayerId, ctx: SimContext, setup: 
           setup.cards.get(bias.source)?.category === 'Event'
         )
           b -= bias.penalty;
+        // The card's own On-field effect needs it out first (Sanji & Pudding before the Leader's DON!! -2).
+        if (
+          bias.kind === 'playBeforeActivate' &&
+          a.type === 'activate' &&
+          a.ability === bias.ability &&
+          queries.card(root, a.card).card === bias.source &&
+          !chars.some((ch) => ch.card === bias.card) &&
+          legal.some((x) => x.type === 'playCard' && queries.card(root, x.card).card === bias.card)
+        ) {
+          const at = c.actions.indexOf(a);
+          const playedFirst = c.actions
+            .slice(0, at)
+            .some((x) => x.type === 'playCard' && queries.card(root, x.card).card === bias.card);
+          if (!playedFirst) b -= bias.penalty;
+        }
         if (bias.kind === 'activateBefore') {
           const mine = (x: Action) =>
             x.type === 'activate' &&

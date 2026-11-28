@@ -30,6 +30,8 @@ import luffyBlack from '../playbooks/OP17-079.json';
 import sabo from '../playbooks/OP13-004.json';
 import purpleEnel from '../playbooks/OP15-058.json';
 import rosinante from '../playbooks/OP12-061.json';
+import luffyGreenPurple from '../playbooks/EB02-010.json';
+import franky from '../playbooks/OP18-021.json';
 
 /** The heuristic terms a playbook can scale (see `search/heuristic.ts`). */
 export type WeightKey = 'life' | 'hand' | 'counter' | 'board' | 'don' | 'threat';
@@ -260,6 +262,19 @@ export type Bias = BiasCite &
         seed: number;
       }
     /**
+     * Use `source`'s `ability` only after `card` is on the field when `card` can be played now
+     * (EB02-010: Sanji & Pudding adds a DON!! when the Leader's DON!! -2 returns two). A move
+     * that activates it first while the play is legal and not yet in the same line pays `penalty`.
+     */
+    | {
+        kind: 'playBeforeActivate';
+        card: string;
+        source: string;
+        ability: string;
+        penalty: number;
+        seed: number;
+      }
+    /**
      * Hold removal for real threats: in this ability's target choice, avoid opposing Characters of
      * cost `maxCost` or less, and do not play the Event (or pay the optional cost) while no
      * opposing Character above `maxCost` is within the removal's `reach` (a power it can answer).
@@ -376,6 +391,8 @@ const ALL = [
   luffyAce,
   luffyRedGreen,
   luffyBlack,
+  luffyGreenPurple,
+  franky,
 ] as unknown as Playbook[];
 
 export const PLAYBOOKS: ReadonlyMap<string, Playbook> = new Map(ALL.map((p) => [p.leaderId, p]));
