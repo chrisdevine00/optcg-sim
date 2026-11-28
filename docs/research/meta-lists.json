@@ -3233,7 +3233,7 @@
       "tierOnepieceGg": null,
       "tierOpmetagame": null,
       "tierOpmetagameLabel": null,
-      "handAdded": "Added by hand 2026-11-28 (M11 Track C). No top-8 result yet (best placing 15th of 121), so the three lists are the best placings found in the cached Limitless standings: 15th of 121, 22nd of 26, 62nd of 95. In the four cached OP18-era events (2026-11-16 to 11-23, 379 decks) it is 1.1% of decks. meta:update replaces the lists as top-8s arrive.",
+      "handAdded": "Added by hand 2026-11-28 (M11 Track C). No top-8 result yet (best placing 15th of 121), so the three lists are the best placings found in the cached Limitless standings (the lowest is 62nd of 95, 1-2): 15th of 121, 22nd of 26, 62nd of 95. In the four cached OP18-era events (2026-11-16 to 11-23, 379 decks) it is 1.1% of decks. meta:update replaces the lists as top-8s arrive.",
       "sources": [
         "https://play.limitlesstcg.com/api/tournaments?game=OP",
         "https://onepiece.limitlesstcg.com/cards/EB02-010"
@@ -3503,7 +3503,7 @@
       "tierOnepieceGg": null,
       "tierOpmetagame": null,
       "tierOpmetagameLabel": null,
-      "handAdded": "Added by hand 2026-11-28 (M11 Track C). OP18 Leader with no top-8 result yet (best placing 28th of 121), so the three lists are the best placings that need no unscripted card: 28th of 121, 28th of 60, 100th of 105. In the four cached OP18-era events (2026-11-16 to 11-23, 379 decks) it is 2.9% of decks. meta:update replaces the lists as top-8s arrive.",
+      "handAdded": "Added by hand 2026-11-28 (M11 Track C). OP18 Leader with no top-8 result yet (best placing 28th of 121), so the three lists are the best-placed lists that need no card the simulator has not scripted yet: 28th of 121, 28th of 60, 100th of 105 (record 0-2). Better-placed Franky lists (34th of 95, 3-2; 69th of 105, 1-2) run Charlotte Pudding OP08-067 and other block-2 cards that are held. In the four cached OP18-era events (2026-11-16 to 11-23, 379 decks) it is 2.9% of decks. meta:update replaces the lists as top-8s arrive.",
       "sources": [
         "https://play.limitlesstcg.com/api/tournaments?game=OP",
         "https://onepiece.limitlesstcg.com/cards/OP18-021"

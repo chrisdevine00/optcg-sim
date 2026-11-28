@@ -30,7 +30,7 @@ import {
 } from '../explain.ts';
 import { biggestCounter, eventCounterOf } from '../knowledge.ts';
 import { ownTurn, type Bias, type PlayCondition, type Playbook } from '../playbook.ts';
-import { playOnlyIfMet } from './conditions.ts';
+import { activateWhenMet, playOnlyIfMet } from './conditions.ts';
 import { battleNumbers } from './sim.ts';
 
 export interface WhyContext {
@@ -332,7 +332,8 @@ export function citation(s: GameState, a: Action, me: PlayerId, ctx: WhyContext)
           a.type === 'activate' &&
           a.ability === b.ability &&
           own >= b.fromOwnTurn &&
-          queries.card(s, a.card).card === b.card
+          queries.card(s, a.card).card === b.card &&
+          activateWhenMet(s, me, ctx.cards, b.when)
         )
           return citeOf(b);
         break;
