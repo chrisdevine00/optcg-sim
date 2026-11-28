@@ -11,15 +11,20 @@
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { Card, Keyword } from '../src/schema.ts';
-import { parseLimitless, type LimitlessCard } from './limitless.ts';
-import { looseText, printedKeywords } from './normalize.ts';
+import type { Keyword } from '../src/schema.ts';
+import { compareWithLimitless, parseLimitless } from './limitless.ts';
+import { printedKeywords } from './normalize.ts';
 import type { Override } from './overrides.ts';
 import { USER_AGENT } from './sources.ts';
 import { pipeline } from './update.ts';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const PAGES = [join(ROOT, '.cache/m1/limitless'), join(ROOT, '.cache/track-g/limitless')];
+// cards:update's Limitless cache (ADR 0015) first, then the M1 and Track G caches.
+const PAGES = [
+  join(ROOT, '.cache/cards/limitless'),
+  join(ROOT, '.cache/m1/limitless'),
+  join(ROOT, '.cache/track-g/limitless'),
+];
 const OVERRIDES = join(ROOT, 'cards/overrides');
 
 export function metaIds(metaListsJson: unknown): string[] {
@@ -32,38 +37,6 @@ export function metaIds(metaListsJson: unknown): string[] {
   };
   walk((metaListsJson as { archetypes: unknown }).archetypes);
   return [...ids].sort();
-}
-
-const noReminder = (s: string | null) => (s ?? '').replace(/\([^)]*\)/g, '');
-const sameSet = (a: readonly string[], b: readonly string[]) =>
-  JSON.stringify([...a].map((x) => x.toLowerCase()).sort()) ===
-  JSON.stringify([...b].map((x) => x.toLowerCase()).sort());
-
-/** Field-by-field differences between our card and the Limitless page. Empty means verified. */
-export function compareWithLimitless(c: Card, l: LimitlessCard): string[] {
-  const d: string[] = [];
-  const diff = (field: string, ours: unknown, theirs: unknown) =>
-    d.push(`${field}: ours ${JSON.stringify(ours)} | limitless ${JSON.stringify(theirs)}`);
-  if (c.name.replace(/\s+/g, ' ') !== l.name.replace(/\s+/g, ' ')) diff('name', c.name, l.name);
-  if (c.category !== l.category) diff('category', c.category, l.category);
-  if (!sameSet(c.colors, l.colors)) diff('colors', c.colors, l.colors);
-  if (c.category === 'Leader') {
-    if (c.life !== l.life) diff('life', c.life, l.life);
-  } else if (c.cost !== l.cost) diff('cost', c.cost, l.cost);
-  if (c.power !== l.power) diff('power', c.power, l.power);
-  if (c.counter !== l.counter) diff('counter', c.counter, l.counter);
-  if (!sameSet(c.attributes, l.attributes)) diff('attributes', c.attributes, l.attributes);
-  if (!sameSet(c.types, l.types)) diff('types', c.types, l.types);
-  if (looseText(noReminder(c.effectText)) !== looseText(noReminder(l.effectText))) {
-    diff('effectText', c.effectText, l.effectText);
-  }
-  if (looseText(noReminder(c.triggerText)) !== looseText(noReminder(l.triggerText))) {
-    diff('triggerText', c.triggerText, l.triggerText);
-  }
-  const ours = printedKeywords(c.effectText);
-  const theirs = printedKeywords(l.effectText);
-  if (!sameSet(ours, theirs)) diff('printed keywords', ours, theirs);
-  return d;
 }
 
 function pagePath(id: string): string | null {
@@ -79,8 +52,8 @@ async function fetchPage(id: string): Promise<void> {
     headers: { 'User-Agent': USER_AGENT },
   });
   if (!res.ok) throw new Error(`${id}: HTTP ${res.status}`);
-  mkdirSync(PAGES[0]!, { recursive: true });
-  writeFileSync(join(PAGES[0]!, `${id}.html`), await res.text());
+  mkdirSync(PAGES[1]!, { recursive: true });
+  writeFileSync(join(PAGES[1]!, `${id}.html`), await res.text());
   await new Promise((r) => setTimeout(r, 1100));
 }
 

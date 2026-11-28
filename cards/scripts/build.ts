@@ -19,7 +19,7 @@ import {
   stripName,
   type RawRow,
 } from './normalize.ts';
-import { cardSourceUrl, IMAGE_BASE, type SourceFile } from './sources.ts';
+import { cardSourceUrl, IMAGE_BASE, limitlessCardUrl, type SourceFile } from './sources.ts';
 import type { TypeVocabulary } from './types-vocab.ts';
 
 export interface SourcedRow extends RawRow {
@@ -193,9 +193,13 @@ export function assemble(rows: SourcedRow[], vocab: TypeVocabulary): Assembly {
       textFixes: fixes,
       artworks: artworks(id, sorted),
       legality: { standard: { status: 'unknown' }, extra: { status: 'unknown' } },
-      sourceUrl: cardSourceUrl(id),
+      sourceUrl: src.file === 'limitless' ? limitlessCardUrl(id) : cardSourceUrl(id),
       fetchedAt: src.fetchedAt,
     };
+    if (src.file === 'limitless') {
+      card.dataSource = 'limitless';
+      bump('source: Limitless card page (ADR 0015)');
+    }
     cards.set(id, card);
   }
 
@@ -239,7 +243,8 @@ function artworks(id: string, rows: SourcedRow[]): Artwork[] {
     const a: Artwork = {
       artworkId: same.length ? `${pid}#${same.length + 1}` : pid,
       imageUrls: path ? { full: path } : {},
-      source: 'optcgapi',
+      // A Limitless row has no image: no new image host (ADR 0015), so the card shows its text face.
+      source: r.file === 'limitless' ? 'none' : 'optcgapi',
       product: productOf(r, id),
       rarity: r.rarity ?? '',
     };

@@ -11,7 +11,10 @@ The card database as static JSON, the hand-verified overrides and format data be
 ```
 optcgapi.com bulk endpoints ──► .cache/cards/ (raw, re-fetched only with --refresh)
    allSetCards, allSTCards,           │
-   promos/filtered/?set_id=P          ▼
+   promos/filtered/?set_id=P          │
+Limitless card pages (ADR 0015) ──►  │  .cache/cards/limitless/: only products optcgapi lacks
+   (LIMITLESS_PRODUCTS, 1.5 s apart)  │  (OP-18); optcgapi wins per card once it has the card
+                                      ▼
                           scripts/normalize.ts   every defect class from the Track B diff
                           scripts/types-vocab.ts type splitting; fails on any ambiguous split
                           scripts/build.ts       printings reconciled by card number
@@ -25,6 +28,10 @@ optcgapi.com bulk endpoints ──► .cache/cards/ (raw, re-fetched only with -
                                     +
              diff report against the previous snapshot (scripts/diff.ts)
 ```
+
+### A product optcgapi does not have yet (ADR 0015)
+
+`scripts/sources.ts` `LIMITLESS_PRODUCTS` lists products read from their Limitless card pages (OP-18 since 2026-11-27). Each page becomes an optcgapi-shaped row (`limitlessRow` in `scripts/limitless.ts`) and goes through the same normalizer, overrides and validation. Such a card records `dataSource: "limitless"` and its Limitless `sourceUrl`; its one artwork has `source: "none"` and no path, so the app shows the text face (no new image host). A card optcgapi has in a set or starter row always comes from optcgapi; `cards:update` then prints each such card's differences from its Limitless page and, once a product is complete in optcgapi, says to remove it from the list. The cache is re-fetched only with `--refresh` (about 120 pages per product, 1.5 s apart).
 
 ## Commands
 

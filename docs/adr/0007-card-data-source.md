@@ -23,3 +23,6 @@ Parsing the official card list in bulk (its terms forbid reproduction; PROMPT.md
 
 ## Addendum, 2026-11-17 (ADR 0014)
 A scheduled bulk fetch is allowed: `update.yml` may call the optcgapi.com bulk endpoints weekly, with the 3 s delay, and its output goes only to a pull request for review. The official site is still never fetched, and no other workflow calls an external data API.
+
+## Addendum, 2026-11-27 (ADR 0015)
+A product optcgapi.com does not have yet may be read from its Limitless card pages (`LIMITLESS_PRODUCTS` in `cards/scripts/sources.ts`; OP-18 first), through the same normalizer. optcgapi stays the primary source and wins per card as soon as it has the card. Those cards record `dataSource: "limitless"` and have no image until optcgapi has them.

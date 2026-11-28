@@ -26,7 +26,7 @@ Terms: It stays off until its maintainer approves third-party use.
 
 https://onepiece.limitlesstcg.com
 
-Tournament decklists and play rates from the Limitless Play public API, and exact card text from its card pages.
+Tournament decklists and play rates from the Limitless Play public API, and card text from its card pages: the data of OP-18 until optcgapi.com has the set (those cards show as text, with no image), and a cross-check for the rest.
 
 Terms: Its developer documentation asks for no key for public reads and sets no attribution rule; it is credited here anyway, and it is read slowly and cached.
 

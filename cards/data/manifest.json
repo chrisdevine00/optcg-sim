@@ -1,11 +1,11 @@
 {
-  "source": "optcgapi.com (normalized; see cards/README.md)",
+  "source": "optcgapi.com (normalized; see cards/README.md); OP-18 from Limitless card pages (https://onepiece.limitlesstcg.com, ADR 0015)",
   "sourceUrl": "https://optcgapi.com",
   "fetchedAt": "2026-11-28T01:53:05.689Z",
-  "generatedAt": "2026-11-28T01:53:06.076Z",
-  "cardCount": 2860,
-  "printingCount": 5175,
-  "newestSet": "OP-17",
+  "generatedAt": "2026-11-28T03:00:23.484Z",
+  "cardCount": 2979,
+  "printingCount": 5294,
+  "newestSet": "OP-18",
   "verifiedCount": 2073,
   "sets": [
     {
@@ -123,6 +123,13 @@
     {
       "code": "OP-17",
       "name": "The World's Strongest Warriors",
+      "kind": "booster",
+      "cardCount": 119,
+      "block": 5
+    },
+    {
+      "code": "OP-18",
+      "name": "The Dominance of God",
       "kind": "booster",
       "cardCount": 119,
       "block": 5
@@ -438,7 +445,7 @@
   ],
   "repairs": {
     "types split": 1413,
-    "trigger: split from effect": 495,
+    "trigger: split from effect": 515,
     "name suffix stripped": 612,
     "printings disagreeing": 140,
     "self-directed sign flagged (E-Q8)": 11,
@@ -446,10 +453,11 @@
     "sign: opponent's power/cost": 81,
     "cleanup: errata'd note": 63,
     "cleanup: NULL text": 120,
-    "attribute junk dropped": 22,
+    "attribute junk dropped": 23,
     "shifted-columns rejected": 31,
     "types deduplicated": 5,
     "trigger: marker restored": 1,
+    "source: Limitless card page (ADR 0015)": 119,
     "cleanup: reprint disclaimer": 1,
     "override: printed keywords": 2073,
     "override: verified": 2073,

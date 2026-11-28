@@ -211,6 +211,15 @@
         "note": "Block icon printed on the base printings of this booster in its own series page (cached 2026-10-28)."
       }
     },
+    "OP-18": {
+      "block": 5,
+      "basis": "printed",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+        "checked": "2026-11-27",
+        "note": "Block icon 5 printed on 117 of the 119 base printings in this booster's own series page, read by hand once (cached in .cache/cards/official/series-569118.html, not committed). OP18-031 and OP18-065 print X and carry it in their overrides."
+      }
+    },
     "PRB-01": {
       "block": 3,
       "basis": "printed",
@@ -1038,6 +1047,6 @@
     "OP15-096 has no block on the official site; the booster formula gives 4 (rulings.md RL-37).",
     "The OP07-115 + EB04-058 banned pair has no effective date on the pages read.",
     "Whether the banned list also applies to Extra Regulation is not stated on restriction.html; this file applies it to both.",
-    "EB-05 has had a cited block (5) since 2026-11-24 (see the starter-deck and EB-05 note above). OP-18 (release 2026-11-20) was still not in optcgapi on 2026-11-27; it enters from Limitless card pages (plan M11 Track B) and through cards:update from optcgapi once upstream has it."
+    "EB-05 has had a cited block (5) since 2026-11-24 (see the starter-deck and EB-05 note above). OP-18 (release 2026-11-20) was still not in optcgapi on 2026-11-27; its card data comes from Limitless card pages (ADR 0015) until optcgapi has it, and its block (5) is cited from the official series page."
   ]
 }

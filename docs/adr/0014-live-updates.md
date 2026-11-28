@@ -25,3 +25,6 @@ Only 180 of the 2,799 cards have scripted effects (the 182 meta-list cards), the
 - Regulation and block changes stay hand-cited `standard.json` edits (ADR 0011 addendum); the update PR flags them, including a rotation warning within 60 days of `regulation.to`.
 - The PLAN estimate grows (row 17b) and the risk register gains rotation (risk 9) and test time and bundle size (risk 10).
 - **Open check before building `update.yml` and `meta:update`:** read the Limitless API terms (whether a key or attribution is required) and the robots.txt of both optcgapi.com and Limitless. If either forbids scheduled automated access, that part is not built and the owner decides. Record the result in DECISIONS.md.
+
+## Addendum, 2026-11-27 (ADR 0015)
+The `update.yml` cards job may also read the Limitless card pages of a product optcgapi lacks (about 120 requests 1.5 s apart, cached). Limitless's robots.txt allows all agents and its legal notice sets no terms of use (checked 2026-11-27); recorded in DECISIONS.

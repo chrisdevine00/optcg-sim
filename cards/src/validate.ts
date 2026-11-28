@@ -99,6 +99,7 @@ export function validateCard(c: Card): string[] {
     req(STATUSES.includes(c.legality?.[f]?.status), `bad ${f} legality`);
   }
   req(isStr(c.sourceUrl) && c.sourceUrl.startsWith('https://'), 'sourceUrl');
+  req(c.dataSource === undefined || c.dataSource === 'limitless', 'bad dataSource');
   req(isStr(c.fetchedAt) && !Number.isNaN(Date.parse(c.fetchedAt)), 'fetchedAt');
   return p;
 }

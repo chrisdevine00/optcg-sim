@@ -339,7 +339,7 @@ export function Inspector({ card, position, onPrev, onNext, onClose }: Props) {
                 .
               </>
             ) : (
-              <>Text from optcgapi.com, not verified.</>
+              <>Text from {new URL(card.sourceUrl).host.replace(/^www\./, '')}, not verified.</>
             )}{' '}
             <a href={card.sourceUrl} target="_blank" rel="noreferrer">
               Upstream record

@@ -55,7 +55,7 @@ export const CREDITS: readonly Credit[] = [
     id: 'limitless',
     name: 'Limitless',
     url: 'https://onepiece.limitlesstcg.com',
-    role: 'Tournament decklists and play rates from the Limitless Play public API, and exact card text from its card pages.',
+    role: 'Tournament decklists and play rates from the Limitless Play public API, and card text from its card pages: the data of OP-18 until optcgapi.com has the set (those cards show as text, with no image), and a cross-check for the rest.',
     terms:
       'Its developer documentation asks for no key for public reads and sets no attribution rule; it is credited here anyway, and it is read slowly and cached.',
     hosts: ['onepiece.limitlesstcg.com', 'play.limitlesstcg.com', 'docs.limitlesstcg.com'],

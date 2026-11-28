@@ -10344,6 +10344,28 @@
     "OP17-099": [
       "Yellow"
     ],
+    "OP18-001": [
+      "Red",
+      "Blue"
+    ],
+    "OP18-021": [
+      "Green",
+      "Purple"
+    ],
+    "OP18-022": [
+      "Green"
+    ],
+    "OP18-041": [
+      "Blue"
+    ],
+    "OP18-060": [
+      "Purple",
+      "Black"
+    ],
+    "OP18-079": [
+      "Black",
+      "Yellow"
+    ],
     "PRB01-001": [
       "Red"
     ],

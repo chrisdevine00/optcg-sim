@@ -1,7 +1,9 @@
 /**
  * `npm run cards:update [-- --refresh] [-- --dry-run] [-- --allow-script-changes]`
  *
- * Fetches optcgapi.com bulk endpoints (cached in .cache/cards/), normalizes every defect class, applies
+ * Fetches optcgapi.com bulk endpoints (cached in .cache/cards/), and the Limitless card pages of a
+ * product optcgapi lacks (ADR 0015; a card optcgapi has always comes from optcgapi, and its Limitless
+ * page differences are reported), normalizes every defect class, applies
  * cards/overrides/, computes block and legality from cards/format/standard.json, validates every record,
  * writes cards/data/, and prints a diff against the previous snapshot. Fails on: an ambiguous or
  * unmatched type split, a card with no usable row, a stale override, an invalid record, or changed text
@@ -13,11 +15,18 @@ import { fileURLToPath } from 'node:url';
 import type { Card, Manifest, SetFile, SetSummary } from '../src/schema.ts';
 import { blockOf, extraLegality, standardLegality, type StandardFormat } from '../src/format.ts';
 import { validateCard } from '../src/validate.ts';
-import { assemble, type Issue, type SourcedRow } from './build.ts';
+import { assemble, cardIdOf, type Issue, type SourcedRow } from './build.ts';
+import { compareWithLimitless } from './limitless.ts';
 import { rowProblems } from './normalize.ts';
 import { diffSnapshots, formatDiff, loadScriptIndex } from './diff.ts';
 import { applyOverride, loadOverrides } from './overrides.ts';
-import { API_BASE, loadSources } from './sources.ts';
+import {
+  API_BASE,
+  LIMITLESS_BASE,
+  loadLimitless,
+  loadSources,
+  type LimitlessSource,
+} from './sources.ts';
 import { TypeVocabulary } from './types-vocab.ts';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -61,6 +70,33 @@ export interface PipelineResult {
   fmt: StandardFormat;
   vocab: TypeVocabulary;
   issues: Issue[];
+  /** Per Limitless product: cards read from Limitless, and cards optcgapi now has (with differences). */
+  limitless: LimitlessReport[];
+}
+
+export interface LimitlessReport {
+  code: string;
+  fromLimitless: string[];
+  /** Cards optcgapi has: their Limitless differences after overrides (empty list: they agree). */
+  inOptcgapi: { id: string; differences: string[] }[];
+}
+
+/**
+ * ADR 0015: a product optcgapi lacks comes from Limitless, card by card. A card optcgapi has in a set
+ * or starter row is never taken from Limitless (its page is kept for the difference report); a promo
+ * row alone does not count, since promos reprint cards before their booster is in optcgapi.
+ */
+export function mergeLimitless(
+  rows: readonly SourcedRow[],
+  limitless: readonly Pick<LimitlessSource, 'cards'>[],
+): { inOptcgapi: Set<string>; added: SourcedRow[] } {
+  const inOptcgapi = new Set(rows.filter((r) => r.file !== 'promos').map(cardIdOf));
+  const added = limitless.flatMap((p) =>
+    p.cards
+      .filter((c) => !inOptcgapi.has(c.id))
+      .map((c) => ({ ...c.row, file: 'limitless' as const, fetchedAt: c.fetchedAt })),
+  );
+  return { inOptcgapi, added };
 }
 
 /** Everything except writing: fetch or read the cache, normalize, override, format, validate. */
@@ -80,6 +116,21 @@ export async function pipeline(opts: {
     s.rows.map((r) => ({ ...r, file: s.file, fetchedAt: s.fetchedAt })),
   );
   log(`${rows.length} upstream rows from ${sources.map((s) => s.url).join(', ')}`);
+
+  const limitless = await loadLimitless({
+    cacheDir: join(ROOT, '.cache/cards'),
+    refresh: opts.refresh,
+    log,
+  });
+  const { inOptcgapi, added } = mergeLimitless(rows, limitless);
+  rows.push(...added);
+  for (const p of limitless) {
+    const taken = p.cards.filter((c) => !inOptcgapi.has(c.id)).length;
+    log(
+      `${p.code}: ${taken} of ${p.cards.length} cards from ${p.setUrl}` +
+        (taken < p.cards.length ? ` (${p.cards.length - taken} now in optcgapi)` : ''),
+    );
+  }
 
   // Vocabulary from rows whose columns are not shifted.
   const vocab = new TypeVocabulary(
@@ -136,6 +187,13 @@ export async function pipeline(opts: {
     };
   }
   for (const c of asm.cards.values()) fatals.push(...validateCard(c).map((p) => `invalid: ${p}`));
+  const limitlessReport: LimitlessReport[] = limitless.map((p) => ({
+    code: p.code,
+    fromLimitless: p.cards.filter((c) => !inOptcgapi.has(c.id)).map((c) => c.id),
+    inOptcgapi: p.cards
+      .filter((c) => inOptcgapi.has(c.id) && asm.cards.has(c.id))
+      .map((c) => ({ id: c.id, differences: compareWithLimitless(asm.cards.get(c.id)!, c.page) })),
+  }));
   return {
     cards: asm.cards,
     fatals,
@@ -147,7 +205,27 @@ export async function pipeline(opts: {
     fmt,
     vocab,
     issues: asm.issues,
+    limitless: limitlessReport,
   };
+}
+
+/** The Limitless section of the run log: what came from Limitless, and what optcgapi now has. */
+export function formatLimitless(report: LimitlessReport[]): string {
+  const out: string[] = [];
+  for (const p of report) {
+    out.push(`  ${p.code}: ${p.fromLimitless.length} cards from Limitless card pages (ADR 0015).`);
+    if (p.inOptcgapi.length === 0) continue;
+    const differing = p.inOptcgapi.filter((c) => c.differences.length);
+    out.push(
+      `  ${p.code}: ${p.inOptcgapi.length} cards now come from optcgapi; ${differing.length} differ from their Limitless page:`,
+    );
+    for (const c of differing) out.push(`    ${c.id}\n      ${c.differences.join('\n      ')}`);
+    if (p.fromLimitless.length === 0)
+      out.push(
+        `  ${p.code} is complete in optcgapi: settle the differences, then remove it from LIMITLESS_PRODUCTS (sources.ts).`,
+      );
+  }
+  return out.join('\n');
 }
 
 async function main() {
@@ -170,6 +248,7 @@ async function main() {
     `\nDiff against the previous snapshot (${prev ? `${prev.size} cards` : 'none'}; ${scripted.size} scripted cards):`,
   );
   log(formatDiff(diff));
+  if (run.limitless.length) log(`\nLimitless products:\n${formatLimitless(run.limitless)}`);
   // The scheduled update PR (update.yml) writes anyway and lists them: the PR's CI then fails on
   // the scripts' text hashes until each card is re-verified (ARCHITECTURE §3 "Update pipeline").
   if (!args.has('--allow-script-changes')) fatals.push(...diff.failures);
@@ -178,7 +257,14 @@ async function main() {
   writeFileSync(
     join(ROOT, '.cache/cards/report.json'),
     JSON.stringify(
-      { summary, fatals, warnings, diff, suspiciousTypes: run.vocab.suspicious() },
+      {
+        summary,
+        fatals,
+        warnings,
+        diff,
+        limitless: run.limitless,
+        suspiciousTypes: run.vocab.suspicious(),
+      },
       null,
       2,
     ),
@@ -195,7 +281,7 @@ async function main() {
     log('\nDry run: nothing written.');
     return;
   }
-  write(run.cards, run.setNames, run.fmt, run.fetched, run.printingCount, summary);
+  write(run.cards, run.setNames, run.fmt, run.fetched, run.printingCount, summary, run.limitless);
 }
 
 function write(
@@ -205,6 +291,7 @@ function write(
   fetched: string[],
   printingCount: number,
   repairs: Record<string, number>,
+  limitless: LimitlessReport[],
 ) {
   const bySet = new Map<string, Card[]>();
   for (const c of cards.values()) bySet.set(c.set, [...(bySet.get(c.set) ?? []), c]);
@@ -226,8 +313,13 @@ function write(
     writeFileSync(join(DATA, 'sets', `${code}.json`), `${JSON.stringify(file, null, 1)}\n`);
   }
   const boosters = sets.filter((s) => s.kind === 'booster').map((s) => s.code);
+  const fromLimitless = limitless.filter((p) => p.fromLimitless.length).map((p) => p.code);
   const manifest: Manifest = {
-    source: 'optcgapi.com (normalized; see cards/README.md)',
+    source:
+      'optcgapi.com (normalized; see cards/README.md)' +
+      (fromLimitless.length
+        ? `; ${fromLimitless.join(', ')} from Limitless card pages (${LIMITLESS_BASE}, ADR 0015)`
+        : ''),
     sourceUrl: API_BASE,
     fetchedAt: fetched.sort().at(-1)!,
     generatedAt: new Date().toISOString(),

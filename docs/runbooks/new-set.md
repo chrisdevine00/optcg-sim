@@ -4,7 +4,7 @@ ADR 0014, ARCHITECTURE §3 "Update pipeline", PLAN §2a. Agents run this locally
 
 ## Before you start
 
-- The set is on `main` as data: `cards/data/sets/<SET>.json` exists, from `update.yml`'s `cards` PR or from `npm run cards:update -- --refresh` run locally (then commit the data on its own, stats only).
+- The set is on `main` as data: `cards/data/sets/<SET>.json` exists, from `update.yml`'s `cards` PR or from `npm run cards:update -- --refresh` run locally (then commit the data on its own, stats only). A set optcgapi does not have yet comes from its Limitless card pages: add it to `LIMITLESS_PRODUCTS` in `cards/scripts/sources.ts` (ADR 0015); its overrides then cite the official card list, not Limitless, since Limitless is the input.
 - `npm run cards:measure` is current, and `cards/data/play-frequency.json` is recent (`npm run meta:update -- --write` if older than a month). Together they give the order inside the set.
 - The time-box rule applies per batch (PROMPT.md): a batch that runs late goes to `docs/BACKLOG.md`, and its unfinished cards stay stats-only with the "effect not automated" badge.
 

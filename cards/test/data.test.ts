@@ -32,7 +32,7 @@ describe('generated card data', () => {
       expect(s.cards.every((c) => c.set === s.set.code)).toBe(true);
       expect(s.set.cardCount).toBe(s.cards.length);
     }
-    expect(manifest.newestSet).toBe('OP-17');
+    expect(manifest.newestSet).toBe('OP-18');
     expect(manifest.printingCount).toBe(
       [...cards.values()].reduce((n, c) => n + c.artworks.length, 0),
     );
@@ -51,6 +51,41 @@ describe('generated card data', () => {
     }
     const files = readdirSync(new URL('./', root), { recursive: true }) as string[];
     expect(files.filter((f) => /\.(png|jpe?g|webp|gif|avif)$/i.test(f))).toEqual([]);
+  });
+});
+
+describe('OP-18 from Limitless card pages (ADR 0015)', () => {
+  const op18 = setFiles.find((s) => s.set.code === 'OP-18')!;
+
+  it('has the whole booster, block 5 cited, every card Standard-legal', () => {
+    expect(op18.set).toMatchObject({ name: 'The Dominance of God', cardCount: 119, block: 5 });
+    expect(fmt.blocksByProduct['OP-18']?.source.url).toMatch(/series=569118$/);
+    for (const c of op18.cards) expect(c.legality.standard.status, c.id).toBe('legal');
+    // Block X printed on two base printings (official series page), carried by their overrides.
+    expect(op18.cards.filter((c) => c.block === 'X').map((c) => c.id)).toEqual([
+      'OP18-031',
+      'OP18-065',
+    ]);
+  });
+
+  it('records the source per card and adds no image host: every card is a text face', () => {
+    for (const c of op18.cards) {
+      expect(c.dataSource, c.id).toBe('limitless');
+      expect(c.sourceUrl).toBe(`https://onepiece.limitlesstcg.com/cards/${c.id}`);
+      for (const a of c.artworks) expect(a).toMatchObject({ source: 'none', imageUrls: {} });
+    }
+    // Every other card still comes from optcgapi.
+    const others = [...cards.values()].filter((c) => c.set !== 'OP-18');
+    expect(others.filter((c) => c.dataSource !== undefined)).toEqual([]);
+    expect(manifest.source).toMatch(/OP-18 from Limitless card pages/);
+  });
+
+  it('keeps the printed minus and splits types on the slash (OP18-021 Franky)', () => {
+    const franky = cards.get('OP18-021')!;
+    expect(franky).toMatchObject({ category: 'Leader', life: 4, power: 5000, rarity: 'L' });
+    expect(franky.colors).toEqual(['Green', 'Purple']);
+    expect(franky.types).toEqual(['Water Seven', 'The Franky Family', 'Straw Hat Crew']);
+    expect(franky.effectText).toContain('DON!! −1: Play up to 1 Stage card');
   });
 });
 

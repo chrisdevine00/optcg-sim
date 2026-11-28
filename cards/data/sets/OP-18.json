@@ -1,0 +1,5776 @@
+{
+ "set": {
+  "code": "OP-18",
+  "name": "The Dominance of God",
+  "kind": "booster",
+  "cardCount": 119,
+  "block": 5
+ },
+ "cards": [
+  {
+   "id": "OP18-001",
+   "name": "Karoo",
+   "category": "Leader",
+   "colors": [
+    "Red",
+    "Blue"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 4,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Animal",
+    "Alabasta"
+   ],
+   "rarity": "L",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "All of your Characters with both the {Animal} and {Alabasta} types gain [Rush] and +1000 power.\n[Once Per Turn] When your {Alabasta} type Character is K.O.'d, draw 1 card.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-001",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "L"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-001",
+   "fetchedAt": "2026-11-28T02:55:20.983Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-002",
+   "name": "Igaram",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 1,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "Alabasta"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On Play] You may trash 1 {Alabasta} type card from your hand: Draw 2 cards.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-002",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-002",
+   "fetchedAt": "2026-11-28T02:55:22.674Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-003",
+   "name": "Sea Cat",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Animal",
+    "Alabasta"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-003",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-003",
+   "fetchedAt": "2026-11-28T02:55:24.351Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-004",
+   "name": "Karoo",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Animal",
+    "Alabasta"
+   ],
+   "rarity": "R",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "Apply each of the following effects based on this Character's power:\n• If it has 5000 power or more, this Character gains [Rush].\n• If it has 6000 power or more, this Character gains [Banish].\n• If it has 7000 power or more, this Character gains [Unblockable].",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-004",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-004",
+   "fetchedAt": "2026-11-28T02:55:26.035Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-005",
+   "name": "Kung Fu Jugon",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 1,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Animal",
+    "Alabasta"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Your Turn] This Character gains +1000 power for every [Kung Fu Jugon].",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-005",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-005",
+   "fetchedAt": "2026-11-28T02:55:27.752Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-006",
+   "name": "Koza",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Alabasta"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "If you have [Nefeltari Vivi], this Character gains [Rush] and +1000 power.\n(This card can attack on the turn in which it is played.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-006",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-006",
+   "fetchedAt": "2026-11-28T02:55:29.423Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-007",
+   "name": "Smoker",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Alabasta",
+    "Navy"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "If your Leader has the {Navy} type, this Character gains [Banish] and +1000 power.\n(When this card deals damage, the target card is trashed without activating its Trigger.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-007",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-007",
+   "fetchedAt": "2026-11-28T02:55:31.105Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-008",
+   "name": "Chaka",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Alabasta"
+   ],
+   "rarity": "R",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "If your Leader has the {Alabasta} type, this Character gains [Rush].\n[On Play] You may trash 1 Character card with 5000 power or less from your hand: Draw 2 cards and this Character gains [Banish] during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-008",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-008",
+   "fetchedAt": "2026-11-28T02:55:32.781Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-009",
+   "name": "Super Spot-Billed Duck Troops",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Animal",
+    "Alabasta"
+   ],
+   "rarity": "R",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Rush] (This card can attack on the turn in which it is played.)\n[Activate: Main] You may trash this Character: If you have 9 or more DON!! cards on your field, play up to 1 [Karoo] from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-009",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-009",
+   "fetchedAt": "2026-11-28T02:55:34.466Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-010",
+   "name": "Tony Tony.Chopper",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Animal",
+    "Alabasta",
+    "Straw Hat Crew"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On K.O.] Add up to 1 Character card with 4000 power or less from your trash to your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-010",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-010",
+   "fetchedAt": "2026-11-28T02:55:36.205Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-011",
+   "name": "Nefeltari Vivi",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 2,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Alabasta"
+   ],
+   "rarity": "SR",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "All of your Characters with both the {Animal} and {Alabasta} types gain +1000 power.\n[Opponent's Turn] This Character gains [Blocker] and +6000 power.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-011",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-011",
+   "fetchedAt": "2026-11-28T02:55:37.875Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-012",
+   "name": "Pincers",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 1,
+   "power": 0,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Animal",
+    "Alabasta"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[When Attacking] Up to 1 of your Characters with both the {Animal} and {Alabasta} types gains +1000 power during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-012",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-012",
+   "fetchedAt": "2026-11-28T02:55:39.566Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-013",
+   "name": "Pell",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Alabasta"
+   ],
+   "rarity": "R",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "If your Leader has the {Alabasta} type, this Character gains [Rush].\n[On Play] You may trash 1 Character card with 5000 power or less from your hand: Draw 2 cards and trash up to 1 of your opponent's Characters with 3000 base power or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-013",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-013",
+   "fetchedAt": "2026-11-28T02:55:41.246Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-014",
+   "name": "Portgas.D.Ace",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 3,
+   "power": 5000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Alabasta",
+    "Whitebeard Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[When Attacking] Up to 1 of your {Alabasta} type Characters gains [Rush] during this turn.\n(This card can attack on the turn in which it is played.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-014",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-014",
+   "fetchedAt": "2026-11-28T02:55:42.932Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-015",
+   "name": "Eyelashes",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 1,
+   "power": 0,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Animal",
+    "Alabasta"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On Your Opponent's Attack] You may trash this Character: If your Leader has the {Alabasta} type, give up to 1 of your opponent's Leader or Characters −3000 power during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-015",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-015",
+   "fetchedAt": "2026-11-28T02:55:44.647Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-016",
+   "name": "Monkey.D.Luffy",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 6,
+   "power": 7000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Alabasta",
+    "Straw Hat Crew"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Banish]\n[On K.O.] Play up to 1 {Alabasta} type Character card with 6000 power or less from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-016",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-016",
+   "fetchedAt": "2026-11-28T02:55:46.321Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-017",
+   "name": "Roronoa Zoro",
+   "category": "Character",
+   "colors": [
+    "Red"
+   ],
+   "cost": 4,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Alabasta",
+    "Straw Hat Crew"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Once Per Turn] If your {Alabasta} type Character would be removed from the field by your opponent's effect, you may give your Leader −2000 power during this turn instead.\n[When Attacking] Up to 1 of your {Alabasta} type Characters gains [Rush] during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-017",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-017",
+   "fetchedAt": "2026-11-28T02:55:47.993Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-018",
+   "name": "Let's Go, Karoo!!",
+   "category": "Event",
+   "colors": [
+    "Red"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Alabasta"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Main] All of your {Alabasta} type Characters gain +1000 power during this turn.",
+   "triggerText": "Up to 1 of your Leader or Characters gains +2000 power during this turn.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-018",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-018",
+   "fetchedAt": "2026-11-28T02:55:49.667Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-019",
+   "name": "Quack!!!",
+   "category": "Event",
+   "colors": [
+    "Red"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Animal",
+    "Alabasta"
+   ],
+   "rarity": "R",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Main] If you have no Characters with 7000 base power or more, give up to 1 of your opponent's Characters −3000 power during this turn.\n[Counter] Your Leader gains +3000 power during this battle.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-019",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-019",
+   "fetchedAt": "2026-11-28T02:55:51.340Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-020",
+   "name": "Stop Fighting!!!",
+   "category": "Event",
+   "colors": [
+    "Red"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Alabasta"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Counter] You may add all of your Life cards to your hand: If your Leader is [Nefeltari Vivi], give your opponent's Leader and all of their Characters −5000 power during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-020",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-020",
+   "fetchedAt": "2026-11-28T02:55:53.092Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-021",
+   "name": "Franky",
+   "category": "Leader",
+   "colors": [
+    "Green",
+    "Purple"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 4,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Water Seven",
+    "The Franky Family",
+    "Straw Hat Crew"
+   ],
+   "rarity": "L",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "All Stage cards in your hand have a +3000 Counter.\n[Activate: Main] [Once Per Turn] DON!! −1: Play up to 1 Stage card with a cost of 5 or less from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-021",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "L"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-021",
+   "fetchedAt": "2026-11-28T02:55:54.779Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-022",
+   "name": "Monkey.D.Luffy",
+   "category": "Leader",
+   "colors": [
+    "Green"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 5,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Water Seven",
+    "Straw Hat Crew"
+   ],
+   "rarity": "L",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[DON!! x3] [When Attacking] [Once Per Turn] You may set this Leader as active. If you do, this Leader will not become active in your next Refresh Phase.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-022",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "L"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-022",
+   "fetchedAt": "2026-11-28T02:55:56.478Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-023",
+   "name": "Gaimon",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 1,
+   "power": 0,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "East Blue"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On Play] Up to 1 of your {East Blue} type Leader or Characters gains [Banish] during this turn.\n(When this card deals damage, the target card is trashed without activating its Trigger.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-023",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-023",
+   "fetchedAt": "2026-11-28T02:55:58.163Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-024",
+   "name": "Kokoro",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 2,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Merfolk",
+    "Water Seven"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[End of Your Turn] You may trash this Character: Set your Leader as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-024",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-024",
+   "fetchedAt": "2026-11-28T02:55:59.844Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-025",
+   "name": "Gonbe",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 1,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Animal",
+    "Water Seven"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[End of Your Turn] If this Character is rested, set your Leader as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-025",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-025",
+   "fetchedAt": "2026-11-28T02:56:01.514Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-026",
+   "name": "Sanji",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 2,
+   "power": 2000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Water Seven",
+    "Straw Hat Crew"
+   ],
+   "rarity": "R",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "If your {Straw Hat Crew} type Character would be removed from the field by your opponent's effect, you may trash this Character instead.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-026",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-026",
+   "fetchedAt": "2026-11-28T02:56:03.203Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-027",
+   "name": "Zoro & Sogeking",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash",
+    "Ranged"
+   ],
+   "types": [
+    "Sniper Island",
+    "Water Seven",
+    "Straw Hat Crew"
+   ],
+   "rarity": "R",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Opponent's Turn] The base power of your active [Monkey.D.Luffy] Leader with 3 or more DON!! cards given becomes 7000.\n[On Play] Set up to 2 of your DON!! cards as active. Then, up to 1 of your opponent's Characters with a cost of 6 or less cannot be rested until the end of your opponent's next End Phase.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-027",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-027",
+   "fetchedAt": "2026-11-28T02:56:04.892Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-028",
+   "name": "Chimney",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 2,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Water Seven"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Activate: Main] You may rest 1 of your [Gonbe] and this Character: Set your [Monkey.D.Luffy] Leader as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-028",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-028",
+   "fetchedAt": "2026-11-28T02:56:06.609Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-029",
+   "name": "Tony Tony.Chopper",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 9,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Animal",
+    "Water Seven",
+    "Straw Hat Crew"
+   ],
+   "rarity": "R",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Rush]\n[When Attacking] [Once Per Turn] Give up to 3 rested DON!! cards to your Leader and set this Character as active. Then, this Character will not become active in your next Refresh Phase.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-029",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-029",
+   "fetchedAt": "2026-11-28T02:56:08.289Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-030",
+   "name": "Nami",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 4,
+   "power": 6000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Water Seven",
+    "Straw Hat Crew"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Opponent's Turn] If this Character is rested, give this Character −2000 power.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-030",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-030",
+   "fetchedAt": "2026-11-28T02:56:09.951Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-031",
+   "name": "Nico Robin",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Water Seven",
+    "Straw Hat Crew"
+   ],
+   "rarity": "SR",
+   "set": "OP-18",
+   "block": "X",
+   "effectText": "[Opponent's Turn] If your Character would be removed from the field by your opponent's effect, you may rest this Character instead.\n[End of Your Turn] Set up to 1 of your {Water Seven} type cards and up to 1 of your DON!! cards as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-031",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block X"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-031",
+   "fetchedAt": "2026-11-28T02:56:11.617Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-032",
+   "name": "Buggy",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "East Blue",
+    "Buggy Pirates"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On Play]/[On K.O.] Up to 1 of your opponent's rested Characters with 8000 power or less will not become active in your opponent's next Refresh Phase.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-032",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-032",
+   "fetchedAt": "2026-11-28T02:56:13.293Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-033",
+   "name": "Banban",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 2,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Water Seven"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[End of Your Turn] You may trash this Character: Set up to 1 of your Characters as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-033",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-033",
+   "fetchedAt": "2026-11-28T02:56:14.967Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-034",
+   "name": "Franky",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 6,
+   "power": 7000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Water Seven",
+    "The Franky Family",
+    "Straw Hat Crew"
+   ],
+   "rarity": "SR",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On Play] Play up to 1 {The Franky Family} or {Straw Hat Crew} type card with a cost of 5 or less from your hand. Then, if you have a Stage with a cost of 5 or more, rest up to 1 of your opponent's Characters with a cost of 6 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-034",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-034",
+   "fetchedAt": "2026-11-28T02:56:16.662Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-035",
+   "name": "Michael & Hoichael",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 3,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Water Seven"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-035",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-035",
+   "fetchedAt": "2026-11-28T02:56:18.332Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-036",
+   "name": "Monkey.D.Luffy",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 2,
+   "power": 0,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Water Seven",
+    "Straw Hat Crew"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[End of Your Turn] You may trash this Character: Draw 1 card and set your Leader as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-036",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-036",
+   "fetchedAt": "2026-11-28T02:56:20.049Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-037",
+   "name": "Yokozuna",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 4,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Animal",
+    "Water Seven"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[On K.O.] Rest up to 1 of your opponent's cards.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-037",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-037",
+   "fetchedAt": "2026-11-28T02:56:21.749Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-038",
+   "name": "Shoot Down That Flag.",
+   "category": "Event",
+   "colors": [
+    "Green"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Water Seven",
+    "Straw Hat Crew"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Main] Look at 5 cards from the top of your deck; reveal up to 1 [Sogeking] or {Straw Hat Crew} type card and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": "Draw 1 card.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-038",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-038",
+   "fetchedAt": "2026-11-28T02:56:23.421Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-039",
+   "name": "Gum-Gum Giant Axe",
+   "category": "Event",
+   "colors": [
+    "Green"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Water Seven",
+    "Straw Hat Crew"
+   ],
+   "rarity": "R",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Counter] Up to 1 of your [Monkey.D.Luffy] gains +2000 power during this battle. Then, if your Leader is active, draw 1 card.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-039",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-039",
+   "fetchedAt": "2026-11-28T02:56:25.116Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-040",
+   "name": "Diable Jambe Flambé Shot",
+   "category": "Event",
+   "colors": [
+    "Green"
+   ],
+   "cost": 4,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Water Seven",
+    "Straw Hat Crew"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Main] K.O. up to 1 of your opponent's rested Characters with a cost of 7 or less.",
+   "triggerText": "Rest up to 1 of your opponent's Characters with a cost of 7 or less.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-040",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-040",
+   "fetchedAt": "2026-11-28T02:56:26.801Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-041",
+   "name": "Ms. All Sunday",
+   "category": "Leader",
+   "colors": [
+    "Blue"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 5,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Baroque Works"
+   ],
+   "rarity": "L",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "When your Character with a type including \"Baroque Works\" and 3000 base power or more is K.O.'d, draw 1 card, and your opponent trashes 1 card from their hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-041",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "L"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-041",
+   "fetchedAt": "2026-11-28T02:56:28.472Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-042",
+   "name": "Hack",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Fish-Man",
+    "Dressrosa",
+    "Revolutionary Army"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On K.O.] Draw 1 card.\n[Activate: Main] [Once Per Turn] Give up to 1 rested DON!! card to 1 of your {Dressrosa} type Leader or Characters.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-042",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-042",
+   "fetchedAt": "2026-11-28T02:56:30.165Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-043",
+   "name": "Accelegator",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 4,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Animal",
+    "Alabasta",
+    "Baroque Works"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-043",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-043",
+   "fetchedAt": "2026-11-28T02:56:31.885Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-044",
+   "name": "Mr.Beans & Miss.Katherina",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Baroque Works"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[DON!! x1] This Character gains +1000 power.\n[On Play] Draw 1 card and trash 1 card from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-044",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-044",
+   "fetchedAt": "2026-11-28T02:56:33.558Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-045",
+   "name": "Mr.Prince",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Alabasta",
+    "Straw Hat Crew"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "Also treat this card's name as [Sanji] according to the rules.\nThis Character gains +1000 power for every 5 Events in your trash.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-045",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-045",
+   "fetchedAt": "2026-11-28T02:56:35.232Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-046",
+   "name": "Mr.0 & Ms. All Sunday",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 9,
+   "power": 10000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special",
+    "Wisdom"
+   ],
+   "types": [
+    "The Seven Warlords of the Sea",
+    "Baroque Works"
+   ],
+   "rarity": "SR",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On Play] Draw 2 cards and give your Leader and all of your Characters up to 2 rested DON!! cards each.\n[On Your Opponent's Attack] You may trash 1 card from your hand: The base power of your Leader with a type including \"Baroque Works\" becomes 7000 during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-046",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-046",
+   "fetchedAt": "2026-11-28T02:56:36.913Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-047",
+   "name": "Mr.1(Daz.Bonez)",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 2,
+   "power": 3000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Cross Guild",
+    "Former Baroque Works"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On Play] Your Leader with the {Cross Guild} type or a type including \"Baroque Works\" gains [Unblockable] during this turn.\n(This card cannot be blocked.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-047",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-047",
+   "fetchedAt": "2026-11-28T02:56:38.590Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-048",
+   "name": "Mr.1 & Miss Doublefinger",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 6,
+   "power": 6000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Baroque Works"
+   ],
+   "rarity": "SR",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Rush] (This card can attack on the turn in which it is played.)\n[On Play] Play up to 1 Character card with a type including \"Baroque Works\" and a cost of 5 or less from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-048",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-048",
+   "fetchedAt": "2026-11-28T02:56:40.265Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-049",
+   "name": "Mr.2.Bon.Kurei(Bentham)",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Baroque Works"
+   ],
+   "rarity": "R",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 card with a type including \"Baroque Works\", add it to your hand and place the rest at the bottom of your deck in any order. Then, give up to 1 rested DON!! card to your Leader or 1 of your Characters.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-049",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-049",
+   "fetchedAt": "2026-11-28T02:56:41.936Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-050",
+   "name": "Mr.3 & Miss.Goldenweek",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special",
+    "Wisdom"
+   ],
+   "types": [
+    "Baroque Works"
+   ],
+   "rarity": "R",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Blocker]\n[On Play] If your Leader's type includes \"Baroque Works\", up to 1 of your opponent's Characters with a cost of 7 or less cannot attack until the end of your opponent's next End Phase.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-050",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-050",
+   "fetchedAt": "2026-11-28T02:56:43.632Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-051",
+   "name": "Mr.4 & Miss.MerryChristmas",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 2,
+   "power": 3000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash",
+    "Strike"
+   ],
+   "types": [
+    "Baroque Works"
+   ],
+   "rarity": "R",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[DON!! x1] This Character gains +1000 power.\n[On Play] You may rest 5 of your DON!! cards: Place up to 1 Character with a cost of 6 or less and up to 1 Character with a cost of 5 or less at the bottom of the owner's deck in any order of the owner's choosing.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-051",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-051",
+   "fetchedAt": "2026-11-28T02:56:45.308Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-052",
+   "name": "Mr.5 & Miss.Valentine",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 5,
+   "power": 4000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Strike",
+    "Special"
+   ],
+   "types": [
+    "Baroque Works"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[DON!! x1] This Character gains +1000 power.\n[On Play] Play up to 1 Character card with a type including \"Baroque Works\" and a cost of 3 or less from your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-052",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-052",
+   "fetchedAt": "2026-11-28T02:56:46.985Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-053",
+   "name": "Mr.7 & Miss.Father'sDay",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 2,
+   "power": 3000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "Baroque Works"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[DON!! x1] This Character gains +1000 power.\n[On Play] Look at 3 cards from the top of your deck, reorganize them in any order and place them at the top or bottom of your deck.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-053",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-053",
+   "fetchedAt": "2026-11-28T02:56:48.652Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-054",
+   "name": "Mr.8 & Ms. Monday",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 2,
+   "power": 3000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Strike",
+    "Ranged"
+   ],
+   "types": [
+    "Baroque Works"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[DON!! x1] This Character gains +1000 power.\n[Opponent's Turn] [Once Per Turn] If your Character with a type including \"Baroque Works\" would be removed from the field by your opponent's effect, you may trash 1 card from your hand instead.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-054",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-054",
+   "fetchedAt": "2026-11-28T02:56:50.333Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-055",
+   "name": "Mr.9 & Ms. Wednesday",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash",
+    "Strike"
+   ],
+   "types": [
+    "Baroque Works"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[DON!! x1] This Character gains +1000 power.\n[On Play] Return up to 1 of your opponent's Characters with a cost of 2 or less to the owner's hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-055",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-055",
+   "fetchedAt": "2026-11-28T02:56:52.017Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-056",
+   "name": "Mr.13 & Ms.Friday",
+   "category": "Character",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 2,
+   "power": 3000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Animal",
+    "Baroque Works"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[DON!! x1] This Character gains +1000 power.\n[On Play] You may place 1 of your Characters with a type including \"Baroque Works\" other than this Character at the bottom of your deck: Your opponent trashes 1 card from their hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-056",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-056",
+   "fetchedAt": "2026-11-28T02:56:53.702Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-057",
+   "name": "Atomic Dicer",
+   "category": "Event",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Baroque Works"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Main] You may rest 3 of your DON!! cards: Return up to 1 Character with a cost of 5 or less to the owner's hand.\n[Counter] Your Leader gains +3000 power during this battle.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-057",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-057",
+   "fetchedAt": "2026-11-28T02:56:55.372Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-058",
+   "name": "This Kingdom is Doomed. You Can't Save It!",
+   "category": "Event",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 3,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "The Seven Warlords of the Sea",
+    "Baroque Works"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Main] You may return 1 of your Characters to the owner's hand: Place up to 1 Character with a cost of 4 or less at the bottom of the owner's deck.",
+   "triggerText": "Activate this card's [Main] effect.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-058",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-058",
+   "fetchedAt": "2026-11-28T02:56:57.045Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-059",
+   "name": "I Pray For Your Success.",
+   "category": "Event",
+   "colors": [
+    "Blue"
+   ],
+   "cost": 0,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "The Seven Warlords of the Sea",
+    "Baroque Works"
+   ],
+   "rarity": "R",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Main] You may rest 1 of your DON!! cards and trash 1 card with a type including \"Baroque Works\" from your hand: Draw 2 cards.\n[Counter] You may trash 1 card from your hand: Up to 1 of your Leader or Characters gains +3000 power during this battle.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-059",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-059",
+   "fetchedAt": "2026-11-28T02:56:58.726Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-060",
+   "name": "Saint Gunko",
+   "category": "Leader",
+   "colors": [
+    "Purple",
+    "Black"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 4,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Celestial Dragons",
+    "Holy Knights of God"
+   ],
+   "rarity": "L",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Once Per Turn] When a Character is played from your trash, draw 2 cards and trash 1 card from your hand.\n[Activate: Main] [Once Per Turn] You may trash 1 card from your hand: If you have a Character with 8000 base power or more, add up to 1 DON!! card as active from your DON!! deck.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-060",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "L"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-060",
+   "fetchedAt": "2026-11-28T02:57:00.433Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-061",
+   "name": "Iceburg",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 2,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Water Seven",
+    "Galley-La Company"
+   ],
+   "rarity": "SR",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On Play] Look at 5 cards from the top of your deck; reveal up to a total of 2 Stage cards or {Water Seven} type cards and add them to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-061",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-061",
+   "fetchedAt": "2026-11-28T02:57:02.115Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-062",
+   "name": "Oimo & Kashii",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 8,
+   "power": 10000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Giant",
+    "World Government"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-062",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-062",
+   "fetchedAt": "2026-11-28T02:57:03.784Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-063",
+   "name": "Kiwi & Mozu",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 3,
+   "power": 1000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Water Seven",
+    "The Franky Family"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On Play] You may K.O. 1 of your Stages with a cost of 5 or less: Add up to 1 DON!! card as rested from your DON!! deck.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-063",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-063",
+   "fetchedAt": "2026-11-28T02:57:05.470Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-064",
+   "name": "Saint Killingham",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Celestial Dragons",
+    "Holy Knights of God"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Your Turn] [On Play] DON!! −1: Up to 1 of your opponent's Characters with 7000 base power or less and up to 1 of your opponent's Characters with 5000 base power or less cannot attack until the end of your opponent's next End Phase.\n[On K.O.] DON!! −1: Play this Character card from your trash.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-064",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-064",
+   "fetchedAt": "2026-11-28T02:57:07.152Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-065",
+   "name": "Saint Gunko",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 10,
+   "power": 11000,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Celestial Dragons",
+    "Holy Knights of God"
+   ],
+   "rarity": "SR",
+   "set": "OP-18",
+   "block": "X",
+   "effectText": "[Blocker]\n[On Play] DON!! −1: Play up to 1 {Celestial Dragons} type Character card with 6000 power or less from your trash.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-065",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block X"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-065",
+   "fetchedAt": "2026-11-28T02:57:08.821Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-066",
+   "name": "Zambai",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Water Seven",
+    "The Franky Family"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Activate: Main] You may K.O. 1 of your Stages with a cost of 5 or less: This Character gains [Rush] during this turn.\n(This card can attack on the turn in which it is played.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-066",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-066",
+   "fetchedAt": "2026-11-28T02:57:10.499Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-067",
+   "name": "Charlotte Smoothie",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 1,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Big Mom Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On Play] You may trash 1 {Big Mom Pirates} type card from your hand: Draw 2 cards.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-067",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-067",
+   "fetchedAt": "2026-11-28T02:57:12.177Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-068",
+   "name": "Senor Pink",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 8,
+   "power": 9000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Donquixote Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Once Per Turn] If this Character would be K.O.'d, you may DON!! −1 instead.\n[On Play] DON!! −1: Up to 1 of your opponent's Characters with a cost of 7 or less cannot be rested until the end of your opponent's next End Phase.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-068",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-068",
+   "fetchedAt": "2026-11-28T02:57:13.859Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-069",
+   "name": "Sodomu & Gomora",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 1,
+   "power": 2000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Animal",
+    "Water Seven",
+    "The Franky Family"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "If your {The Franky Family} type Character would be K.O.'d, you may DON!! −1 and rest this Character instead.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-069",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-069",
+   "fetchedAt": "2026-11-28T02:57:15.538Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-070",
+   "name": "Tom",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 1,
+   "power": 2000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Wisdom"
+   ],
+   "types": [
+    "Fish-Man",
+    "Water Seven"
+   ],
+   "rarity": "R",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On Play] DON!! −1, you may trash 1 card from your hand: Add up to 2 Stage cards from your trash to your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-070",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-070",
+   "fetchedAt": "2026-11-28T02:57:17.215Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-071",
+   "name": "Trebol",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Donquixote Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Once Per Turn] If your {Donquixote Pirates} type Character would be removed from the field by your opponent's effect, you may DON!! −1 instead.\n[Opponent's Turn] If your Leader is {Sugar}, this Characters gains [Blocker] and +2000 power.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-071",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-071",
+   "fetchedAt": "2026-11-28T02:57:18.911Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-072",
+   "name": "The Franky Family",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Water Seven",
+    "The Franky Family"
+   ],
+   "rarity": "R",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Blocker]\n[Activate: Main] [Once Per Turn] You may K.O. 1 of your Stages with a cost of 5 or less: If this Character was played on this turn, give up to 1 of your opponent's Characters −3000 power during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-072",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-072",
+   "fetchedAt": "2026-11-28T02:57:20.614Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-073",
+   "name": "T-Bone",
+   "category": "Character",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 5,
+   "power": 7000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Water Seven",
+    "Navy"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-073",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-073",
+   "fetchedAt": "2026-11-28T02:57:22.301Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-074",
+   "name": "Can You Please Sail on the Ship I Made?!",
+   "category": "Event",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Water Seven",
+    "The Franky Family"
+   ],
+   "rarity": "R",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Counter] If you have a Stage with a cost of 5 or more, up to 1 of your Leader or Characters gains +4000 power during this battle.",
+   "triggerText": "DON!! −1: Add up to 2 Stage cards from your trash to your hand.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-074",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-074",
+   "fetchedAt": "2026-11-28T02:57:23.973Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-075",
+   "name": "Thousand Sunny",
+   "category": "Stage",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 5,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Straw Hat Crew"
+   ],
+   "rarity": "R",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On Play] Draw 1 card, then add up to 1 DON!! card as rested from your DON!! deck.\n[Activate: Main] DON!! −2, you may rest this Stage: Set up to 1 of your {Straw Hat Crew} type Characters with 7000 power or less as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-075",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-075",
+   "fetchedAt": "2026-11-28T02:57:25.654Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-076",
+   "name": "Shark Submerge 3",
+   "category": "Stage",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 5,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Straw Hat Crew"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On Play] Draw 1 card, then add up to 1 DON!! card as rested from your DON!! deck.\n[On Your Opponent's Attack] You may rest this Stage: Your Leader with 5000 power or less and up to 2 of your Characters gain +1000 power during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-076",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-076",
+   "fetchedAt": "2026-11-28T02:57:27.325Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-077",
+   "name": "White Hobby Horse 1",
+   "category": "Stage",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 5,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Straw Hat Crew"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On Play] Draw 1 card, then add up to 1 DON!! card as rested from your DON!! deck.\n[Activate: Main] You may rest this Stage: Up to 1 of your {Straw Hat Crew} type Characters gains [Rush: Character] during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-077",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-077",
+   "fetchedAt": "2026-11-28T02:57:29.003Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-078",
+   "name": "Mini-Merry",
+   "category": "Stage",
+   "colors": [
+    "Purple"
+   ],
+   "cost": 5,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Straw Hat Crew"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On Play] Draw 1 card, then add up to 1 DON!! card as rested from your DON!! deck.\n[Activate: Main] You may rest this Stage: Give up to a total of 4 of your Leader or Characters 1 rested DON!! Card each.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-078",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-078",
+   "fetchedAt": "2026-11-28T02:57:30.684Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-079",
+   "name": "Spandam",
+   "category": "Leader",
+   "colors": [
+    "Black",
+    "Yellow"
+   ],
+   "cost": null,
+   "power": 5000,
+   "counter": null,
+   "life": 4,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "L",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Activate: Main] You may rest 2 of your DON!! cards and this Leader and trash 1 card with a type including \"CP\" from your hand: Add up to 1 card from the top of your deck to the top of your Life cards.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-079",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "L"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-079",
+   "fetchedAt": "2026-11-28T02:57:32.363Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-080",
+   "name": "Van Augur",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "Egghead",
+    "Blackbeard Pirates"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Your Turn] [Once Per Turn] When a card is trashed from your hand by your [Marshall.D.Teach] Leader's effect, if you have no other [Van Augur], draw 1 card.\n[On K.O.] Draw 1 Card.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-080",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-080",
+   "fetchedAt": "2026-11-28T02:57:34.039Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-081",
+   "name": "Oars",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 10,
+   "power": 11000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Giant",
+    "Thriller Bark Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "If you have a [Gecko Moria] Character, this Character gains [Double Attack] and [Blocker].",
+   "triggerText": "Play up to 1 {Thriller Bark Pirates} type Character card with a cost of 4 or less from your trash rested.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-081",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-081",
+   "fetchedAt": "2026-11-28T02:57:35.721Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-082",
+   "name": "Catarina Devon",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 5,
+   "power": 3000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Egghead",
+    "Blackbeard Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[When Attacking] This Character's base power becomes the same as your opponent's Leader's power during this turn.\n[On K.O.] You may trash 1 card from your hand: If your Leader has the {Blackbeard Pirates} type, play this Character card from your trash rested.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-082",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-082",
+   "fetchedAt": "2026-11-28T02:57:37.404Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-083",
+   "name": "Saint Killingham",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 5,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Celestial Dragons",
+    "Holy Knights of God"
+   ],
+   "rarity": "R",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Your Turn] [On Play] Play up to 1 [Sleeptids] from your trash.\n[On K.O.] You may trash 2 cards from your hand: Play this Character card from your trash.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-083",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-083",
+   "fetchedAt": "2026-11-28T02:57:39.080Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-084",
+   "name": "Saint Gunko",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 1,
+   "power": 2000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Celestial Dragons",
+    "Holy Knights of God"
+   ],
+   "rarity": "SR",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On Play] Look at 4 cards from the top of your deck; reveal up to 1 {Holy Knights of God} type card and add it to your hand. Then, trash the rest.\n[Activate: Main] You may rest 4 of your DON!! cards: Play up to 1 {Holy Knights of God} type Character card with a cost of 6 or less from your trash.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-084",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-084",
+   "fetchedAt": "2026-11-28T02:57:40.776Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-085",
+   "name": "Cerberus",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 1,
+   "power": 0,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Holy Knights of God"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Activate: Main] You may return this Character to the owner's hand: Up to 1 of your [Saint Shamrock] Characters gains [Rush], [Banish] or [Unblockable] during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-085",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-085",
+   "fetchedAt": "2026-11-28T02:57:42.449Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-086",
+   "name": "Goldberg",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Giant",
+    "Elbaph",
+    "New Giant Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "This Character gains +12 cost.\n[On K.O.] K.O. up to 1 of your opponent's Characters with a cost of 4 or less.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-086",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-086",
+   "fetchedAt": "2026-11-28T02:57:44.130Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-087",
+   "name": "Stansen",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Giant",
+    "Elbaph",
+    "New Giant Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "This Character gains +12 cost.\nIf you only have Characters with a cost of 12 or more, this Character gains +2000 power.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-087",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-087",
+   "fetchedAt": "2026-11-28T02:57:45.793Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-088",
+   "name": "Saint Sommers",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 6,
+   "power": 6000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Celestial Dragons",
+    "Holy Knights of God"
+   ],
+   "rarity": "R",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Your Turn] [On Play] If you have 6 or more DON!! cards on your field, K.O. up to 1 of your opponent's Characters with a base cost of 4 or less.\n[On K.O.] You may trash 2 cards from your hand: Play this Character card from your trash.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-088",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-088",
+   "fetchedAt": "2026-11-28T02:57:47.464Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-089",
+   "name": "Dorry",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Giant",
+    "Elbaph",
+    "Giant Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "This Character gains +12 cost.\n[On Play] You may trash 1 card from your hand: Your opponent trashes 1 card from their hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-089",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-089",
+   "fetchedAt": "2026-11-28T02:57:49.127Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-090",
+   "name": "Brook",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 7,
+   "power": 9000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Straw Hat Crew"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-090",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-090",
+   "fetchedAt": "2026-11-28T02:57:50.815Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-091",
+   "name": "Brogy",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 4,
+   "power": 5000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Giant",
+    "Elbaph",
+    "Giant Pirates"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "This Character gains +12 cost.\n[When Attacking] You may trash 1 card from your hand: Add up to 1 of your Character cards with a cost of 2 or less from your trash to your hand.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-091",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-091",
+   "fetchedAt": "2026-11-28T02:57:52.495Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-092",
+   "name": "Roronoa Zoro",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 2,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Elbaph",
+    "Straw Hat Crew"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "If there is a Character with a cost of 12 or more, this Character gains +3000 power.\nIf you have 10 or more cards in your trash, this Character gains [Rush].\n(This card can attack on the turn in which it is played.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-092",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-092",
+   "fetchedAt": "2026-11-28T02:57:54.166Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-093",
+   "name": "Sleeptids",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 9,
+   "power": 3000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "Elbaph"
+   ],
+   "rarity": "R",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "Under the rules of this game, you may have any number of this card in your deck.\n[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-093",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-093",
+   "fetchedAt": "2026-11-28T02:57:55.839Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-094",
+   "name": "Hee Hee Hee!! I Smell Adventure!!",
+   "category": "Event",
+   "colors": [
+    "Black"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Elbaph",
+    "The Four Emperors",
+    "Straw Hat Crew"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Main] Look at 5 cards from the top of your deck; reveal up to 1 {Elbaph} type card and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": "Draw 1 card.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-094",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-094",
+   "fetchedAt": "2026-11-28T02:57:57.512Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-095",
+   "name": "I'm Late, I'm Very Late!!",
+   "category": "Event",
+   "colors": [
+    "Black"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Celestial Dragons",
+    "Holy Knights of God"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Main] If your Leader has the {Celestial Dragons} type, look at 5 cards from the top of your deck; reveal up to 1 [Sleeptids] or {Holy Knights of God} type card and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": "Activate this card's [Main] effect.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-095",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-095",
+   "fetchedAt": "2026-11-28T02:57:59.194Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-096",
+   "name": "I'll Make the Call",
+   "category": "Event",
+   "colors": [
+    "Black"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Celestial Dragons",
+    "Holy Knights of God"
+   ],
+   "rarity": "R",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Main] You may rest 3 of your DON!! cards: Play up to 1 {Holy Knights of God} type Character card with a cost of 6 or less from your trash.\n[Counter] If you have 10 or more cards in your trash, up to 1 of your Leader or Characters gains +4000 power during this battle.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-096",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-096",
+   "fetchedAt": "2026-11-28T02:58:00.870Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-097",
+   "name": "Abyss Pentagram",
+   "category": "Stage",
+   "colors": [
+    "Black"
+   ],
+   "cost": 1,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Celestial Dragons",
+    "Holy Knights of God",
+    "Five Elders"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "If your Leader has the {Celestial Dragons} type, the cost of playing {Holy Knights of God} or {Five Elders} type Character cards with a cost of 2 or more from your hand will be reduced by 1.\n[On Play] Draw 1 card and trash 2 cards from the top of your deck.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-097",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-097",
+   "fetchedAt": "2026-11-28T02:58:02.544Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-098",
+   "name": "Onigumo",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 7,
+   "power": 7000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Vice Admiral",
+    "Navy"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Unblockable] (This card cannot be blocked.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-098",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-098",
+   "fetchedAt": "2026-11-28T02:58:04.218Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-099",
+   "name": "Kaku",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 7,
+   "power": 9000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "R",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On Play] Add up to 1 card with a type including \"CP\" from your hand to the top or bottom of your Life cards face-up.",
+   "triggerText": "If your Leader's type includes \"CP\", draw 1 card and place up to 1 Character with a cost of 8 or less at the bottom of the owner's deck.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-099",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-099",
+   "fetchedAt": "2026-11-28T02:58:05.893Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-100",
+   "name": "Kalifa",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 6,
+   "power": 7000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Special"
+   ],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "SR",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On Play] Draw 1 card, then add up to 1 card with a type including \"CP\" from your hand to the top or bottom of your Life cards face-up.",
+   "triggerText": "If your Leader's type includes \"CP\", draw 1 card and rest up to 1 of your opponent's Leader or Characters.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-100",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-100",
+   "fetchedAt": "2026-11-28T02:58:07.565Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-101",
+   "name": "Kumadori",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 4,
+   "power": 6000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On K.O.] Add up to 1 card with a type including \"CP\" from your hand to the top or bottom of your Life cards face-up.",
+   "triggerText": "If your Leader's type includes \"CP\", K.O. or rest up to 1 of your opponent's Characters with a cost of 6 or less.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-101",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-101",
+   "fetchedAt": "2026-11-28T02:58:09.243Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-102",
+   "name": "Jerry",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 4,
+   "power": 6000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "CP6"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-102",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-102",
+   "fetchedAt": "2026-11-28T02:58:10.925Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-103",
+   "name": "Jabra",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 6,
+   "power": 8000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "R",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On K.O.] Add up to 1 card from the top of your deck to the top of your Life cards. Then, trash up to 1 card from the top of your opponent's Life cards.",
+   "triggerText": "If your Leader's type includes \"CP\", draw 1 card and place up to 1 Character with a cost of 8 or less at the bottom of the owner's deck.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-103",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-103",
+   "fetchedAt": "2026-11-28T02:58:12.600Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-104",
+   "name": "Strawberry",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 7,
+   "power": 7000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Vice Admiral",
+    "Navy"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Banish] (When this card deals damage, the target card is trashed without activating its Trigger.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-104",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-104",
+   "fetchedAt": "2026-11-28T02:58:14.278Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-105",
+   "name": "Spandam",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 1,
+   "power": 1000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "R",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "",
+   "triggerText": "If your Leader's type includes \"CP\", reveal up to 1 card with a type including \"CP\" other than [Spandam] from your hand. Activate the [Trigger] effect of the revealed card.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-105",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-105",
+   "fetchedAt": "2026-11-28T02:58:15.957Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-106",
+   "name": "Doberman",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 7,
+   "power": 7000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Vice Admiral",
+    "Navy"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Double Attack] (This card deals 2 damage.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-106",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-106",
+   "fetchedAt": "2026-11-28T02:58:17.657Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-107",
+   "name": "Nero",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 4,
+   "power": 4000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Ranged"
+   ],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Blocker]",
+   "triggerText": "If your Leader's type includes \"CP\", place up to 1 Character with a cost of 5 or less at the bottom of the owner's deck.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-107",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-107",
+   "fetchedAt": "2026-11-28T02:58:19.325Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-108",
+   "name": "Funkfreed",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 1,
+   "power": 0,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On Play] You may trash 1 card with a type including \"CP\" from your hand: Draw 2 cards.\n[Activate: Main] You may rest this Character: Up to 1 of your [Spandam] gains +1000 power during this turn.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-108",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-108",
+   "fetchedAt": "2026-11-28T02:58:21.000Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-109",
+   "name": "Fukurou",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 5,
+   "power": 4000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Blocker]",
+   "triggerText": "If your Leader's type includes \"CP\", K.O. or rest up to 1 of your opponent's Characters with a cost of 6 or less.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-109",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-109",
+   "fetchedAt": "2026-11-28T02:58:22.683Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-110",
+   "name": "Blueno",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 1,
+   "power": 2000,
+   "counter": 1000,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "R",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On Play] Look at 4 cards from the top of your deck; reveal up to 1 card with a type including \"CP\" other than [Blueno] and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
+   "triggerText": "Draw 1 card and K.O. up to 1 of your opponent's Characters with a cost of 2 or less.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-110",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-110",
+   "fetchedAt": "2026-11-28T02:58:24.380Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-111",
+   "name": "Momonga",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 7,
+   "power": 7000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Vice Admiral",
+    "Navy"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Rush] (This card can attack on the turn in which it is played.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-111",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-111",
+   "fetchedAt": "2026-11-28T02:58:26.052Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-112",
+   "name": "Yamakaji",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 7,
+   "power": 7000,
+   "counter": 2000,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Vice Admiral",
+    "Navy"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-112",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-112",
+   "fetchedAt": "2026-11-28T02:58:27.732Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-113",
+   "name": "Rob Lucci",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 8,
+   "power": 10000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "SR",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On Play]/[On K.O.] Trash up to 1 card from the top of your opponent's Life cards.",
+   "triggerText": "If your Leader's type includes \"CP\", draw 1 card and place up to 1 Character with a cost of 8 or less at the bottom of the owner's deck.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-113",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "SR"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-113",
+   "fetchedAt": "2026-11-28T02:58:29.426Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-114",
+   "name": "Wanze",
+   "category": "Character",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 3,
+   "power": 4000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "CP7"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On Play] Look at all of your Life cards and place them back in your Life area in any order.",
+   "triggerText": "If your Leader's type includes \"CP\", place up to 1 Character with a cost of 5 or less at the bottom of the owner's deck.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-114",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-114",
+   "fetchedAt": "2026-11-28T02:58:31.119Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-115",
+   "name": "Ten Finger Pistol",
+   "category": "Event",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 4,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "UC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Main] K.O. up to 1 of your opponent's Characters with a cost of 5 or less.",
+   "triggerText": "If your Leader's type includes \"CP\", draw 1 card and place up to 1 Character with a cost of 7 or less at the bottom of the owner's deck.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-115",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "UC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-115",
+   "fetchedAt": "2026-11-28T02:58:32.788Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-116",
+   "name": "Iron Body Empty Tree",
+   "category": "Event",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 0,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "CP9"
+   ],
+   "rarity": "C",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Counter] You may trash 1 card from your hand: Up to 1 of your Leader or Characters gains +3000 power during this battle.",
+   "triggerText": "If your Leader's type includes \"CP\", rest up to 1 of your opponent's Characters.",
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-116",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "C"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-116",
+   "fetchedAt": "2026-11-28T02:58:34.458Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-117",
+   "name": "Buster Call",
+   "category": "Event",
+   "colors": [
+    "Yellow"
+   ],
+   "cost": 10,
+   "power": null,
+   "counter": null,
+   "life": null,
+   "attributes": [],
+   "types": [
+    "Navy",
+    "CP9"
+   ],
+   "rarity": "R",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[Main] You may trash all of your Life cards: If your Leader is [Spandam], trash all Characters and play up to a total of 5 {Vice Admiral} type Character cards with different card names from your deck or trash. Then, shuffle your deck.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-117",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "R"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-117",
+   "fetchedAt": "2026-11-28T02:58:36.133Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-118",
+   "name": "Monkey.D.Luffy",
+   "category": "Character",
+   "colors": [
+    "Green"
+   ],
+   "cost": 9,
+   "power": 10000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Strike"
+   ],
+   "types": [
+    "Water Seven",
+    "Straw Hat Crew"
+   ],
+   "rarity": "SEC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On Play] Set up to 3 of your DON!! cards as active. Then, up to 1 of your opponent's Characters cannot be rested until the end of your opponent's next End Phase.\n[End of Your Turn] Set up to 1 of your {Water Seven} type cards as active.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-118",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "SEC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-118",
+   "fetchedAt": "2026-11-28T02:58:37.813Z",
+   "dataSource": "limitless"
+  },
+  {
+   "id": "OP18-119",
+   "name": "Saint Shamrock",
+   "category": "Character",
+   "colors": [
+    "Black"
+   ],
+   "cost": 8,
+   "power": 9000,
+   "counter": null,
+   "life": null,
+   "attributes": [
+    "Slash"
+   ],
+   "types": [
+    "Celestial Dragons",
+    "Holy Knights of God"
+   ],
+   "rarity": "SEC",
+   "set": "OP-18",
+   "block": 5,
+   "effectText": "[On K.O.] You may trash 1 card from your hand: Play this Character card from your trash.\n[Activate: Main] [Once Per Turn] If this Character was played on this turn, play up to 1 {Holy Knights of God} type Character card with a cost of 6 or less from your trash.",
+   "triggerText": null,
+   "keywords": [],
+   "verified": false,
+   "verifiedBy": [],
+   "textFixes": [],
+   "artworks": [
+    {
+     "artworkId": "OP18-119",
+     "imageUrls": {},
+     "source": "none",
+     "product": "OP-18",
+     "rarity": "SEC"
+    }
+   ],
+   "legality": {
+    "standard": {
+     "status": "legal",
+     "reason": "block 5"
+    },
+    "extra": {
+     "status": "legal"
+    }
+   },
+   "sourceUrl": "https://onepiece.limitlesstcg.com/cards/OP18-119",
+   "fetchedAt": "2026-11-28T02:58:39.519Z",
+   "dataSource": "limitless"
+  }
+ ]
+}
