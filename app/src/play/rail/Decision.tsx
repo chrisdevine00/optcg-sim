@@ -385,8 +385,8 @@ function contentInner(g: G): Content {
                 <li key={c.handle}>
                   {g.nameOf(c.handle)}
                   {c.cost !== null && `, cost ${c.cost}`}
-                  {c.card && g.cards.get(c.card)?.counter
-                    ? `, Counter +${g.cards.get(c.card)!.counter}`
+                  {(c.counter ?? (c.card ? g.cards.get(c.card)?.counter : null))
+                    ? `, Counter +${c.counter ?? g.cards.get(c.card!)!.counter}`
                     : ''}
                 </li>
               ))}
@@ -1015,11 +1015,17 @@ function findCard(g: G, handle: string) {
 function simCard(
   sim: Simulation,
   handle: string,
-): { card: undefined; power: number | null; owner: PlayerId; zone: string } | null {
+): {
+  card: undefined;
+  counter: number | null;
+  power: number | null;
+  owner: PlayerId;
+  zone: string;
+} | null {
   for (const p of ['p1', 'p2'] as PlayerId[])
     for (const [zone, cards] of Object.entries(sim.view.zones[p])) {
       const c = cards.find((x) => x.handle === handle);
-      if (c) return { card: undefined, power: c.power, owner: p, zone };
+      if (c) return { card: undefined, counter: c.counter ?? null, power: c.power, owner: p, zone };
     }
   return null;
 }
@@ -1210,7 +1216,7 @@ export function defenceNumbers(g: G, s: Staging) {
   const hits = sim.damage?.attackerWins ?? true;
   const target = defendingTarget(g, s);
   const t = g.cardOf(target);
-  const total = shown.counters.reduce((n, c) => n + (g.cardOf(c.card)?.card?.counter ?? 0), 0);
+  const total = shown.counters.reduce((n, c) => n + (g.cardOf(c.card)?.counter ?? 0), 0);
   return {
     sim,
     ap,
@@ -1436,7 +1442,7 @@ function defenceContent(g: G): Content {
         {!hidden && !g.ctl.hotseat && g.L.rail.tall.parts[1] >= 400 && (
           <WhatYouHave
             counters={counterCards.length}
-            worth={counterCards.reduce((t, c) => t + (g.cardOf(c.handle)?.card?.counter ?? 0), 0)}
+            worth={counterCards.reduce((t, c) => t + (g.cardOf(c.handle)?.counter ?? 0), 0)}
             events={eventCounters.length}
             activeDon={view.don[me].active}
             staged={s.counters.length}
@@ -1516,7 +1522,7 @@ function defenceContent(g: G): Content {
                       aria-pressed={on}
                       onClick={() => toggleCounter(g, c.handle)}
                     >
-                      {g.nameOf(c.handle)} +{num(g.cardOf(c.handle)?.card?.counter)}
+                      {g.nameOf(c.handle)} +{num(g.cardOf(c.handle)?.counter)}
                       {on ? ' ✓' : ''}
                     </button>
                   );
@@ -1585,7 +1591,7 @@ export function toggleCounter(g: G, handle: string) {
   g.setStaging(next);
   // flows F6.3: one polite sentence after each change.
   g.ctl.announce(
-    `Staged ${g.nameOf(handle)}, plus ${g.cardOf(handle)?.card?.counter ?? 0}. ${defenceSentence(g, next)}`,
+    `Staged ${g.nameOf(handle)}, plus ${g.cardOf(handle)?.counter ?? 0}. ${defenceSentence(g, next)}`,
   );
 }
 

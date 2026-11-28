@@ -595,7 +595,10 @@ export function counterOf(s: State, id: InstanceId, live = false): number | null
   if (!card) return null;
   const def = s.defs[card.card]!;
   let best = def.counter && def.counter > 0 ? def.counter : null;
-  if (card.zone !== 'hand' || def.category !== 'Character') return best;
+  // Effects give Counter values to cards in hand: Characters, and Stages since OP18-021 ("All Stage
+  // cards in your hand have a +3000 Counter", OP-18 wave G1). Leaders and Events never have one.
+  if (card.zone !== 'hand' || (def.category !== 'Character' && def.category !== 'Stage'))
+    return best;
   const consider = (src: InstanceId, zone: 'hand' | 'field') => {
     for (const ab of permanents(s, src)) {
       if ((ab.zone ?? 'field') !== zone) continue;

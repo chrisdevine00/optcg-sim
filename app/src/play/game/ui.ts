@@ -45,9 +45,14 @@ export interface G {
   setPicks: (p: string[]) => void;
   /** Send one action for the screen's player. */
   act: (a: Action, intentId?: string) => void;
-  cardOf: (
-    handle: string,
-  ) => { card: Card | undefined; power: number | null; owner: PlayerId; zone: string } | null;
+  cardOf: (handle: string) => {
+    card: Card | undefined;
+    /** The engine's current Counter, else the printed one. */
+    counter: number | null;
+    power: number | null;
+    owner: PlayerId;
+    zone: string;
+  } | null;
   nameOf: (handle: string) => string;
   whyText: (text: string | null) => void;
   openInspector: (handle: string) => void;

@@ -56,6 +56,9 @@ function firstTurnOf(s: State): boolean {
   return s.turn <= 2;
 }
 
+/** Cards that may be trashed from hand for their Counter value (CR 7-1-3-1-1; OP-18 wave G1). */
+const counterCard = (category: string) => category === 'Character' || category === 'Stage';
+
 function eventAbility(s: State, cardId: string, t: 'main' | 'counter'): Ability | undefined {
   return s.defs[cardId]!.abilities.find((a) => hasTiming(a, t));
 }
@@ -244,7 +247,9 @@ export function check(s: State, player: PlayerId, a: Intent | null): Reason | nu
             : "This card's [Counter] effect is not automated yet.",
           'CR 7-1-3-1-2, effect-dsl E-D8',
         );
-      if (def.category !== 'Character' || !counterOf(s, a.card))
+      // CR 7-1-3-1-1 names Character cards, the only cards with a printed Counter (CR 2-10-2); a Stage
+      // an effect gives a Counter (OP18-021) is used the same way (OP-18 wave G1, docs/OPEN-QUESTIONS).
+      if (!counterCard(def.category) || !counterOf(s, a.card))
         return r('This card has no Counter value.', 'CR 7-1-3-1-1');
       if (!isOwnLeaderOrCharacter(s, player, a.target))
         return r('A Counter gives power to your Leader or one of your Characters.', 'CR 7-1-3-1-1');
@@ -492,7 +497,7 @@ export function legalActions(s: State): Action[] {
               out.push({ type: 'activate', card: id, ability: ab.id, player: p });
             continue;
           }
-          if (def.category !== 'Character' || !counterOf(s, id)) continue;
+          if (!counterCard(def.category) || !counterOf(s, id)) continue;
           for (const t of targets) out.push({ type: 'counter', card: id, target: t, player: p });
         }
         out.push({ type: 'endCounter', player: p });

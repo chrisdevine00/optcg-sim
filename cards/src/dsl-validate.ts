@@ -780,11 +780,12 @@ function cost(c: Ctx, path: string, v: unknown): void {
       if (k === 'trash') fieldOrHand(c, p, o[k], 'a trash cost');
       return;
     case 'ko':
-      // "K.O. 1 of your Characters": a real K.O. of one of your own Characters (G1).
+      // "K.O. 1 of your Characters": a real K.O. of one of your own Characters (G1), or "K.O. 1 of
+      // your Stages" (OP18-066, OP-18 wave G2; effects K.O. Stages as they do Characters).
       selector(c, p, o.ko);
       if (isObj(o.ko) && !(o.ko as Obj).pick) err(c, p, 'a cost selector needs a pick');
-      zonesIn(c, p, o.ko, ['characters'], "only Characters are K.O.'d (CR 10-2-1)");
-      ownerYou(c, p, o.ko, 'a K.O. cost K.O.s your own Characters');
+      zonesIn(c, p, o.ko, ['characters', 'stage'], 'a K.O. cost K.O.s Characters or a Stage');
+      ownerYou(c, p, o.ko, 'a K.O. cost K.O.s your own Characters or Stage');
       return;
     case 'giveDon': {
       fields(c, p, o.giveDon, ['n', 'state', 'to'], ['from']);

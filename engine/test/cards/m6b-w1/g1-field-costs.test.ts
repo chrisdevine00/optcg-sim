@@ -198,12 +198,13 @@ describe('G1 validation', () => {
     ).toEqual([]);
   });
 
-  it('rejects what it does not: opponent cards, mixed zones, Life, several cards to a deck, K.O. on a Stage', () => {
+  it('rejects what it does not: opponent cards, mixed zones, Life, several cards to a deck, K.O. on a Leader', () => {
     const bad = (cost: unknown) => expect(errorsOf(ab(cost)).length).toBeGreaterThan(0);
     bad({ trash: { from: 'characters', owner: 'opponent', pick: pickOne } });
     bad({ trash: { from: ['hand', 'characters'], owner: 'you', pick: pickOne } });
     bad({ trash: { from: 'leader', owner: 'you', pick: pickOne } });
-    bad({ ko: { from: 'stage', owner: 'you', pick: pickOne } });
+    // A K.O. cost on your own Stage is allowed since OP-18 wave G2 (engine/test/cards/m6b-op18).
+    bad({ ko: { from: 'leader', owner: 'you', pick: pickOne } });
     bad({ ko: { from: 'characters', owner: 'opponent', pick: pickOne } });
     bad({
       move: { from: 'characters', owner: 'you', pick: pickOne },

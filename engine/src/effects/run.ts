@@ -295,7 +295,10 @@ export function costText(costs: readonly Cost[] | undefined): string {
       return 'from' in k.giveDon
         ? `give ${k.giveDon.n} of your opponent's rested DON!!`
         : `give ${k.giveDon.n} active DON!!`;
-    if ('ko' in k) return 'K.O. 1 of your Characters';
+    if ('ko' in k)
+      return [k.ko.from].flat().includes('stage')
+        ? 'K.O. 1 of your Stages'
+        : 'K.O. 1 of your Characters';
     if ('turnLifeFaceDown' in k)
       return typeof k.turnLifeFaceDown === 'number'
         ? `turn ${k.turnLifeFaceDown} of your Life cards face-down`

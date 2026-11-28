@@ -190,8 +190,11 @@ export function Game({
   const cardOf = (h: string) => {
     const x = index.get(h);
     if (!x) return null;
+    const card = x.view.card ? cards.get(x.view.card) : undefined;
     return {
-      card: x.view.card ? cards.get(x.view.card) : undefined,
+      card,
+      // The engine's current Counter (effects give one, e.g. OP18-021's Stages), else the printed one.
+      counter: x.view.counter ?? card?.counter ?? null,
       power: x.view.power,
       owner: x.owner,
       zone: x.zone,
@@ -404,7 +407,7 @@ export function Game({
       if (st >= 0) {
         out.raised = true;
         out.chips!.push({
-          text: `+${num(c.view.card ? cards.get(c.view.card)?.counter : 0)} ✓`,
+          text: `+${num(c.view.counter ?? (c.view.card ? cards.get(c.view.card)?.counter : 0))} ✓`,
           tone: 'you',
         });
         out.extraName = [`staged ${st + 1} of ${staging.counters.length}`];
@@ -963,7 +966,7 @@ export function Game({
     const n = defenceNumbers(g, NO_STAGING);
     const target = n.leader ? 'your Leader' : nameOf(b.target);
     const opts = ctl.revealed() ? counterOptions(g, NO_STAGING) : new Map();
-    const worth = [...opts.keys()].reduce((t, h) => t + (cardOf(h)?.card?.counter ?? 0), 0);
+    const worth = [...opts.keys()].reduce((t, h) => t + (cardOf(h)?.counter ?? 0), 0);
     const hand = ctl.revealed()
       ? opts.size === 0
         ? ' You have no Counter cards.'

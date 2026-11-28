@@ -212,9 +212,9 @@ export function BoardCard(p: BoardCardProps) {
           {kwText}
         </span>
       )}
-      {(p.zone === 'hand' || p.zone === 'mulligan') && def?.counter ? (
+      {(p.zone === 'hand' || p.zone === 'mulligan') && (c.counter ?? def?.counter) ? (
         <span className="bp ctr" aria-hidden="true">
-          +{def.counter}
+          +{c.counter ?? def?.counter}
         </span>
       ) : null}
       {p.glyph && (

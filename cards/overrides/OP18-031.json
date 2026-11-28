@@ -1,7 +1,14 @@
 {
   "id": "OP18-031",
-  "verified": false,
-  "sources": [],
+  "verified": true,
+  "sources": [
+    {
+      "url": "https://en.onepiece-cardgame.com/cardlist/?series=569118",
+      "date": "2026-11-27",
+      "use": "cross-check"
+    }
+  ],
+  "keywords": [],
   "block": {
     "value": "X",
     "source": "https://en.onepiece-cardgame.com/cardlist/?series=569118"
