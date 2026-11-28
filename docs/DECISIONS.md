@@ -2,6 +2,12 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-28 — Search skeleton: a modifier's hidden source no longer makes the opponent's Main unsearchable
+
+- **Context:** the nightly leak property (10,000 games, new seeds) failed on seed 1249377595: on the opponent's Main, a -1000 modifier made this turn named as its `source` a card that had since gone to a zone the viewer cannot see. `projectForSearch` renamed the reference (no leak: the view and the skeleton were identical under every hidden permutation) but marked the skeleton opaque, so the M7 opponent's-turn threat check could not search that turn. The property's "a foreign empty-stack Main is searchable" check caught it.
+- **Decision:** in `engine/src/determinize.ts`, a non-replacement modifier whose source is hidden from the viewer carries `SOURCE_GONE` (`$gone`, the same for every hidden card, not an instance id) instead of the renamed reference, and does not make the skeleton opaque. Outside replacements the engine reads a modifier's source only when it is made (`byEffect`), so the search loses nothing. A replacement modifier keeps its source (it is the replacement's `self`), so a hidden one still makes the skeleton opaque. No `ENGINE_VERSION` bump: rules, records and replays are unchanged; only what the AI may search changes. Regression tests in `engine/test/property/leaks.test.ts` pin the game (both fail with the change reverted). Gates: leak and golden properties at 2,000 games, engine and AI suites.
+- **Rejected:** relaxing the property for this case (the threat check would silently stay off on such turns); keeping every modifier's source by revealing it (it names a hidden card).
+
 ## 2026-11-27 — Ban list effective 2026-11-27: two banned pairs with Jewelry Bonney (EB05-001)
 
 - **Context:** the official Banned/Restricted page (announced 2026-11-17, effective 2026-11-27) adds two banned pairs: EB05-001 Jewelry Bonney with OP13-001 Monkey.D.Luffy, and EB05-001 with OP01-002 Trafalgar Law (parallel printings included). The six banned cards and the three earlier pairs are unchanged; no card is restricted.

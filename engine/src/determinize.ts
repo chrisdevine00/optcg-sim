@@ -56,6 +56,8 @@ export class CannotDeterminize extends Error {
 const ZONE_ORDER = ['leader', 'characters', 'stage', 'trash', 'hand', 'life', 'deck'] as const;
 const ANY_ID = /\$[a-z0-9]{7}/g;
 const HIDDEN_REF = '$hidden0';
+/** A modifier's source that has gone to a zone the viewer cannot see (not an instance id). */
+const SOURCE_GONE = '$gone' as InstanceId;
 
 /**
  * Cards the viewer can identify: in an open area, looked at, known, or being played (all `canSee`; a
@@ -209,7 +211,18 @@ export function skeletonOf(s: State, viewer: PlayerId): Skeleton {
       battle: s.battle && { ...s.battle, keys: { attacker: '', target: '' } },
       stack: s.stack,
       decision,
-      mods: s.mods,
+      // A modifier keeps the card that made it as `source`. Once that card has gone to a zone the
+      // viewer cannot see (a Character returned to its owner's hand), the reference would name a
+      // hidden card and make the skeleton opaque, though the search never needs it: outside
+      // replacements, `source` only marked the modifier as an effect's when it was made. It becomes
+      // SOURCE_GONE, the same for every hidden card, so nothing is revealed and the opponent's Main
+      // stays searchable (nightly leak property, 2026-11-28). A replacement modifier keeps its
+      // source (it is the replacement's `self`), so a hidden one still makes the skeleton opaque.
+      mods: s.mods.map((m) =>
+        m.kind !== 'replacement' && m.source !== null && ids.has(m.source) && !seen.has(m.source)
+          ? { ...m, source: SOURCE_GONE }
+          : m,
+      ),
       pending: s.pending.map(blankKeys),
       oncePerTurn: s.oncePerTurn,
       delayed: s.delayed.map(blankKeys),

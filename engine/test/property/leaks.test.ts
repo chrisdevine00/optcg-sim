@@ -340,3 +340,30 @@ describe.each([false, true])(
 );
 
 export type { Action };
+
+// Regression for the 2026-11-28 nightly (seed 1249377595): a non-replacement modifier whose source
+// went to a hidden zone made the opponent's Main opaque to search. Revert: map `mods` unchanged in
+// `projectForSearch` (determinize.ts) and these fail.
+describe('a modifier whose source went hidden keeps the opponent’s Main searchable', () => {
+  const g0 = leakGame(1249377595, true, undefined, false);
+
+  it('the game reaches that position: p1 watching p2’s Main with a modifier from a now-hidden card', () => {
+    const g = g0.states[111]!;
+    const s = internals(g);
+    expect(s.decision).toMatchObject({ kind: 'main', player: 'p2' });
+    const sk = projectForSearch(g, 'p1').skeleton;
+    const mods = (sk.state as unknown as { mods: { source: string | null; kind: string }[] }).mods;
+    expect(mods.some((m) => m.kind !== 'replacement' && m.source === '$gone')).toBe(true);
+  });
+
+  it('every foreign decision in the game has the right opacity and the view’s public shape', () => {
+    const problems: string[] = [];
+    g0.states.forEach((g, i) => {
+      for (const viewer of ['p1', 'p2'] as const) {
+        for (const p of checkForeignDecision(g, viewer).problems)
+          problems.push(`${i} ${viewer}: ${p}`);
+      }
+    });
+    expect(problems).toEqual([]);
+  });
+});
