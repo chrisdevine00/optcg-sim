@@ -30,11 +30,57 @@ export function eventCounterOf(cardId: string): number {
   return best;
 }
 
-/** A card's defensive value from hand: its printed Counter, or its [Counter] Event's +power. */
-export function counterValueOf(card: Card | undefined): number {
+/** A Counter value a Leader's permanent effect gives cards in its owner's hand (OP18-021 Franky). */
+export interface CounterGrant {
+  categories: CardCategory[];
+  value: number;
+}
+
+/**
+ * The Counter values a Leader gives to cards in its owner's hand, read from its script (public:
+ * a Leader is face up and its text is printed), never listed by id. A grant counts when it is a
+ * permanent effect with no condition whose target is `from: 'hand', owner: 'you'` and whose
+ * filter is a category list alone: the shape of OP18-021 ("All Stage cards in your hand have a
+ * +3000 Counter"). A narrower filter or a condition is left out, so an estimate only errs low.
+ */
+export function leaderCounterGrants(leaderId: string | undefined): CounterGrant[] {
+  const script = leaderId ? SCRIPTS[leaderId] : undefined;
+  if (!script) return [];
+  const out: CounterGrant[] = [];
+  for (const ab of script.abilities as unknown as Record<string, unknown>[]) {
+    if (ab.kind !== 'permanent' || (ab.zone ?? 'field') !== 'field') continue;
+    if (Array.isArray(ab.conditions) && ab.conditions.length > 0) continue;
+    for (const ap of (ab.apply as Record<string, unknown>[] | undefined) ?? []) {
+      const g = ap.counter as
+        | {
+            target?: { from?: unknown; owner?: unknown; filter?: { category?: CardCategory[] } };
+            value?: number;
+            onlyIfNone?: boolean;
+          }
+        | undefined;
+      if (!g || typeof g.value !== 'number' || g.onlyIfNone) continue;
+      const t = g.target;
+      const f = t?.filter;
+      if (t?.from !== 'hand' || t.owner !== 'you' || !f || !Array.isArray(f.category)) continue;
+      if (Object.keys(f).length !== 1) continue;
+      out.push({ categories: f.category, value: g.value });
+    }
+  }
+  return out;
+}
+
+/**
+ * A card's defensive value from hand: its printed Counter, or its [Counter] Event's +power, or the
+ * larger value its owner's Leader gives it (`leaderId`; only the highest applies, CR 2-10-4).
+ */
+export function counterValueOf(card: Card | undefined, leaderId?: string): number {
   if (!card) return 0;
   if (card.category === 'Event') return eventCounterOf(card.id);
-  return card.counter ?? 0;
+  let best = card.counter ?? 0;
+  if (leaderId)
+    for (const g of leaderCounterGrants(leaderId))
+      if (g.categories.includes(card.category) && g.value > best) best = g.value;
+  return best;
 }
 
 interface MetaList {
@@ -203,7 +249,7 @@ export function biggestCounter(leaderId: string, cards: ReadonlyMap<string, Card
   let best = 0;
   // The lists, not a synthetic pool: "its deck's biggest counter" speaks of a typical list.
   for (const id of listCardIds(priorFor(leaderId)))
-    best = Math.max(best, counterValueOf(cards.get(id)));
+    best = Math.max(best, counterValueOf(cards.get(id), leaderId));
   return best;
 }
 
@@ -214,7 +260,7 @@ export function averageCounter(leaderId: string, cards: ReadonlyMap<string, Card
   let n = 0;
   for (const l of p.lists)
     for (const c of l.cards) {
-      sum += counterValueOf(cards.get(c.id)) * c.count * l.weight;
+      sum += counterValueOf(cards.get(c.id), leaderId) * c.count * l.weight;
       n += c.count * l.weight;
     }
   return n ? sum / n : 1000;

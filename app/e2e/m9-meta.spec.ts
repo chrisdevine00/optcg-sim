@@ -20,7 +20,7 @@ test('the tiles: header, sort, arrows, Enter opens a guide, M opens the grid', a
     page.getByText('English Standard · as of 2026-10-28 · 33 online events, 30 Jul to 28 Oct'),
   ).toBeVisible();
   const tiles = page.getByRole('list', { name: 'Archetypes' }).getByRole('listitem');
-  await expect(tiles).toHaveCount(12);
+  await expect(tiles).toHaveCount(14);
   const rocks = page.getByRole('link', {
     name: 'Rocks.D.Xebec, Blue, tier S on opmetagame, 11.2% of lists, 16.1% since the ban. Guide and 3 lists.',
   });
@@ -109,8 +109,8 @@ test('the grid: arrows, Enter, Esc, disagreement, Play this matchup', async ({ p
   await page.goto('meta/matchups');
   await expect(page.getByRole('heading', { level: 1, name: 'Matchup grid' })).toBeFocused();
   const table = page.getByRole('table');
-  await expect(table.getByRole('rowheader')).toHaveCount(12);
-  await expect(table.getByRole('columnheader')).toHaveCount(13);
+  await expect(table.getByRole('rowheader')).toHaveCount(14);
+  await expect(table.getByRole('columnheader')).toHaveCount(15);
   const first = table.getByRole('button', { name: /^Rocks against Rocks: mirror/ });
   await expect(first).toBeVisible();
   await axe(page, info, 'grid');
@@ -124,7 +124,7 @@ test('the grid: arrows, Enter, Esc, disagreement, Play this matchup', async ({ p
   await page.keyboard.press('Home');
   await expect(page.locator('[data-cell="1-0"]')).toBeFocused();
   await page.keyboard.press('End');
-  await expect(page.locator('[data-cell="1-11"]')).toBeFocused();
+  await expect(page.locator('[data-cell="1-13"]')).toBeFocused();
 
   // Rocks against Nico Robin: two sources, two records.
   const robin = page.locator('[data-cell="0-1"]');
@@ -164,6 +164,8 @@ const GUIDES = [
   'OP12-061',
   'OP05-098',
   'OP08-098',
+  'EB02-010',
+  'OP18-021',
 ];
 
 test('every guide passes axe, and the tiles and grid again with it', async ({ page }, info) => {

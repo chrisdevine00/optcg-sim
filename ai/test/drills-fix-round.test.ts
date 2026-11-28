@@ -3,6 +3,7 @@
  * (R3), the empty-hand premise is in every counter and DON!! answer (R6), and the DON!! menu holds the
  * mixed line and the three ways of marking a line best agree (R7).
  */
+import { readFileSync } from 'node:fs';
 import { project } from '@optcg/engine';
 import { describe, expect, it, vi } from 'vitest';
 import { donLedger } from '../src/coach/tempo.ts';
@@ -68,9 +69,16 @@ describe('R3: the counter judge and the answer text agree, over the whole bank',
     }
   });
 
-  it('counter-1 and counter-14 name the counter as the weaker play, with the cost', () => {
-    for (const id of ['counter-1', 'counter-14']) {
-      const i = counters.find((x) => x.id === id)!;
+  // Two take items from the bank as it stood before EB02-010 and OP18-021 were added (counter-1 and
+  // counter-14, M9): the regenerated bank has no take item that shows a counter as the alternative,
+  // so these two stay as a fixture and keep the "Weaker: ..." wording pinned.
+  const takesWithCounterLine = JSON.parse(
+    readFileSync(new URL('./fixtures/counter-weaker-items.json', import.meta.url), 'utf8'),
+  ) as CounterItem[];
+
+  it('the take items name the counter as the weaker play, with the cost', () => {
+    expect(takesWithCounterLine.length).toBeGreaterThanOrEqual(2);
+    for (const i of takesWithCounterLine) {
       const ex = explainCounter(i, cards)!;
       const alt = ex.line!.find((m) => m.kind === 'counter')!;
       expect(alt.text).toMatch(
@@ -81,7 +89,7 @@ describe('R3: the counter judge and the answer text agree, over the whole bank',
   });
 
   it('the checker has teeth: a take item whose text said "Also fine" would disagree with its judge', () => {
-    const i = counters.find((x) => x.id === 'counter-1')!;
+    const i = takesWithCounterLine[0]!;
     const ex = explainCounter(i, cards)!;
     const bad: Explanation = {
       ...ex,

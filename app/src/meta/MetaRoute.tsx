@@ -1,5 +1,5 @@
 /**
- * `/meta` (M9 WP1, learning-ui §5.1): the twelve archetypes as tiles, with where the numbers come
+ * `/meta` (M9 WP1, learning-ui §5.1): the fourteen archetypes as tiles, with where the numbers come
  * from. The tiles are links in a list; arrows move across them, Enter opens a guide, M opens the
  * matchup grid. Dates, shares and tiers are read from `meta-lists.json`; "today" is read once here and
  * handed to the pure staleness check.

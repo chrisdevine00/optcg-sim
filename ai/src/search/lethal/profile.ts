@@ -26,7 +26,7 @@
  * is a `gap`: the proof can no longer claim `any-hand`. lethal.test.ts checks the slice priors have none.
  */
 import { SCRIPTS, type Card } from '@optcg/cards';
-import { hasCounterTiming } from '../../knowledge.ts';
+import { counterValueOf, hasCounterTiming } from '../../knowledge.ts';
 
 type Loose = Record<string, unknown>;
 
@@ -113,6 +113,8 @@ export function counterProfile(
   cards: ReadonlyMap<string, Card>,
   /** A floor for the plain +power (the fallback when the prior is unknown). */
   minPlain = 0,
+  /** The defender's Leader: a Counter it gives to cards in hand (OP18-021's Stages) counts. */
+  leaderId?: string,
 ): CounterProfile {
   const gaps: string[] = [];
   const modes = new Map<string, unknown[]>();
@@ -129,7 +131,7 @@ export function counterProfile(
     }
     card.types.forEach((t) => types.add(t));
     card.colors.forEach((c) => colors.add(c));
-    if (card.category !== 'Event') plain = Math.max(plain, card.counter ?? 0);
+    if (card.category !== 'Event') plain = Math.max(plain, counterValueOf(card, leaderId));
     if (card.category === 'Event' && !SCRIPTS[id]) gaps.push(`${id}: Event without a script`);
     for (const a of counterAbilities(id)) {
       const ops = opsOf(a.effect);
@@ -278,13 +280,16 @@ export function defenceBound(
   fallback: number,
   /** The prior is synthetic (no sourced list): its pool counts, and `fallback` stays the floor. */
   synthetic = false,
+  /** The defender's Leader (see `counterProfile`). */
+  leaderId?: string,
 ): DefenceBound {
   const floor = cardIds.length === 0 || synthetic ? fallback : 0;
-  const prof = counterProfile(cardIds, cards, floor);
+  const prof = counterProfile(cardIds, cards, floor, leaderId);
   let perCard = floor;
   for (const id of cardIds) {
     const card = cards.get(id);
-    if (card && card.category !== 'Event') perCard = Math.max(perCard, card.counter ?? 0);
+    if (card && card.category !== 'Event')
+      perCard = Math.max(perCard, counterValueOf(card, leaderId));
     for (const a of counterAbilities(id)) {
       const don = ((a.cost as Loose[] | undefined) ?? []).reduce(
         (t, c) => t + (typeof c.donMinus === 'number' ? c.donMinus : 0),

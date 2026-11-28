@@ -144,7 +144,10 @@ function factsOf(root: GameState, attacker: PlayerId, cards: ReadonlyMap<string,
       .zone(root, me, 'characters')
       .filter((c) => !c.rested && c.keywords.includes('Blocker'))
       .map((c) => c.card),
-    counters: hand.reduce((t, c) => t + counterValueOf(cards.get(c.card)), 0),
+    counters: hand.reduce(
+      (t, c) => t + counterValueOf(cards.get(c.card), queries.zone(root, me, 'leader')[0]?.card),
+      0,
+    ),
     hand: hand.length,
   };
 }

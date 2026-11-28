@@ -101,8 +101,8 @@ describe('meta-list cards (PLAN M1 done criteria)', () => {
     ),
   );
 
-  it('covers all 182 card IDs of the M1 meta lists', () => {
-    expect(ids).toHaveLength(182);
+  it('covers all 205 card IDs of the pinned meta lists (the M1 182 plus the M11 Track C additions)', () => {
+    expect(ids).toHaveLength(205);
     expect(ids.filter((id) => !cards.has(id))).toEqual([]);
   });
 

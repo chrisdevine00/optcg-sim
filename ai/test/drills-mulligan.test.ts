@@ -20,7 +20,7 @@ import {
   mulliganLabel,
   verdictOf,
 } from '../src/search/drills/mulligan.ts';
-import { explainMulligan, isSourced } from '../src/search/review/mulligan.ts';
+import { explainMulligan, isOurReasoning, isSourced } from '../src/search/review/mulligan.ts';
 import { docExample } from './support/doc.ts';
 import { cardMap } from './support.ts';
 import { counterValueOf } from '../src/knowledge.ts';
@@ -40,8 +40,12 @@ describe('the mulligan bank', () => {
   it('has at least 20 items, both classes, and two or more per sourced guide', () => {
     expect(bank.length).toBeGreaterThanOrEqual(MIN_BANK);
     expect(new Set(bank.map((i) => classOf(i.id)))).toEqual(new Set(['keep', 'redraw']));
-    const { sourced, unsourced } = mulliganCoverage(sets, cards);
+    const { sourced, ourReasoning, unsourced } = mulliganCoverage(sets, cards);
     expect(sourced).toHaveLength(9);
+    // EB02-010 and OP18-021 have no written source: offered, labelled as our reasoning (M11 Track C).
+    expect(ourReasoning.sort()).toEqual(['EB02-010-luffy-gp', 'OP18-021-franky']);
+    for (const id of ourReasoning)
+      expect(bank.filter((i) => i.archetypeId === id).length, id).toBeGreaterThanOrEqual(2);
     expect(unsourced.sort()).toEqual([
       'OP05-098-enel-yellow',
       'OP08-098-kalgara',
@@ -104,7 +108,9 @@ describe('the mulligan bank', () => {
     for (const i of bank) {
       const pb = playbookFor(i.mine, undefined, cards);
       const label = mulliganLabel(i, cards);
-      if (/inference/i.test(pb.mulligan.source)) expect(label, i.id).toMatch(/inference\)$/);
+      if (/our reasoning/i.test(pb.mulligan.source))
+        expect(label, i.id).toMatch(/guide \(our reasoning, no written source\)$/);
+      else if (/inference/i.test(pb.mulligan.source)) expect(label, i.id).toMatch(/inference\)$/);
       else {
         expect(label, i.id).toMatch(/guide \(sourced\)$/);
         sourcedOnly++;
@@ -229,9 +235,10 @@ describe('the answer text is the M8 explanation, unchanged', () => {
 });
 
 describe('who has items', () => {
-  it('only sourced guides: the default playbook gives no rule to teach', () => {
+  it('only sourced guides and our-reasoning guides: the default playbook gives no rule to teach', () => {
     for (const s of sets) {
-      const sourced = isSourced(playbookFor(s.leaderId, s.lists[0], cards));
+      const pb = playbookFor(s.leaderId, s.lists[0], cards);
+      const sourced = isSourced(pb) || isOurReasoning(pb);
       expect(
         bank.some((i) => i.archetypeId === s.archetypeId),
         s.archetypeId,

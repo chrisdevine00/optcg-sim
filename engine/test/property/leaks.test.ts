@@ -56,9 +56,15 @@ export function leakGame(
   onEvents?: (ev: GameEvent[], after: GameState) => void,
   /** Both seats play random Standard-legal decks (`standardDecksFor(seed)`) instead of meta lists. */
   standard = false,
+  /**
+   * Meta mode only: draw from the first `metaLimit` lists. A seed that pins one position (below)
+   * names it against the 36 lists of the first twelve archetypes, so adding archetypes to the
+   * fixture (EB02-010 and OP18-021, M11 Track C) does not move it.
+   */
+  metaLimit?: number,
 ): RandomGame {
   let rng = seedRng(seed);
-  const all = standard ? standardDecksFor(seed) : metaDecks();
+  const all = standard ? standardDecksFor(seed) : metaDecks().slice(0, metaLimit);
   const pickDeck = (): number => {
     let v: number;
     [v, rng] = nextInt(rng, all.length);
@@ -345,7 +351,7 @@ export type { Action };
 // went to a hidden zone made the opponent's Main opaque to search. Revert: map `mods` unchanged in
 // `projectForSearch` (determinize.ts) and these fail.
 describe('a modifier whose source went hidden keeps the opponent’s Main searchable', () => {
-  const g0 = leakGame(1249377595, true, undefined, false);
+  const g0 = leakGame(1249377595, true, undefined, false, 36);
 
   it('the game reaches that position: p1 watching p2’s Main with a modifier from a now-hidden card', () => {
     const g = g0.states[111]!;

@@ -89,7 +89,9 @@ export function rookie(view: PlayerView, ctx: RookieContext): Decided {
       if (counters.length > 0) {
         // The largest Counter first, so the fewest cards stop the attack.
         const value = (a: Extract<Action, { type: 'counter' }>) =>
-          ctx.counterOf(cardByHandle(view, a.card)?.card ?? '') ?? 0;
+          cardByHandle(view, a.card)?.counter ??
+          ctx.counterOf(cardByHandle(view, a.card)?.card ?? '') ??
+          0;
         const best = Math.max(...counters.map(value));
         const top = counters.filter((a) => value(a) === best);
         const [action] = pick(top, rng);
