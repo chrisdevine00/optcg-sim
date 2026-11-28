@@ -167,6 +167,39 @@ for (const [tier, biases] of PLANTED) {
     });
   });
 
+  // M11C-R5: the Leader's cost is paid before its condition is read, so the AI must not pay it
+  // with no Character on the field, or with a Character that is not Straw Hat Crew.
+  describe(`Luffy (EB02-010) never pays DON!! -2 for nothing, planted, ${label}`, () => {
+    t('seed 4: no DON!! -2 with an empty board', () => {
+      const s = luffy(5, 5, {
+        characters: [],
+        hand: ['OP12-037', 'OP13-040'],
+        costArea: { active: 3, rested: 2 },
+      });
+      const { steps } = play(s, 'p1', { biases });
+      expect(activated(steps, 'set-active')).toBe(-1);
+    });
+
+    t('seed 4: no DON!! -2 with a Character that is not Straw Hat Crew', () => {
+      const s = luffy(5, 5, {
+        characters: ['OP13-006'],
+        hand: ['OP12-037', 'OP13-040'],
+        costArea: { active: 3, rested: 2 },
+      });
+      const { steps } = play(s, 'p1', { biases });
+      expect(activated(steps, 'set-active')).toBe(-1);
+    });
+  });
+
+  // M11C-R7: the same for the Franky Leader with no Stage of cost 5 or less to play.
+  describe(`Franky (OP18-021) never pays DON!! -1 for nothing, planted, ${label}`, () => {
+    t('seed 4: no DON!! -1 with no Stage in hand', () => {
+      const s = franky(3, 3, { hand: ['OP18-066', 'OP18-072', 'OP18-034'] });
+      const { steps } = play(s, 'p1', { biases });
+      expect(activated(steps, 'play-stage')).toBe(-1);
+    });
+  });
+
   describe(`Franky (OP18-021) game plan, planted, ${label}`, () => {
     t('seed 1: plays a Stage with the Leader’s DON!! -1 on T2', () => {
       const s = franky(3, 3, { hand: ['OP18-075', 'OP18-061', 'OP18-038'] });

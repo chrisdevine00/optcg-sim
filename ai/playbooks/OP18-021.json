@@ -66,6 +66,8 @@
       "ability": "play-stage",
       "fromOwnTurn": 1,
       "bonus": 3.0,
+      "when": { "kind": "handStage", "maxCost": 5 },
+      "unmetPenalty": 25,
       "cite": "Its guide (our reasoning from the Leader's text): DON!! -1 plays a Stage of cost 5 or less from hand, so the Stage's draw and DON!! come without paying its cost.",
       "citeSource": "CARD-18"
     },
@@ -114,7 +116,7 @@
   "assertions": [
     {
       "seed": 1,
-      "text": "Uses the Leader's DON!! -1 to play a Stage on its own turns T1 to T3 whenever a Stage is in hand and the ability is legal.",
+      "text": "Uses the Leader's DON!! -1 to play a Stage on its own turns T1 to T3 whenever a Stage of cost 5 or less is in hand and the ability is legal.",
       "threshold": 0.8,
       "source": "CARD-18 (threshold is inference)"
     },
@@ -129,6 +131,12 @@
       "text": "Plays a searcher (Iceburg, Nami or Tom) on T1 or T2 when one is in hand.",
       "threshold": 0.8,
       "source": "inference from CARD-18"
+    },
+    {
+      "seed": 4,
+      "text": "Never pays the Leader's DON!! -1 with no Stage of cost 5 or less in hand.",
+      "threshold": 0.95,
+      "source": "CARD-18 (threshold is inference)"
     }
   ]
 }

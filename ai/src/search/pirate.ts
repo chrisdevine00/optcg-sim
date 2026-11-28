@@ -34,7 +34,7 @@ import type { Explanation } from '../explanation.ts';
 import { explainMove } from '../explain.ts';
 import { counterValueOf, type Prior } from '../knowledge.ts';
 import { ownTurn, type Playbook } from '../playbook.ts';
-import { playOnlyIfMet } from './conditions.ts';
+import { activateWhenMet, playOnlyIfMet } from './conditions.ts';
 import { evaluate, total, type Breakdown, type Weights } from './heuristic.ts';
 import { mulliganVerdict } from './mulligan.ts';
 import { determinizations } from './sample.ts';
@@ -352,6 +352,45 @@ function realThreat(
   return (c.cost ?? 0) > bias.maxCost && (bias.reach === undefined || (c.power ?? 0) <= bias.reach);
 }
 
+/**
+ * Drop the candidates that pay an `activate` bias's cost with its `when` unmet (M11C-R5, R7): the
+ * cost is paid before the condition is read, so the move only loses DON!!. The penalty in
+ * `mainBias` is a preference that a losing position can outweigh (seen at turns 10 to 15 of
+ * seeded games), so Pirate removes the candidates, as `holdDon` does; it keeps them all if none
+ * would be left.
+ */
+export function dropUnmetActivations(
+  cands: Candidate[],
+  root: GameState,
+  me: PlayerId,
+  setup: PirateSetup,
+): Candidate[] {
+  const rules = (setup.playbook?.biases ?? []).filter((b) => b.kind === 'activate' && b.when);
+  if (rules.length === 0) return cands;
+  const unmet = (c: Candidate) =>
+    c.actions.some(
+      (a, i) =>
+        a.type === 'activate' &&
+        rules.some(
+          (b) =>
+            b.kind === 'activate' &&
+            a.ability === b.ability &&
+            queries.card(root, a.card).card === b.card &&
+            !activateWhenMet(
+              root,
+              me,
+              setup.cards,
+              b.when,
+              c.actions
+                .slice(0, i)
+                .flatMap((x) => (x.type === 'playCard' ? [queries.card(root, x.card).card] : [])),
+            ),
+        ),
+    );
+  const kept = cands.filter((c) => !unmet(c));
+  return kept.length > 0 ? kept : cands;
+}
+
 /** Does `activateBefore`'s discount pay for this hand card now (see the playbook type)? */
 export function discountPays(
   s: GameState,
@@ -407,8 +446,20 @@ export function mainBias(root: GameState, me: PlayerId, ctx: SimContext, setup: 
           a.ability === bias.ability &&
           own >= bias.fromOwnTurn &&
           queries.card(root, a.card).card === bias.card
-        )
-          b += bias.bonus;
+        ) {
+          const met = activateWhenMet(
+            root,
+            me,
+            setup.cards,
+            bias.when,
+            c.actions
+              .slice(0, c.actions.indexOf(a))
+              .flatMap((x) => (x.type === 'playCard' ? [queries.card(root, x.card).card] : [])),
+          );
+          // The cost is paid before the condition is read: with it unmet the move only loses DON!!.
+          if (met) b += bias.bonus;
+          else b -= bias.unmetPenalty ?? 0;
+        }
         // Sabo: one DON!! on the Leader lifts every body (+1000), so it pays once a cost-12
         // Character is out and the team is ready to swing.
         if (
@@ -1029,7 +1080,12 @@ export function planTurn(
     if (!dec || dec.kind !== 'main' || dec.player !== me || queries.result(root)) break;
     const fp = n === 0 ? fingerprint(view) : fingerprint(project(root, me));
     if (n > 0 && states.some((s) => fingerprint(project(s, me)) !== fp)) break;
-    const cands = holdDon(mainCandidates(root, me, setup, ctx), root, me, ctx, setup);
+    const cands = dropUnmetActivations(
+      holdDon(mainCandidates(root, me, setup, ctx), root, me, ctx, setup),
+      root,
+      me,
+      setup,
+    );
     const ranked = score(
       states,
       cands,

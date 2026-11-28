@@ -7,6 +7,7 @@
 import { queries, type Action, type PlayerId, type ProjectedView } from '@optcg/engine';
 import { ownTurn, PLAYBOOKS, type AiTier } from '../../src/index.ts';
 import type { DecisionRecord } from './match.ts';
+import { cardMap } from '../support.ts';
 import type { Tally } from './plan-tally.ts';
 
 const other = (p: PlayerId): PlayerId => (p === 'p1' ? 'p2' : 'p1');
@@ -103,6 +104,25 @@ export class PlanTallyG4 {
   private isActivate = (r: DecisionRecord, ability: string) =>
     r.action.type === 'activate' && r.action.ability === ability;
 
+  /** Luffy's DON!! -2 reads true: at least one own Character, every one Straw Hat Crew (M11C-R5). */
+  private luffyConditionHolds = (v: ProjectedView): boolean => {
+    const cs = v.zones[this.ai].characters;
+    return (
+      cs.length > 0 &&
+      cs.every((h) =>
+        cardMap()
+          .get(h.card ?? '')
+          ?.types.includes('Straw Hat Crew'),
+      )
+    );
+  };
+  /** Franky's DON!! -1 has a target: a Stage of cost 5 or less in hand (M11C-R7). */
+  private frankyConditionHolds = (v: ProjectedView): boolean =>
+    v.zones[this.ai].hand.some((h) => {
+      const c = cardMap().get(h.card ?? '');
+      return c?.category === 'Stage' && (c.cost ?? 99) <= 5;
+    });
+
   // ---------------------------------------------------------------------------------------------
   // Monkey.D.Luffy (Green/Purple)
   // ---------------------------------------------------------------------------------------------
@@ -111,11 +131,20 @@ export class PlanTallyG4 {
       if (tl.won) continue;
       const mains = this.mains(tl);
       // 1. The Leader's DON!! -2 on every turn from T2 on which it is legal.
-      if (tl.own >= 2 && mains.some((r) => this.legalActivate(r.view, 'set-active')))
+      // Only where its condition holds; paying it with the condition false is seed 4.
+      if (
+        tl.own >= 2 &&
+        mains.some(
+          (r) => this.legalActivate(r.view, 'set-active') && this.luffyConditionHolds(r.view),
+        )
+      )
         this.count(
           1,
           mains.some((r) => this.isActivate(r, 'set-active')),
         );
+      // 4. No DON!! -2 paid while its condition fails.
+      for (const r of mains)
+        if (this.isActivate(r, 'set-active')) this.count(4, this.luffyConditionHolds(r.view));
       // 2. A Nami searcher on T1 or T2.
       if (tl.own <= 2 && mains.length > 0 && this.legalPlay(mains[0]!.view, NAMIS))
         this.count(
@@ -144,8 +173,11 @@ export class PlanTallyG4 {
       if (mains.length === 0) continue;
       const first = mains[0]!;
       const stageLegal = this.legalActivate(first.view, 'play-stage');
-      // 1. The Leader's DON!! -1 plays a Stage on T1 to T3.
-      if (tl.own <= 3 && stageLegal)
+      // 4. No DON!! -1 paid with no Stage of cost 5 or less in hand.
+      for (const r of mains)
+        if (this.isActivate(r, 'play-stage')) this.count(4, this.frankyConditionHolds(r.view));
+      // 1. The Leader's DON!! -1 plays a Stage on T1 to T3 (a Stage of cost 5 or less in hand).
+      if (tl.own <= 3 && stageLegal && this.frankyConditionHolds(first.view))
         this.count(
           1,
           mains.some((r) => this.isActivate(r, 'play-stage')),

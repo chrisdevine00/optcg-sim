@@ -179,3 +179,43 @@ describe('parseSpans', () => {
     ]);
   });
 });
+
+describe('M11 Track C fix round: card readings in the Track C rows (M11C-R1, R3, R6)', () => {
+  type Row = { id: string; cost: number | null; types: string[]; category: string };
+  const SETS = fileURLToPath(new URL('../../cards/data/sets/', import.meta.url));
+  const cards = new Map<string, Row>();
+  for (const f of readdirSync(SETS)) {
+    const d = JSON.parse(readFileSync(SETS + f, 'utf8')) as Row[] | { cards: Row[] };
+    for (const c of Array.isArray(d) ? d : d.cards) cards.set(c.id, c);
+  }
+  const row = (file: string, opponent: string) =>
+    read(file)
+      .split('\n')
+      .find((l) => l.startsWith(`| ${opponent} `))!;
+
+  it('R1: no Stage is a Water Seven card, so Nico Robin cannot set one', () => {
+    for (const id of ['OP18-075', 'OP18-076', 'OP18-077', 'OP18-078']) {
+      expect(cards.get(id)!.category).toBe('Stage');
+      expect(cards.get(id)!.types).not.toContain('Water Seven');
+    }
+    expect(read('OP18-021.md')).not.toMatch(/Water Seven card, such as your Stage/);
+    expect(read('OP18-021.md')).toMatch(/a Stage is Straw Hat Crew only/);
+  });
+
+  it('R3: Demon Aura rests any Character, so the rows about the new Luffy name it', () => {
+    for (const f of ['OP17-058.md', 'OP17-079.md']) {
+      const r = row(f, 'EB02-010 Monkey.D.Luffy');
+      expect(r, f).toMatch(/OP12-037 Demon Aura/);
+      expect(r, f).not.toMatch(/the one effect|only Shanks/);
+    }
+  });
+
+  it('R6: the Franky Characters are cost 5 and 6, and Loki takes all of Tom, Nami and Iceburg', () => {
+    const franky = ['OP18-072', 'OP18-034', 'OP18-066'].map((id) => cards.get(id)!.cost!);
+    expect(Math.max(...franky)).toBe(6);
+    expect(row('OP17-058.md', 'OP18-021 Franky')).toMatch(/cost 5 or 6/);
+    const searchers = ['OP18-070', 'EB02-017', 'OP18-061'].map((id) => cards.get(id)!.cost!);
+    expect(searchers.reduce((a, b) => a + b, 0)).toBeLessThanOrEqual(4);
+    expect(row('OP13-004.md', 'OP18-021 Franky')).toMatch(/all three of Tom, Nami and Iceburg/);
+  });
+});

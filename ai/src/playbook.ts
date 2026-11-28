@@ -226,13 +226,22 @@ export type Bias = BiasCite &
         bonus: number;
         seed: number;
       }
-    /** Use this ability of the AI's own (a Leader's [Activate: Main]) in its main phase, from own turn `fromOwnTurn`. */
+    /**
+     * Use this ability of the AI's own (a Leader's [Activate: Main]) in its main phase, from own turn
+     * `fromOwnTurn`. With `when`, only while it pays (M11C-R5, R7): the cost of these abilities is
+     * paid before their condition is read, so an activation whose condition fails is DON!! thrown
+     * away. The condition reads the engine's public state (the AI's own field and hand), never a
+     * card list.
+     */
     | {
         kind: 'activate';
         card: string;
         ability: string;
         fromOwnTurn: number;
         bonus: number;
+        when?: ActivateWhen;
+        /** With `when` unmet, a move that activates anyway pays this (the DON!! cost is lost for nothing). */
+        unmetPenalty?: number;
         seed: number;
       }
     /** In this ability's target choice, prefer one of the AI's Characters that can attack this turn. */
@@ -289,6 +298,13 @@ export type Bias = BiasCite &
         seed: number;
       }
   );
+
+/** When an `activate` bias applies (public facts only; see `activateWhenMet` in `search/conditions.ts`). */
+export type ActivateWhen =
+  /** The AI controls at least one Character, and every Character it controls has this type (EB02-010). */
+  | { kind: 'ownCharactersAllType'; type: string }
+  /** A Stage card with printed cost `maxCost` or less is in the AI's hand (OP18-021). */
+  | { kind: 'handStage'; maxCost: number };
 
 /** When a `playOnlyWhen` card may be played (public conditions only). */
 export type PlayCondition =

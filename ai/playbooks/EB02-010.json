@@ -59,6 +59,8 @@
       "ability": "set-active",
       "fromOwnTurn": 2,
       "bonus": 3.0,
+      "when": { "kind": "ownCharactersAllType", "type": "Straw Hat Crew" },
+      "unmetPenalty": 25,
       "cite": "Its guide (our reasoning from the Leader's text): DON!! -2 sets 2 DON!! active and gives the Leader +1000 until the end of the opponent's next turn.",
       "citeSource": "CARD-18"
     },
@@ -85,7 +87,7 @@
   "assertions": [
     {
       "seed": 1,
-      "text": "Uses the Leader's DON!! -2 on every own turn from T2 on which it is legal.",
+      "text": "Uses the Leader's DON!! -2 on every own turn from T2 on which it is legal and its condition holds (a Character on the field, every Character Straw Hat Crew).",
       "threshold": 0.8,
       "source": "CARD-18 (threshold is inference)"
     },
@@ -99,6 +101,12 @@
       "seed": 3,
       "text": "When it holds Sanji & Pudding and can pay for it, plays it before using the Leader's DON!! -2 on that turn.",
       "threshold": 0.8,
+      "source": "CARD-18 (threshold is inference)"
+    },
+    {
+      "seed": 4,
+      "text": "Never pays the Leader's DON!! -2 while its condition fails (no Character on the field, or a Character that is not Straw Hat Crew).",
+      "threshold": 0.95,
       "source": "CARD-18 (threshold is inference)"
     }
   ]
