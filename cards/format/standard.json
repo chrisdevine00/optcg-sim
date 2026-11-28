@@ -1,6 +1,6 @@
 {
   "format": "standard",
-  "asOf": "2026-11-24",
+  "asOf": "2026-11-27",
   "regulation": {
     "from": "2026-04-01",
     "to": "2027-03-31",
@@ -990,6 +990,44 @@
         "pageDate": "2026-10-12",
         "note": "\"Banned/Restricted Cards effective from October 12, 2026\". Read from the copy cached by Track B (.cache/track-b/raw/official-restriction.html). Effective date per docs/research/meta-landscape.md."
       }
+    },
+    {
+      "cards": [
+        {
+          "id": "EB05-001",
+          "name": "Jewelry Bonney"
+        },
+        {
+          "id": "OP13-001",
+          "name": "Monkey.D.Luffy"
+        }
+      ],
+      "effective": "2026-11-27",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/news/restriction.html",
+        "checked": "2026-11-27",
+        "pageDate": "2026-11-27",
+        "note": "\"Banned/Restricted Cards effective from November 27, 2026\" (announced November 17, 2026): two banned pairs added; banned cards and earlier pairs unchanged. Parallel (alt-art) printings included."
+      }
+    },
+    {
+      "cards": [
+        {
+          "id": "EB05-001",
+          "name": "Jewelry Bonney"
+        },
+        {
+          "id": "OP01-002",
+          "name": "Trafalgar Law"
+        }
+      ],
+      "effective": "2026-11-27",
+      "source": {
+        "url": "https://en.onepiece-cardgame.com/news/restriction.html",
+        "checked": "2026-11-27",
+        "pageDate": "2026-11-27",
+        "note": "\"Banned/Restricted Cards effective from November 27, 2026\" (announced November 17, 2026): two banned pairs added; banned cards and earlier pairs unchanged. Parallel (alt-art) printings included."
+      }
     }
   ],
   "gaps": [
@@ -1000,6 +1038,6 @@
     "OP15-096 has no block on the official site; the booster formula gives 4 (rulings.md RL-37).",
     "The OP07-115 + EB04-058 banned pair has no effective date on the pages read.",
     "Whether the banned list also applies to Extra Regulation is not stated on restriction.html; this file applies it to both.",
-    "EB-05 (61 cards) was imported from optcgapi on 2026-11-17 with no cited block: its Standard legality is \"unknown\" until its printed block icon is read from the official series page and added to blocksByProduct. OP-18 (release 2026-11-20) was not in optcgapi on 2026-11-17; it enters through cards:update when upstream has it."
+    "EB-05 has had a cited block (5) since 2026-11-24 (see the starter-deck and EB-05 note above). OP-18 (release 2026-11-20) was still not in optcgapi on 2026-11-27; it enters from Limitless card pages (plan M11 Track B) and through cards:update from optcgapi once upstream has it."
   ]
 }

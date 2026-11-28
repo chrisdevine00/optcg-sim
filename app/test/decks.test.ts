@@ -95,6 +95,12 @@ describe('deck builder model', () => {
       ),
     );
   });
+  it('the ban check names the newest list date, counting banned pairs (2026-11-27 added pairs only)', () => {
+    const ok = deck();
+    expect(checkRows(ok, issuesOf(ok, lookup)).map((r) => r.label)).toContain(
+      'No banned cards or pairs (list from 2026-11-27)',
+    );
+  });
   it("a Leader's deck rule (OP12-001, M6b wave 2) is a check row only when the deck breaks it", () => {
     const ok = deck();
     expect(checkRows(ok, issuesOf(ok, lookup)).map((r) => r.label)).not.toContain(

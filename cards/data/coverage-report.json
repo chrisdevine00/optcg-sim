@@ -1,5 +1,5 @@
 {
- "asOf": "2026-11-24T20:57:53.618Z",
+ "asOf": "2026-11-28T01:53:05.689Z",
  "backlog": [
   {"block":5,"category":"Character","id":"EB05-031","legality":"legal","set":"EB-05","status":"unscripted","tags":["addDon","cost:donMinus","cost:trashSelf","mill","timing:onPlay"],"untagged":0,"weight":0},
   {"block":4,"category":"Character","id":"EB04-048","legality":"legal","set":"EB-04","status":"unscripted","tags":["cost:trashOwnCharacter","costMod","draw","powerMod","timing:onPlay"],"untagged":0,"weight":0},

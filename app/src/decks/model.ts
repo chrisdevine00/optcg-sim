@@ -12,12 +12,14 @@ import standard from '../../../cards/format/standard.json';
 const FMT = standard as unknown as {
   regulation: { allowedBlocks: (number | string)[] };
   banned: { effective: string | null }[];
+  bannedPairs: { effective: string | null }[];
 };
 const NUMERIC_BLOCKS = FMT.regulation.allowedBlocks.filter(
   (b): b is number => typeof b === 'number',
 );
 const BLOCKS = `${Math.min(...NUMERIC_BLOCKS)}–${Math.max(...NUMERIC_BLOCKS)}`;
-const BAN_LIST = FMT.banned
+/** The newest effective date across banned cards and banned pairs (a list change may add only pairs). */
+const BAN_LIST = [...FMT.banned, ...FMT.bannedPairs]
   .map((b) => b.effective ?? '')
   .sort()
   .at(-1);

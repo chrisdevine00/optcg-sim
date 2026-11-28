@@ -186,6 +186,24 @@ describe('deckIssues: Standard (cards/format/standard.json)', () => {
     const one = { leader: yLeader.id, main: ['OP07-115', ...filler.slice(0, 49)] };
     expect(codes(one).filter((c) => c !== 'rotated')).not.toContain('bannedPair');
   });
+  it('a banned pair with a Leader (2026-11-27: OP13-001 with EB05-001) is caught when the card is in the main deck', () => {
+    const filler = allCards()
+      .filter(
+        (c) =>
+          c.category === 'Character' &&
+          c.colors.every((x) => ['Green', 'Red'].includes(x)) &&
+          c.legality.standard.status === 'legal' &&
+          !c.legality.standard.bannedWith,
+      )
+      .slice(0, 13)
+      .flatMap((c) => times(4, c.id));
+    const withBonney = { leader: 'OP13-001', main: ['EB05-001', ...filler.slice(0, 49)] };
+    const pairs = deckIssues(withBonney, all).filter((x) => x.code === 'bannedPair');
+    expect(pairs).toHaveLength(1);
+    expect(new Set(pairs[0]!.cards)).toEqual(new Set(['OP13-001', 'EB05-001']));
+    const without = { leader: 'OP13-001', main: filler.slice(0, 50) };
+    expect(deckIssues(without, all).map((x) => x.code)).not.toContain('bannedPair');
+  });
   it('a restricted card over its limit is an error; at its limit it is fine', () => {
     const id = main[0]!;
     const card = all(id)!;

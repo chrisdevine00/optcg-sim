@@ -52,3 +52,14 @@ Fix every severity 3 and 4 with a test that fails on the old code. Re-review the
 ## h. "Scripts: <SET>" PR
 
 One PR from the batch branch. It contains the overrides, scripts, regenerated `cards/effects/registry.ts` and set `index.ts`, tests, the review, `cards/data/coverage-report.json` (`npm run cards:measure`), and the STATUS coverage line. Per-push CI runs the changed cards' tests (`npm run test:ci`); the nightly runs every card. Record any non-trivial decision in `docs/DECISIONS.md`.
+
+## Ban list change (not a set)
+
+A new Banned/Restricted list is a hand-cited data edit; no script changes unless a banned card's script must go (it stays scripted; legality alone stops it).
+
+1. Read the official page (`https://en.onepiece-cardgame.com/news/restriction.html`, the "effective from" section). For each change note the card id and name, the kind (banned, restricted with its limit, or banned pair), the effective date and the page date. Pairs can include a Leader: the deck check covers a Leader paired with a main-deck card.
+2. Edit `cards/format/standard.json` (`banned`, `restricted`, `bannedPairs`), each entry with `source {url, checked, pageDate, note}`; set `asOf`.
+3. Run `npm run cards:update -- --refresh` (a stale local cache would roll other cards' fetch dates back) and `npm run cards:measure` (the committed coverage report carries the data date), then check that the diff is legality only (`git diff -U0 cards/data/sets | grep -E '^[+-] ' | grep -v fetchedAt`).
+4. Fix what it breaks: every list in `docs/research/meta-lists.json` must stay legal (`engine/test/rules/deck-format.test.ts`); a banned Leader's archetype moves to `excluded`; update `ai/test/fixtures/meta-lists.pinned.json`, regenerate the drill banks (`npm run drills:bank -- <drill>`) if they use the card, and edit guides that recommend it.
+5. Pin the change in `cards/test/data.test.ts` and, for a new kind of entry, `engine/test/rules/deck-format.test.ts`; the deck builder's ban row names the newest effective date across bans and pairs (`app/src/decks/model.ts`).
+6. Record it in DECISIONS and the STATUS "Waiting on the owner" line if anything needs the owner.

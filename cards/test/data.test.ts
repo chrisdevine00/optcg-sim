@@ -123,6 +123,9 @@ describe('format/standard.json', () => {
     expect(legal('EB04-061')).toBe('legal'); // block updated by reprint
     expect(legal('OP14-020')).toBe('banned');
     expect(standardLegality('OP11-040', 4, fmt).bannedWith).toEqual(['OP11-067', 'OP08-069']);
+    // 2026-11-27 list: Jewelry Bonney (EB05-001) may not share a deck with OP13-001 or OP01-002.
+    expect(standardLegality('EB05-001', 5, fmt).bannedWith).toEqual(['OP13-001', 'OP01-002']);
+    expect(standardLegality('OP13-001', 4, fmt).bannedWith).toEqual(['EB05-001']);
     expect(blockOf('OP17-118', fmt)).toBe('X');
     expect(blockOf('ST01-011', fmt)).toBe(4);
     expect(blockOf('P-001', fmt)).toBeNull();

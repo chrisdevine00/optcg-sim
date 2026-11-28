@@ -2,6 +2,12 @@
 
 Newest first. One dated paragraph per decision: context, decision, alternatives rejected.
 
+## 2026-11-27 — Ban list effective 2026-11-27: two banned pairs with Jewelry Bonney (EB05-001)
+
+- **Context:** the official Banned/Restricted page (announced 2026-11-17, effective 2026-11-27) adds two banned pairs: EB05-001 Jewelry Bonney with OP13-001 Monkey.D.Luffy, and EB05-001 with OP01-002 Trafalgar Law (parallel printings included). The six banned cards and the three earlier pairs are unchanged; no card is restricted.
+- **Decision:** both pairs added to `cards/format/standard.json` with their source; legality regenerated with `cards:update -- --refresh` (the local cache was older than the committed data, so a cache-only run would have rolled fetch dates back; the refreshed diff is legality and fetch dates only). No meta list or drill deck uses EB05-001, so no archetype or bank changes. OP01-002 is already rotated in Standard; the pair matters for Extra. The deck builder's ban row now names the newest date across bans and pairs ("list from 2026-11-27"; it read only bans before). Tests: the pairs in `cards/test/data.test.ts`, a Leader-and-main-deck pair in `engine/test/rules/deck-format.test.ts`, the label in `app/test/decks.test.ts` (fails without the model change). A "Ban list change" section is added to `docs/runbooks/new-set.md`.
+- **Rejected:** enforcing effective dates per game (the app has no game date; legality applies when the data is regenerated, as before).
+
 ## 2026-11-27 — Nightly: the worker's wait is asserted on the product's millisecond budgets only; iteration-budget runs report it
 
 - **Context:** the first nightly with the M10 fixes (46068291174) passed the millisecond-budget Warlord checks (turns 5.5 to 9.5 s against the 12 s bound; waits 2.5 to 4.5 s against 6 s) but failed three iteration-budget tests on the old wait bounds: Warlord 4,501 and 4,557 ms against 2,700, Emperor 11,273 ms against 7,500. The same iteration-budget turns wait 10 to 992 ms on the reference Mac: on a fixed amount of search the wait measures the runner, not the product.
