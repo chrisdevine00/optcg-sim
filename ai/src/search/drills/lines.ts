@@ -20,6 +20,7 @@ import {
 } from '@optcg/engine';
 import { donLedger } from '../../coach/tempo.ts';
 import { plainReply } from './play.ts';
+import { FOCUS_LEADERS } from './positions.ts';
 import type { DonLine } from './types.ts';
 
 type Cards = ReadonlyMap<string, Card>;
@@ -32,7 +33,20 @@ export interface Line extends DonLine {
 }
 
 export type LineKind =
-  'spend' | 'spend-give' | 'two-cheaper' | 'give-attack' | 'hold' | 'play-give-one';
+  | 'spend'
+  | 'spend-give'
+  | 'two-cheaper'
+  | 'give-attack'
+  | 'hold'
+  | 'play-give-one'
+  | 'leader-last'
+  | 'leader-first';
+
+/** The two kinds that use the focus Leader's own [Activate: Main] (M11 Track C). */
+export const LEADER_KINDS: readonly LineKind[] = ['leader-last', 'leader-first'];
+
+const FRANKY = 'OP18-021';
+const LUFFY = 'EB02-010';
 
 const other = (p: PlayerId): PlayerId => (p === 'p1' ? 'p2' : 'p1');
 
@@ -70,18 +84,65 @@ class Run {
 const costOf = (s: GameState, inst: string): number => queries.card(s, inst).cost ?? 0;
 
 /** The Characters `seat` can play now, dearest first (ties keep the engine's order). */
-function playable(r: Run): Extract<Action, { type: 'playCard' }>[] {
+function playable(
+  r: Run,
+  only: (c: Card) => boolean = () => true,
+): Extract<Action, { type: 'playCard' }>[] {
   const plays = r
     .legal((a) => a.type === 'playCard')
-    .filter(
-      (a): a is Extract<Action, { type: 'playCard' }> =>
-        a.type === 'playCard' &&
-        r.cards.get(queries.card(r.s, a.card).card)?.category === 'Character',
-    );
+    .filter((a): a is Extract<Action, { type: 'playCard' }> => {
+      if (a.type !== 'playCard') return false;
+      const c = r.cards.get(queries.card(r.s, a.card).card);
+      return c?.category === 'Character' && only(c);
+    });
   return plays
     .map((a, i) => ({ a, i, c: costOf(r.s, a.card) }))
     .sort((x, y) => y.c - x.c || x.i - y.i)
     .map((x) => x.a);
+}
+
+const isStrawHat = (c: Card): boolean => c.types.includes('Straw Hat Crew');
+
+/** Play the dearest Character that fits until none does (`only` narrows which). */
+function playAll(r: Run, only?: (c: Card) => boolean): boolean {
+  let any = false;
+  for (let i = 0; i < 10; i++) {
+    const p = playable(r, only)[0];
+    if (!p) break;
+    r.do(p);
+    r.settle();
+    any = true;
+  }
+  return any;
+}
+
+/**
+ * Use the focus Leader's [Activate: Main] and answer what it opens, as a player who knows the card
+ * would: Franky returns an idle (active) DON!! and plays a Stage from hand; Luffy returns rested
+ * DON!!, sets two active, and takes a "you may" that follows (Sanji & Pudding's). Null when the
+ * ability is not offered or does not resolve to the end (the line is then not built).
+ */
+function useLeaderAbility(r: Run, leader: string): boolean {
+  const id = queries.card(r.s, leader).card;
+  const act = r.legal((x) => x.type === 'activate' && x.card === leader)[0];
+  if (!act) return false;
+  r.do(act);
+  for (let i = 0; i < 12; i++) {
+    const dec = queries.decision(r.s);
+    if (!dec || queries.result(r.s) || dec.player !== r.seat || dec.kind === 'main') return true;
+    const picks = r.legal((x) => x.type === 'pick');
+    const want = (id === FRANKY ? 'costActive' : 'costRested') as string;
+    const next =
+      picks.find((x) => x.type === 'pick' && (x.choice as { from?: string }).from === want) ??
+      picks.find((x) => x.type === 'pick' && (x.choice as { option?: string }).option === '2') ??
+      picks.find((x) => x.type === 'pick' && (x.choice as { option?: string }).option === '1') ??
+      r.legal((x) => x.type === 'pick')[0] ??
+      r.legal((x) => x.type === 'done')[0] ??
+      plainReply(r.s, r.seat);
+    if (!next) return false;
+    r.do(next);
+  }
+  return false;
 }
 
 /** Give every active DON!! (or `n`) to `target`, one at a time. */
@@ -147,6 +208,24 @@ function pairOf(r: Run, budget: number): [string, string] | null {
   return best ? [best.x, best.y] : null;
 }
 
+/** Is the focus Leader's ability worth using now: offered, and (Franky) a Stage of cost 5 or less in hand; (Luffy) only Straw Hat Crew Characters out and at least two rested DON!! to return. */
+function leaderReady(r: Run, leader: string, lid: string): boolean {
+  if (!r.legal((x) => x.type === 'activate' && x.card === leader)[0]) return false;
+  if (lid === FRANKY)
+    return queries
+      .zone(r.s, r.seat, 'hand')
+      .some((c) => r.cards.get(c.card)?.category === 'Stage' && (c.cost ?? 99) <= 5);
+  if (lid === LUFFY) {
+    const chars = queries.zone(r.s, r.seat, 'characters');
+    return (
+      chars.length > 0 &&
+      chars.every((c) => r.cards.get(c.card)?.types.includes('Straw Hat Crew')) &&
+      queries.don(r.s, r.seat).rested >= 2
+    );
+  }
+  return false;
+}
+
 function build(kind: LineKind, start: GameState, seat: PlayerId, cards: Cards): Run | null {
   const r = new Run(start, seat, cards);
   const leader = queries.zone(start, seat, 'leader')[0]!.instance;
@@ -208,12 +287,44 @@ function build(kind: LineKind, start: GameState, seat: PlayerId, cards: Cards): 
       if (!attackLeader(r, leader)) return null;
       break;
     }
+    case 'leader-last': {
+      // Spend first, then the Leader: Franky's DON!! -1 takes an idle DON!!, Luffy's DON!! -2 takes
+      // two rested ones and sets two active, which are spent again.
+      if (!FOCUS_LEADERS.includes(queries.card(start, leader).card)) return null;
+      const lid = queries.card(start, leader).card;
+      const only = lid === LUFFY ? isStrawHat : undefined;
+      playAll(r, only);
+      if (!leaderReady(r, leader, lid)) return null;
+      if (!useLeaderAbility(r, leader)) return null;
+      playAll(r, only);
+      break;
+    }
+    case 'leader-first': {
+      // The Leader before anything else (Franky only: Luffy's needs a Character already out).
+      const lid = queries.card(start, leader).card;
+      if (lid !== FRANKY || !leaderReady(r, leader, lid)) return null;
+      if (!useLeaderAbility(r, leader)) return null;
+      playAll(r);
+      break;
+    }
     case 'hold':
       break;
   }
   endTurn(r);
   return r;
 }
+
+/** A focus Leader's menu: its own ability first (the point of the item), then the usual plans. */
+const FOCUS_KINDS: LineKind[] = [
+  'spend',
+  'leader-last',
+  'leader-first',
+  'give-attack',
+  'spend-give',
+  'hold',
+  'play-give-one',
+  'two-cheaper',
+];
 
 /** The order lines are offered when more than four are distinct. */
 const KINDS: LineKind[] = [
@@ -239,10 +350,20 @@ export function candidateLines(
   seat: PlayerId,
   cards: Cards,
   exclude: readonly LineKind[] = [],
+  /**
+   * The focus pass (M11 Track C): offer a focus Leader's own ability as a line (`leader-last`,
+   * `leader-first`). Off in the base walk, so no base item's menu changes.
+   */
+  leaderLines = false,
 ): Line[] {
   const out: Line[] = [];
   const seen = new Set<string>();
-  for (const kind of KINDS) {
+  const focus =
+    leaderLines &&
+    FOCUS_LEADERS.includes(
+      queries.card(start, queries.zone(start, seat, 'leader')[0]!.instance).card,
+    );
+  for (const kind of focus ? FOCUS_KINDS : KINDS) {
     if (exclude.includes(kind)) continue;
     const r = build(kind, start, seat, cards);
     if (!r) continue;
@@ -315,7 +436,16 @@ export function describeLine(
           parts.push(
             t.zone === 'leader' ? 'attack' : `attack ${cards.get(t.card)?.name ?? t.card}`,
           );
-        } else if (a.type === 'activate') parts.push(`use ${nameOf(a.card)}'s effect`);
+        } else if (a.type === 'activate') {
+          const c = queries.card(s, a.card);
+          const note =
+            c.card === FRANKY
+              ? ' (DON!! −1: play a Stage)'
+              : c.card === LUFFY
+                ? ' (DON!! −2: set 2 DON!! active)'
+                : '';
+          parts.push(`use ${nameOf(a.card)}'s effect${note}`);
+        }
       }
     }
     s = reduce(s, a).state;

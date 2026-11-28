@@ -22,6 +22,7 @@ import {
   scriptsVersionOf,
 } from '@optcg/engine';
 import { buildBoard, type BoardShape } from './boards.ts';
+import { FOCUS_LEADERS, FOCUS_MIN } from './positions.ts';
 import {
   classify,
   classifyActual,
@@ -102,6 +103,8 @@ export interface LethalGenOptions {
   /** At most this many items against one opponent Leader (a spread of opponents); default 6. */
   perOpponent?: number;
   nodes?: number;
+  /** The Leaders given their own pass after the walk (default `FOCUS_LEADERS`; `[]` runs the walk alone). */
+  focus?: readonly string[];
   /** One line per seed tried, for tuning. */
   log?: (line: string) => void;
 }
@@ -123,6 +126,45 @@ export function pairOf(seed: number, leaders: readonly string[]): { mine: string
 
 /** The shape tried at a seed: even seeds one attacker short, odd seeds a real attempt. */
 export const shapeOf = (seed: number): BoardShape => (seed % 2 === 0 ? 'short' : 'strike');
+
+/**
+ * The focus Leaders' own pass (M11 Track C): seeds from a range of their own with the Leader fixed in the
+ * player's seat against a seeded opponent, the same shapes and the same any-hand admission
+ * (`lethalItemOf`), until `FOCUS_PER_CLASS` lethal and as many "none" items are found or
+ * `FOCUS_SEEDS` seeds are spent. No cap on the opponent: the pass is already small.
+ */
+export const FOCUS_SEED_BASE = 1_000_000;
+export const FOCUS_SEEDS = 2_000;
+export const FOCUS_PER_CLASS = FOCUS_MIN / 2;
+
+export function lethalFocusItems(
+  leaders: readonly string[],
+  cards: ReadonlyMap<string, Card>,
+  mine: string,
+  opts: { maxSeeds?: number; nodes?: number; log?: (line: string) => void } = {},
+): LethalItem[] {
+  const slot = Math.max(FOCUS_LEADERS.indexOf(mine), 0);
+  const counts = { lethal: 0, none: 0 };
+  const items: LethalItem[] = [];
+  const mix = (x: number): number => Math.imul(x + 1, 2654435761) >>> 0;
+  for (
+    let k = 1;
+    k <= (opts.maxSeeds ?? FOCUS_SEEDS) &&
+    (counts.lethal < FOCUS_PER_CLASS || counts.none < FOCUS_PER_CLASS);
+    k++
+  ) {
+    const seed = FOCUS_SEED_BASE + slot * 100_000 + k;
+    const theirs = leaders[mix(seed) % leaders.length]!;
+    const { item, why } = lethalItemOf(seed, mine, theirs, shapeOf(seed), cards, opts.nodes);
+    opts.log?.(`seed ${seed} ${mine}/${theirs}: ${why}`);
+    if (!item) continue;
+    const key = item.answer.lethal ? 'lethal' : 'none';
+    if (counts[key] >= FOCUS_PER_CLASS) continue;
+    counts[key]++;
+    items.push(item);
+  }
+  return items;
+}
 
 export type GeneratedBank = DrillBank & {
   tried: number;
@@ -158,6 +200,26 @@ export function generateLethalBank(
         createFromScenario({ ...item.scenario, cards: (id) => cards.get(id) }).state,
       ),
     );
+  }
+  // The focus Leaders' own pass comes after the base walk, so no base item or id moves.
+  for (const mine of opts.focus ?? FOCUS_LEADERS) {
+    if (!opts.leaders.includes(mine)) continue;
+    const got = lethalFocusItems(opts.leaders, cards, mine, {
+      ...(opts.maxSeeds ? { maxSeeds: opts.maxSeeds } : {}),
+      ...(opts.nodes ? { nodes: opts.nodes } : {}),
+      ...(opts.log ? { log: opts.log } : {}),
+    });
+    for (const item of got) {
+      counts[item.answer.lethal ? 'lethal' : 'none']++;
+      items.push(item);
+      versions.push(
+        scriptsVersionOf(
+          createFromScenario({ ...item.scenario, cards: (id) => cards.get(id) }).state,
+        ),
+      );
+    }
+    if (got.length < FOCUS_MIN)
+      opts.log?.(`focus ${mine}: only ${got.length} of ${FOCUS_MIN} lethal items`);
   }
   return {
     drill: 'lethal',

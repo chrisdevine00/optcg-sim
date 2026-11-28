@@ -396,7 +396,8 @@ describe('puzzleFromFlag', () => {
 });
 
 describe('the generator', () => {
-  const opts = { leaders: LEADERS, perClass: 1, maxSeeds: 80 };
+  // `focus: []` runs the walk alone: the focus Leaders' own pass (M11 Track C) adds items of its own.
+  const opts = { leaders: LEADERS, perClass: 1, maxSeeds: 80, focus: [] };
 
   it('(e) is deterministic: two runs write the same bytes', () => {
     const a = generateLethalBank(cards, opts);

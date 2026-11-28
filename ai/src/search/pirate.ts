@@ -1142,7 +1142,7 @@ function mulligan(view: PlayerView, setup: PirateSetup): PirateDecision {
   const pb = setup.playbook;
   const hand = view.zones[view.player].hand.map((c) => setup.cards.get(c.card ?? ''));
   const first = view.turn.activePlayer === view.player;
-  const keep = pb ? mulliganVerdict(hand, pb.mulligan, first).keep : true;
+  const keep = pb ? mulliganVerdict(hand, pb.mulligan, first, pb.leaderId).keep : true;
   const action = view.actions.find((a) => a.type === 'mulligan' && a.redraw === !keep)!;
   const m = pb?.mulligan;
   // The guide's rule, one line for what it keeps and one for the seat allowance (copy: <= 30 words).

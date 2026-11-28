@@ -17,9 +17,15 @@ import { project, type GameState } from '@optcg/engine';
 import { donLedger, explainHeld, explainUnused, type DonLedger } from '../../coach/tempo.ts';
 import type { Explanation } from '../../explanation.ts';
 import { withHandPremise } from './hand-premise.ts';
-import { candidateLines, type Line, type LineKind } from './lines.ts';
+import { LEADER_KINDS, candidateLines, type Line, type LineKind } from './lines.ts';
 import { applyAll, startOf } from './play.ts';
-import { DRILL_SCRIPTS_VERSION, mainPosition, type ListSet } from './positions.ts';
+import {
+  DRILL_SCRIPTS_VERSION,
+  FOCUS_LEADERS,
+  FOCUS_MIN,
+  mainPosition,
+  type ListSet,
+} from './positions.ts';
 import type { DonItem, DrillBank } from './types.ts';
 
 export const DON_LESSON = 'L09-don-efficiency';
@@ -51,13 +57,15 @@ export function donItemAt(
   mine: ListSet,
   theirs: ListSet,
   cards: Cards,
+  /** The focus pass: a position built around the Leader's own ability (`mainPosition`). */
+  focus = false,
 ): DonItem | null {
   // E07's lesson is that a held DON!! is not an idle one: giving every DON!! away is not offered then.
   const exclude: LineKind[] = mine.leaderId === HOLD_LEADER ? ['give-attack', 'spend-give'] : [];
-  const scenario = mainPosition(seed, mine, theirs, cards);
+  const scenario = mainPosition(seed, mine, theirs, cards, focus);
   if (!scenario) return null;
   const start = startOf(scenario, cards);
-  const scored = scoreLines(candidateLines(start, 'p1', cards, exclude));
+  const scored = scoreLines(candidateLines(start, 'p1', cards, exclude, focus));
   if (!scored) return null;
   return {
     id: `don-${seed}`,
@@ -83,6 +91,8 @@ export interface DonBankOptions {
   want?: { ordinary: number; hold: number };
   maxSeed?: number;
   onItem?: (item: DonItem) => void;
+  /** Add the focus Leaders' own pass after the walk (default true; the walk's items never move). */
+  focus?: boolean;
 }
 
 /**
@@ -119,6 +129,65 @@ export function donBank(
     if (giveOnly) giveBest++;
     if (item.hold) hold++;
     else ordinary++;
+    items.push(item);
+    opts.onItem?.(item);
+  }
+  if (opts.focus !== false)
+    for (const leader of FOCUS_LEADERS)
+      items.push(
+        ...donFocusItems(sets, cards, leader, {
+          ...(opts.maxSeed ? { maxSeeds: opts.maxSeed } : {}),
+          ...(opts.onItem ? { onItem: opts.onItem } : {}),
+        }),
+      );
+  return items;
+}
+
+/**
+ * The focus Leaders' own pass (M11 Track C): seeds from a range of their own, positions built around
+ * the Leader's ability (`mainPosition` with `focus`), every item offering the Leader's line and
+ * admitted by the same rule as the base walk (`scoreLines`). `FOCUS_LEADER_BEST` of the items are ones
+ * where using the Leader is a best line (the right answer is the Leader's own ability); the rest are
+ * ones where it is on the menu and is not best (the wrong answer is the tempting one).
+ */
+export const DON_FOCUS_SEED_BASE = 1_000_000;
+export const DON_FOCUS_SEEDS = 4_000;
+export const FOCUS_LEADER_BEST = 4;
+
+/** A Leader line is a best line and the plain "play what you can" line is not: the Leader's ability is what saves the DON!!. */
+export const usesLeader = (item: DonItem): boolean =>
+  item.best.some((id) => isLeaderLine(id)) && !item.best.includes('spend');
+const isLeaderLine = (id: string): boolean => (LEADER_KINDS as readonly string[]).includes(id);
+export const offersLeader = (item: DonItem): boolean => item.lines.some((l) => isLeaderLine(l.id));
+
+export function donFocusItems(
+  sets: readonly ListSet[],
+  cards: Cards,
+  leaderId: string,
+  opts: { maxSeeds?: number; onItem?: (item: DonItem) => void } = {},
+): DonItem[] {
+  const mine = sets.find((s) => s.leaderId === leaderId);
+  if (!mine) return [];
+  const slot = Math.max(FOCUS_LEADERS.indexOf(leaderId), 0);
+  const items: DonItem[] = [];
+  let best = 0;
+  let other = 0;
+  const mix = (x: number): number => Math.imul(x + 1, 2654435761) >>> 0;
+  for (
+    let k = 1;
+    k <= (opts.maxSeeds ?? DON_FOCUS_SEEDS) &&
+    (best < FOCUS_LEADER_BEST || other < FOCUS_MIN - FOCUS_LEADER_BEST);
+    k++
+  ) {
+    const seed = DON_FOCUS_SEED_BASE + slot * 100_000 + k;
+    const item = donItemAt(seed, mine, sets[mix(seed) % sets.length]!, cards, true);
+    if (!item || !offersLeader(item) || item.hold) continue;
+    // A tie with the plain line teaches neither way: the Leader line is either the saving line or the wrong one.
+    if (!usesLeader(item) && item.best.some((id) => isLeaderLine(id))) continue;
+    const isBest = usesLeader(item);
+    if (isBest ? best >= FOCUS_LEADER_BEST : other >= FOCUS_MIN - FOCUS_LEADER_BEST) continue;
+    if (isBest) best++;
+    else other++;
     items.push(item);
     opts.onItem?.(item);
   }
@@ -176,7 +245,22 @@ export function explainDon(
   return withHandPremise(explainDonRaw(item, cards, lineId), item);
 }
 
+const LEADER_NOTE: Record<string, string> = {
+  'OP18-021':
+    "Your Leader's DON!! −1 returns one DON!! to your DON!! deck and plays a Stage of cost 5 or less from your hand without paying its cost.",
+  'EB02-010':
+    "Your Leader's DON!! −2 returns two DON!! to your DON!! deck, then sets up to 2 of your DON!! active, so they can be spent again; it needs every Character you control to be Straw Hat Crew.",
+};
+
 function explainDonRaw(item: DonItem, cards: Cards, lineId: string): Explanation {
+  const ex = explainDonLine(item, cards, lineId);
+  const note = LEADER_NOTE[item.mine];
+  const line = item.lines.find((l) => l.id === lineId);
+  if (!note || !line || !(LEADER_KINDS as readonly string[]).includes(line.id)) return ex;
+  return { ...ex, evidence: [{ text: note, figures: {} }, ...ex.evidence] };
+}
+
+function explainDonLine(item: DonItem, cards: Cards, lineId: string): Explanation {
   const { end, ledger } = replayLine(item, lineId, cards);
   const view = project(end, 'p1');
   if (ledger.unused > 0) {
@@ -213,11 +297,22 @@ export function generateDonBank(
   const items = donBank(metaListSets(), cards, {
     ...(opts.maxSeeds ? { maxSeed: opts.maxSeeds } : {}),
     onItem: (i) => {
-      const k = i.hold ? 'hold' : 'ordinary';
+      const k =
+        i.source.kind === 'bank' && i.source.seed >= DON_FOCUS_SEED_BASE
+          ? usesLeader(i)
+            ? 'focus leader-best'
+            : 'focus leader-offered'
+          : i.hold
+            ? 'hold'
+            : 'ordinary';
       counts[k] = (counts[k] ?? 0) + 1;
       opts.log?.(`${i.id}: ${k}`);
     },
   });
+  for (const leader of FOCUS_LEADERS) {
+    const n = items.filter((i) => i.mine === leader).length;
+    if (n < FOCUS_MIN) opts.log?.(`focus ${leader}: only ${n} of ${FOCUS_MIN} DON!! items`);
+  }
   return {
     drill: 'don',
     builtWith: { engine: ENGINE_VERSION, scripts: DRILL_SCRIPTS_VERSION },

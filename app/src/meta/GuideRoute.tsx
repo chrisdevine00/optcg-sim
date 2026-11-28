@@ -249,6 +249,9 @@ export default function GuideRoute({ path }: { path: string }) {
         <Link className="btn" to={play('p2', deck)}>
           Play against this deck
         </Link>
+        <Link className="btn" to={`/drills?leader=${guide.leaderId}`}>
+          Practise with {shortName(guide.leaderId)}
+        </Link>
       </div>
       <nav aria-label="On this page" className="meta-toc">
         <ul>

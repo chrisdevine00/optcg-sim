@@ -39,7 +39,13 @@ import {
 } from '../review/should-counter.ts';
 import { withHandPremise } from './hand-premise.ts';
 import { applyAll, plainReply, startOf } from './play.ts';
-import { DRILL_SCRIPTS_VERSION, defencePosition, type ListSet } from './positions.ts';
+import {
+  DRILL_SCRIPTS_VERSION,
+  FOCUS_LEADERS,
+  FOCUS_MIN,
+  defencePosition,
+  type ListSet,
+} from './positions.ts';
 import type { CounterItem, DrillBank, ScenarioJson } from './types.ts';
 
 /** Search budget of every classification: nodes, never milliseconds (deterministic). */
@@ -290,6 +296,8 @@ export interface CounterBankOptions {
   maxSeed?: number;
   /** Called with each admitted item. */
   onItem?: (item: CounterItem) => void;
+  /** Add the focus Leaders' own pass after the walk (default true; the walk's items never move). */
+  focus?: boolean;
 }
 
 const WANT: Record<CounterItem['detector'], number> = {
@@ -328,9 +336,11 @@ export function counterItemAt(
   sets: readonly ListSet[],
   cards: Cards,
   wanted?: ReadonlySet<CounterItem['detector']>,
+  /** The focus pass fixes the player's Leader; the base walk takes the seed's own pair. */
+  pair?: { mine: ListSet; theirs: ListSet },
 ): CounterItem | null {
-  const [mine, theirs] = pairOf(seed, sets);
-  const base = defencePosition(seed, mine, theirs, cards);
+  const [mine, theirs] = pair ? [pair.mine, pair.theirs] : pairOf(seed, sets);
+  const base = defencePosition(seed, mine, theirs, cards, !!pair);
   if (!base) return null;
   // Positions at one or two Life are pressed to the edge; at three or more the hand is left whole.
   const scenario = (base.p1.life?.length ?? 0) <= 2 ? tightened(base, cards) : base;
@@ -375,6 +385,65 @@ export function counterBank(
     new Set((Object.keys(want) as CounterItem['detector'][]).filter((k) => have[k] < want[k]));
   for (let seed = 1; seed <= (opts.maxSeed ?? 20_000) && open().size > 0; seed++) {
     const item = counterItemAt(seed, sets, cards, open());
+    if (!item) continue;
+    have[item.detector]++;
+    items.push(item);
+    opts.onItem?.(item);
+  }
+  if (opts.focus !== false)
+    for (const leader of FOCUS_LEADERS)
+      items.push(
+        ...counterFocusItems(sets, cards, leader, {
+          ...(opts.maxSeed ? { maxSeeds: opts.maxSeed } : {}),
+          ...(opts.onItem ? { onItem: opts.onItem } : {}),
+        }),
+      );
+  return items;
+}
+
+/**
+ * The focus Leaders' own pass (M11 Track C): for each focus Leader in the player's seat, seeds from a
+ * range of its own (`FOCUS_SEED_BASE`, so no base item id can collide) against a seeded opponent, the
+ * same classification and the same any-hand admission, until `FOCUS_WANT` items are found or
+ * `FOCUS_SEEDS` seeds are spent. Items of a class that is already full for the Leader are skipped so
+ * the set is a mix, not six of one class.
+ */
+export const FOCUS_SEED_BASE = 1_000_000;
+export const FOCUS_SEEDS = 1_500;
+
+/** An item of the focus pass (its seed is in the pass's own range). */
+export const isFocusItem = (i: { source: { kind: string; seed?: number } }): boolean =>
+  i.source.kind === 'bank' && (i.source.seed ?? 0) >= FOCUS_SEED_BASE;
+export const FOCUS_WANT: Record<CounterItem['detector'], number> = {
+  'should-counter': 4,
+  'counter-wasted-a': 2,
+  'counter-wasted-b': 2,
+};
+
+export function counterFocusItems(
+  sets: readonly ListSet[],
+  cards: Cards,
+  leaderId: string,
+  opts: { maxSeeds?: number; onItem?: (item: CounterItem) => void } = {},
+): CounterItem[] {
+  const mine = sets.find((s) => s.leaderId === leaderId);
+  if (!mine) return [];
+  const slot = FOCUS_LEADERS.indexOf(leaderId);
+  const have: Record<CounterItem['detector'], number> = {
+    'should-counter': 0,
+    'counter-wasted-a': 0,
+    'counter-wasted-b': 0,
+  };
+  const items: CounterItem[] = [];
+  const open = (): Set<CounterItem['detector']> =>
+    new Set(
+      (Object.keys(FOCUS_WANT) as CounterItem['detector'][]).filter((k) => have[k] < FOCUS_WANT[k]),
+    );
+  const mix = (x: number): number => Math.imul(x + 1, 2654435761) >>> 0;
+  for (let k = 1; k <= (opts.maxSeeds ?? FOCUS_SEEDS) && open().size > 0; k++) {
+    const seed = FOCUS_SEED_BASE + Math.max(slot, 0) * 100_000 + k;
+    const theirs = sets[mix(seed * 31 + 7) % sets.length]!;
+    const item = counterItemAt(seed, sets, cards, open(), { mine, theirs });
     if (!item) continue;
     have[item.detector]++;
     items.push(item);
@@ -470,11 +539,15 @@ export function generateCounterBank(
   const items = counterBank(metaListSets(), cards, {
     ...(opts.maxSeeds ? { maxSeed: opts.maxSeeds } : {}),
     onItem: (i) => {
-      const k = i.detector;
+      const k = `${isFocusItem(i) ? 'focus ' : ''}${i.detector}`;
       counts[k] = (counts[k] ?? 0) + 1;
       opts.log?.(`${i.id}: ${k}`);
     },
   });
+  for (const leader of FOCUS_LEADERS) {
+    const n = items.filter((i) => i.mine === leader).length;
+    if (n < FOCUS_MIN) opts.log?.(`focus ${leader}: only ${n} of ${FOCUS_MIN} counter items`);
+  }
   return {
     drill: 'counter',
     builtWith: { engine: ENGINE_VERSION, scripts: DRILL_SCRIPTS_VERSION },

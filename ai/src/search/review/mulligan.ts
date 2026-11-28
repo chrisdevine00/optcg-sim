@@ -81,11 +81,11 @@ export interface ExplainMulliganArgs {
  */
 export function explainMulligan(args: ExplainMulliganArgs): Explanation {
   const { hand, ownDeck, pb, first, cards } = args;
-  const verdict = mulliganVerdict(hand, pb.mulligan, first);
+  const verdict = mulliganVerdict(hand, pb.mulligan, first, pb.leaderId);
 
   const guide = guideName(pb);
   const counters = hand
-    .map((c) => ({ c, v: counterValueOf(c) }))
+    .map((c) => ({ c, v: counterValueOf(c, pb.leaderId) }))
     .filter((x) => x.v > 0)
     .sort((x, y) => y.v - x.v);
   const counterTotal = counters.reduce((t, x) => t + x.v, 0);
@@ -213,7 +213,7 @@ export const detect: Detector = (item, ctx): TurnResult | null => {
   const pb = playbookFor(leader, ownDeck, cards);
   if (!isSourced(pb)) return null;
   const first = queries.turn(s).activePlayer === me;
-  const verdict = mulliganVerdict(hand, pb.mulligan, first);
+  const verdict = mulliganVerdict(hand, pb.mulligan, first, pb.leaderId);
   if (verdict.keep === !action.redraw) return null;
   const explanation = explainMulligan({ hand, ownDeck, pb, first, cards });
   const turn = Math.max(1, queries.turn(s).number);

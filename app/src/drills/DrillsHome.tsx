@@ -3,7 +3,9 @@
  * start screen; the lesson link says how it is passed.
  */
 import { useEffect } from 'react';
-import { Link } from '../router.tsx';
+import { ARCHETYPES } from '../play/setup/decks.ts';
+import { displayName } from '../meta/model.ts';
+import { Link, useSearch } from '../router.tsx';
 import { DRILL_LESSON, DRILL_NAMES, DRILL_SLUGS, type DrillId } from './types.ts';
 import { EXIT } from './session.ts';
 import { lessonName } from '../play/coach/ExplanationView.tsx';
@@ -17,6 +19,10 @@ const ASKS: Record<DrillId, string> = {
 };
 
 export default function DrillsHome({ path }: { path: string }) {
+  // `?leader=OP18-021`: the drills for one Leader (the Meta guide's "Practise with ..." link).
+  const leader = new URLSearchParams(useSearch()).get('leader');
+  const mine = leader ? ARCHETYPES.find((a) => a.leaderId === leader) : undefined;
+  const query = mine ? `?leader=${mine.leaderId}` : '';
   useEffect(() => {
     document.title = 'Drills · OPTCG Sim';
     document.getElementById('page-title')?.focus();
@@ -29,11 +35,17 @@ export default function DrillsHome({ path }: { path: string }) {
       <p className="lede">
         Four short drills, each tied to a lesson. Nothing is timed unless you switch a timer on.
       </p>
+      {mine && (
+        <p className="subtle" data-testid="drills-leader">
+          Practising with {displayName(mine.leaderId)}: each drill starts on items where it is your
+          Leader. <Link to="/drills">Show every deck</Link>
+        </p>
+      )}
       <ul className="drill-list">
         {DRILL_SLUGS.map((d) => (
           <li key={d} className="drill-tile">
             <h2>
-              <Link to={`/drills/${d}`}>{DRILL_NAMES[d]}</Link>
+              <Link to={`/drills/${d}${query}`}>{DRILL_NAMES[d]}</Link>
             </h2>
             <p>{ASKS[d]}</p>
             <p className="subtle">

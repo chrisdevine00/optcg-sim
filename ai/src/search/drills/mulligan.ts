@@ -21,13 +21,20 @@ import {
   isOurReasoning,
   isSourced,
 } from '../review/mulligan.ts';
-import { DRILL_SCRIPTS_VERSION, type ListSet } from './positions.ts';
+import { DRILL_SCRIPTS_VERSION, FOCUS_LEADERS, FOCUS_MIN, type ListSet } from './positions.ts';
 import type { DrillBank, MulliganItem } from './types.ts';
 
 export const MULLIGAN_LESSON = 'L12-mulligan';
 
 /** Seeded hands tried per guide and seat before it keeps the one class it has. */
 export const MULLIGAN_SEED_CAP = 400;
+
+/**
+ * Focus Leaders' extra pass (M11 Track C): per seat and class, up to this many hands in all (the
+ * first is the base item above), found in the next `FOCUS_SEED_CAP` seeds of the same walk.
+ */
+export const FOCUS_PER_CLASS = 3;
+export const FOCUS_SEED_CAP = 2_000;
 
 type Cards = ReadonlyMap<string, Card>;
 
@@ -68,7 +75,7 @@ export function verdictOf(
 ): MulliganVerdict {
   const deck = deckOf(item, lists);
   const pb = playbookFor(item.mine, deck, cards);
-  return mulliganVerdict(handCards(item.hand, cards), pb.mulligan, item.first);
+  return mulliganVerdict(handCards(item.hand, cards), pb.mulligan, item.first, item.mine);
 }
 
 /** The list the item's hand was drawn from. */
@@ -84,8 +91,13 @@ export function deckOf(item: MulliganItem, lists: readonly ListSet[]): readonly 
  * exist (at most `MULLIGAN_SEED_CAP` hands; a guide missing a class keeps the one it has). Pure and
  * deterministic in `sets` and the card data; run at call time, nothing committed.
  */
-export function mulliganBank(sets: readonly ListSet[], cards: Cards): MulliganItem[] {
+export function mulliganBank(
+  sets: readonly ListSet[],
+  cards: Cards,
+  focus: readonly string[] = FOCUS_LEADERS,
+): MulliganItem[] {
   const items: MulliganItem[] = [];
+  const extra: MulliganItem[] = [];
   sets.forEach((set, g) => {
     const pb = playbookFor(set.leaderId, set.lists[0], cards);
     if (!(isSourced(pb) || isOurReasoning(pb)) || set.lists.length === 0) return;
@@ -94,7 +106,7 @@ export function mulliganBank(sets: readonly ListSet[], cards: Cards): MulliganIt
       for (let k = 0; k < MULLIGAN_SEED_CAP && !(found.keep && found.redraw); k++) {
         const seed = seedOf(g, first, k);
         const hand = handOf(set.lists, seed);
-        const keep = mulliganVerdict(handCards(hand, cards), pb.mulligan, first).keep;
+        const keep = mulliganVerdict(handCards(hand, cards), pb.mulligan, first, set.leaderId).keep;
         const cls = keep ? 'keep' : 'redraw';
         if (found[cls]) continue;
         found[cls] = {
@@ -113,9 +125,48 @@ export function mulliganBank(sets: readonly ListSet[], cards: Cards): MulliganIt
         };
       }
       for (const cls of ['keep', 'redraw'] as const) if (found[cls]) items.push(found[cls]!);
+      if (!focus.includes(set.leaderId)) continue;
+      // A focus Leader's own pass: more distinct hands of each class, after the base walk, so no
+      // base item or its id moves (the extras come last and carry a number: `-1st-2-keep`).
+      const seen = new Set<string>(
+        (['keep', 'redraw'] as const).flatMap((c) =>
+          found[c] ? [[...found[c]!.hand].sort().join()] : [],
+        ),
+      );
+      const have = { keep: found.keep ? 1 : 0, redraw: found.redraw ? 1 : 0 };
+      for (
+        let k = MULLIGAN_SEED_CAP;
+        k < MULLIGAN_SEED_CAP + FOCUS_SEED_CAP &&
+        (have.keep < FOCUS_PER_CLASS || have.redraw < FOCUS_PER_CLASS);
+        k++
+      ) {
+        const seed = seedOf(g, first, k);
+        const hand = handOf(set.lists, seed);
+        const cls = mulliganVerdict(handCards(hand, cards), pb.mulligan, first, set.leaderId).keep
+          ? 'keep'
+          : 'redraw';
+        const key = [...hand].sort().join();
+        if (have[cls] >= FOCUS_PER_CLASS || seen.has(key)) continue;
+        seen.add(key);
+        have[cls]++;
+        extra.push({
+          id: `mulligan-${set.archetypeId}-${first ? '1st' : '2nd'}-${have[cls]}-${cls}`,
+          drill: 'mulligan',
+          lesson: MULLIGAN_LESSON,
+          source: { kind: 'bank', seed },
+          mine: set.leaderId,
+          theirs: null,
+          first,
+          certainty: 'any-hand',
+          label: 'guide',
+          hand,
+          archetypeId: set.archetypeId,
+          deck: [...set.lists[seed % set.lists.length]!],
+        });
+      }
     }
   });
-  return items;
+  return [...items, ...extra];
 }
 
 /** The generator `scripts/drill-bank.ts` registers: the bank on the pinned lists, committed like the others. */
@@ -125,6 +176,10 @@ export function generateMulliganBank(
 ): DrillBank & { counts: Record<string, number> } {
   const counts: Record<string, number> = {};
   const items = mulliganBank(metaListSets(), cards);
+  for (const l of FOCUS_LEADERS) {
+    const n = items.filter((i) => i.mine === l).length;
+    if (n < FOCUS_MIN) opts.log?.(`focus ${l}: only ${n} of ${FOCUS_MIN} mulligan items`);
+  }
   for (const i of items) {
     const k = i.id.endsWith('-keep') ? 'keep' : 'redraw';
     counts[k] = (counts[k] ?? 0) + 1;

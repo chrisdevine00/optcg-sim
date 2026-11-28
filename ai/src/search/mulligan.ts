@@ -28,6 +28,8 @@ export function mulliganVerdict(
   hand: readonly (Card | undefined)[],
   rule: MulliganRule,
   first: boolean,
+  /** The hand owner's Leader: a Leader that gives cards in hand a Counter (OP18-021's Stages) makes them defence (M11C-R2). */
+  leaderId?: string,
 ): MulliganVerdict {
   const left = hand.filter((c): c is Card => !!c);
   const met: Record<string, boolean> = {};
@@ -37,7 +39,7 @@ export function mulliganVerdict(
     fills[piece.name] = [];
     for (let i = 0; i < left.length && n < piece.min;) {
       const c = left[i]!;
-      const fits = piece.cards ? piece.cards.includes(c.id) : counterValueOf(c) > 0;
+      const fits = piece.cards ? piece.cards.includes(c.id) : counterValueOf(c, leaderId) > 0;
       if (fits) {
         fills[piece.name]!.push(c);
         left.splice(i, 1);

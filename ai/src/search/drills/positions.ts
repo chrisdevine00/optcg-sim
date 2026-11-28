@@ -21,7 +21,17 @@ import type { ScenarioJson } from './types.ts';
  * The version of the WP3 generators (positions, classes, lines). Bump it when any of them changes what
  * a seed builds; the committed banks record it in `builtWith.scripts` and a test compares.
  */
-export const DRILL_SCRIPTS_VERSION = 'wp3-1';
+export const DRILL_SCRIPTS_VERSION = 'wp3-2';
+
+/**
+ * The Leaders the owner practises (M11 Track C): every generator gives each of them its own
+ * deterministic pass, so a bank holds at least `FOCUS_MIN` items with the Leader in the player's seat
+ * however the seeded walk over all fourteen pairs happens to fall. The number is a target, not a rule:
+ * a generator that cannot reach it with items that pass its own admission rule says so in its log and
+ * the bank holds what it found (the tests then name the shortfall; nothing is relaxed to reach it).
+ */
+export const FOCUS_LEADERS: readonly string[] = ['OP18-021', 'EB02-010'];
+export const FOCUS_MIN = 6;
 
 /** A vanilla Character (Mocha, OP01-081): no effect and no [Trigger], so face-down Life that holds it is inert. */
 export const INERT_LIFE = 'OP01-081';
@@ -96,6 +106,8 @@ export function defencePosition(
   mine: ListSet,
   theirs: ListSet,
   cards: Cards,
+  /** A focus pass counts the Counter a Leader gives a card in hand (OP18-021's Stages) when it biases the hand. */
+  leaderGrants = false,
 ): ScenarioJson | null {
   const s = new Stream(seed);
   const ownList = s.pick(mine.lists);
@@ -130,7 +142,8 @@ export function defencePosition(
   }
 
   // The defender: a hand from its own list and no Blocker.
-  const counterCard = (id: string) => counterValueOf(cards.get(id)) > 0;
+  const counterCard = (id: string) =>
+    counterValueOf(cards.get(id), leaderGrants ? mine.leaderId : undefined) > 0;
   const handSize = pressure ? 4 + s.int(2) : 2 + s.int(3);
   const hand = draw(s, ownList, handSize, counterCard);
   const board = draw(
@@ -178,6 +191,12 @@ export function mainPosition(
   mine: ListSet,
   theirs: ListSet,
   cards: Cards,
+  /**
+   * A focus pass (M11 Track C) builds the position around the Leader's own ability: a Stage of cost 5
+   * or less in the hand for OP18-021, a board of Straw Hat Crew Characters only for EB02-010. It
+   * changes what the seed draws, so the base walk never sets it and its items stay as they were.
+   */
+  focus = false,
 ): ScenarioJson | null {
   const s = new Stream(seed);
   const ownList = s.pick(mine.lists);
@@ -189,15 +208,34 @@ export function mainPosition(
     const c = cards.get(id);
     return c?.category === 'Character' && (c.cost ?? 99) <= don && (c.cost ?? 0) >= 1;
   };
-  const hand = draw(s, ownList, 5 + s.int(2), affordable);
+  const luffy = focus && mine.leaderId === 'EB02-010';
+  const franky = focus && mine.leaderId === 'OP18-021';
+  const shc = (id: string) => cards.get(id)?.types.includes('Straw Hat Crew') ?? false;
+  const stage = (id: string) => {
+    const c = cards.get(id);
+    return c?.category === 'Stage' && (c.cost ?? 99) <= 5;
+  };
+  // Luffy's hand is Straw Hat Crew Characters (anything else played first would end his condition).
+  const hand = draw(
+    s,
+    luffy ? ownList.filter(shc) : ownList,
+    5 + s.int(2),
+    franky ? (id) => stage(id) || affordable(id) : affordable,
+  );
   if (!hand.some(affordable)) return null;
+  if (franky && !hand.some(stage)) return null;
   const board = draw(
     s,
     distinct(ownList).filter((id) => {
       const c = cards.get(id);
-      return c?.category === 'Character' && c.power !== null && (c.cost ?? 99) <= 5;
+      return (
+        c?.category === 'Character' &&
+        c.power !== null &&
+        (c.cost ?? 99) <= 5 &&
+        (!luffy || shc(id))
+      );
     }),
-    s.int(3),
+    luffy ? 1 + s.int(2) : s.int(3),
   );
   const foes = draw(
     s,

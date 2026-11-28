@@ -6,6 +6,7 @@
 import { useEffect, useState } from 'react';
 import { ARCHETYPES } from '../play/setup/decks.ts';
 import { lessonName } from '../play/coach/ExplanationView.tsx';
+import { displayName } from '../meta/model.ts';
 import { Link, navigate, useSearch } from '../router.tsx';
 import { drillOfPath, queryOf } from './DrillRun.tsx';
 import { EXIT } from './session.ts';
@@ -78,7 +79,7 @@ export default function DrillStart({ path }: { path: string }) {
             <option value="">Any</option>
             {ARCHETYPES.map((a) => (
               <option key={a.id} value={a.id}>
-                {a.name}
+                {displayName(a.leaderId)}
               </option>
             ))}
           </select>

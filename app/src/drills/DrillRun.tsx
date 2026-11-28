@@ -46,8 +46,12 @@ export function queryOf(search: string): DrillQuery & { sid?: string } {
   const count = num('count');
   const seat = p.get('seat');
   const source = p.get('source');
+  // `?leader=OP18-021` (M11 Track C: "Practise with Franky") is the player's own Leader: every item of
+  // every drill names it in `mine`, so it is the archetype of that Leader. An explicit `archetype` wins.
+  const leader = p.get('leader');
+  const archetype = p.get('archetype') ?? (leader ? archetypeIdOf(leader) : null);
   return {
-    ...(p.get('archetype') ? { archetype: p.get('archetype')! } : {}),
+    ...(archetype ? { archetype } : {}),
     ...(seat === 'first' || seat === 'second' ? { seat } : {}),
     ...(source === 'mine' || source === 'bank' ? { source } : {}),
     ...((SESSION_COUNTS as readonly number[]).includes(count ?? -1) ? { count: count! } : {}),
