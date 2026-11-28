@@ -811,7 +811,7 @@ function mainContent(g: G, rewind: NonNullable<Foot['secondary']>): Content {
                 onClick={() => confirmWaste(g, ui.handle, play, () => g.act(play))}
               >
                 <span>
-                  ▶ Play · rest {c?.card?.cost ?? 0} DON!! <kbd>P</kbd>
+                  ▶ Play · rest {c?.playCost ?? c?.card?.cost ?? 0} DON!! <kbd>P</kbd>
                 </span>
                 {unpayable(g, ui.handle, play) && (
                   <span className="sub warnline" data-testid="unpayable">
@@ -1018,6 +1018,7 @@ function simCard(
 ): {
   card: undefined;
   counter: number | null;
+  playCost: number | null;
   power: number | null;
   owner: PlayerId;
   zone: string;
@@ -1025,7 +1026,15 @@ function simCard(
   for (const p of ['p1', 'p2'] as PlayerId[])
     for (const [zone, cards] of Object.entries(sim.view.zones[p])) {
       const c = cards.find((x) => x.handle === handle);
-      if (c) return { card: undefined, counter: c.counter ?? null, power: c.power, owner: p, zone };
+      if (c)
+        return {
+          card: undefined,
+          counter: c.counter ?? null,
+          playCost: c.playCost ?? c.cost,
+          power: c.power,
+          owner: p,
+          zone,
+        };
     }
   return null;
 }

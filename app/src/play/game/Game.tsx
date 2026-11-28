@@ -195,6 +195,8 @@ export function Game({
       card,
       // The engine's current Counter (effects give one, e.g. OP18-021's Stages), else the printed one.
       counter: x.view.counter ?? card?.counter ?? null,
+      // What playing it from hand costs now: the engine's play cost (OP18-097's discount), else its cost.
+      playCost: x.view.playCost ?? x.view.cost ?? card?.cost ?? null,
       power: x.view.power,
       owner: x.owner,
       zone: x.zone,
@@ -1633,7 +1635,7 @@ function ActionMenu({
   if (g.mine && g.legal.kind === 'main') {
     if (play)
       items.push({
-        label: `▶ Play · rest ${c?.card?.cost ?? 0} DON!!${unpayable(g, handle, play) ? ` · ${UNPAYABLE_NOTE}` : ''}`,
+        label: `▶ Play · rest ${c?.playCost ?? c?.card?.cost ?? 0} DON!!${unpayable(g, handle, play) ? ` · ${UNPAYABLE_NOTE}` : ''}`,
         key: 'P',
         run: () => confirmWaste(g, handle, play, () => g.act(play)),
       });

@@ -49,6 +49,8 @@ export interface G {
     card: Card | undefined;
     /** The engine's current Counter, else the printed one. */
     counter: number | null;
+    /** What playing it from hand costs now (the engine's play cost), else its cost. */
+    playCost: number | null;
     power: number | null;
     owner: PlayerId;
     zone: string;

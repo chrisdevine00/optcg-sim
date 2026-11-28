@@ -13,7 +13,7 @@ import type {
   ZoneName,
 } from './api.ts';
 import { derive } from './derive.ts';
-import { counterOf } from './effects/eval.ts';
+import { counterOf, playCostOf } from './effects/eval.ts';
 import type { State } from './state.ts';
 
 const st = (g: GameState): State => g as unknown as State;
@@ -74,15 +74,24 @@ export function cardView(s: State, id: InstanceId): CardView {
   };
 }
 
-/** M4a additions to a card's view: Counter value and effect flags. */
+/**
+ * M4a additions to a card's view: Counter value and effect flags. `playCost` (OP-18, review R9): what
+ * playing this hand card costs its owner now, present only when it differs from `cost` (a permanent
+ * reduction such as OP18-097's, or a pending one-shot discount).
+ */
 export function extras(
   s: State,
   id: InstanceId,
-): { counter: number | null; cannotAttack?: true; negated?: true } {
+): { counter: number | null; playCost?: number; cannotAttack?: true; negated?: true } {
   const dv = derive(s, id);
-  const out: { counter: number | null; cannotAttack?: true; negated?: true } = {
+  const out: { counter: number | null; playCost?: number; cannotAttack?: true; negated?: true } = {
     counter: counterOf(s, id),
   };
+  const c = s.cards[id];
+  if (c && c.zone === 'hand' && dv.cost !== null) {
+    const play = playCostOf(s, c.owner, id).cost;
+    if (play !== dv.cost) out.playCost = play;
+  }
   if (dv.cannotAttack) out.cannotAttack = true;
   if (dv.negated) out.negated = true;
   return out;

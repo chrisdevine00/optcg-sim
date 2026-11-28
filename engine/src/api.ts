@@ -190,6 +190,11 @@ export interface CardView {
   keywords: string[];
   /** Added in M4a. Current Counter value (hand cards include permanent grants, CR 2-10-4). */
   counter?: number | null;
+  /**
+   * What playing this hand card from hand costs its owner now, present only when it differs from
+   * `cost`: a permanent reduction (OP18-097) or a pending one-shot discount (`playCostOf`).
+   */
+  playCost?: number;
   /** Added in M4a. Set while an effect says it cannot attack. */
   cannotAttack?: boolean;
   /** Added in M4a. Set while its effects are negated (CR 8-2). */
@@ -282,6 +287,8 @@ export interface ViewCard {
   keywords: string[];
   /** Added in M4a: see `CardView`. Present only for cards the viewer can see. */
   counter?: number | null;
+  /** What playing this hand card costs now, when it differs from `cost` (see `CardView.playCost`). */
+  playCost?: number;
   cannotAttack?: boolean;
   negated?: boolean;
 }
